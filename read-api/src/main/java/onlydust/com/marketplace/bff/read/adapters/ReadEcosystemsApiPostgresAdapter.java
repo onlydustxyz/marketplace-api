@@ -21,8 +21,7 @@ import java.util.List;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -96,7 +95,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     @Override
     public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Integer pageIndex, Integer pageSize) {
         final var page = featured ?
-                ecosystemReadRepository.findAllFeatured(PageRequest.of(pageIndex, pageSize, Sort.by("featured"))) :
+                ecosystemReadRepository.findAllFeatured(PageRequest.of(pageIndex, pageSize, Sort.by("featuredRank"))) :
                 ecosystemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
 
         final var response = new EcosystemPageV2()
