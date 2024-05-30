@@ -76,7 +76,9 @@ public class CommitteeService implements CommitteeFacadePort {
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
         if (status == Committee.Status.CLOSED) {
             final var juryAssignments = committeeStoragePort.findJuryAssignments(committeeId);
-            if (juryAssignments.stream().anyMatch(JuryAssignment::scoreMissing))
+            if (juryAssignments.stream()
+                    .collect(groupingBy(JuryAssignment::getProjectId)).values().stream()
+                    .anyMatch(l -> l.stream().allMatch(JuryAssignment::scoreMissing)))
                 throw forbidden("Cannot close committee if a project score is missing");
         }
 
