@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.contract.model.EcosystemDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemShortResponseBanners;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
@@ -57,6 +58,19 @@ public class EcosystemReadEntity {
                         .xl(xlBanner == null ? null : xlBanner.toDto()))
                 .projectCount(projects().size())
                 .topProjects(projects.stream().limit(3).map(ProjectMapper::map).toList())
+                ;
+    }
+
+    public EcosystemDetailsResponse toDetailsResponse() {
+        return new EcosystemDetailsResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .description(description)
+                .banners(new EcosystemShortResponseBanners()
+                        .md(mdBanner == null ? null : mdBanner.toDto())
+                        .xl(xlBanner == null ? null : xlBanner.toDto()))
+                .relatedArticles(null) // TODO
                 ;
     }
 }

@@ -261,4 +261,35 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """, true);
     }
+
+    @Test
+    void should_get_ecosystem_by_slug() {
+        // When
+        client.get()
+                .uri(getApiURI(ECOSYSTEM_BY_SLUG.formatted("ethereum")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                          "slug": "ethereum",
+                          "name": "Ethereum",
+                          "description": "Ethereum ecosystem",
+                          "banners": {
+                            "xl": {
+                              "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
+                              "fontColor": "LIGHT"
+                            },
+                            "md": {
+                              "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
+                              "fontColor": "LIGHT"
+                            }
+                          },
+                          "relatedArticles": null
+                        }
+                        """);
+    }
 }

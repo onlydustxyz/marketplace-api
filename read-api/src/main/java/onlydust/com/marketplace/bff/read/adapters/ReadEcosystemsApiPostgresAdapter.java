@@ -2,10 +2,7 @@ package onlydust.com.marketplace.bff.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadEcosystemsApi;
-import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPage;
-import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.EcosystemPageV2;
-import onlydust.com.marketplace.api.contract.model.EcosystemProjectPageResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
@@ -23,6 +20,9 @@ import java.util.List;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -58,6 +58,14 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<EcosystemDetailsResponse> getEcosystemBySlug(String slug) {
+        final var ecosystem = ecosystemReadRepository.findBySlug(slug)
+                .orElseThrow(() -> notFound("Ecosystem %s not found".formatted(slug)));
+
+        return ok(ecosystem.toDetailsResponse());
     }
 
     @Override
