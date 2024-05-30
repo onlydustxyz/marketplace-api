@@ -47,6 +47,13 @@ public class EcosystemReadEntity {
             inverseJoinColumns = @JoinColumn(name = "project_id"))
     private Set<ProjectLinkViewEntity> projects;
 
+
+    @ManyToMany
+    @JoinTable(name = "ecosystems_articles",
+            joinColumns = @JoinColumn(name = "ecosystem_id"),
+            inverseJoinColumns = @JoinColumn(name = "article_id"))
+    private Set<EcosystemArticleReadEntity> articles;
+
     public EcosystemPageItemResponse toPageItemResponse() {
         return new EcosystemPageItemResponse()
                 .id(id)
@@ -70,7 +77,7 @@ public class EcosystemReadEntity {
                 .banners(new EcosystemShortResponseBanners()
                         .md(mdBanner == null ? null : mdBanner.toDto())
                         .xl(xlBanner == null ? null : xlBanner.toDto()))
-                .relatedArticles(null) // TODO
+                .relatedArticles(articles.stream().map(EcosystemArticleReadEntity::toDto).toList())
                 ;
     }
 }

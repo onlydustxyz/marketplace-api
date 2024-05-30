@@ -288,7 +288,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               "fontColor": "LIGHT"
                             }
                           },
-                          "relatedArticles": null
+                          "relatedArticles": [
+                            {
+                              "title": "Ethereum article 1",
+                              "url": "https://ethereum.org/",
+                              "imageUrl": "https://s3.amazonaws.com/onlydust/ecosystem_articles/ethereum-article-1.png",
+                              "description": "Ethereum article 1 description"
+                            },
+                            {
+                              "title": "Ethereum article 2",
+                              "url": "https://ethereum.org/",
+                              "imageUrl": "https://s3.amazonaws.com/onlydust/ecosystem_articles/ethereum-article-2.png",
+                              "description": "Ethereum article 2 description"
+                            }
+                          ]
                         }
                         """);
     }

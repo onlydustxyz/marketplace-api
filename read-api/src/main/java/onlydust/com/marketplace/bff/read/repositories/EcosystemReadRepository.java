@@ -15,6 +15,7 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
             FROM EcosystemReadEntity e
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner
+            LEFT JOIN FETCH e.articles
             WHERE e.slug = :slug
             """)
     Optional<EcosystemReadEntity> findBySlug(String slug);
