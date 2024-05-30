@@ -110,7 +110,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Cairo foundry",
                                 "logoUrl": null
                               },
-                              "score": null,
+                              "score": 3.0,
                               "allocation": {
                                 "amount": 1111.11111,
                                 "currency": {
@@ -129,7 +129,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Deluge",
                                 "logoUrl": null
                               },
-                              "score": null,
+                              "score": 4.0,
                               "allocation": {
                                 "amount": 3333.33333,
                                 "currency": {
@@ -148,7 +148,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "score": null,
+                              "score": 5.0,
                               "allocation": {
                                 "amount": 5555.55556,
                                 "currency": {
@@ -327,7 +327,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Cairo foundry",
                                 "logoUrl": null
                               },
-                              "score": null,
+                              "score": 3.0,
                               "allocation": {
                                 "amount": 1000,
                                 "currency": {
@@ -346,7 +346,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Deluge",
                                 "logoUrl": null
                               },
-                              "score": null,
+                              "score": 4.0,
                               "allocation": {
                                 "amount": 2000,
                                 "currency": {
@@ -365,7 +365,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                                 "name": "Starklings",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13746458086965388437.jpg"
                               },
-                              "score": null,
+                              "score": 5.0,
                               "allocation": {
                                 "amount": 3000,
                                 "currency": {

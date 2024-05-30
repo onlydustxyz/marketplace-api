@@ -12,7 +12,10 @@ import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Set;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.bff.read.mapper.CommitteeMapper.roundScore;
 
 @Entity
 @Value
@@ -48,6 +51,13 @@ public class CommitteeBudgetAllocationReadEntity {
 
     private @NonNull BigDecimal amount;
 
+    @OneToMany
+    @JoinColumns({
+            @JoinColumn(name = "committeeId", referencedColumnName = "committeeId"),
+            @JoinColumn(name = "projectId", referencedColumnName = "projectId")
+    })
+    Set<CommitteeJuryVoteReadEntity> votes;
+
     public CommitteeProjectAllocationLinkResponse toDto() {
         return new CommitteeProjectAllocationLinkResponse()
                 .project(new ProjectLinkResponse()
@@ -57,7 +67,8 @@ public class CommitteeBudgetAllocationReadEntity {
                         .logoUrl(project.getLogoUrl()))
                 .allocation(new MoneyResponse()
                         .amount(amount)
-                        .currency(currency.toDto()));
+                        .currency(currency.toDto()))
+                .score(roundScore(votes.stream().filter(v -> v.score() != null).mapToInt(CommitteeJuryVoteReadEntity::score).average()));
     }
 
     @EqualsAndHashCode
