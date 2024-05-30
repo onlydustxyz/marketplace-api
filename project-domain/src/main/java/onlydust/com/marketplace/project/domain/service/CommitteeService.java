@@ -200,8 +200,8 @@ public class CommitteeService implements CommitteeFacadePort {
         final var projectScores = committeeStoragePort.findJuryAssignments(committee.id())
                 .stream()
                 .collect(groupingBy(JuryAssignment::getProjectId,
-                        mapping(JuryAssignment::getScore,
-                                averagingDouble(s -> s.doubleValue()))))
+                        mapping(JuryAssignment::getScore, filtering(OptionalDouble::isPresent,
+                                averagingDouble(s -> s.getAsDouble())))))
                 .entrySet().stream()
                 .filter(e -> e.getValue() >= 3)
                 .collect(toMap(Map.Entry::getKey, e -> (e.getValue().doubleValue() - 3) * 2 + 1));
