@@ -43,7 +43,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final Page<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                Optional.ofNullable(hasGoodFirstIssues).orElse(false),
+                hasGoodFirstIssues,
                 PageRequest.of(sanitizePageIndex, sanitizePageSize));
 
         final EcosystemProjectPageResponse response = new EcosystemProjectPageResponse()

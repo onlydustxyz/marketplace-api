@@ -58,7 +58,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     WHERE i.status = 'OPEN'
                                       AND gia.user_id IS NULL
                                     group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
-                where e.slug =:ecosystemSlug and (:hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                where e.slug =:ecosystemSlug and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
             """)
-    Page<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, boolean hasGoodFirstIssues, Pageable pageable);
+    Page<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, Pageable pageable);
 }

@@ -11,8 +11,6 @@ public class LanguageLinkJson {
     UUID id;
     @NonNull
     String name;
-    @NonNull
     String logoUrl;
-    @NonNull
     String bannerUrl;
 }
