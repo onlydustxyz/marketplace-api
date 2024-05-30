@@ -54,4 +54,8 @@ public class JuryAssignment {
                 .average()
                 .orElseThrow(() -> internalServerError("Cannot compute score for project %s".formatted(projectId)));
     }
+
+    public boolean scoreMissing() {
+        return votes.values().stream().allMatch(Optional::isEmpty);
+    }
 }

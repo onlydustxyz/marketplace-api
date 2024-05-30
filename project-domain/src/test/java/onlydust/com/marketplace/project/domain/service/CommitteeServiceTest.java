@@ -621,7 +621,7 @@ public class CommitteeServiceTest {
             assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Not enough juries or vote per jury to cover all projects given some juries are project lead or contributor on application " +
-                            "project");
+                                "project");
         }
 
 
@@ -727,6 +727,22 @@ public class CommitteeServiceTest {
             assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot compute score for project");
+        }
+
+        @Test
+        void given_an_open_committee_with_missing_scores() {
+            // Given
+            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee.toBuilder().status(Committee.Status.OPEN_TO_VOTES).build()));
+            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria()))
+            ));
+
+            // When
+            assertThatThrownBy(() -> committeeService.updateStatus(committee.id(), Committee.Status.CLOSED))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessageContaining("Cannot close committee if a project score is missing");
         }
 
         @Test
