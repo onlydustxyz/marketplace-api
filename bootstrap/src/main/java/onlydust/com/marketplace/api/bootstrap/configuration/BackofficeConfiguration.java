@@ -111,12 +111,6 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public LanguageFacadePort languageFacadePort(final LanguageStorage languageStorage,
-                                                 final ImageStoragePort imageStoragePort) {
-        return new onlydust.com.marketplace.project.domain.service.LanguageService(languageStorage, imageStoragePort);
-    }
-
-    @Bean
     public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort) {
         return new BackofficeCommitteeManagementRestApi(committeeFacadePort);
     }
