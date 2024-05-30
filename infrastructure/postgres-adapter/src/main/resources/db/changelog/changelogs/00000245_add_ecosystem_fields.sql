@@ -22,6 +22,7 @@ alter table ecosystems
     add description     text,
     add md_banner_id    UUID references ecosystem_banners (id),
     add xl_banner_id    UUID references ecosystem_banners (id),
+    add featured_rank   int,
     add tech_created_at timestamp not null default now(),
     add tech_updated_at timestamp not null default now();
 

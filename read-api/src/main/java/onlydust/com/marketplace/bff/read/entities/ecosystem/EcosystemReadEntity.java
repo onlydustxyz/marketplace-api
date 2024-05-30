@@ -33,6 +33,8 @@ public class EcosystemReadEntity {
     private @NonNull String slug;
     private @NonNull String name;
     private String description;
+    @Column(name = "featured_rank")
+    private Integer featured;
 
     @ManyToOne
     private EcosystemBannerReadEntity mdBanner;

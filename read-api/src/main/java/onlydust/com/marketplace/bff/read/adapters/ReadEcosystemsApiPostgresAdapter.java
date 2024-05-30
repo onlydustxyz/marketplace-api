@@ -63,7 +63,10 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
 
     @Override
     public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Integer pageIndex, Integer pageSize) {
-        final var page = ecosystemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
+        final var page = featured ?
+                ecosystemReadRepository.findAllByFeaturedNotNull(PageRequest.of(pageIndex, pageSize, Sort.by("featured"))) :
+                ecosystemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
+
         final var response = new EcosystemPageV2()
                 .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toPageItemResponse).toList())
                 .totalPageNumber(page.getTotalPages())

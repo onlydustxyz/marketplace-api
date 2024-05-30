@@ -55,3 +55,16 @@ update ecosystems
 set xl_banner_id = b.id
 from ecosystem_banners b
 where b.image_url = 'https://s3.amazonaws.com/onlydust/ecosystem_banners/' || slug || '-xl.png';
+
+update ecosystems
+set featured_rank = 1
+where slug = 'ethereum';
+
+update ecosystems
+set featured_rank = 2
+where slug = 'starknet';
+
+update ecosystems
+set featured_rank = 3
+where slug = 'aptos';
+

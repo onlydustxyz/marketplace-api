@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface EcosystemReadRepository extends Repository<EcosystemReadEntity, UUID> {
     Page<EcosystemReadEntity> findAll(Pageable pageable);
+
+    Page<EcosystemReadEntity> findAllByFeaturedNotNull(Pageable pageable);
 }
