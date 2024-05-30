@@ -148,6 +148,6 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 }
