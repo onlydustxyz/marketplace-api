@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.bff.read.entities.user;
 
 import lombok.Data;
-
-import java.util.UUID;
+import lombok.NonNull;
 
 @Data
-public class UserLinkJson {
-    UUID id;
+public class GithubUserLinkJson {
+    @NonNull
     Long githubUserId;
+    @NonNull
     String login;
+    @NonNull
     String avatarUrl;
 }
