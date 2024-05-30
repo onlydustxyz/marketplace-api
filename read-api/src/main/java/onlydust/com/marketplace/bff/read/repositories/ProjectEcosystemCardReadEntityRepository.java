@@ -1,12 +1,10 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
-import org.intellij.lang.annotations.Language;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<ProjectEcosystemCardReadEntity, UUID> {
@@ -58,7 +56,35 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     WHERE i.status = 'OPEN'
                                       AND gia.user_id IS NULL
                                     group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
-                where e.slug =:ecosystemSlug and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                where e.slug = :ecosystemSlug
+                and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                offset :offset limit :limit
             """)
-    Page<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, Pageable pageable);
+    List<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, int offset,
+                                                   int limit);
+
+    @Query(nativeQuery = true, value = """
+                    select count(distinct p.id)
+                             from ecosystems e
+                             join projects_ecosystems pe on pe.ecosystem_id = e.id
+                             join projects p on p.id = pe.project_id
+                             left join (SELECT pgr.project_id, count(i.id) > 0 exist
+                                        FROM project_github_repos pgr
+                                                 join indexer_exp.github_issues i on i.repo_id = pgr.github_repo_id
+                                                 LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
+                                                 JOIN LATERAL (
+                                            SELECT issue_id
+                                            FROM indexer_exp.github_issues_labels gil
+                                                     JOIN indexer_exp.github_labels gl ON gil.label_id = gl.id
+                                            WHERE gil.issue_id = i.id
+                                              AND gl.name ilike '%good%first%issue%'
+                                            LIMIT 1
+                                            ) gfi ON gfi.issue_id = i.id
+                                        WHERE i.status = 'OPEN'
+                                          AND gia.user_id IS NULL
+                                        group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
+                            where e.slug = :ecosystemSlug
+                            and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+            """)
+    int countAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues);
 }

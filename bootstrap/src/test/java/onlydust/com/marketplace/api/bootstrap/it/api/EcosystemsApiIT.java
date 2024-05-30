@@ -260,6 +260,49 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println);
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                              "slug": "bretzel",
+                              "name": "Bretzel",
+                              "shortDescription": "A project for people who love fruits",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "topContributors": [
+                                {
+                                  "githubUserId": 52197971,
+                                  "login": "jb1011",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
+                                },
+                                {
+                                  "githubUserId": 117665867,
+                                  "login": "gilbertVDB17",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4"
+                                },
+                                {
+                                  "githubUserId": 74653697,
+                                  "login": "antiyro",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
+                                }
+                              ],
+                              "contributorsCount": 4,
+                              "languages": [
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "name": "Typescript",
+                                  "url": null,
+                                  "logoUrl": null,
+                                  "bannerUrl": null
+                                }
+                              ]
+                            }
+                          ],
+                          "hasMore": false,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "nextPageIndex": 0
+                        }
+                        """);
     }
 }

@@ -12,17 +12,16 @@ import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageIt
 import onlydust.com.marketplace.bff.read.repositories.EcosystemReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.ProjectEcosystemCardReadEntityRepository;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
+import java.util.List;
 
+import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -42,16 +41,19 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                                                                              Boolean hasGoodFirstIssues) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final Page<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                hasGoodFirstIssues,
-                PageRequest.of(sanitizePageIndex, sanitizePageSize));
+        final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
+                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize
+        );
+
+        final int projectsCount = projectEcosystemCardReadEntityRepository.countAllBy(ecosystemSlug, hasGoodFirstIssues);
+        final int totalNumberOfPage = calculateTotalNumberOfPage(sanitizePageSize, projectsCount);
 
         final EcosystemProjectPageResponse response = new EcosystemProjectPageResponse()
                 .projects(projects.stream().map(ProjectEcosystemCardReadEntity::toContract).toList())
-                .hasMore(PaginationHelper.hasMore(sanitizePageIndex, projects.getTotalPages()))
-                .nextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, projects.getTotalPages()))
-                .totalItemNumber((int) projects.getTotalElements())
-                .totalPageNumber(projects.getTotalPages());
+                .hasMore(PaginationHelper.hasMore(sanitizePageIndex, totalNumberOfPage))
+                .nextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, totalNumberOfPage))
+                .totalItemNumber(projectsCount)
+                .totalPageNumber(totalNumberOfPage);
 
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
