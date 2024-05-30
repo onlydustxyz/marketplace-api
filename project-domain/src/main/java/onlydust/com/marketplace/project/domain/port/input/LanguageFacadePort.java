@@ -19,4 +19,6 @@ public interface LanguageFacadePort {
     URL uploadPicture(InputStream imageInputStream);
 
     Map<String, Optional<Language>> getKnownExtensions();
+
+    void updateProjectsLanguages();
 }

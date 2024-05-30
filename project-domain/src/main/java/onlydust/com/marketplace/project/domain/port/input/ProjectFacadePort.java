@@ -87,4 +87,5 @@ public interface ProjectFacadePort {
     Page<GithubIssueView> findGoodFirstIssues(UUID projectId, Integer page, Integer pageSize);
 
     void suggestCategory(String categoryName, UUID userId);
+
 }

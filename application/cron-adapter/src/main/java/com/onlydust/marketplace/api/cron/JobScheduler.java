@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
+import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.context.annotation.Profile;
@@ -32,6 +33,7 @@ public class JobScheduler {
     private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
     private final OutboxConsumerJob projectMailOutboxJob;
+    private final LanguageFacadePort languageFacadePort;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -111,6 +113,12 @@ public class JobScheduler {
     public void historizeUserRanks() {
         LOGGER.info("Historizing user ranks");
         userFacadePort.historizeUserRanks();
+    }
+
+    @Scheduled(cron = "${application.cron.update-projects-languages}")
+    public void updateProjectLanguages(){
+        LOGGER.info("Update projects languages");
+        languageFacadePort.updateProjectsLanguages();
     }
 
 }

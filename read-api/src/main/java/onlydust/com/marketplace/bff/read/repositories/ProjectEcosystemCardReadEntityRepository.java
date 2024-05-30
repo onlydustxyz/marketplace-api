@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
+import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,7 +28,9 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                                'id', l.id, 'name', l.name, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
                                        )
                                )
-                        from languages l)                                                                         languages
+                        from project_languages pl
+                        join languages l on pl.language_id = l.id
+                        where pl.project_id = p.id)                                                                languages
                 from projects p
                          left join (select c.project_id,
                                            jsonb_agg(
