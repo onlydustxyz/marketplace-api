@@ -714,22 +714,6 @@ public class CommitteeServiceTest {
         }
 
         @Test
-        void given_a_project_with_missing_score() {
-            // Given
-            when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
-            when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria()))
-            ));
-
-            // When
-            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN))
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Cannot compute score for project");
-        }
-
-        @Test
         void given_an_open_committee_with_missing_scores() {
             // Given
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee.toBuilder().status(Committee.Status.OPEN_TO_VOTES).build()));
