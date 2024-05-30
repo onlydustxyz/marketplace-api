@@ -5,13 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -47,11 +43,14 @@ public class JuryAssignment {
         );
     }
 
-    public double getScore() {
+    public OptionalDouble getScore() {
         return votes.values().stream()
                 .filter(Optional::isPresent)
                 .mapToInt(Optional::get)
-                .average()
-                .orElseThrow(() -> internalServerError("Cannot compute score for project %s".formatted(projectId)));
+                .average();
+    }
+
+    public boolean scoreMissing() {
+        return votes.values().stream().allMatch(Optional::isEmpty);
     }
 }
