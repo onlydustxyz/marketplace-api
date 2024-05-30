@@ -115,7 +115,7 @@ public class JobScheduler {
         userFacadePort.historizeUserRanks();
     }
 
-    @Scheduled(cron = "${application.cron.update-projects-languages}")
+    @Scheduled(fixedDelayString = "${application.cron.update-projects-languages}")
     public void updateProjectLanguages(){
         LOGGER.info("Update projects languages");
         languageFacadePort.updateProjectsLanguages();
