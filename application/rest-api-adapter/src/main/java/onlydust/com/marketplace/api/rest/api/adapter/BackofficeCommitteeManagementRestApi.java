@@ -10,7 +10,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,13 +50,6 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
         return committeePageResponse.getTotalPageNumber() > 1 ?
                 status(HttpStatus.PARTIAL_CONTENT).body(committeePageResponse) :
                 ok(committeePageResponse);
-    }
-
-    @Override
-    public ResponseEntity<CommitteeProjectApplicationResponse> getProjectApplication(UUID committeeId, UUID projectId) {
-        final CommitteeApplicationDetailsView committeeApplicationDetails = committeeFacadePort.getCommitteeApplicationDetails(Committee.Id.of(committeeId),
-                projectId);
-        return ok(BackOfficeCommitteeMapper.committeeApplicationDetailsToResponse(committeeApplicationDetails));
     }
 
     @Override

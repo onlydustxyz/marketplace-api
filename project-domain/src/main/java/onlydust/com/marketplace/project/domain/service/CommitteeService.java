@@ -9,7 +9,6 @@ import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,7 +133,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (!assignedProjectIds.containsAll(projectIds)) {
             throw internalServerError("Not enough juries or vote per jury to cover all projects given some" +
-                    " juries are project lead or contributor on application project");
+                                      " juries are project lead or contributor on application project");
         }
 
         committeeStoragePort.saveJuryAssignments(
@@ -168,13 +167,6 @@ public class CommitteeService implements CommitteeFacadePort {
 
         if (application.answers().stream().map(Committee.ProjectAnswer::projectQuestionId).anyMatch(id -> !projectQuestionIds.contains(id)))
             throw internalServerError("A project question is not linked to committee %s".formatted(committee.id().value()));
-    }
-
-    @Override
-    public CommitteeApplicationDetailsView getCommitteeApplicationDetails(Committee.Id committeeId, UUID projectId) {
-        return committeeStoragePort.findByCommitteeIdAndProjectId(committeeId, projectId)
-                .orElseThrow(() -> internalServerError("Application on committee %s not found for project %s"
-                        .formatted(committeeId.value(), projectId)));
     }
 
     @Override

@@ -1,21 +1,20 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeLinkViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectInfosQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeBudgetAllocationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeJuryVoteEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeBudgetAllocationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Committee;
+import onlydust.com.marketplace.project.domain.model.JuryAssignment;
+import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
-import onlydust.com.marketplace.project.domain.view.ProjectAnswerView;
-import onlydust.com.marketplace.project.domain.view.ProjectShortView;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,17 +23,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresCommitteeAdapter implements CommitteeStoragePort {
 
     private final CommitteeRepository committeeRepository;
-    private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
-    private final ProjectInfosViewRepository projectInfosViewRepository;
     private final CommitteeLinkViewRepository committeeLinkViewRepository;
     private final CommitteeJuryVoteRepository committeeJuryVoteRepository;
-    private final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository;
     private final CommitteeBudgetAllocationRepository committeeBudgetAllocationRepository;
 
     @Override
@@ -64,34 +59,6 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     @Transactional
     public void updateStatus(Committee.Id committeeId, Committee.Status status) {
         committeeRepository.updateStatus(committeeId.value(), status.name());
-    }
-
-    private @NotNull List<ProjectAnswerView> getProjectAnswerViews(Committee.Id committeeId, UUID projectId) {
-        return committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId.value(), projectId).stream()
-                .map(committeeProjectAnswerView -> new ProjectAnswerView(ProjectQuestion.Id.of(committeeProjectAnswerView.getQuestionId()),
-                        committeeProjectAnswerView.getProjectQuestion().getQuestion(), committeeProjectAnswerView.getProjectQuestion().getRequired(),
-                        committeeProjectAnswerView.getAnswer()))
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId) {
-        final List<ProjectAnswerView> projectAnswerViews = getProjectAnswerViews(committeeId, projectId);
-        if (projectAnswerViews.isEmpty()) {
-            return Optional.empty();
-        } else {
-            final ProjectInfosQueryEntity projectInfos = projectInfosViewRepository.findByProjectIdWithoutMetrics(projectId)
-                    .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
-            return Optional.of(
-                    new CommitteeApplicationDetailsView(
-                            projectAnswerViews, new ProjectShortView(projectInfos.id(), projectInfos.slug(), projectInfos.name(),
-                            projectInfos.logoUrl(), projectInfos.shortDescription(), ProjectVisibility.valueOf(projectInfos.visibility())), true,
-                            CommitteeJuryVoteViewEntity.toDomain(committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectId(committeeId.value(),
-                                    projectId))
-                    )
-            );
-        }
     }
 
     @Override
@@ -130,7 +97,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                 .collect(groupingBy(CommitteeJuryVoteEntity::getProjectId,
                         groupingBy(CommitteeJuryVoteEntity::getUserId,
                                 groupingBy(vote -> JuryCriteria.Id.of(vote.getCriteriaId()),
-                                        mapping(CommitteeJuryVoteEntity::getScore, summingInt(Integer::intValue))))))
+                                        mapping(CommitteeJuryVoteEntity::getScore,
+                                                reducing(null, (a, b) -> b))))))
                 .entrySet().stream()
                 .flatMap(byProject -> byProject.getValue().entrySet().stream()
                         .map(byJury -> JuryAssignment.withVotes(byJury.getKey(), committeeId, byProject.getKey(), byJury.getValue()))

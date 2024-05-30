@@ -5,10 +5,12 @@ import onlydust.com.backoffice.api.contract.BackofficeCommitteesReadApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
-import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
+import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
+import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeProjectAnswerReadEntity;
-import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
 import onlydust.com.marketplace.bff.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
@@ -25,10 +27,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
+import static onlydust.com.marketplace.bff.read.mapper.CommitteeMapper.roundScore;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @AllArgsConstructor
@@ -37,6 +40,8 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
 
     private final CommitteeReadRepository committeeReadRepository;
     private final CommitteeBudgetAllocationsResponseEntityRepository committeeBudgetAllocationsResponseEntityRepository;
+    private final ProjectInfosViewRepository projectInfosViewRepository;
+    private final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository;
 
     @Override
     public ResponseEntity<CommitteeResponse> getCommittee(UUID committeeId) {
@@ -55,13 +60,16 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                                 .max(Comparator.comparing(CommitteeProjectAnswerReadEntity::techUpdatedAt))
                                 .orElseThrow())));
 
+        final Map<UUID, MoneyResponse> projectAllocations = committee.budgetAllocations().stream()
+                .collect(toMap(CommitteeBudgetAllocationReadEntity::projectId, a -> new MoneyResponse(a.amount(), a.currency().toDto())));
+
         final List<ApplicationResponse> projectApplications = mostRecentAnswerPerProject.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .map(a -> new ApplicationResponse()
                         .project(ProjectMapper.mapBO(a.project()))
                         .applicant(UserMapper.map(a.user()))
                         .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
-                        .allocatedBudget(null))// TODO: implement
+                        .allocation(projectAllocations.get(a.projectId())))
                 .toList();
 
         final Map<AllUserViewEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
@@ -97,23 +105,87 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .map(j -> UserMapper.map(j.user())).toList())
                 .juryAssignments(juryAssignments)
                 .totalAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getTotalAssignment).sum())
-                .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum());
+                .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum())
+                .allocation(projectAllocations.values().stream()
+                        .reduce((left, right) -> new MoneyResponse(left.getAmount().add(right.getAmount()), left.getCurrency()))
+                        .orElse(null));
 
-        return ResponseEntity.ok(response);
+        return ok(response);
+    }
+
+    @Override
+    public ResponseEntity<CommitteeProjectApplicationResponse> getProjectApplication(UUID committeeId, UUID projectId) {
+        final var committee = committeeReadRepository.findById(committeeId)
+                .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
+
+        final var project = projectInfosViewRepository.findByProjectId(projectId)
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+
+        final var projectAnswers = committeeProjectAnswerViewRepository.findByCommitteeIdAndAndProjectId(committeeId, projectId);
+
+        final List<JuryVoteResponse> juryVotes = committee.juryVotes().stream()
+                .filter(v -> v.projectId().equals(projectId))
+                .collect(groupingBy(CommitteeJuryVoteReadEntity::user, toList()))
+                .entrySet().stream()
+                .map(e -> new JuryVoteResponse()
+                        .totalScore(roundScore(e.getValue().stream()
+                                .filter(v -> v.score() != null)
+                                .mapToInt(CommitteeJuryVoteReadEntity::score)
+                                .average()))
+                        .jury(UserMapper.map(e.getKey()))
+                        .answers(e.getValue().stream()
+                                .map(a -> new ScoredAnswerResponse()
+                                        .criteria(a.criteria().criteria())
+                                        .score(a.score()))
+                                .toList()))
+                .toList();
+
+        final var totalScore = juryVotes.stream()
+                .map(v -> v.getTotalScore())
+                .filter(Objects::nonNull)
+                .mapToDouble(BigDecimal::doubleValue)
+                .average();
+
+        final var allocation = committee.budgetAllocations().stream()
+                .filter(a -> a.projectId().equals(projectId))
+                .map(a -> new MoneyResponse(a.amount(), a.currency().toDto()))
+                .reduce((left, right) -> new MoneyResponse(left.getAmount().add(right.getAmount()), left.getCurrency()))
+                .orElse(null);
+
+        final var response = new CommitteeProjectApplicationResponse()
+                .project(new ProjectLinkResponse()
+                        .id(project.id())
+                        .slug(project.slug())
+                        .name(project.name())
+                        .logoUrl(isNull(project.logoUrl()) ? null : project.logoUrl())
+                )
+                .projectQuestions(projectAnswers.stream()
+                        .map(answer -> new ProjectAnswerResponse()
+                                .answer(answer.getAnswer())
+                                .question(answer.getProjectQuestion().getQuestion())
+                                .required(answer.getProjectQuestion().getRequired())
+                        )
+                        .toList()
+                )
+                .totalScore(totalScore == null ? null : roundScore(totalScore))
+                .juryVotes(juryVotes)
+                .allocation(allocation);
+
+        return ok(response);
     }
 
     @Override
     public ResponseEntity<CommitteeBudgetAllocationsResponse> getBudgetAllocations(UUID committeeId) {
         final var committeeBudgetAllocations = committeeBudgetAllocationsResponseEntityRepository.findAllByCommitteeId(committeeId);
-        return ResponseEntity.ok(new CommitteeBudgetAllocationsResponse()
+        return ok(new CommitteeBudgetAllocationsResponse()
                 .totalAllocationAmount(committeeBudgetAllocations.stream()
-                        .map(CommitteeBudgetAllocationViewEntity::amount)
+                        .map(CommitteeBudgetAllocationReadEntity::amount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
                 .currency(committeeBudgetAllocations.stream().findFirst()
-                        .map(CommitteeBudgetAllocationViewEntity::currency).map(ShortCurrencyResponseEntity::toDto)
+                        .map(CommitteeBudgetAllocationReadEntity::currency).map(ShortCurrencyResponseEntity::toDto)
                         .orElse(null))
                 .projectAllocations(committeeBudgetAllocations.stream()
-                        .map(CommitteeBudgetAllocationViewEntity::toDto)
+                        .map(CommitteeBudgetAllocationReadEntity::toDto)
                         .toList()));
     }
 }

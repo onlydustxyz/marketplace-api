@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -17,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
@@ -152,10 +150,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         updateCommitteeRequest1.name(faker.rickAndMorty().location())
                 .applicationStartDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
-                .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
-                .maximumAllocationAmount(BigDecimal.valueOf(111.212))
-                .minimumAllocationAmount(BigDecimal.valueOf(95.47))
                 .votePerJury(3)
                 .projectQuestions(
                         List.of(projectQuestionRequest1,
@@ -224,11 +219,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         final UpdateCommitteeRequest updateCommitteeRequest2 = new UpdateCommitteeRequest().name(faker.rickAndMorty().location())
                 .applicationStartDate(faker.date().past(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
-                .allocationCurrencyId(CurrencyHelper.STRK.value())
                 .status(CommitteeStatus.DRAFT)
                 .votePerJury(5)
-                .maximumAllocationAmount(BigDecimal.valueOf(222.33))
-                .minimumAllocationAmount(BigDecimal.valueOf(47.95))
                 .sponsorId(cocaColax)
                 .projectQuestions(
                         List.of(projectQuestionRequest3,
@@ -356,7 +348,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "score": null,
-                              "allocatedBudget": null
+                              "allocation": null
                             }
                           ]
                         }
@@ -380,8 +372,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "name": "Bretzel",
                             "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                           },
-                          "allocatedAmount": null,
-                          "allocationCurrency": null,
+                          "allocation": null,
                           "projectQuestions": [
                             {
                               "question": "%s",
@@ -441,7 +432,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                               },
                               "score": null,
-                              "allocatedBudget": null
+                              "allocation": null
                             }
                           ]
                         }
@@ -470,8 +461,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "name": "Bretzel",
                             "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                           },
-                          "allocatedAmount": null,
-                          "allocationCurrency": null
+                          "allocation": null
                         }
                         """)
                 .jsonPath("$.projectQuestions.size()").isEqualTo(1)

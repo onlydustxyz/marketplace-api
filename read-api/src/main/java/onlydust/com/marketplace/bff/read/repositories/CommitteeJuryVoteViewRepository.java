@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
+import onlydust.com.marketplace.bff.read.entities.CommitteeJuryVoteViewEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

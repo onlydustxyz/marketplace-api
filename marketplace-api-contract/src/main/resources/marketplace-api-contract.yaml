@@ -2986,6 +2986,49 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/ecosystems/{ecosystemSlug}/contributors:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem contributors
+      operationId: getEcosystemContributors
+      parameters:
+        - in: path
+          name: ecosystemSlug
+          description: Ecosystem slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+        - in: query
+          name: sort
+          description: Sort order
+          schema:
+            enum:
+              - CONTRIBUTION_COUNT
+              - TOTAL_EARNED
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Page of ecosystem contributors'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemContributorsPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v2/ecosystems:
     get:
@@ -7066,6 +7109,66 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemPageItemResponse'
+
+    EcosystemContributorsPage:
+      type: object
+      required:
+        - contributors
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+        - hasHiddenContributors
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        contributors:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemContributorsPageItemResponse'
+
+    EcosystemContributorsPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubUserResponse'
+        - type: object
+          required:
+            - dynamicRank
+            - globalRank
+            - globalRankCategory
+            - contributionCount
+            - rewardCount
+            - totalEarnedUsd
+          properties:
+            dynamicRank:
+              type: integer
+              description: |
+                Rank of the contributor in the ecosystem, depending on sorting parameters.
+                This is NOT the same as the global OnlyDust rank.
+              example: 1
+            globalRank:
+              type: integer
+              description: User rank on OnlyDust (the lower, the better)
+              example: 42
+            globalRankCategory:
+              $ref: '#/components/schemas/UserRankCategory'
+            contributionCount:
+              type: integer
+              description: Total number of contributions the contributor made on this ecosystem.
+              example: 22
+            rewardCount:
+              type: integer
+              description: Total number of rewards the contributor got on this ecosystem.
+              example: 10
+            totalEarnedUsd:
+              type: number
+              description: Total amount earned by the contributor in USD on this ecosystem.
 
     InvoiceMandateRequest:
       type: object

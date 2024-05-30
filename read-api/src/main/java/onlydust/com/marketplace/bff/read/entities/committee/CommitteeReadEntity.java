@@ -59,4 +59,7 @@ public class CommitteeReadEntity {
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY)
     List<CommitteeJuryVoteReadEntity> juryVotes;
+
+    @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY)
+    List<CommitteeBudgetAllocationReadEntity> budgetAllocations;
 }

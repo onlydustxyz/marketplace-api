@@ -420,18 +420,12 @@ public class PostgresConfiguration {
 
     @Bean
     PostgresCommitteeAdapter postgresCommitteeAdapter(final CommitteeRepository committeeRepository,
-                                                      final CommitteeProjectAnswerViewRepository committeeProjectAnswerViewRepository,
-                                                      final ProjectInfosViewRepository projectInfosViewRepository,
                                                       final CommitteeLinkViewRepository committeeLinkViewRepository,
                                                       final CommitteeJuryVoteRepository committeeJuryVoteRepository,
-                                                      final CommitteeJuryVoteViewRepository committeeJuryVoteViewRepository,
                                                       final CommitteeBudgetAllocationRepository committeeBudgetAllocationRepository) {
         return new PostgresCommitteeAdapter(committeeRepository,
-                committeeProjectAnswerViewRepository,
-                projectInfosViewRepository,
                 committeeLinkViewRepository,
                 committeeJuryVoteRepository,
-                committeeJuryVoteViewRepository,
                 committeeBudgetAllocationRepository);
     }
 }

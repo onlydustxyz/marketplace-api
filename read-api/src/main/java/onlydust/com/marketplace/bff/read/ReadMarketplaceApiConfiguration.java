@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.bff.read;
 
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
@@ -56,7 +55,8 @@ public class ReadMarketplaceApiConfiguration {
     }
 
     @Bean
-    public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter(final ProjectEcosystemCardReadEntityRepository projectEcosystemCardReadEntityRepository) {
-        return new ReadEcosystemsApiPostgresAdapter(projectEcosystemCardReadEntityRepository);
+    public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter(final ProjectEcosystemCardReadEntityRepository projectEcosystemCardReadEntityRepository,
+                                                                             final EcosystemContributorPageItemEntityRepository ecosystemContributorPageItemEntityRepository) {
+        return new ReadEcosystemsApiPostgresAdapter(ecosystemContributorPageItemEntityRepository, projectEcosystemCardReadEntityRepository);
     }
 }

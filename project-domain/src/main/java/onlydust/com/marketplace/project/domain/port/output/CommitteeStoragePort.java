@@ -4,7 +4,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignment;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
-import onlydust.com.marketplace.project.domain.view.commitee.CommitteeApplicationDetailsView;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
 
 import java.math.BigDecimal;
@@ -21,8 +20,6 @@ public interface CommitteeStoragePort {
     Optional<Committee> findById(Committee.Id committeeId);
 
     void updateStatus(Committee.Id committeeId, Committee.Status status);
-
-    Optional<CommitteeApplicationDetailsView> findByCommitteeIdAndProjectId(Committee.Id committeeId, UUID projectId);
 
     void saveJuryAssignments(List<JuryAssignment> juryAssignments);
 
