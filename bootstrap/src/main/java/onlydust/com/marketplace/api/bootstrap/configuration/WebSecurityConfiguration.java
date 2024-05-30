@@ -107,6 +107,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/projects/**")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/search")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/committees/*")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/ecosystems")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/projects/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/users/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v2/users/**")).permitAll()

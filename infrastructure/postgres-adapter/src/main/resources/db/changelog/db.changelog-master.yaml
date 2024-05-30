@@ -316,4 +316,6 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000244_create_committee_budget_allocations.sql
   - include:
-      file: db/changelog/changelogs/00000245_create_project_languages_materialized_view.sql
+      file: db/changelog/changelogs/00000245_add_ecosystem_fields.sql
+  - include:
+      file: db/changelog/changelogs/00000246_create_project_languages_materialized_view.sql
