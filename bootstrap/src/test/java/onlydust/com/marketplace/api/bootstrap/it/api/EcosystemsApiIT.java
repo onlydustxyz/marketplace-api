@@ -246,4 +246,20 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_return_ecosystem_projects() {
+        // Given
+        final String ecosystemSlug = "zama";
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_ECOSYSTEM_PROJECTS.formatted(ecosystemSlug), Map.of("pageIndex", "0", "pageSize", "5")))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println);
+    }
 }

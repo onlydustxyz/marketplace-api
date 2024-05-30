@@ -115,6 +115,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/technologies")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/hackathons/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/*/contributors")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems/*/projects")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/ecosystems")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/swagger-ui.html")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/v3/api-docs/**")).permitAll()

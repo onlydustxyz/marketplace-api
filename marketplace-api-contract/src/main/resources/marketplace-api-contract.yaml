@@ -7639,9 +7639,13 @@ components:
           format: url
           description: Direct URL to project's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
-        contributors:
+        topContributors:
           type: array
           items:
             $ref: '#/components/schemas/GithubUserResponse'
+        contributorsCount:
+          type: integer
         languages:
-          $ref: '#/components/schemas/LanguageResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'

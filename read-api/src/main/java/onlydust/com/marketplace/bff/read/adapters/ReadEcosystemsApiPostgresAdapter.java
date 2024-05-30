@@ -6,19 +6,24 @@ import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPage;
 import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemPageV2;
 import onlydust.com.marketplace.api.contract.model.EcosystemProjectPageResponse;
-import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
-import org.springframework.data.domain.PageRequest;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
+import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.EcosystemReadRepository;
+import onlydust.com.marketplace.bff.read.repositories.ProjectEcosystemCardReadEntityRepository;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import java.util.Optional;
+
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -28,20 +33,37 @@ import static org.springframework.http.ResponseEntity.status;
 public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     public static final String SORT_BY_TOTAL_EARNED = "TOTAL_EARNED";
     final EcosystemContributorPageItemEntityRepository ecosystemContributorPageItemEntityRepository;
+    private final ProjectEcosystemCardReadEntityRepository projectEcosystemCardReadEntityRepository;
 
     private final EcosystemReadRepository ecosystemReadRepository;
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
                                                                              Boolean hasGoodFirstIssues) {
-        return ReadEcosystemsApi.super.getEcosystemProjects(ecosystemSlug, pageIndex, pageSize, hasGoodFirstIssues);
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+        final Page<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
+                Optional.ofNullable(hasGoodFirstIssues).orElse(false),
+                PageRequest.of(sanitizePageIndex, sanitizePageSize));
+
+        final EcosystemProjectPageResponse response = new EcosystemProjectPageResponse()
+                .projects(projects.stream().map(ProjectEcosystemCardReadEntity::toContract).toList())
+                .hasMore(PaginationHelper.hasMore(sanitizePageIndex, projects.getTotalPages()))
+                .nextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, projects.getTotalPages()))
+                .totalItemNumber((int) projects.getTotalElements())
+                .totalPageNumber(projects.getTotalPages());
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, Integer pageIndex, Integer pageSize, String sort) {
         final var contributors = SORT_BY_TOTAL_EARNED.equals(sort) ?
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByTotalEarnedUsdDesc(ecosystemSlug, PageRequest.of(pageIndex, pageSize)) :
-                ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByContributionCountDesc(ecosystemSlug, PageRequest.of(pageIndex, pageSize));
+                ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByContributionCountDesc(ecosystemSlug, PageRequest.of(pageIndex,
+                        pageSize));
 
         return ResponseEntity.ok(new EcosystemContributorsPage()
                 .hasMore(contributors.hasNext())

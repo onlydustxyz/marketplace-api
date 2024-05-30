@@ -302,4 +302,9 @@ public class ProjectConfiguration {
     public OutboxConsumer projectMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
         return new RetriedOutboxConsumer(customerIOAdapter);
     }
+
+    @Bean
+    public LanguageFacadePort languageFacadePort(final LanguageStorage languageStorage, final ImageStoragePort imageStoragePort) {
+        return new LanguageService(languageStorage, imageStoragePort);
+    }
 }
