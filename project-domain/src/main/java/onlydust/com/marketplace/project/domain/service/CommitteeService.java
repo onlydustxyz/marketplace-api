@@ -193,18 +193,21 @@ public class CommitteeService implements CommitteeFacadePort {
 
         final var projectScores = committeeStoragePort.findJuryAssignments(committee.id())
                 .stream()
-                .collect(filtering(a -> a.getScore() >= 3,
-                        groupingBy(JuryAssignment::getProjectId,
-                                mapping(JuryAssignment::getScore,
-                                        averagingDouble(s -> (s.doubleValue() - 3) * 2 + 1)))));
+                .collect(groupingBy(JuryAssignment::getProjectId,
+                        mapping(JuryAssignment::getScore,
+                                averagingDouble(s -> s.doubleValue()))))
+                .entrySet().stream()
+                .filter(e -> e.getValue() >= 3)
+                .collect(toMap(Map.Entry::getKey, e -> (e.getValue().doubleValue() - 3) * 2 + 1));
 
         final var totalShares = projectScores.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
         final var perShareAllocation = budget.divide(totalShares, 6, RoundingMode.DOWN);
 
-        final var projectAllocations = projectScores.entrySet().stream().collect(toMap(
-                Map.Entry::getKey,
-                e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue())).setScale(5, RoundingMode.HALF_EVEN)
-        ));
+        final var projectAllocations = projectScores.entrySet().stream()
+                .collect(toMap(
+                        Map.Entry::getKey,
+                        e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue())).setScale(5, RoundingMode.HALF_EVEN)
+                ));
 
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
     }
