@@ -38,11 +38,11 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
-                                                                             Boolean hasGoodFirstIssues) {
+                                                                             Boolean hasGoodFirstIssues, String sortBy) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize
+                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize, sortBy
         );
 
         final int projectsCount = projectEcosystemCardReadEntityRepository.countAllBy(ecosystemSlug, hasGoodFirstIssues);

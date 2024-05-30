@@ -58,10 +58,14 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
                 where e.slug = :ecosystemSlug
                 and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                order by case
+                    when cast(:orderBy as text) = 'RANK' then (p.rank, UPPER(p.name))
+                    else (0, UPPER(p.name))
+                end
                 offset :offset limit :limit
             """)
     List<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, int offset,
-                                                   int limit);
+                                                   int limit, String orderBy);
 
     @Query(nativeQuery = true, value = """
                     select count(distinct p.id)
