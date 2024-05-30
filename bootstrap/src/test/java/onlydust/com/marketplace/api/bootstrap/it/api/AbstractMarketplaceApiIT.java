@@ -129,6 +129,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
     protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";
+    protected static final String GET_ECOSYSTEM_CONTRIBUTORS = "/api/v1/ecosystems/%s/contributors";
     protected static final String BILLING_PROFILES_POST = "/api/v1/billing-profiles";
     protected static final String BILLING_PROFILES_GET_BY_ID = "/api/v1/billing-profiles/%s";
     protected static final String BILLING_PROFILES_DELETE_BY_ID = "/api/v1/billing-profiles/%s";

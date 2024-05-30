@@ -55,7 +55,7 @@ public class ReadMarketplaceApiConfiguration {
     }
 
     @Bean
-    public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter() {
-        return new ReadEcosystemsApiPostgresAdapter();
+    public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter(final EcosystemContributorPageItemEntityRepository ecosystemContributorPageItemEntityRepository) {
+        return new ReadEcosystemsApiPostgresAdapter(ecosystemContributorPageItemEntityRepository);
     }
 }
