@@ -305,4 +305,33 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_get_ecosystem_languages() {
+        // When
+        client.get()
+                .uri(getApiURI(ECOSYSTEM_LANGUAGES.formatted("ethereum")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "languages": [
+                            {
+                              "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                              "name": "Typescript",
+                              "url": null,
+                              "logoUrl": null,
+                              "bannerUrl": null
+                            }
+                          ]
+                        }
+                        """);
+    }
 }
