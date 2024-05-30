@@ -3502,6 +3502,12 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: sortBy
+          required: false
+          schema:
+            enum:
+              - RANK
       responses:
         "200":
           description: 'List of ecosystem projects'
