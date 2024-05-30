@@ -2533,6 +2533,8 @@ components:
           type: string
         logoUrl:
           type: string
+        description:
+          type: string
 
     EcosystemResponse:
       type: object
@@ -2540,11 +2542,15 @@ components:
         id:
           type: string
           format: uuid
+        slug:
+          type: string
         name:
           type: string
         url:
           type: string
         logoUrl:
+          type: string
+        description:
           type: string
 
     UpdateInvoiceStatusRequest:

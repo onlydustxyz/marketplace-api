@@ -18,4 +18,12 @@ public class Ecosystem {
     String url;
     @NonNull
     String logoUrl;
+    @NonNull
+    String description;
+
+    public String getSlug() {
+        return name.replaceAll("[^a-zA-Z0-9_\\- ]+", "")
+                .replaceAll("\s+", "-")
+                .toLowerCase();
+    }
 }

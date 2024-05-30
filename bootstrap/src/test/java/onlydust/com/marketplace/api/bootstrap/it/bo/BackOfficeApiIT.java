@@ -201,6 +201,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
         ecosystemRequest.setLogoUrl(faker.internet().url());
         ecosystemRequest.setUrl(faker.internet().url());
         ecosystemRequest.setName(faker.rickAndMorty().character());
+        ecosystemRequest.setDescription(faker.rickAndMorty().quote());
 
         // When
         client.post()
@@ -213,8 +214,10 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.name").isEqualTo(ecosystemRequest.getName())
+                .jsonPath("$.slug").isNotEmpty()
                 .jsonPath("$.url").isEqualTo(ecosystemRequest.getUrl())
                 .jsonPath("$.logoUrl").isEqualTo(ecosystemRequest.getLogoUrl())
+                .jsonPath("$.description").isEqualTo(ecosystemRequest.getDescription())
                 .jsonPath("$.id").isNotEmpty();
     }
 

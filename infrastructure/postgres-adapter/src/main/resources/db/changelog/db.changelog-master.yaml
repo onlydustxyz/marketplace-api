@@ -319,3 +319,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000245_add_ecosystem_fields.sql
   - include:
       file: db/changelog/changelogs/00000246_create_project_languages_materialized_view.sql
+  - include:
+      file: db/changelog/changelogs/00000247_add_ecosystem_related_articles.sql

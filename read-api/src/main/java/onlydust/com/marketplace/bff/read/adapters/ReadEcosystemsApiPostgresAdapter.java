@@ -2,10 +2,7 @@ package onlydust.com.marketplace.bff.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadEcosystemsApi;
-import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPage;
-import onlydust.com.marketplace.api.contract.model.EcosystemContributorsPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.EcosystemPageV2;
-import onlydust.com.marketplace.api.contract.model.EcosystemProjectPageResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
@@ -22,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -61,6 +60,14 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     }
 
     @Override
+    public ResponseEntity<EcosystemDetailsResponse> getEcosystemBySlug(String slug) {
+        final var ecosystem = ecosystemReadRepository.findBySlug(slug)
+                .orElseThrow(() -> notFound("Ecosystem %s not found".formatted(slug)));
+
+        return ok(ecosystem.toDetailsResponse());
+    }
+
+    @Override
     public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, Integer pageIndex, Integer pageSize, String sort) {
         final var contributors = SORT_BY_TOTAL_EARNED.equals(sort) ?
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByTotalEarnedUsdDesc(ecosystemSlug, PageRequest.of(pageIndex, pageSize)) :
@@ -88,7 +95,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     @Override
     public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Integer pageIndex, Integer pageSize) {
         final var page = featured ?
-                ecosystemReadRepository.findAllByFeaturedNotNull(PageRequest.of(pageIndex, pageSize, Sort.by("featured"))) :
+                ecosystemReadRepository.findAllFeatured(PageRequest.of(pageIndex, pageSize, Sort.by("featuredRank"))) :
                 ecosystemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
 
         final var response = new EcosystemPageV2()
