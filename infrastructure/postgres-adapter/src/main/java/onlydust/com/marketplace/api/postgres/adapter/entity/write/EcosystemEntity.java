@@ -1,12 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import lombok.*;
-import onlydust.com.marketplace.project.domain.model.Ecosystem;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.*;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
 
 import java.util.UUID;
 
@@ -22,19 +21,25 @@ public class EcosystemEntity {
     @Id
     @Column(name = "id")
     UUID id;
+    @Column(name = "slug", nullable = false)
+    String slug;
     @Column(name = "name", nullable = false)
     String name;
     @Column(name = "logo_url", nullable = false)
     String logoUrl;
     @Column(name = "url")
     String url;
+    @Column(name = "description", nullable = false)
+    String description;
 
     public static EcosystemEntity fromDomain(final Ecosystem ecosystem) {
         return EcosystemEntity.builder()
                 .id(ecosystem.getId())
-                .url(ecosystem.getUrl())
+                .slug(ecosystem.getSlug())
                 .name(ecosystem.getName())
                 .logoUrl(ecosystem.getLogoUrl())
+                .url(ecosystem.getUrl())
+                .description(ecosystem.getDescription())
                 .build();
     }
 
@@ -44,6 +49,7 @@ public class EcosystemEntity {
                 .logoUrl(this.logoUrl)
                 .url(this.url)
                 .name(this.name)
+                .description(this.description)
                 .build();
     }
 }

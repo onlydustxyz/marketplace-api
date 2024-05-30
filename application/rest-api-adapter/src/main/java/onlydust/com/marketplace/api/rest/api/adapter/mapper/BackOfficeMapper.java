@@ -675,15 +675,18 @@ public interface BackOfficeMapper {
                 .name(ecosystemRequest.getName())
                 .url(ecosystemRequest.getUrl())
                 .logoUrl(ecosystemRequest.getLogoUrl())
+                .description(ecosystemRequest.getDescription())
                 .build();
     }
 
     static EcosystemResponse mapEcosystemToResponse(final Ecosystem ecosystem) {
         return new EcosystemResponse()
                 .id(ecosystem.getId())
+                .slug(ecosystem.getSlug())
                 .url(ecosystem.getUrl())
                 .name(ecosystem.getName())
-                .logoUrl(ecosystem.getLogoUrl());
+                .logoUrl(ecosystem.getLogoUrl())
+                .description(ecosystem.getDescription());
     }
 
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {
