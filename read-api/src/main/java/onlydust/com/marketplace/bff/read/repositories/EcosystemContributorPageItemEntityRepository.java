@@ -42,7 +42,6 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
                                   reward_stats.recipient_id = uer.contributor_id
             """;
 
-    // TODO: use real slug column
     @Query(value = SELECT + """
             where eco.name = :ecosystemSlug
             order by stats.contribution_count desc
@@ -52,12 +51,11 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
                            uer.contributor_id                   as contributor_id
                     from users_ecosystems_ranks uer
                             join ecosystems eco on eco.id = uer.ecosystem_id
-                    where eco.name = :ecosystemSlug
+                    where eco.slug = :ecosystemSlug
                     """,
             nativeQuery = true)
     Page<EcosystemContributorPageItemEntity> findByEcosystemSlugOrderByContributionCountDesc(String ecosystemSlug, Pageable pageable);
 
-    // TODO: use real slug column
     @Query(value = SELECT + """
             where eco.name = :ecosystemSlug
             order by reward_stats.usd_total desc
@@ -67,7 +65,7 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
                            uer.contributor_id                   as contributor_id
                     from users_ecosystems_ranks uer
                             join ecosystems eco on eco.id = uer.ecosystem_id
-                    where eco.name = :ecosystemSlug
+                    where eco.slug = :ecosystemSlug
                     """,
             nativeQuery = true)
     Page<EcosystemContributorPageItemEntity> findByEcosystemSlugOrderByTotalEarnedUsdDesc(String ecosystemSlug, Pageable pageable);
