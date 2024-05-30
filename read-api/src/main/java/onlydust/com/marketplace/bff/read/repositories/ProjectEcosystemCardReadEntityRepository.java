@@ -31,7 +31,9 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                         from project_languages pl
                         join languages l on pl.language_id = l.id
                         where pl.project_id = p.id)                                                                languages
-                from projects p
+                from ecosystems e
+                         join projects_ecosystems pe on pe.ecosystem_id = e.id
+                         join projects p on p.id = pe.project_id
                          left join (select c.project_id,
                                            jsonb_agg(
                                                    jsonb_build_object(
@@ -56,7 +58,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     WHERE i.status = 'OPEN'
                                       AND gia.user_id IS NULL
                                     group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
-                where (:hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                where e.slug =:ecosystemSlug and (:hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
             """)
     Page<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, boolean hasGoodFirstIssues, Pageable pageable);
 }

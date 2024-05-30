@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -40,9 +42,9 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                                                                              Boolean hasGoodFirstIssues) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final Page<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug, hasGoodFirstIssues,
-                PageRequest.of(sanitizePageIndex, sanitizePageSize,
-                        JpaSort.unsafe(Sort.Direction.DESC, "rank")));
+        final Page<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
+                Optional.ofNullable(hasGoodFirstIssues).orElse(false),
+                PageRequest.of(sanitizePageIndex, sanitizePageSize));
 
         final EcosystemProjectPageResponse response = new EcosystemProjectPageResponse()
                 .projects(projects.stream().map(ProjectEcosystemCardReadEntity::toContract).toList())
