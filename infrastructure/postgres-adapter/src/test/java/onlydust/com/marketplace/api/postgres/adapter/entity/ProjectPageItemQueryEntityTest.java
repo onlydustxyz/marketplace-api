@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -67,7 +68,7 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_no_tags() {
             // Given
-            final List<Project.Tag> tags = null;
+            final List<String> tags = null;
 
             // When
             final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
@@ -79,7 +80,7 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_one_tag() {
             // Given
-            final List<Project.Tag> tags = List.of(Project.Tag.NEWBIES_WELCOME);
+            final List<String> tags = Stream.of(Project.Tag.NEWBIES_WELCOME).map(Enum::name).toList();
 
             // When
             final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);
@@ -91,7 +92,7 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_two_tags() {
             // Given
-            final List<Project.Tag> tags = List.of(Project.Tag.LIKELY_TO_REWARD, Project.Tag.FAST_AND_FURIOUS);
+            final List<String> tags = Stream.of(Project.Tag.LIKELY_TO_REWARD, Project.Tag.FAST_AND_FURIOUS).map(Enum::name).toList();
 
             // When
             final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags);

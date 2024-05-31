@@ -3,6 +3,7 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadEcosystemsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -39,14 +41,16 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
-                                                                             Boolean hasGoodFirstIssues, String sortBy) {
+                                                                             Boolean hasGoodFirstIssues, String sortBy, ProjectTag tag) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
+        final String tagJsonPath = Optional.ofNullable(tag).map(Enum::name).map(List::of).map(ProjectPageItemQueryEntity::getTagsJsonPath).orElse(null);
         final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize, sortBy
+                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize, sortBy,
+                tagJsonPath
         );
 
-        final int projectsCount = projectEcosystemCardReadEntityRepository.countAllBy(ecosystemSlug, hasGoodFirstIssues);
+        final int projectsCount = projectEcosystemCardReadEntityRepository.countAllBy(ecosystemSlug, hasGoodFirstIssues, tagJsonPath);
         final int totalNumberOfPage = calculateTotalNumberOfPage(sanitizePageSize, projectsCount);
 
         final EcosystemProjectPageResponse response = new EcosystemProjectPageResponse()

@@ -3508,6 +3508,11 @@ paths:
           schema:
             enum:
               - RANK
+        - in: query
+          name: tag
+          required: false
+          schema:
+            $ref: '#/components/schemas/ProjectTag'
       responses:
         "200":
           description: 'List of ecosystem projects'
