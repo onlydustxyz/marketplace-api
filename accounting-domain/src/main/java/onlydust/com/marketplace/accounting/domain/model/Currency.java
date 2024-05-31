@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static onlydust.com.marketplace.kernel.Utils.CurrencyConversion.optimimumScale;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -187,6 +188,10 @@ public class Currency implements Cloneable {
                 .latestUsdQuote(latestUsdQuote)
                 .logoUrl(logoUri().orElse(null))
                 .build();
+    }
+
+    public int precision() {
+        return optimimumScale(latestUsdQuote, decimals);
     }
 
     @NoArgsConstructor(staticName = "random")

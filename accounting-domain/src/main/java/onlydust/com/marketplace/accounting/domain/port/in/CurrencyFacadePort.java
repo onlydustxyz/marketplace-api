@@ -27,4 +27,6 @@ public interface CurrencyFacadePort {
     Collection<Currency> listCurrencies();
 
     BigDecimal latestQuote(Currency.Code usd, Currency.Code eur);
+
+    Currency get(Currency.Id id);
 }

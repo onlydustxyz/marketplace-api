@@ -140,6 +140,11 @@ public class CurrencyService implements CurrencyFacadePort {
                 .orElseThrow(() -> notFound("Could not find quote from %s to %s".formatted(from, to)));
     }
 
+    @Override
+    public Currency get(Currency.Id id) {
+        return currencyStorage.get(id).orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
+    }
+
     private void saveQuotes(Set<Currency> currencies) {
         final var bases = new HashSet<>(currencyStorage.all());
         bases.addAll(currencies);

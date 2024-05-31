@@ -48,7 +48,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     private static final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
 
     // Currencies
-    private static final UUID STRK = UUID.fromString("81b7e948-954f-4718-bad3-b70a0edd27e1");
+    private static final UUID USDC = UUID.fromString("562bbf65-8a71-4d30-ad63-520c0d68ba27");
 
     private static final Faker faker = new Faker();
     private UUID committeeId;
@@ -73,7 +73,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     void should_add_budget_to_committee() {
         final var request = new CommitteeBudgetAllocationsCreateRequest()
                 .amount(BigDecimal.valueOf(10000))
-                .currencyId(STRK);
+                .currencyId(USDC);
 
         client.post()
                 .uri(getApiURI(COMMITTEE_BUDGET_ALLOCATIONS.formatted(committeeId)))
@@ -95,13 +95,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                 .json("""
                         {
                           "currency": {
-                            "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                            "code": "STRK",
-                            "name": "StarkNet Token",
-                            "logoUrl": null,
-                            "decimals": 18
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                            "decimals": 6
                           },
-                          "totalAllocationAmount": 10000.00000,
+                          "totalAllocationAmount": 10000.00,
                           "projectAllocations": [
                             {
                               "project": {
@@ -112,13 +112,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 3.0,
                               "allocation": {
-                                "amount": 1111.11111,
+                                "amount": 1111.11,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -131,13 +131,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 4.0,
                               "allocation": {
-                                "amount": 3333.33333,
+                                "amount": 3333.33,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -150,13 +150,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 5.0,
                               "allocation": {
-                                "amount": 5555.55556,
+                                "amount": 5555.56,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             }
@@ -181,13 +181,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 3.0,
                               "allocation": {
-                                "amount": 1111.11111,
+                                "amount": 1111.11,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -204,13 +204,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 4.0,
                               "allocation": {
-                                "amount": 3333.33333,
+                                "amount": 3333.33,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -227,25 +227,25 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               },
                               "score": 5.0,
                               "allocation": {
-                                "amount": 5555.55556,
+                                "amount": 5555.56,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             }
                           ],
                           "allocation": {
-                            "amount": 10000.00000,
+                            "amount": 10000.00,
                             "currency": {
-                              "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                              "code": "STRK",
-                              "name": "StarkNet Token",
-                              "logoUrl": null,
-                              "decimals": 18
+                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                              "code": "USDC",
+                              "name": "USD Coin",
+                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                              "decimals": 6
                             }
                           }
                         }
@@ -263,13 +263,13 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                         {
                           "totalScore": 5.0,
                           "allocation": {
-                            "amount": 5555.55556,
+                            "amount": 5555.56,
                             "currency": {
-                              "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                              "code": "STRK",
-                              "name": "StarkNet Token",
-                              "logoUrl": null,
-                              "decimals": 18
+                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                               "code": "USDC",
+                               "name": "USD Coin",
+                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                               "decimals": 6
                             }
                           }
                         }
@@ -279,7 +279,7 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     @Test
     void should_override_budget_allocations() {
         final var request = new CommitteeBudgetAllocationsUpdateRequest()
-                .currencyId(STRK)
+                .currencyId(USDC)
                 .allocations(List.of(
                         new CommitteeProjectAllocationRequest()
                                 .projectId(cairoFoundryId)
@@ -312,11 +312,11 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                 .json("""
                         {
                           "currency": {
-                            "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                            "code": "STRK",
-                            "name": "StarkNet Token",
-                            "logoUrl": null,
-                            "decimals": 18
+                            "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                            "code": "USDC",
+                            "name": "USD Coin",
+                            "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                            "decimals": 6
                           },
                           "totalAllocationAmount": 6000,
                           "projectAllocations": [
@@ -331,11 +331,11 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               "allocation": {
                                 "amount": 1000,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -350,11 +350,11 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               "allocation": {
                                 "amount": 2000,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             },
@@ -369,11 +369,11 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
                               "allocation": {
                                 "amount": 3000,
                                 "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
                                 }
                               }
                             }
