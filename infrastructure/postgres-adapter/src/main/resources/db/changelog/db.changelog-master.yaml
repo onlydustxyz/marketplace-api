@@ -327,3 +327,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000249_add_ecosystem_projects_featured_ranks.sql
   - include:
       file: db/changelog/changelogs/00000250_create_project_good_first_issues_view.sql
+  - include:
+      file: db/changelog/changelogs/00000251_create_project_category_suggestions.sql

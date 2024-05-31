@@ -83,7 +83,7 @@ public interface ProjectStoragePort {
 
     void updateProjectsTags(Date now);
 
-    void createCategory(ProjectCategory projectCategory);
+    void save(ProjectCategorySuggestion suggestion);
 
     boolean exists(UUID projectId);
 

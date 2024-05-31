@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
-import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -14,10 +13,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
-public class ProjectCategoryApiIT extends AbstractMarketplaceApiIT {
+public class ProjectCategorySuggestionApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
-    ProjectCategoryRepository projectCategoryRepository;
+    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     @Autowired
     SlackApiAdapter slackApiAdapter;
 
@@ -42,11 +41,10 @@ public class ProjectCategoryApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        final List<ProjectCategoryEntity> projectCategories = projectCategoryRepository.findAll();
+        final List<ProjectCategorySuggestionEntity> projectCategories = projectCategorySuggestionRepository.findAll();
         assertEquals(1, projectCategories.size());
-        final ProjectCategoryEntity projectCategoryEntity = projectCategories.get(0);
-        assertEquals(categoryName, projectCategoryEntity.getName());
-        assertEquals(ProjectCategory.Status.SUGGESTED.name(), projectCategoryEntity.getStatus().name());
+        final ProjectCategorySuggestionEntity projectCategorySuggestionEntity = projectCategories.get(0);
+        assertEquals(categoryName, projectCategorySuggestionEntity.getName());
 
         verify(slackApiAdapter).onProjectCategorySuggested(categoryName, pierre.user().getId());
     }

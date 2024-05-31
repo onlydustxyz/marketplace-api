@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -63,7 +63,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
-    private final ProjectCategoryRepository projectCategoryRepository;
+    private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
 
     @Override
@@ -518,8 +518,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void createCategory(ProjectCategory projectCategory) {
-        projectCategoryRepository.save(ProjectCategoryEntity.fromDomain(projectCategory));
+    public void save(ProjectCategorySuggestion suggestion) {
+        projectCategorySuggestionRepository.save(ProjectCategorySuggestionEntity.fromDomain(suggestion));
     }
 
     @Override

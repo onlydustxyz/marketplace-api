@@ -27,7 +27,8 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class ProjectServiceTest {
@@ -752,12 +753,10 @@ public class ProjectServiceTest {
         projectService.suggestCategory(projectCategoryName, userId);
 
         // Then
-        final ArgumentCaptor<ProjectCategory> projectCategoryArgumentCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
-        verify(projectStoragePort).createCategory(projectCategoryArgumentCaptor.capture());
+        final var projectCategoryArgumentCaptor = ArgumentCaptor.forClass(ProjectCategorySuggestion.class);
+        verify(projectStoragePort).save(projectCategoryArgumentCaptor.capture());
         assertEquals(projectCategoryName, projectCategoryArgumentCaptor.getValue().name());
-        assertEquals(ProjectCategory.Status.SUGGESTED, projectCategoryArgumentCaptor.getValue().status());
         assertNotNull(projectCategoryArgumentCaptor.getValue().id());
-        assertNull(projectCategoryArgumentCaptor.getValue().iconUrl());
         verify(projectObserverPort).onProjectCategorySuggested(projectCategoryName, userId);
     }
 }
