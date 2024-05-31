@@ -113,5 +113,10 @@ public class BackofficeConfiguration {
                                                                                      final CurrencyFacadePort currencyFacadePort) {
         return new BackofficeCommitteeManagementRestApi(committeeFacadePort, currencyFacadePort);
     }
+
+    @Bean
+    BackofficeProjectCategoriesRestApi backofficeProjectCategoriesRestApi(final ProjectFacadePort projectFacadePort) {
+        return new BackofficeProjectCategoriesRestApi(projectFacadePort);
+    }
 }
 

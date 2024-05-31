@@ -92,4 +92,6 @@ public interface ProjectStoragePort {
     List<UUID> getProjectLedIdsForUser(UUID userId);
 
     List<UUID> getProjectContributedOnIdsForUser(UUID userId);
+
+    void deleteCategorySuggestion(ProjectCategorySuggestion.Id id);
 }

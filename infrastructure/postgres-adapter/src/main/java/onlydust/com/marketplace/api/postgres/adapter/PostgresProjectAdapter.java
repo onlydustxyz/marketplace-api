@@ -544,4 +544,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public List<UUID> getProjectContributedOnIdsForUser(UUID userId) {
         return projectRepository.getProjectContributedOnIdsForUser(userId);
     }
+
+    @Override
+    public void deleteCategorySuggestion(ProjectCategorySuggestion.Id id) {
+        projectCategorySuggestionRepository.deleteById(id.value());
+    }
 }

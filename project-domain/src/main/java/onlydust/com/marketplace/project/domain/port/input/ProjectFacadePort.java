@@ -85,4 +85,6 @@ public interface ProjectFacadePort {
     void updateProjectsTags();
 
     void suggestCategory(String categoryName, UUID userId);
+
+    void deleteCategorySuggestion(ProjectCategorySuggestion.Id id);
 }

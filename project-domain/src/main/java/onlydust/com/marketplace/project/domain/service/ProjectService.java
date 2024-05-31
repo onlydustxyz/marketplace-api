@@ -397,4 +397,9 @@ public class ProjectService implements ProjectFacadePort {
         projectStoragePort.save(ProjectCategorySuggestion.of(categoryName));
         projectObserverPort.onProjectCategorySuggested(categoryName, userId);
     }
+
+    @Override
+    public void deleteCategorySuggestion(ProjectCategorySuggestion.Id id) {
+        projectStoragePort.deleteCategorySuggestion(id);
+    }
 }

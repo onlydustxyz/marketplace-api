@@ -26,12 +26,12 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
     @Test
     void should_get_project_category_suggestions() {
         // Given
-        final var camille = userAuthHelper.authenticateCamille();
+        final var emilie = userAuthHelper.authenticateEmilie();
 
         // When
         client.get()
                 .uri(PROJECT_CATEGORIES)
-                .header("Authorization", "Bearer " + camille.jwt())
+                .header("Authorization", "Bearer " + emilie.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -68,5 +68,43 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                           ]
                         }
                         """, true);
+    }
+
+
+    @Test
+    void should_delete_project_category_suggestion() {
+        // Given
+        final var emilie = userAuthHelper.authenticateEmilie();
+
+        // When
+        client.delete()
+                .uri(PROJECT_CATEGORY_SUGGESTION.formatted("d3af3bfc-5689-412a-8191-1466aa269830"))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(PROJECT_CATEGORIES)
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "categories": [
+                            {
+                              "name": "Art"
+                            },
+                            {
+                              "name": "Gaming"
+                            }
+                          ]
+                        }
+                        """);
     }
 }
