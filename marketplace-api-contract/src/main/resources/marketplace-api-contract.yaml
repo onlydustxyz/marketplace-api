@@ -1448,7 +1448,7 @@ paths:
       security:
         - { }
       tags:
-        - Projects
+        - ReadProjects
       summary: Get project good first issues
       operationId: getProjectGoodFirstIssues
       description: |

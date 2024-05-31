@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
+package onlydust.com.marketplace.bff.read.entities.github;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,7 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
-import onlydust.com.marketplace.project.domain.view.GithubLabelView;
+import onlydust.com.marketplace.api.contract.model.GithubLabel;
 import org.hibernate.annotations.Immutable;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -16,7 +16,7 @@ import org.hibernate.annotations.Immutable;
 @NoArgsConstructor(force = true)
 @Table(schema = "indexer_exp", name = "github_labels")
 @Immutable
-public class GithubLabelViewEntity {
+public class GithubLabelReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
@@ -27,7 +27,7 @@ public class GithubLabelViewEntity {
 
     String description;
 
-    public GithubLabelView toView() {
-        return new GithubLabelView(id, name, description);
+    public GithubLabel toDto() {
+        return new GithubLabel().name(name).description(description);
     }
 }
