@@ -13,7 +13,8 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                 with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id) rank
                                       from projects_contributors pc
                                                join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
-                                      order by pc.total_contribution_count desc)
+                                      order by pc.total_contribution_count desc),
+                     has_gfi as (select project_id, count(issue_id) > 0 as exist from projects_good_first_issues group by project_id)
                 select p.id,
                        p.name,
                        p.slug,
@@ -41,21 +42,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     from contributors c
                                     where c.rank <= 3
                                     group by c.project_id) cc on cc.project_id = p.id
-                         left join (SELECT pgr.project_id, count(i.id) > 0 exist
-                                    FROM project_github_repos pgr
-                                             join indexer_exp.github_issues i on i.repo_id = pgr.github_repo_id
-                                             LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
-                                             JOIN LATERAL (
-                                        SELECT issue_id
-                                        FROM indexer_exp.github_issues_labels gil
-                                                 JOIN indexer_exp.github_labels gl ON gil.label_id = gl.id
-                                        WHERE gil.issue_id = i.id
-                                          AND gl.name ilike '%good%first%issue%'
-                                        LIMIT 1
-                                        ) gfi ON gfi.issue_id = i.id
-                                    WHERE i.status = 'OPEN'
-                                      AND gia.user_id IS NULL
-                                    group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
+                        left join has_gfi on has_gfi.project_id = p.id
                         left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
@@ -74,25 +61,12 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                                    int limit, String orderBy, String tagJsonPath);
 
     @Query(nativeQuery = true, value = """
+                    with has_gfi as (select project_id, count(issue_id) > 0 as exist from projects_good_first_issues group by project_id)
                     select count(distinct p.id)
-                             from ecosystems e
-                             join projects_ecosystems pe on pe.ecosystem_id = e.id
-                             join projects p on p.id = pe.project_id
-                             left join (SELECT pgr.project_id, count(i.id) > 0 exist
-                                        FROM project_github_repos pgr
-                                                 join indexer_exp.github_issues i on i.repo_id = pgr.github_repo_id
-                                                 LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
-                                                 JOIN LATERAL (
-                                            SELECT issue_id
-                                            FROM indexer_exp.github_issues_labels gil
-                                                     JOIN indexer_exp.github_labels gl ON gil.label_id = gl.id
-                                            WHERE gil.issue_id = i.id
-                                              AND gl.name ilike '%good%first%issue%'
-                                            LIMIT 1
-                                            ) gfi ON gfi.issue_id = i.id
-                                        WHERE i.status = 'OPEN'
-                                          AND gia.user_id IS NULL
-                                        group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
+                            from ecosystems e
+                            join projects_ecosystems pe on pe.ecosystem_id = e.id
+                            join projects p on p.id = pe.project_id
+                            left join has_gfi on has_gfi.project_id = p.id
                             left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
