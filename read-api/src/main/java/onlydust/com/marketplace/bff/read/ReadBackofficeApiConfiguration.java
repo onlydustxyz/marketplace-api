@@ -4,9 +4,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProject
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeCommitteesReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeHackathonsReadApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.adapters.BackofficeReadProjectCategoriesApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeUsersReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
+import onlydust.com.marketplace.bff.read.repositories.ProjectCategorySuggestionReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserShortRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,5 +37,10 @@ public class ReadBackofficeApiConfiguration {
                 committeeBudgetAllocationsResponseEntityRepository,
                 projectInfosViewRepository,
                 committeeProjectAnswerViewRepository);
+    }
+
+    @Bean
+    public BackofficeReadProjectCategoriesApiPostgresAdapter backofficeReadProjectCategoriesApiPostgresAdapter(final ProjectCategorySuggestionReadRepository projectCategorySuggestionReadRepository) {
+        return new BackofficeReadProjectCategoriesApiPostgresAdapter(projectCategorySuggestionReadRepository);
     }
 }

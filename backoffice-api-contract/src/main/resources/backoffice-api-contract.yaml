@@ -1505,6 +1505,14 @@ paths:
         - BackofficeProjectCategories
       summary: Delete a project category suggestion
       operationId: deleteProjectCategorySuggestion
+      description: |
+        Delete a project category suggestion
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectCategorySuggestionId'
       responses:
         "204":
           description: 'Category suggestion deleted'
@@ -4723,9 +4731,9 @@ components:
         - categories
       properties:
         categories:
-        type: array
-        items:
-          $ref: '#/components/schemas/ProjectCategorySuggestionResponse'
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategorySuggestionResponse'
 
     ProjectCategorySuggestionResponse:
       type: object
@@ -4734,10 +4742,10 @@ components:
         - name
       properties:
         id:
-          $ref: '#/components/schemas/ProjectCategoryId'
+          $ref: '#/components/schemas/ProjectCategorySuggestionId'
         name:
           type: string
 
-    ProjectCategoryId:
+    ProjectCategorySuggestionId:
       type: string
       format: uuid
