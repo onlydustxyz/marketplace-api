@@ -101,7 +101,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/currencies/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
 
-                                .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/project-category-suggestions")).hasAnyAuthority(BO_READER.name())
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/project-categories")).hasAnyAuthority(BO_READER.name())
 
                                 .requestMatchers(antMatcher("/api/v1/me/**")).hasAuthority(USER.name())
                                 .requestMatchers(antMatcher("/api/v1/billing-profiles/**")).hasAuthority(USER.name())

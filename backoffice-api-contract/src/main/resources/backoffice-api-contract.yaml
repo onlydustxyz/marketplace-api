@@ -1475,22 +1475,37 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/project-category-suggestions:
+  /bo/v1/project-categories:
     get:
       security:
         - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeReadProjectCategories
-      summary: Get project category suggestions
-      operationId: getProjectCategorySuggestions
+      summary: Get project categories
+      operationId: getProjectCategories
+      description: |
+        Get project categories
+      parameters:
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
       responses:
         "200":
-          description: 'Suggested project categories'
+          description: 'Project categories'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectCategorySuggestionsResponse'
+                $ref: '#/components/schemas/ProjectCategoryPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -1512,7 +1527,7 @@ paths:
           name: id
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectCategorySuggestionId'
+            $ref: '#/components/schemas/ProjectCategoryId'
       responses:
         "204":
           description: 'Category suggestion deleted'
@@ -4725,27 +4740,54 @@ components:
         score:
           type: integer
 
-    ProjectCategorySuggestionsResponse:
+    ProjectCategoryPageResponse:
       type: object
       required:
         - categories
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
       properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
         categories:
           type: array
           items:
-            $ref: '#/components/schemas/ProjectCategorySuggestionResponse'
+            $ref: '#/components/schemas/ProjectCategoryPageItemResponse'
 
-    ProjectCategorySuggestionResponse:
+
+    ProjectCategoryPageItemResponse:
       type: object
       required:
         - id
         - name
+        - status
       properties:
         id:
-          $ref: '#/components/schemas/ProjectCategorySuggestionId'
+          $ref: '#/components/schemas/ProjectCategoryId'
         name:
           type: string
+        status:
+          $ref: '#/components/schemas/ProjectCategorySuggestionStatus'
+        iconSlug:
+          type: string
+        projectCount:
+          type: integer
 
-    ProjectCategorySuggestionId:
+    ProjectCategoryId:
       type: string
       format: uuid
+
+    ProjectCategorySuggestionStatus:
+      type: string
+      enum:
+        - PENDING
+        - APPROVED

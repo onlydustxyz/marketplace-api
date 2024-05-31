@@ -190,8 +190,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String COMMITTEES_STATUS = "/bo/v1/committees/%s/status";
     protected static final String COMMITTEES_APPLICATIONS_BY_IDS = "/bo/v1/committees/%s/projects/%s/applications";
     protected static final String COMMITTEE_BUDGET_ALLOCATIONS = "/bo/v1/committees/%s/allocations";
-    protected static final String PROJECT_CATEGORY_SUGGESTIONS = "/bo/v1/project-category-suggestions";
-    protected static final String PROJECT_CATEGORY_SUGGESTION = "/bo/v1/project-category-suggestions/%s";
+    protected static final String PROJECT_CATEGORIES = "/bo/v1/project-categories";
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()
