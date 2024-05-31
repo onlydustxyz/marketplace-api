@@ -1181,13 +1181,12 @@ paths:
             items:
               type: string
         - in: query
-          name: ecosystemId
+          name: ecosystemSlug
           description: Ecosystem filter
           schema:
             type: array
             items:
-              type: string
-              format: uuid
+              $ref: '#/components/schemas/EcosystemSlug'
         - in: query
           name: tags
           description: Filter on project tags
@@ -3003,11 +3002,10 @@ paths:
             $ref: '#/components/schemas/EcosystemSlug'
         - in: query
           name: sort
+          required: true
           description: Sort order
           schema:
-            enum:
-              - CONTRIBUTION_COUNT
-              - TOTAL_EARNED
+            $ref: '#/components/schemas/EcosystemContributorsFilter'
         - in: query
           name: pageIndex
           required: true
@@ -3506,8 +3504,7 @@ paths:
           name: sortBy
           required: false
           schema:
-            enum:
-              - RANK
+            $ref: '#/components/schemas/EcosystemProjectsSortBy'
         - in: query
           name: tag
           required: false
@@ -4565,6 +4562,7 @@ components:
         - name
         - url
         - logoUrl
+        - slug
       properties:
         id:
           $ref: '#/components/schemas/EcosystemId'
@@ -4587,6 +4585,8 @@ components:
           format: url
           description: Direct URL to ecosystem's banner image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+        slug:
+          $ref: '#/components/schemas/EcosystemSlug'
 
     EcosystemShortResponse:
       type: object
@@ -7660,3 +7660,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LanguageResponse'
+
+    EcosystemContributorsFilter:
+      enum:
+        - CONTRIBUTION_COUNT
+        - TOTAL_EARNED
+
+    EcosystemProjectsSortBy:
+      enum:
+        - RANK

@@ -12,4 +12,5 @@ public class EcosystemView {
     String logoUrl;
     String name;
     String url;
+    String slug;
 }

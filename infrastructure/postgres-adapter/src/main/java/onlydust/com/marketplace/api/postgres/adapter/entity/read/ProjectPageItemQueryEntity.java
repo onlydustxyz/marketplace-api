@@ -54,11 +54,11 @@ public class ProjectPageItemQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<Tag> tags;
 
-    public static String getEcosystemsJsonPath(List<UUID> ecosystemIds) {
-        if (isNull(ecosystemIds) || ecosystemIds.isEmpty()) {
+    public static String getEcosystemsJsonPath(List<String> ecosystemSlugs) {
+        if (isNull(ecosystemSlugs) || ecosystemSlugs.isEmpty()) {
             return null;
         }
-        return "$[*] ? (" + String.join(" || ", ecosystemIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
+        return "$[*] ? (" + String.join(" || ", ecosystemSlugs.stream().map(s -> "@.slug == \"" + s + "\"").toList()) + ")";
     }
 
     public static String getTechnologiesJsonPath(List<String> technologies) {
@@ -100,6 +100,7 @@ public class ProjectPageItemQueryEntity {
                     .logoUrl(ecosystem.logoUrl)
                     .name(ecosystem.name)
                     .url(ecosystem.url)
+                    .slug(ecosystem.slug)
                     .build()));
         }
         if (nonNull(this.projectLeads) && !this.projectLeads.isEmpty()) {
@@ -123,8 +124,7 @@ public class ProjectPageItemQueryEntity {
                 case "WORK_IN_PROGRESS" -> Project.Tag.WORK_IN_PROGRESS;
                 case "HOT_COMMUNITY" -> Project.Tag.HOT_COMMUNITY;
                 case "UPDATED_ROADMAP" -> Project.Tag.UPDATED_ROADMAP;
-                default ->
-                        throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
+                default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
             }));
         }
         return view;
@@ -134,10 +134,8 @@ public class ProjectPageItemQueryEntity {
     @Getter
     @Accessors(fluent = true)
     public static class ProjectLead {
-
         @JsonProperty("id")
         UUID id;
-
         @JsonProperty("url")
         String url;
         @JsonProperty("avatarUrl")
@@ -150,16 +148,16 @@ public class ProjectPageItemQueryEntity {
 
     @EqualsAndHashCode
     public static class Ecosystem {
-
         @JsonProperty("url")
         String url;
-
         @JsonProperty("logoUrl")
         String logoUrl;
         @JsonProperty("id")
         UUID id;
         @JsonProperty("name")
         String name;
+        @JsonProperty("slug")
+        String slug;
     }
 
     @EqualsAndHashCode

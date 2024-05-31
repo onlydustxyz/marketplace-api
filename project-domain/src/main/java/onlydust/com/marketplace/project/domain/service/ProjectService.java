@@ -71,17 +71,17 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
-                                                                                   List<UUID> ecosystemIds, String search,
+                                                                                   List<String> ecosystemSlugs, String search,
                                                                                    ProjectCardView.SortBy sort, UUID userId
             , Boolean mine, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemIds, userId, search,
+        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemSlugs, userId, search,
                 sort, mine, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> ecosystemIds,
+    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                              String search, ProjectCardView.SortBy sort, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsSearchSortBy(tags, technologies, ecosystemIds, search, sort,
+        return projectStoragePort.findByTagsTechnologiesEcosystemsSearchSortBy(tags, technologies, ecosystemSlugs, search, sort,
                 pageIndex, pageSize);
     }
 

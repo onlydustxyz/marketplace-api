@@ -16,12 +16,12 @@ public interface ProjectFacadePort {
 
     ProjectDetailsView getBySlug(String slug, User caller);
 
-    Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> ecosystemIds,
+    Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                             String search, ProjectCardView.SortBy sort,
                                                                             UUID userId, Boolean mine,
                                                                             Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> ecosystemIds,
+    Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                       String search, ProjectCardView.SortBy sort,
                                                                       Integer pageIndex, Integer pageSize);
 

@@ -236,6 +236,7 @@ public interface ProjectMapper {
         ecosystemResponse.setName(ecosystem.getName());
         ecosystemResponse.setLogoUrl(ecosystem.getLogoUrl());
         ecosystemResponse.setUrl(ecosystem.getUrl());
+        ecosystemResponse.setSlug(ecosystem.getSlug());
         return ecosystemResponse;
     }
 
