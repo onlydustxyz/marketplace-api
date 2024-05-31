@@ -164,7 +164,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                                     Integer pageSize) {
         final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
         final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags.stream().map(Enum::name).toList());
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath, technologiesJsonPath,
                 ecosystemsJsonPath, search);
         final List<ProjectPageItemQueryEntity> projectsForUserId =
@@ -192,7 +192,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
         final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags.stream().map(Enum::name).toList());
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final List<ProjectPageItemQueryEntity> projectsForAnonymousUser =
                 projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, ecosystemsJsonPath, search,
                         isNull(sort) ?
