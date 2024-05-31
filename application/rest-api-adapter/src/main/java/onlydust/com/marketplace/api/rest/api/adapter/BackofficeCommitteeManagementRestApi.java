@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackOfficeCommitteeManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -27,6 +29,7 @@ import static org.springframework.http.ResponseEntity.*;
 public class BackofficeCommitteeManagementRestApi implements BackOfficeCommitteeManagementApi {
 
     private final CommitteeFacadePort committeeFacadePort;
+    private final CurrencyFacadePort currencyFacadePort;
 
     @Override
     public ResponseEntity<CommitteeResponse> createCommittee(CreateCommitteeRequest createCommitteeRequest) {
@@ -37,7 +40,8 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
 
     @Override
     public ResponseEntity<Void> createProjectAllocations(UUID committeeId, CommitteeBudgetAllocationsCreateRequest request) {
-        committeeFacadePort.allocate(Committee.Id.of(committeeId), request.getCurrencyId(), request.getAmount());
+        final var currency = currencyFacadePort.get(Currency.Id.of(request.getCurrencyId()));
+        committeeFacadePort.allocate(Committee.Id.of(committeeId), request.getCurrencyId(), request.getAmount(), currency.precision());
         return noContent().build();
     }
 

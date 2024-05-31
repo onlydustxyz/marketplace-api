@@ -9,11 +9,9 @@ import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -111,8 +109,9 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort) {
-        return new BackofficeCommitteeManagementRestApi(committeeFacadePort);
+    public BackofficeCommitteeManagementRestApi backofficeCommitteeManagementRestApi(final CommitteeFacadePort committeeFacadePort,
+                                                                                     final CurrencyFacadePort currencyFacadePort) {
+        return new BackofficeCommitteeManagementRestApi(committeeFacadePort, currencyFacadePort);
     }
 }
 
