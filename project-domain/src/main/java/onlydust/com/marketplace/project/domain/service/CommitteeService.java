@@ -192,7 +192,8 @@ public class CommitteeService implements CommitteeFacadePort {
     @Override
     public void allocate(final Committee.Id committeeId,
                          final UUID currencyId,
-                         final BigDecimal budget) {
+                         final BigDecimal budget,
+                         final int precision) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId.value().toString())));
 
@@ -209,12 +210,12 @@ public class CommitteeService implements CommitteeFacadePort {
                 .collect(toMap(Map.Entry::getKey, e -> (e.getValue().doubleValue() - 3) * 2 + 1));
 
         final var totalShares = projectScores.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
-        final var perShareAllocation = budget.divide(totalShares, 6, RoundingMode.DOWN);
+        final var perShareAllocation = budget.divide(totalShares, precision + 1, RoundingMode.DOWN);
 
         final var projectAllocations = projectScores.entrySet().stream()
                 .collect(toMap(
                         Map.Entry::getKey,
-                        e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue())).setScale(5, RoundingMode.HALF_EVEN)
+                        e -> perShareAllocation.multiply(BigDecimal.valueOf(e.getValue())).setScale(precision, RoundingMode.HALF_EVEN)
                 ));
 
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);

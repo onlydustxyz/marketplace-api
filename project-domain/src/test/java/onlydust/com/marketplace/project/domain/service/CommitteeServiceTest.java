@@ -688,7 +688,7 @@ public class CommitteeServiceTest {
                 .status(Committee.Status.CLOSED)
                 .build();
         private final UUID STRK = UUID.randomUUID();
-
+        private final UUID ETH = UUID.randomUUID();
 
         @Test
         void given_a_non_existing_committee() {
@@ -696,7 +696,7 @@ public class CommitteeServiceTest {
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN))
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN, 2))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Committee %s was not found".formatted(committee.id()));
         }
@@ -708,7 +708,7 @@ public class CommitteeServiceTest {
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee.toBuilder().status(status).build()));
 
             // When
-            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN))
+            assertThatThrownBy(() -> committeeService.allocate(committee.id(), STRK, BigDecimal.TEN, 2))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Committee %s must be closed to allocate budgets".formatted(committee.id()));
         }
@@ -730,7 +730,7 @@ public class CommitteeServiceTest {
         }
 
         @Test
-        void given_correct_inputs() {
+        void a_STRK_budget() {
             // Given
             final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
             final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
@@ -749,28 +749,28 @@ public class CommitteeServiceTest {
             ));
 
             // When
-            committeeService.allocate(committee.id(), STRK, budget);
+            committeeService.allocate(committee.id(), STRK, budget, 2);
 
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
             verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
             final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(3);
-            assertThat(allocations.get(project3)).isEqualByComparingTo(BigDecimal.valueOf(1.66667));
-            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(5));
-            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(8.33333));
+            assertThat(allocations.get(project3)).isEqualTo(BigDecimal.valueOf(1.67));
+            assertThat(allocations.get(project4)).isEqualTo(BigDecimal.valueOf(5).setScale(2));
+            assertThat(allocations.get(project5)).isEqualTo(BigDecimal.valueOf(8.33));
             assertThat(allocations.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add)).isEqualByComparingTo(budget);
         }
 
         @Test
-        void given_more_complex_inputs() {
+        void an_ETH_budget() {
             // Given
             final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
             final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
             final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
             final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
             final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
-            final var budget = BigDecimal.valueOf(15);
+            final var budget = BigDecimal.valueOf(0.1);
 
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
@@ -782,15 +782,15 @@ public class CommitteeServiceTest {
             ));
 
             // When
-            committeeService.allocate(committee.id(), STRK, budget);
+            committeeService.allocate(committee.id(), ETH, budget, 6);
 
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
-            verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
+            verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(ETH), allocationsCaptor.capture());
             final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(2);
-            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(3.75));
-            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(11.25));
+            assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(0.025000));
+            assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(0.075000));
             assertThat(allocations.values().stream().reduce(BigDecimal.ZERO, BigDecimal::add)).isEqualByComparingTo(budget);
         }
 
