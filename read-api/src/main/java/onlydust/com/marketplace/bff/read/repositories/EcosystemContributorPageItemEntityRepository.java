@@ -26,10 +26,10 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
                         else 'F'
                    end                                    as rank_category,
                    stats.contribution_count               as contribution_count,
-                   rank() OVER (ORDER BY stats.contribution_count) as contribution_count_rank,
+                   rank() OVER (ORDER BY stats.contribution_count desc nulls last) as contribution_count_rank,
                    coalesce(reward_stats.reward_count, 0) as reward_count,
                    coalesce(reward_stats.usd_total, 0)    as total_earned_usd,
-                   rank() OVER (ORDER BY reward_stats.usd_total) as total_earned_usd_rank
+                   rank() OVER (ORDER BY reward_stats.usd_total desc nulls last) as total_earned_usd_rank
             from users_ecosystems_ranks uer
                      join global_users_ranks gur on gur.github_user_id = uer.contributor_id
                      join ecosystems eco on eco.id = uer.ecosystem_id
@@ -44,7 +44,7 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
 
     @Query(value = SELECT + """
             where eco.slug = :ecosystemSlug
-            order by stats.contribution_count desc
+            order by stats.contribution_count desc nulls last
             """,
             countQuery = """
                     select uer.ecosystem_id                     as ecosystem_id,
@@ -58,7 +58,7 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
 
     @Query(value = SELECT + """
             where eco.slug = :ecosystemSlug
-            order by reward_stats.usd_total desc
+            order by reward_stats.usd_total desc nulls last
             """,
             countQuery = """
                     select uer.ecosystem_id                     as ecosystem_id,
