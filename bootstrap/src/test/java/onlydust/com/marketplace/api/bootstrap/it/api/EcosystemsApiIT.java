@@ -99,7 +99,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("starknet"),
-                        Map.of("pageIndex", "0", "pageSize", "5")))
+                        Map.of("pageIndex", "0", "pageSize", "5", "sort", "CONTRIBUTION_COUNT")))
                 .exchange()
                 // Then
                 .expectStatus()
