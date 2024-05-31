@@ -11,6 +11,7 @@ public interface EcosystemMapper {
                 .name(ecosystem.name())
                 .url(ecosystem.url())
                 .logoUrl(ecosystem.logoUrl())
+                .slug(ecosystem.slug())
                 .bannerUrl(ecosystem.bannerUrl());
     }
 }

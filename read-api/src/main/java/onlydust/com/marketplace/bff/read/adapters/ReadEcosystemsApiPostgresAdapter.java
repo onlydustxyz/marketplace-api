@@ -74,8 +74,8 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     }
 
     @Override
-    public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, Integer pageIndex, Integer pageSize,
-                                                                              EcosystemContributorsFilter sort) {
+    public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, EcosystemContributorsFilter sort, Integer pageIndex,
+                                                                              Integer pageSize) {
         final var contributors = SORT_BY_TOTAL_EARNED.equals(sort.name()) ?
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByTotalEarnedUsdDesc(ecosystemSlug, PageRequest.of(pageIndex, pageSize)) :
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByContributionCountDesc(ecosystemSlug, PageRequest.of(pageIndex,
