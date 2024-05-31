@@ -61,14 +61,16 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     group by p_tags.project_id) tags on tags.project_id = p.id
                 where e.slug = :ecosystemSlug
                 and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                and ( :featuredProjectsOnly is null or pe.featured_rank is not null)
                 and ( :tagJsonPath is null or jsonb_path_exists(tags.names, cast(cast(:tagJsonPath as text) as jsonpath )))
                 order by case
+                    when :featuredProjectsOnly is not null then (pe.featured_rank, UPPER(p.name))
                     when cast(:orderBy as text) = 'RANK' then (p.rank, UPPER(p.name))
                     else (0, UPPER(p.name))
                 end
                 offset :offset limit :limit
             """)
-    List<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, int offset,
+    List<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, Boolean featuredProjectsOnly, int offset,
                                                    int limit, String orderBy, String tagJsonPath);
 
     @Query(nativeQuery = true, value = """

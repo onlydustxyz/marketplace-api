@@ -3491,15 +3491,22 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: featuredOnly
+          required: false
+          schema:
+            type: boolean
+        - in: query
           name: pageIndex
-          required: true
+          required: false
           schema:
             type: integer
+            default: 0
         - in: query
           name: pageSize
-          required: true
+          required: false
           schema:
             type: integer
+            default: 5
         - in: query
           name: sortBy
           required: false

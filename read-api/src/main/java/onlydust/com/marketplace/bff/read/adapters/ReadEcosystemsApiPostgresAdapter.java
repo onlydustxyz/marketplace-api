@@ -40,13 +40,14 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     private final LanguageReadRepository languageReadRepository;
 
     @Override
-    public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
-                                                                             Boolean hasGoodFirstIssues, EcosystemProjectsSortBy sortBy, ProjectTag tag) {
+    public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Boolean hasGoodFirstIssues, Boolean featuredOnly,
+                                                                             Integer pageIndex, Integer pageSize, EcosystemProjectsSortBy sortBy,
+                                                                             ProjectTag tag) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final String tagJsonPath = Optional.ofNullable(tag).map(Enum::name).map(List::of).map(ProjectPageItemQueryEntity::getTagsJsonPath).orElse(null);
         final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize,
+                hasGoodFirstIssues, featuredOnly, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize,
                 Optional.ofNullable(sortBy).map(Enum::name).orElse(null), tagJsonPath
         );
 
