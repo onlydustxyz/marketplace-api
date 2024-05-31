@@ -1475,6 +1475,44 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/project-category-suggestions:
+    get:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeReadProjectCategories
+      summary: Get project category suggestions
+      operationId: getProjectCategorySuggestions
+      responses:
+        "200":
+          description: 'Suggested project categories'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategorySuggestionsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/project-category-suggestions/{id}:
+    delete:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProjectCategories
+      summary: Delete a project category suggestion
+      operationId: deleteProjectCategorySuggestion
+      responses:
+        "204":
+          description: 'Category suggestion deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeLanguageManagement ===============================================================
 
   /bo/v1/languages:
@@ -4679,5 +4717,27 @@ components:
         score:
           type: integer
 
+    ProjectCategorySuggestionsResponse:
+      type: object
+      required:
+        - categories
+      properties:
+        categories:
+        type: array
+        items:
+          $ref: '#/components/schemas/ProjectCategorySuggestionResponse'
 
+    ProjectCategorySuggestionResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectCategoryId'
+        name:
+          type: string
 
+    ProjectCategoryId:
+      type: string
+      format: uuid
