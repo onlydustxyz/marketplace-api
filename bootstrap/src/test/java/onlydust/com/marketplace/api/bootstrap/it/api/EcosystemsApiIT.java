@@ -98,7 +98,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
     void should_return_ecosystem_contributors_by_contribution_count() {
         // When
         client.get()
-                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("Starknet"),
+                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("starknet"),
                         Map.of("pageIndex", "0", "pageSize", "5")))
                 .exchange()
                 // Then
@@ -176,7 +176,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
     void should_return_ecosystem_contributors_by_total_earned() {
         // When
         client.get()
-                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("Starknet"),
+                .uri(getApiURI(GET_ECOSYSTEM_CONTRIBUTORS.formatted("starknet"),
                         Map.of("pageIndex", "0", "pageSize", "5", "sort", "TOTAL_EARNED")))
                 .exchange()
                 // Then
