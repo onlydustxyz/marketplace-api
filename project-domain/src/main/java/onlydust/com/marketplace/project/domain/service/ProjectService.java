@@ -393,11 +393,6 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<GithubIssueView> findGoodFirstIssues(UUID projectId, Integer page, Integer pageSize) {
-        return githubStoragePort.findGoodFirstIssuesForProject(projectId, page, pageSize);
-    }
-
-    @Override
     public void suggestCategory(String categoryName, UUID userId) {
         projectStoragePort.createCategory(ProjectCategory.suggest(categoryName));
         projectObserverPort.onProjectCategorySuggested(categoryName, userId);

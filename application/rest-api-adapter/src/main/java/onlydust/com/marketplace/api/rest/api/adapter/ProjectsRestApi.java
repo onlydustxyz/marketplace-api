@@ -73,7 +73,8 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies, List<String> ecosystemSlugs,
+    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies,
+                                                           List<String> ecosystemSlugs,
                                                            List<ProjectTag> tags, Boolean mine, String search) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
@@ -489,20 +490,6 @@ public class ProjectsRestApi implements ProjectsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<GoodFirstIssuesPageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-
-        final var page = projectFacadePort.findGoodFirstIssues(projectId, sanitizedPageIndex, sanitizedPageSize);
-
-        final var response = GithubIssueMapper.map(page, sanitizedPageIndex);
-
-        return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response)
-                : ResponseEntity.ok(response);
     }
 
     @Override
