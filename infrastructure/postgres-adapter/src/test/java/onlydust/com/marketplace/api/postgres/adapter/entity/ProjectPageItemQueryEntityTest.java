@@ -23,10 +23,10 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_no_ecosystems() {
             // Given
-            final List<UUID> ecosystems = null;
+            List<String> ecosystemSlugs = null;
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystems);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
 
             // Then
             assertNull(ecosystemsJsonPath);
@@ -35,28 +35,27 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_one_ecosystem() {
             // Given
-            final UUID ecosystemId1 = UUID.randomUUID();
-            final List<UUID> ecosystems = List.of(ecosystemId1);
+            List<String> ecosystemSlugs = List.of("slug1");
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystems);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\")", ecosystemsJsonPath);
+            assertEquals("$[*] ? (@.slug == \"" + "slug1" + "\")", ecosystemsJsonPath);
         }
 
         @Test
         void given_two_ecosystems() {
             // Given
-            final UUID ecosystemId1 = UUID.randomUUID();
-            final UUID ecosystemId2 = UUID.randomUUID();
-            final List<UUID> ecosystemIds = List.of(ecosystemId1, ecosystemId2);
+            final String slug1 = "slug1";
+            final String slug2 = "slug2";
+            List<String> ecosystemSlugs = List.of(slug1, slug2);
 
             // When
-            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemIds);
+            final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + ecosystemId1 + "\" || @.id == \"" + ecosystemId2 + "\")", ecosystemsJsonPath);
+            assertEquals("$[*] ? (@.slug == \"" + slug1 + "\" || @.slug == \"" + slug2 + "\")", ecosystemsJsonPath);
         }
 
 

@@ -22,6 +22,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @Value
 @ToString
@@ -75,19 +77,20 @@ public class PublicUserProfileResponseV2Entity {
                         .leadedProjectCount(leadedProjectCount)
                         .contributionCount(contributionCount)
                         .rewardCount(rewardCount))
-                .ecosystems(ecosystems.stream()
+                .ecosystems(isNull(ecosystems) ? List.of() : ecosystems.stream()
                         .map(ecosystem -> new EcosystemResponse()
                                 .id(ecosystem.id())
                                 .name(ecosystem.name())
                                 .url(ecosystem.url())
                                 .logoUrl(ecosystem.logoUrl())
                                 .bannerUrl(ecosystem.bannerUrl())
+                                .slug(ecosystem.slug())
                         ).toList());
     }
 
     public static BigDecimal prettyRankPercentile(BigDecimal rankPercentile) {
         final var percent = rankPercentile.multiply(BigDecimal.valueOf(100)).doubleValue();
-        return List.of(0.1D, 1D, 5D, 10D).stream()
+        return Stream.of(0.1D, 1D, 5D, 10D)
                 .filter(i -> percent <= i)
                 .map(BigDecimal::valueOf)
                 .min(BigDecimal::compareTo)
@@ -106,6 +109,6 @@ public class PublicUserProfileResponseV2Entity {
                 .toList();
     }
 
-    record Ecosystem(UUID id, String name, String url, String logoUrl, String bannerUrl) {
+    record Ecosystem(UUID id, String name, String url, String logoUrl, String bannerUrl, String slug) {
     }
 }

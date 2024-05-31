@@ -40,6 +40,8 @@ public class ProjectPageItemFiltersQueryEntity {
         UUID id;
         @JsonProperty("name")
         String name;
+        @JsonProperty("slug")
+        String slug;
     }
 
     public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersQueryEntity> filtersViewEntities) {
@@ -60,6 +62,7 @@ public class ProjectPageItemFiltersQueryEntity {
                                 .id(ecosystem.id)
                                 .url(ecosystem.url)
                                 .logoUrl(ecosystem.logoUrl)
+                                .slug(ecosystem.slug)
                                 .name(ecosystem.name).build())
                         .forEach(ecosystems::add);
             }

@@ -157,14 +157,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional(readOnly = true)
     public Page<ProjectCardView> findByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags,
                                                                                     List<String> technologies,
-                                                                                    List<UUID> sponsorIds, UUID userId,
+                                                                                    List<String> ecosystemSlugs, UUID userId,
                                                                                     String search,
                                                                                     ProjectCardView.SortBy sort,
                                                                                     Boolean mine, Integer pageIndex,
                                                                                     Integer pageSize) {
-        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(sponsorIds);
+        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
         final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags.stream().map(Enum::name).toList());
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath, technologiesJsonPath,
                 ecosystemsJsonPath, search);
         final List<ProjectPageItemQueryEntity> projectsForUserId =
@@ -186,13 +186,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional(readOnly = true)
     public Page<ProjectCardView> findByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags,
                                                                               List<String> technologies,
-                                                                              List<UUID> sponsorIds, String search,
+                                                                              List<String> ecosystemSlugs, String search,
                                                                               ProjectCardView.SortBy sort,
                                                                               Integer pageIndex, Integer pageSize) {
 
-        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(sponsorIds);
+        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
         final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(tags.stream().map(Enum::name).toList());
+        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final List<ProjectPageItemQueryEntity> projectsForAnonymousUser =
                 projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, technologiesJsonPath, ecosystemsJsonPath, search,
                         isNull(sort) ?

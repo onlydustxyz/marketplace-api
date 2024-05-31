@@ -28,4 +28,5 @@ public class EcosystemViewEntity {
     @Column(name = "logo_url")
     String logoUrl;
     String bannerUrl;
+    @NonNull String slug;
 }

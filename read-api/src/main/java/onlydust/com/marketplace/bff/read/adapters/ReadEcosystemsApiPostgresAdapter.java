@@ -41,13 +41,13 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
-                                                                             Boolean hasGoodFirstIssues, String sortBy, ProjectTag tag) {
+                                                                             Boolean hasGoodFirstIssues, EcosystemProjectsSortBy sortBy, ProjectTag tag) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final String tagJsonPath = Optional.ofNullable(tag).map(Enum::name).map(List::of).map(ProjectPageItemQueryEntity::getTagsJsonPath).orElse(null);
         final List<ProjectEcosystemCardReadEntity> projects = projectEcosystemCardReadEntityRepository.findAllBy(ecosystemSlug,
-                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize, sortBy,
-                tagJsonPath
+                hasGoodFirstIssues, getPostgresOffsetFromPagination(sanitizePageSize, sanitizePageIndex), sanitizePageSize,
+                Optional.ofNullable(sortBy).map(Enum::name).orElse(null), tagJsonPath
         );
 
         final int projectsCount = projectEcosystemCardReadEntityRepository.countAllBy(ecosystemSlug, hasGoodFirstIssues, tagJsonPath);
@@ -74,8 +74,9 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     }
 
     @Override
-    public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, Integer pageIndex, Integer pageSize, String sort) {
-        final var contributors = SORT_BY_TOTAL_EARNED.equals(sort) ?
+    public ResponseEntity<EcosystemContributorsPage> getEcosystemContributors(String ecosystemSlug, EcosystemContributorsFilter sort, Integer pageIndex,
+                                                                              Integer pageSize) {
+        final var contributors = SORT_BY_TOTAL_EARNED.equals(sort.name()) ?
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByTotalEarnedUsdDesc(ecosystemSlug, PageRequest.of(pageIndex, pageSize)) :
                 ecosystemContributorPageItemEntityRepository.findByEcosystemSlugOrderByContributionCountDesc(ecosystemSlug, PageRequest.of(pageIndex,
                         pageSize));
@@ -89,7 +90,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                         .githubUserId(c.contributorId())
                         .avatarUrl(c.avatarUrl())
                         .login(c.login())
-                        .dynamicRank(SORT_BY_TOTAL_EARNED.equals(sort) ? c.totalEarnedUsdRank() : c.contributionCountRank())
+                        .dynamicRank(SORT_BY_TOTAL_EARNED.equals(sort.name()) ? c.totalEarnedUsdRank() : c.contributionCountRank())
                         .globalRank(c.rank())
                         .globalRankCategory(c.rankCategory())
                         .contributionCount(c.contributionCount())

@@ -49,7 +49,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                    'url', ecosystem.url,
                                                    'logoUrl', ecosystem.logo_url,
                                                    'id', ecosystem.id,
-                                                   'name', ecosystem.name
+                                                   'name', ecosystem.name,
+                                                   'slug', ecosystem.slug
                                            )) ecosystem_json
                                     from ecosystems ecosystem
                                              join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
@@ -128,7 +129,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                'url', ecosystem.url,
                                                'logoUrl', ecosystem.logo_url,
                                                'id', ecosystem.id,
-                                               'name', ecosystem.name
+                                               'name', ecosystem.name,
+                                               'slug', ecosystem.slug
                                        )) ecosystem_json
                                 from ecosystems ecosystem
                                 join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
@@ -203,7 +205,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                            'url', ecosystem.url,
                                                            'logoUrl', ecosystem.logo_url,
                                                            'id', ecosystem.id,
-                                                           'name', ecosystem.name
+                                                           'name', ecosystem.name,
+                                                           'slug', ecosystem.slug
                                                    )) ecosystem_json
                                             from ecosystems ecosystem
                                                      join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
@@ -238,7 +241,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                'url', ecosystem.url,
                                                'logoUrl', ecosystem.logo_url,
                                                'id', ecosystem.id,
-                                               'name', ecosystem.name
+                                               'name', ecosystem.name,
+                                               'slug', ecosystem.slug
                                        )) ecosystem_json
                                 from ecosystems ecosystem
                                 join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id

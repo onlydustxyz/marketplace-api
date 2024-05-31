@@ -13,12 +13,12 @@ public interface ProjectStoragePort {
 
     ProjectDetailsView getBySlug(String slug, User caller);
 
-    Page<ProjectCardView> findByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+    Page<ProjectCardView> findByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                              UUID userId, String search,
                                                                              ProjectCardView.SortBy sort, Boolean mine,
                                                                              Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> findByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<UUID> sponsorIds,
+    Page<ProjectCardView> findByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                        String search, ProjectCardView.SortBy sort,
                                                                        Integer pageIndex, Integer pageSize);
 
