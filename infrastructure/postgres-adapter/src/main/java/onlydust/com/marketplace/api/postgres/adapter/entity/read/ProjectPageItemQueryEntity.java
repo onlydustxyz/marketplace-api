@@ -68,11 +68,11 @@ public class ProjectPageItemQueryEntity {
         return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
     }
 
-    public static String getTagsJsonPath(List<Project.Tag> tags) {
+    public static String getTagsJsonPath(List<String> tags) {
         if (isNull(tags) || tags.isEmpty()) {
             return null;
         }
-        return "$[*] ? (" + String.join(" || ", tags.stream().map(Enum::name).map(s -> "@.name == \"" + s + "\"").toList()) + ")";
+        return "$[*] ? (" + String.join(" || ", tags.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
     }
 
     public ProjectCardView toView(UUID userId) {

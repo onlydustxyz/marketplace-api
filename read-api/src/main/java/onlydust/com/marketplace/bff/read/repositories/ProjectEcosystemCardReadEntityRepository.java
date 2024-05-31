@@ -56,8 +56,12 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                     WHERE i.status = 'OPEN'
                                       AND gia.user_id IS NULL
                                     group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
+                        left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
+                                    from projects_tags p_tags
+                                    group by p_tags.project_id) tags on tags.project_id = p.id
                 where e.slug = :ecosystemSlug
                 and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                and ( :tagJsonPath is null or jsonb_path_exists(tags.names, cast(cast(:tagJsonPath as text) as jsonpath )))
                 order by case
                     when cast(:orderBy as text) = 'RANK' then (p.rank, UPPER(p.name))
                     else (0, UPPER(p.name))
@@ -65,7 +69,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                 offset :offset limit :limit
             """)
     List<ProjectEcosystemCardReadEntity> findAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, int offset,
-                                                   int limit, String orderBy);
+                                                   int limit, String orderBy, String tagJsonPath);
 
     @Query(nativeQuery = true, value = """
                     select count(distinct p.id)
@@ -87,8 +91,12 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                         WHERE i.status = 'OPEN'
                                           AND gia.user_id IS NULL
                                         group by pgr.project_id) has_gfi on has_gfi.project_id = p.id
+                            left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
+                                    from projects_tags p_tags
+                                    group by p_tags.project_id) tags on tags.project_id = p.id
                             where e.slug = :ecosystemSlug
                             and ( :hasGoodFirstIssues is null or has_gfi.exist = :hasGoodFirstIssues)
+                            and ( :tagJsonPath is null or jsonb_path_exists(tags.names, cast(cast(:tagJsonPath as text) as jsonpath )))
             """)
-    int countAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues);
+    int countAllBy(String ecosystemSlug, Boolean hasGoodFirstIssues, String tagJsonPath);
 }
