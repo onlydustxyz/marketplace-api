@@ -43,7 +43,7 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
             """;
 
     @Query(value = SELECT + """
-            where eco.name = :ecosystemSlug
+            where eco.slug = :ecosystemSlug
             order by stats.contribution_count desc
             """,
             countQuery = """
@@ -57,7 +57,7 @@ public interface EcosystemContributorPageItemEntityRepository extends Repository
     Page<EcosystemContributorPageItemEntity> findByEcosystemSlugOrderByContributionCountDesc(String ecosystemSlug, Pageable pageable);
 
     @Query(value = SELECT + """
-            where eco.name = :ecosystemSlug
+            where eco.slug = :ecosystemSlug
             order by reward_stats.usd_total desc
             """,
             countQuery = """
