@@ -321,3 +321,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000246_create_project_languages_materialized_view.sql
   - include:
       file: db/changelog/changelogs/00000247_add_ecosystem_related_articles.sql
+  - include:
+      file: db/changelog/changelogs/00000248_create_ecosystem_languages.sql

@@ -3,10 +3,12 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadEcosystemsApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.EcosystemReadRepository;
+import onlydust.com.marketplace.bff.read.repositories.LanguageReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.ProjectEcosystemCardReadEntityRepository;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
@@ -34,6 +35,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     private final ProjectEcosystemCardReadEntityRepository projectEcosystemCardReadEntityRepository;
 
     private final EcosystemReadRepository ecosystemReadRepository;
+    private final LanguageReadRepository languageReadRepository;
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Integer pageIndex, Integer pageSize,
@@ -90,6 +92,17 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                         .totalEarnedUsd(c.totalEarnedUsd())
                         .rewardCount(c.rewardCount())
                 ).toList()));
+    }
+
+    @Override
+    public ResponseEntity<EcosystemLanguagesPageResponse> getEcosystemLanguages(String slug, Integer pageIndex, Integer pageSize) {
+        final var page = languageReadRepository.findAllByEcosystemSlug(slug, PageRequest.of(pageIndex, pageSize));
+        return ResponseEntity.ok(new EcosystemLanguagesPageResponse()
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .languages(page.stream().map(LanguageReadEntity::toDto).toList()));
     }
 
     @Override

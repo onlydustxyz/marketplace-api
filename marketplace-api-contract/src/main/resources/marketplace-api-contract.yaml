@@ -3091,7 +3091,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/ecosystems/{ecosystemId}/languages:
+  /api/v1/ecosystems/slug/{slug}/languages:
     get:
       security:
         - { }
@@ -3101,10 +3101,10 @@ paths:
       operationId: getEcosystemLanguages
       parameters:
         - in: path
-          name: ecosystemId
+          name: slug
           required: true
           schema:
-            $ref: '#/components/schemas/EcosystemId'
+            $ref: '#/components/schemas/EcosystemSlug'
         - in: query
           name: pageIndex
           required: false
