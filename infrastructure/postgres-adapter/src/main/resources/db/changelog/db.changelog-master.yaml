@@ -325,3 +325,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000248_create_ecosystem_languages.sql
   - include:
       file: db/changelog/changelogs/00000249_add_ecosystem_projects_featured_ranks.sql
+  - include:
+      file: db/changelog/changelogs/00000250_create_project_good_first_issues_view.sql
