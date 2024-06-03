@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
@@ -8,10 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
+import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ProjectCategoryServiceTest {
@@ -29,17 +32,100 @@ class ProjectCategoryServiceTest {
     @Test
     void should_suggest_project_category() {
         // Given
-        final String projectCategoryName = faker.rickAndMorty().character();
-        final UUID userId = UUID.randomUUID();
+        final var userId = UUID.randomUUID();
+        final var name = faker.rickAndMorty().character();
 
         // When
-        projectCategoryService.suggest(projectCategoryName, userId);
+        projectCategoryService.suggest(name, userId);
 
         // Then
-        final var projectCategoryArgumentCaptor = ArgumentCaptor.forClass(ProjectCategorySuggestion.class);
-        verify(projectCategoryStoragePort).save(projectCategoryArgumentCaptor.capture());
-        assertEquals(projectCategoryName, projectCategoryArgumentCaptor.getValue().name());
-        assertNotNull(projectCategoryArgumentCaptor.getValue().id());
-        verify(projectObserverPort).onProjectCategorySuggested(projectCategoryName, userId);
+        final var suggestionCaptor = ArgumentCaptor.forClass(ProjectCategorySuggestion.class);
+        verify(projectCategoryStoragePort).save(suggestionCaptor.capture());
+        final var projectCategorySuggestion = suggestionCaptor.getValue();
+
+        assertThat(suggestionCaptor.getValue().id()).isNotNull();
+        assertThat(projectCategorySuggestion.name()).isEqualTo(name);
+
+        verify(projectObserverPort).onProjectCategorySuggested(name, userId);
+    }
+
+    @Test
+    void should_delete_project_category_suggestion() {
+        // Given
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+
+        // When
+        projectCategoryService.deleteCategorySuggestion(suggestionId);
+
+        // Then
+        verify(projectCategoryStoragePort).delete(suggestionId);
+    }
+
+    @Test
+    void should_create_project_category() {
+        // Given
+        final var name = faker.rickAndMorty().character();
+        final var iconSlug = faker.rickAndMorty().location();
+
+        // When
+        projectCategoryService.createCategory(name, iconSlug);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isNotNull();
+        assertThat(projectCategory.name()).isEqualTo(name);
+        assertThat(projectCategory.iconSlug()).isEqualTo(iconSlug);
+    }
+
+    @Test
+    void should_throw_if_not_found() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().location());
+        final var newName = faker.rickAndMorty().character();
+        final var newIconSlug = faker.rickAndMorty().location();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> projectCategoryService.updateCategory(existing.id(), newName, newIconSlug))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Project category %s not found".formatted(existing.id()));
+    }
+
+    @Test
+    void should_update_project_category() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().location());
+        final var newName = faker.rickAndMorty().character();
+        final var newIconSlug = faker.rickAndMorty().location();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), newName, newIconSlug);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(newName);
+        assertThat(projectCategory.iconSlug()).isEqualTo(newIconSlug);
+    }
+
+    @Test
+    void should_delete_project_category() {
+        // Given
+        final var categoryId = ProjectCategory.Id.random();
+
+        // When
+        projectCategoryService.deleteCategory(categoryId);
+
+        // Then
+        verify(projectCategoryStoragePort).delete(categoryId);
     }
 }

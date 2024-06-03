@@ -87,8 +87,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public ProjectCategoryStoragePort projectCategoryStoragePort(final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
-        return new PostgresProjectCategoryAdapter(projectCategorySuggestionRepository);
+    public ProjectCategoryStoragePort projectCategoryStoragePort(final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
+                                                                 final ProjectCategoryRepository projectCategoryRepository) {
+        return new PostgresProjectCategoryAdapter(projectCategorySuggestionRepository, projectCategoryRepository);
     }
 
     @Bean

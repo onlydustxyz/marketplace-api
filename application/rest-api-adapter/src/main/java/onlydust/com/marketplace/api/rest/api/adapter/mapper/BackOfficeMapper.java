@@ -22,6 +22,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
@@ -460,6 +461,13 @@ public interface BackOfficeMapper {
                 .githubAvatarUrl(URI.create(userView.githubAvatarUrl().toString()))
                 .email(userView.email())
                 .name(userView.name());
+    }
+
+    static ProjectCategoryResponse map(ProjectCategory projectCategory) {
+        return new ProjectCategoryResponse()
+                .id(projectCategory.id().value())
+                .name(projectCategory.name())
+                .iconSlug(projectCategory.iconSlug());
     }
 
     static RewardDetailsResponse map(RewardDetailsView view, AuthenticatedUser authenticatedUser) {

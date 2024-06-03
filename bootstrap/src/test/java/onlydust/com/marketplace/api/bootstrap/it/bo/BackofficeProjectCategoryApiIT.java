@@ -1,84 +1,165 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import org.junit.jupiter.api.*;
+import org.springframework.http.MediaType;
 
-import java.util.List;
 import java.util.UUID;
 
-public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplaceBackOfficeApiIT {
-
-    @Autowired
-    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    UserAuthHelper.AuthenticatedBackofficeUser emilie;
+    static UUID projectCategoryId;
 
     @BeforeEach
     void setUp() {
-        projectCategorySuggestionRepository.saveAll(List.of(
-                new ProjectCategorySuggestionEntity(UUID.fromString("fbb36293-1a5b-49c5-9cd0-6e33922d22ba"), "Gaming"),
-                new ProjectCategorySuggestionEntity(UUID.fromString("d3af3bfc-5689-412a-8191-1466aa269830"), "DeFi"),
-                new ProjectCategorySuggestionEntity(UUID.fromString("d3df4dbf-850e-42a5-af16-ca8a0278489c"), "Art")
-        ));
+        emilie = userAuthHelper.authenticateEmilie();
     }
 
     @Test
-    void should_get_project_category_suggestions() {
+    @Order(0)
+    void should_forbid_non_admin_to_modify_categories() {
         // Given
-        final var emilie = userAuthHelper.authenticateEmilie();
+        final var notAnAdmin = userAuthHelper.authenticateGregoire();
+
+        // When
+        client.post()
+                .uri(PROJECT_CATEGORIES)
+                .header("Authorization", "Bearer " + notAnAdmin.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Security",
+                          "iconSlug": "lock"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+
+        // When
+        client.put()
+                .uri(PROJECT_CATEGORY.formatted(UUID.randomUUID()))
+                .header("Authorization", "Bearer " + notAnAdmin.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Security",
+                          "iconSlug": "lock"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+
+
+        // When
+        client.delete()
+                .uri(PROJECT_CATEGORY.formatted(UUID.randomUUID()))
+                .header("Authorization", "Bearer " + notAnAdmin.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isUnauthorized();
+    }
+
+
+    @Test
+    @Order(1)
+    void should_create_project_category() {
+        // When
+        final var response = client.post()
+                .uri(PROJECT_CATEGORIES)
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Security",
+                          "iconSlug": "lock"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ProjectCategoryResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        projectCategoryId = response.getId();
 
         // When
         client.get()
-                .uri(PROJECT_CATEGORIES)
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.id").isEqualTo(projectCategoryId.toString())
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "categories": [
-                            {
-                              "id": "d3df4dbf-850e-42a5-af16-ca8a0278489c",
-                              "name": "Art",
-                              "status": "PENDING",
-                              "iconSlug": null,
-                              "projectCount": null
-                            },
-                            {
-                              "id": "d3af3bfc-5689-412a-8191-1466aa269830",
-                              "name": "DeFi",
-                              "status": "PENDING",
-                              "iconSlug": null,
-                              "projectCount": null
-                            },
-                            {
-                              "id": "fbb36293-1a5b-49c5-9cd0-6e33922d22ba",
-                              "name": "Gaming",
-                              "status": "PENDING",
-                              "iconSlug": null,
-                              "projectCount": null
-                            }
-                          ]
+                          "name": "Security",
+                          "iconSlug": "lock"
                         }
-                        """, true);
+                        """);
     }
 
-
     @Test
-    void should_delete_project_category_suggestion() {
-        // Given
-        final var emilie = userAuthHelper.authenticateEmilie();
+    @Order(2)
+    void should_update_project_category() {
+        // When
+        client.put()
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "name": "Another name",
+                          "iconSlug": "something-else"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectCategoryId.toString())
+                .json("""
+                        {
+                          "name": "Another name",
+                          "iconSlug": "something-else"
+                        }
+                        """);
 
         // When
+        client.get()
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectCategoryId.toString())
+                .json("""
+                        {
+                          "name": "Another name",
+                          "iconSlug": "something-else"
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(3)
+    void should_delete_project_category() {
+        // When
         client.delete()
-                .uri(PROJECT_CATEGORY_SUGGESTION.formatted("d3af3bfc-5689-412a-8191-1466aa269830"))
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 // Then
                 .exchange()
@@ -87,24 +168,11 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
 
         // When
         client.get()
-                .uri(PROJECT_CATEGORIES)
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .json("""
-                        {
-                          "categories": [
-                            {
-                              "name": "Art"
-                            },
-                            {
-                              "name": "Gaming"
-                            }
-                          ]
-                        }
-                        """);
+                .isNotFound();
     }
 }
