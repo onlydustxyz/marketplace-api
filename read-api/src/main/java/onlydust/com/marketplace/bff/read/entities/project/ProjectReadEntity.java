@@ -7,24 +7,33 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Table(name = "projects", schema = "public")
 @Immutable
 public class ProjectReadEntity {
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     UUID id;
     @Column(name = "name")
@@ -73,6 +82,50 @@ public class ProjectReadEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectMoreInfoViewEntity> moreInfos;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.projectId")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectTagViewEntity> tags;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            schema = "public",
+            name = "projects_project_categories",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_category_id")
+    )
+    Set<ProjectCategoryReadEntity> categories;
+
+    public Map<String, Long> technologies() {
+        return getRepos().stream()
+                .flatMap(repo -> repo.getLanguages().stream())
+                .collect(Collectors.groupingBy(GithubRepoLanguageViewEntity::getLanguage, Collectors.summingLong(GithubRepoLanguageViewEntity::getLineCount)));
+    }
+
+    public List<ProjectOrganizationView> organizations() {
+        final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
+        getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
+
+        final var repoIdsIncludedInProject =
+                getRepos().stream()
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(GithubRepoViewEntity::getId).collect(Collectors.toSet());
+
+        return organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
+                .id(entity.id())
+                .login(entity.login())
+                .avatarUrl(entity.avatarUrl())
+                .htmlUrl(entity.htmlUrl())
+                .name(entity.name())
+                .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
+                .isInstalled(nonNull(entity.installation()))
+                .repos(entity.repos().stream()
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(repo -> RepoMapper.mapToDomain(repo,
+                                repoIdsIncludedInProject.contains(repo.getId()),
+                                entity.installation() != null &&
+                                        entity.installation().getAuthorizedRepos().stream()
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                        )
+                        .collect(Collectors.toSet()))
+                .build()).toList();
+    }
 }

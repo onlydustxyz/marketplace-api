@@ -9,9 +9,8 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 public interface ProjectStoragePort {
-    ProjectDetailsView getById(UUID projectId, User caller);
 
-    ProjectDetailsView getBySlug(String slug, User caller);
+    Optional<Project> getById(UUID projectId);
 
     Page<ProjectCardView> findByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
                                                                              UUID userId, String search,
@@ -48,6 +47,8 @@ public interface ProjectStoragePort {
     Set<Long> getProjectInvitedLeadIds(UUID projectId);
 
     Set<Long> getProjectRepoIds(UUID projectId);
+
+    List<ProjectOrganizationView> getProjectOrganizations(UUID projectId);
 
     Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                            ContributionType contributionType,

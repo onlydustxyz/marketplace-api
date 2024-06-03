@@ -56,22 +56,6 @@ public class ProjectsRestApi implements ProjectsApi {
 
 
     @Override
-    public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var project = projectFacadePort.getById(projectId, caller);
-        final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
-        return ResponseEntity.ok(projectResponse);
-    }
-
-    @Override
-    public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var project = projectFacadePort.getBySlug(slug, caller);
-        final var projectResponse = mapProjectDetails(project, Boolean.TRUE.equals(includeAllAvailableRepos));
-        return ResponseEntity.ok(projectResponse);
-    }
-
-    @Override
     public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies,
                                                            List<String> ecosystemSlugs,
                                                            List<ProjectTag> tags, Boolean mine, String search) {
@@ -293,12 +277,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
             contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }

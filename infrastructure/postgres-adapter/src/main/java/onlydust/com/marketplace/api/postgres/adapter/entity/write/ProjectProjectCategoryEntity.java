@@ -16,10 +16,12 @@ import java.util.UUID;
 @IdClass(ProjectProjectCategoryEntity.PrimaryKey.class)
 public class ProjectProjectCategoryEntity {
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "project_id", nullable = false, updatable = false)
     UUID projectId;
 
     @Id
+    @EqualsAndHashCode.Include
     @Column(name = "project_category_id", nullable = false, updatable = false)
     UUID projectCategoryId;
 

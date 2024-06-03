@@ -179,15 +179,18 @@ public class UserService implements UserFacadePort {
 
     @Override
     public void claimProjectForAuthenticatedUser(UUID projectId, User user) {
-        final ProjectDetailsView projectDetails = projectStoragePort.getById(projectId, user);
-        if (!projectDetails.getLeaders().isEmpty() || !projectDetails.getInvitedLeaders().isEmpty()) {
+        final var projectLeaders = projectStoragePort.getProjectLeadIds(projectId);
+        final var projectInvitedLeaders = projectStoragePort.getProjectInvitedLeadIds(projectId);
+        if (!projectLeaders.isEmpty() || !projectInvitedLeaders.isEmpty()) {
             throw OnlyDustException.forbidden("Project must have no project (pending) leads to be claimable");
         }
-        if (projectDetails.getOrganizations().isEmpty()) {
+
+        final var projectOrganizations = projectStoragePort.getProjectOrganizations(projectId);
+        if (projectOrganizations.isEmpty()) {
             throw OnlyDustException.forbidden("Project must have at least one organization to be claimable");
         }
 
-        final boolean isNotClaimable = projectDetails.getOrganizations().stream()
+        final boolean isNotClaimable = projectOrganizations.stream()
                 .anyMatch(org -> cannotBeClaimedByUser(user, org));
         if (isNotClaimable) {
             throw OnlyDustException.forbidden("User must be github admin on every organizations not installed and at " +

@@ -87,7 +87,7 @@ public interface ProjectMapper {
                 .hasRemainingBudget(hasRemainingBudget)
                 .me(me)
                 .tags(projectEntity.getTags().stream()
-                        .map(projectTagEntity -> projectTagEntity.getId().getTag()).collect(Collectors.toSet()))
+                        .map(projectTagEntity -> projectTagEntity.getTag()).collect(Collectors.toSet()))
                 .build();
 
         for (ProjectOrganizationView organization : organizations) {

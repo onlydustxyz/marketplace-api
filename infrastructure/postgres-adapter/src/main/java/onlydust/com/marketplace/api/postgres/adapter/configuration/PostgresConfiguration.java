@@ -78,8 +78,6 @@ public class PostgresConfiguration {
                 churnedContributorViewEntityRepository,
                 newcomerViewEntityRepository,
                 contributorActivityViewEntityRepository,
-                applicationRepository,
-                contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
                 projectInfosViewRepository
@@ -127,8 +125,6 @@ public class PostgresConfiguration {
                 churnedContributorViewEntityRepository,
                 newcomerViewEntityRepository,
                 contributorActivityViewEntityRepository,
-                applicationRepository,
-                contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
                 projectInfosViewRepository

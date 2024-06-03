@@ -1351,7 +1351,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get project details
       operationId: getProject
       description: |
@@ -1419,7 +1419,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get project details
       operationId: getProjectBySlug
       description: |
@@ -4890,6 +4890,7 @@ components:
         - leaders
         - invitedLeaders
         - ecosystems
+        - categories
         - technologies
         - hasRemainingBudget
         - indexingComplete
@@ -4952,6 +4953,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
         sponsors:
           type: array
           items:

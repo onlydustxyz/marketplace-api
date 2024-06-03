@@ -47,29 +47,6 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
-    public ProjectDetailsView getById(UUID projectId, User caller) {
-        final var userId = caller == null ? null : caller.getId();
-
-        final ProjectDetailsView projectById = projectStoragePort.getById(projectId, caller);
-        if (!permissionService.hasUserAccessToProject(projectId, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
-        }
-        return projectById;
-    }
-
-    @Override
-    public ProjectDetailsView getBySlug(String slug, User caller) {
-        final var userId = caller == null ? null : caller.getId();
-
-        final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug, caller);
-        if (!permissionService.hasUserAccessToProject(slug, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
-                    userId));
-        }
-        return projectBySlug;
-    }
-
-    @Override
     public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
                                                                                    List<String> ecosystemSlugs, String search,
                                                                                    ProjectCardView.SortBy sort, UUID userId

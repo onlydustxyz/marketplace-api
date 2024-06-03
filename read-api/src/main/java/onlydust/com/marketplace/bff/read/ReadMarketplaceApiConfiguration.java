@@ -1,8 +1,7 @@
 package onlydust.com.marketplace.bff.read;
 
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.adapters.*;
 import onlydust.com.marketplace.bff.read.repositories.*;
@@ -66,8 +65,24 @@ public class ReadMarketplaceApiConfiguration {
     }
 
     @Bean
-    public ReadProjectsApiPostgresAdapter readProjectsApiPostgresAdapter(final GithubIssueReadRepository githubIssueReadRepository) {
-        return new ReadProjectsApiPostgresAdapter(githubIssueReadRepository);
+    public ReadProjectsApiPostgresAdapter readProjectsApiPostgresAdapter(final AuthenticatedAppUserService authenticatedAppUserService,
+                                                                         final PermissionService permissionService,
+                                                                         final GithubIssueReadRepository githubIssueReadRepository,
+                                                                         final ProjectReadRepository projectReadRepository,
+                                                                         final CustomProjectRepository customProjectRepository,
+                                                                         final CustomContributorRepository customContributorRepository,
+                                                                         final ProjectLeadViewRepository projectLeadViewRepository,
+                                                                         final ApplicationRepository applicationRepository,
+                                                                         final ContributionViewEntityRepository contributionViewEntityRepository) {
+        return new ReadProjectsApiPostgresAdapter(authenticatedAppUserService,
+                permissionService,
+                githubIssueReadRepository,
+                projectReadRepository,
+                customProjectRepository,
+                customContributorRepository,
+                projectLeadViewRepository,
+                applicationRepository,
+                contributionViewEntityRepository);
     }
 
     @Bean

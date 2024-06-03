@@ -12,7 +12,6 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
-import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,70 +52,6 @@ public class ProjectServiceTest {
     void setUp() {
         // Default expectations, should be overridden in test if needed
         when(permissionService.isUserProjectLead(any(), any())).thenReturn(true);
-    }
-
-    @Test
-    void should_get_a_project_by_slug() {
-        // Given
-        final String slug = faker.pokemon().name();
-        final UUID userId = UUID.randomUUID();
-        final var caller = User.builder().id(userId).build();
-
-        // When
-        final var expectedProject = ProjectDetailsView.builder()
-                .id(UUID.randomUUID())
-                .slug(slug)
-                .build();
-        when(permissionService.hasUserAccessToProject(slug, userId)).thenReturn(true);
-        when(projectStoragePort.getBySlug(slug, caller))
-                .thenReturn(expectedProject);
-        final var project = projectService.getBySlug(slug, caller);
-
-        // Then
-        assertThat(project).isEqualTo(expectedProject);
-    }
-
-    @Test
-    void should_throw_project_not_found_by_slug() {
-        // Given
-        final String slug = faker.pokemon().name();
-
-        // When
-        when(projectStoragePort.getBySlug(slug, null)).thenThrow(OnlyDustException.class);
-
-        // Then
-        assertThatThrownBy(() -> projectService.getBySlug(slug, null))
-                .isInstanceOf(OnlyDustException.class);
-        verifyNoInteractions(permissionService);
-    }
-
-    @Test
-    void should_throw_project_not_found_by_id() {
-        // Given
-        final UUID projectId = UUID.randomUUID();
-
-        // When
-        when(projectStoragePort.getById(projectId, null)).thenThrow(OnlyDustException.class);
-
-        // Then
-        assertThatThrownBy(() -> projectService.getById(projectId, null))
-                .isInstanceOf(OnlyDustException.class);
-        verifyNoInteractions(permissionService);
-    }
-
-
-    @Test
-    void should_not_get_a_private_project_when_not_logged() {
-        // Given
-        final String slug = faker.pokemon().name();
-
-        // When
-        when(permissionService.hasUserAccessToProject(slug, null)).thenReturn(false);
-
-        // Then
-        assertThatThrownBy(() -> projectService.getBySlug(slug, null))
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Project %s is private and user null cannot access it".formatted(slug));
     }
 
     @Test
