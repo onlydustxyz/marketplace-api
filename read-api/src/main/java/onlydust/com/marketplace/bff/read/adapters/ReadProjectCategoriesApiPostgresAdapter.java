@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.contract.ReadProjectCategoriesApi;
 import onlydust.com.marketplace.api.contract.model.ProjectCategoriesResponse;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.ProjectCategoryReadRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +18,7 @@ public class ReadProjectCategoriesApiPostgresAdapter implements ReadProjectCateg
 
     @Override
     public ResponseEntity<ProjectCategoriesResponse> getAllProjectCategories() {
-        final var categories = projectCategoryReadRepository.findAll();
+        final var categories = projectCategoryReadRepository.findAll(Sort.by("name").ascending());
         return ResponseEntity.ok(new ProjectCategoriesResponse().categories(categories.stream().map(ProjectCategoryReadEntity::toDto).toList()));
     }
 }
