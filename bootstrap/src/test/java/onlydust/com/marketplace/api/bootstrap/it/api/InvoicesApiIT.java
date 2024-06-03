@@ -31,7 +31,7 @@ import org.springframework.http.MediaType;
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -744,7 +744,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     private void resetInvoiceMandateLatestVersionDate() {
         final var settings = globalSettingsRepository.get();
-        settings.setInvoiceMandateLatestVersionDate(new Date());
+        settings.setInvoiceMandateLatestVersionDate(ZonedDateTime.now());
         globalSettingsRepository.save(settings);
     }
 

@@ -12,8 +12,13 @@ import java.util.Set;
 
 @Getter
 @Accessors(fluent = true)
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class CompanyBillingProfile extends BillingProfile {
+    @Override
+    public boolean isAdmin(UserId userId) {
+        return members.stream().anyMatch(user -> user.id().equals(userId) && user.role() == User.Role.ADMIN);
+    }
+
     @NonNull
     private final Set<User> members;
     @NonNull
@@ -23,6 +28,13 @@ public class CompanyBillingProfile extends BillingProfile {
         super(name);
         this.members = new HashSet<>(Set.of(new User(firstAdmin, User.Role.ADMIN)));
         this.kyb = Kyb.initForUserAndBillingProfile(firstAdmin, this.id());
+    }
+
+    @Override
+    public boolean isInvoiceMandateAccepted() {
+        return invoiceMandateAcceptedAt != null &&
+               invoiceMandateLatestVersionDate != null &&
+               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
     }
 
     @Override

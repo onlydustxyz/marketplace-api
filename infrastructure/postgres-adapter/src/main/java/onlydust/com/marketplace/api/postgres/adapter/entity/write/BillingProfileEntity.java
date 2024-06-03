@@ -4,14 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.api.postgres.adapter.entity.GlobalSettingsEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Set;
@@ -37,7 +38,7 @@ public class BillingProfileEntity {
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "billing_profile_type")
     BillingProfile.Type type;
-    Date invoiceMandateAcceptedAt;
+    ZonedDateTime invoiceMandateAcceptedAt;
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "verification_status")
@@ -66,6 +67,10 @@ public class BillingProfileEntity {
     @JoinColumn(name = "id", referencedColumnName = "billing_profile_id", insertable = false, updatable = false)
     BillingProfileStatsViewEntity stats;
 
+    @ManyToOne
+    @JoinFormula(value = "1")
+    GlobalSettingsEntity globalSettings;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
     @EqualsAndHashCode.Exclude
@@ -74,10 +79,6 @@ public class BillingProfileEntity {
     @Column(name = "tech_updated_at", nullable = false)
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
-
-    public ZonedDateTime getInvoiceMandateAcceptedAt() {
-        return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
-    }
 
     public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId, final ZonedDateTime ownerJoinedAt) {
         return BillingProfileEntity.builder()
@@ -93,6 +94,7 @@ public class BillingProfileEntity {
                         .build())
                 )
                 .enabled(billingProfile.enabled())
+                .invoiceMandateAcceptedAt(billingProfile.invoiceMandateAcceptedAt())
                 .build();
     }
 
@@ -105,6 +107,8 @@ public class BillingProfileEntity {
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
                     .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).collect(toSet()))
+                    .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
+                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
             case SELF_EMPLOYED -> SelfEmployedBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -113,6 +117,8 @@ public class BillingProfileEntity {
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
                     .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
+                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
             case INDIVIDUAL -> IndividualBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -121,6 +127,8 @@ public class BillingProfileEntity {
                     .enabled(enabled)
                     .kyc(kyc.toDomain())
                     .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
+                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
         };
     }

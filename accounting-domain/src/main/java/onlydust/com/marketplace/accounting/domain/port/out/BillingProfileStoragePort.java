@@ -15,8 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface BillingProfileStoragePort {
-
-    void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
+    void save(BillingProfile billingProfile);
 
     void save(IndividualBillingProfile billingProfile);
 

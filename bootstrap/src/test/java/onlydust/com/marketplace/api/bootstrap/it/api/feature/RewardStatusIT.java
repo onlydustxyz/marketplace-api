@@ -3026,7 +3026,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         // When
         final Invoice companyInvoice = billingProfileService.previewInvoice(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId),
                 List.of(RewardId.of(companyBPAdmin1RewardId1), RewardId.of(companyBPMember1RewardId1), RewardId.of(companyBPAdmin2RewardId1)));
-        billingProfileService.updateInvoiceMandateAcceptanceDate(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId));
+        billingProfileService.acceptInvoiceMandate(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId));
         billingProfileService.uploadGeneratedInvoice(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId), companyInvoice.id(),
                 new ByteArrayInputStream(faker.address().fullAddress().getBytes()));
 

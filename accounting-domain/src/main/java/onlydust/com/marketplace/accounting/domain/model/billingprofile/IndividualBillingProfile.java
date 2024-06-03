@@ -35,6 +35,16 @@ public class IndividualBillingProfile extends BillingProfile {
         return Type.INDIVIDUAL;
     }
 
+    @Override
+    public boolean isInvoiceMandateAccepted() {
+        return true;
+    }
+
+    @Override
+    public boolean isAdmin(UserId userId) {
+        return owner.id().equals(userId);
+    }
+
     public PositiveAmount currentYearPaymentLimit() {
         return YEARLY_USD_PAYMENT_LIMIT;
     }

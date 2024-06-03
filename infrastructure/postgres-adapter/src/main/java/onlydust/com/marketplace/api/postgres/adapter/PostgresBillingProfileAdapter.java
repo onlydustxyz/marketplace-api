@@ -49,16 +49,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull RewardRepository rewardRepository;
     private final @NonNull UserRepository userRepository;
 
-
-    @Override
-    @Transactional
-    public void updateInvoiceMandateAcceptanceDate(@NonNull final BillingProfile.Id billingProfileId, @NonNull final ZonedDateTime acceptanceDate) {
-        final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-        billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-        billingProfileRepository.saveAndFlush(billingProfile);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
@@ -80,7 +70,22 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
+    public void save(BillingProfile billingProfile) {
+        if (billingProfile instanceof IndividualBillingProfile individualBillingProfile)
+            save(individualBillingProfile);
+        else if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile)
+            save(selfEmployedBillingProfile);
+        else if (billingProfile instanceof CompanyBillingProfile companyBillingProfile)
+            save(companyBillingProfile);
+        else
+            throw new IllegalArgumentException("Unknown billing profile type: %s".formatted(billingProfile.getClass().getSimpleName()));
+
+    }
+
+    @Override
+    @Transactional
     public void save(IndividualBillingProfile billingProfile) {
+        // TODO cascade merge the KYC/KYB and remove flush
         billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
         final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKycEntity.isEmpty()) {
@@ -135,6 +140,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<BillingProfile> findById(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.findById(billingProfileId.value()).map(BillingProfileEntity::toDomain);
     }

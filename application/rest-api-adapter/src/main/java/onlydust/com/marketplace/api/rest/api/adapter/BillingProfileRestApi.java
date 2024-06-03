@@ -116,7 +116,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<Void> acceptOrDeclineInvoiceMandate(UUID billingProfileId, InvoiceMandateRequest invoiceMandateRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         if (Boolean.TRUE.equals(invoiceMandateRequest.getHasAcceptedInvoiceMandate())) {
-            billingProfileFacadePort.updateInvoiceMandateAcceptanceDate(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
+            billingProfileFacadePort.acceptInvoiceMandate(UserId.of(authenticatedUser.getId()), BillingProfile.Id.of(billingProfileId));
         }
         return ResponseEntity.noContent().build();
     }
