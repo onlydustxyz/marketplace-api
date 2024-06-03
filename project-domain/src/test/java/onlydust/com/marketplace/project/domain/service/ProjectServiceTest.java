@@ -203,7 +203,8 @@ public class ProjectServiceTest {
                 command.getProjectLeadersToKeep(),
                 imageUrl,
                 command.getRewardSettings(),
-                command.getEcosystemIds()
+                command.getEcosystemIds(),
+                command.getCategoryIds()
         );
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));

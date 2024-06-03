@@ -578,7 +578,8 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",
-                new ProjectRewardSettings(false, false, false, null), List.of());
+                new ProjectRewardSettings(false, false, false, null),
+                List.of(), List.of());
         return projectId;
     }
 

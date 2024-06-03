@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -116,13 +117,13 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
         return customProjectRepository.isProjectPublic(projectId) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
+                (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
     }
 
     @Override
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         return customProjectRepository.isProjectPublic(projectSlug) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
+                (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
     }
 
     private ProjectDetailsView getProjectDetails(ProjectViewEntity projectView, User caller) {
@@ -215,7 +216,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               Boolean isLookingForContributors, List<NamedLink> moreInfos,
                               List<Long> githubRepoIds, UUID firstProjectLeaderId,
                               List<Long> githubUserIdsAsProjectLeads,
-                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
+                              ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings,
+                              List<UUID> ecosystemIds, List<UUID> categoryIds) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -242,6 +244,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                         .collect(Collectors.toSet()))
                         .ecosystems(ecosystemIds == null ? null :
                                 ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId)).collect(Collectors.toSet()))
+                        .categories(categoryIds == null ? null :
+                                categoryIds.stream().map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId)).collect(Collectors.toSet()))
                         .rank(0)
                         .build();
 
@@ -255,7 +259,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               Boolean isLookingForContributors, List<NamedLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                               List<UUID> projectLeadersToKeep, String imageUrl,
-                              ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds) {
+                              ProjectRewardSettings rewardSettings,
+                              List<UUID> ecosystemIds, List<UUID> categoryIds) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
         project.setSlug(slug);
@@ -288,12 +293,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(projectLeaderInvitations)) {
                 projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
                         .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                   invitation.getProjectId().equals(projectId)));
+                                invitation.getProjectId().equals(projectId)));
 
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
                         .filter(githubUserId -> projectLeaderInvitations.stream()
                                 .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                         invitation.getProjectId().equals(projectId)))
+                                        invitation.getProjectId().equals(projectId)))
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
                                 githubUserId)).toList());
             } else {
@@ -334,6 +339,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             } else {
                 project.setEcosystems(ecosystemIds.stream()
                         .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
+                        .collect(Collectors.toSet()));
+            }
+        }
+
+        if (nonNull(categoryIds)) {
+            if (nonNull(project.getCategories())) {
+                project.getCategories().clear();
+                project.getCategories().addAll(categoryIds.stream()
+                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
+                        .collect(Collectors.toSet()));
+            } else {
+                project.setCategories(categoryIds.stream()
+                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
                         .collect(Collectors.toSet()));
             }
         }

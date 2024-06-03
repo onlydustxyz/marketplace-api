@@ -108,7 +108,10 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
-                ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
+                ProjectRewardSettings.defaultSettings(dateProvider.now()),
+                command.getEcosystemIds(),
+                command.getCategoryIds()
+        );
 
         projectObserverPort.onProjectCreated(projectId, projectLeadId);
         if (nonNull(command.getGithubRepoIds())) {
@@ -149,7 +152,10 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
-                command.getRewardSettings(), command.getEcosystemIds());
+                command.getRewardSettings(),
+                command.getEcosystemIds(),
+                command.getCategoryIds()
+        );
 
         if (!isNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(command.getId(), linkedRepoIds, unlinkedRepoIds);
