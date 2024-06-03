@@ -4,10 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkVie
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.bff.read.adapters.ReadCommitteesApiPostgresAdapter;
-import onlydust.com.marketplace.bff.read.adapters.ReadEcosystemsApiPostgresAdapter;
-import onlydust.com.marketplace.bff.read.adapters.ReadProjectsApiPostgresAdapter;
-import onlydust.com.marketplace.bff.read.adapters.ReadUsersApiPostgresAdapter;
+import onlydust.com.marketplace.bff.read.adapters.*;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Bean;
@@ -71,5 +68,10 @@ public class ReadMarketplaceApiConfiguration {
     @Bean
     public ReadProjectsApiPostgresAdapter readProjectsApiPostgresAdapter(final GithubIssueReadRepository githubIssueReadRepository) {
         return new ReadProjectsApiPostgresAdapter(githubIssueReadRepository);
+    }
+
+    @Bean
+    public ReadProjectCategoriesApiPostgresAdapter readProjectCategoriesApiPostgresAdapter(final ProjectCategoryReadRepository projectCategoryReadRepository) {
+        return new ReadProjectCategoriesApiPostgresAdapter(projectCategoryReadRepository);
     }
 }
