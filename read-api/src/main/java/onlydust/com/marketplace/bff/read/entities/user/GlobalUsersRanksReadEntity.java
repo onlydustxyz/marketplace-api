@@ -2,27 +2,26 @@ package onlydust.com.marketplace.bff.read.entities.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Data;
+import jakarta.persistence.Table;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.Immutable;
 
-import java.util.Date;
-import java.util.UUID;
-
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
 @Entity
 @Immutable
-public class UserShortEntity {
+@Accessors(fluent = true)
+@Table(name = "global_users_ranks", schema = "public")
+public class GlobalUsersRanksReadEntity {
     @Id
+    @NonNull
     @EqualsAndHashCode.Include
-    UUID id;
     Long githubUserId;
-    String login;
-    String avatarUrl;
-    String email;
-    Date lastSeenAt;
-    Date createdAt;
+
+    @NonNull Long leadedProjectCount;
 }

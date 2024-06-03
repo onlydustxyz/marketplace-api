@@ -16,13 +16,13 @@ import org.springframework.context.annotation.Profile;
 public class ReadBackofficeApiConfiguration {
 
     @Bean
-    public BackofficeUsersReadApiPostgresAdapter backofficeUsersReadApiPostgresAdapter(final UserShortRepository userShortRepository) {
-        return new BackofficeUsersReadApiPostgresAdapter(userShortRepository);
+    public BackofficeUsersReadApiPostgresAdapter backofficeUsersReadApiPostgresAdapter(final UserReadRepository userReadRepository) {
+        return new BackofficeUsersReadApiPostgresAdapter(userReadRepository);
     }
 
     @Bean
-    public BackofficeHackathonsReadApiPostgresAdapter backofficeHackathonsReadApiPostgresAdapter(final UserShortRepository userShortRepository) {
-        return new BackofficeHackathonsReadApiPostgresAdapter(userShortRepository);
+    public BackofficeHackathonsReadApiPostgresAdapter backofficeHackathonsReadApiPostgresAdapter(final UserReadRepository userReadRepository) {
+        return new BackofficeHackathonsReadApiPostgresAdapter(userReadRepository);
     }
 
     @Bean
