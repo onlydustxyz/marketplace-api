@@ -40,7 +40,6 @@ paths:
   /bo/v1/invoices:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
@@ -231,7 +230,6 @@ paths:
   /bo/v1/external/invoices/{invoiceId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeInvoicingManagement
@@ -261,7 +259,6 @@ paths:
   /bo/v1/sponsors/{sponsorId}/accounts:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -299,7 +296,6 @@ paths:
 
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -326,7 +322,6 @@ paths:
   /bo/v1/sponsors/{sponsorId}/transactions:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -363,7 +358,6 @@ paths:
   /bo/v1/sponsor-accounts/{accountId}/allowance:
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -402,7 +396,6 @@ paths:
   /bo/v1/sponsor-accounts/{accountId}/receipts:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -440,7 +433,6 @@ paths:
   /bo/v1/sponsor-accounts/{accountId}/receipts/{receiptId}:
     delete:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -474,7 +466,6 @@ paths:
   /bo/v1/sponsor-accounts/{accountId}:
     patch:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -510,7 +501,6 @@ paths:
   /bo/v1/projects/{projectId}/budgets/allocate:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -541,7 +531,6 @@ paths:
   /bo/v1/projects/{projectId}/budgets/unallocate:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -572,7 +561,6 @@ paths:
   /bo/v1/rewards/{rewardId}/pay:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -605,7 +593,6 @@ paths:
   /bo/v1/rewards/{rewardId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -634,7 +621,6 @@ paths:
   /bo/v1/rewards:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -716,7 +702,6 @@ paths:
   /bo/v1/rewards/csv:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -782,7 +767,6 @@ paths:
   /bo/v1/rewards/batch-payments:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -810,7 +794,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -852,7 +835,6 @@ paths:
   /bo/v1/rewards/batch-payments/{batchPaymentId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -879,7 +861,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -909,7 +890,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     delete:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -936,7 +916,6 @@ paths:
   /bo/v1/rewards/notify-payments:
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -955,7 +934,6 @@ paths:
   /bo/v1/billing-profiles/{billingProfileId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -985,7 +963,6 @@ paths:
   /bo/v1/sponsors:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1035,7 +1012,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1069,7 +1045,6 @@ paths:
   /bo/v1/sponsors/logos:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1108,7 +1083,6 @@ paths:
   /bo/v2/sponsors:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1146,7 +1120,6 @@ paths:
   /bo/v1/sponsors/{sponsorId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1174,7 +1147,6 @@ paths:
 
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeSponsorManagement
@@ -1212,7 +1184,6 @@ paths:
   /bo/v1/ecosystems:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - Backoffice
@@ -1262,7 +1233,6 @@ paths:
           $ref: '#/components/responses/InternalServerError'
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - Backoffice
@@ -1290,7 +1260,6 @@ paths:
   /bo/v1/users:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeUsersRead
@@ -1329,7 +1298,6 @@ paths:
   /bo/v1/users/{userId}:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeUser
@@ -1358,7 +1326,6 @@ paths:
   /bo/v1/earnings:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
@@ -1439,7 +1406,6 @@ paths:
   /bo/v1/projects:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - Backoffice
@@ -1478,7 +1444,6 @@ paths:
   /bo/v1/project-categories:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeReadProjectCategories
@@ -1624,7 +1589,6 @@ paths:
   /bo/v1/project-category-suggestions/{id}:
     delete:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeProjectCategories
@@ -1651,7 +1615,6 @@ paths:
   /bo/v1/languages:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeLanguageManagement
@@ -1683,7 +1646,6 @@ paths:
 
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeLanguageManagement
@@ -1709,7 +1671,6 @@ paths:
   /bo/v1/languages/{languageId}:
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeLanguageManagement
@@ -1748,7 +1709,6 @@ paths:
   /bo/v1/languages/logos:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeLanguageManagement
@@ -1787,7 +1747,6 @@ paths:
   /bo/v1/languages/extensions:
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeLanguageManagement
@@ -1815,7 +1774,6 @@ paths:
   /bo/v1/currencies:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
@@ -1847,7 +1805,6 @@ paths:
 
     get:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
@@ -1873,7 +1830,6 @@ paths:
   /bo/v1/currencies/{currencyId}:
     put:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
@@ -1912,7 +1868,6 @@ paths:
   /bo/v1/currencies/logos:
     post:
       security:
-        - apiKey: [ ]
         - bearerAuth: [ ]
       tags:
         - BackofficeCurrencyManagement
@@ -2447,10 +2402,6 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    apiKey:
-      type: apiKey
-      in: header
-      name: Api-Key
   responses:
     InternalServerError:
       description: Internal Server Error

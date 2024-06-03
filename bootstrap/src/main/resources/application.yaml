@@ -8,8 +8,6 @@ application:
       expires-at-leeway: 10
     machine-to-machine:
       api-key: ${INTERNAL_API_KEY}
-    back-office:
-      api-key: ${BACKOFFICE_API_KEY}
     back-office-invoice-token:
       token: ${BACKOFFICE_INVOICE_DOWNLOAD_TOKEN}
       base-url: ${BACKOFFICE_API_BASE_URL}
