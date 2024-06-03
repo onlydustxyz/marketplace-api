@@ -9,6 +9,7 @@ import onlydust.com.marketplace.bff.read.repositories.ProjectCategoryPageItemRea
 import onlydust.com.marketplace.bff.read.repositories.ProjectCategoryReadRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +20,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -37,11 +39,13 @@ public class BackofficeReadProjectCategoriesApiPostgresAdapter implements Backof
     @Override
     public ResponseEntity<ProjectCategoryPageResponse> getProjectCategories(Integer pageIndex, Integer pageSize) {
         final var page = projectCategoryPageItemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("name")));
-        return ok(new ProjectCategoryPageResponse()
+        final var body = new ProjectCategoryPageResponse()
                 .categories(page.getContent().stream().map(ProjectCategoryPageItemReadEntity::toDto).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
+
+        return body.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(body) : ok(body);
     }
 }
