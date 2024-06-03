@@ -7,10 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -21,7 +18,6 @@ import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageS
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -58,9 +54,8 @@ public class AccountingServiceTest {
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
     final String thirdPartyAccountNumber = "0x" + faker.random().hex(10);
-    final BillingProfileView billingProfileView = BillingProfileView.builder()
+    final IndividualBillingProfile billingProfile = IndividualBillingProfile.builder()
             .id(BillingProfile.Id.random())
-            .type(BillingProfile.Type.INDIVIDUAL)
             .kyc(Kyc.builder()
                     .id(UUID.randomUUID())
                     .ownerId(UserId.random())
@@ -71,14 +66,19 @@ public class AccountingServiceTest {
                     .consideredUsPersonQuestionnaire(false)
                     .idDocumentCountry(Country.fromIso3("FRA"))
                     .build())
-            .payoutInfo(PayoutInfo.builder()
-                    .ethWallet(Ethereum.wallet(thirdPartyAccountNumber))
-                    .optimismAddress(Optimism.accountAddress(thirdPartyAccountNumber))
-                    .starknetAddress(StarkNet.accountAddress(thirdPartyAccountNumber))
-                    .build())
             .name("OnlyDust")
+            .enabled(true)
+            .status(VerificationStatus.VERIFIED)
+            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
             .build();
-    final Invoice.BillingProfileSnapshot billingProfileSnapshot = Invoice.BillingProfileSnapshot.of(billingProfileView, billingProfileView.getPayoutInfo());
+
+    final PayoutInfo payoutInfo = PayoutInfo.builder()
+            .ethWallet(Ethereum.wallet(thirdPartyAccountNumber))
+            .optimismAddress(Optimism.accountAddress(thirdPartyAccountNumber))
+            .starknetAddress(StarkNet.accountAddress(thirdPartyAccountNumber))
+            .build();
+
+    final Invoice.BillingProfileSnapshot billingProfileSnapshot = Invoice.BillingProfileSnapshot.of(billingProfile, payoutInfo);
     final InvoiceView invoiceView = new InvoiceView(Invoice.Id.random(),
             billingProfileSnapshot,
             new UserView(faker.number().randomNumber(), faker.name().username(), URI.create(faker.internet().avatar()),
@@ -90,7 +90,7 @@ public class AccountingServiceTest {
             Invoice.Status.APPROVED,
             List.of(), null, null, null);
 
-    final Invoice invoice = Invoice.of(billingProfileView, 1, invoiceView.createdBy().id())
+    final Invoice invoice = Invoice.of(billingProfile, 1, invoiceView.createdBy().id(), payoutInfo)
             .status(invoiceView.status())
             .rewards(List.of());
 

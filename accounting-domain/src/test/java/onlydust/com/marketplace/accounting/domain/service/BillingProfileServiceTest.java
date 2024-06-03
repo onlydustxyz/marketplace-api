@@ -65,22 +65,22 @@ class BillingProfileServiceTest {
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
     Invoice invoice;
     BillingProfile.Id billingProfileId;
-    BillingProfileView companyBillingProfile;
+    CompanyBillingProfile companyBillingProfile;
     PayoutInfo payoutInfo;
 
     @BeforeEach
     void setUp() {
         payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         billingProfileId = BillingProfile.Id.random();
-        companyBillingProfile = BillingProfileView.builder()
+        companyBillingProfile = CompanyBillingProfile.builder()
                 .id(billingProfileId)
-                .type(BillingProfile.Type.COMPANY)
-                .payoutInfo(payoutInfo)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("OnlyDust")
                 .kyb(newKyb(billingProfileId, userId))
+                .enabled(true)
+                .members(Set.of(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN)))
                 .build();
-        invoice = Invoice.of(companyBillingProfile, 1, userId)
+        invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                 .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver, accountingFacadePort);
     }
@@ -107,7 +107,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
@@ -158,6 +158,7 @@ class BillingProfileServiceTest {
                     companyBillingProfile)
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
 
             // When
             final var preview = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds);
@@ -184,13 +185,13 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    CompanyBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.COMPANY)
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.UNDER_REVIEW)
+                            .status(VerificationStatus.UNDER_REVIEW)
                             .name("OnlyDust")
                             .kyb(newKyb(billingProfileId, userId))
+                            .enabled(true)
+                            .members(Set.of(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN)))
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
@@ -221,7 +222,7 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
@@ -229,14 +230,16 @@ class BillingProfileServiceTest {
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .name("John")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
                             .build())
             );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
                     RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null, billingProfileId)));
@@ -256,7 +259,7 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
@@ -264,14 +267,16 @@ class BillingProfileServiceTest {
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .name("John")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
                             .build())
             );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -315,7 +320,7 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
@@ -323,14 +328,17 @@ class BillingProfileServiceTest {
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .name("John")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
                             .build())
             );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
+
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(), RewardStatus.builder()
@@ -354,20 +362,22 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .name("John")
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
@@ -392,7 +402,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_not_found() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
@@ -407,7 +417,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_not_a_draft() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
@@ -422,7 +432,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_given_a_disabled_billing_profile() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
@@ -439,7 +449,7 @@ class BillingProfileServiceTest {
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId)
+            when(billingProfileStoragePort.findViewById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId)
                     .type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
@@ -454,7 +464,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_when_a_reward_was_cancelled() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
@@ -471,7 +481,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -490,7 +500,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -510,7 +520,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_not_a_draft() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
@@ -527,7 +537,7 @@ class BillingProfileServiceTest {
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
 
             // When
@@ -543,7 +553,7 @@ class BillingProfileServiceTest {
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
             when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(false);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
 
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
@@ -557,7 +567,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_a_reward_was_cancelled() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
@@ -574,7 +584,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -593,7 +603,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -687,7 +697,7 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+                when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
@@ -732,7 +742,7 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsNotAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.COMPANY).build()));
+                when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.COMPANY).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
@@ -1086,7 +1096,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.empty());
         Exception exception = null;
@@ -1126,7 +1136,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1136,7 +1146,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1167,7 +1177,7 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
         when(billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserIdInvited)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdNotMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1177,7 +1187,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1207,7 +1217,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1217,7 +1227,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1233,7 +1243,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.empty());
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.empty());
         Exception exception = null;
         try {
             billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
@@ -1548,7 +1558,7 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                 .type(BillingProfile.Type.COMPANY)
                 .build()
         ));
@@ -1569,7 +1579,7 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
 
         // When
         assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.MEMBER))
@@ -1589,7 +1599,7 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId))
+        when(billingProfileStoragePort.findViewById(billingProfileId))
                 .thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL)
                         .verificationStatus(VerificationStatus.NOT_STARTED).build()));
 
@@ -1612,7 +1622,7 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId))
+        when(billingProfileStoragePort.findViewById(billingProfileId))
                 .thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED)
                         .verificationStatus(VerificationStatus.NOT_STARTED).build()));
 
@@ -2182,7 +2192,7 @@ class BillingProfileServiceTest {
             final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.COMPANY;
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.SELF_EMPLOYED).build()));
             when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder().build()));
@@ -2201,7 +2211,7 @@ class BillingProfileServiceTest {
             final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.COMPANY).build()));
             when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder().billingProfileCoworkersCount(0L).build()));
@@ -2220,7 +2230,7 @@ class BillingProfileServiceTest {
             final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
             when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .type(BillingProfile.Type.COMPANY).build()));
             when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
                     .thenReturn(Optional.of(BillingProfileUserRightsView.builder()

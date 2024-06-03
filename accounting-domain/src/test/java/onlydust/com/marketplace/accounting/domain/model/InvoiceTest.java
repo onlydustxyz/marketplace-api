@@ -1,13 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -19,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
@@ -48,7 +45,7 @@ class InvoiceTest {
 
     @Nested
     class GivenAnIndividual {
-        BillingProfileView individualBillingProfile;
+        IndividualBillingProfile individualBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
@@ -56,16 +53,16 @@ class InvoiceTest {
         void setUp() {
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
-            individualBillingProfile = BillingProfileView.builder()
+            individualBillingProfile = IndividualBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.INDIVIDUAL)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("John")
                     .kyc(newKyc(billingProfileId, UserId.random()))
+                    .enabled(true)
+                    .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
                     .build();
 
-            invoice = Invoice.of(individualBillingProfile, 1, UserId.random())
+            invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
@@ -110,7 +107,7 @@ class InvoiceTest {
 
     @Nested
     class GivenACompanyOutsideOfEurope {
-        BillingProfileView companyBillingProfile;
+        CompanyBillingProfile companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
@@ -132,16 +129,16 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            companyBillingProfile = BillingProfileView.builder()
+            companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
@@ -185,7 +182,7 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanySubjectToVAT {
-        BillingProfileView companyBillingProfile;
+        CompanyBillingProfile companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
@@ -207,16 +204,16 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            companyBillingProfile = BillingProfileView.builder()
+            companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
@@ -261,7 +258,7 @@ class InvoiceTest {
 
     @Nested
     class GivenAFrenchCompanyNonSubjectToVAT {
-        BillingProfileView companyBillingProfile;
+        CompanyBillingProfile companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
@@ -283,16 +280,16 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            companyBillingProfile = BillingProfileView.builder()
+            companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),
@@ -337,7 +334,7 @@ class InvoiceTest {
 
     @Nested
     class GivenANonFrenchEuropeanCompany {
-        BillingProfileView companyBillingProfile;
+        CompanyBillingProfile companyBillingProfile;
         PayoutInfo payoutInfo;
         Invoice invoice;
 
@@ -359,16 +356,16 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .build();
             payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
-            companyBillingProfile = BillingProfileView.builder()
+            companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random())
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo)
                     .rewards(List.of(
                             new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                     Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), null, List.of()),

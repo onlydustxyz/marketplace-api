@@ -135,8 +135,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    public Optional<BillingProfile> findById(BillingProfile.Id billingProfileId) {
+        return billingProfileRepository.findById(billingProfileId.value()).map(BillingProfileEntity::toDomain);
+    }
+
+    @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
+    public Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId) {
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> {
@@ -456,5 +461,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
         return userRepository.findById(ownerId.value()).map(UserEntity::toDomain);
+    }
+
+    @Override
+    public Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId) {
+        return payoutInfoRepository.findById(billingProfileId.value()).map(PayoutInfoEntity::toDomain);
     }
 }

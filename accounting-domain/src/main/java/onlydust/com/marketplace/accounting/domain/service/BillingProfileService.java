@@ -79,12 +79,20 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-        if (!billingProfile.isVerified()) {
+
+        if (!billingProfile.isVerified())
             throw badRequest("Billing profile %s is not verified".formatted(billingProfileId));
-        }
+
+        final var payoutInfo = billingProfileStoragePort.getPayoutInfo(billingProfileId)
+                .orElseThrow(() -> internalServerError("An invoice can only be created on a billing profile with payout info (billing profile %s)".formatted(billingProfileId)));
 
         final int sequenceNumber = invoiceStoragePort.getNextSequenceNumber(billingProfileId);
-        final var invoice = Invoice.of(billingProfile, sequenceNumber, userId).rewards(rewards);
+        final var invoice = (switch (billingProfile.type()) {
+            case INDIVIDUAL -> Invoice.of((IndividualBillingProfile) billingProfile, sequenceNumber, userId, payoutInfo);
+            case COMPANY -> Invoice.of((CompanyBillingProfile) billingProfile, sequenceNumber, userId, payoutInfo);
+            case SELF_EMPLOYED -> Invoice.of((SelfEmployedBillingProfile) billingProfile, sequenceNumber, userId, payoutInfo);
+        }).rewards(rewards);
+
         checkInvoicePreviewRewards(invoice);
 
         invoiceStoragePort.deleteDraftsOf(billingProfileId);
@@ -121,7 +129,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Transactional
     public void uploadGeneratedInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                                        final @NonNull InputStream data) {
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         if (!billingProfileStoragePort.isEnabled(billingProfileId))
@@ -137,7 +145,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Transactional
     public void uploadExternalInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
                                       @NonNull InputStream data) {
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         if (!billingProfileStoragePort.isEnabled(billingProfileId))
@@ -231,7 +239,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     }
 
     private BillingProfileView getBillingProfileViewWithUserRights(BillingProfile.Id billingProfileId, UserId userId) {
-        final BillingProfileView billingProfileView = billingProfileStoragePort.findById(billingProfileId)
+        final BillingProfileView billingProfileView = billingProfileStoragePort.findViewById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId)
                 .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
@@ -276,7 +284,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
         if (!billingProfileStoragePort.isAdmin(billingProfileId, invitedBy)) {
             throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId));
@@ -396,7 +404,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public BillingProfileView getById(BillingProfile.Id id) {
-        return billingProfileStoragePort.findById(id)
+        return billingProfileStoragePort.findViewById(id)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(id)));
     }
 }

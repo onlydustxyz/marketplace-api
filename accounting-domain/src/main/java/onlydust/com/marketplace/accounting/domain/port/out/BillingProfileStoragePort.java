@@ -34,7 +34,9 @@ public interface BillingProfileStoragePort {
 
     boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId);
 
-    Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId);
+    Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
+
+    Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);
 
     Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
 
@@ -96,4 +98,6 @@ public interface BillingProfileStoragePort {
     boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId);
 
     Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId);
+
+    Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId);
 }

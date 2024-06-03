@@ -1029,7 +1029,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         // Then switch billing profile type
         final var ownerId = UserId.of(antho.user().getId());
         final var individualBillingProfileId = billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).orElseThrow().getId();
-        final var individualBillingProfile = billingProfileStoragePort.findById(individualBillingProfileId).orElseThrow();
+        final var individualBillingProfile = billingProfileStoragePort.findViewById(individualBillingProfileId).orElseThrow();
         billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder()
                 .consideredUsPersonQuestionnaire(false)
                 .country(Country.fromIso3("FRA"))

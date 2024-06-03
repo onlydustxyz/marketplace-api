@@ -38,6 +38,10 @@ public abstract class BillingProfile {
 
     public abstract Type type();
 
+    public boolean isVerified() {
+        return status == VerificationStatus.VERIFIED;
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
