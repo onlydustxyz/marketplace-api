@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -31,6 +32,8 @@ import static java.util.Objects.isNull;
 @AllArgsConstructor
 public class PostgresContributionAdapter implements ContributionStoragePort {
 
+    public static final long UNEXISTING_GITHUB_USER_ID = -1L;
+    
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
@@ -43,7 +46,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ContributionView> findContributions(Long contributorId,
+    public Page<ContributionView> findContributions(Optional<Long> callerGithubUserId,
                                                     ContributionView.Filters filters,
                                                     ContributionView.Sort sort,
                                                     SortDirection direction,
@@ -51,7 +54,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                                                     Integer pageSize) {
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var contributionPage = contributionViewEntityRepository.findContributions(
-                contributorId,
+                callerGithubUserId.orElse(UNEXISTING_GITHUB_USER_ID),
                 filters.getContributors(),
                 filters.getProjects(),
                 filters.getRepos(),
@@ -59,6 +62,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
                 filters.getStatuses().stream().map(Enum::name).toList(),
                 filters.getLanguages().toArray(UUID[]::new),
                 filters.getEcosystems().toArray(UUID[]::new),
+                Boolean.TRUE.equals(filters.getIncludePrivateProjects()),
                 isNull(filters.getFrom()) ? null : format.format(filters.getFrom()),
                 isNull(filters.getTo()) ? null : format.format(filters.getTo()),
                 PageRequest.of(page, pageSize, sortBy(sort, direction == SortDirection.asc ? Sort.Direction.ASC :

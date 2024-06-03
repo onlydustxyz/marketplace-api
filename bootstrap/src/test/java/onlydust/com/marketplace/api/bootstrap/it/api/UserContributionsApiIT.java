@@ -22,13 +22,13 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     private ImageStoragePort imageStoragePort;
 
     @Test
-    void should_get_my_contributions() {
+    void should_get_my_contributions_including_private_projects() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
 
         // When
         client.get()
-                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of("pageSize", "3")))
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of("pageSize", "3", "includePrivateProjects", "true")))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
                 .exchange()
@@ -178,6 +178,162 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_my_contributions_without_private_projects() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of("pageSize", "3")))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "contributions": [
+                            {
+                              "type": "PULL_REQUEST",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                              },
+                              "githubNumber": 2,
+                              "githubStatus": "MERGED",
+                              "githubTitle": "DUST token creation",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/2",
+                              "githubBody": "ERC721 based\\r\\ncan be minted and burned\\r\\non-chain metadata:\\r\\n* Space size\\r\\n* position (x, y)\\r\\n* direction (x, y)\\r\\n\\r\\nCan move and will bounce in case it hurts one of the border/corner of the space\\r\\n\\r\\nSome nice features added:\\r\\n* batch minting (with user defined position/direction)\\r\\n* random minting (on the edge of the board game)\\r\\n* random batch minting\\r\\n* optimization of storage",
+                              "githubCodeReviewOutcome": null,
+                              "id": "6d3bac610f1f9e983b179478916eefcd39583dd7ca869ec15529c66539ff9045",
+                              "createdAt": "2022-04-12T16:56:44Z",
+                              "completedAt": "2022-04-13T09:00:48Z",
+                              "lastUpdatedAt": "2022-04-13T09:00:48Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                "slug": "zama",
+                                "name": "Zama",
+                                "shortDescription": "A super description for Zama",
+                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                "visibility": "PUBLIC"
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "links": []
+                            },
+                            {
+                              "type": "PULL_REQUEST",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                              },
+                              "githubNumber": 1,
+                              "githubStatus": "DRAFT",
+                              "githubTitle": "feat: add common model",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/1",
+                              "githubBody": "Note: if we use ERC20 instead of ERC721 to keep track of dust balance, then `token_id` must be removed from `Dust` struct.",
+                              "githubCodeReviewOutcome": null,
+                              "id": "7b076143d6844660494a112d2182017a367914577b14ed562250ef1751de6547",
+                              "createdAt": "2022-04-12T11:59:17Z",
+                              "completedAt": "2022-04-13T09:00:49Z",
+                              "lastUpdatedAt": "2022-04-13T09:00:49Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": "PENDING_REVIEWER",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                "slug": "zama",
+                                "name": "Zama",
+                                "shortDescription": "A super description for Zama",
+                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                "visibility": "PUBLIC"
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "links": []
+                            },
+                            {
+                              "type": "PULL_REQUEST",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "description": null,
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "githubAuthor": {
+                                "githubUserId": 595505,
+                                "login": "ofux",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                              },
+                              "githubNumber": 3,
+                              "githubStatus": "MERGED",
+                              "githubTitle": "Feature/space",
+                              "githubHtmlUrl": "https://github.com/onlydustxyz/starklings/pull/3",
+                              "githubBody": "Add a space contract that is in charge of processing game turns.\\r\\n\\r\\nAt each turn:\\r\\n- one dust is spawned\\r\\n- dust is moved on the grid\\r\\n- dust collisions are handled. When a collision occurs, one of the dust is burnt\\r\\n\\r\\nThe random generator is now in its own contract so we can mock it.\\r\\n\\r\\nThe TODOs can be found here: https://www.notion.so/onlydust/Workshop-TODO-9a67a936a5ca4180a3a23d7d94fecd61\\r\\n\\r\\n> Note: I just realised that we have different formatting between @AnthonyBuisset and me. I don't know why. This is quite annoying for tracking changes, so I apologise in advance.",
+                              "githubCodeReviewOutcome": null,
+                              "id": "5befa137a9ef4264834de24e223c7ee0b6fada1bb24ca3dc713496a96fba805b",
+                              "createdAt": "2022-04-13T15:42:14Z",
+                              "completedAt": "2022-04-13T16:01:10Z",
+                              "lastUpdatedAt": "2022-04-13T16:01:10Z",
+                              "status": "COMPLETED",
+                              "githubPullRequestReviewState": "APPROVED",
+                              "rewardIds": [],
+                              "project": {
+                                "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                "slug": "zama",
+                                "name": "Zama",
+                                "shortDescription": "A super description for Zama",
+                                "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M",
+                                "visibility": "PUBLIC"
+                              },
+                              "contributor": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "links": []
+                            }
+                          ],
+                          "hasMore": true,
+                          "totalPageNumber": 1410,
+                          "totalItemNumber": 4230,
+                          "nextPageIndex": 1
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_my_rewards_with_project_filter() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
@@ -209,7 +365,8 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
-                        "ecosystems", "99b6c284-f9bb-4f89-8ce7-03771465ef8e,6ab7fa6c-c418-4997-9c5f-55fb021a8e5c")
+                        "ecosystems", "99b6c284-f9bb-4f89-8ce7-03771465ef8e,6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                        "includePrivateProjects", "true")
                 ))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
@@ -301,7 +458,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
-                        "types", "ISSUE")
+                        "types", "ISSUE", "includePrivateProjects", "true")
                 ))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then
@@ -327,6 +484,31 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
                         "statuses", "IN_PROGRESS")
+                ))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.contributions.length()").isEqualTo(1)
+                .jsonPath("$.contributions[0].status").isEqualTo("IN_PROGRESS")
+                .jsonPath("$.hasMore").isEqualTo(false)
+                .jsonPath("$.totalPageNumber").isEqualTo(1)
+                .jsonPath("$.totalItemNumber").isEqualTo(1)
+                .jsonPath("$.nextPageIndex").isEqualTo(0)
+        ;
+    }
+
+    @Test
+    void should_get_my_rewards_with_status_filter_and_includeing_private_projects() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(USERS_GET_CONTRIBUTIONS.formatted(user.user().getGithubUserId()), Map.of(
+                        "statuses", "IN_PROGRESS", "includePrivateProjects", "true")
                 ))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 // Then

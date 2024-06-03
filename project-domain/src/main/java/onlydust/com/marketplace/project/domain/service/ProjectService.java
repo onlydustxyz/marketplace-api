@@ -170,7 +170,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
+                    "leaders");
         }
     }
 
@@ -275,7 +275,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                                                  "project");
+                        "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
@@ -323,7 +323,7 @@ public class ProjectService implements ProjectFacadePort {
         if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw OnlyDustException.forbidden("Only project leads can list project contributions");
         }
-        return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page,
+        return contributionStoragePort.findContributions(Optional.of(caller.getGithubUserId()), filters, sort, direction, page,
                 pageSize);
     }
 

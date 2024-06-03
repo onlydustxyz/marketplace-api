@@ -12,10 +12,7 @@ import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 public class ContributorService implements ContributorFacadePort {
@@ -40,21 +37,21 @@ public class ContributorService implements ContributorFacadePort {
 
         final List<Contributor> externalContributors =
                 (externalSearchOnly || internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch) &&
-                login != null && !login.isEmpty() ?
+                        login != null && !login.isEmpty() ?
                         getExternalContributors(login) : List.of();
 
         return Pair.of(internalContributors, externalContributors);
     }
 
     @Override
-    public Page<ContributionView> contributions(Long contributorId,
+    public Page<ContributionView> contributions(Optional<Long> callerGithubUserId,
                                                 ContributionView.Filters filters,
                                                 ContributionView.Sort sort,
                                                 SortDirection direction,
                                                 Integer page,
                                                 Integer pageSize) {
         return contributionStoragePort.findContributions(
-                contributorId, filters, sort, direction, page, pageSize);
+                callerGithubUserId, filters, sort, direction, page, pageSize);
     }
 
     @Override

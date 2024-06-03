@@ -8,10 +8,11 @@ import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ContributionStoragePort {
-    Page<ContributionView> findContributions(Long contributorId,
+    Page<ContributionView> findContributions(Optional<Long> callerGithubUserId,
                                              ContributionView.Filters filters,
                                              ContributionView.Sort sort,
                                              SortDirection direction,

@@ -977,6 +977,11 @@ paths:
             items:
               $ref: '#/components/schemas/EcosystemId'
         - in: query
+          name: includePrivateProjects
+          description: Include contributions in private projects
+          schema:
+            type: boolean
+        - in: query
           name: fromDate
           description: Contribution date filter
           schema:

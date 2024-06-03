@@ -671,7 +671,7 @@ public class ProjectServiceTest {
                 .totalPageNumber(1)
                 .build();
 
-        when(contributionStoragePort.findContributions(projectLead.getGithubUserId(), filters, sort, direction, page,
+        when(contributionStoragePort.findContributions(Optional.of(projectLead.getGithubUserId()), filters, sort, direction, page,
                 pageSize))
                 .thenReturn(expectedContributions);
 

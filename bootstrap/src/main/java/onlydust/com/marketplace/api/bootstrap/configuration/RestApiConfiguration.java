@@ -40,8 +40,9 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public UsersRestApi usersRestApi(final ContributorFacadePort contributorFacadePort) {
-        return new UsersRestApi(contributorFacadePort);
+    public UsersRestApi usersRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
+                                     final ContributorFacadePort contributorFacadePort) {
+        return new UsersRestApi(authenticatedAppUserService, contributorFacadePort);
     }
 
     @Bean
