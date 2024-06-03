@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -171,6 +172,8 @@ public class AbstractMarketplaceApiIT {
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
+            .withReuse(true)
+            .withTmpFs(singletonMap("/testtmpfs", "rw"))
             .waitingFor(Wait.forLogMessage(".*PostgreSQL init process complete; ready for start up.*", 1));
 
     @InjectWireMock("github")
