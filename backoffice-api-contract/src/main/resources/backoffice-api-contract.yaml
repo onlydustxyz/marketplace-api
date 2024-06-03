@@ -1475,6 +1475,67 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/project-categories:
+    get:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeReadProjectCategories
+      summary: Get project categories
+      operationId: getProjectCategories
+      description: |
+        Get project categories
+      parameters:
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Project categories'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategoryPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/project-category-suggestions/{id}:
+    delete:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProjectCategories
+      summary: Delete a project category suggestion
+      operationId: deleteProjectCategorySuggestion
+      description: |
+        Delete a project category suggestion
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectCategoryId'
+      responses:
+        "204":
+          description: 'Category suggestion deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeLanguageManagement ===============================================================
 
   /bo/v1/languages:
@@ -4679,5 +4740,54 @@ components:
         score:
           type: integer
 
+    ProjectCategoryPageResponse:
+      type: object
+      required:
+        - categories
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryPageItemResponse'
 
 
+    ProjectCategoryPageItemResponse:
+      type: object
+      required:
+        - id
+        - name
+        - status
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectCategoryId'
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/ProjectCategorySuggestionStatus'
+        iconSlug:
+          type: string
+        projectCount:
+          type: integer
+
+    ProjectCategoryId:
+      type: string
+      format: uuid
+
+    ProjectCategorySuggestionStatus:
+      type: string
+      enum:
+        - PENDING
+        - APPROVED
