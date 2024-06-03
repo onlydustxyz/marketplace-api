@@ -13,7 +13,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                 with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id) rank
                                       from projects_contributors pc
                                                join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
-                                      order by pc.total_contribution_count desc),
+                                      order by pc.total_contribution_count desc, ga.login),
                      has_gfi as (select project_id, count(issue_id) > 0 as exist from projects_good_first_issues group by project_id)
                 select p.id,
                        p.name,
