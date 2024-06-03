@@ -18,6 +18,25 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
                 null        as project_count
             FROM
                 project_category_suggestions pcs
-            """, nativeQuery = true)
+            UNION
+            SELECT
+                pc.id        as id,
+                pc.name      as name,
+                pc.icon_slug as icon_slug,
+                'APPROVED'   as status,
+                0            as project_count
+            FROM
+                project_categories pc
+            ORDER BY
+                status DESC, name ASC
+            """,
+            countQuery = """
+                    WITH suggestions as (SELECT count(*) as total FROM project_category_suggestions pcs),
+                         categories as (SELECT count(*) as total FROM project_categories pc)
+                    SELECT
+                        suggestions.total + categories.total
+                    FROM
+                        suggestions, categories
+                    """, nativeQuery = true)
     Page<ProjectCategoryPageItemReadEntity> findAll(Pageable pageable);
 }

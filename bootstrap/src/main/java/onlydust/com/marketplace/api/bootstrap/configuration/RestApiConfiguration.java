@@ -16,6 +16,7 @@ public class RestApiConfiguration {
 
     @Bean
     public ProjectsRestApi projectRestApi(final ProjectFacadePort projectFacadePort,
+                                          final ProjectCategoryFacadePort projectCategoryFacadePort,
                                           final ProjectRewardFacadePort projectRewardFacadePort,
                                           final ProjectRewardFacadePort projectRewardFacadePortV2,
                                           final AuthenticatedAppUserService authenticatedAppUserService,
@@ -23,6 +24,7 @@ public class RestApiConfiguration {
                                           final ContributionFacadePort contributionFacadePort) {
         return new ProjectsRestApi(
                 projectFacadePort,
+                projectCategoryFacadePort,
                 projectRewardFacadePort,
                 projectRewardFacadePortV2,
                 authenticatedAppUserService,
@@ -87,7 +89,7 @@ public class RestApiConfiguration {
 
     @Bean
     public CommitteeRestApi committeeRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
-                                             final CommitteeFacadePort committeeFacadePort){
+                                             final CommitteeFacadePort committeeFacadePort) {
         return new CommitteeRestApi(authenticatedAppUserService, committeeFacadePort);
     }
 }

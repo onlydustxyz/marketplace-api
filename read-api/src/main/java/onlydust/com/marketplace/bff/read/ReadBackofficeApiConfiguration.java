@@ -6,10 +6,7 @@ import onlydust.com.marketplace.bff.read.adapters.BackofficeCommitteesReadApiPos
 import onlydust.com.marketplace.bff.read.adapters.BackofficeHackathonsReadApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeReadProjectCategoriesApiPostgresAdapter;
 import onlydust.com.marketplace.bff.read.adapters.BackofficeUsersReadApiPostgresAdapter;
-import onlydust.com.marketplace.bff.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
-import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.ProjectCategoryPageItemReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.UserShortRepository;
+import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -40,7 +37,8 @@ public class ReadBackofficeApiConfiguration {
     }
 
     @Bean
-    public BackofficeReadProjectCategoriesApiPostgresAdapter backofficeReadProjectCategoriesApiPostgresAdapter(final ProjectCategoryPageItemReadRepository projectCategoryPageItemReadRepository) {
-        return new BackofficeReadProjectCategoriesApiPostgresAdapter(projectCategoryPageItemReadRepository);
+    public BackofficeReadProjectCategoriesApiPostgresAdapter backofficeReadProjectCategoriesApiPostgresAdapter(final ProjectCategoryPageItemReadRepository projectCategoryPageItemReadRepository,
+                                                                                                               final ProjectCategoryReadRepository projectCategoryReadRepository) {
+        return new BackofficeReadProjectCategoriesApiPostgresAdapter(projectCategoryPageItemReadRepository, projectCategoryReadRepository);
     }
 }

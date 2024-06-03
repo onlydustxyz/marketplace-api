@@ -83,8 +83,4 @@ public interface ProjectFacadePort {
     void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 
     void updateProjectsTags();
-
-    void suggestCategory(String categoryName, UUID userId);
-
-    void deleteCategorySuggestion(ProjectCategorySuggestion.Id id);
 }

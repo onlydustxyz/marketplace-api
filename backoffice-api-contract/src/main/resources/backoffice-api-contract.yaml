@@ -1510,6 +1510,116 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProjectCategories
+      summary: Create a  project category
+      operationId: createProjectCategory
+      description: Create a  project category
+      requestBody:
+        description: Project category to create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCategoryCreateRequest'
+      responses:
+        "200":
+          description: 'Project category created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/project-categories/{id}:
+    get:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeReadProjectCategories
+      summary: Get project category
+      operationId: getProjectCategory
+      description: Get project category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectCategoryId'
+      responses:
+        "200":
+          description: 'Project category'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProjectCategories
+      summary: Update project category
+      operationId: updateProjectCategory
+      description: Update project category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectCategoryId'
+      requestBody:
+        description: Project category to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectCategoryUpdateRequest'
+      responses:
+        "200":
+          description: 'Project category updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - apiKey: [ ]
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProjectCategories
+      summary: Delete project category
+      operationId: deleteProjectCategory
+      description: Delete project category
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectCategoryId'
+      responses:
+        "204":
+          description: 'Project category deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/project-category-suggestions/{id}:
     delete:
@@ -4781,6 +4891,35 @@ components:
           type: string
         projectCount:
           type: integer
+
+    ProjectCategoryCreateRequest:
+      type: object
+      required:
+        - name
+        - iconSlug
+      properties:
+        name:
+          type: string
+        iconSlug:
+          type: string
+
+    ProjectCategoryUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/ProjectCategoryCreateRequest'
+
+    ProjectCategoryResponse:
+      type: object
+      required:
+        - id
+        - name
+        - iconSlug
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectCategoryId'
+        name:
+          type: string
+        iconSlug:
+          type: string
 
     ProjectCategoryId:
       type: string

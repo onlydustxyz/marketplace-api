@@ -391,15 +391,4 @@ public class ProjectService implements ProjectFacadePort {
         final Date now = new Date();
         projectStoragePort.updateProjectsTags(now);
     }
-
-    @Override
-    public void suggestCategory(String categoryName, UUID userId) {
-        projectStoragePort.save(ProjectCategorySuggestion.of(categoryName));
-        projectObserverPort.onProjectCategorySuggested(categoryName, userId);
-    }
-
-    @Override
-    public void deleteCategorySuggestion(ProjectCategorySuggestion.Id id) {
-        projectStoragePort.deleteCategorySuggestion(id);
-    }
 }

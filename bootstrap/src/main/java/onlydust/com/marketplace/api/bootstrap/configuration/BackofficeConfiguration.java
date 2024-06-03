@@ -115,8 +115,8 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    BackofficeProjectCategoriesRestApi backofficeProjectCategoriesRestApi(final ProjectFacadePort projectFacadePort) {
-        return new BackofficeProjectCategoriesRestApi(projectFacadePort);
+    BackofficeProjectCategoriesRestApi backofficeProjectCategoriesRestApi(final ProjectCategoryFacadePort projectCategoryFacadePort) {
+        return new BackofficeProjectCategoriesRestApi(projectCategoryFacadePort);
     }
 }
 

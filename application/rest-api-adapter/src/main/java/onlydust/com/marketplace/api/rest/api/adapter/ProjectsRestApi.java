@@ -14,10 +14,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.core.io.Resource;
@@ -41,6 +38,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectReward
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
 @Tags(@Tag(name = "Projects"))
@@ -49,6 +47,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
+    private final ProjectCategoryFacadePort projectCategoryFacadePort;
     private final ProjectRewardFacadePort projectRewardFacadePort;
     private final ProjectRewardFacadePort projectRewardFacadePortV2;
     private final AuthenticatedAppUserService authenticatedAppUserService;
@@ -206,7 +205,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<Void> cancelReward(UUID projectId, UUID rewardId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         rewardFacadePort.cancelReward(authenticatedUser.getId(), projectId, rewardId);
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -303,7 +302,7 @@ public class ProjectsRestApi implements ProjectsApi {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -482,20 +481,20 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<Void> hideContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         projectFacadePort.hideContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> showContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> suggestProjectCategory(SuggestProjectCategoryRequest suggestProjectCategoryRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectFacadePort.suggestCategory(suggestProjectCategoryRequest.getName(), authenticatedUser.getId());
-        return ResponseEntity.noContent().build();
+        projectCategoryFacadePort.suggest(suggestProjectCategoryRequest.getName(), authenticatedUser.getId());
+        return noContent().build();
     }
 }
