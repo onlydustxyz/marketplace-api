@@ -3,7 +3,6 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeCommitteesReadApi;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
@@ -11,10 +10,10 @@ import onlydust.com.marketplace.bff.read.entities.ShortCurrencyResponseEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeBudgetAllocationReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.bff.read.entities.committee.CommitteeProjectAnswerReadEntity;
+import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
-import onlydust.com.marketplace.bff.read.mapper.UserMapper;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.bff.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
@@ -67,18 +66,18 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .map(Map.Entry::getValue)
                 .map(a -> new ApplicationResponse()
                         .project(ProjectMapper.mapBO(a.project()))
-                        .applicant(UserMapper.map(a.user()))
+                        .applicant(a.user().toLinkResponse())
                         .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
                         .allocation(projectAllocations.get(a.projectId())))
                 .toList();
 
-        final Map<AllUserViewEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
+        final Map<AllUserReadEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
                 .collect(groupingBy(CommitteeJuryVoteReadEntity::user, groupingBy(CommitteeJuryVoteReadEntity::project)));
 
         final List<JuryAssignmentResponse> juryAssignments = new ArrayList<>();
         votesPerUserPerProject.forEach((user, votesPerProject) -> {
             juryAssignments.add(new JuryAssignmentResponse()
-                    .user(UserMapper.map(user))
+                    .user(user.toLinkResponse())
                     .projectsAssigned(votesPerProject.keySet().stream().map(ProjectMapper::mapBO).toList())
                     .totalAssignment(votesPerProject.size())
                     .completedAssignments((int) votesPerProject.entrySet().stream()
@@ -102,7 +101,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .juryCriteria(committee.juryCriterias().stream()
                         .map(c -> new JuryCriteriaResponse(c.id(), c.criteria())).toList())
                 .juries(committee.juries().stream()
-                        .map(j -> UserMapper.map(j.user())).toList())
+                        .map(j -> j.user().toLinkResponse()).toList())
                 .juryAssignments(juryAssignments)
                 .totalAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getTotalAssignment).sum())
                 .completedAssignments(juryAssignments.stream().mapToInt(JuryAssignmentResponse::getCompletedAssignments).sum())
@@ -132,7 +131,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                                 .filter(v -> v.score() != null)
                                 .mapToInt(CommitteeJuryVoteReadEntity::score)
                                 .average()))
-                        .jury(UserMapper.map(e.getKey()))
+                        .jury(e.getKey().toLinkResponse())
                         .answers(e.getValue().stream()
                                 .map(a -> new ScoredAnswerResponse()
                                         .criteria(a.criteria().criteria())

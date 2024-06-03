@@ -1,21 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
 
 public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
-    @Autowired
-    BillingProfileService billingProfileService;
     UserAuthHelper.AuthenticatedBackofficeUser mehdi;
 
     @BeforeEach
@@ -28,7 +22,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_USERS, Map.of("pageIndex", "0", "pageSize", "5")))
-                .header("Authorization", "Bearer "+ mehdi.jwt())
+                .header("Authorization", "Bearer " + mehdi.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -96,7 +90,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_USERS, Map.of("pageIndex", "0", "pageSize", "5", "login", "buisset")))
-                .header("Authorization", "Bearer "+ mehdi.jwt())
+                .header("Authorization", "Bearer " + mehdi.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -130,7 +124,7 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_USERS_BY_ID.formatted(anthony.user().getId().toString())))
-                .header("Authorization", "Bearer "+ mehdi.jwt())
+                .header("Authorization", "Bearer " + mehdi.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -197,14 +191,11 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         // And given
         final var userId = UserId.of(anthony.user().getId());
-        final CompanyBillingProfile companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
-        final SelfEmployedBillingProfile selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId,
-                faker.rickAndMorty().character(), null);
 
         // When
         client.get()
                 .uri(getApiURI(GET_USERS_BY_ID.formatted(userId.value().toString())))
-                .header("Authorization", "Bearer "+ mehdi.jwt())
+                .header("Authorization", "Bearer " + mehdi.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
