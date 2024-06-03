@@ -742,21 +742,4 @@ public class ProjectServiceTest {
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Only project leads can show contributors on their projects");
     }
-
-    @Test
-    void should_suggest_project_category() {
-        // Given
-        final String projectCategoryName = faker.rickAndMorty().character();
-        final UUID userId = UUID.randomUUID();
-
-        // When
-        projectService.suggestCategory(projectCategoryName, userId);
-
-        // Then
-        final var projectCategoryArgumentCaptor = ArgumentCaptor.forClass(ProjectCategorySuggestion.class);
-        verify(projectStoragePort).save(projectCategoryArgumentCaptor.capture());
-        assertEquals(projectCategoryName, projectCategoryArgumentCaptor.getValue().name());
-        assertNotNull(projectCategoryArgumentCaptor.getValue().id());
-        verify(projectObserverPort).onProjectCategorySuggested(projectCategoryName, userId);
-    }
 }

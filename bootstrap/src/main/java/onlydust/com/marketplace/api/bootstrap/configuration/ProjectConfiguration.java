@@ -80,6 +80,12 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public ProjectCategoryFacadePort projectCategoryFacadePort(final ProjectObserverPort projectObservers,
+                                                               final ProjectCategoryStoragePort projectCategoryStoragePort) {
+        return new ProjectCategoryService(projectObservers, projectCategoryStoragePort);
+    }
+
+    @Bean
     public ProjectRewardFacadePort projectRewardFacadePort(final ProjectRewardStoragePort projectRewardStoragePort,
                                                            final PermissionService permissionService
     ) {

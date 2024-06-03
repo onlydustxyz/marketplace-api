@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -63,7 +62,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
-    private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
 
     @Override
@@ -517,12 +515,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    @Transactional
-    public void save(ProjectCategorySuggestion suggestion) {
-        projectCategorySuggestionRepository.save(ProjectCategorySuggestionEntity.fromDomain(suggestion));
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public boolean exists(UUID projectId) {
         return projectRepository.existsById(projectId);
@@ -543,10 +535,5 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public List<UUID> getProjectContributedOnIdsForUser(UUID userId) {
         return projectRepository.getProjectContributedOnIdsForUser(userId);
-    }
-
-    @Override
-    public void deleteCategorySuggestion(ProjectCategorySuggestion.Id id) {
-        projectCategorySuggestionRepository.deleteById(id.value());
     }
 }

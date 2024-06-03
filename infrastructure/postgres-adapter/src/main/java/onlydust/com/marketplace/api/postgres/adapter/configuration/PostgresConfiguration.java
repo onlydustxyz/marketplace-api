@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.Batch
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -61,7 +62,6 @@ public class PostgresConfiguration {
                                                  final ContributionViewEntityRepository contributionViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
-                                                 final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
                                                  final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
@@ -82,9 +82,13 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategorySuggestionRepository,
                 projectInfosViewRepository
         );
+    }
+
+    @Bean
+    public ProjectCategoryStoragePort projectCategoryStoragePort(final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
+        return new PostgresProjectCategoryAdapter(projectCategorySuggestionRepository);
     }
 
     @Bean
@@ -106,7 +110,6 @@ public class PostgresConfiguration {
                                                            final ContributionViewEntityRepository contributionViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
-                                                           final ProjectCategorySuggestionRepository projectCategorySuggestionRepository,
                                                            final ProjectInfosViewRepository projectInfosViewRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
@@ -127,7 +130,6 @@ public class PostgresConfiguration {
                 contributionViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectCategorySuggestionRepository,
                 projectInfosViewRepository
         );
     }
