@@ -41,7 +41,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                            ) users
                                     from contributors c
                                     where c.rank <= 3
-                                    group by c.project_id) cc on cc.project_id = p.id
+                                    group by c.project_id ) cc on cc.project_id = p.id
                         left join has_gfi on has_gfi.project_id = p.id
                         left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags

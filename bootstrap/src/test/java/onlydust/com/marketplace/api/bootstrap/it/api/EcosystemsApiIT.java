@@ -271,7 +271,6 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
         em.getTransaction().commit();
         em.close();
 
-
         // When
         client.get()
                 .uri(getApiURI(GET_ECOSYSTEM_PROJECTS.formatted("zama"), Map.of("pageIndex", "0", "pageSize", "5")))
@@ -281,6 +280,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
+                        
                         {
                           "projects": [
                             {
@@ -323,6 +323,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 1,
                           "nextPageIndex": 0
                         }
+                        
                         """);
 
         // When
@@ -442,7 +443,8 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                           "totalPageNumber": 2,
                           "totalItemNumber": 4,
                           "nextPageIndex": 1
-                        }""");
+                        }
+                        """);
 
         // When
         client.get()
@@ -569,54 +571,54 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "projects": [
-                            {
-                              "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                              "slug": "mooooooonlight",
-                              "name": "Mooooooonlight",
-                              "shortDescription": "hello la team",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                              "topContributors": [
-                                {
-                                  "githubUserId": 143011364,
-                                  "login": "pixelfact",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
-                                },
-                                {
-                                  "githubUserId": 21149076,
-                                  "login": "oscarwroche",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
-                                },
-                                {
-                                  "githubUserId": 45264458,
-                                  "login": "abdelhamidbakhta",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4"
-                                }
-                              ],
-                              "contributorsCount": 20,
-                              "languages": [
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "name": "Typescript",
-                                  "url": null,
-                                  "logoUrl": null,
-                                  "bannerUrl": null
-                                },
-                                {
-                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                  "name": "Rust",
-                                  "url": null,
-                                  "logoUrl": null,
-                                  "bannerUrl": null
-                                }
-                              ]
-                            }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "nextPageIndex": 0
-                        }
+                           "projects": [
+                             {
+                               "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                               "slug": "mooooooonlight",
+                               "name": "Mooooooonlight",
+                               "shortDescription": "hello la team",
+                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                               "topContributors": [
+                                 {
+                                   "githubUserId": 143011364,
+                                   "login": "pixelfact",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
+                                 },
+                                 {
+                                   "githubUserId": 21149076,
+                                   "login": "oscarwroche",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
+                                 },
+                                 {
+                                   "githubUserId": 45264458,
+                                   "login": "abdelhamidbakhta",
+                                   "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4"
+                                 }
+                               ],
+                               "contributorsCount": 20,
+                               "languages": [
+                                 {
+                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                   "name": "Typescript",
+                                   "url": null,
+                                   "logoUrl": null,
+                                   "bannerUrl": null
+                                 },
+                                 {
+                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                   "name": "Rust",
+                                   "url": null,
+                                   "logoUrl": null,
+                                   "bannerUrl": null
+                                 }
+                               ]
+                             }
+                           ],
+                           "hasMore": false,
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 1,
+                           "nextPageIndex": 0
+                         }
                         """);
 
         // When
@@ -687,114 +689,114 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "projects": [
-                            {
-                              "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                              "slug": "b-conseil",
-                              "name": "B Conseil",
-                              "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
-                              "topContributors": [
-                                {
-                                  "githubUserId": 595505,
-                                  "login": "ofux",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
-                                },
-                                {
-                                  "githubUserId": 4435377,
-                                  "login": "Bernardstanislas",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
-                                },
-                                {
-                                  "githubUserId": 43467246,
-                                  "login": "AnthonyBuisset",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
-                                }
-                              ],
-                              "contributorsCount": 3,
-                              "languages": null
-                            },
-                            {
-                              "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                              "slug": "mooooooonlight",
-                              "name": "Mooooooonlight",
-                              "shortDescription": "hello la team",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                              "topContributors": [
-                                {
-                                  "githubUserId": 143011364,
-                                  "login": "pixelfact",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
-                                },
-                                {
-                                  "githubUserId": 21149076,
-                                  "login": "oscarwroche",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
-                                },
-                                {
-                                  "githubUserId": 45264458,
-                                  "login": "abdelhamidbakhta",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4"
-                                }
-                              ],
-                              "contributorsCount": 20,
-                              "languages": [
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "name": "Typescript",
-                                  "url": null,
-                                  "logoUrl": null,
-                                  "bannerUrl": null
-                                },
-                                {
-                                  "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                  "name": "Rust",
-                                  "url": null,
-                                  "logoUrl": null,
-                                  "bannerUrl": null
-                                }
-                              ]
-                            },
-                            {
-                              "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                              "slug": "zero-title-11",
-                              "name": "Zero title 11",
-                              "shortDescription": "Missing short description",
-                              "logoUrl": null,
-                              "topContributors": [
-                                {
-                                  "githubUserId": 24900324,
-                                  "login": "arindamghosh4995",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/24900324?v=4"
-                                },
-                                {
-                                  "githubUserId": 80708120,
-                                  "login": "colinh80",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/80708120?v=4"
-                                },
-                                {
-                                  "githubUserId": 930603,
-                                  "login": "medvedev1088",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/930603?v=4"
-                                }
-                              ],
-                              "contributorsCount": 453,
-                              "languages": [
-                                {
-                                  "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                                  "name": "Solidity",
-                                  "url": null,
-                                  "logoUrl": null,
-                                  "bannerUrl": null
-                                }
-                              ]
-                            }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 4,
-                          "nextPageIndex": 0
-                        }
+                            "projects": [
+                              {
+                                "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                                "slug": "b-conseil",
+                                "name": "B Conseil",
+                                "shortDescription": "Nous sommes B.Conseil, la bonne gestion du Crédit d’Impôt Recherche.",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png",
+                                "topContributors": [
+                                  {
+                                    "githubUserId": 595505,
+                                    "login": "ofux",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 4435377,
+                                    "login": "Bernardstanislas",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4"
+                                  }
+                                ],
+                                "contributorsCount": 3,
+                                "languages": null
+                              },
+                              {
+                                "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                "slug": "mooooooonlight",
+                                "name": "Mooooooonlight",
+                                "shortDescription": "hello la team",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
+                                "topContributors": [
+                                  {
+                                    "githubUserId": 143011364,
+                                    "login": "pixelfact",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/143011364?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 21149076,
+                                    "login": "oscarwroche",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/21149076?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 45264458,
+                                    "login": "abdelhamidbakhta",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/45264458?v=4"
+                                  }
+                                ],
+                                "contributorsCount": 20,
+                                "languages": [
+                                  {
+                                    "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                    "name": "Typescript",
+                                    "url": null,
+                                    "logoUrl": null,
+                                    "bannerUrl": null
+                                  },
+                                  {
+                                    "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                    "name": "Rust",
+                                    "url": null,
+                                    "logoUrl": null,
+                                    "bannerUrl": null
+                                  }
+                                ]
+                              },
+                              {
+                                "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                "slug": "zero-title-11",
+                                "name": "Zero title 11",
+                                "shortDescription": "Missing short description",
+                                "logoUrl": null,
+                                "topContributors": [
+                                  {
+                                    "githubUserId": 24900324,
+                                    "login": "arindamghosh4995",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/24900324?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 80708120,
+                                    "login": "colinh80",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/80708120?v=4"
+                                  },
+                                  {
+                                    "githubUserId": 930603,
+                                    "login": "medvedev1088",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/930603?v=4"
+                                  }
+                                ],
+                                "contributorsCount": 453,
+                                "languages": [
+                                  {
+                                    "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
+                                    "name": "Solidity",
+                                    "url": null,
+                                    "logoUrl": null,
+                                    "bannerUrl": null
+                                  }
+                                ]
+                              }
+                            ],
+                            "hasMore": false,
+                            "totalPageNumber": 1,
+                            "totalItemNumber": 4,
+                            "nextPageIndex": 0
+                          }
                         """, true);
     }
 }
