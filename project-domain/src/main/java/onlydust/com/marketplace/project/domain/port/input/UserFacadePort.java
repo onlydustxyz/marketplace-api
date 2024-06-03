@@ -18,8 +18,6 @@ public interface UserFacadePort {
 
     User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly);
 
-    User getUserById(UUID userId);
-
     UserProfileView getProfileById(UUID userId);
 
     UserProfileView updateProfile(UUID userId, UserProfile userProfile);
