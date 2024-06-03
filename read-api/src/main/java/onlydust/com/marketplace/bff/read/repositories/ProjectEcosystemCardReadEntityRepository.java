@@ -10,10 +10,9 @@ import java.util.UUID;
 public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<ProjectEcosystemCardReadEntity, UUID> {
 
     @Query(nativeQuery = true, value = """
-                with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id) rank
+                with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id order by pc.total_contribution_count desc) rank
                                       from projects_contributors pc
-                                               join indexer_exp.github_accounts ga on ga.id = pc.github_user_id
-                                      order by pc.total_contribution_count desc, ga.login),
+                                               join indexer_exp.github_accounts ga on ga.id = pc.github_user_id),
                      has_gfi as (select project_id, count(issue_id) > 0 as exist from projects_good_first_issues group by project_id)
                 select p.id,
                        p.name,
@@ -25,7 +24,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                        (select jsonb_agg(
                                        jsonb_build_object(
                                                'id', l.id, 'name', l.name, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
-                                       )
+                                       ) order by l.name
                                )
                         from project_languages pl
                         join languages l on pl.language_id = l.id
@@ -37,7 +36,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                            jsonb_agg(
                                                    jsonb_build_object(
                                                            'githubUserId', c.id, 'login', c.login, 'avatarUrl', c.avatar_url
-                                                   )
+                                                   ) order by c.rank, c.name
                                            ) users
                                     from contributors c
                                     where c.rank <= 3
