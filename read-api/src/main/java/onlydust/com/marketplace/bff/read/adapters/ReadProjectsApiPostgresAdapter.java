@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
@@ -12,6 +14,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationR
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
 import onlydust.com.marketplace.bff.read.repositories.GithubIssueReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.ProjectReadRepository;
@@ -20,7 +23,6 @@ import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
-import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -98,41 +100,50 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
-    private ProjectResponse getProjectDetails(ProjectReadEntity projectView, User caller, final Boolean includeAllAvailableRepos) {
-        final var topContributors = customContributorRepository.findProjectTopContributors(projectView.getId(), TOP_CONTRIBUTOR_COUNT);
-        final var contributorCount = customContributorRepository.getProjectContributorCount(projectView.getId(), null);
-        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(projectView.getId());
-        final var ecosystems = customProjectRepository.getProjectEcosystems(projectView.getId());
-        final var hasRemainingBudget = customProjectRepository.hasRemainingBudget(projectView.getId());
-        final var me = isNull(caller) ? null : new ProjectDetailsView.Me(
+    private ProjectResponse getProjectDetails(ProjectReadEntity project, User caller, final Boolean includeAllAvailableRepos) {
+        final var topContributors = customContributorRepository.findProjectTopContributors(project.getId(), TOP_CONTRIBUTOR_COUNT);
+        final var contributorCount = customContributorRepository.getProjectContributorCount(project.getId(), null);
+        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(project.getId());
+        final var ecosystems = customProjectRepository.getProjectEcosystems(project.getId());
+        final var hasRemainingBudget = customProjectRepository.hasRemainingBudget(project.getId());
+        final var reposIndexedTimes = project.getRepos().stream()
+                .map(GithubRepoViewEntity::getStats)
+                .filter(Objects::nonNull)
+                .map(GithubRepoStatsViewEntity::getLastIndexedAt).toList();
+
+        record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor, Boolean hasApplied) {
+            public Boolean isMember() {
+                return isLeader || isInvitedAsProjectLead || isContributor;
+            }
+        }
+        final var me = isNull(caller) ? null : new Me(
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),
-                contributionViewEntityRepository.countBy(caller.getGithubUserId(), projectView.getId()) > 0,
-                applicationRepository.findByProjectIdAndApplicantId(projectView.getId(), caller.getId()).isPresent()
+                contributionViewEntityRepository.countBy(caller.getGithubUserId(), project.getId()) > 0,
+                applicationRepository.findByProjectIdAndApplicantId(project.getId(), caller.getId()).isPresent()
         );
-        final var reposIndexedTimes = projectView.getRepos().stream().map(r -> r.getStats().getLastIndexedAt()).toList();
 
         return new ProjectResponse()
-                .id(projectView.getId())
-                .slug(projectView.getSlug())
-                .name(projectView.getName())
-                .createdAt(DateMapper.ofNullable(projectView.getCreatedAt()))
-                .shortDescription(projectView.getShortDescription())
-                .longDescription(projectView.getLongDescription())
-                .logoUrl(projectView.getLogoUrl())
-                .moreInfos(isNull(projectView.getMoreInfos()) ? null : projectView.getMoreInfos().stream()
+                .id(project.getId())
+                .slug(project.getSlug())
+                .name(project.getName())
+                .createdAt(DateMapper.ofNullable(project.getCreatedAt()))
+                .shortDescription(project.getShortDescription())
+                .longDescription(project.getLongDescription())
+                .logoUrl(project.getLogoUrl())
+                .moreInfos(isNull(project.getMoreInfos()) ? null : project.getMoreInfos().stream()
                         .sorted(Comparator.comparing(ProjectMoreInfoViewEntity::getRank))
                         .map(moreInfo -> new SimpleLink().url(moreInfo.getUrl()).value(moreInfo.getName()))
                         .collect(Collectors.toList()))
-                .hiring(projectView.getHiring())
-                .visibility(mapProjectVisibility(projectView.getVisibility()))
+                .hiring(project.getHiring())
+                .visibility(mapProjectVisibility(project.getVisibility()))
                 .contributorCount(contributorCount)
                 .hasRemainingBudget(hasRemainingBudget)
                 .rewardSettings(mapRewardSettings(new ProjectRewardSettings(
-                        projectView.getIgnorePullRequests(),
-                        projectView.getIgnoreIssues(),
-                        projectView.getIgnoreCodeReviews(),
-                        projectView.getIgnoreContributionsBefore()
+                        project.getIgnorePullRequests(),
+                        project.getIgnoreIssues(),
+                        project.getIgnoreCodeReviews(),
+                        project.getIgnoreContributionsBefore()
                 )))
                 .topContributors(topContributors.stream().map(u -> new GithubUserResponse()
                         .githubUserId(u.getGithubUserId())
@@ -149,7 +160,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .map(UserMapper::map)
                         .sorted(comparing(RegisteredUserResponse::getGithubUserId))
                         .collect(Collectors.toList()))
-                .tags(projectView.getTags().stream()
+                .tags(project.getTags().stream()
                         .map(t -> switch (t.getTag()) {
                             case HOT_COMMUNITY -> ProjectTag.HOT_COMMUNITY;
                             case NEWBIES_WELCOME -> ProjectTag.NEWBIES_WELCOME;
@@ -171,7 +182,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(EcosystemResponse::getName))
                         .toList())
-                .categories(projectView.getCategories().stream()
+                .categories(project.getCategories().stream()
                         .map(c -> new ProjectCategoryResponse()
                                 .id(c.getId())
                                 .name(c.getName())
@@ -179,7 +190,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(ProjectCategoryResponse::getName))
                         .toList())
-                .sponsors(projectView.getSponsors().stream()
+                .sponsors(project.getSponsors().stream()
+                        .filter(s -> SponsorMapper.isActive(s))
                         .map(s -> s.sponsor())
                         .map(s -> new SponsorResponse()
                                 .id(s.getId())
@@ -189,11 +201,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(SponsorResponse::getName))
                         .toList())
-                .organizations(projectView.organizations().stream()
+                .organizations(project.organizations().stream()
                         .map(organizationView -> mapOrganization(organizationView, Boolean.TRUE.equals(includeAllAvailableRepos)))
                         .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
                         .toList())
-                .technologies(projectView.technologies())
+                .technologies(project.technologies())
                 .indexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull))
                 .indexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null))
                 .me(me == null ? null : new ProjectMeResponse()

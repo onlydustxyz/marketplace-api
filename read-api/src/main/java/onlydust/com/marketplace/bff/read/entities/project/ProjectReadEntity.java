@@ -77,7 +77,7 @@ public class ProjectReadEntity {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "github_repo_id")
     )
-    List<GithubRepoViewEntity> repos;
+    Set<GithubRepoViewEntity> repos;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectMoreInfoViewEntity> moreInfos;
@@ -96,6 +96,7 @@ public class ProjectReadEntity {
 
     public Map<String, Long> technologies() {
         return getRepos().stream()
+                .filter(GithubRepoViewEntity::isPublic)
                 .flatMap(repo -> repo.getLanguages().stream())
                 .collect(Collectors.groupingBy(GithubRepoLanguageViewEntity::getLanguage, Collectors.summingLong(GithubRepoLanguageViewEntity::getLineCount)));
     }

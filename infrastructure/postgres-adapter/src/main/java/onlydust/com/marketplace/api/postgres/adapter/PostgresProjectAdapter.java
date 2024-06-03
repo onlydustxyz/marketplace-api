@@ -414,6 +414,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectOrganizationView> getProjectOrganizations(UUID projectId) {
         final var project = projectViewRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));

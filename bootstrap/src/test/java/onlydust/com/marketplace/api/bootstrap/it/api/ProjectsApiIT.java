@@ -2857,7 +2857,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "technologies", "Rust", "search", "t", "ecosystemSlug", "fake",
-                        "pageIndex", "0", "pageSize","100")))
+                        "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful().expectBody().json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
@@ -2913,7 +2913,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(true)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
+                .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,

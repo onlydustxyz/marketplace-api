@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.project.domain.view.ShortRepoView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -61,15 +60,5 @@ public class GithubRepoViewEntity {
 
     public Boolean isPublic() {
         return nonNull(this.visibility) && this.visibility.equals(Visibility.PUBLIC);
-    }
-
-    public ShortRepoView toShortView() {
-        return ShortRepoView.builder()
-                .id(id)
-                .owner(owner.login())
-                .name(name)
-                .htmlUrl(htmlUrl)
-                .description(description)
-                .build();
     }
 }
