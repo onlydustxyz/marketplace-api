@@ -3529,6 +3529,26 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/project-categories:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjectCategories
+      summary: Get all project categories
+      operationId: getAllProjectCategories
+      description: |
+        Get all project categories
+      responses:
+        "200":
+          description: 'List of project categories'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectCategoriesResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -3716,6 +3736,10 @@ components:
       type: string
       format: uuid
       description: OnlyDust ecosystem ID
+
+    ProjectCategoryId:
+      type: string
+      format: uuid
 
     LanguageId:
       type: string
@@ -6008,6 +6032,30 @@ components:
           items:
             $ref: '#/components/schemas/EcosystemId'
 
+    ProjectCategoriesResponse:
+      type: object
+      required:
+        - categories
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
+
+    ProjectCategoryResponse:
+      type: object
+      required:
+        - id
+        - name
+        - iconSlug
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectCategoryId'
+        name:
+          type: string
+        iconSlug:
+          type: string
+
     ProjectRewardSettings:
       type: object
       properties:
@@ -6036,6 +6084,7 @@ components:
           format: uuid
         projectSlug:
           type: string
+
     UpdateProjectResponse:
       type: object
       required:
@@ -6047,6 +6096,7 @@ components:
           format: uuid
         projectSlug:
           type: string
+
     SimpleLink:
       type: object
       required:

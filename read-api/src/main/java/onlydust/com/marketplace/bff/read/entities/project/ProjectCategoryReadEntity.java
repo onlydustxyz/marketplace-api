@@ -24,8 +24,16 @@ public class ProjectCategoryReadEntity {
     private @NonNull String name;
     private @NonNull String iconSlug;
 
-    public ProjectCategoryResponse toDto() {
+    public ProjectCategoryResponse toBoDto() {
         return new ProjectCategoryResponse()
+                .id(id)
+                .name(name)
+                .iconSlug(iconSlug)
+                ;
+    }
+
+    public onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse toDto() {
+        return new onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse()
                 .id(id)
                 .name(name)
                 .iconSlug(iconSlug)

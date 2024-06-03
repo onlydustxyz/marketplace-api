@@ -33,7 +33,7 @@ public class BackofficeReadProjectCategoriesApiPostgresAdapter implements Backof
     public ResponseEntity<ProjectCategoryResponse> getProjectCategory(UUID id) {
         final var projectCategory = projectCategoryReadRepository.findById(id)
                 .orElseThrow(() -> notFound("Project category %s not found".formatted(id)));
-        return ok(projectCategory.toDto());
+        return ok(projectCategory.toBoDto());
     }
 
     @Override
