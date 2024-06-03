@@ -2,6 +2,7 @@ package onlydust.com.marketplace.bff.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeUsersReadApi;
+import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
 import onlydust.com.marketplace.bff.read.repositories.UserReadRepository;
@@ -12,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
@@ -21,6 +25,14 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersReadApi {
 
     private UserReadRepository userReadRepository;
+
+    @Override
+    public ResponseEntity<UserDetailsResponse> getUserById(UUID userId) {
+        final var user = userReadRepository.findByUserId(userId)
+                .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
+
+        return ResponseEntity.ok(user.toUserDetailsResponse());
+    }
 
     @Override
     public ResponseEntity<UserPage> getUserPage(Integer pageIndex, Integer pageSize, String login) {
@@ -34,4 +46,5 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
+
 }

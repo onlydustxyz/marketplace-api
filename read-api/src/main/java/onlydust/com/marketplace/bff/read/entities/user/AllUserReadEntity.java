@@ -6,16 +6,20 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
+import onlydust.com.marketplace.bff.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonRegistrationReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.Set;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -44,6 +48,26 @@ public class AllUserReadEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     Set<HackathonRegistrationReadEntity> hackathonRegistrations;
 
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    Set<ContactInformationReadEntity> contacts;
+
+    @ManyToMany
+    @JoinTable(
+            name = "billing_profiles_users",
+            schema = "accounting",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "billing_profile_id")
+    )
+    Set<BillingProfileReadEntity> billingProfiles;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
+    GlobalUsersRanksReadEntity globalUsersRanks;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
+    ReceivedRewardStatsPerUserReadEntity receivedRewardStats;
+
     public UserPageItemResponse toBoPageItemResponse() {
         return new UserPageItemResponse()
                 .id(userId)
@@ -62,5 +86,21 @@ public class AllUserReadEntity {
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl);
+    }
+
+    public UserDetailsResponse toUserDetailsResponse() {
+        return new UserDetailsResponse()
+                .id(userId)
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .email(email)
+                .lastSeenAt(registered == null ? null : registered.lastSeenAt())
+                .signedUpAt(registered == null ? null : toZoneDateTime(registered.createdAt()))
+                .contacts(contacts.stream().map(ContactInformationReadEntity::toDto).toList())
+                .leadedProjectCount(globalUsersRanks == null ? 0 : globalUsersRanks.leadedProjectCount().intValue())
+                .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
+                .billingProfiles(billingProfiles.stream().map(BillingProfileReadEntity::toShortResponse).toList())
+                ;
     }
 }

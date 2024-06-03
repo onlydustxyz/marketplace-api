@@ -255,42 +255,6 @@ public class BackofficeUserApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                 "idDocumentCountryCode": null,
                                 "sumsubUrl": null
                               }
-                            },
-                            {
-                              "subject": null,
-                              "type": "COMPANY",
-                              "verificationStatus": "NOT_STARTED",
-                              "kyb": {
-                                "name": null,
-                                "registrationNumber": null,
-                                "registrationDate": null,
-                                "address": null,
-                                "country": null,
-                                "countryCode": null,
-                                "usEntity": null,
-                                "subjectToEuropeVAT": null,
-                                "euVATNumber": null,
-                                "sumsubUrl": null
-                              },
-                              "kyc": null
-                            },
-                            {
-                              "subject": null,
-                              "type": "SELF_EMPLOYED",
-                              "verificationStatus": "NOT_STARTED",
-                              "kyb": {
-                                "name": null,
-                                "registrationNumber": null,
-                                "registrationDate": null,
-                                "address": null,
-                                "country": null,
-                                "countryCode": null,
-                                "usEntity": null,
-                                "subjectToEuropeVAT": null,
-                                "euVATNumber": null,
-                                "sumsubUrl": null
-                              },
-                              "kyc": null
                             }
                           ]
                         }

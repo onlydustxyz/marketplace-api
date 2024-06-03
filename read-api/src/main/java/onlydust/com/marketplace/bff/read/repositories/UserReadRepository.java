@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserReadRepository extends JpaRepository<AllUserReadEntity, UUID> {
@@ -31,4 +32,17 @@ public interface UserReadRepository extends JpaRepository<AllUserReadEntity, UUI
             """)
     @NotNull
     Page<AllUserReadEntity> findAllRegisteredOnHackathon(final String login, @NonNull UUID hackathonId, final @NotNull Pageable pageable);
+
+    @Query(value = """
+            SELECT u
+            FROM AllUserReadEntity u
+            JOIN FETCH u.registered
+            JOIN FETCH u.globalUsersRanks
+            JOIN FETCH u.receivedRewardStats
+            LEFT JOIN FETCH u.billingProfiles bp
+            LEFT JOIN FETCH bp.kyc
+            LEFT JOIN FETCH bp.kyb
+            WHERE u.userId = :userId
+            """)
+    Optional<AllUserReadEntity> findByUserId(UUID userId);
 }

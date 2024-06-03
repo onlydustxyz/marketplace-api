@@ -98,12 +98,6 @@ public class BackofficeConfiguration {
     }
 
     @Bean
-    public BackofficeUserRestApi backofficeUserRestApi(final UserFacadePort userFacadePort,
-                                                       final BillingProfileFacadePort billingProfileFacadePort) {
-        return new BackofficeUserRestApi(userFacadePort, billingProfileFacadePort);
-    }
-
-    @Bean
     public BackofficeLanguageRestApi backofficeLanguageRestApi(final LanguageFacadePort languageFacadePort) {
         return new BackofficeLanguageRestApi(languageFacadePort);
     }
