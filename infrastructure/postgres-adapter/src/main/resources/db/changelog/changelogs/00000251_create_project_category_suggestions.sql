@@ -12,10 +12,9 @@ CREATE TRIGGER project_category_suggestions_set_tech_updated_at
     FOR EACH ROW
 EXECUTE FUNCTION set_tech_updated_at();
 
-
 insert into project_category_suggestions (id, name)
 select id, name
-from marketplace_db.public.project_categories
+from project_categories
 where status = 'SUGGESTED';
 
 delete
