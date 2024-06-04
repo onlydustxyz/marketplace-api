@@ -22,27 +22,31 @@ import static org.apache.commons.lang3.stream.Streams.nonNull;
 @Entity
 @Table(schema = "accounting", name = "payout_infos")
 @EntityListeners(AuditingEntityListener.class)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class PayoutInfoEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID billingProfileId;
+
     @OneToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     @Builder.Default
     Set<WalletEntity> wallets = new HashSet<>();
+
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     BankAccountEntity bankAccount;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
     private Date createdAt;
+
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
-    @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
     public PayoutInfo toDomain() {
@@ -59,7 +63,7 @@ public class PayoutInfoEntity {
         return wallets.stream().filter(w -> w.getNetwork().equals(network)).findFirst();
     }
 
-    public static PayoutInfoEntity toEntity(final BillingProfile.Id billingProfileId, final PayoutInfo payoutInfo) {
+    public static PayoutInfoEntity fromDomain(final BillingProfile.Id billingProfileId, final PayoutInfo payoutInfo) {
         return PayoutInfoEntity.builder()
                 .billingProfileId(billingProfileId.value())
                 .bankAccount(payoutInfo.bankAccount().map(b -> BankAccountEntity.of(billingProfileId, b)).orElse(null))

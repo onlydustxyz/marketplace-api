@@ -245,7 +245,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId) {
         payoutInfoRepository.findById(billingProfileId.value())
                 .ifPresent(payoutInfoEntity -> walletRepository.deleteByBillingProfileId(billingProfileId.value()));
-        payoutInfoRepository.save(PayoutInfoEntity.toEntity(billingProfileId, payoutInfo));
+        payoutInfoRepository.save(PayoutInfoEntity.fromDomain(billingProfileId, payoutInfo));
     }
 
     @Override

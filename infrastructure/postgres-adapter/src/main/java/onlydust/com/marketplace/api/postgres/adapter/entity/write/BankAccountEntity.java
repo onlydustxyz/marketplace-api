@@ -20,23 +20,23 @@ import java.util.UUID;
 @Table(name = "bank_accounts", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 public class BankAccountEntity {
-
     @Id
+    @EqualsAndHashCode.Include
     UUID billingProfileId;
     String bic;
     String number;
+
     @OneToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     BillingProfileEntity billingProfile;
+
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
     private Date createdAt;
+
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
-    @EqualsAndHashCode.Exclude
     private Date updatedAt;
-
 
     public static BankAccountEntity of(BillingProfile.Id billingProfileId, BankAccount bankAccount) {
         return BankAccountEntity.builder()

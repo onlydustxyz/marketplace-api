@@ -23,7 +23,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "wallets", schema = "accounting")
@@ -31,8 +31,11 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class WalletEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID billingProfileId;
+
     @Id
+    @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "network")
@@ -44,6 +47,7 @@ public class WalletEntity {
 
     @Column(name = "address", nullable = false)
     String address;
+
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "wallet_type", nullable = false)
@@ -51,13 +55,11 @@ public class WalletEntity {
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
     private Date createdAt;
+
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
-    @EqualsAndHashCode.Exclude
     private Date updatedAt;
-
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
