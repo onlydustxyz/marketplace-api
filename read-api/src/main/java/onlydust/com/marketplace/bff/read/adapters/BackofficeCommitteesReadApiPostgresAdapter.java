@@ -69,6 +69,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .applicant(a.user().toLinkResponse())
                         .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
                         .allocation(projectAllocations.get(a.projectId())))
+                .sorted(Comparator.nullsLast(Comparator.comparing(ApplicationResponse::getScore).reversed()))
                 .toList();
 
         final Map<AllUserReadEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
@@ -185,6 +186,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .orElse(null))
                 .projectAllocations(committeeBudgetAllocations.stream()
                         .map(CommitteeBudgetAllocationReadEntity::toDto)
+                        .sorted(Comparator.nullsLast(Comparator.comparing(CommitteeProjectAllocationLinkResponse::getScore).reversed()))
                         .toList()));
     }
 }
