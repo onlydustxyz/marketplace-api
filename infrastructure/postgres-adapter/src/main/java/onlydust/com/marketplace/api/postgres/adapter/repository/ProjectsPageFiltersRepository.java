@@ -30,6 +30,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                                                'id', l.id,
                                                                'name', l.name,
                                                                'logoUrl', l.logo_url,
+                                                               'bannerUrl', l.banner_url
                                                     )) language_json
                                from languages l
                                         join project_languages pl on pl.language_id = l.id
@@ -63,6 +64,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                                                'id', l.id,
                                                                'name', l.name,
                                                                'logoUrl', l.logo_url,
+                                                               'bannerUrl', l.banner_url
                                                     )) language_json
                                from languages l
                                         join project_languages pl on pl.language_id = l.id

@@ -172,9 +172,13 @@ public class ProjectPageItemQueryEntity {
     }
 
     public static class Languages {
+        @JsonProperty("id")
         UUID id;
+        @JsonProperty("name")
         String name;
+        @JsonProperty("logoUrl")
         String logoUrl;
+        @JsonProperty("bannerUrl")
         String bannerUrl;
     }
 }

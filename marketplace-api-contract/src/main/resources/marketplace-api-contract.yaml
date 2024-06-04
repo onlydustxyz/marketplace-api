@@ -4755,11 +4755,6 @@ components:
           type: string
           description: Language name
           example: Rust
-        url:
-          type: string
-          format: url
-          description: URL of language's website
-          example: 'https://rust.org'
         logoUrl:
           type: string
           format: url

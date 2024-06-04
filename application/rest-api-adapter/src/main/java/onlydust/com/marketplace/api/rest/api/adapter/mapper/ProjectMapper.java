@@ -172,11 +172,17 @@ public interface ProjectMapper {
                 .map(EcosystemView.class::cast)
                 .map(ProjectMapper::mapEcosystem)
                 .collect(Collectors.toSet());
+        final Set<LanguageResponse> languages = page.getFilters().get(ProjectCardView.FilterBy.LANGUAGES.name())
+                .stream()
+                .map(LanguageView.class::cast)
+                .map(ProjectMapper::mapLanguage)
+                .collect(Collectors.toSet());
         for (ProjectCardView projectCardView : page.getContent()) {
             projectPageItemResponses.add(mapProjectCard(projectCardView));
         }
         projectPageResponse.setProjects(projectPageItemResponses);
         projectPageResponse.setEcosystems(ecosystems.stream().sorted(comparing(EcosystemResponse::getName)).toList());
+        projectPageResponse.setLanguages(languages.stream().sorted(comparing(LanguageResponse::getName)).toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
         projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
@@ -192,9 +198,7 @@ public interface ProjectMapper {
         for (EcosystemView ecosystemView : projectCardView.getEcosystems()) {
             projectListItemResponse.addEcosystemsItem(mapEcosystem(ecosystemView));
         }
-        for (LanguageView language : projectCardView.getLanguages()) {
-            projectListItemResponse.addLanguagesItem(mapLanguage(language));
-        }
+        projectListItemResponse.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList());
         return projectListItemResponse;
     }
 

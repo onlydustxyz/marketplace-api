@@ -71,8 +71,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
-                                            'logo_url', l.logo_url,
-                                            'banner_url', l.banner_url
+                                            'logoUrl', l.logo_url,
+                                            'bannerUrl', l.banner_url
                                             )) json
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
@@ -179,8 +179,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
-                                            'logo_url', l.logo_url,
-                                            'banner_url', l.banner_url
+                                            'logoUrl', l.logo_url,
+                                            'bannerUrl', l.banner_url
                                             )) json
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
@@ -239,8 +239,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
-                                            'logo_url', l.logo_url,
-                                            'banner_url', l.banner_url
+                                            'logoUrl', l.logo_url,
+                                            'bannerUrl', l.banner_url
                                             )) json
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
@@ -310,8 +310,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
-                                            'logo_url', l.logo_url,
-                                            'banner_url', l.banner_url
+                                            'logoUrl', l.logo_url,
+                                            'bannerUrl', l.banner_url
                                             )) json
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
