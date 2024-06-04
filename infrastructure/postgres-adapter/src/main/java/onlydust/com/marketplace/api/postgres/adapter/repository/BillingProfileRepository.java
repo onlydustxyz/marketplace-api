@@ -25,11 +25,6 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
             """)
     void updateEnabled(UUID billingProfileId, Boolean enabled);
 
-    @Query(nativeQuery = true, value = """
-                select enabled from accounting.billing_profiles where id = :billingProfileId
-            """)
-    boolean isBillingProfileEnabled(UUID billingProfileId);
-
     @Modifying
     @Query(nativeQuery = true, value = """
                 update accounting.billing_profiles

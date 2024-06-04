@@ -39,9 +39,9 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public IndividualBillingProfile createIndividualBillingProfile(@NonNull UserId ownerId, @NonNull String name, Set<ProjectId> selectForProjects) {
-        billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).ifPresent(billingProfile -> {
+        if (billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).isPresent())
             throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId.value()));
-        });
+
         final var billingProfile = new IndividualBillingProfile(name, ownerId);
         billingProfileStoragePort.save(billingProfile);
         selectBillingProfileForUserAndProjects(billingProfile.id(), ownerId, selectForProjects);
@@ -67,18 +67,18 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        if (!billingProfile.isAdmin(userId))
             throw unauthorized("User is not allowed to generate invoice for this billing profile");
 
-        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+        if (!billingProfile.enabled())
             throw unauthorized("Cannot generate invoice on a disabled billing profile");
 
         final var rewards = invoiceStoragePort.findRewards(rewardIds)
                 .stream().map(r -> r.withNetworks(accountingFacadePort.networksOf(r.amount().getCurrency().id(), r.id())))
                 .toList();
-
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
         if (!billingProfile.isVerified())
             throw badRequest("Billing profile %s is not verified".formatted(billingProfileId));
@@ -102,18 +102,19 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     private void checkInvoicePreviewRewards(Invoice invoice) {
         final var rewards = invoiceStoragePort.getRewardAssociations(invoice.rewards().stream().map(Invoice.Reward::id).toList());
-        if (rewards.size() != invoice.rewards().size()) {
+
+        if (rewards.size() != invoice.rewards().size())
             throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
-        }
-        if (rewards.stream().anyMatch(r -> !r.status().isPendingRequest())) {
+
+        if (rewards.stream().anyMatch(r -> !r.status().isPendingRequest()))
             throw badRequest("Some rewards don't have the PENDING_REQUEST status");
-        }
-        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT && r.invoiceStatus() != Invoice.Status.REJECTED)) {
+
+        if (rewards.stream().anyMatch(r -> nonNull(r.invoiceId()) && r.invoiceStatus() != Invoice.Status.DRAFT && r.invoiceStatus() != Invoice.Status.REJECTED))
             throw badRequest("Some rewards are already invoiced");
-        }
-        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id())))
             throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
-        }
+
     }
 
     @Override
@@ -132,13 +133,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
-        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+        if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
 
         if (!billingProfile.isInvoiceMandateAccepted())
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfileId, invoiceId, null, Invoice.Status.APPROVED, data);
+        uploadInvoice(userId, billingProfile, invoiceId, null, Invoice.Status.APPROVED, data);
     }
 
     @Override
@@ -148,25 +149,25 @@ public class BillingProfileService implements BillingProfileFacadePort {
         final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
 
-        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+        if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
 
         if (billingProfile.isInvoiceMandateAccepted())
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfileId, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
+        uploadInvoice(userId, billingProfile, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
     }
 
     @Transactional
-    private void uploadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
+    private void uploadInvoice(@NonNull UserId userId, @NonNull BillingProfile billingProfile, Invoice.@NonNull Id invoiceId, String fileName,
                                @NonNull Invoice.Status status,
                                @NonNull InputStream data) {
-        if (!billingProfileStoragePort.isAdmin(billingProfileId, userId))
+        if (!billingProfile.isAdmin(userId))
             throw unauthorized("User is not allowed to upload an invoice for this billing profile");
 
         final var invoice = invoiceStoragePort.get(invoiceId)
-                .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
-                .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfileId)));
+                .filter(i -> i.billingProfileSnapshot().id().equals(billingProfile.id()))
+                .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfile.id())));
         if (invoice.status() != Invoice.Status.DRAFT)
             throw badRequest("Invoice %s is not in DRAFT status".formatted(invoiceId));
 
@@ -178,7 +179,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .url(url)
                 .originalFileName(fileName));
 
-        billingProfileObserver.onInvoiceUploaded(billingProfileId, invoiceId, nonNull(fileName));
+        billingProfileObserver.onInvoiceUploaded(billingProfile.id(), invoiceId, nonNull(fileName));
     }
 
     private void checkInvoiceRewards(Invoice invoice) {

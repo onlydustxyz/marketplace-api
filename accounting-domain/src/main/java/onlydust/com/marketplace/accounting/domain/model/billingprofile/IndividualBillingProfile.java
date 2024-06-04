@@ -47,6 +47,11 @@ public class IndividualBillingProfile extends BillingProfile {
         return owner.id().equals(userId);
     }
 
+    @Override
+    public boolean isMember(UserId userId) {
+        return isAdmin(userId);
+    }
+
     public PositiveAmount currentYearPaymentLimit() {
         return YEARLY_USD_PAYMENT_LIMIT;
     }

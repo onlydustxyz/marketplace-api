@@ -28,14 +28,20 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
 
     @Override
     public void setPayoutPreference(ProjectId projectId, BillingProfile.Id billingProfileId, UserId userId) {
-        if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId))
+        final var billingProfile = billingProfileStoragePort.findById(billingProfileId)
+                .orElseThrow(() -> forbidden("Billing profile %s not found".formatted(billingProfileId.value())));
+
+        if (!billingProfile.isMember(userId))
             throw forbidden("User %s is not member of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+
         if (!payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId))
             throw forbidden("Cannot set payout preference for user %s on project %s because user has not received any rewards on it"
                     .formatted(userId.value(), projectId.value()));
-        if (!billingProfileStoragePort.isEnabled(billingProfileId))
+
+        if (!billingProfile.enabled())
             throw forbidden("Cannot set payout preference for user %s on project %s because billing profile %s is disabled"
                     .formatted(userId, projectId, billingProfileId));
+        
         payoutPreferenceStoragePort.save(projectId, billingProfileId, userId);
         accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
     }

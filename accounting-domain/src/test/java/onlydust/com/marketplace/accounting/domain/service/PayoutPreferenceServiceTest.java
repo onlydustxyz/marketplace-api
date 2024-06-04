@@ -2,6 +2,9 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -10,7 +13,8 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +28,11 @@ public class PayoutPreferenceServiceTest {
     private final PayoutPreferenceService payoutPreferenceService = new PayoutPreferenceService(payoutPreferenceStoragePort, billingProfileStoragePort,
             accountingObserverPort);
 
+    final ProjectId projectId = ProjectId.random();
+    final UserId userId = UserId.random();
+    final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+
+
     @BeforeEach
     void setUp() {
         reset(payoutPreferenceStoragePort, billingProfileStoragePort);
@@ -32,12 +41,18 @@ public class PayoutPreferenceServiceTest {
     @Test
     void should_forbid_to_set_payout_preference_given_a_user_not_member_of_billing_profile() {
         // Given
-        final ProjectId projectId = ProjectId.of(UUID.randomUUID());
-        final UserId userId = UserId.of(UUID.randomUUID());
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(IndividualBillingProfile.builder()
+                .id(billingProfileId)
+                .name("Billing profile")
+                .enabled(true)
+                .status(VerificationStatus.VERIFIED)
+                .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                .build()));
+
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(false);
 
         // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(false);
         Exception exception = null;
         try {
             payoutPreferenceService.setPayoutPreference(projectId, billingProfileId, userId);
@@ -55,13 +70,18 @@ public class PayoutPreferenceServiceTest {
     @Test
     void should_forbid_to_set_payout_preference_given_a_user_which_has_not_received_a_reward_on_given_project() {
         // Given
-        final ProjectId projectId = ProjectId.of(UUID.randomUUID());
-        final UserId userId = UserId.of(UUID.randomUUID());
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-
-        // When
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(IndividualBillingProfile.builder()
+                .id(billingProfileId)
+                .name("Billing profile")
+                .enabled(true)
+                .status(VerificationStatus.VERIFIED)
+                .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                .build()));
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(true);
         when(payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId)).thenReturn(false);
+
+        // When
         Exception exception = null;
         try {
             payoutPreferenceService.setPayoutPreference(projectId, billingProfileId, userId);
@@ -80,14 +100,18 @@ public class PayoutPreferenceServiceTest {
     @Test
     void should_forbid_to_set_payout_preference_given_a_disabled_billing_profile() {
         // Given
-        final ProjectId projectId = ProjectId.of(UUID.randomUUID());
-        final UserId userId = UserId.of(UUID.randomUUID());
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(IndividualBillingProfile.builder()
+                .id(billingProfileId)
+                .name("Billing profile")
+                .enabled(false)
+                .status(VerificationStatus.VERIFIED)
+                .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                .build()));
+        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(true);
+        when(payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId)).thenReturn(true);
 
         // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(true);
-        when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
-        when(payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId)).thenReturn(true);
         Exception exception = null;
         try {
             payoutPreferenceService.setPayoutPreference(projectId, billingProfileId, userId);
@@ -105,14 +129,19 @@ public class PayoutPreferenceServiceTest {
 
     @Test
     void should_set_payout_preference() {
-        final ProjectId projectId = ProjectId.of(UUID.randomUUID());
-        final UserId userId = UserId.of(UUID.randomUUID());
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(IndividualBillingProfile.builder()
+                .id(billingProfileId)
+                .name("Billing profile")
+                .enabled(true)
+                .status(VerificationStatus.VERIFIED)
+                .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                .build()));
 
-        // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userId)).thenReturn(true);
         when(payoutPreferenceStoragePort.hasUserReceivedSomeRewardsOnProject(userId, projectId)).thenReturn(true);
-        when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+
+        // When
         payoutPreferenceService.setPayoutPreference(projectId, billingProfileId, userId);
 
         // Then

@@ -433,12 +433,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isEnabled(BillingProfile.Id billingProfileId) {
-        return billingProfileRepository.isBillingProfileEnabled(billingProfileId.value());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<BillingProfileUserRightsView> getUserRightsForBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
         return billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(userId.value(), billingProfileId.value())
                 .map(BillingProfileUserRightsQueryEntity::toDomain);

@@ -112,7 +112,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
 
             // When
@@ -153,7 +152,6 @@ class BillingProfileServiceTest {
         @Test
         void should_generate_invoice_preview() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -186,7 +184,6 @@ class BillingProfileServiceTest {
             // Given
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build()));
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -204,7 +201,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_preview_given_a_disabled_billing_profile() {
             // When
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(companyBillingProfile.toBuilder().enabled(false).build()));
 
             // Then
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -222,7 +219,6 @@ class BillingProfileServiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
@@ -258,7 +254,6 @@ class BillingProfileServiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
@@ -319,7 +314,6 @@ class BillingProfileServiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
@@ -351,7 +345,6 @@ class BillingProfileServiceTest {
             invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
             when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
 
@@ -387,7 +380,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
@@ -402,7 +394,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
@@ -417,9 +408,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_given_a_disabled_billing_profile() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(companyBillingProfile.toBuilder().enabled(false).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -434,7 +423,6 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(billingProfileStoragePort.findById(otherBillingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().id(otherBillingProfileId).build()));
@@ -449,13 +437,12 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_a_reward_was_cancelled() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
                             .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
-                            .enabled(false)
+                            .enabled(true)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
@@ -476,13 +463,12 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
                             .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
-                            .enabled(false)
+                            .enabled(true)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
@@ -506,13 +492,12 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
                     IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
                             .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
-                            .enabled(false)
+                            .enabled(true)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
@@ -536,7 +521,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
@@ -553,7 +537,6 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(otherBillingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder()
                             .id(otherBillingProfileId)
@@ -572,7 +555,6 @@ class BillingProfileServiceTest {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
             when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(false);
             when(billingProfileStoragePort.findById(otherBillingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder()
                             .id(otherBillingProfileId)
@@ -590,7 +572,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_a_reward_was_cancelled() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
@@ -607,7 +588,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
 
@@ -627,7 +607,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(billingProfileStoragePort.findById(billingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
@@ -729,7 +708,6 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_external_invoice_upload() {
                 // When
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -742,7 +720,6 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                         .map(r -> new RewardAssociations(r.id(),
                                 RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
@@ -775,7 +752,6 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_generated_invoice_upload() {
                 // When
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -788,7 +764,6 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                         .map(r -> new RewardAssociations(r.id(),
                                 RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
@@ -811,7 +786,6 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_external_invoice_upload_if_not_found() {
                 // Given
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
                 // When

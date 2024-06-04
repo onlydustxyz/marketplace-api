@@ -32,6 +32,11 @@ public class CompanyBillingProfile extends BillingProfile {
     }
 
     @Override
+    public boolean isMember(UserId userId) {
+        return members.stream().anyMatch(user -> user.id().equals(userId));
+    }
+
+    @Override
     public boolean isInvoiceMandateAccepted() {
         return invoiceMandateAcceptedAt != null &&
                invoiceMandateLatestVersionDate != null &&

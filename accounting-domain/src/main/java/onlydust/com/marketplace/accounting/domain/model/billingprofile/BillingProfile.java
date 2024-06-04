@@ -53,6 +53,8 @@ public abstract class BillingProfile {
 
     public abstract boolean isAdmin(UserId userId);
 
+    public abstract boolean isMember(UserId userId);
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

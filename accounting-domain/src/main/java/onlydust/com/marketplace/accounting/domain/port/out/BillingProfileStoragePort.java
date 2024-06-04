@@ -84,8 +84,6 @@ public interface BillingProfileStoragePort {
 
     void updateEnableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
 
-    boolean isEnabled(BillingProfile.Id billingProfileId);
-
     Optional<BillingProfileUserRightsView> getUserRightsForBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
 
     void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
