@@ -56,6 +56,7 @@ public class ContributionView {
         List<UUID> languages = List.of();
         @Builder.Default
         List<UUID> ecosystems = List.of();
+        Boolean includePrivateProjects;
         Date from;
         Date to;
     }

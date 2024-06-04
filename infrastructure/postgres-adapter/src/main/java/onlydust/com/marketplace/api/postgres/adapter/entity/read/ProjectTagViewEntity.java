@@ -1,16 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.Project;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -24,20 +21,22 @@ import java.util.UUID;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @Immutable
+@IdClass(ProjectTagViewEntity.PrimaryKey.class)
 public class ProjectTagViewEntity {
 
-    @EmbeddedId
-    Id id;
+    @Id
+    UUID projectId;
+    @Id
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "project_tag")
+    Project.Tag tag;
 
     @Embeddable
     @Getter
     @NoArgsConstructor
     @EqualsAndHashCode
-    public static class Id implements Serializable {
+    public static class PrimaryKey implements Serializable {
         UUID projectId;
-        @Enumerated(EnumType.STRING)
-        @JdbcType(PostgreSQLEnumJdbcType.class)
-        @Column(columnDefinition = "project_tag")
         Project.Tag tag;
     }
 

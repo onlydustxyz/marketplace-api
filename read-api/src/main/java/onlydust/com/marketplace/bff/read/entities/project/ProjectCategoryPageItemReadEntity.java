@@ -19,6 +19,7 @@ import java.util.UUID;
 @Immutable
 public class ProjectCategoryPageItemReadEntity {
     @Id
+    @EqualsAndHashCode.Include
     private @NonNull UUID id;
     private @NonNull String name;
     private String iconSlug;

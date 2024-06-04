@@ -462,8 +462,12 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId, caller))
-                .thenReturn(ProjectDetailsView.builder().leaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of(UUID.randomUUID()));
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
+                .thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId))
+                .thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -484,8 +488,12 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId, caller))
-                .thenReturn(ProjectDetailsView.builder().invitedLeaders(Set.of(ProjectLeaderLinkView.builder().build())).build());
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
+                .thenReturn(Set.of(1L, 2L));
+        when(projectStoragePort.getProjectOrganizations(projectId))
+                .thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -506,8 +514,12 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getById(projectId, caller))
-                .thenReturn(ProjectDetailsView.builder().build());
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
+                .thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId))
+                .thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -524,44 +536,44 @@ public class UserServiceTest {
     @Test
     void should_fail_to_claim_project_if_user_not_github_admin_on_every_orga() {
         // Given
-        final String githubAccessToken = faker.rickAndMorty().character();
-        final User user =
-                User.builder().githubUserId(faker.random().nextLong()).githubLogin(faker.pokemon().name()).build();
+        final User user = User.builder().githubUserId(faker.random().nextLong()).githubLogin(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getById(projectId, user))
-                .thenReturn(ProjectDetailsView.builder()
-                        .organizations(Set.of(
-                                ProjectOrganizationView.builder()
-                                        .login("org1")
-                                        .id(1L)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org2")
-                                        .id(2L)
-                                        .isInstalled(true)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org3")
-                                        .id(3L)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org4")
-                                        .id(4L)
-                                        .isInstalled(true)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org5")
-                                        .id(5L)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org6")
-                                        .id(6L)
-                                        .isInstalled(true)
-                                        .build()
-                        ))
-                        .build());
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
+                .thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId))
+                .thenReturn(List.of(
+                        ProjectOrganizationView.builder()
+                                .login("org1")
+                                .id(1L)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org2")
+                                .id(2L)
+                                .isInstalled(true)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org3")
+                                .id(3L)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org4")
+                                .id(4L)
+                                .isInstalled(true)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org5")
+                                .id(5L)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org6")
+                                .id(6L)
+                                .isInstalled(true)
+                                .build()
+                ));
         when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org1")).thenReturn(GithubMembership.ADMIN);
         when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
@@ -585,44 +597,45 @@ public class UserServiceTest {
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("User must be github admin on every organizations not installed and at least member on every " +
-                     "organization already installed linked to the project",
+                        "organization already installed linked to the project",
                 onlyDustException.getMessage());
     }
 
     @Test
     void should_claim_project() {
-        final String githubAccessToken = faker.rickAndMorty().character();
         final User user = User.builder().id(UUID.randomUUID())
                 .githubUserId(faker.random().nextLong())
                 .githubLogin(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getById(projectId, user))
-                .thenReturn(ProjectDetailsView.builder()
-                        .organizations(Set.of(
-                                ProjectOrganizationView.builder()
-                                        .login("org1")
-                                        .id(1L)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org2")
-                                        .id(2L)
-                                        .isInstalled(true)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org3")
-                                        .id(3l)
-                                        .isInstalled(true)
-                                        .build(),
-                                ProjectOrganizationView.builder()
-                                        .login("org4")
-                                        .id(4L)
-                                        .isInstalled(true)
-                                        .id(user.getGithubUserId())
-                                        .build()
-                        ))
-                        .build());
+        when(projectStoragePort.getProjectLeadIds(projectId))
+                .thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
+                .thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId))
+                .thenReturn(List.of(
+                        ProjectOrganizationView.builder()
+                                .login("org1")
+                                .id(1L)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org2")
+                                .id(2L)
+                                .isInstalled(true)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org3")
+                                .id(3l)
+                                .isInstalled(true)
+                                .build(),
+                        ProjectOrganizationView.builder()
+                                .login("org4")
+                                .id(4L)
+                                .isInstalled(true)
+                                .id(user.getGithubUserId())
+                                .build()
+                ));
         when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
                 "org1")).thenReturn(GithubMembership.ADMIN);
         when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),

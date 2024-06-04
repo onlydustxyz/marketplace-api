@@ -5,10 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.UsersApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,7 @@ public class UsersRestApi implements UsersApi {
     private final static int DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_TRIGGER_EXTERNAL_SEARCH = 5;
     private final static int DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN = 50;
 
+    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ContributorFacadePort contributorFacadePort;
 
     @Override
@@ -64,6 +67,7 @@ public class UsersRestApi implements UsersApi {
                                                                          List<Long> repositories,
                                                                          List<UUID> languages,
                                                                          List<UUID> ecosystems,
+                                                                         Boolean includePrivateProjects,
                                                                          String fromDate,
                                                                          String toDate,
                                                                          ContributionSort sort,
@@ -73,6 +77,11 @@ public class UsersRestApi implements UsersApi {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(page);
 
+        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
+        if (caller.isEmpty()) {
+            includePrivateProjects = false;
+        }
+
         final var filters = ContributionView.Filters.builder()
                 .contributors(List.of(githubUserId))
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
@@ -81,12 +90,13 @@ public class UsersRestApi implements UsersApi {
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
                 .languages(Optional.ofNullable(languages).orElse(List.of()))
                 .ecosystems(Optional.ofNullable(ecosystems).orElse(List.of()))
+                .includePrivateProjects(includePrivateProjects)
                 .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
                 .to(isNull(toDate) ? null : DateMapper.parse(toDate))
                 .build();
 
         final var contributions = contributorFacadePort.contributions(
-                githubUserId,
+                caller.map(User::getGithubUserId),
                 filters,
                 ContributionMapper.mapSort(sort),
                 SortDirectionMapper.requestToDomain(direction),

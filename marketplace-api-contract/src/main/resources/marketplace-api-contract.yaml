@@ -977,6 +977,11 @@ paths:
             items:
               $ref: '#/components/schemas/EcosystemId'
         - in: query
+          name: includePrivateProjects
+          description: Include contributions in private projects
+          schema:
+            type: boolean
+        - in: query
           name: fromDate
           description: Contribution date filter
           schema:
@@ -1346,7 +1351,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get project details
       operationId: getProject
       description: |
@@ -1414,7 +1419,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get project details
       operationId: getProjectBySlug
       description: |
@@ -4882,6 +4887,7 @@ components:
         - leaders
         - invitedLeaders
         - ecosystems
+        - categories
         - technologies
         - hasRemainingBudget
         - indexingComplete
@@ -4944,6 +4950,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
         sponsors:
           type: array
           items:
@@ -5952,6 +5962,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemId'
+        categoryIds:
+          type: array
+          description: List of categories to link the project on.
+          items:
+            $ref: '#/components/schemas/ProjectCategoryId'
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
@@ -6028,6 +6043,15 @@ components:
             It is allowed to link a new ecosystem directly through this list.
           items:
             $ref: '#/components/schemas/EcosystemId'
+        categoryIds:
+          type: array
+          description: List of categories to link the project on.
+            All other categories will be unlinked from the project.
+            If empty, all categories will be unlinked from the project.
+            If null, no change will be made.
+            It is allowed to link a new category directly through this list.
+          items:
+            $ref: '#/components/schemas/ProjectCategoryId'
 
     ProjectCategoriesResponse:
       type: object

@@ -175,6 +175,7 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                 (COALESCE(:statuses) IS NULL OR CAST(c.status AS TEXT) IN (:statuses)) AND
                 (array_length(:ecosystemIds, 1) IS NULL OR contrib_ecosystems.ecosystem_ids && :ecosystemIds) AND
                 (array_length(:languageIds, 1) IS NULL OR contrib_languages.language_ids && :languageIds) AND
+                (p.visibility = 'PUBLIC' OR (:includePrivateProjects IS TRUE AND c.contributor_id = :callerGithubUserId)) AND
                 (:fromDate IS NULL OR coalesce(c.completed_at, c.created_at) >= to_date(cast(:fromDate as text), 'YYYY-MM-DD')) AND
                 (:toDate IS NULL OR coalesce(c.completed_at, c.created_at) < to_date(cast(:toDate as text), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
@@ -186,7 +187,21 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                                                    List<String> statuses,
                                                    UUID[] languageIds,
                                                    UUID[] ecosystemIds,
+                                                   boolean includePrivateProjects,
                                                    String fromDate,
                                                    String toDate,
                                                    Pageable pageable);
+
+    @Query(value = """
+            SELECT
+                count(distinct c.id)
+            FROM
+                indexer_exp.contributions c
+            INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
+            INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
+            WHERE 
+                c.contributor_id = :contributorId AND
+                pgr.project_id = :projectId
+            """, nativeQuery = true)
+    int countBy(Long contributorId, UUID projectId);
 }

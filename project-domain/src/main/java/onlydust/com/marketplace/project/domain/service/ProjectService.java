@@ -47,6 +47,7 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
+<<<<<<< HEAD
     public ProjectDetailsView getById(UUID projectId, User caller) {
         final var userId = caller == null ? null : caller.getId();
 
@@ -75,6 +76,14 @@ public class ProjectService implements ProjectFacadePort {
                                                List<UUID> languageIds, Integer pageIndex, Integer pageSize) {
         return projectStoragePort.findForUserId(tags, ecosystemSlugs, userId, search,
                 sort, mine, languageIds, pageIndex, pageSize);
+=======
+    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
+                                                                                   List<String> ecosystemSlugs, String search,
+                                                                                   ProjectCardView.SortBy sort, UUID userId
+            , Boolean mine, Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemSlugs, userId, search,
+                sort, mine, pageIndex, pageSize);
+>>>>>>> main
     }
 
     @Override
@@ -107,7 +116,10 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 ProjectVisibility.PUBLIC,
                 command.getImageUrl(),
-                ProjectRewardSettings.defaultSettings(dateProvider.now()), command.getEcosystemIds());
+                ProjectRewardSettings.defaultSettings(dateProvider.now()),
+                command.getEcosystemIds(),
+                command.getCategoryIds()
+        );
 
         projectObserverPort.onProjectCreated(projectId, projectLeadId);
         if (nonNull(command.getGithubRepoIds())) {
@@ -148,7 +160,10 @@ public class ProjectService implements ProjectFacadePort {
                 command.getGithubRepoIds(),
                 command.getGithubUserIdsAsProjectLeadersToInvite(),
                 command.getProjectLeadersToKeep(), command.getImageUrl(),
-                command.getRewardSettings(), command.getEcosystemIds());
+                command.getRewardSettings(),
+                command.getEcosystemIds(),
+                command.getCategoryIds()
+        );
 
         if (!isNull(command.getGithubRepoIds())) {
             projectObserverPort.onLinkedReposChanged(command.getId(), linkedRepoIds, unlinkedRepoIds);
@@ -169,7 +184,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                                               "leaders");
+                    "leaders");
         }
     }
 
@@ -274,7 +289,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                                                  "project");
+                        "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
@@ -322,7 +337,7 @@ public class ProjectService implements ProjectFacadePort {
         if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw OnlyDustException.forbidden("Only project leads can list project contributions");
         }
-        return contributionStoragePort.findContributions(caller.getGithubUserId(), filters, sort, direction, page,
+        return contributionStoragePort.findContributions(Optional.of(caller.getGithubUserId()), filters, sort, direction, page,
                 pageSize);
     }
 

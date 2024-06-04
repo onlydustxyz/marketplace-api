@@ -9,9 +9,8 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 public interface ProjectStoragePort {
-    ProjectDetailsView getById(UUID projectId, User caller);
 
-    ProjectDetailsView getBySlug(String slug, User caller);
+    Optional<Project> getById(UUID projectId);
 
     Page<ProjectCardView> findForUserId(List<Project.Tag> tags, List<String> ecosystemSlugs,
                                         UUID userId, String search,
@@ -26,12 +25,12 @@ public interface ProjectStoragePort {
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                        ProjectVisibility visibility
-            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds);
+            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds);
 
     void updateProject(UUID id, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds);
+                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds);
 
     ProjectContributorsLinkViewPage findContributors(UUID projectId, String login,
                                                      ProjectContributorsLinkView.SortBy sortBy,
@@ -48,6 +47,8 @@ public interface ProjectStoragePort {
     Set<Long> getProjectInvitedLeadIds(UUID projectId);
 
     Set<Long> getProjectRepoIds(UUID projectId);
+
+    List<ProjectOrganizationView> getProjectOrganizations(UUID projectId);
 
     Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                            ContributionType contributionType,

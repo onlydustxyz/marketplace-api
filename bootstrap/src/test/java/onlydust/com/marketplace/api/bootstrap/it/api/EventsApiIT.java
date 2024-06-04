@@ -213,7 +213,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",
-                rewardSettings, List.of());
+                rewardSettings, List.of(), List.of());
         return projectId;
     }
 

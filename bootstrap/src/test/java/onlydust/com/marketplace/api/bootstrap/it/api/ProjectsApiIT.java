@@ -3646,7 +3646,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(true)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
+                .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,

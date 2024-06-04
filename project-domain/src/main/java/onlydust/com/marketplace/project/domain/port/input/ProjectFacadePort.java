@@ -12,9 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProjectFacadePort {
-    ProjectDetailsView getById(UUID projectId, User caller);
-
-    ProjectDetailsView getBySlug(String slug, User caller);
 
     Page<ProjectCardView> searchForUser(List<Project.Tag> tags, List<String> ecosystemSlugs,
                                         String search, ProjectCardView.SortBy sort,

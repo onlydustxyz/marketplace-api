@@ -3,8 +3,8 @@ package onlydust.com.marketplace.bff.read.entities.committee;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
+import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -43,7 +43,7 @@ public class CommitteeJuryVoteReadEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
-    AllUserViewEntity user;
+    AllUserReadEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)

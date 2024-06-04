@@ -20,6 +20,7 @@ import java.util.UUID;
 @Table(name = "project_categories", schema = "public")
 public class ProjectCategoryReadEntity {
     @Id
+    @EqualsAndHashCode.Include
     private @NonNull UUID id;
     private @NonNull String name;
     private @NonNull String iconSlug;

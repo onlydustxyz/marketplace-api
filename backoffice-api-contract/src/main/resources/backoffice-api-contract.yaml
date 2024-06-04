@@ -1300,7 +1300,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeUser
+        - BackofficeUsersRead
       summary: Get user page
       operationId: getUserById
       description: |
