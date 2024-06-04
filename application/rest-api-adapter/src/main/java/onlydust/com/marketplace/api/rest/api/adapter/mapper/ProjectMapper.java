@@ -136,7 +136,8 @@ public interface ProjectMapper {
         for (EcosystemView ecosystemView : projectCardView.getEcosystems()) {
             projectListItemResponse.addEcosystemsItem(mapEcosystem(ecosystemView));
         }
-        projectListItemResponse.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList());
+        projectListItemResponse.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList()
+                .stream().sorted(comparing(LanguageResponse::getName)).toList());
         return projectListItemResponse;
     }
 
