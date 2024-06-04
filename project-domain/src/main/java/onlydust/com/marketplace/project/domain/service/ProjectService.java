@@ -47,18 +47,17 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
-                                                                                   List<String> ecosystemSlugs, String search,
-                                                                                   ProjectCardView.SortBy sort, UUID userId
-            , Boolean mine, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemSlugs, userId, search,
-                sort, mine, pageIndex, pageSize);
+    public Page<ProjectCardView> searchForUser(List<Project.Tag> tags, List<String> ecosystemSlugs, String search,
+                                               ProjectCardView.SortBy sort, UUID userId, Boolean mine,
+                                               List<UUID> languageIds, Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findForUserId(tags, ecosystemSlugs, userId, search,
+                sort, mine, languageIds, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
-                                                                             String search, ProjectCardView.SortBy sort, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsSearchSortBy(tags, technologies, ecosystemSlugs, search, sort,
+    public Page<ProjectCardView> search(List<Project.Tag> tags, List<String> ecosystemSlugs, String search, ProjectCardView.SortBy sort, List<UUID> languageIds,
+                                        Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.find(tags, ecosystemSlugs, search, sort, languageIds,
                 pageIndex, pageSize);
     }
 
@@ -153,7 +152,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                    "leaders");
+                                               "leaders");
         }
     }
 
@@ -258,7 +257,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                        "project");
+                                                  "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");

@@ -13,14 +13,14 @@ import java.util.UUID;
 
 public interface ProjectFacadePort {
 
-    Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
-                                                                            String search, ProjectCardView.SortBy sort,
-                                                                            UUID userId, Boolean mine,
-                                                                            Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> searchForUser(List<Project.Tag> tags, List<String> ecosystemSlugs,
+                                        String search, ProjectCardView.SortBy sort,
+                                        UUID userId, Boolean mine, List<UUID> languageIds,
+                                        Integer pageIndex, Integer pageSize);
 
-    Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
-                                                                      String search, ProjectCardView.SortBy sort,
-                                                                      Integer pageIndex, Integer pageSize);
+    Page<ProjectCardView> search(List<Project.Tag> tags, List<String> ecosystemSlugs,
+                                 String search, ProjectCardView.SortBy sort, List<UUID> languageIds,
+                                 Integer pageIndex, Integer pageSize);
 
 
     Pair<UUID, String> createProject(UUID projectLeadId, CreateProjectCommand createProjectCommand);

@@ -318,20 +318,19 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "languages": [
-                            {
-                              "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                              "name": "Typescript",
-                              "url": null,
-                              "logoUrl": null,
-                              "bannerUrl": null
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 1,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "languages": [
+                             {
+                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                               "name": "Typescript",
+                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                             }
+                           ]
+                         }
                         """);
     }
 }

@@ -1179,14 +1179,7 @@ paths:
               - REPO_COUNT
               - CONTRIBUTOR_COUNT
         - in: query
-          name: technologies
-          description: Technology filter
-          schema:
-            type: array
-            items:
-              type: string
-        - in: query
-          name: ecosystemSlug
+          name: ecosystemSlugs
           description: Ecosystem filter
           schema:
             type: array
@@ -1219,6 +1212,13 @@ paths:
           required: true
           schema:
             type: integer
+        - in: query
+          name: languages
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/LanguageId'
       responses:
         "200":
           description: 'List of projects'
@@ -4760,11 +4760,6 @@ components:
           type: string
           description: Language name
           example: Rust
-        url:
-          type: string
-          format: url
-          description: URL of language's website
-          example: 'https://rust.org'
         logoUrl:
           type: string
           format: url
@@ -4789,10 +4784,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectPageItemResponse'
-        technologies:
+        languages:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/LanguageResponse'
         ecosystems:
           type: array
           items:
@@ -4860,8 +4855,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
-        technologies:
-          $ref: '#/components/schemas/Technologies'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
         isInvitedAsProjectLead:
           type: boolean
           default: false

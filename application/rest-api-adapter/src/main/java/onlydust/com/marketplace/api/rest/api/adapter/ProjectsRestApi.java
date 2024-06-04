@@ -54,22 +54,20 @@ public class ProjectsRestApi implements ProjectsApi {
     private final RewardFacadePort rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
 
-
     @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies,
-                                                           List<String> ecosystemSlugs,
-                                                           List<ProjectTag> tags, Boolean mine, String search) {
+    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> ecosystemSlugs,
+                                                           List<ProjectTag> tags, Boolean mine, String search, List<UUID> languageIds) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final Optional<User> optionalUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final List<Project.Tag> projectTags = mapTagsParameter(tags);
         final Page<ProjectCardView> projectCardViewPage =
-                optionalUser.map(user -> projectFacadePort.getByTagsTechnologiesEcosystemsUserIdSearchSortBy(projectTags, technologies,
-                                ecosystemSlugs, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
+                optionalUser.map(user -> projectFacadePort.searchForUser(projectTags,
+                                ecosystemSlugs, search, sortBy, user.getId(), !isNull(mine) && mine, languageIds, sanitizedPageIndex,
                                 sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getByTagsTechnologiesEcosystemsSearchSortBy(projectTags, technologies,
-                                ecosystemSlugs, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
+                        .orElseGet(() -> projectFacadePort.search(projectTags,
+                                ecosystemSlugs, search, sortBy, languageIds, sanitizedPageIndex, sanitizedPageSize));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }
 
@@ -277,12 +275,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
-                !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
             contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
-                !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }

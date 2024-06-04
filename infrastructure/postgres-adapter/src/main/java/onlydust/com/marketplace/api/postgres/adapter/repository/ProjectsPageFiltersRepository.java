@@ -11,13 +11,10 @@ import java.util.UUID;
 public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersQueryEntity, UUID> {
 
     @Query(value = """
-            select t.technologies,
-                   s.ecosystem_json as ecosystems,
+            select s.ecosystem_json as ecosystems,
+                   l.language_json as languages,
                    p.id
             from projects p
-                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
-                                 from project_technologies pt
-                                 group by pt.project_id)) as t on t.project_id = p.id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', ecosystem.url,
@@ -29,6 +26,15 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                 from ecosystems ecosystem
                                          join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.id
+                    left join (select pl.project_id, jsonb_agg(jsonb_build_object(
+                                                               'id', l.id,
+                                                               'name', l.name,
+                                                               'logoUrl', l.logo_url,
+                                                               'bannerUrl', l.banner_url
+                                                    )) language_json
+                               from languages l
+                                        join project_languages pl on pl.language_id = l.id
+                                        group by pl.project_id) l on l.project_id = p.id
             where (select count(github_repo_id)
                    from project_github_repos pgr_count
                    join indexer_exp.github_repos gr on pgr_count.github_repo_id = gr.id
@@ -40,12 +46,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.id,
-                   t.technologies                             as technologies,
-                   s.ecosystem_json                             as   ecosystems
+                   s.ecosystem_json                             as   ecosystems,
+                   l.language_json as languages
             from projects p
-                     left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
-                                 from project_technologies pt
-                                 group by pt.project_id)) as t on t.project_id = p.id
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', ecosystem.url,
@@ -57,6 +60,15 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                 from ecosystems ecosystem
                                          join public.projects_ecosystems ps on ps.ecosystem_id = ecosystem.id
                                 group by ps.project_id) s on s.project_id = p.id
+                     left join (select pl.project_id, jsonb_agg(jsonb_build_object(
+                                                               'id', l.id,
+                                                               'name', l.name,
+                                                               'logoUrl', l.logo_url,
+                                                               'bannerUrl', l.banner_url
+                                                    )) language_json
+                               from languages l
+                                        join project_languages pl on pl.language_id = l.id
+                                        group by pl.project_id) l on l.project_id = p.id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.id

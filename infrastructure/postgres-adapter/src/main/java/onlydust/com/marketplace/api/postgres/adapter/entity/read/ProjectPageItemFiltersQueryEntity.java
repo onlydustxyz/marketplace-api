@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.LanguageView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -28,7 +28,7 @@ public class ProjectPageItemFiltersQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Map<String, Long>> technologies;
+    List<ProjectPageItemQueryEntity.Languages> languages;
 
     @EqualsAndHashCode
     public static class Ecosystem {
@@ -46,15 +46,9 @@ public class ProjectPageItemFiltersQueryEntity {
 
     public static Map<String, Set<Object>> entitiesToFilters(final List<ProjectPageItemFiltersQueryEntity> filtersViewEntities) {
         final Map<String, Set<Object>> filters = new HashMap<>();
-        final Set<String> technologyNames = new HashSet<>();
         final Set<EcosystemView> ecosystems = new HashSet<>();
+        final Set<LanguageView> languages = new HashSet<>();
         for (ProjectPageItemFiltersQueryEntity filtersViewEntity : filtersViewEntities) {
-            if (nonNull(filtersViewEntity.technologies)) {
-                filtersViewEntity.technologies.stream()
-                        .filter(Objects::nonNull)
-                        .map(Map::keySet)
-                        .forEach(technologyNames::addAll);
-            }
             if (nonNull(filtersViewEntity.ecosystems)) {
                 filtersViewEntity.ecosystems.stream()
                         .filter(ecosystem -> nonNull(ecosystem.name))
@@ -66,11 +60,22 @@ public class ProjectPageItemFiltersQueryEntity {
                                 .name(ecosystem.name).build())
                         .forEach(ecosystems::add);
             }
+            if (nonNull(filtersViewEntity.languages)) {
+                filtersViewEntity.languages.stream()
+                        .filter(Objects::nonNull)
+                        .map(l -> LanguageView.builder()
+                                .id(l.id)
+                                .name(l.name)
+                                .logoUrl(l.logoUrl)
+                                .bannerUrl(l.bannerUrl)
+                                .build())
+                        .forEach(languages::add);
+            }
         }
-        filters.put(ProjectCardView.FilterBy.TECHNOLOGIES.name(),
-                technologyNames.stream().map(Object.class::cast).collect(Collectors.toSet()));
         filters.put(ProjectCardView.FilterBy.ECOSYSTEMS.name(),
                 ecosystems.stream().map(Object.class::cast).collect(Collectors.toSet()));
+        filters.put(ProjectCardView.FilterBy.LANGUAGES.name(),
+                languages.stream().map(Object.class::cast).collect(Collectors.toSet()));
         return filters;
     }
 
