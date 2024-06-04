@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.isNull;
@@ -67,20 +68,18 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User is not allowed to generate invoice for this billing profile");
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User is not allowed to generate invoice for this billing profile"));
 
         if (!billingProfile.enabled())
             throw unauthorized("Cannot generate invoice on a disabled billing profile");
 
+        if (!billingProfile.isVerified())
+            throw badRequest("Billing profile %s is not verified".formatted(billingProfileId));
+
         final var rewards = invoiceStoragePort.findRewards(rewardIds)
                 .stream().map(r -> r.withNetworks(accountingFacadePort.networksOf(r.amount().getCurrency().id(), r.id())))
                 .toList();
-
-        if (!billingProfile.isVerified())
-            throw badRequest("Billing profile %s is not verified".formatted(billingProfileId));
 
         final var payoutInfo = billingProfileStoragePort.getPayoutInfo(billingProfileId)
                 .orElseThrow(() -> internalServerError("An invoice can only be created on a billing profile with payout info (billing profile %s)".formatted(billingProfileId)));
@@ -119,10 +118,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public Page<InvoiceView> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
                                         final @NonNull Integer pageSize, final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User is not allowed to view invoices for this billing profile");
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User is not allowed to view invoices for this billing profile"));
 
         return invoiceStoragePort.invoicesOf(billingProfileId, pageNumber, pageSize, sort, direction);
     }
@@ -131,7 +128,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Transactional
     public void uploadGeneratedInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Invoice.Id invoiceId,
                                        final @NonNull InputStream data) {
-        final var billingProfile = getBillingProfile(billingProfileId);
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User is not allowed to upload an invoice for this billing profile"));
 
         if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
@@ -139,14 +137,15 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfile.isInvoiceMandateAccepted())
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfile, invoiceId, null, Invoice.Status.APPROVED, data);
+        uploadInvoice(billingProfile, invoiceId, null, Invoice.Status.APPROVED, data);
     }
 
     @Override
     @Transactional
     public void uploadExternalInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId, String fileName,
                                       @NonNull InputStream data) {
-        final var billingProfile = getBillingProfile(billingProfileId);
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User is not allowed to upload an invoice for this billing profile"));
 
         if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
@@ -154,16 +153,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (billingProfile.isInvoiceMandateAccepted())
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
 
-        uploadInvoice(userId, billingProfile, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
+        uploadInvoice(billingProfile, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
     }
 
     @Transactional
-    private void uploadInvoice(@NonNull UserId userId, @NonNull BillingProfile billingProfile, Invoice.@NonNull Id invoiceId, String fileName,
+    private void uploadInvoice(@NonNull BillingProfile billingProfile, Invoice.@NonNull Id invoiceId, String fileName,
                                @NonNull Invoice.Status status,
                                @NonNull InputStream data) {
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User is not allowed to upload an invoice for this billing profile");
-
         final var invoice = invoiceStoragePort.get(invoiceId)
                 .filter(i -> i.billingProfileSnapshot().id().equals(billingProfile.id()))
                 .orElseThrow(() -> notFound("Invoice %s not found for billing profile %s".formatted(invoiceId, billingProfile.id())));
@@ -183,31 +179,29 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     private void checkInvoiceRewards(Invoice invoice) {
         final var rewards = invoiceStoragePort.getRewardAssociations(invoice.rewards().stream().map(Invoice.Reward::id).toList());
-        if (rewards.size() != invoice.rewards().size()) {
+
+        if (rewards.size() != invoice.rewards().size())
             throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
-        }
-        if (rewards.stream().anyMatch(r -> isNull(r.invoiceId()) || !r.invoiceId().equals(invoice.id()))) {
+
+        if (rewards.stream().anyMatch(r -> isNull(r.invoiceId()) || !r.invoiceId().equals(invoice.id())))
             throw badRequest("Some rewards are not associated with invoice %s".formatted(invoice.id()));
-        }
-        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id()))) {
+
+        if (rewards.stream().anyMatch(r -> isNull(r.billingProfileId()) || !r.billingProfileId().equals(invoice.billingProfileSnapshot().id())))
             throw badRequest("Some rewards are not associated with billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
-        }
     }
 
     private void selectBillingProfileForUserAndProjects(@NonNull BillingProfile.Id billingProfileId, @NonNull UserId userId, Set<ProjectId> projectIds) {
-        if (projectIds != null)
-            projectIds.forEach(projectId -> {
-                billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId);
-                accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
-            });
+        Optional.ofNullable(projectIds).orElse(Set.of()).forEach(projectId -> {
+            billingProfileStoragePort.savePayoutPreference(billingProfileId, userId, projectId);
+            accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
+        });
     }
 
     @Override
     public @NonNull InvoiceDownload downloadInvoice(@NonNull UserId userId, BillingProfile.@NonNull Id billingProfileId, Invoice.@NonNull Id invoiceId) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoiceId, billingProfileId));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s is not allowed to download invoice %s of billing profile %s"
+                        .formatted(userId, invoiceId, billingProfileId)));
 
         final var invoice = invoiceStoragePort.get(invoiceId)
                 .filter(i -> i.billingProfileSnapshot().id().equals(billingProfileId))
@@ -219,10 +213,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public void acceptInvoiceMandate(UserId userId, BillingProfile.Id billingProfileId) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId)));
 
         if (!billingProfile.enabled())
             throw unauthorized("Cannot update mandateAcceptanceDate on a disabled billing profile %s".formatted(billingProfileId));
@@ -263,20 +255,16 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId, billingProfileId));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId, billingProfileId)));
 
         return billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId).orElseGet(() -> PayoutInfoView.builder().build());
     }
 
     @Override
     public void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId, billingProfileId));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to edit payout info of billing profile %s".formatted(userId, billingProfileId)));
 
         payoutInfoValidator.validate(payoutInfo);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
@@ -284,10 +272,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to read coworkers of billing profile %s".formatted(userId, billingProfileId));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to read coworkers of billing profile %s".formatted(userId, billingProfileId)));
 
         return billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), pageIndex, pageSize);
     }
@@ -295,10 +281,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     @Transactional
     public void inviteCoworker(BillingProfile.Id billingProfileId, UserId invitedBy, GithubUserId invitedGithubUserId, BillingProfile.User.Role role) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(invitedBy))
-            throw unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId));
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, invitedBy)
+                .orElseThrow(() -> unauthorized("User %s must be admin to invite coworker to billing profile %s".formatted(invitedBy, billingProfileId)));
 
         if (List.of(BillingProfile.Type.INDIVIDUAL, BillingProfile.Type.SELF_EMPLOYED).contains(billingProfile.type()))
             throw unauthorized("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
@@ -350,10 +334,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public void updateCoworkerRole(BillingProfile.Id billingProfileId, UserId updatedBy, GithubUserId coworkerGithubUserId, BillingProfile.User.Role role) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(updatedBy))
-            throw unauthorized("User %s must be admin to manage billing profile %s coworkers".formatted(updatedBy, billingProfileId));
+        getBillingProfileAsAdmin(billingProfileId, updatedBy)
+                .orElseThrow(() -> unauthorized("User %s must be admin to manage billing profile %s coworkers".formatted(updatedBy, billingProfileId)));
 
         final var coworker = billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)
                 .orElseThrow(() -> notFound("Coworker %s not found for billing profile %s"
@@ -383,10 +365,8 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enabled) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value())));
 
         billingProfileStoragePort.updateEnableBillingProfile(billingProfileId, enabled);
         accountingObserverPort.onBillingProfileEnableChanged(billingProfileId, enabled);
@@ -397,12 +377,16 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
     }
 
+    private Optional<BillingProfile> getBillingProfileAsAdmin(BillingProfile.Id billingProfileId, UserId userId) {
+        return billingProfileStoragePort.findById(billingProfileId)
+                .filter(bp -> bp.isAdmin(userId));
+    }
+
     @Override
     public void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to modify billing profile %s type to %s".formatted(userId.value(), billingProfileId.value(), type));
+        final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to modify billing profile %s type to %s"
+                        .formatted(userId.value(), billingProfileId.value(), type)));
 
         if (type == BillingProfile.Type.INDIVIDUAL)
             throw unauthorized("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userId, billingProfileId));
@@ -415,15 +399,13 @@ public class BillingProfileService implements BillingProfileFacadePort {
             throw internalServerError("User %s cannot update billing profile %s of type %s to type %s".formatted(
                     userId, billingProfileId, billingProfile.type(), type
             ));
-
     }
 
     @Override
     public List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
-        final var billingProfile = getBillingProfile(billingProfileId);
-
-        if (!billingProfile.isAdmin(userId))
-            throw unauthorized("User %s must be admin to get invoiceable rewards of billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        getBillingProfileAsAdmin(billingProfileId, userId)
+                .orElseThrow(() -> unauthorized("User %s must be admin to get invoiceable rewards of billing profile %s"
+                        .formatted(userId.value(), billingProfileId.value())));
 
         return billingProfileStoragePort.findInvoiceableRewardsForBillingProfile(billingProfileId);
     }
