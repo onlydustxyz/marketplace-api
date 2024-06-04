@@ -33,136 +33,195 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 3,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "languages": [
-                            {
-                              "rank": 2,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 6,
-                              "contributionCount": 217,
-                              "rewardCount": 10,
-                              "totalEarnedUsd": 1799150.00,
-                              "projects": [
-                                {
-                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                  "slug": "kaaper",
-                                  "name": "kaaper",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "5aabf0f1-7495-4bff-8de2-4396837ce6b4",
-                                  "slug": "marketplace-2",
-                                  "name": "Marketplace 2",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "d4e8ab3b-a4a8-493d-83bd-a4c8283b94f9",
-                                  "slug": "oscars-awesome-project",
-                                  "name": "oscar's awesome project",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                  "slug": "qa-new-contributions",
-                                  "name": "QA new contributions",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "language": {
-                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                "name": "Typescript",
-                                "url": null,
-                                "logoUrl": null,
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 2,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 5,
-                              "contributionCount": 192,
-                              "rewardCount": 12,
-                              "totalEarnedUsd": 10605.00,
-                              "projects": [
-                                {
-                                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                                  "slug": "kaaper",
-                                  "name": "kaaper",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
-                                  "slug": "kaaper-3",
-                                  "name": "kaaper 3",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                                  "slug": "mooooooonlight",
-                                  "name": "Mooooooonlight",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
-                                },
-                                {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                                  "slug": "qa-new-contributions",
-                                  "name": "QA new contributions",
-                                  "logoUrl": null
-                                }
-                              ],
-                              "language": {
-                                "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                "name": "Rust",
-                                "url": null,
-                                "logoUrl": null,
-                                "bannerUrl": null
-                              }
-                            },
-                            {
-                              "rank": 16,
-                              "contributingStatus": "GREEN",
-                              "contributedProjectCount": 1,
-                              "contributionCount": 9,
-                              "rewardCount": 0,
-                              "totalEarnedUsd": 0,
-                              "projects": [
-                                {
-                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
-                                  "slug": "zama",
-                                  "name": "Zama",
-                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
-                                }
-                              ],
-                              "language": {
-                                "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                                "name": "Cairo",
-                                "url": null,
-                                "logoUrl": null,
-                                "bannerUrl": null
-                              }
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 5,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "languages": [
+                             {
+                               "rank": 2,
+                               "contributingStatus": "GREEN",
+                               "contributedProjectCount": 6,
+                               "contributionCount": 217,
+                               "rewardCount": 10,
+                               "totalEarnedUsd": 1799150.00,
+                               "projects": [
+                                 {
+                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                   "slug": "kaaper",
+                                   "name": "kaaper",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 },
+                                 {
+                                   "id": "5aabf0f1-7495-4bff-8de2-4396837ce6b4",
+                                   "slug": "marketplace-2",
+                                   "name": "Marketplace 2",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                   "slug": "no-sponsors",
+                                   "name": "No sponsors",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "d4e8ab3b-a4a8-493d-83bd-a4c8283b94f9",
+                                   "slug": "oscars-awesome-project",
+                                   "name": "oscar's awesome project",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                   "slug": "qa-new-contributions",
+                                   "name": "QA new contributions",
+                                   "logoUrl": null
+                                 }
+                               ],
+                               "language": {
+                                 "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                 "name": "Typescript",
+                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                               }
+                             },
+                             {
+                               "rank": 2,
+                               "contributingStatus": "GREEN",
+                               "contributedProjectCount": 5,
+                               "contributionCount": 192,
+                               "rewardCount": 12,
+                               "totalEarnedUsd": 10605.00,
+                               "projects": [
+                                 {
+                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                   "slug": "kaaper",
+                                   "name": "kaaper",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "29cdf359-f60c-41a0-8b11-18d6841311f6",
+                                   "slug": "kaaper-3",
+                                   "name": "kaaper 3",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 },
+                                 {
+                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                   "slug": "no-sponsors",
+                                   "name": "No sponsors",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                   "slug": "qa-new-contributions",
+                                   "name": "QA new contributions",
+                                   "logoUrl": null
+                                 }
+                               ],
+                               "language": {
+                                 "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
+                                 "name": "Rust",
+                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
+                               }
+                             },
+                             {
+                               "rank": 3,
+                               "contributingStatus": "GREEN",
+                               "contributedProjectCount": 4,
+                               "contributionCount": 24,
+                               "rewardCount": 0,
+                               "totalEarnedUsd": 0,
+                               "projects": [
+                                 {
+                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                   "slug": "kaaper",
+                                   "name": "kaaper",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                   "slug": "mooooooonlight",
+                                   "name": "Mooooooonlight",
+                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                 },
+                                 {
+                                   "id": "90fb751a-1137-4815-b3c4-54927a5db059",
+                                   "slug": "no-sponsors",
+                                   "name": "No sponsors",
+                                   "logoUrl": null
+                                 },
+                                 {
+                                   "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                   "slug": "qa-new-contributions",
+                                   "name": "QA new contributions",
+                                   "logoUrl": null
+                                 }
+                               ],
+                               "language": {
+                                 "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                 "name": "Javascript",
+                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                               }
+                             },
+                             {
+                               "rank": 16,
+                               "contributingStatus": "GREEN",
+                               "contributedProjectCount": 1,
+                               "contributionCount": 9,
+                               "rewardCount": 0,
+                               "totalEarnedUsd": 0,
+                               "projects": [
+                                 {
+                                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                   "slug": "zama",
+                                   "name": "Zama",
+                                   "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                 }
+                               ],
+                               "language": {
+                                 "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                                 "name": "Cairo",
+                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                               }
+                             },
+                             {
+                               "rank": 20,
+                               "contributingStatus": "GREEN",
+                               "contributedProjectCount": 1,
+                               "contributionCount": 7,
+                               "rewardCount": 0,
+                               "totalEarnedUsd": 0,
+                               "projects": [
+                                 {
+                                   "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                   "slug": "zama",
+                                   "name": "Zama",
+                                   "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                 }
+                               ],
+                               "language": {
+                                 "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                 "name": "Python",
+                                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                               }
+                             }
+                           ]
+                         }
                         """, true);
     }
 
