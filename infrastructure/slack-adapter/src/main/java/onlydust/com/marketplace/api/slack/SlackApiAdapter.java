@@ -19,7 +19,6 @@ import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
-import onlydust.com.marketplace.project.domain.view.ProjectDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.util.Set;
@@ -60,9 +59,10 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     public void onProjectCreated(UUID projectId, UUID projectLeadId) {
         final User user = userStoragePort.getUserById(projectLeadId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectLeadId)));
-        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectId, user);
+        final var project = projectStoragePort.getById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(projectId)));
         sendNotification(slackProperties.getDevRelChannel(), "New project created", ProjectCreatedEventMapper.mapToSlackBlock(user,
-                projectDetailsView, slackProperties.getEnvironment()));
+                project, slackProperties.getEnvironment()));
     }
 
     @Override
@@ -78,9 +78,10 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     public void onUserApplied(UUID projectId, UUID userId, UUID applicationId) {
         final User user = userStoragePort.getUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
-        final ProjectDetailsView projectDetailsView = projectStoragePort.getById(projectId, user);
+        final var project = projectStoragePort.getById(projectId)
+                .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(projectId)));
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project", UserAppliedOnProjectEventMapper.mapToSlackBlock(user,
-                projectDetailsView, slackProperties.getEnvironment()));
+                project, slackProperties.getEnvironment()));
     }
 
     @Override

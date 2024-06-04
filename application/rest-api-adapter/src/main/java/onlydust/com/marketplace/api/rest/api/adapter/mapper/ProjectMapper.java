@@ -34,6 +34,7 @@ public interface ProjectMapper {
                                 .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList() : null)
                 .imageUrl(createProjectRequest.getLogoUrl())
                 .ecosystemIds(createProjectRequest.getEcosystemIds())
+                .categoryIds(createProjectRequest.getCategoryIds())
                 .build();
     }
 
@@ -55,51 +56,8 @@ public interface ProjectMapper {
                                         .url(moreInfo.getUrl()).value(moreInfo.getValue()).build()).toList())
                 .imageUrl(updateProjectRequest.getLogoUrl())
                 .ecosystemIds(updateProjectRequest.getEcosystemIds())
+                .categoryIds(updateProjectRequest.getCategoryIds())
                 .build();
-    }
-
-    static ProjectResponse mapProjectDetails(final ProjectDetailsView project, final boolean includeAllAvailableRepos) {
-        final ProjectResponse projectResponse = mapProjectDetailsMetadata(project);
-        projectResponse.setTopContributors(project.getTopContributors().stream().map(ProjectMapper::mapGithubUser).toList());
-        projectResponse.setLeaders(project.getLeaders().stream().map(ProjectMapper::mapRegisteredUser).collect(Collectors.toList()));
-        projectResponse.setInvitedLeaders(project.getInvitedLeaders().stream()
-                .map(ProjectMapper::mapRegisteredUser)
-                .sorted(comparing(RegisteredUserResponse::getGithubUserId))
-                .collect(Collectors.toList()));
-        projectResponse.setTags(project.getTags().stream()
-                .map(ProjectMapper::mapTag)
-                .sorted(comparing(ProjectTag::name))
-                .toList());
-        projectResponse.setEcosystems(project.getEcosystems().stream()
-                .map(ProjectMapper::mapEcosystem)
-                .sorted(comparing(EcosystemResponse::getName))
-                .toList());
-        projectResponse.setSponsors(project.getActiveSponsors().stream()
-                .map(ProjectMapper::mapSponsor)
-                .sorted(comparing(SponsorResponse::getName))
-                .toList());
-        projectResponse.setOrganizations(project.getOrganizations().stream()
-                .map(organizationView -> mapOrganization(organizationView, includeAllAvailableRepos))
-                .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
-                .toList());
-        projectResponse.setTechnologies(project.getTechnologies());
-
-        final var reposIndexedTimes =
-                project.getOrganizations().stream().map(ProjectOrganizationView::getRepos)
-                        .flatMap(Collection::stream)
-                        .filter(ProjectOrganizationRepoView::getIsIncludedInProject)
-                        .map(ProjectOrganizationRepoView::getIndexedAt).toList();
-        projectResponse.setIndexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull));
-        projectResponse.setIndexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null));
-        if (project.getMe() != null)
-            projectResponse.setMe(new ProjectMeResponse()
-                    .isMember(project.getMe().isMember())
-                    .isProjectLead(project.getMe().isLeader())
-                    .isInvitedAsProjectLead(project.getMe().isInvitedAsProjectLead())
-                    .isContributor(project.getMe().isContributor())
-                    .hasApplied(project.getMe().hasApplied()));
-
-        return projectResponse;
     }
 
     static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
@@ -119,26 +77,6 @@ public interface ProjectMapper {
                 .sorted(comparing(GithubRepoResponse::getId))
                 .toList());
         return organization;
-    }
-
-    private static ProjectResponse mapProjectDetailsMetadata(final ProjectDetailsView projectDetailsView) {
-        final var project = new ProjectResponse();
-        project.setId(projectDetailsView.getId());
-        project.setSlug(projectDetailsView.getSlug());
-        project.setName(projectDetailsView.getName());
-        project.setCreatedAt(toZoneDateTime(projectDetailsView.getCreatedAt()));
-        project.setShortDescription(projectDetailsView.getShortDescription());
-        project.setLongDescription(projectDetailsView.getLongDescription());
-        project.setLogoUrl(projectDetailsView.getLogoUrl());
-        project.setMoreInfos(isNull(projectDetailsView.getMoreInfos()) ? null :
-                projectDetailsView.getMoreInfos().stream()
-                        .map(moreInfo -> new SimpleLink().url(moreInfo.getUrl()).value(moreInfo.getValue())).collect(Collectors.toList()));
-        project.setHiring(projectDetailsView.getHiring());
-        project.setVisibility(mapProjectVisibility(projectDetailsView.getVisibility()));
-        project.setContributorCount(projectDetailsView.getContributorCount());
-        project.setHasRemainingBudget(projectDetailsView.getHasRemainingBudget());
-        project.setRewardSettings(mapRewardSettings(projectDetailsView.getRewardSettings()));
-        return project;
     }
 
     static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.project.domain.model.ProjectRewardSettings rewardSettings) {
@@ -238,15 +176,6 @@ public interface ProjectMapper {
         ecosystemResponse.setUrl(ecosystem.getUrl());
         ecosystemResponse.setSlug(ecosystem.getSlug());
         return ecosystemResponse;
-    }
-
-    private static SponsorResponse mapSponsor(final ProjectSponsorView projectSponsorView) {
-        final SponsorResponse sponsorResponse = new SponsorResponse();
-        sponsorResponse.setId(projectSponsorView.sponsorId());
-        sponsorResponse.setName(projectSponsorView.sponsorName());
-        sponsorResponse.setLogoUrl(projectSponsorView.sponsorLogoUrl());
-        sponsorResponse.setUrl(projectSponsorView.sponsorUrl());
-        return sponsorResponse;
     }
 
 

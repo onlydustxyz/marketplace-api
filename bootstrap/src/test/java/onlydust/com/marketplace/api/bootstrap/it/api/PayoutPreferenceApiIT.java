@@ -433,7 +433,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 faker.gameOfThrones().character() + faker.number().randomNumber(),
                 faker.rickAndMorty().character(), faker.pokemon().name(), null, faker.internet().url(), false, 0, "slug-" + UUID.randomUUID(),
                 ProjectVisibility.PRIVATE,
-                false, false, false, new Date(), null, null, null, null, null, null, null));
+                false, false, false, new Date(), null, null, null, null, null, null, null, null));
         // To get the slug
         return projectRepository.findById(projectEntity.getId()).orElseThrow();
     }

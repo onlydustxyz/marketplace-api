@@ -1,15 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -17,6 +20,10 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 
 @Entity
@@ -75,8 +82,9 @@ public class ProjectViewEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectMoreInfoViewEntity> moreInfos;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "id.projectId")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
     Set<ProjectTagViewEntity> tags;
+
 
     public Project toDomain() {
         return Project.builder()
@@ -108,5 +116,40 @@ public class ProjectViewEntity {
                 .shortDescription(shortDescription)
                 .id(ProjectId.of(id))
                 .build();
+    }
+
+    public Map<String, Long> technologies() {
+        return getRepos().stream()
+                .flatMap(repo -> repo.getLanguages().stream())
+                .collect(Collectors.groupingBy(GithubRepoLanguageViewEntity::getLanguage, Collectors.summingLong(GithubRepoLanguageViewEntity::getLineCount)));
+    }
+
+    public List<ProjectOrganizationView> organizations() {
+        final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
+        getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
+
+        final var repoIdsIncludedInProject =
+                getRepos().stream()
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(GithubRepoViewEntity::getId).collect(Collectors.toSet());
+
+        return organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
+                .id(entity.id())
+                .login(entity.login())
+                .avatarUrl(entity.avatarUrl())
+                .htmlUrl(entity.htmlUrl())
+                .name(entity.name())
+                .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
+                .isInstalled(nonNull(entity.installation()))
+                .repos(entity.repos().stream()
+                        .filter(GithubRepoViewEntity::isPublic)
+                        .map(repo -> RepoMapper.mapToDomain(repo,
+                                repoIdsIncludedInProject.contains(repo.getId()),
+                                entity.installation() != null &&
+                                        entity.installation().getAuthorizedRepos().stream()
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                        )
+                        .collect(Collectors.toSet()))
+                .build()).toList();
     }
 }

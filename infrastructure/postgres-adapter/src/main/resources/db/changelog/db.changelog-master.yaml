@@ -331,3 +331,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000251_create_project_category_suggestions.sql
   - include:
       file: db/changelog/changelogs/00000252_modify_project_categories.sql
+  - include:
+      file: db/changelog/changelogs/00000253_create_table_projects_categories.sql

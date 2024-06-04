@@ -21,4 +21,5 @@ public class UpdateProjectCommand {
     String imageUrl;
     ProjectRewardSettings rewardSettings;
     List<UUID> ecosystemIds;
+    List<UUID> categoryIds;
 }

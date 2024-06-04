@@ -5,7 +5,10 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
+import onlydust.com.marketplace.project.domain.port.input.ProjectCategoryFacadePort;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -22,7 +25,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     private static UUID projectId;
     private static UUID projectId2;
+    private static ProjectCategory gameCategory;
+    private static ProjectCategory tutorialCategory;
+    private static ProjectCategory cryptoCategory;
 
+    @Autowired
+    private ProjectCategoryFacadePort projectCategoryFacadePort;
 
     @BeforeEach
     public void setup() {
@@ -62,6 +70,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(1)
     public void should_create_a_new_project() {
         // Given
+        gameCategory = projectCategoryFacadePort.createCategory("Game", "game");
+        tutorialCategory = projectCategoryFacadePort.createCategory("Tutorial", "tuto");
+        cryptoCategory = projectCategoryFacadePort.createCategory("Crypto", "crypto");
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
@@ -96,9 +107,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             498695724, 602953043
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                          "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"]
+                          "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"],
+                          "categoryIds": ["%s", "%s"]
                         }
-                        """)
+                        """.formatted(gameCategory.id(), tutorialCategory.id()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -121,6 +133,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.id").isEqualTo(response.getProjectId().toString())
                 .jsonPath("$.visibility").isEqualTo("PUBLIC")
                 .jsonPath("$.name").isEqualTo("Super Project")
@@ -155,7 +168,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isNotEmpty()
                 .jsonPath("$.ecosystems.length()").isEqualTo(2)
                 .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
-                .jsonPath("$.ecosystems[1].name").isEqualTo("Zama");
+                .jsonPath("$.ecosystems[1].name").isEqualTo("Zama")
+                .jsonPath("$.categories[0].name").isEqualTo("Game")
+                .jsonPath("$.categories[1].name").isEqualTo("Tutorial");
     }
 
     @SneakyThrows
@@ -259,9 +274,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             "ignoreCodeReviews": true,
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
                           },
-                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"]
+                          "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"],
+                          "categoryIds": ["%s"]
                         }
-                        """)
+                        """.formatted(cryptoCategory.id()))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -786,6 +802,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewardSettings.ignoreContributionsBefore").isEqualTo("2021-01-01T00:00:00Z")
 
                 .jsonPath("$.ecosystems[0].name").isEqualTo("Ethereum")
-                .jsonPath("$.ecosystems[1].name").isEqualTo("Starknet");
+                .jsonPath("$.ecosystems[1].name").isEqualTo("Starknet")
+
+                .jsonPath("$.categories[0].name").isEqualTo("Crypto");
     }
 }

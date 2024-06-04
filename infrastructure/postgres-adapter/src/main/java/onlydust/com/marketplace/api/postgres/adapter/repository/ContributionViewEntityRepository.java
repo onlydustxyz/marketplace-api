@@ -191,4 +191,17 @@ public interface ContributionViewEntityRepository extends JpaRepository<Contribu
                                                    String fromDate,
                                                    String toDate,
                                                    Pageable pageable);
+
+    @Query(value = """
+            SELECT
+                count(distinct c.id)
+            FROM
+                indexer_exp.contributions c
+            INNER JOIN indexer_exp.github_repos gr on c.repo_id = gr.id and gr.visibility = 'PUBLIC'
+            INNER JOIN public.project_github_repos pgr on pgr.github_repo_id = gr.id
+            WHERE 
+                c.contributor_id = :contributorId AND
+                pgr.project_id = :projectId
+            """, nativeQuery = true)
+    int countBy(Long contributorId, UUID projectId);
 }
