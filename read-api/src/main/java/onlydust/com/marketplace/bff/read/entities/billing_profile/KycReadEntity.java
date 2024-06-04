@@ -57,7 +57,7 @@ public class KycReadEntity {
                 .lastName(lastName)
                 .birthdate(birthdate)
                 .address(address)
-                .country(Country.fromIso3(country).display().orElse(country))
+                .country(country == null ? null : Country.fromIso3(country).display().orElse(country))
                 .countryCode(country)
                 .idDocumentType(idDocumentType)
                 .idDocumentNumber(idDocumentNumber)

@@ -57,7 +57,7 @@ public class KybReadEntity {
                 .registrationNumber(registrationNumber)
                 .registrationDate(registrationDate)
                 .address(address)
-                .country(Country.fromIso3(country).display().orElse(country))
+                .country(country == null ? null : Country.fromIso3(country).display().orElse(country))
                 .countryCode(country)
                 .usEntity(usEntity)
                 .subjectToEuropeVAT(subjectToEuVAT)
