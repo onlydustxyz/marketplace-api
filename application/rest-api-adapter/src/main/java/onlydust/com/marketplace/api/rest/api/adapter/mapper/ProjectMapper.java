@@ -167,10 +167,6 @@ public interface ProjectMapper {
     static ProjectPageResponse mapProjectCards(final Page<ProjectCardView> page, final Integer pageIndex) {
         final ProjectPageResponse projectPageResponse = new ProjectPageResponse();
         final List<ProjectPageItemResponse> projectPageItemResponses = new ArrayList<>();
-        final Set<String> technologies = page.getFilters().get(ProjectCardView.FilterBy.TECHNOLOGIES.name())
-                .stream()
-                .map(String.class::cast)
-                .collect(Collectors.toSet());
         final Set<EcosystemResponse> ecosystems = page.getFilters().get(ProjectCardView.FilterBy.ECOSYSTEMS.name())
                 .stream()
                 .map(EcosystemView.class::cast)
@@ -180,7 +176,6 @@ public interface ProjectMapper {
             projectPageItemResponses.add(mapProjectCard(projectCardView));
         }
         projectPageResponse.setProjects(projectPageItemResponses);
-        projectPageResponse.setTechnologies(technologies.stream().sorted().toList());
         projectPageResponse.setEcosystems(ecosystems.stream().sorted(comparing(EcosystemResponse::getName)).toList());
         projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
         projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
@@ -197,8 +192,19 @@ public interface ProjectMapper {
         for (EcosystemView ecosystemView : projectCardView.getEcosystems()) {
             projectListItemResponse.addEcosystemsItem(mapEcosystem(ecosystemView));
         }
-        projectListItemResponse.setTechnologies(projectCardView.getTechnologies());
+        for (LanguageView language : projectCardView.getLanguages()) {
+            projectListItemResponse.addLanguagesItem(mapLanguage(language));
+        }
         return projectListItemResponse;
+    }
+
+    static LanguageResponse mapLanguage(LanguageView view) {
+        return new LanguageResponse()
+                .id(view.getId())
+                .name(view.getName())
+                .logoUrl(view.getLogoUrl())
+                .bannerUrl(view.getBannerUrl())
+                ;
     }
 
     private static ProjectPageItemResponse mapProjectCardMetadata(final ProjectCardView projectCardView) {
@@ -215,6 +221,7 @@ public interface ProjectMapper {
         project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
         project.setHasMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
         project.setTags(projectCardView.getTags().stream().map(ProjectMapper::mapTag).toList());
+        project.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList());
         return project;
     }
 
@@ -247,13 +254,6 @@ public interface ProjectMapper {
         sponsorResponse.setLogoUrl(projectSponsorView.sponsorLogoUrl());
         sponsorResponse.setUrl(projectSponsorView.sponsorUrl());
         return sponsorResponse;
-    }
-
-
-    private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
-        final var organizationRepo = mapOrganizationRepo(repo);
-        organizationRepo.setIsIncludedInProject(null);
-        return organizationRepo;
     }
 
     private static GithubRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {

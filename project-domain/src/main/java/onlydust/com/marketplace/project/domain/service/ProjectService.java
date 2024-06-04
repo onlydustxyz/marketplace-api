@@ -70,18 +70,17 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
-                                                                                   List<String> ecosystemSlugs, String search,
-                                                                                   ProjectCardView.SortBy sort, UUID userId
-            , Boolean mine, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemSlugs, userId, search,
-                sort, mine, pageIndex, pageSize);
+    public Page<ProjectCardView> searchForUser(List<Project.Tag> tags, List<String> ecosystemSlugs, String search,
+                                               ProjectCardView.SortBy sort, UUID userId, Boolean mine,
+                                               List<UUID> languageIds, Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.findForUserId(tags, ecosystemSlugs, userId, search,
+                sort, mine, languageIds, pageIndex, pageSize);
     }
 
     @Override
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsSearchSortBy(List<Project.Tag> tags, List<String> technologies, List<String> ecosystemSlugs,
-                                                                             String search, ProjectCardView.SortBy sort, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsSearchSortBy(tags, technologies, ecosystemSlugs, search, sort,
+    public Page<ProjectCardView> search(List<Project.Tag> tags, List<String> ecosystemSlugs, String search, ProjectCardView.SortBy sort, List<UUID> languageIds,
+                                        Integer pageIndex, Integer pageSize) {
+        return projectStoragePort.find(tags, ecosystemSlugs, search, sort, languageIds,
                 pageIndex, pageSize);
     }
 

@@ -72,20 +72,19 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> technologies,
-                                                           List<String> ecosystemSlugs,
-                                                           List<ProjectTag> tags, Boolean mine, String search) {
+    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> ecosystemSlugs,
+                                                           List<ProjectTag> tags, Boolean mine, String search, List<UUID> languageIds) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final Optional<User> optionalUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
         final List<Project.Tag> projectTags = mapTagsParameter(tags);
         final Page<ProjectCardView> projectCardViewPage =
-                optionalUser.map(user -> projectFacadePort.getByTagsTechnologiesEcosystemsUserIdSearchSortBy(projectTags, technologies,
-                                ecosystemSlugs, search, sortBy, user.getId(), !isNull(mine) && mine, sanitizedPageIndex,
+                optionalUser.map(user -> projectFacadePort.searchForUser(projectTags,
+                                ecosystemSlugs, search, sortBy, user.getId(), !isNull(mine) && mine, languageIds, sanitizedPageIndex,
                                 sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getByTagsTechnologiesEcosystemsSearchSortBy(projectTags, technologies,
-                                ecosystemSlugs, search, sortBy, sanitizedPageIndex, sanitizedPageSize));
+                        .orElseGet(() -> projectFacadePort.search(projectTags,
+                                ecosystemSlugs, search, sortBy, languageIds, sanitizedPageIndex, sanitizedPageSize));
         return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
     }
 

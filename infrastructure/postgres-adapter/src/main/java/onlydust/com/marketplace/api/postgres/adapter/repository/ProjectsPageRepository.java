@@ -39,7 +39,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     group by pl.project_id)                   as   project_leads,
                    t.technologies as  technologies,
                    s.ecosystem_json                                 ecosystems,
-                   tags.names                                    tags
+                   tags.names                                    tags,
+                   languages.json   as languages
             from projects p
                 left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                             from project_technologies pt
@@ -66,9 +67,19 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                 left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
+                left join (select pl.project_id,
+                                  jsonb_agg(jsonb_build_object(
+                                            'id', l.id,
+                                            'name', l.name,
+                                            'logo_url', l.logo_url,
+                                            'banner_url', l.banner_url
+                                            )) json
+                                  from project_languages pl
+                           join languages l on pl.language_id = l.id
+                           group by pl.project_id) languages on languages.project_id = p.id
             where r_count.repo_count > 0
               and p.visibility = 'PUBLIC'
-              and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+              and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
@@ -79,12 +90,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                            when cast(:orderBy as text) = 'RANK' then (-p.rank, upper(p.name))
                        end
               offset :offset limit :limit
-              """, nativeQuery = true)
+            """, nativeQuery = true)
     List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
-                                                                  @Param("technologiesJsonPath") String technologiesJsonPath,
                                                                   @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                                   @Param("search") String search,
                                                                   @Param("orderBy") String orderBy,
+                                                                  @Param("languagesJsonPath") String languagesJsonPath,
                                                                   @Param("offset") int offset,
                                                                   @Param("limit") int limit);
 
@@ -119,7 +130,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                     join indexer_exp.github_repos gr2 on gr2.id = pgr.github_repo_id
                                     left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                            where pgr.project_id = p.id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation,
-                   tags.names                                    tags
+                   tags.names                                    tags,
+                   languages.json   as languages
             from projects p
                      left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                                  from project_technologies pt
@@ -163,13 +175,22 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                      left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
+                     left join (select pl.project_id,
+                                  jsonb_agg(jsonb_build_object(
+                                            'id', l.id,
+                                            'name', l.name,
+                                            'logo_url', l.logo_url,
+                                            'banner_url', l.banner_url
+                                            )) json
+                                  from project_languages pl
+                           join languages l on pl.language_id = l.id
+                           group by pl.project_id) languages on languages.project_id = p.id
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC'
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
-              and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
+              and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or
                    jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
@@ -183,14 +204,14 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                          when cast(:orderBy as text) = 'RANK' then (not coalesce(is_pending_pl.is_p_pl, false), -p.rank, upper(p.name))
                      end
                      offset :offset limit :limit
-                     """, nativeQuery = true)
+            """, nativeQuery = true)
     List<ProjectPageItemQueryEntity> findProjectsForUserId(@Param("userId") UUID userId,
                                                            @Param("mine") Boolean mine,
                                                            @Param("tagsJsonPath") String tagsJsonPath,
-                                                           @Param("technologiesJsonPath") String technologiesJsonPath,
                                                            @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                            @Param("search") String search,
                                                            @Param("orderBy") String orderBy,
+                                                           @Param("languagesJsonPath") String languagesJsonPath,
                                                            @Param("offset") int offset,
                                                            @Param("limit") int limit);
 
@@ -214,21 +235,31 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                         left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
+                        left join (select pl.project_id,
+                                  jsonb_agg(jsonb_build_object(
+                                            'id', l.id,
+                                            'name', l.name,
+                                            'logo_url', l.logo_url,
+                                            'banner_url', l.banner_url
+                                            )) json
+                                  from project_languages pl
+                           join languages l on pl.language_id = l.id
+                           group by pl.project_id) languages on languages.project_id = p.id 
                         where (select count(github_repo_id)
                                            from project_github_repos pgr_count
                                            join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
                                            where pgr_count.project_id = p.id and gr2.visibility = 'PUBLIC') > 0
                                        and p.visibility = 'PUBLIC'
-                                       and (coalesce(:technologiesJsonPath) is null or jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath )))
+                                       and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
                                        and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
             , nativeQuery = true)
     Long countProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
-                                       @Param("technologiesJsonPath") String technologiesJsonPath,
                                        @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                       @Param("search") String search);
+                                       @Param("search") String search,
+                                       @Param("languagesJsonPath") String languagesJsonPath);
 
     @Query(value = """
             select count(p.id)
@@ -275,13 +306,22 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
                                     group by p_tags.project_id) tags on tags.project_id = p.id
+                    left join (select pl.project_id,
+                                  jsonb_agg(jsonb_build_object(
+                                            'id', l.id,
+                                            'name', l.name,
+                                            'logo_url', l.logo_url,
+                                            'banner_url', l.banner_url
+                                            )) json
+                                  from project_languages pl
+                           join languages l on pl.language_id = l.id
+                           group by pl.project_id) languages on languages.project_id = p.id
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC'
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
-              and (coalesce(:technologiesJsonPath) is null or
-                   jsonb_path_exists(technologies, cast(cast(:technologiesJsonPath as text) as jsonpath)))
+              and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or
                    jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
@@ -292,7 +332,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
     Long countProjectsForUserId(@Param("userId") UUID userId,
                                 @Param("mine") Boolean mine,
                                 @Param("tagsJsonPath") String tagsJsonPath,
-                                @Param("technologiesJsonPath") String technologiesJsonPath,
                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                @Param("search") String search);
+                                @Param("search") String search,
+                                @Param("languagesJsonPath") String languagesJsonPath);
 }

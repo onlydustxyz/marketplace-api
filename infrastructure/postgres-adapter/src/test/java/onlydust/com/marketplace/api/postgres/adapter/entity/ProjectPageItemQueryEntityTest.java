@@ -104,48 +104,43 @@ public class ProjectPageItemQueryEntityTest {
     }
 
     @Nested
-    public class ShouldReturnTechnologiesJsonPath {
-
+    public class ShouldReturnLanguagesJsonPath {
 
         @Test
-        void given_no_technologies() {
+        void given_no_languages() {
             // Given
-            final List<String> technologies = null;
+            final List<UUID> languageIds = null;
 
             // When
-            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
+            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
-            assertNull(technologiesJsonPath);
+            assertNull(languagesJsonPath);
         }
 
         @Test
-        void given_one_technology() {
+        void given_one_language() {
             // Given
-            final String technology1 = faker.harryPotter().character();
-            final List<String> technologies = List.of(technology1);
+            final List<UUID> languageIds = List.of(UUID.randomUUID());
 
             // When
-            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
+            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
-            assertEquals("$[*] ? (@.\"" + technology1 + "\" > 0)", technologiesJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + languageIds.get(0) + "\")", languagesJsonPath);
         }
 
         @Test
-        void given_two_technologies() {
+        void given_two_languages() {
             // Given
-            final String technology1 = faker.harryPotter().character();
-            final String technology2 = faker.harryPotter().location();
-            final List<String> technologies = List.of(technology1, technology2);
+            final List<UUID> languageIds = List.of(UUID.randomUUID(), UUID.randomUUID());
 
             // When
-            final String technologiesJsonPath = ProjectPageItemQueryEntity.getTechnologiesJsonPath(technologies);
+            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
-            assertEquals("$[*] ? (@.\"" + technology1 + "\" > 0 || @.\"" + technology2 + "\" > 0)", technologiesJsonPath);
+            assertEquals("$[*] ? (@.id == \"" + languageIds.get(0) + "\" || @.id == \"" + languageIds.get(1) + "\")", languagesJsonPath);
         }
-
 
     }
 

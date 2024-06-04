@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.LanguageView;
 import onlydust.com.marketplace.project.domain.view.ProjectCardView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import org.hibernate.annotations.Immutable;
@@ -18,7 +19,6 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -50,9 +50,9 @@ public class ProjectPageItemQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLead> projectLeads;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Map<String, Long>> technologies;
-    @JdbcTypeCode(SqlTypes.JSON)
     List<Tag> tags;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<Languages> languages;
 
     public static String getEcosystemsJsonPath(List<String> ecosystemSlugs) {
         if (isNull(ecosystemSlugs) || ecosystemSlugs.isEmpty()) {
@@ -61,18 +61,18 @@ public class ProjectPageItemQueryEntity {
         return "$[*] ? (" + String.join(" || ", ecosystemSlugs.stream().map(s -> "@.slug == \"" + s + "\"").toList()) + ")";
     }
 
-    public static String getTechnologiesJsonPath(List<String> technologies) {
-        if (isNull(technologies) || technologies.isEmpty()) {
-            return null;
-        }
-        return "$[*] ? (" + String.join(" || ", technologies.stream().map(t -> "@.\"" + t + "\" > 0").toList()) + ")";
-    }
-
     public static String getTagsJsonPath(List<String> tags) {
         if (isNull(tags) || tags.isEmpty()) {
             return null;
         }
         return "$[*] ? (" + String.join(" || ", tags.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
+    }
+
+    public static String getLanguagesJsonPath(List<UUID> languageIds) {
+        if (isNull(languageIds) || languageIds.isEmpty()) {
+            return null;
+        }
+        return "$[*] ? (" + String.join(" || ", languageIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
     }
 
     public ProjectCardView toView(UUID userId) {
@@ -91,9 +91,6 @@ public class ProjectPageItemQueryEntity {
                     case PRIVATE -> ProjectVisibility.PRIVATE;
                 })
                 .build();
-        if (nonNull(this.technologies) && !this.technologies.isEmpty()) {
-            this.technologies.forEach(view::addTechnologies);
-        }
         if (nonNull(this.ecosystems) && !this.ecosystems.isEmpty()) {
             this.ecosystems.forEach(ecosystem -> view.addEcosystem(EcosystemView.builder()
                     .id(ecosystem.id)
@@ -126,6 +123,14 @@ public class ProjectPageItemQueryEntity {
                 case "UPDATED_ROADMAP" -> Project.Tag.UPDATED_ROADMAP;
                 default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
             }));
+        }
+        if (nonNull(this.languages) && !this.languages.isEmpty()) {
+            this.languages.forEach(l -> view.addLanguages(LanguageView.builder()
+                    .id(l.id)
+                    .logoUrl(l.logoUrl)
+                    .bannerUrl(l.bannerUrl)
+                    .name(l.name)
+                    .build()));
         }
         return view;
     }
@@ -164,5 +169,12 @@ public class ProjectPageItemQueryEntity {
     public static class Tag {
         @JsonProperty("name")
         String name;
+    }
+
+    public static class Languages {
+        UUID id;
+        String name;
+        String logoUrl;
+        String bannerUrl;
     }
 }
