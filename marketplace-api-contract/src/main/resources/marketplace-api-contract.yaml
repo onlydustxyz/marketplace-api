@@ -1166,8 +1166,39 @@ paths:
       summary: Get all projects
       operationId: getProjects
       description: |
-        Get the (soon to be paginated) list of all projects on the platform that are visible to the caller.
+        Get the paginated list of all projects on the platform that are visible to the caller.
       parameters:
+        - in: query
+          name: mine
+          description: Filter my projects
+          schema:
+            type: boolean
+        - in: query
+          name: search
+          description: Full text search
+          schema:
+            type: string
+        - in: query
+          name: tags
+          description: Filter on project tags
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectTag'
+        - in: query
+          name: ecosystemSlugs
+          description: Ecosystem filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/EcosystemSlug'
+        - in: query
+          name: languages
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/LanguageId'
         - in: query
           name: sort
           description: Sort order
@@ -1179,30 +1210,6 @@ paths:
               - REPO_COUNT
               - CONTRIBUTOR_COUNT
         - in: query
-          name: ecosystemSlugs
-          description: Ecosystem filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/EcosystemSlug'
-        - in: query
-          name: tags
-          description: Filter on project tags
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectTag'
-        - in: query
-          name: mine
-          description: Filter mine projects
-          schema:
-            type: boolean
-        - in: query
-          name: search
-          description: Full text search
-          schema:
-            type: string
-        - in: query
           name: pageIndex
           required: true
           schema:
@@ -1212,13 +1219,6 @@ paths:
           required: true
           schema:
             type: integer
-        - in: query
-          name: languageIds
-          required: false
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/LanguageId'
       responses:
         "200":
           description: 'List of projects'

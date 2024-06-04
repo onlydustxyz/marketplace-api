@@ -91,11 +91,11 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                        end
               offset :offset limit :limit
             """, nativeQuery = true)
-    List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
+    List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("search") String search,
+                                                                  @Param("tagsJsonPath") String tagsJsonPath,
                                                                   @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                                  @Param("search") String search,
-                                                                  @Param("orderBy") String orderBy,
                                                                   @Param("languagesJsonPath") String languagesJsonPath,
+                                                                  @Param("orderBy") String orderBy,
                                                                   @Param("offset") int offset,
                                                                   @Param("limit") int limit);
 
@@ -209,11 +209,11 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
             """, nativeQuery = true)
     List<ProjectPageItemQueryEntity> findProjectsForUserId(@Param("userId") UUID userId,
                                                            @Param("mine") Boolean mine,
+                                                           @Param("search") String search,
                                                            @Param("tagsJsonPath") String tagsJsonPath,
                                                            @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                           @Param("search") String search,
-                                                           @Param("orderBy") String orderBy,
                                                            @Param("languagesJsonPath") String languagesJsonPath,
+                                                           @Param("orderBy") String orderBy,
                                                            @Param("offset") int offset,
                                                            @Param("limit") int limit);
 
@@ -258,9 +258,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
             , nativeQuery = true)
-    Long countProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
+    Long countProjectsForAnonymousUser(@Param("search") String search,
+                                       @Param("tagsJsonPath") String tagsJsonPath,
                                        @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                       @Param("search") String search,
                                        @Param("languagesJsonPath") String languagesJsonPath);
 
     @Query(value = """
@@ -333,8 +333,8 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
             """, nativeQuery = true)
     Long countProjectsForUserId(@Param("userId") UUID userId,
                                 @Param("mine") Boolean mine,
+                                @Param("search") String search,
                                 @Param("tagsJsonPath") String tagsJsonPath,
                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                @Param("search") String search,
                                 @Param("languagesJsonPath") String languagesJsonPath);
 }
