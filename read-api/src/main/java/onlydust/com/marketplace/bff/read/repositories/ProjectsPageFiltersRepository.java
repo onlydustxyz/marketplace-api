@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemFiltersQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,8 +46,8 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.id,
-                   s.ecosystem_json                             as   ecosystems,
-                   l.language_json as languages
+                   s.ecosystem_json as ecosystems,
+                   l.language_json  as languages
             from projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(

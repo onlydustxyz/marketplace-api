@@ -1162,7 +1162,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get all projects
       operationId: getProjects
       description: |

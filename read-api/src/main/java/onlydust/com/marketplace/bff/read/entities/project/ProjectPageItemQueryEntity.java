@@ -1,17 +1,11 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.bff.read.entities.project;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.EcosystemView;
-import onlydust.com.marketplace.project.domain.view.LanguageView;
-import onlydust.com.marketplace.project.domain.view.ProjectCardView;
-import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
+import onlydust.com.marketplace.api.contract.model.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -75,70 +69,49 @@ public class ProjectPageItemQueryEntity {
         return "$[*] ? (" + String.join(" || ", languageIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
     }
 
-    public ProjectCardView toView(UUID userId) {
-        final ProjectCardView view = ProjectCardView.builder()
-                .repoCount(this.repoCount)
+    public ProjectPageItemResponse toDto(UUID userId) {
+        return new ProjectPageItemResponse()
                 .id(this.projectId)
                 .slug(this.slug)
                 .name(this.name)
                 .shortDescription(this.shortDescription)
                 .logoUrl(this.logoUrl)
                 .hiring(this.hiring)
+                .visibility(this.visibility)
                 .contributorCount(this.contributorsCount)
+                .repoCount(this.repoCount)
+                .tags(isNull(this.tags) ? List.of() : this.tags.stream().map(Tag::name).map(ProjectTag::valueOf).toList())
+                .ecosystems(isNull(this.ecosystems) ? List.of() : this.ecosystems.stream().map(ecosystem -> new EcosystemResponse()
+                        .id(ecosystem.id)
+                        .logoUrl(ecosystem.logoUrl)
+                        .name(ecosystem.name)
+                        .slug(ecosystem.slug)
+                        .url(ecosystem.url)
+                ).toList())
+                .leaders(isNull(this.projectLeads) ? List.of() : this.projectLeads.stream().map(projectLead -> new RegisteredUserResponse()
+                        .id(projectLead.id)
+                        .githubUserId(projectLead.githubId)
+                        .avatarUrl(projectLead.avatarUrl)
+                        .login(projectLead.login)
+                ).toList())
+                .languages(isNull(this.languages) ? List.of() : this.languages.stream().map(language -> new LanguageResponse()
+                        .id(language.id)
+                        .logoUrl(language.logoUrl)
+                        .bannerUrl(language.bannerUrl)
+                        .name(language.name)
+                ).toList())
                 .isInvitedAsProjectLead(this.isPendingProjectLead)
-                .visibility(switch (this.visibility) {
-                    case PUBLIC -> ProjectVisibility.PUBLIC;
-                    case PRIVATE -> ProjectVisibility.PRIVATE;
-                })
-                .build();
-        if (nonNull(this.ecosystems) && !this.ecosystems.isEmpty()) {
-            this.ecosystems.forEach(ecosystem -> view.addEcosystem(EcosystemView.builder()
-                    .id(ecosystem.id)
-                    .logoUrl(ecosystem.logoUrl)
-                    .name(ecosystem.name)
-                    .url(ecosystem.url)
-                    .slug(ecosystem.slug)
-                    .build()));
-        }
-        if (nonNull(this.projectLeads) && !this.projectLeads.isEmpty()) {
-            this.projectLeads.forEach(projectLead -> view.addProjectLeader(ProjectLeaderLinkView.builder()
-                    .avatarUrl(projectLead.avatarUrl)
-                    .url(projectLead.url)
-                    .githubUserId(projectLead.githubId)
-                    .login(projectLead.login)
-                    .id(projectLead.id)
-                    .build()));
-            if (userId != null && this.projectLeads.stream().anyMatch(lead -> userId.equals(lead.id))) {
-                view.setIsMissingGithubAppInstallation(this.isMissingGithubAppInstallation);
-            }
-        }
-        if (nonNull(this.tags)) {
-            this.tags.forEach(tag -> view.addTag(switch (tag.name) {
-                case "NEWBIES_WELCOME" -> Project.Tag.NEWBIES_WELCOME;
-                case "BIG_WHALE" -> Project.Tag.BIG_WHALE;
-                case "LIKELY_TO_REWARD" -> Project.Tag.LIKELY_TO_REWARD;
-                case "FAST_AND_FURIOUS" -> Project.Tag.FAST_AND_FURIOUS;
-                case "WORK_IN_PROGRESS" -> Project.Tag.WORK_IN_PROGRESS;
-                case "HOT_COMMUNITY" -> Project.Tag.HOT_COMMUNITY;
-                case "UPDATED_ROADMAP" -> Project.Tag.UPDATED_ROADMAP;
-                default -> throw OnlyDustException.internalServerError(String.format("Invalid project tag %s which is not contained in enum", tag));
-            }));
-        }
-        if (nonNull(this.languages) && !this.languages.isEmpty()) {
-            this.languages.forEach(l -> view.addLanguages(LanguageView.builder()
-                    .id(l.id)
-                    .logoUrl(l.logoUrl)
-                    .bannerUrl(l.bannerUrl)
-                    .name(l.name)
-                    .build()));
-        }
-        return view;
+                .hasMissingGithubAppInstallation(nonNull(userId) && nonNull(this.projectLeads)
+                        && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId))
+                        ?
+                        this.isMissingGithubAppInstallation : null);
     }
 
-    @EqualsAndHashCode
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
     @Getter
     @Accessors(fluent = true)
     public static class ProjectLead {
+        @EqualsAndHashCode.Include
         @JsonProperty("id")
         UUID id;
         @JsonProperty("url")
@@ -151,27 +124,28 @@ public class ProjectPageItemQueryEntity {
         Long githubId;
     }
 
-    @EqualsAndHashCode
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Getter
+    @Accessors(fluent = true)
     public static class Ecosystem {
+        @EqualsAndHashCode.Include
+        @JsonProperty("id")
+        UUID id;
         @JsonProperty("url")
         String url;
         @JsonProperty("logoUrl")
         String logoUrl;
-        @JsonProperty("id")
-        UUID id;
         @JsonProperty("name")
         String name;
         @JsonProperty("slug")
         String slug;
     }
 
-    @EqualsAndHashCode
-    public static class Tag {
-        @JsonProperty("name")
-        String name;
-    }
-
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Getter
+    @Accessors(fluent = true)
     public static class Languages {
+        @EqualsAndHashCode.Include
         @JsonProperty("id")
         UUID id;
         @JsonProperty("name")
@@ -180,5 +154,14 @@ public class ProjectPageItemQueryEntity {
         String logoUrl;
         @JsonProperty("bannerUrl")
         String bannerUrl;
+    }
+
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Getter
+    @Accessors(fluent = true)
+    public static class Tag {
+        @EqualsAndHashCode.Include
+        @JsonProperty("name")
+        String name;
     }
 }

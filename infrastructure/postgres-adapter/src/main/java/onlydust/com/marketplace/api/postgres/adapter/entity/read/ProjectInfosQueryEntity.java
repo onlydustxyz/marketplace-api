@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -34,7 +36,7 @@ public class ProjectInfosQueryEntity {
     String longDescription;
     @NonNull
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectPageItemQueryEntity.ProjectLead> projectLeads;
+    List<ProjectLead> projectLeads;
     @NonNull
     Integer activeContributors;
     @NonNull
@@ -73,5 +75,22 @@ public class ProjectInfosQueryEntity {
                 newContributors,
                 openIssue
         );
+    }
+
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Getter
+    @Accessors(fluent = true)
+    public static class ProjectLead {
+        @EqualsAndHashCode.Include
+        @JsonProperty("id")
+        UUID id;
+        @JsonProperty("url")
+        String url;
+        @JsonProperty("avatarUrl")
+        String avatarUrl;
+        @JsonProperty("login")
+        String login;
+        @JsonProperty("githubId")
+        Long githubId;
     }
 }

@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
-import static onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity.getLanguagesJsonPath;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -49,8 +48,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
-    private final ProjectsPageRepository projectsPageRepository;
-    private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardableItemRepository rewardableItemRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
     private final ChurnedContributorViewEntityRepository churnedContributorViewEntityRepository;
@@ -109,64 +106,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     public Optional<Project> getById(UUID projectId) {
         return projectRepository.findById(projectId).map(ProjectEntity::toDomain);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProjectCardView> findForUserId(List<Project.Tag> tags,
-                                               List<String> ecosystemSlugs, UUID userId,
-                                               String search,
-                                               ProjectCardView.SortBy sort,
-                                               Boolean mine,
-                                               List<UUID> languageIds,
-                                               Integer pageIndex,
-                                               Integer pageSize) {
-        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
-        final String languagesJsonPath = getLanguagesJsonPath(languageIds);
-        final Long count = projectsPageRepository.countProjectsForUserId(userId, mine, tagsJsonPath,
-                ecosystemsJsonPath, search, languagesJsonPath);
-        final List<ProjectPageItemQueryEntity> projectsForUserId =
-                projectsPageRepository.findProjectsForUserId(userId, mine, tagsJsonPath,
-                        ecosystemsJsonPath, search, isNull(sort) ?
-                                ProjectCardView.SortBy.NAME.name() : sort.name(), languagesJsonPath,
-                        PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
-        final Map<String, Set<Object>> filters = ProjectPageItemFiltersQueryEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForUser(userId, mine));
-        return Page.<ProjectCardView>builder()
-                .content(projectsForUserId.stream().map(p -> p.toView(userId)).toList())
-                .totalItemNumber(count.intValue())
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
-                .filters(filters)
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ProjectCardView> find(List<Project.Tag> tags,
-                                      List<String> ecosystemSlugs, String search,
-                                      ProjectCardView.SortBy sort,
-                                      List<UUID> languageIds,
-                                      Integer pageIndex, Integer pageSize) {
-
-        final String ecosystemsJsonPath = ProjectPageItemQueryEntity.getEcosystemsJsonPath(ecosystemSlugs);
-        final String tagsJsonPath = ProjectPageItemQueryEntity.getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
-        final String languagesJsonPath = getLanguagesJsonPath(languageIds);
-        final List<ProjectPageItemQueryEntity> projectsForAnonymousUser =
-                projectsPageRepository.findProjectsForAnonymousUser(tagsJsonPath, ecosystemsJsonPath, search,
-                        isNull(sort) ?
-                                ProjectCardView.SortBy.NAME.name() : sort.name(), languagesJsonPath,
-                        PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex), pageSize);
-        final Long count = projectsPageRepository.countProjectsForAnonymousUser(tagsJsonPath,
-                ecosystemsJsonPath, search, languagesJsonPath);
-        final Map<String, Set<Object>> filters = ProjectPageItemFiltersQueryEntity.entitiesToFilters(
-                projectsPageFiltersRepository.findFiltersForAnonymousUser());
-        return Page.<ProjectCardView>builder()
-                .content(projectsForAnonymousUser.stream().map(p -> p.toView(null)).toList())
-                .totalItemNumber(count.intValue())
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count.intValue()))
-                .filters(filters)
-                .build();
     }
 
     @Override
