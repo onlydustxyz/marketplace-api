@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
@@ -205,7 +206,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .map(organizationView -> mapOrganization(organizationView, Boolean.TRUE.equals(includeAllAvailableRepos)))
                         .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
                         .toList())
-                .technologies(project.technologies())
+                .languages(project.getLanguages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())
                 .indexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull))
                 .indexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null))
                 .me(me == null ? null : new ProjectMeResponse()

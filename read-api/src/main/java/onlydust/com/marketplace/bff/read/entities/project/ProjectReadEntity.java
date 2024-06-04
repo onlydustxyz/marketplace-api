@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import org.hibernate.annotations.Immutable;
@@ -93,13 +94,14 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "project_category_id")
     )
     Set<ProjectCategoryReadEntity> categories;
-
-    public Map<String, Long> technologies() {
-        return getRepos().stream()
-                .filter(GithubRepoViewEntity::isPublic)
-                .flatMap(repo -> repo.getLanguages().stream())
-                .collect(Collectors.groupingBy(GithubRepoLanguageViewEntity::getLanguage, Collectors.summingLong(GithubRepoLanguageViewEntity::getLineCount)));
-    }
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            schema = "public",
+            name = "project_languages",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "language_id")
+    )
+    Set<LanguageReadEntity> languages;
 
     public List<ProjectOrganizationView> organizations() {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();

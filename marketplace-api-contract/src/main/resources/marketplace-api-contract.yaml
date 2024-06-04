@@ -1213,7 +1213,7 @@ paths:
           schema:
             type: integer
         - in: query
-          name: languages
+          name: languageIds
           required: false
           schema:
             type: array
@@ -4888,7 +4888,7 @@ components:
         - invitedLeaders
         - ecosystems
         - categories
-        - technologies
+        - languages
         - hasRemainingBudget
         - indexingComplete
         - indexedAt
@@ -4958,8 +4958,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SponsorResponse'
-        technologies:
-          $ref: '#/components/schemas/Technologies'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
         hasRemainingBudget:
           type: boolean
         rewardSettings:

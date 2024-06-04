@@ -31,161 +31,186 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String BRETZEL_OVERVIEW_JSON = """
             {
-              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-              "slug": "bretzel",
-              "name": "Bretzel",
-              "createdAt": "2023-02-21T09:15:09.603Z",
-              "shortDescription": "A project for people who love fruits",
-              "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
-              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-              "moreInfos": [],
-              "hiring": true,
-              "visibility": "PUBLIC",
-              "contributorCount": 4,
-              "topContributors": [
-                {
-                  "githubUserId": 8642470,
-                  "login": "gregcha",
-                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                },
-                {
-                  "githubUserId": 52197971,
-                  "login": "jb1011",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
-                },
-                {
-                  "githubUserId": 74653697,
-                  "login": "antiyro",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
-                }
-              ],
-              "organizations": [
-                {
-                  "githubUserId": 8642470,
-                  "login": "gregcha",
-                  "htmlUrl": "https://github.com/gregcha",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                  "name": "Grégoire CHARLES",
-                  "repos": [
-                    {
-                      "id": 380954304,
-                      "owner": "gregcha",
-                      "name": "bretzel-app",
-                      "description": null,
-                      "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                      "stars": 0,
-                      "forkCount": 0,
-                      "hasIssues": true,
-                      "isIncludedInProject": true,
-                      "isAuthorizedInGithubApp": true
-                    },
-                    {
-                      "id": 452047076,
-                      "owner": "gregcha",
-                      "name": "bretzel-site",
-                      "description": null,
-                      "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                      "stars": 0,
-                      "forkCount": 0,
-                      "hasIssues": true,
-                      "isIncludedInProject": true,
-                      "isAuthorizedInGithubApp": true
-                    },
-                    {
-                      "id": 466482535,
-                      "owner": "gregcha",
-                      "name": "bretzel-ressources",
-                      "description": null,
-                      "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                      "stars": 0,
-                      "forkCount": 0,
-                      "hasIssues": true,
-                      "isIncludedInProject": true,
-                      "isAuthorizedInGithubApp": true
-                    }
-                  ],
-                  "installed": true,
-                  "isCurrentUserAdmin": null,
-                  "isPersonal": null,
-                  "installationId": 44637372
-                },
-                {
-                  "githubUserId": 119948009,
-                  "login": "KasarLabs",
-                  "htmlUrl": "https://github.com/KasarLabs",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
-                  "name": "KasarLabs",
-                  "repos": [
-                    {
-                      "id": 659718526,
-                      "owner": "KasarLabs",
-                      "name": "deoxys-telemetry",
-                      "description": "Deoxys Telemetry service",
-                      "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                      "stars": 0,
-                      "forkCount": 1,
-                      "hasIssues": false,
-                      "isIncludedInProject": true,
-                      "isAuthorizedInGithubApp": false
-                    }
-                  ],
-                  "installed": false,
-                  "isCurrentUserAdmin": null,
-                  "isPersonal": null,
-                  "installationId": null
-                }
-              ],
-              "leaders": [
-                {
-                  "githubUserId": 8642470,
-                  "login": "gregcha",
-                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                  "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                },
-                {
-                  "githubUserId": 98735421,
-                  "login": "pacovilletard",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                  "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
-                }
-              ],
-              "invitedLeaders": [],
-              "sponsors": [
-                {
-                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                  "name": "OGC Nissa Ineos",
-                  "url": "https://www.ogcnice.com/fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-                },
-                {
-                  "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                  "name": "Coca Cola",
-                  "url": null,
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                }
-              ],
-              "technologies": {
-                "TypeScript": 190809,
-                "Dockerfile": 1982,
-                "CSS": 423688,
-                "Shell": 732,
-                "Rust": 408641,
-                "SCSS": 98360,
-                "JavaScript": 62716,
-                "HTML": 121874
+            "id": "7d04163c-4187-4313-8066-61504d34fc56",
+            "slug": "bretzel",
+            "name": "Bretzel",
+            "createdAt": "2023-02-21T09:15:09.603Z",
+            "shortDescription": "A project for people who love fruits",
+            "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
+            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+            "moreInfos": [],
+            "hiring": true,
+            "visibility": "PUBLIC",
+            "contributorCount": 4,
+            "topContributors": [
+              {
+                "githubUserId": 8642470,
+                "login": "gregcha",
+                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
               },
-              "hasRemainingBudget": true,
-              "rewardSettings": {
-                "ignorePullRequests": false,
-                "ignoreIssues": false,
-                "ignoreCodeReviews": false,
-                "ignoreContributionsBefore": null
+              {
+                "githubUserId": 52197971,
+                "login": "jb1011",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
               },
-              "indexingComplete": true,
-              "indexedAt": "2023-12-04T14:35:10.986567Z"
-            }
-            
-            """;
+              {
+                "githubUserId": 74653697,
+                "login": "antiyro",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
+              }
+            ],
+            "organizations": [
+              {
+                "githubUserId": 8642470,
+                "login": "gregcha",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                "name": "Grégoire CHARLES",
+                "htmlUrl": "https://github.com/gregcha",
+                "repos": [
+                  {
+                    "id": 380954304,
+                    "owner": "gregcha",
+                    "name": "bretzel-app",
+                    "description": null,
+                    "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                    "stars": 0,
+                    "forkCount": 0,
+                    "hasIssues": true,
+                    "isIncludedInProject": true,
+                    "isAuthorizedInGithubApp": true
+                  },
+                  {
+                    "id": 452047076,
+                    "owner": "gregcha",
+                    "name": "bretzel-site",
+                    "description": null,
+                    "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                    "stars": 0,
+                    "forkCount": 0,
+                    "hasIssues": true,
+                    "isIncludedInProject": true,
+                    "isAuthorizedInGithubApp": true
+                  },
+                  {
+                    "id": 466482535,
+                    "owner": "gregcha",
+                    "name": "bretzel-ressources",
+                    "description": null,
+                    "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                    "stars": 0,
+                    "forkCount": 0,
+                    "hasIssues": true,
+                    "isIncludedInProject": true,
+                    "isAuthorizedInGithubApp": true
+                  }
+                ],
+                "installed": true,
+                "isCurrentUserAdmin": null,
+                "isPersonal": null,
+                "installationId": 44637372
+              },
+              {
+                "githubUserId": 119948009,
+                "login": "KasarLabs",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
+                "name": "KasarLabs",
+                "htmlUrl": "https://github.com/KasarLabs",
+                "repos": [
+                  {
+                    "id": 659718526,
+                    "owner": "KasarLabs",
+                    "name": "deoxys-telemetry",
+                    "description": "Deoxys Telemetry service",
+                    "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                    "stars": 0,
+                    "forkCount": 1,
+                    "hasIssues": false,
+                    "isIncludedInProject": true,
+                    "isAuthorizedInGithubApp": false
+                  }
+                ],
+                "installed": false,
+                "isCurrentUserAdmin": null,
+                "isPersonal": null,
+                "installationId": null
+              }
+            ],
+            "leaders": [
+              {
+                "githubUserId": 8642470,
+                "login": "gregcha",
+                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+              },
+              {
+                "githubUserId": 98735421,
+                "login": "pacovilletard",
+                "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+              }
+            ],
+            "invitedLeaders": [],
+            "ecosystems": [
+              {
+                "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                "name": "Aptos",
+                "url": "https://aptosfoundation.org/",
+                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
+                "bannerUrl": null,
+                "slug": "aptos"
+              },
+              {
+                "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                "name": "Ethereum",
+                "url": "https://ethereum.foundation/",
+                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
+                "bannerUrl": null,
+                "slug": "ethereum"
+              },
+              {
+                "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                "name": "Zama",
+                "url": "https://www.zama.ai/",
+                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                "bannerUrl": null,
+                "slug": "zama"
+              }
+            ],
+            "categories": [],
+            "sponsors": [
+              {
+                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                "name": "Coca Cola",
+                "url": null,
+                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+              },
+              {
+                "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                "name": "OGC Nissa Ineos",
+                "url": "https://www.ogcnice.com/fr/",
+                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+              }
+            ],
+            "languages": [
+              {
+                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                "name": "Typescript",
+                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+              }
+            ],
+            "hasRemainingBudget": true,
+            "rewardSettings": {
+              "ignorePullRequests": false,
+              "ignoreIssues": false,
+              "ignoreCodeReviews": false,
+              "ignoreContributionsBefore": null
+            },
+            "indexingComplete": true,
+            "indexedAt": "2023-12-04T14:35:10.986567Z",
+            "tags": []
+          }
+           """;
     private static final String BRETZEL_OVERVIEW_WITH_TAGS_JSON = """
             {
               "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -220,9 +245,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 8642470,
                   "login": "gregcha",
-                  "htmlUrl": "https://github.com/gregcha",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "name": "Grégoire CHARLES",
+                  "htmlUrl": "https://github.com/gregcha",
                   "repos": [
                     {
                       "id": 380954304,
@@ -269,9 +294,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 119948009,
                   "login": "KasarLabs",
-                  "htmlUrl": "https://github.com/KasarLabs",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
                   "name": "KasarLabs",
+                  "htmlUrl": "https://github.com/KasarLabs",
                   "repos": [
                     {
                       "id": 659718526,
@@ -314,30 +339,55 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "id": null
                 }
               ],
-              "sponsors": [
+              "ecosystems": [
                 {
-                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                  "name": "OGC Nissa Ineos",
-                  "url": "https://www.ogcnice.com/fr/",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+                  "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                  "name": "Aptos",
+                  "url": "https://aptosfoundation.org/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
+                  "bannerUrl": null,
+                  "slug": "aptos"
                 },
+                {
+                  "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                  "name": "Ethereum",
+                  "url": "https://ethereum.foundation/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
+                  "bannerUrl": null,
+                  "slug": "ethereum"
+                },
+                {
+                  "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                  "name": "Zama",
+                  "url": "https://www.zama.ai/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                  "bannerUrl": null,
+                  "slug": "zama"
+                }
+              ],
+              "categories": [],
+              "sponsors": [
                 {
                   "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
                   "name": "Coca Cola",
                   "url": null,
                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                },
+                {
+                  "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                  "name": "OGC Nissa Ineos",
+                  "url": "https://www.ogcnice.com/fr/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
                 }
               ],
-              "technologies": {
-                "TypeScript": 190809,
-                "Dockerfile": 1982,
-                "CSS": 423688,
-                "Shell": 732,
-                "Rust": 408641,
-                "SCSS": 98360,
-                "JavaScript": 62716,
-                "HTML": 121874
-              },
+              "languages": [
+                {
+                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                  "name": "Typescript",
+                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                }
+              ],
               "hasRemainingBudget": true,
               "rewardSettings": {
                 "ignorePullRequests": false,
@@ -355,10 +405,10 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "hasApplied": false
               },
               "tags": [
-                "NEWBIES_WELCOME",
-                "FAST_AND_FURIOUS"
+                "FAST_AND_FURIOUS",
+                "NEWBIES_WELCOME"
               ]
-            }            
+            }
             """;
 
     private static final String B_CONSEIL_OVERVIEW_JSON = """
@@ -381,23 +431,23 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                 },
                 {
-                  "githubUserId": 4435377,
-                  "login": "Bernardstanislas",
-                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
-                },
-                {
                   "githubUserId": 595505,
                   "login": "ofux",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                },
+                {
+                  "githubUserId": 4435377,
+                  "login": "Bernardstanislas",
+                  "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
                 }
               ],
               "organizations": [
                 {
                   "githubUserId": 8642470,
                   "login": "gregcha",
-                  "htmlUrl": "https://github.com/gregcha",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
                   "name": "Grégoire CHARLES",
+                  "htmlUrl": "https://github.com/gregcha",
                   "repos": [
                     {
                       "id": 302082426,
@@ -420,9 +470,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "githubUserId": 121887739,
                   "login": "od-mocks",
-                  "htmlUrl": "https://github.com/od-mocks",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/121887739?v=4",
                   "name": "OD Mocks",
+                  "htmlUrl": "https://github.com/od-mocks",
                   "repos": [
                     {
                       "id": 602953043,
@@ -459,20 +509,52 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                   "id": null
                 }
               ],
-              "technologies": {
-                "CSS": 323507,
-                "Rust": 527,
-                "SCSS": 102453,
-                "JavaScript": 58624,
-                "HTML": 169898
-              },
+              "ecosystems": [
+                {
+                  "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
+                  "name": "Lava",
+                  "url": "https://www.lavanet.xyz/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15939879525439639427.jpg",
+                  "bannerUrl": null,
+                  "slug": "lava"
+                },
+                {
+                  "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                  "name": "Optimism",
+                  "url": "https://www.optimism.io/",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12058007825795511084.png",
+                  "bannerUrl": null,
+                  "slug": "optimism"
+                },
+                {
+                  "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                  "name": "Starknet",
+                  "url": "https://www.starknet.io/en",
+                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
+                  "bannerUrl": null,
+                  "slug": "starknet"
+                }
+              ],
+              "categories": [],
+              "sponsors": [
+                {
+                  "id": "01bc5c57-9b7c-4521-b7be-8a12861ae5f4",
+                  "name": "No Sponsor",
+                  "url": null,
+                  "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                }
+              ],
+              "languages": [],
               "hasRemainingBudget": true,
               "rewardSettings": {
                 "ignorePullRequests": false,
                 "ignoreIssues": false,
                 "ignoreCodeReviews": false,
                 "ignoreContributionsBefore": null
-              }
+              },
+              "indexingComplete": true,
+              "indexedAt": "2023-12-04T14:29:52.896598Z",
+              "tags": []
             }
             """;
     private static final String GET_PROJECTS_FOR_AUTHENTICATED_USER_FOR_MINE_JSON_RESPONSE = """
@@ -2017,294 +2099,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
             """;
     private static final String GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE = """
             {
-              "projects": [
-                {
-                  "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
-                  "slug": "zero-title-5",
-                  "name": "Zero title 5",
-                  "shortDescription": "Missing short description",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
-                  "hiring": false,
-                  "visibility": "PUBLIC",
-                  "repoCount": 1,
-                  "contributorCount": 297,
-                  "leaders": [
-                    {
-                      "githubUserId": 595505,
-                      "login": "ofux",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                      "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
-                    }
-                  ],
-                  "ecosystems": [],
-                  "languages": [
-                    {
-                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                      "name": "Rust",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                    }
-                  ],
-                  "isInvitedAsProjectLead": false,
-                  "hasMissingGithubAppInstallation": null,
-                  "tags": []
-                },
-                {
-                  "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                  "slug": "taco-tuesday",
-                  "name": "Taco Tuesday",
-                  "shortDescription": "A projects for the midweek lovers",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
-                  "hiring": false,
-                  "visibility": "PUBLIC",
-                  "repoCount": 3,
-                  "contributorCount": 45,
-                  "leaders": [
-                    {
-                      "githubUserId": 141839618,
-                      "login": "Blumebee",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/16582211468658783329.webp",
-                      "id": "46fec596-7a91-422e-8532-5f479e790217"
-                    },
-                    {
-                      "githubUserId": 139852598,
-                      "login": "mat-yas",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/139852598?v=4",
-                      "id": "bdc705b5-cf8e-488f-926a-258e1800ed79"
-                    },
-                    {
-                      "githubUserId": 31901905,
-                      "login": "kaelsky",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/31901905?v=4",
-                      "id": "a0da3c1e-6493-4ea1-8bd0-8c46d653f274"
-                    },
-                    {
-                      "githubUserId": 134493681,
-                      "login": "croziflette74",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/134493681?v=4",
-                      "id": "44e078b7-d095-49f2-a7b3-647149337dc5"
-                    },
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    },
-                    {
-                      "githubUserId": 122993337,
-                      "login": "GregGamb",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11849964898247380166.webp",
-                      "id": "743e096e-c922-4097-9e6f-8ea503055336"
-                    }
-                  ],
-                  "ecosystems": [],
-                  "languages": [
-                    {
-                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                      "name": "Rust",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                    },
-                    {
-                      "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                      "name": "Cairo",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
-                    },
-                    {
-                      "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                      "name": "Solidity",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                    },
-                    {
-                      "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                      "name": "Typescript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                    }
-                  ],
-                  "isInvitedAsProjectLead": false,
-                  "hasMissingGithubAppInstallation": null,
-                  "tags": []
-                },
-                {
-                  "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
-                  "slug": "kaaper",
-                  "name": "kaaper",
-                  "shortDescription": "Documentation generator for Cairo projects.",
-                  "logoUrl": null,
-                  "hiring": true,
-                  "visibility": "PUBLIC",
-                  "repoCount": 2,
-                  "contributorCount": 21,
-                  "leaders": [
-                    {
-                      "githubUserId": 43467246,
-                      "login": "AnthonyBuisset",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                      "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
-                    }
-                  ],
-                  "ecosystems": [],
-                  "languages": [
-                    {
-                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                      "name": "Javascript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                    },
-                    {
-                      "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                      "name": "Python",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                    },
-                    {
-                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                      "name": "Rust",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                    },
-                    {
-                      "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                      "name": "Cairo",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
-                    },
-                    {
-                      "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                      "name": "Typescript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                    }
-                  ],
-                  "isInvitedAsProjectLead": false,
-                  "hasMissingGithubAppInstallation": null,
-                  "tags": []
-                },
-                {
-                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
-                  "slug": "mooooooonlight",
-                  "name": "Mooooooonlight",
-                  "shortDescription": "hello la team",
-                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg",
-                  "hiring": false,
-                  "visibility": "PUBLIC",
-                  "repoCount": 4,
-                  "contributorCount": 20,
-                  "leaders": [
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    }
-                  ],
-                  "ecosystems": [
-                    {
-                      "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                      "name": "Aztec",
-                      "url": "https://aztec.network/",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                      "bannerUrl": null,
-                      "slug": "aztec"
-                    },
-                    {
-                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                      "name": "Starknet",
-                      "url": "https://www.starknet.io/en",
-                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                      "bannerUrl": null,
-                      "slug": "starknet"
-                    }
-                  ],
-                  "languages": [
-                    {
-                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                      "name": "Javascript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                    },
-                    {
-                      "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                      "name": "Python",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                    },
-                    {
-                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                      "name": "Rust",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                    },
-                    {
-                      "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                      "name": "Typescript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                    }
-                  ],
-                  "isInvitedAsProjectLead": false,
-                  "hasMissingGithubAppInstallation": null,
-                  "tags": []
-                },
-                {
-                  "id": "f39b827f-df73-498c-8853-99bc3f562723",
-                  "slug": "qa-new-contributions",
-                  "name": "QA new contributions",
-                  "shortDescription": "QA new contributions",
-                  "logoUrl": null,
-                  "hiring": false,
-                  "visibility": "PUBLIC",
-                  "repoCount": 1,
-                  "contributorCount": 18,
-                  "leaders": [
-                    {
-                      "githubUserId": 16590657,
-                      "login": "PierreOucif",
-                      "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                      "id": "fc92397c-3431-4a84-8054-845376b630a0"
-                    },
-                    {
-                      "githubUserId": 8642470,
-                      "login": "gregcha",
-                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                      "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-                    }
-                  ],
-                  "ecosystems": [],
-                  "languages": [
-                    {
-                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                      "name": "Javascript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                    },
-                    {
-                      "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                      "name": "Python",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                    },
-                    {
-                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                      "name": "Rust",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                    },
-                    {
-                      "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                      "name": "Typescript",
-                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                    }
-                  ],
-                  "isInvitedAsProjectLead": false,
-                  "hasMissingGithubAppInstallation": null,
-                  "tags": []
-                }
-              ],
+              "projects": [],
               "languages": [
                 {
                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
@@ -2400,8 +2195,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 }
               ],
               "hasMore": false,
-              "totalPageNumber": 1,
-              "totalItemNumber": 5,
+              "totalPageNumber": 0,
+              "totalItemNumber": 0,
               "nextPageIndex": 0
             }
             """;
@@ -3531,13 +3326,27 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus().is2xxSuccessful().expectBody()
+                .json(BRETZEL_OVERVIEW_JSON);
 
         // When user is authenticated
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(false).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember")
+                .isEqualTo(false)
+                .jsonPath("$.me.isContributor")
+                .isEqualTo(false)
+                .jsonPath("$.me.isProjectLead")
+                .isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead")
+                .isEqualTo(false)
+                .jsonPath("$.me.hasApplied")
+                .isEqualTo(false)
+                .json(BRETZEL_OVERVIEW_JSON);
     }
 
 
@@ -3562,7 +3371,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false).json(BRETZEL_OVERVIEW_JSON);
+                .jsonPath("$.me.hasApplied").isEqualTo(false)
+                .json(BRETZEL_OVERVIEW_JSON);
     }
 
     @Test
@@ -3580,7 +3390,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
         // Rust id : "ca600cac-0f45-44e9-a6e8-25e21b0c6887"
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languages", "ca600cac-0f45-44e9-a6e8-25e21b0c6887", "search", "t", "ecosystemSlug", "fake",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887", "search", "t", "ecosystemSlugs", "fake",
                         "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then
