@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -14,7 +15,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -50,15 +50,15 @@ class InvoiceServiceTest {
     void setUp() {
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         final var billingProfileId = BillingProfile.Id.random();
-        final var individualBillingProfile = BillingProfileView.builder()
+        final var individualBillingProfile = IndividualBillingProfile.builder()
                 .id(billingProfileId)
-                .type(BillingProfile.Type.INDIVIDUAL)
-                .payoutInfo(payoutInfo)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("John")
                 .kyc(newKyc(billingProfileId, UserId.random()))
+                .enabled(true)
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
-        invoice = Invoice.of(individualBillingProfile, 1, UserId.random());
+        invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo);
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
     }
 
@@ -119,16 +119,16 @@ class InvoiceServiceTest {
         // Given
         final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         final var billingProfileId = BillingProfile.Id.random();
-        final var individualBillingProfile = BillingProfileView.builder()
+        final var individualBillingProfile = IndividualBillingProfile.builder()
                 .id(billingProfileId)
-                .type(BillingProfile.Type.INDIVIDUAL)
-                .payoutInfo(payoutInfo)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("John")
                 .kyc(newKyc(billingProfileId, UserId.random()))
+                .enabled(true)
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
 
-        final var invoice = Invoice.of(individualBillingProfile, 1, UserId.random());
+        final var invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo);
         invoice.rewards(List.of(
                 new Invoice.Reward(RewardId.random(), ZonedDateTime.now(), faker.rickAndMorty().character(),
                         Money.of(BigDecimal.TEN, Currency.crypto("dustyCrypto", Currency.Code.of("DSTC"), 10)),

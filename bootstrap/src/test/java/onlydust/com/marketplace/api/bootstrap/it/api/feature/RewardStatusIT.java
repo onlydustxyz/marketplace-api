@@ -115,7 +115,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     private UUID companyBPAdmin2RewardId2;
     private UUID companyBPMember1RewardId1;
     private UUID companyBPMember1RewardId2;
-    // 12 for project1 reward1
+    // 11 for project1 reward1
     private UUID selfEmployedBPAdminRewardId11;
     // 12 for project1 reward2
     private UUID selfEmployedBPAdminRewardId12;
@@ -392,8 +392,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful();
-
-
     }
 
     @Test
@@ -3026,7 +3024,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         // When
         final Invoice companyInvoice = billingProfileService.previewInvoice(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId),
                 List.of(RewardId.of(companyBPAdmin1RewardId1), RewardId.of(companyBPMember1RewardId1), RewardId.of(companyBPAdmin2RewardId1)));
-        billingProfileService.updateInvoiceMandateAcceptanceDate(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId));
+        billingProfileService.acceptInvoiceMandate(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId));
         billingProfileService.uploadGeneratedInvoice(UserId.of(companyBPAdmin2Id), BillingProfile.Id.of(companyBPId), companyInvoice.id(),
                 new ByteArrayInputStream(faker.address().fullAddress().getBytes()));
 
@@ -4141,8 +4139,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     @Builder
     private record RewardDatum(@NonNull UUID rewardId, @NonNull String status, @NonNull Long rewardedAmount,
-                               @NonNull Long pendingAmount,
-                               @NonNull Optional<Double> usdConversionRate) {
+                               @NonNull Long pendingAmount, @NonNull Optional<Double> usdConversionRate) {
 
         Optional<BigDecimal> usdEquivalent() {
             return usdConversionRate.map(rate -> BigDecimal.valueOf(rewardedAmount).multiply(BigDecimal.valueOf(rate)));

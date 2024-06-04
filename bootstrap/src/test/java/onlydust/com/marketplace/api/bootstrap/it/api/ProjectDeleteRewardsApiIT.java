@@ -108,7 +108,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         billingProfileService.updatePayoutInfo(billingProfileId, UserId.of(userId),
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name("foobar.eth")))
                         .bankAccount(new BankAccount("BIC", "FR76000111222333334444")).build());
-        billingProfileService.updateInvoiceMandateAcceptanceDate(UserId.of(userId), billingProfileId);
+        billingProfileService.acceptInvoiceMandate(UserId.of(userId), billingProfileId);
         final Invoice.Id invoiceId = billingProfileService.previewInvoice(UserId.of(userId), billingProfileId, List.of(RewardId.of(rewardId))).id();
         billingProfileService.uploadGeneratedInvoice(UserId.of(userId), billingProfileId, invoiceId,
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());

@@ -13,7 +13,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusUpdater;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,20 +113,18 @@ public class RewardStatusUpdaterTest {
                     .paidAt(null)
                     .withAdditionalNetworks(Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
-            final var reference = new Payment.Reference(ZonedDateTime.now(), Network.ETHEREUM, "0x1234", "ofux", "ofux.eth");
-
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
-            final var companyBillingProfile = BillingProfileView.builder()
+            final var companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(newKyb(billingProfileId, UserId.random()))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
+                    .enabled(true)
                     .build();
 
-            var invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
+            var invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo);
             invoice = invoice.rewards(List.of(
                     new Invoice.Reward(rewardId, ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                             Money.of(BigDecimal.ONE, ETH), Money.of(2700L, USD), invoice.id(), List.of()),
@@ -227,16 +224,16 @@ public class RewardStatusUpdaterTest {
         void setUp() {
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
-            final var companyBillingProfile = BillingProfileView.builder()
+            final var companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(newKyb(billingProfileId, UserId.random()))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo);
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
@@ -278,16 +275,16 @@ public class RewardStatusUpdaterTest {
         void setUp() {
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
-            final var companyBillingProfile = BillingProfileView.builder()
+            final var companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(newKyb(billingProfileId, UserId.random()))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo);
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),

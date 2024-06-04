@@ -4,13 +4,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +24,7 @@ public class OnboardingViewEntity {
     @Column(name = "user_id", nullable = false)
     UUID id;
     @Column(name = "terms_and_conditions_acceptance_date")
-    Date termsAndConditionsAcceptanceDate;
+    ZonedDateTime termsAndConditionsAcceptanceDate;
     @Column(name = "profile_wizard_display_date")
-    Date profileWizardDisplayDate;
+    ZonedDateTime profileWizardDisplayDate;
 }

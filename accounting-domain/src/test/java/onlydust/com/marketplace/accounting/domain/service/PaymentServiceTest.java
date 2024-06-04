@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
@@ -11,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -62,8 +62,8 @@ public class PaymentServiceTest {
     PayoutInfo payoutInfo2;
     Currency USDC;
     Currency STRK;
-    BillingProfileView billingProfile1;
-    BillingProfileView billingProfile2;
+    IndividualBillingProfile billingProfile1;
+    IndividualBillingProfile billingProfile2;
 
     @BeforeEach
     void setUp() {
@@ -83,26 +83,26 @@ public class PaymentServiceTest {
                 .build();
 
         final var billingProfileId1 = BillingProfile.Id.random();
-        billingProfile1 = BillingProfileView.builder()
+        billingProfile1 = IndividualBillingProfile.builder()
                 .id(billingProfileId1)
-                .type(BillingProfile.Type.INDIVIDUAL)
-                .payoutInfo(payoutInfo1)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("John")
                 .kyc(newKyc(billingProfileId1, UserId.random()))
+                .enabled(true)
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
         final var billingProfileId2 = BillingProfile.Id.random();
-        billingProfile2 = BillingProfileView.builder()
+        billingProfile2 = IndividualBillingProfile.builder()
                 .id(billingProfileId2)
-                .type(BillingProfile.Type.INDIVIDUAL)
-                .payoutInfo(payoutInfo2)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("John")
                 .kyc(newKyc(billingProfileId2, UserId.random()))
+                .enabled(true)
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
 
         invoices = List.of(
-                Invoice.of(billingProfile1, 1, UserId.random())
+                Invoice.of(billingProfile1, 1, UserId.random(), payoutInfo1)
                         .rewards(List.of(
                                 new Invoice.Reward(rewardIds.get(0), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                         Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),
@@ -111,7 +111,7 @@ public class PaymentServiceTest {
                                 new Invoice.Reward(rewardIds.get(4), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                         Money.of(0L, ETH), Money.of(0L, USD), null, List.of())
                         )),
-                Invoice.of(billingProfile2, 1, UserId.random())
+                Invoice.of(billingProfile2, 1, UserId.random(), payoutInfo2)
                         .rewards(List.of(
                                 new Invoice.Reward(rewardIds.get(1), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),
                                         Money.of(0L, ETH), Money.of(0L, USD), null, List.of()),

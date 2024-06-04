@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -17,7 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -41,20 +39,50 @@ public class Invoice {
     private String originalFileName;
     private String rejectionReason;
 
-    public static Invoice of(final @NonNull BillingProfileView billingProfile, int sequenceNumber, final @NonNull UserId createdBy) {
-        if (billingProfile.getPayoutInfo() == null) {
-            throw internalServerError("An invoice can only be created on a billing profile with payout info (billing profile %s)".formatted(billingProfile.getId()));
-        }
+    public static Invoice of(final @NonNull IndividualBillingProfile billingProfile,
+                             int sequenceNumber,
+                             final @NonNull UserId createdBy,
+                             final @NonNull PayoutInfo payoutInfo) {
         final var now = ZonedDateTime.now();
         return new Invoice(
                 Id.random(),
-                BillingProfileSnapshot.of(billingProfile, billingProfile.getPayoutInfo()),
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
                 createdBy,
                 now,
                 now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
-                isNull(billingProfile.getKyc()) ?
-                        Number.of(sequenceNumber, billingProfile.getKyb().getName()) :
-                        Number.of(sequenceNumber, billingProfile.getKyc().getLastName(), billingProfile.getKyc().getFirstName()),
+                Number.of(sequenceNumber, billingProfile.kyc().getLastName(), billingProfile.kyc().getFirstName()),
+                Status.DRAFT
+        );
+    }
+
+    public static Invoice of(final @NonNull CompanyBillingProfile billingProfile,
+                             int sequenceNumber,
+                             final @NonNull UserId createdBy,
+                             final @NonNull PayoutInfo payoutInfo) {
+        final var now = ZonedDateTime.now();
+        return new Invoice(
+                Id.random(),
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
+                createdBy,
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Number.of(sequenceNumber, billingProfile.kyb().getName()),
+                Status.DRAFT
+        );
+    }
+
+    public static Invoice of(final @NonNull SelfEmployedBillingProfile billingProfile,
+                             int sequenceNumber,
+                             final @NonNull UserId createdBy,
+                             final @NonNull PayoutInfo payoutInfo) {
+        final var now = ZonedDateTime.now();
+        return new Invoice(
+                Id.random(),
+                BillingProfileSnapshot.of(billingProfile, payoutInfo),
+                createdBy,
+                now,
+                now.plusDays(DUE_DAY_COUNT_AFTER_CREATION),
+                Number.of(sequenceNumber, billingProfile.kyb().getName()),
                 Status.DRAFT
         );
     }
@@ -179,12 +207,38 @@ public class Invoice {
             BankAccount bankAccount,
             @NonNull List<Wallet> wallets) {
 
-        public static BillingProfileSnapshot of(final @NonNull BillingProfileView billingProfile, final @NonNull PayoutInfo payoutInfo) {
+        public static BillingProfileSnapshot of(final @NonNull IndividualBillingProfile billingProfile,
+                                                final @NonNull PayoutInfo payoutInfo) {
             return new BillingProfileSnapshot(
-                    billingProfile.getId(),
-                    billingProfile.getType(),
-                    isNull(billingProfile.getKyc()) ? null : KycSnapshot.of(billingProfile.getKyc()),
-                    isNull(billingProfile.getKyb()) ? null : KybSnapshot.of(billingProfile.getKyb()),
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    KycSnapshot.of(billingProfile.kyc()),
+                    null,
+                    payoutInfo.bankAccount().orElse(null),
+                    payoutInfo.wallets()
+            );
+        }
+
+
+        public static BillingProfileSnapshot of(final @NonNull CompanyBillingProfile billingProfile,
+                                                final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    null,
+                    KybSnapshot.of(billingProfile.kyb()),
+                    payoutInfo.bankAccount().orElse(null),
+                    payoutInfo.wallets()
+            );
+        }
+
+        public static BillingProfileSnapshot of(final @NonNull SelfEmployedBillingProfile billingProfile,
+                                                final @NonNull PayoutInfo payoutInfo) {
+            return new BillingProfileSnapshot(
+                    billingProfile.id(),
+                    billingProfile.type(),
+                    null,
+                    KybSnapshot.of(billingProfile.kyb()),
                     payoutInfo.bankAccount().orElse(null),
                     payoutInfo.wallets()
             );

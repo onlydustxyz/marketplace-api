@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -31,10 +32,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static onlydust.com.marketplace.accounting.domain.model.Invoice.Status.*;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
@@ -57,7 +55,7 @@ class BillingProfileServiceTest {
     final PayoutInfoValidator payoutInfoValidator = mock(PayoutInfoValidator.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
             billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator);
-    final UserId userId = UserId.random();
+    UserId userId = UserId.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
     List<Invoice.Reward> rewards = List.of(fakeReward(), fakeReward(), fakeReward());
@@ -65,31 +63,37 @@ class BillingProfileServiceTest {
     final InputStream pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
     Invoice invoice;
     BillingProfile.Id billingProfileId;
-    BillingProfileView companyBillingProfile;
+    CompanyBillingProfile companyBillingProfile;
     PayoutInfo payoutInfo;
 
     @BeforeEach
     void setUp() {
         payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
         billingProfileId = BillingProfile.Id.random();
-        companyBillingProfile = BillingProfileView.builder()
+        companyBillingProfile = CompanyBillingProfile.builder()
                 .id(billingProfileId)
-                .type(BillingProfile.Type.COMPANY)
-                .payoutInfo(payoutInfo)
-                .verificationStatus(VerificationStatus.VERIFIED)
+                .status(VerificationStatus.VERIFIED)
                 .name("OnlyDust")
                 .kyb(newKyb(billingProfileId, userId))
+                .enabled(true)
+                .members(new HashSet<>())
+                .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
                 .build();
-        invoice = Invoice.of(companyBillingProfile, 1, userId)
+        companyBillingProfile.addMember(userId, BillingProfile.User.Role.ADMIN);
+        invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                 .rewards(rewards);
         reset(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObserver, accountingFacadePort);
+
+        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(companyBillingProfile));
+        when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
     }
 
     @Nested
     class GivenCallerIsNotTheBillingProfileAdmin {
         @BeforeEach
         void setup() {
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(false);
+            userId = UserId.random();
         }
 
         @Test
@@ -106,8 +110,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
@@ -135,29 +138,20 @@ class BillingProfileServiceTest {
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User %s is not allowed to download invoice %s of billing profile %s".formatted(userId, invoice.id(), billingProfileId));
         }
-
     }
 
     @Nested
     class GivenUserIsBillingProfileAdmin {
-        @BeforeEach
-        void setup() {
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
-        }
-
         @Test
         void should_generate_invoice_preview() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
                             RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null,
                             billingProfileId)).toList());
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    companyBillingProfile)
-            );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
 
             // When
             final var preview = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds);
@@ -181,19 +175,14 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_preview_if_billing_profile_is_not_verified() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().status(VerificationStatus.NOT_STARTED).build()));
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
-                            .id(billingProfileId)
-                            .type(BillingProfile.Type.COMPANY)
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.UNDER_REVIEW)
-                            .name("OnlyDust")
-                            .kyb(newKyb(billingProfileId, userId))
-                            .build())
-            );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(1);
+            when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
+                    .map(r -> new RewardAssociations(r.id(),
+                            RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null,
+                            billingProfileId)).toList());
 
             // When
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
@@ -205,14 +194,13 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_preview_given_a_disabled_billing_profile() {
             // When
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(companyBillingProfile.toBuilder().enabled(false).build()));
 
             // Then
             assertThatThrownBy(() -> billingProfileService.previewInvoice(userId, billingProfileId, rewardIds))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Cannot generate invoice on a disabled billing profile");
         }
-
 
         @Test
         void should_prevent_invoice_preview_if_some_rewards_have_been_cancelled() {
@@ -221,22 +209,23 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .name("John")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
                     RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), null, null, billingProfileId)));
@@ -248,7 +237,6 @@ class BillingProfileServiceTest {
                     .hasMessageContaining("Some invoice's rewards were not found");
         }
 
-
         @Test
         void should_prevent_invoice_preview_if_rewards_are_already_invoiced() {
             // Given
@@ -256,22 +244,23 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .name("John")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -315,22 +304,14 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
-                            .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
-                            .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
-                            .build())
-            );
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
+
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(), RewardStatus.builder()
@@ -354,20 +335,21 @@ class BillingProfileServiceTest {
             rewards = List.of(fakeReward(), fakeReward(), reward, fakeReward());
             rewardIds = rewards.stream().map(Invoice.Reward::id).toList();
 
-            invoice = Invoice.of(companyBillingProfile, 1, userId)
+            invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
                     .rewards(rewards)
                     .status(Invoice.Status.APPROVED);
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
             when(invoiceStoragePort.get(reward.invoiceId())).thenReturn(Optional.of(invoice));
+            when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
 
             when(invoiceStoragePort.findRewards(rewardIds)).thenReturn(rewards);
             when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
-                    BillingProfileView.builder()
+                    IndividualBillingProfile.builder()
                             .id(billingProfileId)
-                            .type(BillingProfile.Type.INDIVIDUAL)
+                            .name("John")
                             .kyc(newKyc(billingProfileId, userId))
-                            .payoutInfo(payoutInfo)
-                            .verificationStatus(VerificationStatus.VERIFIED)
+                            .status(VerificationStatus.VERIFIED)
+                            .enabled(true)
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
@@ -391,8 +373,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
@@ -406,8 +387,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                     .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
@@ -421,9 +401,7 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_given_a_disabled_billing_profile() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(companyBillingProfile.toBuilder().enabled(false).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -437,11 +415,9 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(otherBillingProfileId)
-                    .type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
+            when(billingProfileStoragePort.findById(otherBillingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().id(otherBillingProfileId).build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, otherBillingProfileId, invoice.id(), pdf))
@@ -453,9 +429,18 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_a_reward_was_cancelled() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    IndividualBillingProfile.builder()
+                            .id(billingProfileId)
+                            .name("name")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                            .enabled(true)
+                            .status(VerificationStatus.NOT_STARTED)
+                            .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                            .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .build()
+            ));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
                     RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
@@ -470,9 +455,19 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(IndividualBillingProfile.builder()
+                            .id(billingProfileId)
+                            .name("name")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                            .enabled(true)
+                            .status(VerificationStatus.NOT_STARTED)
+                            .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                            .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .build()
+                    ));
+
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -489,9 +484,18 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
+            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(
+                    IndividualBillingProfile.builder()
+                            .id(billingProfileId)
+                            .name("name")
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                            .enabled(true)
+                            .status(VerificationStatus.NOT_STARTED)
+                            .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                            .invoiceMandateAcceptedAt(ZonedDateTime.now())
+                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .build()
+            ));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -509,9 +513,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
             // When
@@ -525,10 +528,11 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
+            when(billingProfileStoragePort.findById(otherBillingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder()
+                            .id(otherBillingProfileId)
+                            .invoiceMandateAcceptedAt(null)
+                            .build()));
 
             // When
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
@@ -541,10 +545,12 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_given_a_disabled_billing_profile() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
-            when(billingProfileStoragePort.isEnabled(otherBillingProfileId)).thenReturn(false);
-            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(otherBillingProfileId).type(BillingProfile.Type.COMPANY).build()));
+            when(billingProfileStoragePort.findById(otherBillingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder()
+                            .id(otherBillingProfileId)
+                            .invoiceMandateAcceptedAt(null)
+                            .enabled(false)
+                            .build()));
 
             assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, otherBillingProfileId, invoice.id(), "foo.pdf", pdf))
                     // Then
@@ -556,9 +562,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_a_reward_was_cancelled() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
                     RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
@@ -573,9 +578,9 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
+
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -592,9 +597,8 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_external_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
-            when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED).build()));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -658,7 +662,7 @@ class BillingProfileServiceTest {
         void should_prevent_invoice_download_if_billing_profile_does_not_match() {
             // Given
             final var otherBillingProfileId = BillingProfile.Id.random();
-            when(billingProfileStoragePort.isAdmin(otherBillingProfileId, userId)).thenReturn(true);
+            when(billingProfileStoragePort.findById(otherBillingProfileId)).thenReturn(Optional.of(companyBillingProfile.toBuilder().id(otherBillingProfileId).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
 
             // When
@@ -687,14 +691,13 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
+                when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
             @Test
             void should_prevent_external_invoice_upload() {
                 // When
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoice.id(), "foo.pdf", pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -707,7 +710,6 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                         .map(r -> new RewardAssociations(r.id(),
                                 RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
@@ -732,14 +734,14 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsNotAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.COMPANY).build()));
+                when(billingProfileStoragePort.findById(billingProfileId))
+                        .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(2)).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
             @Test
             void should_prevent_generated_invoice_upload() {
                 // When
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                         // Then
                         .isInstanceOf(OnlyDustException.class)
@@ -752,7 +754,6 @@ class BillingProfileServiceTest {
                 // Given
                 final var url = new URL("https://" + faker.internet().url());
                 when(pdfStoragePort.upload(invoice.id() + ".pdf", pdf)).thenReturn(url);
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                         .map(r -> new RewardAssociations(r.id(),
                                 RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(),
@@ -775,7 +776,6 @@ class BillingProfileServiceTest {
             @Test
             void should_prevent_external_invoice_upload_if_not_found() {
                 // Given
-                when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(true);
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
                 // When
@@ -894,7 +894,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
-        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        assertThat(billingProfile.members()).hasSize(1);
+        assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
         verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any(), any(), any());
@@ -913,7 +914,9 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
-        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        assertThat(billingProfile.members()).hasSize(1);
+        assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
+
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
         verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfile.id(), userId, selectForProjects.iterator().next());
@@ -983,10 +986,11 @@ class BillingProfileServiceTest {
             billingProfile.addMember(adminId, BillingProfile.User.Role.ADMIN);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(
-                    new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN),
-                    new BillingProfile.User(memberId, BillingProfile.User.Role.MEMBER),
-                    new BillingProfile.User(adminId, BillingProfile.User.Role.ADMIN)
+            assertThat(billingProfile.members()).hasSize(3);
+            assertThat(billingProfile.members()).usingElementComparatorIgnoringFields("joinedAt").containsExactlyInAnyOrder(
+                    new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()),
+                    new BillingProfile.User(memberId, BillingProfile.User.Role.MEMBER, ZonedDateTime.now()),
+                    new BillingProfile.User(adminId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now())
             );
         }
 
@@ -1003,7 +1007,8 @@ class BillingProfileServiceTest {
             billingProfile.removeMember(adminId);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+            assertThat(billingProfile.members()).hasSize(1);
+            assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
         }
 
         @Test
@@ -1016,7 +1021,9 @@ class BillingProfileServiceTest {
             billingProfile.removeMember(memberId);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+            assertThat(billingProfile.members())
+                    .usingElementComparatorIgnoringFields("joinedAt")
+                    .containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()));
         }
 
 
@@ -1086,7 +1093,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.empty());
         Exception exception = null;
@@ -1126,7 +1133,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1136,7 +1143,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1167,7 +1174,7 @@ class BillingProfileServiceTest {
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
         when(billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserIdInvited)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdNotMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1177,7 +1184,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1207,7 +1214,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
         when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
                 .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
                         .billingProfileProcessingRewardsCount(0L)
@@ -1217,7 +1224,7 @@ class BillingProfileServiceTest {
         final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
 
         // Then
-        verify(billingProfileStoragePort).findById(billingProfileId);
+        verify(billingProfileStoragePort).findViewById(billingProfileId);
         assertNotNull(billingProfile.getMe());
         assertNotNull(billingProfile.getKyb());
         assertNotNull(billingProfile.getKyc());
@@ -1233,7 +1240,7 @@ class BillingProfileServiceTest {
 
         // When
         when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.empty());
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.empty());
         Exception exception = null;
         try {
             billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
@@ -1248,15 +1255,12 @@ class BillingProfileServiceTest {
                 exception.getMessage());
     }
 
-
     @Test
     void should_not_authorized_to_modify_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
         final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
         Exception exception = null;
         try {
             billingProfileService.updatePayoutInfo(billingProfileId, userIdNotAdmin, PayoutInfo.builder().build());
@@ -1274,11 +1278,9 @@ class BillingProfileServiceTest {
     @Test
     void should_not_authorized_to_read_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
         final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIdNotAdmin)).thenReturn(false);
         Exception exception = null;
         try {
             billingProfileService.getPayoutInfo(billingProfileId, userIdNotAdmin);
@@ -1289,20 +1291,14 @@ class BillingProfileServiceTest {
         // Then
         assertTrue(exception instanceof OnlyDustException);
         assertEquals(401, ((OnlyDustException) exception).getStatus());
-        assertEquals("User %s must be admin to read payout info of billing profile %s".formatted(userIdNotAdmin.value(), billingProfileId.value()),
+        assertEquals("User %s must be admin to read payout info of billing profile %s".formatted(userIdNotAdmin, billingProfileId),
                 exception.getMessage());
     }
 
     @Test
     void should_update_payout_info_given_a_user_admin() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-        final PayoutInfo payoutInfo = PayoutInfo.builder().build();
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        billingProfileService.updatePayoutInfo(billingProfileId, userIAdmin, payoutInfo);
+        billingProfileService.updatePayoutInfo(billingProfileId, userId, payoutInfo);
 
         // Then
         verify(billingProfileStoragePort).savePayoutInfoForBillingProfile(payoutInfo, billingProfileId);
@@ -1312,15 +1308,10 @@ class BillingProfileServiceTest {
     @Test
     void should_not_update_payout_info_given_invalid_payout_info() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-        final PayoutInfo payoutInfo = PayoutInfo.builder().build();
-
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         doThrow(badRequest("Invalid payout info")).when(payoutInfoValidator).validate(payoutInfo);
 
         // When
-        assertThatThrownBy(() -> billingProfileService.updatePayoutInfo(billingProfileId, userIAdmin, payoutInfo))
+        assertThatThrownBy(() -> billingProfileService.updatePayoutInfo(billingProfileId, userId, payoutInfo))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Invalid payout info");
@@ -1329,15 +1320,12 @@ class BillingProfileServiceTest {
     @Test
     void should_get_payout_info_given_a_user_admin() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final PayoutInfoView expectedPayoutInfo = PayoutInfoView.builder().build();
 
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.of(expectedPayoutInfo));
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
 
         // Then
         assertEquals(expectedPayoutInfo, payoutInfo);
@@ -1346,15 +1334,10 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_empty_payout_info_given_a_user_admin_and_no_payout_info() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
                 .thenReturn(Optional.empty());
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userIAdmin);
+        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
 
         // Then
         assertNotNull(payoutInfo);
@@ -1363,12 +1346,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_coworkers_last_admin() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
@@ -1381,7 +1359,7 @@ class BillingProfileServiceTest {
                                 .build()
                 )).build());
 
-        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userId, 0, 10);
 
         // Then
         assertThat(coworkers.getContent()).hasSize(1);
@@ -1390,12 +1368,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_coworkers_non_last_admin() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
@@ -1416,7 +1389,7 @@ class BillingProfileServiceTest {
                                 .build()
                 )).build());
 
-        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userId, 0, 10);
 
         // Then
         assertThat(coworkers.getContent()).hasSize(2);
@@ -1426,12 +1399,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_coworkers_member() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
@@ -1452,7 +1420,7 @@ class BillingProfileServiceTest {
                                 .build()
                 )).build());
 
-        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userId, 0, 10);
 
         // Then
         assertThat(coworkers.getContent()).hasSize(2);
@@ -1462,12 +1430,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_coworkers_member_with_rewards() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
@@ -1496,7 +1459,7 @@ class BillingProfileServiceTest {
                                 .build()
                 )).build());
 
-        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userId, 0, 10);
 
         // Then
         assertThat(coworkers.getContent()).hasSize(3);
@@ -1507,12 +1470,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_get_invited_coworkers() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.findCoworkersByBillingProfile(billingProfileId, BillingProfile.User.Role.all(), 0, 10))
                 .thenReturn(Page.<BillingProfileCoworkerView>builder().content(List.of(
                         BillingProfileCoworkerView.builder()
@@ -1533,7 +1491,7 @@ class BillingProfileServiceTest {
                                 .build()
                 )).build());
 
-        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userIAdmin, 0, 10);
+        final var coworkers = billingProfileService.getCoworkers(billingProfileId, userId, 0, 10);
 
         // Then
         assertThat(coworkers.getContent()).hasSize(2);
@@ -1544,38 +1502,32 @@ class BillingProfileServiceTest {
     @Test
     void should_invite_coworker() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
+        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
                 .type(BillingProfile.Type.COMPANY)
                 .build()
         ));
 
         // When
-        billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(billingProfileId, userId, githubUserId, BillingProfile.User.Role.MEMBER);
 
         // Then
         verify(indexerPort).indexUser(githubUserId.value());
-        verify(billingProfileStoragePort).saveCoworkerInvitation(eq(billingProfileId), eq(userIAdmin), eq(githubUserId), eq(BillingProfile.User.Role.MEMBER),
+        verify(billingProfileStoragePort).saveCoworkerInvitation(eq(billingProfileId), eq(userId), eq(githubUserId), eq(BillingProfile.User.Role.MEMBER),
                 any());
     }
 
     @Test
     void should_prevent_non_admin_to_invite_coworker() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
-        when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.MEMBER))
+        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIdNotAdmin, githubUserId, BillingProfile.User.Role.MEMBER))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %s must be admin to invite coworker to billing profile %s".formatted(userIAdmin.value(), billingProfileId.value()));
+                .hasMessage("User %s must be admin to invite coworker to billing profile %s".formatted(userIdNotAdmin, billingProfileId));
 
         // Then
         verify(indexerPort, never()).indexUser(any());
@@ -1585,19 +1537,15 @@ class BillingProfileServiceTest {
     @Test
     void should_prevent_to_invite_coworker_on_individual_billing_profile() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final var billingProfile = billingProfileService.createIndividualBillingProfile(userId, "name", null);
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId))
-                .thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL)
-                        .verificationStatus(VerificationStatus.NOT_STARTED).build()));
+        when(billingProfileStoragePort.findById(billingProfile.id())).thenReturn(Optional.of(billingProfile));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.ADMIN))
+        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfile.id(), userId, githubUserId, BillingProfile.User.Role.ADMIN))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfileId));
+                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
 
         // Then
         verify(indexerPort, never()).indexUser(any());
@@ -1608,19 +1556,16 @@ class BillingProfileServiceTest {
     @Test
     void should_prevent_to_invite_coworker_on_self_employed_billing_profile() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final var billingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "name", null);
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
-        when(billingProfileStoragePort.findById(billingProfileId))
-                .thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.SELF_EMPLOYED)
-                        .verificationStatus(VerificationStatus.NOT_STARTED).build()));
+        when(billingProfileStoragePort.findById(billingProfile.id()))
+                .thenReturn(Optional.of(billingProfile));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfileId, userIAdmin, githubUserId, BillingProfile.User.Role.ADMIN))
+        assertThatThrownBy(() -> billingProfileService.inviteCoworker(billingProfile.id(), userId, githubUserId, BillingProfile.User.Role.ADMIN))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfileId));
+                .hasMessage("Cannot invite coworker on individual or self employed billing profile %s".formatted(billingProfile.id()));
 
         // Then
         verify(indexerPort, never()).indexUser(any());
@@ -1636,7 +1581,6 @@ class BillingProfileServiceTest {
         final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId invitedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(invitedUserId)
@@ -1658,10 +1602,8 @@ class BillingProfileServiceTest {
     void should_not_accept_invitation_when_not_found() {
         // Given
         final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId invitedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId invitedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.getInvitedCoworker(billingProfileId, invitedGithubUserId)).thenReturn(Optional.empty());
 
         // When
@@ -1715,12 +1657,10 @@ class BillingProfileServiceTest {
     @Test
     void should_remove_user() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId removedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
+
         when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(removedUserId)
@@ -1732,7 +1672,7 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId);
+        billingProfileService.removeCoworker(billingProfileId, userId, callerGithubUserId, removedGithubUserId);
 
         // Then
         verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(removedUserId));
@@ -1741,12 +1681,9 @@ class BillingProfileServiceTest {
     @Test
     void should_downgrade_user() {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final var coworkerUserId = UserId.of(UUID.randomUUID());
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(coworkerUserId)
@@ -1758,7 +1695,7 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
+        billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
 
         // Then
         verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, coworkerUserId, BillingProfile.User.Role.MEMBER);
@@ -1768,12 +1705,9 @@ class BillingProfileServiceTest {
     @EnumSource(value = BillingProfile.User.Role.class)
     void should_update_invited_user_role(BillingProfile.User.Role role) {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final var coworkerUserId = UserId.of(UUID.randomUUID());
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(coworkerUserId)
@@ -1785,7 +1719,7 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, role);
+        billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, role);
 
         // Then
         verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
@@ -1796,12 +1730,9 @@ class BillingProfileServiceTest {
     @Test
     void should_upgrade_user() {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final var coworkerUserId = UserId.of(UUID.randomUUID());
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(coworkerUserId)
@@ -1813,7 +1744,7 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.ADMIN);
+        billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, BillingProfile.User.Role.ADMIN);
 
         // Then
         verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, coworkerUserId, BillingProfile.User.Role.ADMIN);
@@ -1822,13 +1753,11 @@ class BillingProfileServiceTest {
     @Test
     void should_remove_user_when_caller_is_user() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final UserId otherUser = UserId.of(UUID.randomUUID());
         final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
         when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
-                        .userId(userIAdmin)
+                        .userId(otherUser)
                         .githubUserId(removedGithubUserId)
                         .role(BillingProfile.User.Role.MEMBER)
                         .joinedAt(ZonedDateTime.now())
@@ -1838,24 +1767,21 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.removeCoworker(billingProfileId, userIAdmin, removedGithubUserId, removedGithubUserId);
+        billingProfileService.removeCoworker(billingProfileId, otherUser, removedGithubUserId, removedGithubUserId);
 
         // Then
-        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(userIAdmin));
+        verify(billingProfileStoragePort).deleteCoworker(eq(billingProfileId), eq(otherUser));
         verify(billingProfileStoragePort).deleteCoworkerInvitation(eq(billingProfileId), eq(removedGithubUserId));
     }
 
     @Test
     void should_downgrade_user_when_caller_is_user() {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
-                        .userId(admin)
+                        .userId(userId)
                         .githubUserId(coworkerGithubUserId)
                         .role(BillingProfile.User.Role.ADMIN)
                         .joinedAt(ZonedDateTime.now())
@@ -1864,25 +1790,22 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
+        billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, BillingProfile.User.Role.MEMBER);
 
         // Then
-        verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, admin, BillingProfile.User.Role.MEMBER);
+        verify(billingProfileStoragePort).updateCoworkerRole(billingProfileId, userId, BillingProfile.User.Role.MEMBER);
     }
 
     @Test
     void should_not_remove_user_when_not_found() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId invitedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userId, callerGithubUserId, removedGithubUserId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Coworker %d not found for billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
@@ -1894,14 +1817,11 @@ class BillingProfileServiceTest {
     @Test
     void should_not_downgrade_user_when_not_found() {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
-                        .userId(admin)
+                        .userId(userId)
                         .githubUserId(coworkerGithubUserId)
                         .role(BillingProfile.User.Role.ADMIN)
                         .joinedAt(ZonedDateTime.now())
@@ -1911,10 +1831,10 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Cannot downgrade user %s of billing profile %s".formatted(admin, billingProfileId));
+                .hasMessage("Cannot downgrade user %s of billing profile %s".formatted(userId, billingProfileId));
 
         // Then
         verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
@@ -1923,12 +1843,9 @@ class BillingProfileServiceTest {
     @Test
     void should_not_remove_user_when_not_removable() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
         final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId invitedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(invitedUserId)
@@ -1940,7 +1857,7 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userId, callerGithubUserId, removedGithubUserId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Coworker %d cannot be removed from billing profile %s".formatted(removedGithubUserId.value(), billingProfileId.value()));
@@ -1952,15 +1869,12 @@ class BillingProfileServiceTest {
     @Test
     void should_not_downgrade_user_when_last_admin() {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(true);
         when(billingProfileStoragePort.getCoworker(billingProfileId, coworkerGithubUserId)).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, userId, coworkerGithubUserId, BillingProfile.User.Role.MEMBER))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Coworker %d not found for billing profile %s".formatted(coworkerGithubUserId.value(), billingProfileId.value()));
@@ -1972,12 +1886,10 @@ class BillingProfileServiceTest {
     @Test
     void should_not_remove_user_when_caller_is_not_admin_and_not_removed_user() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIAdmin = UserId.of(UUID.randomUUID());
+        final UserId otherUser = UserId.of(UUID.randomUUID());
         final GithubUserId callerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final GithubUserId removedGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
         final UserId invitedUserId = UserId.of(UUID.randomUUID());
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userIAdmin)).thenReturn(false);
         when(billingProfileStoragePort.getCoworker(billingProfileId, removedGithubUserId)).thenReturn(Optional.of(
                 BillingProfileCoworkerView.builder()
                         .userId(invitedUserId)
@@ -1989,10 +1901,10 @@ class BillingProfileServiceTest {
         ));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, userIAdmin, callerGithubUserId, removedGithubUserId))
+        assertThatThrownBy(() -> billingProfileService.removeCoworker(billingProfileId, otherUser, callerGithubUserId, removedGithubUserId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %s must be admin to remove coworker %d from billing profile %s".formatted(userIAdmin, removedGithubUserId.value(),
+                .hasMessage("User %s must be admin to remove coworker %d from billing profile %s".formatted(otherUser, removedGithubUserId.value(),
                         billingProfileId.value()));
 
         // Then
@@ -2003,17 +1915,14 @@ class BillingProfileServiceTest {
     @EnumSource(value = BillingProfile.User.Role.class)
     void should_not_modify_user_role_when_caller_is_not_admin(BillingProfile.User.Role role) {
         // Given
-        final var billingProfileId = BillingProfile.Id.random();
-        final var admin = UserId.random();
+        final var otherUser = UserId.random();
         final var coworkerGithubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
 
-        when(billingProfileStoragePort.isAdmin(billingProfileId, admin)).thenReturn(false);
-
         // When
-        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, admin, coworkerGithubUserId, role))
+        assertThatThrownBy(() -> billingProfileService.updateCoworkerRole(billingProfileId, otherUser, coworkerGithubUserId, role))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %s must be admin to manage billing profile %s coworkers".formatted(admin.value(), billingProfileId.value()));
+                .hasMessage("User %s must be admin to manage billing profile %s coworkers".formatted(otherUser.value(), billingProfileId.value()));
 
         // Then
         verify(billingProfileStoragePort, never()).updateCoworkerRole(any(), any(), any());
@@ -2085,30 +1994,19 @@ class BillingProfileServiceTest {
     @Test
     void should_not_enable_billing_profile_given_a_user_not_admin() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-        final UserId userId = UserId.random();
-
-        // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(false);
+        final UserId otherUser = UserId.random();
 
         // Then
-        assertThatThrownBy(() -> billingProfileService.enableBillingProfile(userId, billingProfileId, false))
+        assertThatThrownBy(() -> billingProfileService.enableBillingProfile(otherUser, billingProfileId, false))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value()));
+                .hasMessage("User %s must be admin to enable billing profile %s".formatted(otherUser.value(), billingProfileId.value()));
         verify(billingProfileStoragePort, never()).updateEnableBillingProfile(billingProfileId, false);
     }
 
     @Test
     void should_enable_billing_profile() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-        final UserId userId = UserId.random();
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(true);
         billingProfileService.enableBillingProfile(userId, billingProfileId, true);
 
         // Then
@@ -2119,10 +2017,19 @@ class BillingProfileServiceTest {
     @Test
     void should_prevent_update_mandate_acceptance_date_given_a_user_not_admin() {
         // Given
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(false);
+        when(billingProfileStoragePort.findById(billingProfileId))
+                .thenReturn(Optional.of(IndividualBillingProfile.builder()
+                        .id(billingProfileId)
+                        .name("name")
+                        .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                        .enabled(false)
+                        .status(VerificationStatus.NOT_STARTED)
+                        .kyc(Kyc.initForUserAndBillingProfile(UserId.random(), billingProfileId))
+                        .build()
+                ));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.updateInvoiceMandateAcceptanceDate(userId, billingProfileId))
+        assertThatThrownBy(() -> billingProfileService.acceptInvoiceMandate(userId, billingProfileId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User %s is not allowed to accept invoice mandate for billing profile %s".formatted(userId, billingProfileId));
@@ -2131,16 +2038,23 @@ class BillingProfileServiceTest {
     @Test
     void should_prevent_update_mandate_acceptance_date_given_a_disabled_billing_profile() {
         // Given
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId)).thenReturn(true);
-        when(billingProfileStoragePort.isEnabled(billingProfileId)).thenReturn(false);
+        when(billingProfileStoragePort.findById(billingProfileId))
+                .thenReturn(Optional.of(IndividualBillingProfile.builder()
+                        .id(billingProfileId)
+                        .name("name")
+                        .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                        .enabled(false)
+                        .status(VerificationStatus.NOT_STARTED)
+                        .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
+                        .build()
+                ));
 
         // When
-        assertThatThrownBy(() -> billingProfileService.updateInvoiceMandateAcceptanceDate(userId, billingProfileId))
+        assertThatThrownBy(() -> billingProfileService.acceptInvoiceMandate(userId, billingProfileId))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Cannot update mandateAcceptanceDate on a disabled billing profile %s".formatted(billingProfileId));
     }
-
 
     @Nested
     class UpdateBillingProfileType {
@@ -2148,7 +2062,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_given_a_user_not_admin() {
             // Given
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
             final UserId userIdNotAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.COMPANY;
 
@@ -2163,51 +2076,36 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_given_type_equals_to_individual() {
             // Given
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-            final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.INDIVIDUAL;
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
 
             // When
-            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type))
+            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userId, type))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userIdAdmin, billingProfileId));
+                    .hasMessage("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userId, billingProfileId));
         }
 
         @Test
         void given_a_self_employed_billing_profile_to_update_to_company() {
             // Given
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-            final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.COMPANY;
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .type(BillingProfile.Type.SELF_EMPLOYED).build()));
-            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
-                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().build()));
+            final var selfEmployedBillingProfile = billingProfileService.createSelfEmployedBillingProfile(userId, "name", null);
+            when(billingProfileStoragePort.findById(selfEmployedBillingProfile.id())).thenReturn(Optional.of(selfEmployedBillingProfile));
 
             // When
-            billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type);
+            billingProfileService.updateBillingProfileType(selfEmployedBillingProfile.id(), userId, type);
 
             // Then
-            verify(billingProfileStoragePort).updateBillingProfileType(billingProfileId, type);
+            verify(billingProfileStoragePort).updateBillingProfileType(selfEmployedBillingProfile.id(), type);
         }
 
         @Test
         void given_a_company_billing_profile_to_update_to_self_employed() {
             // Given
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-            final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .type(BillingProfile.Type.COMPANY).build()));
-            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
-                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder().billingProfileCoworkersCount(0L).build()));
 
             // When
-            billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type);
+            billingProfileService.updateBillingProfileType(billingProfileId, userId, type);
 
             // Then
             verify(billingProfileStoragePort).updateBillingProfileType(billingProfileId, type);
@@ -2216,22 +2114,15 @@ class BillingProfileServiceTest {
         @Test
         void prevent_given_a_company_billing_profile_to_update_to_self_employed_with_some_coworkers() {
             // Given
-            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-            final UserId userIdAdmin = UserId.random();
             final BillingProfile.Type type = BillingProfile.Type.SELF_EMPLOYED;
-            when(billingProfileStoragePort.isAdmin(billingProfileId, userIdAdmin)).thenReturn(true);
-            when(billingProfileStoragePort.findById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .type(BillingProfile.Type.COMPANY).build()));
-            when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdAdmin))
-                    .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                            .billingProfileCoworkersCount(2L).build()));
+            companyBillingProfile.addMember(UserId.random(), BillingProfile.User.Role.MEMBER);
 
             // When
-            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userIdAdmin, type))
+            assertThatThrownBy(() -> billingProfileService.updateBillingProfileType(billingProfileId, userId, type))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("User %s cannot update billing profile %s of type %s to type %s".formatted(
-                            userIdAdmin, billingProfileId, BillingProfile.Type.COMPANY, type));
+                            userId, billingProfileId, BillingProfile.Type.COMPANY, type));
 
         }
     }
@@ -2239,12 +2130,7 @@ class BillingProfileServiceTest {
     @Test
     void should_not_return_invoiceable_rewards_given_a_user_not_admin() {
         // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
         final UserId userId = UserId.random();
-
-        // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(false);
 
         // Then
         assertThatThrownBy(() -> billingProfileService.getInvoiceableRewardsForBillingProfile(userId, billingProfileId))
@@ -2256,13 +2142,7 @@ class BillingProfileServiceTest {
 
     @Test
     void should_return_invoiceable_rewards() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
-        final UserId userId = UserId.random();
-
         // When
-        when(billingProfileStoragePort.isAdmin(billingProfileId, userId))
-                .thenReturn(true);
         billingProfileService.getInvoiceableRewardsForBillingProfile(userId, billingProfileId);
 
         // Then

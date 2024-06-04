@@ -16,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -46,7 +46,7 @@ public class BillingProfileUserViewEntity {
     @Column(columnDefinition = "billing_profile_role")
     BillingProfile.User.Role role;
 
-    Date joinedAt;
+    ZonedDateTime joinedAt;
 
     public BillingProfileView.User toView() {
         return new BillingProfileView.User(

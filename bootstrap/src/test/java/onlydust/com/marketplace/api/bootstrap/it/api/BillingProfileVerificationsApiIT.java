@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -61,6 +61,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false);
         final String jwt = authenticatedUser.jwt();
 
+        MutableObject<UUID> billingProfileId = new MutableObject<>();
+
         // When
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -82,15 +84,9 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.kyc.id").isNotEmpty()
                 .jsonPath("$.kyb").isEmpty()
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
-        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.INDIVIDUAL))
-                .findFirst()
-                .orElseThrow()
-                .getId();
-
-        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId).orElseThrow().getId();
+        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().getId();
 
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
@@ -260,6 +256,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
+        MutableObject<UUID> billingProfileId = new MutableObject<>();
+
         // When
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -281,15 +279,9 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.kyb.id").isNotEmpty()
                 .jsonPath("$.kyc").isEmpty()
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
-        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.COMPANY))
-                .findFirst()
-                .orElseThrow()
-                .getId();
-
-        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().id();
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
@@ -563,6 +555,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final var userId = UUID.randomUUID();
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
         final String applicantId = "kyb-" + faker.number().randomNumber();
+        MutableObject<UUID> billingProfileId = new MutableObject<>();
 
         // When
         client.post()
@@ -585,15 +578,9 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.status").isEqualTo("NOT_STARTED")
                 .jsonPath("$.kyb.id").isNotEmpty()
                 .jsonPath("$.kyc").isEmpty()
-                .jsonPath("$.id").isNotEmpty();
+                .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
-        final UUID billingProfileId = billingProfileRepository.findBillingProfilesForUserId(userId).stream()
-                .filter(billingProfileEntity -> billingProfileEntity.getType().equals(BillingProfile.Type.COMPANY))
-                .findFirst()
-                .orElseThrow()
-                .getId();
-
-        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId).orElseThrow().id();
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
         sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))

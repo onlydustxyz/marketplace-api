@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
@@ -49,16 +48,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull RewardRepository rewardRepository;
     private final @NonNull UserRepository userRepository;
 
-
-    @Override
-    @Transactional
-    public void updateInvoiceMandateAcceptanceDate(@NonNull final BillingProfile.Id billingProfileId, @NonNull final ZonedDateTime acceptanceDate) {
-        final var billingProfile = billingProfileRepository.findById(billingProfileId.value())
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-        billingProfile.setInvoiceMandateAcceptedAt(Date.from(acceptanceDate.toInstant()));
-        billingProfileRepository.saveAndFlush(billingProfile);
-    }
-
     @Override
     @Transactional(readOnly = true)
     public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
@@ -80,8 +69,23 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional
+    public void save(BillingProfile billingProfile) {
+        if (billingProfile instanceof IndividualBillingProfile individualBillingProfile)
+            save(individualBillingProfile);
+        else if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile)
+            save(selfEmployedBillingProfile);
+        else if (billingProfile instanceof CompanyBillingProfile companyBillingProfile)
+            save(companyBillingProfile);
+        else
+            throw new IllegalArgumentException("Unknown billing profile type: %s".formatted(billingProfile.getClass().getSimpleName()));
+
+    }
+
+    @Override
+    @Transactional
     public void save(IndividualBillingProfile billingProfile) {
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        // TODO cascade merge the KYC/KYB and remove flush
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKycEntity.isEmpty()) {
             kycRepository.saveAndFlush(KycEntity.fromDomain(billingProfile.kyc()));
@@ -91,7 +95,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(SelfEmployedBillingProfile billingProfile) {
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
@@ -101,8 +105,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(CompanyBillingProfile billingProfile) {
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile,
-                billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
@@ -128,15 +131,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId) {
-        return billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
-                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfile.User.Role.ADMIN))
-                .orElse(false);
+    public Optional<BillingProfile> findById(BillingProfile.Id billingProfileId) {
+        return billingProfileRepository.findById(billingProfileId.value()).map(BillingProfileEntity::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId) {
+    public Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId) {
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> {
@@ -244,7 +245,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     public void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId) {
         payoutInfoRepository.findById(billingProfileId.value())
                 .ifPresent(payoutInfoEntity -> walletRepository.deleteByBillingProfileId(billingProfileId.value()));
-        payoutInfoRepository.save(PayoutInfoEntity.toEntity(billingProfileId, payoutInfo));
+        payoutInfoRepository.save(PayoutInfoEntity.fromDomain(billingProfileId, payoutInfo));
     }
 
     @Override
@@ -348,7 +349,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .billingProfileId(billingProfileId.value())
                 .userId(invitedUser.value())
                 .role(role)
-                .joinedAt(Date.from(acceptedAt.toInstant()))
+                .joinedAt(acceptedAt)
                 .build());
     }
 
@@ -391,7 +392,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var rewardIds = rewardRepository.getRewardIdsToBeRemovedFromBillingProfileForUser(billingProfileId.value(), userId.value())
                 .stream().map(RewardEntity::id).toList();
         rewardRepository.removeBillingProfileIdOf(rewardIds);
-        billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
 
     @Override
@@ -424,12 +424,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isEnabled(BillingProfile.Id billingProfileId) {
-        return billingProfileRepository.isBillingProfileEnabled(billingProfileId.value());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<BillingProfileUserRightsView> getUserRightsForBillingProfile(BillingProfile.Id billingProfileId, UserId userId) {
         return billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(userId.value(), billingProfileId.value())
                 .map(BillingProfileUserRightsQueryEntity::toDomain);
@@ -456,5 +450,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
         return userRepository.findById(ownerId.value()).map(UserEntity::toDomain);
+    }
+
+    @Override
+    public Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId) {
+        return payoutInfoRepository.findById(billingProfileId.value()).map(PayoutInfoEntity::toDomain);
     }
 }

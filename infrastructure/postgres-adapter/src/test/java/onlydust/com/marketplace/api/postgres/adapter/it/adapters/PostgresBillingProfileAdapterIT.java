@@ -69,7 +69,7 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
         final String name = faker.rickAndMorty().character();
         postgresBillingProfileAdapter.save(new CompanyBillingProfile(name, ownerId));
         final BillingProfile.Id billingProfileId = postgresBillingProfileAdapter.findAllBillingProfilesForUser(ownerId).get(0).getId();
-        final BillingProfileView billingProfileView = postgresBillingProfileAdapter.findById(billingProfileId).orElseThrow();
+        final BillingProfileView billingProfileView = postgresBillingProfileAdapter.findViewById(billingProfileId).orElseThrow();
         assertEquals(name, billingProfileView.getName());
         final UUID kybId = billingProfileView.getKyb().getId();
         final String kybApplicantId = faker.internet().emailAddress();
@@ -103,7 +103,7 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
         postgresBillingProfileAdapter.deleteBillingProfile(billingProfileId);
 
         // Then
-        assertTrue(postgresBillingProfileAdapter.findById(billingProfileId).isEmpty());
+        assertTrue(postgresBillingProfileAdapter.findViewById(billingProfileId).isEmpty());
         assertTrue(kybRepository.findById(kybId).isEmpty());
         assertTrue(payoutPreferenceRepository.findAll().stream()
                 .filter(payoutPreferenceEntity -> payoutPreferenceEntity.getBillingProfileId().equals(billingProfileId.value()))

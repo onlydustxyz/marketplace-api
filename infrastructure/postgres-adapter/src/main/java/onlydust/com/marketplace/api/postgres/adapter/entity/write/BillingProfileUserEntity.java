@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class BillingProfileUserEntity {
     @Column(columnDefinition = "billing_profile_role")
     BillingProfile.User.Role role;
 
-    Date joinedAt;
+    ZonedDateTime joinedAt;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
@@ -74,6 +75,16 @@ public class BillingProfileUserEntity {
                     case ADMIN -> BillingProfileLinkView.Role.ADMIN;
                     case MEMBER -> BillingProfileLinkView.Role.MEMBER;
                 })
+                .build();
+    }
+
+    // TODO make this child owner of the relationship
+    public static BillingProfileUserEntity fromDomain(BillingProfile.Id billingProfileId, BillingProfile.User user) {
+        return BillingProfileUserEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .userId(user.id().value())
+                .role(user.role())
+                .joinedAt(user.joinedAt())
                 .build();
     }
 

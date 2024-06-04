@@ -9,15 +9,15 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.UUID;
 
 @Getter
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 @Accessors(fluent = true)
 public abstract class BillingProfile {
-
     @NonNull
     protected final Id id;
     @NonNull
@@ -26,6 +26,13 @@ public abstract class BillingProfile {
     protected final VerificationStatus status;
     @NonNull
     protected final Boolean enabled;
+
+    protected ZonedDateTime invoiceMandateAcceptedAt;
+    protected ZonedDateTime invoiceMandateLatestVersionDate;
+
+    public void acceptMandate() {
+        invoiceMandateAcceptedAt = ZonedDateTime.now();
+    }
 
     public abstract String subject();
 
@@ -37,6 +44,20 @@ public abstract class BillingProfile {
     }
 
     public abstract Type type();
+
+    public boolean isVerified() {
+        return status == VerificationStatus.VERIFIED;
+    }
+
+    public abstract boolean isInvoiceMandateAccepted();
+
+    public abstract boolean isAdmin(UserId userId);
+
+    public abstract boolean isMember(UserId userId);
+
+    public abstract boolean isSwitchableToSelfEmployed();
+
+    public abstract boolean isSwitchableToCompany();
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
@@ -55,7 +76,7 @@ public abstract class BillingProfile {
         INDIVIDUAL, COMPANY, SELF_EMPLOYED
     }
 
-    public record User(@NonNull UserId id, @NonNull Role role) {
+    public record User(@NonNull UserId id, @NonNull Role role, @NonNull ZonedDateTime joinedAt) {
         public enum Role {
             ADMIN, MEMBER;
 

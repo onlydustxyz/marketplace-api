@@ -15,8 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface BillingProfileStoragePort {
-
-    void updateInvoiceMandateAcceptanceDate(BillingProfile.Id billingProfileId, ZonedDateTime now);
+    void save(BillingProfile billingProfile);
 
     void save(IndividualBillingProfile billingProfile);
 
@@ -32,9 +31,9 @@ public interface BillingProfileStoragePort {
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
-    boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId);
+    Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
 
-    Optional<BillingProfileView> findById(BillingProfile.Id billingProfileId);
+    Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);
 
     Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId);
 
@@ -83,8 +82,6 @@ public interface BillingProfileStoragePort {
 
     void updateEnableBillingProfile(BillingProfile.Id billingProfileId, Boolean enabled);
 
-    boolean isEnabled(BillingProfile.Id billingProfileId);
-
     Optional<BillingProfileUserRightsView> getUserRightsForBillingProfile(BillingProfile.Id billingProfileId, UserId userId);
 
     void acceptCoworkerInvitation(BillingProfile.Id billingProfileId, GithubUserId invitedGithubUserId);
@@ -96,4 +93,6 @@ public interface BillingProfileStoragePort {
     boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId);
 
     Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId);
+
+    Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId);
 }

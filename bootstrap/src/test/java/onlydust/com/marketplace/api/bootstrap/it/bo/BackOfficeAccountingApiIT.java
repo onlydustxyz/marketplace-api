@@ -1296,7 +1296,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_get_billing_profile() {
         final var billingProfileId = BillingProfile.Id.of("1253b889-e5d5-49ee-8e8a-21405ccab8a6");
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
         billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .bankAccount(BankAccount.builder()
@@ -1363,7 +1363,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_get_current_month_rewarded_amounts() {
         final var billingProfileId = BillingProfile.Id.of("9cae91ac-e70f-426f-af0d-e35c1d3578ed");
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
         billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
 
         final var rewardIds = List.of(
@@ -1418,7 +1418,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .map(ShortBillingProfileView::getId)
                 .orElseGet(() -> billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null).id());
 
-        final var billingProfile = billingProfileStoragePort.findById(billingProfileId).orElseThrow();
+        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
 
         billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
         billingProfileStoragePort.saveKyc(billingProfile.getKyc().toBuilder()

@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.accounting.domain.AccountBookTest.accountBookFromEvents;
@@ -205,16 +206,16 @@ public class AccountingMailNotifierTest {
         void setUp() {
             final var payoutInfo = PayoutInfo.builder().ethWallet(new WalletLocator(new Name("vitalik.eth"))).build();
             final var billingProfileId = BillingProfile.Id.random();
-            final var companyBillingProfile = BillingProfileView.builder()
+            final var companyBillingProfile = CompanyBillingProfile.builder()
                     .id(billingProfileId)
-                    .type(BillingProfile.Type.COMPANY)
-                    .payoutInfo(payoutInfo)
-                    .verificationStatus(VerificationStatus.VERIFIED)
+                    .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(newKyb(billingProfileId, UserId.random()))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
+                    .enabled(true)
                     .build();
 
-            invoice = Invoice.of(companyBillingProfile, 1, UserId.random());
+            invoice = Invoice.of(companyBillingProfile, 1, UserId.random(), payoutInfo);
 
             invoice.rewards(List.of(
                     new Invoice.Reward(RewardId.random(), ZonedDateTime.now().minusDays(1), faker.lordOfTheRings().location(),

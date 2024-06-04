@@ -18,6 +18,7 @@ import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -48,7 +49,7 @@ public interface UserMapper {
                 .build();
     }
 
-    static User mapUserToDomain(UserViewEntity user, Date termsAndConditionsLatestVersionDate,
+    static User mapUserToDomain(UserViewEntity user, ZonedDateTime termsAndConditionsLatestVersionDate,
                                 List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
                                 List<ApplicationEntity> applications,
                                 List<BillingProfileLinkView> billingProfiles,
@@ -65,7 +66,7 @@ public interface UserMapper {
                 .roles(Arrays.stream(user.roles()).toList())
                 .hasAcceptedLatestTermsAndConditions(nonNull(user.onboarding())
                                                      && nonNull(user.onboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.onboarding().getTermsAndConditionsAcceptanceDate().after(termsAndConditionsLatestVersionDate))
+                                                     && user.onboarding().getTermsAndConditionsAcceptanceDate().isAfter(termsAndConditionsLatestVersionDate))
                 .hasSeenOnboardingWizard(nonNull(user.onboarding())
                                          && nonNull(user.onboarding().getProfileWizardDisplayDate()))
                 .projectsLed(projectLedIdViewEntities.stream()

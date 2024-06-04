@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it;
 
 import com.github.javafaker.Faker;
+import jakarta.annotation.PostConstruct;
 import onlydust.com.marketplace.api.postgres.adapter.configuration.PostgresConfiguration;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.annotation.DirtiesContext;
@@ -12,6 +13,8 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import java.util.TimeZone;
 
 import static org.testcontainers.utility.MountableFile.forClasspathResource;
 
@@ -38,4 +41,8 @@ public class AbstractPostgresIT {
         registry.add("spring.datasource.username", postgresSQLContainer::getUsername);
     }
 
+    @PostConstruct
+    public void init() {
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    }
 }

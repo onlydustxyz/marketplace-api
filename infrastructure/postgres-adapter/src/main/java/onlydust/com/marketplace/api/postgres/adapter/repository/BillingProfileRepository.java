@@ -4,9 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfile
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface BillingProfileRepository extends JpaRepository<BillingProfileEntity, UUID> {
@@ -26,17 +24,6 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
                 where id = :billingProfileId
             """)
     void updateEnabled(UUID billingProfileId, Boolean enabled);
-
-    @Query(nativeQuery = true, value = """
-                select enabled from accounting.billing_profiles where id = :billingProfileId
-            """)
-    boolean isBillingProfileEnabled(UUID billingProfileId);
-
-    @Query(value = """
-            select bp.* from accounting.billing_profiles bp
-            join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
-            """, nativeQuery = true)
-    List<BillingProfileEntity> findBillingProfilesForUserId(@Param("userId") UUID userId);
 
     @Modifying
     @Query(nativeQuery = true, value = """

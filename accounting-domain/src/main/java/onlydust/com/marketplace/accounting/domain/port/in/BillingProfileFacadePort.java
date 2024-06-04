@@ -36,7 +36,7 @@ public interface BillingProfileFacadePort {
     InvoiceDownload downloadInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId,
                                     final @NonNull Invoice.Id invoiceId);
 
-    void updateInvoiceMandateAcceptanceDate(UserId userId, BillingProfile.Id billingProfileId);
+    void acceptInvoiceMandate(UserId userId, BillingProfile.Id billingProfileId);
 
     List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId);
 
@@ -45,8 +45,6 @@ public interface BillingProfileFacadePort {
     PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
 
     void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo);
-
-    List<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, Set<BillingProfile.User.Role> roles);
 
     Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize);
 
