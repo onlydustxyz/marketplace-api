@@ -70,7 +70,7 @@ public abstract class BillingProfile {
         INDIVIDUAL, COMPANY, SELF_EMPLOYED
     }
 
-    public record User(@NonNull UserId id, @NonNull Role role) {
+    public record User(@NonNull UserId id, @NonNull Role role, @NonNull ZonedDateTime joinedAt) {
         public enum Role {
             ADMIN, MEMBER;
 

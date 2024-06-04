@@ -22,7 +22,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.time.ZonedDateTime.now;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.reducing;
@@ -86,7 +85,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional
     public void save(IndividualBillingProfile billingProfile) {
         // TODO cascade merge the KYC/KYB and remove flush
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKycEntity.isEmpty()) {
             kycRepository.saveAndFlush(KycEntity.fromDomain(billingProfile.kyc()));
@@ -96,7 +95,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(SelfEmployedBillingProfile billingProfile) {
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile, billingProfile.owner().id(), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
@@ -106,8 +105,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional
     public void save(CompanyBillingProfile billingProfile) {
-        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile,
-                billingProfile.members().stream().map(BillingProfile.User::id).toList().get(0), now()));
+        billingProfileRepository.saveAndFlush(BillingProfileEntity.fromDomain(billingProfile));
         final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfile.id().value());
         if (optionalKybEntity.isEmpty()) {
             kybRepository.saveAndFlush(KybEntity.fromDomain(billingProfile.kyb()));
@@ -359,7 +357,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 .billingProfileId(billingProfileId.value())
                 .userId(invitedUser.value())
                 .role(role)
-                .joinedAt(Date.from(acceptedAt.toInstant()))
+                .joinedAt(acceptedAt)
                 .build());
     }
 

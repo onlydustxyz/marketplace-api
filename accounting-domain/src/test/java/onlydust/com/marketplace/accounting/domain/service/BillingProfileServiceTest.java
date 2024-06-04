@@ -78,7 +78,7 @@ class BillingProfileServiceTest {
                 .name("OnlyDust")
                 .kyb(newKyb(billingProfileId, userId))
                 .enabled(true)
-                .members(Set.of(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN)))
+                .members(Set.of(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                 .invoiceMandateAcceptedAt(ZonedDateTime.now())
                 .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
                 .build();
@@ -233,7 +233,7 @@ class BillingProfileServiceTest {
                             .status(VerificationStatus.VERIFIED)
                             .enabled(true)
                             .name("John")
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
             when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
@@ -269,7 +269,7 @@ class BillingProfileServiceTest {
                             .status(VerificationStatus.VERIFIED)
                             .enabled(true)
                             .name("John")
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
             when(billingProfileStoragePort.getPayoutInfo(billingProfileId)).thenReturn(Optional.of(payoutInfo));
@@ -363,7 +363,7 @@ class BillingProfileServiceTest {
                             .kyc(newKyc(billingProfileId, userId))
                             .status(VerificationStatus.VERIFIED)
                             .enabled(true)
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .build())
             );
             when(invoiceStoragePort.getNextSequenceNumber(billingProfileId)).thenReturn(42);
@@ -454,7 +454,7 @@ class BillingProfileServiceTest {
                     IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .enabled(false)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
@@ -481,7 +481,7 @@ class BillingProfileServiceTest {
                     .thenReturn(Optional.of(IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .enabled(false)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
@@ -511,7 +511,7 @@ class BillingProfileServiceTest {
                     IndividualBillingProfile.builder()
                             .id(billingProfileId)
                             .name("name")
-                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .enabled(false)
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
@@ -930,7 +930,8 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
-        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        assertThat(billingProfile.members()).hasSize(1);
+        assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort, never()).savePayoutPreference(eq(billingProfile.id()), eq(userId), any());
         verify(accountingObserverPort, never()).onPayoutPreferenceChanged(any(), any(), any());
@@ -949,7 +950,9 @@ class BillingProfileServiceTest {
         assertThat(billingProfile.id()).isNotNull();
         assertThat(billingProfile.name()).isEqualTo(name);
         assertThat(billingProfile.type()).isEqualTo(BillingProfile.Type.COMPANY);
-        assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+        assertThat(billingProfile.members()).hasSize(1);
+        assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
+
         verify(billingProfileStoragePort).save(billingProfile);
         verify(billingProfileStoragePort).savePayoutPreference(billingProfile.id(), userId, selectForProjects.iterator().next());
         verify(accountingObserverPort).onPayoutPreferenceChanged(billingProfile.id(), userId, selectForProjects.iterator().next());
@@ -1019,10 +1022,11 @@ class BillingProfileServiceTest {
             billingProfile.addMember(adminId, BillingProfile.User.Role.ADMIN);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(
-                    new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN),
-                    new BillingProfile.User(memberId, BillingProfile.User.Role.MEMBER),
-                    new BillingProfile.User(adminId, BillingProfile.User.Role.ADMIN)
+            assertThat(billingProfile.members()).hasSize(3);
+            assertThat(billingProfile.members()).usingElementComparatorIgnoringFields("joinedAt").containsExactlyInAnyOrder(
+                    new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()),
+                    new BillingProfile.User(memberId, BillingProfile.User.Role.MEMBER, ZonedDateTime.now()),
+                    new BillingProfile.User(adminId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now())
             );
         }
 
@@ -1039,7 +1043,8 @@ class BillingProfileServiceTest {
             billingProfile.removeMember(adminId);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+            assertThat(billingProfile.members()).hasSize(1);
+            assertThat(billingProfile.members()).allMatch(u -> u.id().equals(userId) && u.role().equals(BillingProfile.User.Role.ADMIN));
         }
 
         @Test
@@ -1052,7 +1057,9 @@ class BillingProfileServiceTest {
             billingProfile.removeMember(memberId);
 
             // Then
-            assertThat(billingProfile.members()).containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN));
+            assertThat(billingProfile.members())
+                    .usingElementComparatorIgnoringFields("joinedAt")
+                    .containsExactlyInAnyOrder(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()));
         }
 
 
@@ -2159,7 +2166,7 @@ class BillingProfileServiceTest {
                 .thenReturn(Optional.of(IndividualBillingProfile.builder()
                         .id(billingProfileId)
                         .name("name")
-                        .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                        .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                         .enabled(false)
                         .status(VerificationStatus.NOT_STARTED)
                         .kyc(Kyc.initForUserAndBillingProfile(UserId.random(), billingProfileId))
@@ -2180,7 +2187,7 @@ class BillingProfileServiceTest {
                 .thenReturn(Optional.of(IndividualBillingProfile.builder()
                         .id(billingProfileId)
                         .name("name")
-                        .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN))
+                        .owner(new BillingProfile.User(userId, BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                         .enabled(false)
                         .status(VerificationStatus.NOT_STARTED)
                         .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))

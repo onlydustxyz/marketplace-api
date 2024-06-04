@@ -56,7 +56,7 @@ class InvoiceServiceTest {
                 .name("John")
                 .kyc(newKyc(billingProfileId, UserId.random()))
                 .enabled(true)
-                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
         invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo);
         reset(invoiceStoragePort, pdfStoragePort, billingProfileObserver);
@@ -125,7 +125,7 @@ class InvoiceServiceTest {
                 .name("John")
                 .kyc(newKyc(billingProfileId, UserId.random()))
                 .enabled(true)
-                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
 
         final var invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo);

@@ -19,6 +19,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStu
 import org.junit.jupiter.api.*;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
@@ -58,7 +59,7 @@ public class AccountingServiceConcurrencyTest {
                                     .build())
                             .name("OnlyDust")
                             .enabled(true)
-                            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                             .status(VerificationStatus.VERIFIED)
                             .build(), 1,
                     UserId.random(),

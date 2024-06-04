@@ -59,7 +59,7 @@ class InvoiceTest {
                     .name("John")
                     .kyc(newKyc(billingProfileId, UserId.random()))
                     .enabled(true)
-                    .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                    .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                     .build();
 
             invoice = Invoice.of(individualBillingProfile, 1, UserId.random(), payoutInfo)
@@ -134,7 +134,7 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
-                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                     .enabled(true)
                     .build();
 
@@ -209,7 +209,7 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
-                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                     .enabled(true)
                     .build();
 
@@ -285,7 +285,7 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
-                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                     .enabled(true)
                     .build();
 
@@ -361,7 +361,7 @@ class InvoiceTest {
                     .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(kyb)
-                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                     .enabled(true)
                     .build();
 

@@ -69,7 +69,7 @@ public class AccountingServiceTest {
             .name("OnlyDust")
             .enabled(true)
             .status(VerificationStatus.VERIFIED)
-            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
             .build();
 
     final PayoutInfo payoutInfo = PayoutInfo.builder()

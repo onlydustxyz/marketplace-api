@@ -89,7 +89,7 @@ public class PaymentServiceTest {
                 .name("John")
                 .kyc(newKyc(billingProfileId1, UserId.random()))
                 .enabled(true)
-                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
         final var billingProfileId2 = BillingProfile.Id.random();
         billingProfile2 = IndividualBillingProfile.builder()
@@ -98,7 +98,7 @@ public class PaymentServiceTest {
                 .name("John")
                 .kyc(newKyc(billingProfileId2, UserId.random()))
                 .enabled(true)
-                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN))
+                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
 
         invoices = List.of(

@@ -211,7 +211,7 @@ public class AccountingMailNotifierTest {
                     .status(VerificationStatus.VERIFIED)
                     .name("OnlyDust")
                     .kyb(newKyb(billingProfileId, UserId.random()))
-                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN)))
+                    .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                     .enabled(true)
                     .build();
 

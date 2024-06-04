@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
+import java.time.ZonedDateTime;
+
 @Getter
 @Accessors(fluent = true)
 @SuperBuilder
@@ -15,7 +17,7 @@ public class SelfEmployedBillingProfile extends BillingProfile {
 
     @Override
     public boolean isInvoiceMandateAccepted() {
-        // TODO refavtor as same logic as in CompanyBillingProfile
+        // TODO refactor as same logic as in CompanyBillingProfile
         return invoiceMandateAcceptedAt != null &&
                invoiceMandateLatestVersionDate != null &&
                invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
@@ -31,7 +33,7 @@ public class SelfEmployedBillingProfile extends BillingProfile {
 
     public SelfEmployedBillingProfile(@NonNull String name, @NonNull UserId ownerId) {
         super(name);
-        this.owner = new User(ownerId, User.Role.ADMIN);
+        this.owner = new User(ownerId, User.Role.ADMIN, ZonedDateTime.now());
         this.kyb = Kyb.initForUserAndBillingProfile(ownerId, this.id());
     }
 

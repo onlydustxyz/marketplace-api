@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ public class CompanyBillingProfile extends BillingProfile {
 
     public CompanyBillingProfile(@NonNull String name, @NonNull UserId firstAdmin) {
         super(name);
-        this.members = new HashSet<>(Set.of(new User(firstAdmin, User.Role.ADMIN)));
+        this.members = new HashSet<>(Set.of(new User(firstAdmin, User.Role.ADMIN, ZonedDateTime.now())));
         this.kyb = Kyb.initForUserAndBillingProfile(firstAdmin, this.id());
     }
 
@@ -52,7 +53,7 @@ public class CompanyBillingProfile extends BillingProfile {
     }
 
     public void addMember(UserId userId, User.Role role) {
-        members.add(new User(userId, role));
+        members.add(new User(userId, role, ZonedDateTime.now()));
     }
 
     public void removeMember(UserId userId) {

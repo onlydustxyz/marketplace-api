@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -57,7 +56,7 @@ public class BillingProfileViewEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).collect(toSet()))
+                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).collect(toSet()))
                     .build();
             case SELF_EMPLOYED -> SelfEmployedBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -65,7 +64,7 @@ public class BillingProfileViewEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .build();
             case INDIVIDUAL -> IndividualBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -73,7 +72,7 @@ public class BillingProfileViewEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyc(kyc.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .build();
         };
     }

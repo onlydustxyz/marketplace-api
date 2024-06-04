@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 
 @Entity
@@ -80,19 +79,37 @@ public class BillingProfileEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
-    public static BillingProfileEntity fromDomain(final BillingProfile billingProfile, final UserId ownerId, final ZonedDateTime ownerJoinedAt) {
+    public static BillingProfileEntity fromDomain(final IndividualBillingProfile billingProfile) {
         return BillingProfileEntity.builder()
                 .id(billingProfile.id().value())
                 .name(billingProfile.name())
                 .verificationStatus(billingProfile.status())
                 .type(billingProfile.type())
-                .users(isNull(ownerId) ? Set.of() : Set.of(BillingProfileUserEntity.builder()
-                        .billingProfileId(billingProfile.id().value())
-                        .userId(ownerId.value())
-                        .role(BillingProfile.User.Role.ADMIN)
-                        .joinedAt(Date.from(ownerJoinedAt.toInstant()))
-                        .build())
-                )
+                .users(Set.of(BillingProfileUserEntity.fromDomain(billingProfile.id(), billingProfile.owner())))
+                .enabled(billingProfile.enabled())
+                .invoiceMandateAcceptedAt(billingProfile.invoiceMandateAcceptedAt())
+                .build();
+    }
+
+    public static BillingProfileEntity fromDomain(final SelfEmployedBillingProfile billingProfile) {
+        return BillingProfileEntity.builder()
+                .id(billingProfile.id().value())
+                .name(billingProfile.name())
+                .verificationStatus(billingProfile.status())
+                .type(billingProfile.type())
+                .users(Set.of(BillingProfileUserEntity.fromDomain(billingProfile.id(), billingProfile.owner())))
+                .enabled(billingProfile.enabled())
+                .invoiceMandateAcceptedAt(billingProfile.invoiceMandateAcceptedAt())
+                .build();
+    }
+
+    public static BillingProfileEntity fromDomain(final CompanyBillingProfile billingProfile) {
+        return BillingProfileEntity.builder()
+                .id(billingProfile.id().value())
+                .name(billingProfile.name())
+                .verificationStatus(billingProfile.status())
+                .type(billingProfile.type())
+                .users(billingProfile.members().stream().map(u -> BillingProfileUserEntity.fromDomain(billingProfile.id(), u)).collect(toSet()))
                 .enabled(billingProfile.enabled())
                 .invoiceMandateAcceptedAt(billingProfile.invoiceMandateAcceptedAt())
                 .build();
@@ -106,7 +123,7 @@ public class BillingProfileEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).collect(toSet()))
+                    .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).collect(toSet()))
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
                     .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
@@ -116,7 +133,7 @@ public class BillingProfileEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyb(kyb.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
                     .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
@@ -126,7 +143,7 @@ public class BillingProfileEntity {
                     .status(verificationStatus)
                     .enabled(enabled)
                     .kyc(kyc.toDomain())
-                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role)).orElseThrow())
+                    .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
                     .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
                     .build();
