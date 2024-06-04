@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -20,7 +19,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
@@ -209,18 +207,6 @@ public interface BillingProfileMapper {
                 .createdAt(invoice.createdAt())
                 .totalAfterTax(map(invoice.totalAfterTax()))
                 .status(map(invoice.status()));
-    }
-
-    static MyBillingProfilesResponse myBillingProfileToResponse(final List<ShortBillingProfileView> shortBillingProfileViews) {
-        final MyBillingProfilesResponse myBillingProfilesResponse = new MyBillingProfilesResponse();
-        myBillingProfilesResponse.setBillingProfiles(isNull(shortBillingProfileViews) ?
-                List.of() :
-                shortBillingProfileViews.stream()
-                        .map(PayoutPreferenceMapper::billingProfileToShortResponse)
-                        .sorted(Comparator.comparing(ShortBillingProfileResponse::getName))
-                        .collect(Collectors.toList()));
-        return myBillingProfilesResponse;
-
     }
 
     static BillingProfileResponse billingProfileViewToResponse(BillingProfileView view) {

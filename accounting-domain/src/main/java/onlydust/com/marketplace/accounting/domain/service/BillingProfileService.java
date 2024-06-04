@@ -134,7 +134,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
 
-        if (!billingProfile.isInvoiceMandateAccepted())
+        if (billingProfile.invoiceMandateAcceptanceOutdated())
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
 
         uploadInvoice(billingProfile, invoiceId, null, Invoice.Status.APPROVED, data);
@@ -150,7 +150,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!billingProfile.enabled())
             throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
 
-        if (billingProfile.isInvoiceMandateAccepted())
+        if (!billingProfile.invoiceMandateAcceptanceOutdated())
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
 
         uploadInvoice(billingProfile, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);

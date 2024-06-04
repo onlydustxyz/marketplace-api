@@ -15,6 +15,7 @@ import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,7 +59,8 @@ public class AllUserReadEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"),
             inverseJoinColumns = @JoinColumn(name = "billing_profile_id")
     )
-    Set<BillingProfileReadEntity> billingProfiles;
+    @OrderBy("name")
+    List<BillingProfileReadEntity> billingProfiles;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
@@ -100,7 +102,7 @@ public class AllUserReadEntity {
                 .contacts(contacts.stream().map(ContactInformationReadEntity::toDto).toList())
                 .leadedProjectCount(globalUsersRanks == null ? 0 : globalUsersRanks.leadedProjectCount().intValue())
                 .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
-                .billingProfiles(billingProfiles.stream().map(BillingProfileReadEntity::toShortResponse).toList())
+                .billingProfiles(billingProfiles.stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
                 ;
     }
 }

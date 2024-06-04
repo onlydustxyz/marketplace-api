@@ -10,7 +10,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -253,15 +252,6 @@ public class MeRestApi implements MeApi {
         userFacadePort.updateGithubProfile(authenticatedUser);
         return ResponseEntity.ok().build();
     }
-
-    @Override
-    public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final List<ShortBillingProfileView> shortBillingProfileViews = billingProfileFacadePort.getBillingProfilesForUser(UserId.of(authenticatedUser.getId()));
-        final MyBillingProfilesResponse myBillingProfilesResponse = BillingProfileMapper.myBillingProfileToResponse(shortBillingProfileViews);
-        return ResponseEntity.ok(myBillingProfilesResponse);
-    }
-
 
     @Override
     public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {

@@ -5,17 +5,20 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
+@Accessors(fluent = true)
 @Table(name = "billing_profiles", schema = "accounting")
 public class BillingProfileReadEntity {
     @Id
@@ -39,7 +42,16 @@ public class BillingProfileReadEntity {
 
     Boolean enabled;
 
-    public BillingProfileShortResponse toShortResponse() {
+    @OneToMany(mappedBy = "billingProfile")
+    Set<AllBillingProfileUserReadEntity> users;
+
+    @OneToMany(mappedBy = "billingProfile")
+    Set<BillingProfileUserInvitationReadEntity> invitations;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    BillingProfileStatsReadEntity stats;
+
+    public BillingProfileShortResponse toBoShortResponse() {
         return new BillingProfileShortResponse()
                 .id(id)
                 .subject(kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null)

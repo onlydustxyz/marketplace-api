@@ -24,5 +24,7 @@ public class BillingProfileStatsViewEntity {
     Integer invoiceableRewardCount;
     Boolean missingPayoutInfo;
     Boolean missingVerification;
+    Boolean individualLimitReached;
     BigDecimal currentYearPaymentAmount;
+    Boolean mandateAcceptanceOutdated;
 }

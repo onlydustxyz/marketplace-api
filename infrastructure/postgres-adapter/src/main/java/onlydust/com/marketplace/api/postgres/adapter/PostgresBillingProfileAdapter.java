@@ -58,12 +58,10 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Override
     @Transactional(readOnly = true)
     public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
-        final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
         final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of());
         final var billingProfilesInvitedOn = shortBillingProfileViewRepository.findBillingProfilesForUserIdInvited(userId.value());
         return Stream.concat(billingProfiles.stream(), billingProfilesInvitedOn.stream())
                 .map(ShortBillingProfileQueryEntity::toView)
-                .peek(bp -> bp.setInvoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate))
                 .toList();
     }
 
@@ -155,7 +153,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .verificationStatus(billingProfileEntity.getVerificationStatus())
                             .missingPayoutInfo(billingProfileCustomData.getStats().missingPayoutInfo())
                             .missingVerification(billingProfileCustomData.getStats().missingVerification())
-                            .individualLimitReached(billingProfileCustomData.getIndividualLimitReached())
+                            .individualLimitReached(billingProfileCustomData.getStats().individualLimitReached())
                             .rewardCount(billingProfileCustomData.getStats().rewardCount())
                             .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
