@@ -333,3 +333,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000252_modify_project_categories.sql
   - include:
       file: db/changelog/changelogs/00000253_create_table_projects_categories.sql
+  - include:
+      file: db/changelog/changelogs/00000254_create_mandate_acceptance_outdated.sql

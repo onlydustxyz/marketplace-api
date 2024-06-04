@@ -38,19 +38,19 @@ public class AllBillingProfileUserReadEntity {
     public ShortBillingProfileResponse toShortResponse() {
         return new ShortBillingProfileResponse()
                 .id(billingProfileId)
-                .name(billingProfile.getName())
-                .enabled(billingProfile.getEnabled())
-                .invoiceMandateAccepted(billingProfile.invoiceMandateAccepted())
+                .name(billingProfile.name())
+                .enabled(billingProfile.enabled())
+                .invoiceMandateAccepted(!billingProfile.stats().mandateAcceptanceOutdated())
                 .pendingInvitationResponse(!invitationAccepted)
-                .invoiceableRewardCount(billingProfile.getStats().getInvoiceableRewardCount())
-                .requestableRewardCount(role == BillingProfileCoworkerRole.ADMIN ? billingProfile.getStats().getInvoiceableRewardCount() : 0)
-                .rewardCount(billingProfile.getStats().getRewardCount())
-                .missingPayoutInfo(billingProfile.getStats().getMissingPayoutInfo())
-                .missingVerification(billingProfile.getStats().getMissingVerification())
-                .individualLimitReached(billingProfile.individualLimitReached())
-                .verificationBlocked(billingProfile.getVerificationStatus() == VerificationStatus.REJECTED || billingProfile.getVerificationStatus() == VerificationStatus.CLOSED)
+                .invoiceableRewardCount(billingProfile.stats().invoiceableRewardCount())
+                .requestableRewardCount(role == BillingProfileCoworkerRole.ADMIN ? billingProfile.stats().invoiceableRewardCount() : 0)
+                .rewardCount(billingProfile.stats().rewardCount())
+                .missingPayoutInfo(billingProfile.stats().missingPayoutInfo())
+                .missingVerification(billingProfile.stats().missingVerification())
+                .individualLimitReached(billingProfile.stats().individualLimitReached())
+                .verificationBlocked(billingProfile.verificationStatus() == VerificationStatus.REJECTED || billingProfile.verificationStatus() == VerificationStatus.CLOSED)
                 .role(role)
-                .type(onlydust.com.marketplace.api.contract.model.BillingProfileType.valueOf(billingProfile.getType().name()));
+                .type(onlydust.com.marketplace.api.contract.model.BillingProfileType.valueOf(billingProfile.type().name()));
     }
 
     @EqualsAndHashCode

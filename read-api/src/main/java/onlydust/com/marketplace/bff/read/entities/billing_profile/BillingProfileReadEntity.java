@@ -5,11 +5,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.UUID;
@@ -18,6 +18,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
+@Accessors(fluent = true)
 @Table(name = "billing_profiles", schema = "accounting")
 public class BillingProfileReadEntity {
     @Id
@@ -50,10 +51,6 @@ public class BillingProfileReadEntity {
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     BillingProfileStatsReadEntity stats;
 
-//    @OneToOne
-//    @JoinFormula(value = "1")
-//    GlobalSettingsReadEntity globalSettings;
-
     public BillingProfileShortResponse toBoShortResponse() {
         return new BillingProfileShortResponse()
                 .id(id)
@@ -64,16 +61,5 @@ public class BillingProfileReadEntity {
                 .kyb(kyb == null ? null : kyb.toDto())
                 .kyc(kyc == null ? null : kyc.toDto())
                 ;
-    }
-
-    public Boolean invoiceMandateAccepted() {
-        return invoiceMandateAcceptedAt != null;// &&
-//               globalSettings.getInvoiceMandateLatestVersionDate() != null &&
-//               invoiceMandateAcceptedAt.isAfter(globalSettings.getInvoiceMandateLatestVersionDate());
-    }
-
-    public Boolean individualLimitReached() {
-        return type == BillingProfileType.INDIVIDUAL &&
-               stats.getCurrentYearPaymentAmount().compareTo(BigDecimal.valueOf(5000)) >= 0;
     }
 }

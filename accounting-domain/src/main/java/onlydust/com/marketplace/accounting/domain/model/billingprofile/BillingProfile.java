@@ -28,7 +28,7 @@ public abstract class BillingProfile {
     protected final Boolean enabled;
 
     protected ZonedDateTime invoiceMandateAcceptedAt;
-    protected ZonedDateTime invoiceMandateLatestVersionDate;
+    protected boolean invoiceMandateAcceptanceOutdated;
 
     public void acceptMandate() {
         invoiceMandateAcceptedAt = ZonedDateTime.now();
@@ -48,8 +48,6 @@ public abstract class BillingProfile {
     public boolean isVerified() {
         return status == VerificationStatus.VERIFIED;
     }
-
-    public abstract boolean isInvoiceMandateAccepted();
 
     public abstract boolean isAdmin(UserId userId);
 

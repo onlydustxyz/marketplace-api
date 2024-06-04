@@ -4,11 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.api.postgres.adapter.entity.GlobalSettingsEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -62,13 +60,8 @@ public class BillingProfileEntity {
     PayoutInfoEntity payoutInfo;
     Boolean enabled;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "billing_profile_id", insertable = false, updatable = false)
-    BillingProfileStatsViewEntity stats;
-
-    @ManyToOne
-    @JoinFormula(value = "1")
-    GlobalSettingsEntity globalSettings;
+    @Formula("(SELECT bps.mandate_acceptance_outdated from accounting.billing_profile_stats bps where bps.billing_profile_id = id)")
+    Boolean invoiceMandateAcceptanceOutdated;
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
@@ -124,7 +117,7 @@ public class BillingProfileEntity {
                     .kyb(kyb.toDomain())
                     .members(users.stream().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).collect(toSet()))
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
-                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
+                    .invoiceMandateAcceptanceOutdated(invoiceMandateAcceptanceOutdated)
                     .build();
             case SELF_EMPLOYED -> SelfEmployedBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -134,7 +127,7 @@ public class BillingProfileEntity {
                     .kyb(kyb.toDomain())
                     .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
-                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
+                    .invoiceMandateAcceptanceOutdated(invoiceMandateAcceptanceOutdated)
                     .build();
             case INDIVIDUAL -> IndividualBillingProfile.builder()
                     .id(BillingProfile.Id.of(id))
@@ -144,7 +137,7 @@ public class BillingProfileEntity {
                     .kyc(kyc.toDomain())
                     .owner(users.stream().findFirst().map(u -> new BillingProfile.User(UserId.of(u.userId), u.role, u.joinedAt)).orElseThrow())
                     .invoiceMandateAcceptedAt(invoiceMandateAcceptedAt)
-                    .invoiceMandateLatestVersionDate(globalSettings.getInvoiceMandateLatestVersionDate())
+                    .invoiceMandateAcceptanceOutdated(invoiceMandateAcceptanceOutdated)
                     .build();
         };
     }

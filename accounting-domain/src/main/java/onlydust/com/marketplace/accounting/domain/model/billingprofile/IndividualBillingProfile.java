@@ -38,11 +38,6 @@ public class IndividualBillingProfile extends BillingProfile {
     }
 
     @Override
-    public boolean isInvoiceMandateAccepted() {
-        return true;
-    }
-
-    @Override
     public boolean isAdmin(UserId userId) {
         return owner.id().equals(userId);
     }

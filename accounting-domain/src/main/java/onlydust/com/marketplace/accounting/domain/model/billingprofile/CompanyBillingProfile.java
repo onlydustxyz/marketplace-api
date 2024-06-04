@@ -37,13 +37,6 @@ public class CompanyBillingProfile extends BillingProfile {
     }
 
     @Override
-    public boolean isInvoiceMandateAccepted() {
-        return invoiceMandateAcceptedAt != null &&
-               invoiceMandateLatestVersionDate != null &&
-               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
-    }
-
-    @Override
     public String subject() {
         return kyb().getName();
     }

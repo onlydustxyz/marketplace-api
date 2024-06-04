@@ -78,7 +78,7 @@ class BillingProfileServiceTest {
                 .enabled(true)
                 .members(new HashSet<>())
                 .invoiceMandateAcceptedAt(ZonedDateTime.now())
-                .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                .invoiceMandateAcceptanceOutdated(false)
                 .build();
         companyBillingProfile.addMember(userId, BillingProfile.User.Role.ADMIN);
         invoice = Invoice.of(companyBillingProfile, 1, userId, payoutInfo)
@@ -438,7 +438,7 @@ class BillingProfileServiceTest {
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
-                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .invoiceMandateAcceptanceOutdated(false)
                             .build()
             ));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
@@ -464,7 +464,7 @@ class BillingProfileServiceTest {
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
-                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .invoiceMandateAcceptanceOutdated(false)
                             .build()
                     ));
 
@@ -493,7 +493,7 @@ class BillingProfileServiceTest {
                             .status(VerificationStatus.NOT_STARTED)
                             .kyc(Kyc.initForUserAndBillingProfile(userId, billingProfileId))
                             .invoiceMandateAcceptedAt(ZonedDateTime.now())
-                            .invoiceMandateLatestVersionDate(ZonedDateTime.now().minusDays(1))
+                            .invoiceMandateAcceptanceOutdated(false)
                             .build()
             ));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
@@ -514,7 +514,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_if_not_a_draft() {
             // Given
             when(billingProfileStoragePort.findById(billingProfileId))
-                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptanceOutdated(true).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
             // When
@@ -531,7 +531,7 @@ class BillingProfileServiceTest {
             when(billingProfileStoragePort.findById(otherBillingProfileId))
                     .thenReturn(Optional.of(companyBillingProfile.toBuilder()
                             .id(otherBillingProfileId)
-                            .invoiceMandateAcceptedAt(null)
+                            .invoiceMandateAcceptanceOutdated(true)
                             .build()));
 
             // When
@@ -563,7 +563,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_a_reward_was_cancelled() {
             // Given
             when(billingProfileStoragePort.findById(billingProfileId))
-                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptanceOutdated(true).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(List.of(new RewardAssociations(rewardIds.get(0),
                     RewardStatus.builder().projectId(ProjectId.random().value()).recipientId(faker.number().randomNumber(4, true)).status(RewardStatus.Input.PENDING_REQUEST).build(), invoice.id(), Invoice.Status.DRAFT, billingProfileId)));
@@ -579,7 +579,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_reward_invoice_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.findById(billingProfileId))
-                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptanceOutdated(true).build()));
 
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
@@ -598,7 +598,7 @@ class BillingProfileServiceTest {
         void should_prevent_external_invoice_upload_when_reward_billing_profile_id_does_not_match() {
             // Given
             when(billingProfileStoragePort.findById(billingProfileId))
-                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(null).build()));
+                    .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptanceOutdated(true).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             when(invoiceStoragePort.getRewardAssociations(rewardIds)).thenReturn(rewards.stream()
                     .map(r -> new RewardAssociations(r.id(),
@@ -735,7 +735,7 @@ class BillingProfileServiceTest {
             @BeforeEach
             void setup() {
                 when(billingProfileStoragePort.findById(billingProfileId))
-                        .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(2)).build()));
+                        .thenReturn(Optional.of(companyBillingProfile.toBuilder().invoiceMandateAcceptanceOutdated(true).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 

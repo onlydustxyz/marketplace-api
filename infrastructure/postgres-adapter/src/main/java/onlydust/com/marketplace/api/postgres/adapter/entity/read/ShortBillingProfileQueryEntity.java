@@ -10,13 +10,8 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Where;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.Objects.isNull;
 
 @Entity
 @Data
@@ -41,10 +36,8 @@ public class ShortBillingProfileQueryEntity {
     VerificationStatus verificationStatus;
 
     String name;
-    Date invoiceMandateAcceptedAt;
     Boolean enabled;
     Boolean pendingInvitation;
-    Boolean individualLimitReached;
 
     @OneToOne
     @JoinColumn(name = "id", referencedColumnName = "billingProfileId")
@@ -61,10 +54,6 @@ public class ShortBillingProfileQueryEntity {
             """)
     List<RewardViewEntity> currentMonthRewards;
 
-    public ZonedDateTime getInvoiceMandateAcceptedAt() {
-        return isNull(invoiceMandateAcceptedAt) ? null : new Date(invoiceMandateAcceptedAt.getTime()).toInstant().atZone(ZoneOffset.UTC);
-    }
-
     public ShortBillingProfileView toView() {
         return ShortBillingProfileView.builder()
                 .id(BillingProfile.Id.of(this.id))
@@ -74,12 +63,12 @@ public class ShortBillingProfileQueryEntity {
                 .name(this.name)
                 .enabled(this.enabled)
                 .pendingInvitationResponse(this.pendingInvitation)
-                .invoiceMandateAcceptedAt(this.getInvoiceMandateAcceptedAt())
+                .invoiceMandateAcceptanceOutdated(this.stats.mandateAcceptanceOutdated())
                 .rewardCount(this.stats.rewardCount())
                 .invoiceableRewardCount(this.stats.invoiceableRewardCount())
                 .missingVerification(this.stats.missingVerification())
                 .missingPayoutInfo(this.stats.missingPayoutInfo())
-                .individualLimitReached(this.individualLimitReached)
+                .individualLimitReached(this.stats.individualLimitReached())
                 .build();
     }
 }

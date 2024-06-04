@@ -15,14 +15,6 @@ public class SelfEmployedBillingProfile extends BillingProfile {
     @NonNull
     private final User owner;
 
-    @Override
-    public boolean isInvoiceMandateAccepted() {
-        // TODO refactor as same logic as in CompanyBillingProfile
-        return invoiceMandateAcceptedAt != null &&
-               invoiceMandateLatestVersionDate != null &&
-               invoiceMandateAcceptedAt.isAfter(invoiceMandateLatestVersionDate);
-    }
-
     @NonNull
     private final Kyb kyb;
 
