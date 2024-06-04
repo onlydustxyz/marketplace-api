@@ -20,13 +20,16 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
                 project_category_suggestions pcs
             UNION
             SELECT
-                pc.id        as id,
-                pc.name      as name,
-                pc.icon_slug as icon_slug,
-                'APPROVED'   as status,
-                0            as project_count
+                pc.id                           as id,
+                pc.name                         as name,
+                pc.icon_slug                    as icon_slug,
+                'APPROVED'                      as status,
+                count(distinct ppc.project_id)  as project_count
             FROM
                 project_categories pc
+                LEFT JOIN projects_project_categories ppc ON ppc.project_category_id = pc.id
+            GROUP BY
+                pc.id
             ORDER BY
                 status DESC, name ASC
             """,
