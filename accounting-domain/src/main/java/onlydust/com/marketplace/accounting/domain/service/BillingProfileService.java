@@ -325,8 +325,11 @@ public class BillingProfileService implements BillingProfileFacadePort {
         if (!coworker.removable())
             throw forbidden("Coworker %s cannot be removed from billing profile %s".formatted(githubUserId, billingProfileId));
 
-        if (coworker.hasJoined())
+        if (coworker.hasJoined() && billingProfile instanceof CompanyBillingProfile companyBillingProfile) {
+            companyBillingProfile.removeMember(coworker.userId());
+            billingProfileStoragePort.save(companyBillingProfile);
             billingProfileStoragePort.deleteCoworker(billingProfileId, coworker.userId());
+        }
 
         if (coworker.hasBeenInvited())
             billingProfileStoragePort.deleteCoworkerInvitation(billingProfileId, coworker.githubUserId());

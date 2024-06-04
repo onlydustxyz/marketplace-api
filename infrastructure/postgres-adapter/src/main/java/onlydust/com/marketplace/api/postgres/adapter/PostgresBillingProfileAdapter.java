@@ -392,7 +392,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var rewardIds = rewardRepository.getRewardIdsToBeRemovedFromBillingProfileForUser(billingProfileId.value(), userId.value())
                 .stream().map(RewardEntity::id).toList();
         rewardRepository.removeBillingProfileIdOf(rewardIds);
-        billingProfileUserRepository.deleteById(new BillingProfileUserEntity.PrimaryKey(userId.value(), billingProfileId.value()));
     }
 
     @Override
