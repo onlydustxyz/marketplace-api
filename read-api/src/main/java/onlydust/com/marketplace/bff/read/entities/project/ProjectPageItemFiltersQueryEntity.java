@@ -1,11 +1,16 @@
 package onlydust.com.marketplace.bff.read.entities.project;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
 import onlydust.com.marketplace.api.contract.model.LanguageResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -28,6 +33,21 @@ public class ProjectPageItemFiltersQueryEntity {
     List<ProjectPageItemQueryEntity.Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectPageItemQueryEntity.Languages> languages;
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<Category> categories;
+
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    @Getter
+    @Accessors(fluent = true)
+    public static class Category {
+        @EqualsAndHashCode.Include
+        @JsonProperty("id")
+        UUID id;
+        @JsonProperty("name")
+        String name;
+        @JsonProperty("iconSlug")
+        String iconSlug;
+    }
 
 
     public static Set<LanguageResponse> languagesOf(final List<ProjectPageItemFiltersQueryEntity> entities) {
@@ -63,6 +83,22 @@ public class ProjectPageItemFiltersQueryEntity {
             }
         }
         return ecosystems;
+    }
+
+    public static Set<ProjectCategoryResponse> categoriesOf(final List<ProjectPageItemFiltersQueryEntity> entities) {
+        final Set<ProjectCategoryResponse> categories = new HashSet<>();
+        for (var entity : entities) {
+            if (nonNull(entity.categories)) {
+                categories.addAll(entity.categories.stream()
+                        .filter(c -> nonNull(c.id()))
+                        .map(c -> new ProjectCategoryResponse()
+                                .id(c.id())
+                                .name(c.name())
+                                .iconSlug(c.iconSlug())
+                        ).toList());
+            }
+        }
+        return categories;
     }
 
 }

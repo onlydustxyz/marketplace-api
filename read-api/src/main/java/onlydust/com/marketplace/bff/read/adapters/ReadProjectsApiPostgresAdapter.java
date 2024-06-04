@@ -43,8 +43,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
-import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.ecosystemsOf;
-import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.languagesOf;
+import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -78,6 +77,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final List<ProjectTag> tags,
                                                            final List<String> ecosystemSlugs,
                                                            final List<UUID> languageIds,
+                                                           final List<UUID> categoryIds,
                                                            final String sort
     ) {
         final Optional<User> user = authenticatedAppUserService.tryGetAuthenticatedUser();
@@ -87,25 +87,28 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final String languagesJsonPath = getLanguagesJsonPath(languageIds);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
     }
 
     private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
                                                                 Boolean mine,
                                                                 String search,
                                                                 String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
+                                                                List<UUID> categoryIds,
                                                                 Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine,
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
-                languagesJsonPath);
+                languagesJsonPath,
+                categoryIds);
         final var projects = projectsPageRepository.findProjectsForUserId(userId, mine,
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
+                categoryIds,
                 isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
@@ -117,17 +120,20 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     private ProjectPageResponse getProjectsForAnonymousUser(String search,
                                                             String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
+                                                            List<UUID> categoryIds,
                                                             Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
-                languagesJsonPath);
+                languagesJsonPath,
+                categoryIds);
         final var projects = projectsPageRepository.findProjectsForAnonymousUser(
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
+                categoryIds,
                 isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
@@ -142,6 +148,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .projects(projects.stream().map(p -> p.toDto(userId)).toList())
                 .languages(languagesOf(filters).stream().toList())
                 .ecosystems(ecosystemsOf(filters).stream().toList())
+                .categories(categoriesOf(filters).stream().toList())
                 .totalPageNumber(totalNumberOfPage)
                 .totalItemNumber(count.intValue())
                 .hasMore(hasMore(pageIndex, totalNumberOfPage))
@@ -273,9 +280,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .toList())
                 .categories(project.getCategories().stream()
                         .map(c -> new ProjectCategoryResponse()
-                                .id(c.getId())
-                                .name(c.getName())
-                                .iconSlug(c.getIconSlug())
+                                .id(c.id())
+                                .name(c.name())
+                                .iconSlug(c.iconSlug())
                         )
                         .sorted(comparing(ProjectCategoryResponse::getName))
                         .toList())

@@ -82,6 +82,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
               order by case
                            when cast(:orderBy as text) = 'NAME' then (upper(p.name), 0)
@@ -95,6 +96,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                                   @Param("tagsJsonPath") String tagsJsonPath,
                                                                   @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                                   @Param("languagesJsonPath") String languagesJsonPath,
+                                                                  @Param("categoryIds") List<UUID> categoryIds,
                                                                   @Param("orderBy") String orderBy,
                                                                   @Param("offset") int offset,
                                                                   @Param("limit") int limit);
@@ -197,6 +199,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
             order by case
@@ -213,6 +216,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                            @Param("tagsJsonPath") String tagsJsonPath,
                                                            @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                            @Param("languagesJsonPath") String languagesJsonPath,
+                                                           @Param("categoryIds") List<UUID> categoryIds,
                                                            @Param("orderBy") String orderBy,
                                                            @Param("offset") int offset,
                                                            @Param("limit") int limit);
@@ -255,13 +259,15 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                        and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
                                        and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+                                       and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
             , nativeQuery = true)
     Long countProjectsForAnonymousUser(@Param("search") String search,
                                        @Param("tagsJsonPath") String tagsJsonPath,
                                        @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                       @Param("languagesJsonPath") String languagesJsonPath);
+                                       @Param("languagesJsonPath") String languagesJsonPath,
+                                       @Param("categoryIds") List<UUID> categoryIds);
 
     @Query(value = """
             select count(p.id)
@@ -324,9 +330,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
-              and (coalesce(:ecosystemsJsonPath) is null or
-                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
@@ -336,5 +342,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                 @Param("search") String search,
                                 @Param("tagsJsonPath") String tagsJsonPath,
                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                @Param("languagesJsonPath") String languagesJsonPath);
+                                @Param("languagesJsonPath") String languagesJsonPath,
+                                @Param("categoryIds") List<UUID> categoryIds);
 }

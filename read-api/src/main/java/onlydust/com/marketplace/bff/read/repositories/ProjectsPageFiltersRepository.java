@@ -11,9 +11,10 @@ import java.util.UUID;
 public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPageItemFiltersQueryEntity, UUID> {
 
     @Query(value = """
-            select s.ecosystem_json as ecosystems,
-                   l.language_json as languages,
-                   p.id
+            select p.id,
+                   s.ecosystem_json  as ecosystems,
+                   l.language_json   as languages,
+                   cat.category_json as categories
             from projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -35,6 +36,14 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                from languages l
                                         join project_languages pl on pl.language_id = l.id
                                         group by pl.project_id) l on l.project_id = p.id
+                    left join (select ppc.project_id, jsonb_agg(jsonb_build_object(
+                                                               'id', pc.id,
+                                                               'name', pc.name,
+                                                               'iconSlug', pc.icon_slug
+                                                    )) category_json
+                               from project_categories pc
+                                        join projects_project_categories ppc on ppc.project_category_id = pc.id
+                                        group by ppc.project_id) cat on cat.project_id = p.id
             where (select count(github_repo_id)
                    from project_github_repos pgr_count
                    join indexer_exp.github_repos gr on pgr_count.github_repo_id = gr.id
@@ -46,8 +55,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.id,
-                   s.ecosystem_json as ecosystems,
-                   l.language_json  as languages
+                   s.ecosystem_json  as ecosystems,
+                   l.language_json   as languages,
+                   cat.category_json as categories
             from projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -69,6 +79,14 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                from languages l
                                         join project_languages pl on pl.language_id = l.id
                                         group by pl.project_id) l on l.project_id = p.id
+                    left join (select ppc.project_id, jsonb_agg(jsonb_build_object(
+                                                               'id', pc.id,
+                                                               'name', pc.name,
+                                                               'iconSlug', pc.icon_slug
+                                                    )) category_json
+                               from project_categories pc
+                                        join projects_project_categories ppc on ppc.project_category_id = pc.id
+                                        group by ppc.project_id) cat on cat.project_id = p.id
                      left join (select pgr_count.project_id, count(github_repo_id) repo_count
                                 from project_github_repos pgr_count
                                 group by pgr_count.project_id) r_count on r_count.project_id = p.id

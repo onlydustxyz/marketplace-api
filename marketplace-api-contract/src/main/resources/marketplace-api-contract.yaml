@@ -1200,6 +1200,13 @@ paths:
             items:
               $ref: '#/components/schemas/LanguageId'
         - in: query
+          name: categoryIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectCategoryId'
+        - in: query
           name: sort
           description: Sort order
           schema:
@@ -4792,6 +4799,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EcosystemResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
         hasMore:
           type: boolean
           example: true
