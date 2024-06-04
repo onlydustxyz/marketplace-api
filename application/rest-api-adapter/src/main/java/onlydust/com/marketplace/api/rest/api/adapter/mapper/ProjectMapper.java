@@ -189,7 +189,6 @@ public interface ProjectMapper {
         return ecosystemResponse;
     }
 
-<<<<<<< HEAD
     private static SponsorResponse mapSponsor(final ProjectSponsorView projectSponsorView) {
         final SponsorResponse sponsorResponse = new SponsorResponse();
         sponsorResponse.setId(projectSponsorView.sponsorId());
@@ -197,13 +196,6 @@ public interface ProjectMapper {
         sponsorResponse.setLogoUrl(projectSponsorView.sponsorLogoUrl());
         sponsorResponse.setUrl(projectSponsorView.sponsorUrl());
         return sponsorResponse;
-=======
-
-    private static GithubRepoResponse mapRepo(final ProjectOrganizationRepoView repo) {
-        final var organizationRepo = mapOrganizationRepo(repo);
-        organizationRepo.setIsIncludedInProject(null);
-        return organizationRepo;
->>>>>>> main
     }
 
     private static GithubRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {

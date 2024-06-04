@@ -47,43 +47,11 @@ public class ProjectService implements ProjectFacadePort {
     private final GithubStoragePort githubStoragePort;
 
     @Override
-<<<<<<< HEAD
-    public ProjectDetailsView getById(UUID projectId, User caller) {
-        final var userId = caller == null ? null : caller.getId();
-
-        final ProjectDetailsView projectById = projectStoragePort.getById(projectId, caller);
-        if (!permissionService.hasUserAccessToProject(projectId, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
-        }
-        return projectById;
-    }
-
-    @Override
-    public ProjectDetailsView getBySlug(String slug, User caller) {
-        final var userId = caller == null ? null : caller.getId();
-
-        final ProjectDetailsView projectBySlug = projectStoragePort.getBySlug(slug, caller);
-        if (!permissionService.hasUserAccessToProject(slug, userId)) {
-            throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug,
-                    userId));
-        }
-        return projectBySlug;
-    }
-
-    @Override
     public Page<ProjectCardView> searchForUser(List<Project.Tag> tags, List<String> ecosystemSlugs, String search,
                                                ProjectCardView.SortBy sort, UUID userId, Boolean mine,
                                                List<UUID> languageIds, Integer pageIndex, Integer pageSize) {
         return projectStoragePort.findForUserId(tags, ecosystemSlugs, userId, search,
                 sort, mine, languageIds, pageIndex, pageSize);
-=======
-    public Page<ProjectCardView> getByTagsTechnologiesEcosystemsUserIdSearchSortBy(List<Project.Tag> tags, List<String> technologies,
-                                                                                   List<String> ecosystemSlugs, String search,
-                                                                                   ProjectCardView.SortBy sort, UUID userId
-            , Boolean mine, Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findByTagsTechnologiesEcosystemsUserIdSearchSortBy(tags, technologies, ecosystemSlugs, userId, search,
-                sort, mine, pageIndex, pageSize);
->>>>>>> main
     }
 
     @Override
@@ -184,7 +152,7 @@ public class ProjectService implements ProjectFacadePort {
                 .anyMatch(userId -> projectLeadIds.stream()
                         .noneMatch(projectLeaderId -> projectLeaderId.equals(userId)))) {
             throw OnlyDustException.badRequest("Project leaders to keep must be a subset of current project " +
-                    "leaders");
+                                               "leaders");
         }
     }
 
@@ -289,7 +257,7 @@ public class ProjectService implements ProjectFacadePort {
                 return closedIssue;
             } else {
                 throw OnlyDustException.forbidden("Rewardable issue can only be created on repos linked to this " +
-                        "project");
+                                                  "project");
             }
         } else {
             throw OnlyDustException.forbidden("Only project leads can create rewardable issue on their projects");
