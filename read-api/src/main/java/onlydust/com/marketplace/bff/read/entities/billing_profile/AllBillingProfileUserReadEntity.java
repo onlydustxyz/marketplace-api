@@ -17,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @IdClass(AllBillingProfileUserReadEntity.PrimaryKey.class)
+@Table(name = "all_billing_profile_users", schema = "accounting")
 public class AllBillingProfileUserReadEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -24,6 +25,8 @@ public class AllBillingProfileUserReadEntity {
 
     @Id
     @EqualsAndHashCode.Include
+    Long githubUserId;
+
     UUID userId;
 
     @ManyToOne
@@ -58,6 +61,6 @@ public class AllBillingProfileUserReadEntity {
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID billingProfileId;
-        UUID userId;
+        Long githubUserId;
     }
 }
