@@ -1,6 +1,6 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -82,6 +82,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
               order by case
                            when cast(:orderBy as text) = 'NAME' then (upper(p.name), 0)
@@ -91,11 +92,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                        end
               offset :offset limit :limit
             """, nativeQuery = true)
-    List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
+    List<ProjectPageItemQueryEntity> findProjectsForAnonymousUser(@Param("search") String search,
+                                                                  @Param("tagsJsonPath") String tagsJsonPath,
                                                                   @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                                  @Param("search") String search,
-                                                                  @Param("orderBy") String orderBy,
                                                                   @Param("languagesJsonPath") String languagesJsonPath,
+                                                                  @Param("categoryIds") List<UUID> categoryIds,
+                                                                  @Param("orderBy") String orderBy,
                                                                   @Param("offset") int offset,
                                                                   @Param("limit") int limit);
 
@@ -186,16 +188,19 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                            join languages l on pl.language_id = l.id
                            group by pl.project_id) languages on languages.project_id = p.id
             where r_count.repo_count > 0
-              and (p.visibility = 'PUBLIC'
-                or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
-                    and (coalesce(is_pending_pl.is_p_pl, false) or
-                         coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
+              and (p.visibility = 'PUBLIC' 
+                       or (p.visibility = 'PRIVATE' 
+                                and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
+                                and (coalesce(is_pending_pl.is_p_pl, false) or
+                                     coalesce(is_me_lead.is_lead, false) or 
+                                     coalesce(is_pending_contributor.is_p_c, false))
+                          )
+                  )
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
-              and (coalesce(:ecosystemsJsonPath) is null or
-                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
-              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
-                   p.short_description ilike '%' || cast(:search as text) || '%')
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
+              and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
             order by case
                          when cast(:orderBy as text) = 'NAME' then (not coalesce(is_pending_pl.is_p_pl, false), upper(p.name), 0)
@@ -207,11 +212,12 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
             """, nativeQuery = true)
     List<ProjectPageItemQueryEntity> findProjectsForUserId(@Param("userId") UUID userId,
                                                            @Param("mine") Boolean mine,
+                                                           @Param("search") String search,
                                                            @Param("tagsJsonPath") String tagsJsonPath,
                                                            @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                                           @Param("search") String search,
-                                                           @Param("orderBy") String orderBy,
                                                            @Param("languagesJsonPath") String languagesJsonPath,
+                                                           @Param("categoryIds") List<UUID> categoryIds,
+                                                           @Param("orderBy") String orderBy,
                                                            @Param("offset") int offset,
                                                            @Param("limit") int limit);
 
@@ -253,13 +259,15 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                        and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
                                        and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+                                       and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
             """
             , nativeQuery = true)
-    Long countProjectsForAnonymousUser(@Param("tagsJsonPath") String tagsJsonPath,
+    Long countProjectsForAnonymousUser(@Param("search") String search,
+                                       @Param("tagsJsonPath") String tagsJsonPath,
                                        @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                       @Param("search") String search,
-                                       @Param("languagesJsonPath") String languagesJsonPath);
+                                       @Param("languagesJsonPath") String languagesJsonPath,
+                                       @Param("categoryIds") List<UUID> categoryIds);
 
     @Query(value = """
             select count(p.id)
@@ -322,17 +330,18 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     and (coalesce(is_pending_pl.is_p_pl, false) or
                          coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_contributor.is_p_c, false))))
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
-              and (coalesce(:ecosystemsJsonPath) is null or
-                   jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
+              and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath)))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
+              and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
             """, nativeQuery = true)
     Long countProjectsForUserId(@Param("userId") UUID userId,
                                 @Param("mine") Boolean mine,
+                                @Param("search") String search,
                                 @Param("tagsJsonPath") String tagsJsonPath,
                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
-                                @Param("search") String search,
-                                @Param("languagesJsonPath") String languagesJsonPath);
+                                @Param("languagesJsonPath") String languagesJsonPath,
+                                @Param("categoryIds") List<UUID> categoryIds);
 }

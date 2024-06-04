@@ -73,7 +73,9 @@ public class ReadMarketplaceApiConfiguration {
                                                                          final CustomContributorRepository customContributorRepository,
                                                                          final ProjectLeadViewRepository projectLeadViewRepository,
                                                                          final ApplicationRepository applicationRepository,
-                                                                         final ContributionViewEntityRepository contributionViewEntityRepository) {
+                                                                         final ContributionViewEntityRepository contributionViewEntityRepository,
+                                                                         final ProjectsPageRepository projectsPageRepository,
+                                                                         final ProjectsPageFiltersRepository projectsPageFiltersRepository) {
         return new ReadProjectsApiPostgresAdapter(authenticatedAppUserService,
                 permissionService,
                 githubIssueReadRepository,
@@ -82,7 +84,9 @@ public class ReadMarketplaceApiConfiguration {
                 customContributorRepository,
                 projectLeadViewRepository,
                 applicationRepository,
-                contributionViewEntityRepository);
+                contributionViewEntityRepository,
+                projectsPageRepository,
+                projectsPageFiltersRepository);
     }
 
     @Bean

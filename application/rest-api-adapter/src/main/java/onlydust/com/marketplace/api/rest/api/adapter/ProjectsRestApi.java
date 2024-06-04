@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectsApi;
-import onlydust.com.marketplace.api.contract.model.ContributionStatus;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
@@ -13,7 +12,9 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
+import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +34,8 @@ import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapCreateProjectCommandToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapUpdateProjectCommandToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapProjectRewardPageToResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
@@ -53,23 +55,6 @@ public class ProjectsRestApi implements ProjectsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final RewardFacadePort rewardFacadePort;
     private final ContributionFacadePort contributionsFacadePort;
-
-    @Override
-    public ResponseEntity<ProjectPageResponse> getProjects(Integer pageIndex, Integer pageSize, String sort, List<String> ecosystemSlugs,
-                                                           List<ProjectTag> tags, Boolean mine, String search, List<UUID> languageIds) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final Optional<User> optionalUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final ProjectCardView.SortBy sortBy = mapSortByParameter(sort);
-        final List<Project.Tag> projectTags = mapTagsParameter(tags);
-        final Page<ProjectCardView> projectCardViewPage =
-                optionalUser.map(user -> projectFacadePort.searchForUser(projectTags,
-                                ecosystemSlugs, search, sortBy, user.getId(), !isNull(mine) && mine, languageIds, sanitizedPageIndex,
-                                sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.search(projectTags,
-                                ecosystemSlugs, search, sortBy, languageIds, sanitizedPageIndex, sanitizedPageSize));
-        return ResponseEntity.ok(mapProjectCards(projectCardViewPage, sanitizedPageIndex));
-    }
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
@@ -275,12 +260,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
             contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }

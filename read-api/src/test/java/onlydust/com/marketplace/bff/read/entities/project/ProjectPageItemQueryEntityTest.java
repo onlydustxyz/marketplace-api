@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
 import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectPageItemQueryEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 

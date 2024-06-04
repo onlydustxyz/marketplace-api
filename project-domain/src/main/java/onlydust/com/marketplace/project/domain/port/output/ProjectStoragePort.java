@@ -12,15 +12,6 @@ public interface ProjectStoragePort {
 
     Optional<Project> getById(UUID projectId);
 
-    Page<ProjectCardView> findForUserId(List<Project.Tag> tags, List<String> ecosystemSlugs,
-                                        UUID userId, String search,
-                                        ProjectCardView.SortBy sort, Boolean mine, List<UUID> languageIds,
-                                        Integer pageIndex, Integer pageSize);
-
-    Page<ProjectCardView> find(List<Project.Tag> tags, List<String> ecosystemSlugs,
-                               String search, ProjectCardView.SortBy sort, List<UUID> languageIds,
-                               Integer pageIndex, Integer pageSize);
-
     void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,

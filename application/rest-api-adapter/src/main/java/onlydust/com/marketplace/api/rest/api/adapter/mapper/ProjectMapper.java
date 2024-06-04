@@ -1,17 +1,17 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationRepoView;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
+import onlydust.com.marketplace.project.domain.view.UserLinkView;
 
 import java.net.URI;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
@@ -102,103 +102,6 @@ public interface ProjectMapper {
         );
     }
 
-    static ProjectPageResponse mapProjectCards(final Page<ProjectCardView> page, final Integer pageIndex) {
-        final ProjectPageResponse projectPageResponse = new ProjectPageResponse();
-        final List<ProjectPageItemResponse> projectPageItemResponses = new ArrayList<>();
-        final Set<EcosystemResponse> ecosystems = page.getFilters().get(ProjectCardView.FilterBy.ECOSYSTEMS.name())
-                .stream()
-                .map(EcosystemView.class::cast)
-                .map(ProjectMapper::mapEcosystem)
-                .collect(Collectors.toSet());
-        final Set<LanguageResponse> languages = page.getFilters().get(ProjectCardView.FilterBy.LANGUAGES.name())
-                .stream()
-                .map(LanguageView.class::cast)
-                .map(ProjectMapper::mapLanguage)
-                .collect(Collectors.toSet());
-        for (ProjectCardView projectCardView : page.getContent()) {
-            projectPageItemResponses.add(mapProjectCard(projectCardView));
-        }
-        projectPageResponse.setProjects(projectPageItemResponses);
-        projectPageResponse.setEcosystems(ecosystems.stream().sorted(comparing(EcosystemResponse::getName)).toList());
-        projectPageResponse.setLanguages(languages.stream().sorted(comparing(LanguageResponse::getName)).toList());
-        projectPageResponse.setTotalPageNumber(page.getTotalPageNumber());
-        projectPageResponse.setTotalItemNumber(page.getTotalItemNumber());
-        projectPageResponse.setHasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPageNumber()));
-        projectPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPageNumber()));
-        return projectPageResponse;
-    }
-
-    private static ProjectPageItemResponse mapProjectCard(ProjectCardView projectCardView) {
-        final ProjectPageItemResponse projectListItemResponse = mapProjectCardMetadata(projectCardView);
-        for (ProjectLeaderLinkView leader : projectCardView.getLeaders()) {
-            projectListItemResponse.addLeadersItem(mapRegisteredUser(leader));
-        }
-        for (EcosystemView ecosystemView : projectCardView.getEcosystems()) {
-            projectListItemResponse.addEcosystemsItem(mapEcosystem(ecosystemView));
-        }
-        projectListItemResponse.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList()
-                .stream().sorted(comparing(LanguageResponse::getName)).toList());
-        return projectListItemResponse;
-    }
-
-    static LanguageResponse mapLanguage(LanguageView view) {
-        return new LanguageResponse()
-                .id(view.getId())
-                .name(view.getName())
-                .logoUrl(view.getLogoUrl())
-                .bannerUrl(view.getBannerUrl())
-                ;
-    }
-
-    private static ProjectPageItemResponse mapProjectCardMetadata(final ProjectCardView projectCardView) {
-        final ProjectPageItemResponse project = new ProjectPageItemResponse();
-        project.setId(projectCardView.getId());
-        project.setName(projectCardView.getName());
-        project.setLogoUrl(projectCardView.getLogoUrl());
-        project.setSlug(projectCardView.getSlug());
-        project.setHiring(projectCardView.getHiring());
-        project.setShortDescription(projectCardView.getShortDescription());
-        project.setContributorCount(projectCardView.getContributorCount());
-        project.setRepoCount(projectCardView.getRepoCount());
-        project.setVisibility(mapProjectVisibility(projectCardView.getVisibility()));
-        project.setIsInvitedAsProjectLead(projectCardView.getIsInvitedAsProjectLead());
-        project.setHasMissingGithubAppInstallation(projectCardView.getIsMissingGithubAppInstallation());
-        project.setTags(projectCardView.getTags().stream().map(ProjectMapper::mapTag).toList());
-        project.setLanguages(projectCardView.getLanguages().stream().map(ProjectMapper::mapLanguage).toList());
-        return project;
-    }
-
-    private static ProjectTag mapTag(final Project.Tag tag) {
-        return switch (tag) {
-            case HOT_COMMUNITY -> ProjectTag.HOT_COMMUNITY;
-            case UPDATED_ROADMAP -> ProjectTag.UPDATED_ROADMAP;
-            case BIG_WHALE -> ProjectTag.BIG_WHALE;
-            case FAST_AND_FURIOUS -> ProjectTag.FAST_AND_FURIOUS;
-            case LIKELY_TO_REWARD -> ProjectTag.LIKELY_TO_REWARD;
-            case NEWBIES_WELCOME -> ProjectTag.NEWBIES_WELCOME;
-            case WORK_IN_PROGRESS -> ProjectTag.WORK_IN_PROGRESS;
-        };
-    }
-
-    private static EcosystemResponse mapEcosystem(final EcosystemView ecosystem) {
-        final EcosystemResponse ecosystemResponse = new EcosystemResponse();
-        ecosystemResponse.setId(ecosystem.getId());
-        ecosystemResponse.setName(ecosystem.getName());
-        ecosystemResponse.setLogoUrl(ecosystem.getLogoUrl());
-        ecosystemResponse.setUrl(ecosystem.getUrl());
-        ecosystemResponse.setSlug(ecosystem.getSlug());
-        return ecosystemResponse;
-    }
-
-    private static SponsorResponse mapSponsor(final ProjectSponsorView projectSponsorView) {
-        final SponsorResponse sponsorResponse = new SponsorResponse();
-        sponsorResponse.setId(projectSponsorView.sponsorId());
-        sponsorResponse.setName(projectSponsorView.sponsorName());
-        sponsorResponse.setLogoUrl(projectSponsorView.sponsorLogoUrl());
-        sponsorResponse.setUrl(projectSponsorView.sponsorUrl());
-        return sponsorResponse;
-    }
-
     private static GithubRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
         final GithubRepoResponse repoResponse = new GithubRepoResponse();
         repoResponse.setId(repo.getGithubRepoId());
@@ -212,15 +115,6 @@ public interface ProjectMapper {
         repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
         repoResponse.setIsAuthorizedInGithubApp(repo.getIsAuthorizedInGithubApp());
         return repoResponse;
-    }
-
-    private static RegisteredUserResponse mapRegisteredUser(final ProjectLeaderLinkView projectLeader) {
-        final var user = new RegisteredUserResponse();
-        user.setId(projectLeader.getId());
-        user.setGithubUserId(projectLeader.getGithubUserId());
-        user.setAvatarUrl(projectLeader.getAvatarUrl());
-        user.setLogin(projectLeader.getLogin());
-        return user;
     }
 
     static GithubUserResponse mapGithubUser(final UserLinkView userLinkView) {
@@ -243,41 +137,6 @@ public interface ProjectMapper {
         throw new IllegalArgumentException("Could not map project visibility");
     }
 
-    static ProjectCardView.SortBy mapSortByParameter(final String sort) {
-        if (Objects.nonNull(sort)) {
-            if (sort.equals("RANK")) {
-                return ProjectCardView.SortBy.RANK;
-            }
-            if (sort.equals("NAME")) {
-                return ProjectCardView.SortBy.NAME;
-            }
-            if (sort.equals("REPO_COUNT")) {
-                return ProjectCardView.SortBy.REPOS_COUNT;
-            }
-            if (sort.equals("CONTRIBUTOR_COUNT")) {
-                return ProjectCardView.SortBy.CONTRIBUTORS_COUNT;
-            }
-        }
-        return null;
-    }
-
-    static List<Project.Tag> mapTagsParameter(final List<ProjectTag> projectTags) {
-        return isNull(projectTags) ? null : projectTags.stream()
-                .map(ProjectMapper::mapTagParameter)
-                .toList();
-    }
-
-    private static Project.Tag mapTagParameter(final ProjectTag projectTag) {
-        return switch (projectTag) {
-            case BIG_WHALE -> Project.Tag.BIG_WHALE;
-            case FAST_AND_FURIOUS -> Project.Tag.FAST_AND_FURIOUS;
-            case HOT_COMMUNITY -> Project.Tag.HOT_COMMUNITY;
-            case LIKELY_TO_REWARD -> Project.Tag.LIKELY_TO_REWARD;
-            case NEWBIES_WELCOME -> Project.Tag.NEWBIES_WELCOME;
-            case UPDATED_ROADMAP -> Project.Tag.UPDATED_ROADMAP;
-            case WORK_IN_PROGRESS -> Project.Tag.WORK_IN_PROGRESS;
-        };
-    }
 
     static ProjectShortResponse mapShortProjectResponse(Project project) {
         return new ProjectShortResponse()

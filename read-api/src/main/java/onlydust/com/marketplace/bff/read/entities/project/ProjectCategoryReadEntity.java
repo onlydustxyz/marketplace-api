@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
 import org.hibernate.annotations.Immutable;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
+@Accessors(fluent = true)
 @Immutable
 @Table(name = "project_categories", schema = "public")
 public class ProjectCategoryReadEntity {

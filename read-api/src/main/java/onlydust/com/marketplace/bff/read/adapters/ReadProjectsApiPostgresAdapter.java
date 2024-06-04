@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionViewEntityRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
@@ -14,11 +15,16 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationR
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
 import onlydust.com.marketplace.bff.read.repositories.GithubIssueReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.ProjectReadRepository;
+import onlydust.com.marketplace.bff.read.repositories.ProjectsPageFiltersRepository;
+import onlydust.com.marketplace.bff.read.repositories.ProjectsPageRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
@@ -30,18 +36,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
+import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.*;
+import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
+import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -59,6 +65,95 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final ApplicationRepository applicationRepository;
     private final ContributionViewEntityRepository contributionViewEntityRepository;
+
+    private final ProjectsPageRepository projectsPageRepository;
+    private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
+
+    @Override
+    public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex,
+                                                           final Integer pageSize,
+                                                           final Boolean mine,
+                                                           final String search,
+                                                           final List<ProjectTag> tags,
+                                                           final List<String> ecosystemSlugs,
+                                                           final List<UUID> languageIds,
+                                                           final List<UUID> categoryIds,
+                                                           final String sort
+    ) {
+        final Optional<User> user = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final ProjectMapper.SortBy sortBy = mapSortByParameter(sort);
+
+        final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
+        final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
+        final String languagesJsonPath = getLanguagesJsonPath(languageIds);
+
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
+    }
+
+    private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
+                                                                Boolean mine,
+                                                                String search,
+                                                                String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
+                                                                List<UUID> categoryIds,
+                                                                Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
+        final Long count = projectsPageRepository.countProjectsForUserId(userId, mine,
+                search,
+                tagsJsonPath,
+                ecosystemsJsonPath,
+                languagesJsonPath,
+                categoryIds);
+        final var projects = projectsPageRepository.findProjectsForUserId(userId, mine,
+                search,
+                tagsJsonPath,
+                ecosystemsJsonPath,
+                languagesJsonPath,
+                categoryIds,
+                isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
+                PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
+                pageSize);
+        final var filters = projectsPageFiltersRepository.findFiltersForUser(userId, mine);
+        final var totalNumberOfPage = calculateTotalNumberOfPage(pageSize, count.intValue());
+
+        return toProjectPage(userId, pageIndex, projects, filters, totalNumberOfPage, count);
+    }
+
+    private ProjectPageResponse getProjectsForAnonymousUser(String search,
+                                                            String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
+                                                            List<UUID> categoryIds,
+                                                            Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
+        final Long count = projectsPageRepository.countProjectsForAnonymousUser(
+                search,
+                tagsJsonPath,
+                ecosystemsJsonPath,
+                languagesJsonPath,
+                categoryIds);
+        final var projects = projectsPageRepository.findProjectsForAnonymousUser(
+                search,
+                tagsJsonPath,
+                ecosystemsJsonPath,
+                languagesJsonPath,
+                categoryIds,
+                isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
+                PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
+                pageSize);
+        final var filters = projectsPageFiltersRepository.findFiltersForAnonymousUser();
+        final var totalNumberOfPage = calculateTotalNumberOfPage(pageSize, count.intValue());
+
+        return toProjectPage(null, pageIndex, projects, filters, totalNumberOfPage, count);
+    }
+
+    private static ProjectPageResponse toProjectPage(UUID userId, Integer pageIndex, List<ProjectPageItemQueryEntity> projects, List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
+        return new ProjectPageResponse()
+                .projects(projects.stream().map(p -> p.toDto(userId)).toList())
+                .languages(languagesOf(filters).stream().toList())
+                .ecosystems(ecosystemsOf(filters).stream().toList())
+                .categories(categoriesOf(filters).stream().toList())
+                .totalPageNumber(totalNumberOfPage)
+                .totalItemNumber(count.intValue())
+                .hasMore(hasMore(pageIndex, totalNumberOfPage))
+                .nextPageIndex(nextPageIndex(pageIndex, totalNumberOfPage));
+    }
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
@@ -185,9 +280,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .toList())
                 .categories(project.getCategories().stream()
                         .map(c -> new ProjectCategoryResponse()
-                                .id(c.getId())
-                                .name(c.getName())
-                                .iconSlug(c.getIconSlug())
+                                .id(c.id())
+                                .name(c.name())
+                                .iconSlug(c.iconSlug())
                         )
                         .sorted(comparing(ProjectCategoryResponse::getName))
                         .toList())
