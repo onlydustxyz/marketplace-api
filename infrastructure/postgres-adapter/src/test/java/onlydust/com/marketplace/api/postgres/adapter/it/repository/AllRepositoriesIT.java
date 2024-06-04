@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -92,9 +93,9 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final UserViewEntity result = userViewRepository.findById(user.getId()).orElseThrow();
 
         // Then
-        assertEquals(1, userRepository.findAll().size());
-        assertEquals(onboarding.getProfileWizardDisplayDate(), result.onboarding().getProfileWizardDisplayDate());
-        assertEquals(onboarding.getTermsAndConditionsAcceptanceDate(), result.onboarding().getTermsAndConditionsAcceptanceDate());
+        assertThat(userRepository.findAll()).hasSize(1);
+        assertThat(result.onboarding().getProfileWizardDisplayDate()).isEqualToIgnoringNanos(onboarding.getProfileWizardDisplayDate().toInstant().atZone(ZoneOffset.UTC));
+        assertThat(result.onboarding().getTermsAndConditionsAcceptanceDate()).isEqualToIgnoringNanos(onboarding.getTermsAndConditionsAcceptanceDate().toInstant().atZone(ZoneOffset.UTC));
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
 
