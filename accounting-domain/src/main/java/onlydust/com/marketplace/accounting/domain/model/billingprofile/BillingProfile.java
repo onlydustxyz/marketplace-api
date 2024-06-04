@@ -55,6 +55,10 @@ public abstract class BillingProfile {
 
     public abstract boolean isMember(UserId userId);
 
+    public abstract boolean isSwitchableToSelfEmployed();
+
+    public abstract boolean isSwitchableToCompany();
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

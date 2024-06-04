@@ -52,6 +52,16 @@ public class IndividualBillingProfile extends BillingProfile {
         return isAdmin(userId);
     }
 
+    @Override
+    public boolean isSwitchableToSelfEmployed() {
+        return false;
+    }
+
+    @Override
+    public boolean isSwitchableToCompany() {
+        return false;
+    }
+
     public PositiveAmount currentYearPaymentLimit() {
         return YEARLY_USD_PAYMENT_LIMIT;
     }

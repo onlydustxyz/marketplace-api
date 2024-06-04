@@ -52,6 +52,11 @@ public class SelfEmployedBillingProfile extends BillingProfile {
         return Type.SELF_EMPLOYED;
     }
 
+    @Override
+    public boolean isSwitchableToSelfEmployed() {
+        return false;
+    }
+
     public boolean isSwitchableToCompany() {
         return true;
     }

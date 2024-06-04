@@ -57,6 +57,11 @@ public class CompanyBillingProfile extends BillingProfile {
         return members.size() == 1;
     }
 
+    @Override
+    public boolean isSwitchableToCompany() {
+        return false;
+    }
+
     public void addMember(UserId userId, User.Role role) {
         members.add(new User(userId, role, ZonedDateTime.now()));
     }

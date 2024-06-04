@@ -31,8 +31,6 @@ public interface BillingProfileStoragePort {
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
-    boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId);
-
     Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
 
     Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);

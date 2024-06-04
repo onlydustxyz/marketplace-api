@@ -131,14 +131,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isAdmin(BillingProfile.Id billingProfileId, UserId userId) {
-        return billingProfileUserRepository.findByBillingProfileIdAndUserId(billingProfileId.value(), userId.value())
-                .map(billingProfileUserEntity -> billingProfileUserEntity.getRole().equals(BillingProfile.User.Role.ADMIN))
-                .orElse(false);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<BillingProfile> findById(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.findById(billingProfileId.value()).map(BillingProfileEntity::toDomain);
     }
