@@ -71,6 +71,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
+                                            'slug', l.slug,
                                             'logoUrl', l.logo_url,
                                             'bannerUrl', l.banner_url
                                             )) json
@@ -181,6 +182,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
+                                            'slug', l.slug,
                                             'logoUrl', l.logo_url,
                                             'bannerUrl', l.banner_url
                                             )) json
@@ -245,6 +247,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
+                                            'slug', l.slug,
                                             'logoUrl', l.logo_url,
                                             'bannerUrl', l.banner_url
                                             )) json
@@ -318,6 +321,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   jsonb_agg(jsonb_build_object(
                                             'id', l.id,
                                             'name', l.name,
+                                            'slug', l.slug,
                                             'logoUrl', l.logo_url,
                                             'bannerUrl', l.banner_url
                                             )) json
