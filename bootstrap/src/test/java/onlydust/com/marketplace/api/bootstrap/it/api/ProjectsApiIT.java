@@ -3719,7 +3719,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
 
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "categories", "ai",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "categorySlugs", "ai",
                         "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then

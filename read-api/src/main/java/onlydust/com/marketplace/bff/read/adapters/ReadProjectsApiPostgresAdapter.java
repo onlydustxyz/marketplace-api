@@ -78,7 +78,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final List<ProjectTag> tags,
                                                            final List<String> ecosystemSlugs,
                                                            final List<String> languageSlugs,
-                                                           final List<String> categories,
+                                                           final List<String> categorySlugs,
                                                            final Boolean hasGoodFirstIssues,
                                                            final String sort
     ) {
@@ -90,8 +90,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
-                        categories, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categories, hasGoodFirstIssues,
+                        categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs, hasGoodFirstIssues,
                         sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
     }
 

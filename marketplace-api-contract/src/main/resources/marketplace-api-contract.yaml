@@ -1200,7 +1200,7 @@ paths:
             items:
               $ref: '#/components/schemas/LanguageSlug'
         - in: query
-          name: categories
+          name: categorySlugs
           required: false
           schema:
             type: array
