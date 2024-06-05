@@ -78,6 +78,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
                            group by pl.project_id) languages on languages.project_id = p.id
+                left join (select pgfi.project_id, count(*) > 0 exist
+                                    from projects_good_first_issues pgfi
+                                    group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
             where r_count.repo_count > 0
               and p.visibility = 'PUBLIC'
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
@@ -85,6 +88,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
               and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
+              and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
               order by case
                            when cast(:orderBy as text) = 'NAME' then (upper(p.name), 0)
                            when cast(:orderBy as text) = 'REPOS_COUNT' then (-r_count.repo_count, upper(p.name))
@@ -98,6 +102,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                                   @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                                   @Param("languagesJsonPath") String languagesJsonPath,
                                                                   @Param("categoryIds") List<UUID> categoryIds,
+                                                                  @Param("hasGoodFirstIssues") Boolean hasGoodFirstIssues,
                                                                   @Param("orderBy") String orderBy,
                                                                   @Param("offset") int offset,
                                                                   @Param("limit") int limit);
@@ -189,6 +194,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
                            group by pl.project_id) languages on languages.project_id = p.id
+                    left join (select pgfi.project_id, count(*) > 0 exist
+                                        from projects_good_first_issues pgfi
+                                        group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC' 
                        or (p.visibility = 'PRIVATE' 
@@ -204,6 +212,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
+              and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
             order by case
                          when cast(:orderBy as text) = 'NAME' then (not coalesce(is_pending_pl.is_p_pl, false), upper(p.name), 0)
                          when cast(:orderBy as text) = 'REPOS_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false),-r_count.repo_count,upper(p.name))
@@ -219,6 +228,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                                            @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                                            @Param("languagesJsonPath") String languagesJsonPath,
                                                            @Param("categoryIds") List<UUID> categoryIds,
+                                                           @Param("hasGoodFirstIssues") Boolean hasGoodFirstIssues,
                                                            @Param("orderBy") String orderBy,
                                                            @Param("offset") int offset,
                                                            @Param("limit") int limit);
@@ -253,7 +263,10 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                             )) json
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
-                           group by pl.project_id) languages on languages.project_id = p.id 
+                           group by pl.project_id) languages on languages.project_id = p.id
+                        left join (select pgfi.project_id, count(*) > 0 exist
+                                            from projects_good_first_issues pgfi
+                                            group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
                         where (select count(github_repo_id)
                                            from project_github_repos pgr_count
                                            join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
@@ -264,13 +277,15 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
                                        and (coalesce(:categoryIds) is null or exists(select 1 from projects_project_categories ppc where ppc.project_id = p.id and ppc.project_category_id in (:categoryIds)))
                                        and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) ||'%' or p.short_description ilike '%' || cast(:search as text) ||'%')
+                                       and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
             """
             , nativeQuery = true)
     Long countProjectsForAnonymousUser(@Param("search") String search,
                                        @Param("tagsJsonPath") String tagsJsonPath,
                                        @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                        @Param("languagesJsonPath") String languagesJsonPath,
-                                       @Param("categoryIds") List<UUID> categoryIds);
+                                       @Param("categoryIds") List<UUID> categoryIds,
+                                       @Param("hasGoodFirstIssues") Boolean hasGoodFirstIssues);
 
     @Query(value = """
             select count(p.id)
@@ -328,6 +343,9 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                   from project_languages pl
                            join languages l on pl.language_id = l.id
                            group by pl.project_id) languages on languages.project_id = p.id
+                    left join (select pgfi.project_id, count(*) > 0 exist
+                                        from projects_good_first_issues pgfi
+                                        group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC'
                 or (p.visibility = 'PRIVATE' and (pl_count.project_lead_count > 0 or coalesce(is_pending_pl.is_p_pl, false))
@@ -340,6 +358,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:search) is null or p.name ilike '%' || cast(:search as text) || '%' or
                    p.short_description ilike '%' || cast(:search as text) || '%')
               and (coalesce(:mine) is null or case when :mine is true then (coalesce(is_me_lead.is_lead, false) or coalesce(is_pending_pl.is_p_pl, false)) else true end)
+              and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
             """, nativeQuery = true)
     Long countProjectsForUserId(@Param("userId") UUID userId,
                                 @Param("mine") Boolean mine,
@@ -347,5 +366,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                 @Param("tagsJsonPath") String tagsJsonPath,
                                 @Param("ecosystemsJsonPath") String ecosystemsJsonPath,
                                 @Param("languagesJsonPath") String languagesJsonPath,
-                                @Param("categoryIds") List<UUID> categoryIds);
+                                @Param("categoryIds") List<UUID> categoryIds,
+                                @Param("hasGoodFirstIssues") Boolean hasGoodFirstIssues);
 }

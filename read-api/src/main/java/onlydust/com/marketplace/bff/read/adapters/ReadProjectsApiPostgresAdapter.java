@@ -79,6 +79,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final List<String> ecosystemSlugs,
                                                            final List<String> languageSlugs,
                                                            final List<UUID> categoryIds,
+                                                           final Boolean hasGoodFirstIssues,
                                                            final String sort
     ) {
         final Optional<User> user = authenticatedAppUserService.tryGetAuthenticatedUser();
@@ -89,8 +90,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
-                        categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds,
+                        categoryIds, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, hasGoodFirstIssues,
                         sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
     }
 
@@ -98,20 +99,22 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                 Boolean mine,
                                                                 String search,
                                                                 String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
-                                                                List<UUID> categoryIds,
+                                                                List<UUID> categoryIds, Boolean hasGoodFirstIssues,
                                                                 Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine,
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
-                categoryIds);
+                categoryIds,
+                hasGoodFirstIssues);
         final var projects = projectsPageRepository.findProjectsForUserId(userId, mine,
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
                 categoryIds,
+                hasGoodFirstIssues,
                 isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
@@ -123,20 +126,22 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     private ProjectPageResponse getProjectsForAnonymousUser(String search,
                                                             String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
-                                                            List<UUID> categoryIds,
+                                                            List<UUID> categoryIds, Boolean hasGoodFirstIssues,
                                                             Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
-                categoryIds);
+                categoryIds,
+                hasGoodFirstIssues);
         final var projects = projectsPageRepository.findProjectsForAnonymousUser(
                 search,
                 tagsJsonPath,
                 ecosystemsJsonPath,
                 languagesJsonPath,
                 categoryIds,
+                hasGoodFirstIssues,
                 isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
