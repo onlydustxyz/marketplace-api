@@ -12,6 +12,7 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
     @Query(value = """
             SELECT
                 pcs.id      as id,
+                null        as slug,
                 pcs.name    as name,
                 null        as icon_slug,
                 'PENDING'   as status,
@@ -21,6 +22,7 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
             UNION
             SELECT
                 pc.id                           as id,
+                pc.slug                         as slug,
                 pc.name                         as name,
                 pc.icon_slug                    as icon_slug,
                 'APPROVED'                      as status,

@@ -29,10 +29,12 @@ public class ProjectCategoriesApiIT extends AbstractMarketplaceApiIT {
                           "categories": [
                             {
                               "name": "Game",
+                              "slug": "game",
                               "iconSlug": "game"
                             },
                             {
                               "name": "Tutorial",
+                              "slug": "tutorial",
                               "iconSlug": "tuto"
                             }
                           ]

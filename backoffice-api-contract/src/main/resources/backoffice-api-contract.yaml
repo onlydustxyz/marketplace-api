@@ -4843,6 +4843,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectCategoryId'
+        slug:
+          $ref: '#/components/schemas/ProjectCategorySlug'
         name:
           type: string
         status:
@@ -4876,6 +4878,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectCategoryId'
+        slug:
+          $ref: '#/components/schemas/ProjectCategorySlug'
         name:
           type: string
         iconSlug:
@@ -4884,6 +4888,9 @@ components:
     ProjectCategoryId:
       type: string
       format: uuid
+
+    ProjectCategorySlug:
+      type: string
 
     ProjectCategorySuggestionStatus:
       type: string

@@ -339,3 +339,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000255_create_ecosystem_categories.sql
   - include:
       file: db/changelog/changelogs/00000256_create_language_slugs.sql
+  - include:
+      file: db/changelog/changelogs/00000257_create_project_category_slugs.sql
