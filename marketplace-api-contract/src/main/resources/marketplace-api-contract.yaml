@@ -1207,6 +1207,11 @@ paths:
             items:
               $ref: '#/components/schemas/ProjectCategoryId'
         - in: query
+          name: hasGoodFirstIssues
+          required: false
+          schema:
+            type: boolean
+        - in: query
           name: sort
           description: Sort order
           schema:
