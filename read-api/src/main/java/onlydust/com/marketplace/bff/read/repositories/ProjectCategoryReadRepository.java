@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.bff.read.repositories;
 
 import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
@@ -12,4 +15,12 @@ public interface ProjectCategoryReadRepository extends Repository<ProjectCategor
     Optional<ProjectCategoryReadEntity> findById(UUID Id);
 
     List<ProjectCategoryReadEntity> findAll(Sort sort);
+
+    @Query("""
+            SELECT DISTINCT pc
+            FROM ProjectCategoryReadEntity pc
+            JOIN pc.ecosystems e
+            WHERE e.slug = :ecosystemSlug
+            """)
+    Page<ProjectCategoryReadEntity> findAllByEcosystemSlug(String ecosystemSlug, Pageable pageable);
 }

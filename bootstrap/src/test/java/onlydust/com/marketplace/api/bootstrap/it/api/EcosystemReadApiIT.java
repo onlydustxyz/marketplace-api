@@ -1,11 +1,43 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
+    @Autowired
+    ProjectCategoryRepository projectCategoryRepository;
+    @Autowired
+    ProjectRepository projectRepository;
+
+    @BeforeEach
+    void setUp() {
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "AI", "brain");
+        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "Security", "lock");
+        projectCategoryRepository.saveAll(List.of(
+                categorySecurity,
+                categoryAI,
+                new ProjectCategoryEntity(UUID.fromString("d847060c-490c-482b-a3be-e48f93506b5d"), "Foo", "bar")
+        ));
+        final var project = projectRepository.findById(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56")).get();
+        project.setCategories(Set.of(new ProjectProjectCategoryEntity(project.getId(), categoryAI.getId()),
+                new ProjectProjectCategoryEntity(project.getId(), categorySecurity.getId())));
+        projectRepository.save(project);
+    }
+
     @Test
     void should_list_ecosystems() {
         // When
@@ -46,7 +78,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "397df411-045d-4d9f-8d65-8284c88f9208",
@@ -71,7 +116,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
@@ -96,7 +143,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
@@ -121,7 +170,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
@@ -146,11 +208,13 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
@@ -193,7 +257,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
@@ -230,7 +307,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
                                 }
                               ],
-                              "projectCount": 4
+                              "projectCount": 4,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
@@ -255,11 +334,24 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
@@ -331,6 +423,38 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                              }
                            ]
                          }
+                        """);
+    }
+
+    @Test
+    void should_get_ecosystem_project_categories() {
+        // When
+        client.get()
+                .uri(getApiURI(ECOSYSTEM_PROJECT_CATEGORIES.formatted("ethereum")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "projectCategories": [
+                            {
+                              "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                              "name": "Security",
+                              "iconSlug": "lock"
+                            },
+                            {
+                              "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                              "name": "AI",
+                              "iconSlug": "brain"
+                            }
+                          ]
+                        }
                         """);
     }
 }

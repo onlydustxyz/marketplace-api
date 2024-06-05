@@ -55,12 +55,14 @@ public class ReadMarketplaceApiConfiguration {
     public ReadEcosystemsApiPostgresAdapter readEcosystemsApiPostgresAdapter(final ProjectEcosystemCardReadEntityRepository projectEcosystemCardReadEntityRepository,
                                                                              final EcosystemContributorPageItemEntityRepository ecosystemContributorPageItemEntityRepository,
                                                                              final EcosystemReadRepository ecosystemReadRepository,
-                                                                             final LanguageReadRepository languageReadRepository) {
+                                                                             final LanguageReadRepository languageReadRepository,
+                                                                             final ProjectCategoryReadRepository projectCategoryReadRepository) {
         return new ReadEcosystemsApiPostgresAdapter(
                 ecosystemContributorPageItemEntityRepository,
                 projectEcosystemCardReadEntityRepository,
                 ecosystemReadRepository,
-                languageReadRepository
+                languageReadRepository,
+                projectCategoryReadRepository
         );
     }
 
