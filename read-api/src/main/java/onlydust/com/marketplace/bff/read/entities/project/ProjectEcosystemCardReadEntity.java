@@ -20,6 +20,8 @@ import org.hibernate.type.SqlTypes;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @Accessors(fluent = true)
 @Entity
 @NoArgsConstructor
@@ -55,7 +57,7 @@ public class ProjectEcosystemCardReadEntity {
                 .shortDescription(shortDescription)
                 .logoUrl(logoUrl)
                 .contributorsCount(contributorsCount)
-                .topContributors(topContributors.stream()
+                .topContributors(isNull(topContributors) ? List.of() : topContributors.stream()
                         .map(githubUserLinkJson -> new GithubUserResponse()
                                 .avatarUrl(githubUserLinkJson.getAvatarUrl())
                                 .githubUserId(githubUserLinkJson.getGithubUserId())
