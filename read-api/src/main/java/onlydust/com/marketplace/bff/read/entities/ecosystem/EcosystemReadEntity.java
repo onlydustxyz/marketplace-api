@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.contract.model.EcosystemPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemShortResponseBanners;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.LanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -60,6 +61,12 @@ public class EcosystemReadEntity {
             inverseJoinColumns = @JoinColumn(name = "language_id"))
     private Set<LanguageViewEntity> languages;
 
+    @ManyToMany
+    @JoinTable(name = "ecosystem_project_categories",
+            joinColumns = @JoinColumn(name = "ecosystem_id"),
+            inverseJoinColumns = @JoinColumn(name = "project_category_id"))
+    private Set<ProjectCategoryReadEntity> projectCategories;
+
     public EcosystemPageItemResponse toPageItemResponse() {
         return new EcosystemPageItemResponse()
                 .id(id)
@@ -71,6 +78,8 @@ public class EcosystemReadEntity {
                         .xl(xlBanner == null ? null : xlBanner.toDto()))
                 .projectCount(projects().size())
                 .topProjects(projects.stream().limit(3).map(ProjectMapper::map).toList())
+                .projectCategoryCount(projectCategories().size())
+                .topProjectCategories(projectCategories.stream().limit(3).map(ProjectCategoryReadEntity::toDto).toList())
                 ;
     }
 

@@ -78,7 +78,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "397df411-045d-4d9f-8d65-8284c88f9208",
@@ -103,7 +116,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
@@ -128,7 +143,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
@@ -153,7 +170,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
@@ -178,11 +208,13 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
@@ -225,7 +257,20 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             },
                             {
                               "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
@@ -262,7 +307,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
                                 }
                               ],
-                              "projectCount": 4
+                              "projectCount": 4,
+                              "topProjectCategories": [],
+                              "projectCategoryCount": 0
                             },
                             {
                               "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
@@ -287,11 +334,24 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
                                 }
                               ],
-                              "projectCount": 1
+                              "projectCount": 1,
+                              "topProjectCategories": [
+                                {
+                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
+                                  "name": "Security",
+                                  "iconSlug": "lock"
+                                },
+                                {
+                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                                  "name": "AI",
+                                  "iconSlug": "brain"
+                                }
+                              ],
+                              "projectCategoryCount": 2
                             }
                           ]
                         }
-                        """, true);
+                        """);
     }
 
     @Test
