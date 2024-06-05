@@ -3608,9 +3608,12 @@ components:
       type: object
       required:
         - name
+        - slug
         - fileExtensions
       properties:
         name:
+          type: string
+        slug:
           type: string
         fileExtensions:
           type: array
@@ -3621,9 +3624,12 @@ components:
       type: object
       required:
         - name
+        - slug
         - fileExtensions
       properties:
         name:
+          type: string
+        slug:
           type: string
         fileExtensions:
           type: array
@@ -3648,12 +3654,15 @@ components:
       type: object
       required:
         - id
+        - slug
         - name
         - fileExtensions
       properties:
         id:
           $ref: '#/components/schemas/LanguageId'
         name:
+          type: string
+        slug:
           type: string
         fileExtensions:
           type: array

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.entities;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,17 +21,15 @@ import java.util.UUID;
 @Table(name = "languages", schema = "public")
 @Immutable
 @Accessors(fluent = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class LanguageReadEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull
-    UUID id;
-
-    @NonNull
-    String name;
+    @NonNull UUID id;
+    @NonNull String name;
+    @NonNull String slug;
     String logoUrl;
     String bannerUrl;
-
 
     @ManyToMany
     @JoinTable(name = "ecosystem_languages",
@@ -41,6 +40,7 @@ public class LanguageReadEntity {
     public LanguageResponse toDto() {
         return new LanguageResponse()
                 .id(id)
+                .slug(slug)
                 .name(name)
                 .logoUrl(logoUrl)
                 .bannerUrl(bannerUrl);

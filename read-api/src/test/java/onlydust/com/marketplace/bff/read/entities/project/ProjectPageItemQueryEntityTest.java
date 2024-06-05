@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,10 +108,10 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_no_languages() {
             // Given
-            final List<UUID> languageIds = null;
+            final List<String> languageIds = null;
 
             // When
-            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
+            final var languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
             assertNull(languagesJsonPath);
@@ -121,27 +120,25 @@ public class ProjectPageItemQueryEntityTest {
         @Test
         void given_one_language() {
             // Given
-            final List<UUID> languageIds = List.of(UUID.randomUUID());
+            final var languageIds = List.of("rust");
 
             // When
-            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
+            final var languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + languageIds.get(0) + "\")", languagesJsonPath);
+            assertEquals("$[*] ? (@.slug == \"rust\")", languagesJsonPath);
         }
 
         @Test
         void given_two_languages() {
             // Given
-            final List<UUID> languageIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+            final var languageIds = List.of("rust", "cairo");
 
             // When
-            final String languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
+            final var languagesJsonPath = ProjectPageItemQueryEntity.getLanguagesJsonPath(languageIds);
 
             // Then
-            assertEquals("$[*] ? (@.id == \"" + languageIds.get(0) + "\" || @.id == \"" + languageIds.get(1) + "\")", languagesJsonPath);
+            assertEquals("$[*] ? (@.slug == \"rust\" || @.slug == \"cairo\")", languagesJsonPath);
         }
-
     }
-
 }

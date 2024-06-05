@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemProjectPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
-import onlydust.com.marketplace.api.contract.model.LanguageResponse;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.GithubUserLinkJson;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -19,8 +19,6 @@ import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.UUID;
-
-import static java.util.Objects.nonNull;
 
 @Accessors(fluent = true)
 @Entity
@@ -45,37 +43,24 @@ public class ProjectEcosystemCardReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<GithubUserLinkJson> topContributors;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<LanguageLinkJson> languages;
+    List<LanguageReadEntity> languages;
     Integer contributorsCount;
 
 
     public EcosystemProjectPageItemResponse toContract() {
-        EcosystemProjectPageItemResponse contractResponse = new EcosystemProjectPageItemResponse();
-        contractResponse.setId(id);
-        contractResponse.setName(name);
-        contractResponse.setSlug(slug);
-        contractResponse.setShortDescription(shortDescription);
-        contractResponse.setLogoUrl(logoUrl);
-        contractResponse.setContributorsCount(contributorsCount);
-        if (nonNull(topContributors)) {
-            this.topContributors.stream()
-                    .map(githubUserLinkJson -> new GithubUserResponse()
-                            .avatarUrl(githubUserLinkJson.getAvatarUrl())
-                            .githubUserId(githubUserLinkJson.getGithubUserId())
-                            .login(githubUserLinkJson.getLogin())
-                    )
-                    .forEach(contractResponse::addTopContributorsItem);
-        }
-        if (nonNull(languages)) {
-            this.languages.stream()
-                    .map(languageLinkJson -> new LanguageResponse()
-                            .id(languageLinkJson.id)
-                            .bannerUrl(languageLinkJson.getBannerUrl())
-                            .logoUrl(languageLinkJson.getLogoUrl())
-                            .name(languageLinkJson.getName())
-                    )
-                    .forEach(contractResponse::addLanguagesItem);
-        }
-        return contractResponse;
+        return new EcosystemProjectPageItemResponse()
+                .id(id)
+                .name(name)
+                .slug(slug)
+                .shortDescription(shortDescription)
+                .logoUrl(logoUrl)
+                .contributorsCount(contributorsCount)
+                .topContributors(topContributors.stream()
+                        .map(githubUserLinkJson -> new GithubUserResponse()
+                                .avatarUrl(githubUserLinkJson.getAvatarUrl())
+                                .githubUserId(githubUserLinkJson.getGithubUserId())
+                                .login(githubUserLinkJson.getLogin())
+                        ).toList())
+                .languages(languages.stream().map(LanguageReadEntity::toDto).toList());
     }
 }

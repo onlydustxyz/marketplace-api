@@ -42,8 +42,9 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
-import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.*;
+import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.Category;
 import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -76,7 +77,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final String search,
                                                            final List<ProjectTag> tags,
                                                            final List<String> ecosystemSlugs,
-                                                           final List<UUID> languageIds,
+                                                           final List<String> languages,
                                                            final List<UUID> categoryIds,
                                                            final String sort
     ) {
@@ -85,10 +86,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
-        final String languagesJsonPath = getLanguagesJsonPath(languageIds);
+        final String languagesJsonPath = getLanguagesJsonPath(languages);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
+                        categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds,
+                        sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
     }
 
     private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
@@ -143,12 +146,13 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return toProjectPage(null, pageIndex, projects, filters, totalNumberOfPage, count);
     }
 
-    private static ProjectPageResponse toProjectPage(UUID userId, Integer pageIndex, List<ProjectPageItemQueryEntity> projects, List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
+    private static ProjectPageResponse toProjectPage(UUID userId, Integer pageIndex, List<ProjectPageItemQueryEntity> projects,
+                                                     List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
         return new ProjectPageResponse()
                 .projects(projects.stream().map(p -> p.toDto(userId)).toList())
-                .languages(languagesOf(filters).stream().toList())
-                .ecosystems(ecosystemsOf(filters).stream().toList())
-                .categories(categoriesOf(filters).stream().toList())
+                .languages(filters.stream().flatMap(e -> e.languages().stream().map(LanguageReadEntity::toDto)).collect(toSet()).stream().toList())
+                .ecosystems(filters.stream().flatMap(e1 -> e1.ecosystems().stream().map(Ecosystem::toDto)).collect(toSet()).stream().toList())
+                .categories(filters.stream().flatMap(e2 -> e2.categories().stream().map(Category::toDto)).collect(toSet()).stream().toList())
                 .totalPageNumber(totalNumberOfPage)
                 .totalItemNumber(count.intValue())
                 .hasMore(hasMore(pageIndex, totalNumberOfPage))

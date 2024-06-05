@@ -885,6 +885,7 @@ public interface BackOfficeMapper {
     static LanguageResponse mapLanguageResponse(Language language) {
         return new LanguageResponse()
                 .id(language.id().value())
+                .slug(language.slug())
                 .name(language.name())
                 .fileExtensions(language.fileExtensions().stream().toList())
                 .logoUrl(language.logoUrl())
@@ -894,6 +895,7 @@ public interface BackOfficeMapper {
     static Language mapLanguageUpdateRequest(UUID languageId, LanguageUpdateRequest languageUpdateRequest) {
         return new Language(Language.Id.of(languageId),
                 languageUpdateRequest.getName(),
+                languageUpdateRequest.getSlug(),
                 new HashSet<>(languageUpdateRequest.getFileExtensions()),
                 languageUpdateRequest.getLogoUrl(),
                 languageUpdateRequest.getBannerUrl());

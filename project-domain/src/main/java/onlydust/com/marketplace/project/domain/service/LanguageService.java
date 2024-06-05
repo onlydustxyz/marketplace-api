@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
@@ -22,8 +23,8 @@ public class LanguageService implements LanguageFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
-    public Language createLanguage(String name, Set<String> fileExtensions) {
-        final var language = Language.of(name, fileExtensions);
+    public Language createLanguage(final @NonNull String name, final @NonNull String slug, final @NonNull Set<String> fileExtensions) {
+        final var language = Language.of(name, slug, fileExtensions);
         languageStorage.save(language);
         return language;
     }

@@ -40,7 +40,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    t.technologies as  technologies,
                    s.ecosystem_json                                 ecosystems,
                    tags.names                                    tags,
-                   languages.json   as languages
+                   coalesce(languages.json, '[]')   as languages
             from projects p
                 left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                             from project_technologies pt
@@ -133,7 +133,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                     left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
                            where pgr.project_id = p.id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation,
                    tags.names                                    tags,
-                   languages.json   as languages
+                   coalesce(languages.json, '[]')   as languages
             from projects p
                      left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                                  from project_technologies pt
