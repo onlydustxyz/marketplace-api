@@ -69,4 +69,12 @@ public class User {
                 .administratedBillingProfiles(getAdministratedBillingProfiles())
                 .build();
     }
+
+    public GithubUserIdentity toGithubIdentity() {
+        return GithubUserIdentity.builder()
+                .githubUserId(githubUserId)
+                .githubLogin(githubLogin)
+                .githubAvatarUrl(githubAvatarUrl)
+                .build();
+    }
 }

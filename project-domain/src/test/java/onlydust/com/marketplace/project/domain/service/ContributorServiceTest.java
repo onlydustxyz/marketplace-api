@@ -82,7 +82,12 @@ public class ContributorServiceTest {
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
                 contributor -> when(userStoragePort.getUserByGithubId(contributor.getId().getGithubUserId()))
-                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder().build()) :
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
+                                .githubUserId(contributor.getId().getGithubUserId())
+                                .githubLogin(contributor.getId().getGithubLogin())
+                                .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
+                                .githubEmail(contributor.getId().getEmail())
+                                .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
                 false);
@@ -180,7 +185,12 @@ public class ContributorServiceTest {
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
                 contributor -> when(userStoragePort.getUserByGithubId(contributor.getId().getGithubUserId()))
-                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder().build()) :
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
+                                .githubUserId(contributor.getId().getGithubUserId())
+                                .githubLogin(contributor.getId().getGithubLogin())
+                                .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
+                                .githubEmail(contributor.getId().getEmail())
+                                .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(null, null, login, 0, 0,
                 true);
