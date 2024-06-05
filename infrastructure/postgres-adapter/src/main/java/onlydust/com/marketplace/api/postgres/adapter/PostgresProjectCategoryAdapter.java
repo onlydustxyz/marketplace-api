@@ -43,4 +43,10 @@ public class PostgresProjectCategoryAdapter implements ProjectCategoryStoragePor
         return projectCategoryRepository.findById(id.value())
                 .map(ProjectCategoryEntity::toDomain);
     }
+
+    @Override
+    public Optional<ProjectCategorySuggestion> get(ProjectCategorySuggestion.Id id) {
+        return projectCategorySuggestionRepository.findById(id.value())
+                .map(ProjectCategorySuggestionEntity::toDomain);
+    }
 }

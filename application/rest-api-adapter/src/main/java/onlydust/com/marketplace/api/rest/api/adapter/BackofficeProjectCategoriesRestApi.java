@@ -26,7 +26,8 @@ public class BackofficeProjectCategoriesRestApi implements BackofficeProjectCate
     public ResponseEntity<ProjectCategoryResponse> createProjectCategory(ProjectCategoryCreateRequest request) {
         final var projectCategory = projectCategoryFacadePort.createCategory(
                 request.getName(),
-                request.getIconSlug());
+                request.getIconSlug(),
+                request.getSuggestionId() == null ? null : ProjectCategorySuggestion.Id.of(request.getSuggestionId()));
 
         return ok(map(projectCategory));
     }
@@ -48,7 +49,8 @@ public class BackofficeProjectCategoriesRestApi implements BackofficeProjectCate
         final var projectCategory = projectCategoryFacadePort.updateCategory(
                 ProjectCategory.Id.of(id),
                 request.getName(),
-                request.getIconSlug());
+                request.getIconSlug(),
+                request.getSuggestionId() == null ? null : ProjectCategorySuggestion.Id.of(request.getSuggestionId()));
 
         return ok(map(projectCategory));
     }

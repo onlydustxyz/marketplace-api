@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -19,37 +18,34 @@ import java.util.UUID;
 public class EcosystemEntity {
 
     @Id
-    @Column(name = "id")
-    UUID id;
-    @Column(name = "slug", nullable = false)
-    String slug;
-    @Column(name = "name", nullable = false)
-    String name;
-    @Column(name = "logo_url", nullable = false)
-    String logoUrl;
-    @Column(name = "url")
-    String url;
-    @Column(name = "description", nullable = false)
-    String description;
+    private @NonNull UUID id;
+    private @NonNull String slug;
+    private @NonNull String name;
+    private @NonNull String logoUrl;
+    private String url;
+    private @NonNull String description;
+    private @NonNull Boolean hidden;
 
     public static EcosystemEntity fromDomain(final Ecosystem ecosystem) {
         return EcosystemEntity.builder()
-                .id(ecosystem.getId())
-                .slug(ecosystem.getSlug())
-                .name(ecosystem.getName())
-                .logoUrl(ecosystem.getLogoUrl())
-                .url(ecosystem.getUrl())
-                .description(ecosystem.getDescription())
+                .id(ecosystem.id())
+                .slug(ecosystem.slug())
+                .name(ecosystem.name())
+                .logoUrl(ecosystem.logoUrl())
+                .url(ecosystem.url())
+                .description(ecosystem.description())
+                .hidden(ecosystem.hidden())
                 .build();
     }
 
     public Ecosystem toDomain() {
         return Ecosystem.builder()
-                .id(this.id)
-                .logoUrl(this.logoUrl)
-                .url(this.url)
-                .name(this.name)
-                .description(this.description)
+                .id(id)
+                .logoUrl(logoUrl)
+                .url(url)
+                .name(name)
+                .description(description)
+                .hidden(hidden)
                 .build();
     }
 }

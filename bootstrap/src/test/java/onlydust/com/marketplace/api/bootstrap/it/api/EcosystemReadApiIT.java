@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepositor
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Map;
@@ -25,12 +24,13 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain");
-        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock");
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain", Set.of());
+        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock",
+                Set.of());
         projectCategoryRepository.saveAll(List.of(
                 categorySecurity,
                 categoryAI,
-                new ProjectCategoryEntity(UUID.fromString("d847060c-490c-482b-a3be-e48f93506b5d"), "foo", "Foo", "bar")
+                new ProjectCategoryEntity(UUID.fromString("d847060c-490c-482b-a3be-e48f93506b5d"), "foo", "Foo", "bar", Set.of())
         ));
         final var project = projectRepository.findById(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56")).get();
         project.setCategories(Set.of(new ProjectProjectCategoryEntity(project.getId(), categoryAI.getId()),
@@ -149,11 +149,13 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
                                   "name": "Security",
+                                  "slug": "security",
                                   "iconSlug": "lock"
                                 },
                                 {
                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
                                   "name": "AI",
+                                  "slug": "ai",
                                   "iconSlug": "brain"
                                 }
                               ],
@@ -275,11 +277,13 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
                                   "name": "Security",
+                                  "slug": "security",
                                   "iconSlug": "lock"
                                 },
                                 {
                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
                                   "name": "AI",
+                                  "slug": "ai",
                                   "iconSlug": "brain"
                                 }
                               ],

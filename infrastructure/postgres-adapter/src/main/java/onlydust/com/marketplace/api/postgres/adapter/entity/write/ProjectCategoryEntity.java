@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 
+import java.util.Set;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @AllArgsConstructor
@@ -22,12 +23,18 @@ public class ProjectCategoryEntity {
     private @NonNull String name;
     private @NonNull String iconSlug;
 
+    @OneToMany(mappedBy = "projectCategoryId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProjectProjectCategoryEntity> projectCategories;
+
     public static ProjectCategoryEntity fromDomain(ProjectCategory projectCategory) {
         return ProjectCategoryEntity.builder()
                 .id(projectCategory.id().value())
                 .slug(projectCategory.slug())
                 .name(projectCategory.name())
                 .iconSlug(projectCategory.iconSlug())
+                .projectCategories(projectCategory.projects().stream()
+                        .map(projectId -> new ProjectProjectCategoryEntity(projectId, projectCategory.id().value()))
+                        .collect(toSet()))
                 .build();
     }
 
@@ -35,6 +42,7 @@ public class ProjectCategoryEntity {
         return new ProjectCategory(
                 ProjectCategory.Id.of(id),
                 name,
-                iconSlug);
+                iconSlug,
+                projectCategories.stream().map(ProjectProjectCategoryEntity::getProjectId).collect(toSet()));
     }
 }

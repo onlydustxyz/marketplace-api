@@ -1,13 +1,15 @@
 package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 
 import java.util.UUID;
 
 @Builder
-@Data
+@Value
+@Accessors(fluent = true)
 public class Ecosystem {
     @NonNull
     @Builder.Default
@@ -20,8 +22,10 @@ public class Ecosystem {
     String logoUrl;
     @NonNull
     String description;
+    @NonNull
+    Boolean hidden;
 
-    public String getSlug() {
+    public String slug() {
         return name.replaceAll("[^a-zA-Z0-9_\\- ]+", "")
                 .replaceAll("\s+", "-")
                 .toLowerCase();

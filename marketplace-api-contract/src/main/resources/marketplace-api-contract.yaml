@@ -7576,9 +7576,12 @@ components:
       type: object
       required:
         - name
+        - projectId
       properties:
         name:
           type: string
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
 
     CommitteeResponse:
       type: object

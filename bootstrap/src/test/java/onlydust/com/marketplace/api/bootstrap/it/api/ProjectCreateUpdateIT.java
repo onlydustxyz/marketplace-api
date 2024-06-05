@@ -70,9 +70,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
     @Order(1)
     public void should_create_a_new_project() {
         // Given
-        gameCategory = projectCategoryFacadePort.createCategory("Game", "game");
-        tutorialCategory = projectCategoryFacadePort.createCategory("Tutorial", "tuto");
-        cryptoCategory = projectCategoryFacadePort.createCategory("Crypto", "crypto");
+        gameCategory = projectCategoryFacadePort.createCategory("Game", "game", null);
+        tutorialCategory = projectCategoryFacadePort.createCategory("Tutorial", "tuto", null);
+        cryptoCategory = projectCategoryFacadePort.createCategory("Crypto", "crypto", null);
         indexerApiWireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withRequestBody(WireMock.equalToJson("""
                         {
@@ -156,7 +156,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
                 .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
-                        "services")
+                                                                               "services")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
@@ -505,7 +505,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(response.getMessage()).contains("Project leaders to keep must be a subset of current project " +
-                "leaders");
+                                                   "leaders");
     }
 
     @Test
@@ -772,7 +772,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.slug").isEqualTo("updated-project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice " +
-                        "description")
+                                                         "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
                 .jsonPath("$.moreInfos.length()").isEqualTo(2)

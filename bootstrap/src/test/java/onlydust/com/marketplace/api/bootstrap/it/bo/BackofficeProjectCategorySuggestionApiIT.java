@@ -17,6 +17,8 @@ import java.util.UUID;
 
 public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
+    private static final UUID projectId = UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54");
+
     @Autowired
     ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     @Autowired
@@ -27,17 +29,17 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
     @BeforeEach
     void setUp() {
         projectCategorySuggestionRepository.saveAll(List.of(
-                new ProjectCategorySuggestionEntity(UUID.fromString("fbb36293-1a5b-49c5-9cd0-6e33922d22ba"), "Gaming"),
-                new ProjectCategorySuggestionEntity(UUID.fromString("d3af3bfc-5689-412a-8191-1466aa269830"), "DeFi"),
-                new ProjectCategorySuggestionEntity(UUID.fromString("d3df4dbf-850e-42a5-af16-ca8a0278489c"), "Art")
+                new ProjectCategorySuggestionEntity(UUID.fromString("fbb36293-1a5b-49c5-9cd0-6e33922d22ba"), "Gaming", projectId),
+                new ProjectCategorySuggestionEntity(UUID.fromString("d3af3bfc-5689-412a-8191-1466aa269830"), "DeFi", projectId),
+                new ProjectCategorySuggestionEntity(UUID.fromString("d3df4dbf-850e-42a5-af16-ca8a0278489c"), "Art", projectId)
         ));
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain");
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain", Set.of());
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock"),
-                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "nft", "NFT", "paint"),
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock", Set.of()),
+                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "nft", "NFT", "paint", Set.of()),
                 categoryAI
         ));
-        final var project = projectRepository.findById(UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54")).get();
+        final var project = projectRepository.findById(projectId).get();
         project.setCategories(Set.of(new ProjectProjectCategoryEntity(project.getId(), categoryAI.getId())));
         projectRepository.save(project);
     }

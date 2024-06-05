@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfo
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
@@ -90,8 +89,8 @@ public class ProjectReadEntity {
     @JoinTable(
             schema = "public",
             name = "projects_project_categories",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_category_id")
+            joinColumns = @JoinColumn(name = "projectId"),
+            inverseJoinColumns = @JoinColumn(name = "projectCategoryId")
     )
     Set<ProjectCategoryReadEntity> categories;
     @ManyToMany(fetch = FetchType.LAZY)
@@ -125,8 +124,8 @@ public class ProjectReadEntity {
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                        entity.installation().getAuthorizedRepos().stream()
-                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                entity.installation().getAuthorizedRepos().stream()
+                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();

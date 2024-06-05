@@ -2648,6 +2648,11 @@ components:
 
     EcosystemRequest:
       type: object
+      required:
+        - name
+        - logoUrl
+        - description
+        - hidden
       properties:
         name:
           type: string
@@ -2657,6 +2662,8 @@ components:
           type: string
         description:
           type: string
+        hidden:
+          type: boolean
 
     EcosystemResponse:
       type: object
@@ -2674,6 +2681,8 @@ components:
           type: string
         description:
           type: string
+        hidden:
+          type: boolean
 
     UpdateInvoiceStatusRequest:
       type: object
@@ -4864,7 +4873,9 @@ components:
           type: string
         iconSlug:
           type: string
-
+        suggestionId:
+          $ref: '#/components/schemas/ProjectCategoryId'
+    
     ProjectCategoryUpdateRequest:
       allOf:
         - $ref: '#/components/schemas/ProjectCategoryCreateRequest'

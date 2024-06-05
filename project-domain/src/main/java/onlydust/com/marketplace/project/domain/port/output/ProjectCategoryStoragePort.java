@@ -14,5 +14,7 @@ public interface ProjectCategoryStoragePort {
 
     Optional<ProjectCategory> get(ProjectCategory.Id id);
 
+    Optional<ProjectCategorySuggestion> get(ProjectCategorySuggestion.Id id);
+
     void delete(ProjectCategory.Id id);
 }
