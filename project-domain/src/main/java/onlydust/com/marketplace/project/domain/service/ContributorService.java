@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -37,7 +38,7 @@ public class ContributorService implements ContributorFacadePort {
 
         final List<Contributor> externalContributors =
                 (externalSearchOnly || internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch) &&
-                        login != null && !login.isEmpty() ?
+                login != null && !login.isEmpty() ?
                         getExternalContributors(login) : List.of();
 
         return Pair.of(internalContributors, externalContributors);
@@ -86,10 +87,13 @@ public class ContributorService implements ContributorFacadePort {
 
     private List<Contributor> getExternalContributors(String login) {
         return githubSearchPort.searchUsersByLogin(login).stream().map(
-                identity -> Contributor.builder()
-                        .id(identity)
-                        .isRegistered(userStoragePort.getUserByGithubId(identity.getGithubUserId()).isPresent())
-                        .build()
+                identity -> {
+                    final var user = userStoragePort.getUserByGithubId(identity.getGithubUserId()).map(User::toGithubIdentity);
+                    return Contributor.builder()
+                            .id(user.orElse(identity))
+                            .isRegistered(user.isPresent())
+                            .build();
+                }
         ).toList();
     }
 }
