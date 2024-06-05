@@ -51,7 +51,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                 and ( :tagJsonPath is null or jsonb_path_exists(tags.names, cast(cast(:tagJsonPath as text) as jsonpath )))
                 order by case
                     when :featuredProjectsOnly is not null then (pe.featured_rank, UPPER(p.name))
-                    when cast(:orderBy as text) = 'RANK' then (p.rank, UPPER(p.name))
+                    when cast(:orderBy as text) = 'RANK' then (-p.rank, UPPER(p.name))
                     else (0, UPPER(p.name))
                 end
                 offset :offset limit :limit
