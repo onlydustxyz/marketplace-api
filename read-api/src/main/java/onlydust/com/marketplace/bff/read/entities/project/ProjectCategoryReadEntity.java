@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.bff.read.entities.project;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -26,6 +26,12 @@ public class ProjectCategoryReadEntity {
     private @NonNull UUID id;
     private @NonNull String name;
     private @NonNull String iconSlug;
+
+    @ManyToMany
+    @JoinTable(name = "ecosystem_project_categories",
+            joinColumns = @JoinColumn(name = "project_category_id"),
+            inverseJoinColumns = @JoinColumn(name = "ecosystem_id"))
+    private Set<EcosystemReadEntity> ecosystems;
 
     public ProjectCategoryResponse toBoDto() {
         return new ProjectCategoryResponse()

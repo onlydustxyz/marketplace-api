@@ -3131,11 +3131,47 @@ paths:
             default: 5
       responses:
         "200":
-          description: 'Ecosystem details'
+          description: 'Ecosystem project languages'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EcosystemLanguagesPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/ecosystems/slug/{slug}/project-categories:
+    get:
+      security:
+        - { }
+      tags:
+        - ReadEcosystems
+      summary: Get ecosystem categories page
+      operationId: getEcosystemCategories
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemSlug'
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Ecosystem project categories'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EcosystemProjectCategoriesPageResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -4697,6 +4733,14 @@ components:
               type: integer
               description: Number of projects within the ecosystem
               example: 2
+            topProjectCategories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+            projectCategoryCount:
+              type: integer
+              description: Number of project categories within the ecosystem
+              example: 2
 
     EcosystemDetailsResponse:
       allOf:
@@ -4753,6 +4797,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/LanguageResponse'
+
+    EcosystemProjectCategoriesPageResponse:
+      type: object
+      required:
+        - projectCategories
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        projectCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
 
     LanguageResponse:
       type: object

@@ -5,12 +5,10 @@ import onlydust.com.marketplace.api.contract.ReadEcosystemsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.ecosystem.EcosystemReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectEcosystemCardReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
-import onlydust.com.marketplace.bff.read.repositories.EcosystemContributorPageItemEntityRepository;
-import onlydust.com.marketplace.bff.read.repositories.EcosystemReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.LanguageReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.ProjectEcosystemCardReadEntityRepository;
+import onlydust.com.marketplace.bff.read.repositories.*;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,6 +36,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
 
     private final EcosystemReadRepository ecosystemReadRepository;
     private final LanguageReadRepository languageReadRepository;
+    private final ProjectCategoryReadRepository projectCategoryReadRepository;
 
     @Override
     public ResponseEntity<EcosystemProjectPageResponse> getEcosystemProjects(String ecosystemSlug, Boolean hasGoodFirstIssues, Boolean featuredOnly,
@@ -109,6 +108,17 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
                 .languages(page.stream().map(LanguageReadEntity::toDto).toList()));
+    }
+
+    @Override
+    public ResponseEntity<EcosystemProjectCategoriesPageResponse> getEcosystemCategories(String slug, Integer pageIndex, Integer pageSize) {
+        final var page = projectCategoryReadRepository.findAllByEcosystemSlug(slug, PageRequest.of(pageIndex, pageSize));
+        return ResponseEntity.ok(new EcosystemProjectCategoriesPageResponse()
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages())
+                .projectCategories(page.stream().map(ProjectCategoryReadEntity::toDto).toList()));
     }
 
     @Override
