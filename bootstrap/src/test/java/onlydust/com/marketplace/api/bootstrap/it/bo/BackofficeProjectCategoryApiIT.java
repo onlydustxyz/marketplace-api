@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryCreateRequest;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.backoffice.api.contract.model.ProjectCategoryUpdateRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
@@ -162,7 +163,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                           "iconSlug": "brain"
                         }
                         """);
-        
+
         // When
         client.get()
                 .uri(PROJECT_CATEGORIES)
@@ -219,6 +220,63 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                           "iconSlug": "something-else"
                         }
                         """);
+    }
+
+
+    @Test
+    @Order(2)
+    void should_update_project_category_with_suggestion() {
+        // Given
+        final var suggestionId = UUID.randomUUID();
+        final var projectId = UUID.fromString("3a1e0a11-634e-4bf1-a3ed-022ae68b6436");
+
+        projectCategorySuggestionRepository.save(new ProjectCategorySuggestionEntity(suggestionId, "ai", projectId));
+
+        // When
+        final var response = client.put()
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryFromSuggestionId))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new ProjectCategoryUpdateRequest()
+                        .name("AI")
+                        .iconSlug("brain")
+                        .suggestionId(suggestionId))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(ProjectCategoryResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        // When
+        client.get()
+                .uri(PROJECT_CATEGORY.formatted(projectCategoryFromSuggestionId))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectCategoryFromSuggestionId.toString())
+                .json("""
+                        {
+                          "name": "AI",
+                          "iconSlug": "brain"
+                        }
+                        """);
+
+        // When
+        client.get()
+                .uri(PROJECT_CATEGORIES)
+                .header("Authorization", "Bearer " + emilie.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.categories[?(@.name == 'AI')].projectCount").isEqualTo(2)
+                .jsonPath("$.categories[?(@.status == 'PENDING')]").doesNotExist();
     }
 
     @Test

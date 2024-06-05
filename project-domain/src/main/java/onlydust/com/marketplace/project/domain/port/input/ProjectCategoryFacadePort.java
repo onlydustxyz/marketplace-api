@@ -13,7 +13,8 @@ public interface ProjectCategoryFacadePort {
 
     ProjectCategory createCategory(final @NonNull String categoryName, final @NonNull String iconSlug, final ProjectCategorySuggestion.Id suggestionId);
 
-    ProjectCategory updateCategory(final @NonNull ProjectCategory.Id id, final @NonNull String name, final @NonNull String iconSlug);
+    ProjectCategory updateCategory(final @NonNull ProjectCategory.Id id, final @NonNull String name, final @NonNull String iconSlug,
+                                   final ProjectCategorySuggestion.Id suggestionId);
 
     void deleteCategory(ProjectCategory.Id id);
 }

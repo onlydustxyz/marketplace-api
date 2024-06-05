@@ -36,22 +36,22 @@ public class ProjectCategoryService implements ProjectCategoryFacadePort {
     @Override
     public ProjectCategory createCategory(@NonNull String categoryName, @NonNull String iconSlug, final ProjectCategorySuggestion.Id suggestionId) {
         final var projectCategory = ProjectCategory.of(categoryName, iconSlug);
-        
-        if (suggestionId != null) {
-            final var suggestion = projectCategoryStoragePort.get(suggestionId)
-                    .orElseThrow(() -> notFound("Project category suggestion %s not found".formatted(suggestionId)));
-            projectCategory.projects().add(suggestion.projectId());
-            projectCategoryStoragePort.delete(suggestionId);
-        }
+
+        if (suggestionId != null)
+            link(suggestionId, projectCategory);
 
         projectCategoryStoragePort.save(projectCategory);
         return projectCategory;
     }
 
     @Override
-    public ProjectCategory updateCategory(ProjectCategory.@NonNull Id id, @NonNull String name, @NonNull String iconSlug) {
+    public ProjectCategory updateCategory(ProjectCategory.@NonNull Id id, @NonNull String name, @NonNull String iconSlug,
+                                          final ProjectCategorySuggestion.Id suggestionId) {
         final var projectCategory = projectCategoryStoragePort.get(id)
                 .orElseThrow(() -> notFound("Project category %s not found".formatted(id)));
+
+        if (suggestionId != null)
+            link(suggestionId, projectCategory);
 
         projectCategoryStoragePort.save(projectCategory
                 .name(name)
@@ -62,5 +62,12 @@ public class ProjectCategoryService implements ProjectCategoryFacadePort {
     @Override
     public void deleteCategory(ProjectCategory.Id id) {
         projectCategoryStoragePort.delete(id);
+    }
+
+    private void link(ProjectCategorySuggestion.Id suggestionId, ProjectCategory projectCategory) {
+        final var suggestion = projectCategoryStoragePort.get(suggestionId)
+                .orElseThrow(() -> notFound("Project category suggestion %s not found".formatted(suggestionId)));
+        projectCategory.projects().add(suggestion.projectId());
+        projectCategoryStoragePort.delete(suggestionId);
     }
 }

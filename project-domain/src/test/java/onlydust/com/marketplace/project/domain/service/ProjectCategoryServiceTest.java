@@ -155,7 +155,7 @@ class ProjectCategoryServiceTest {
         when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> projectCategoryService.updateCategory(existing.id(), newName, newIconSlug))
+        assertThatThrownBy(() -> projectCategoryService.updateCategory(existing.id(), newName, newIconSlug, null))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Project category %s not found".formatted(existing.id()));
     }
@@ -170,7 +170,7 @@ class ProjectCategoryServiceTest {
         when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
 
         // When
-        projectCategoryService.updateCategory(existing.id(), newName, newIconSlug);
+        projectCategoryService.updateCategory(existing.id(), newName, newIconSlug, null);
 
         // Then
         final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
@@ -180,6 +180,56 @@ class ProjectCategoryServiceTest {
         assertThat(projectCategory.id()).isEqualTo(existing.id());
         assertThat(projectCategory.name()).isEqualTo(newName);
         assertThat(projectCategory.iconSlug()).isEqualTo(newIconSlug);
+    }
+
+    @Test
+    void should_update_project_category_from_a_suggestion() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().location());
+        existing.projects().add(UUID.randomUUID());
+        final var newName = faker.rickAndMorty().character();
+        final var newIconSlug = faker.rickAndMorty().location();
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+        final var projectId = UUID.randomUUID();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+        when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(faker.rickAndMorty().character(), projectId)));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), newName, newIconSlug, suggestionId);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(newName);
+        assertThat(projectCategory.iconSlug()).isEqualTo(newIconSlug);
+        assertThat(projectCategory.projects()).hasSize(2);
+        assertThat(projectCategory.projects()).contains(projectId);
+
+        verify(projectCategoryStoragePort).delete(suggestionId);
+    }
+
+    @Test
+    void should_fail_to_update_category_if_suggestion_not_found() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().location());
+        final var newName = faker.rickAndMorty().character();
+        final var newIconSlug = faker.rickAndMorty().location();
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+        when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> projectCategoryService.updateCategory(existing.id(), newName, newIconSlug, suggestionId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Project category suggestion %s not found".formatted(suggestionId));
+
+        verify(projectCategoryStoragePort, never()).delete(suggestionId);
     }
 
     @Test
