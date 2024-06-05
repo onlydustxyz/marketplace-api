@@ -108,7 +108,8 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages())
-                .languages(page.stream().map(LanguageReadEntity::toDto).toList()));
+                .languages(page.stream().map(LanguageReadEntity::toDto).toList()
+                        .stream().sorted(Comparator.comparing(LanguageResponse::getName)).toList()));
     }
 
     @Override
