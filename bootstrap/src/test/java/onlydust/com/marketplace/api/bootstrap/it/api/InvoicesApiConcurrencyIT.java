@@ -15,11 +15,11 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,8 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static onlydust.com.marketplace.api.bootstrap.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,7 +61,10 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
             UUID.fromString("6587511b-3791-47c6-8430-8f793606c63a"),
             UUID.fromString("79209029-c488-4284-aa3f-bce8870d3a66"),
             UUID.fromString("303f26b1-63f0-41f1-ab11-e70b54ef4a2a"),
-            UUID.fromString("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf")
+            UUID.fromString("0b275f04-bdb1-4d4f-8cd1-76fe135ccbdf"),
+            UUID.fromString("dd7d445f-6915-4955-9bae-078173627b05"),
+            UUID.fromString("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"),
+            UUID.fromString("95e079c9-609c-4531-8c5c-13217306b299")
     );
 
     @BeforeEach
@@ -107,27 +112,34 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(1)
     void preview_invoices_concurrently() {
-        // When
-        final var invoiceId = new MutableObject<String>();
-        client.get()
-                .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(
-                        "rewardIds", REWARD_IDS.stream().map(UUID::toString).collect(Collectors.joining(","))
-                )))
-                .header("Authorization", BEARER_PREFIX + antho.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").value(invoiceId::setValue)
-                .jsonPath("$.createdAt").isNotEmpty()
-                .jsonPath("$.dueAt").isNotEmpty()
-                .jsonPath("$.rewards.length()").isEqualTo(4);
 
-        REWARD_IDS.forEach(rewardId -> {
-            final var reward = rewardRepository.findById(rewardId).orElseThrow();
-            assertThat(reward.invoiceId().toString()).isEqualTo(invoiceId.getValue());
+        final var rawResponses = new ConcurrentHashMap<Integer, InvoicePreviewResponse>();
+
+        runConcurrently(100, threadId -> {
+            // When
+            client.get()
+                    .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(
+                            "rewardIds", REWARD_IDS.stream().map(UUID::toString).collect(Collectors.joining(","))
+                    )))
+                    .header("Authorization", BEARER_PREFIX + antho.jwt())
+                    .exchange()
+                    .returnResult(InvoicePreviewResponse.class)
+                    .consumeWith(result -> {
+                        if (result.getStatus().is2xxSuccessful()) {
+                            final var body = result.getResponseBody().blockFirst();
+                            rawResponses.put(threadId, body);
+                        }
+                    });
+
         });
+
+        assertThat(rawResponses.values()).isNotEmpty();
+        final var invoiceIds = rawResponses.values().stream().map(r -> r.getId()).collect(Collectors.toSet());
+
+        // Assert that all rewards have the same invoice id, and that it is one of the invoice ids returned by the API
+        final var rewardInvoiceIds = REWARD_IDS.stream().map(rewardId -> rewardRepository.findById(rewardId).orElseThrow().invoiceId()).collect(Collectors.toSet());
+        assertThat(rewardInvoiceIds).hasSize(1);
+        assertThat(invoiceIds).containsAll(rewardInvoiceIds);
     }
 
 }
