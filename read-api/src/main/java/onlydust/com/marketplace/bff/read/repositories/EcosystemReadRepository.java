@@ -25,8 +25,9 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
             FROM EcosystemReadEntity e
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner
+            WHERE (:hidden IS NULL OR e.hidden = :hidden)
             """)
-    Page<EcosystemReadEntity> findAll(Pageable pageable);
+    Page<EcosystemReadEntity> findAll(Boolean hidden, Pageable pageable);
 
     @Query("""
             SELECT e 
@@ -34,6 +35,7 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner
             WHERE e.featuredRank IS NOT NULL
+            AND (:hidden IS NULL OR e.hidden = :hidden)
             """)
-    Page<EcosystemReadEntity> findAllFeatured(Pageable pageable);
+    Page<EcosystemReadEntity> findAllFeatured(Boolean hidden, Pageable pageable);
 }

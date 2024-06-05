@@ -42,81 +42,55 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
     void should_list_ecosystems() {
         // When
         client.get()
-                .uri(getApiURI(V2_ECOSYSTEMS))
+                .uri(getApiURI(V2_ECOSYSTEMS, "hidden", "false"))
                 .exchange()
                 // Then
                 .expectStatus()
-                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .is2xxSuccessful()
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 2,
-                          "totalItemNumber": 8,
-                          "hasMore": true,
-                          "nextPageIndex": 1,
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 4,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "ecosystems": [
                             {
-                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                              "slug": "aptos",
-                              "name": "Aptos",
-                              "description": "Aptos ecosystem",
+                              "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
+                              "slug": "starknet",
+                              "name": "Starknet",
+                              "description": "Starknet ecosystem",
                               "banners": {
                                 "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aptos-xl.png",
-                                  "fontColor": "LIGHT"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aptos-md.png",
-                                  "fontColor": "LIGHT"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "projectCount": 1,
-                              "topProjectCategories": [
-                                {
-                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "name": "Security",
-                                  "iconSlug": "lock"
-                                },
-                                {
-                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "name": "AI",
-                                  "iconSlug": "brain"
-                                }
-                              ],
-                              "projectCategoryCount": 2
-                            },
-                            {
-                              "id": "397df411-045d-4d9f-8d65-8284c88f9208",
-                              "slug": "avail",
-                              "name": "Avail",
-                              "description": "Avail ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/avail-xl.png",
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-xl.png",
                                   "fontColor": "DARK"
                                 },
                                 "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/avail-md.png",
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/starknet-md.png",
                                   "fontColor": "DARK"
                                 }
                               },
                               "topProjects": [
                                 {
-                                  "id": "90fb751a-1137-4815-b3c4-54927a5db059",
-                                  "slug": "no-sponsors",
-                                  "name": "No sponsors",
-                                  "logoUrl": null
+                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
+                                  "slug": "b-conseil",
+                                  "name": "B Conseil",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
+                                },
+                                {
+                                  "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
+                                  "slug": "mooooooonlight",
+                                  "name": "Mooooooonlight",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1913921207486176664.jpg"
+                                },
+                                {
+                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                  "slug": "calcom",
+                                  "name": "Cal.com",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
                                 }
                               ],
-                              "projectCount": 1,
+                              "projectCount": 4,
                               "topProjectCategories": [],
                               "projectCategoryCount": 0
                             },
@@ -186,18 +160,18 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               "projectCategoryCount": 2
                             },
                             {
-                              "id": "f7821bfb-df73-464c-9d87-a94dfb4f5aef",
-                              "slug": "lava",
-                              "name": "Lava",
-                              "description": "Lava ecosystem",
+                              "id": "dd6f737e-2a9d-40b9-be62-8f64ec157989",
+                              "slug": "optimism",
+                              "name": "Optimism",
+                              "description": "Optimism ecosystem",
                               "banners": {
                                 "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/lava-xl.png",
-                                  "fontColor": "LIGHT"
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-xl.png",
+                                  "fontColor": "DARK"
                                 },
                                 "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/lava-md.png",
-                                  "fontColor": "LIGHT"
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/optimism-md.png",
+                                  "fontColor": "DARK"
                                 }
                               },
                               "topProjects": [
@@ -214,14 +188,14 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 
     @Test
     void should_list_featured_ecosystems() {
         // When
         client.get()
-                .uri(getApiURI(V2_ECOSYSTEMS, Map.of("featured", "true")))
+                .uri(getApiURI(V2_ECOSYSTEMS, Map.of("featured", "true", "hidden", "false")))
                 .exchange()
                 // Then
                 .expectStatus()
@@ -230,48 +204,10 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 3,
+                          "totalItemNumber": 2,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "ecosystems": [
-                            {
-                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                              "slug": "ethereum",
-                              "name": "Ethereum",
-                              "description": "Ethereum ecosystem",
-                              "banners": {
-                                "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
-                                  "fontColor": "LIGHT"
-                                },
-                                "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
-                                  "fontColor": "LIGHT"
-                                }
-                              },
-                              "topProjects": [
-                                {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                }
-                              ],
-                              "projectCount": 1,
-                              "topProjectCategories": [
-                                {
-                                  "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "name": "Security",
-                                  "iconSlug": "lock"
-                                },
-                                {
-                                  "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "name": "AI",
-                                  "iconSlug": "brain"
-                                }
-                              ],
-                              "projectCategoryCount": 2
-                            },
                             {
                               "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
                               "slug": "starknet",
@@ -312,17 +248,17 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               "projectCategoryCount": 0
                             },
                             {
-                              "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                              "slug": "aptos",
-                              "name": "Aptos",
-                              "description": "Aptos ecosystem",
+                              "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                              "slug": "ethereum",
+                              "name": "Ethereum",
+                              "description": "Ethereum ecosystem",
                               "banners": {
                                 "xl": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aptos-xl.png",
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-xl.png",
                                   "fontColor": "LIGHT"
                                 },
                                 "md": {
-                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/aptos-md.png",
+                                  "url": "https://s3.amazonaws.com/onlydust/ecosystem_banners/ethereum-md.png",
                                   "fontColor": "LIGHT"
                                 }
                               },
@@ -351,7 +287,7 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                        """);
+                        """, true);
     }
 
     @Test

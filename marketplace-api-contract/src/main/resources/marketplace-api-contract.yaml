@@ -3063,6 +3063,12 @@ paths:
             type: boolean
             default: false
         - in: query
+          name: hidden
+          required: false
+          schema:
+            type: boolean
+            default: false
+        - in: query
           name: pageIndex
           required: false
           schema:

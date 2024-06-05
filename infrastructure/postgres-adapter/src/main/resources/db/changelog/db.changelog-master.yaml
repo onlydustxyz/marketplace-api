@@ -340,4 +340,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000256_create_language_slugs.sql
   - include:
-      file: db/changelog/changelogs/00000257_create_project_category_slugs.sql
+      file: db/changelog/changelogs/00000257_create_project_category_slugs.sql  
+  - include:
+      file: db/changelog/changelogs/00000259_add_hidden_on_ecosystem_table.sql
+    
