@@ -1193,12 +1193,12 @@ paths:
             items:
               $ref: '#/components/schemas/EcosystemSlug'
         - in: query
-          name: languageIds
+          name: languages
           required: false
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/LanguageId'
+              $ref: '#/components/schemas/LanguageSlug'
         - in: query
           name: categoryIds
           required: false

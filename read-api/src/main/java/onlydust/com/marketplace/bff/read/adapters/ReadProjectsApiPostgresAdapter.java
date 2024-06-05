@@ -76,7 +76,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final String search,
                                                            final List<ProjectTag> tags,
                                                            final List<String> ecosystemSlugs,
-                                                           final List<UUID> languageIds,
+                                                           final List<String> languages,
                                                            final List<UUID> categoryIds,
                                                            final String sort
     ) {
@@ -85,10 +85,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
-        final String languagesJsonPath = getLanguagesJsonPath(languageIds);
+        final String languagesJsonPath = getLanguagesJsonPath(languages);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
+                        categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categoryIds,
+                        sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
     }
 
     private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
@@ -143,7 +145,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return toProjectPage(null, pageIndex, projects, filters, totalNumberOfPage, count);
     }
 
-    private static ProjectPageResponse toProjectPage(UUID userId, Integer pageIndex, List<ProjectPageItemQueryEntity> projects, List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
+    private static ProjectPageResponse toProjectPage(UUID userId, Integer pageIndex, List<ProjectPageItemQueryEntity> projects,
+                                                     List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
         return new ProjectPageResponse()
                 .projects(projects.stream().map(p -> p.toDto(userId)).toList())
                 .languages(languagesOf(filters).stream().toList())

@@ -63,11 +63,11 @@ public class ProjectPageItemQueryEntity {
         return "$[*] ? (" + String.join(" || ", tags.stream().map(s -> "@.name == \"" + s + "\"").toList()) + ")";
     }
 
-    public static String getLanguagesJsonPath(List<UUID> languageIds) {
-        if (isNull(languageIds) || languageIds.isEmpty()) {
+    public static String getLanguagesJsonPath(List<String> languageSlugs) {
+        if (isNull(languageSlugs) || languageSlugs.isEmpty()) {
             return null;
         }
-        return "$[*] ? (" + String.join(" || ", languageIds.stream().map(s -> "@.id == \"" + s + "\"").toList()) + ")";
+        return "$[*] ? (" + String.join(" || ", languageSlugs.stream().map(s -> "@.slug == \"" + s + "\"").toList()) + ")";
     }
 
     public ProjectPageItemResponse toDto(UUID userId) {
