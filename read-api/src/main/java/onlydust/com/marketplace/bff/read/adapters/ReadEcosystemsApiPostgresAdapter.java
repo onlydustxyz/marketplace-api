@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -122,13 +123,16 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     }
 
     @Override
-    public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Boolean hidden, Integer pageIndex, Integer pageSize) {
         final var page = featured ?
-                ecosystemReadRepository.findAllFeatured(PageRequest.of(pageIndex, pageSize, Sort.by("featuredRank"))) :
-                ecosystemReadRepository.findAll(PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
+                ecosystemReadRepository.findAllFeatured(hidden, PageRequest.of(pageIndex, pageSize, Sort.by("featuredRank"))) :
+                ecosystemReadRepository.findAll(hidden, PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
 
         final var response = new EcosystemPageV2()
-                .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toPageItemResponse).toList())
+                .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toPageItemResponse).toList()
+                        .stream()
+                        .sorted(Comparator.nullsLast(Comparator.comparing(EcosystemPageItemResponse::getProjectCount).reversed()))
+                        .toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

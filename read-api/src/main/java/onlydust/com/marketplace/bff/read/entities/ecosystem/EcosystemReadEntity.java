@@ -37,6 +37,7 @@ public class EcosystemReadEntity {
     private @NonNull String name;
     private String description;
     private Integer featuredRank;
+    private Boolean hidden;
 
     @ManyToOne
     private EcosystemBannerReadEntity mdBanner;

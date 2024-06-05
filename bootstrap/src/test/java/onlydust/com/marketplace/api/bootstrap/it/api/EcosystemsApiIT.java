@@ -655,7 +655,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(GET_ECOSYSTEM_PROJECTS.formatted("zama"), Map.of("pageIndex", "0", "pageSize", "3", "sortBy", "RANK",
-                        "tag", "FAST_AND_FURIOUS")))
+                        "tag", "FAST_AND_FURIOUS", "hidden", "true")))
                 // Then
                 .exchange()
                 .expectStatus()
