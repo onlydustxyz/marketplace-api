@@ -30,6 +30,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                     left join (select pl.project_id, jsonb_agg(jsonb_build_object(
                                                                'id', l.id,
                                                                'name', l.name,
+                                                               'slug', l.slug,
                                                                'logoUrl', l.logo_url,
                                                                'bannerUrl', l.banner_url
                                                     )) language_json
@@ -73,6 +74,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                      left join (select pl.project_id, jsonb_agg(jsonb_build_object(
                                                                'id', l.id,
                                                                'name', l.name,
+                                                               'slug', l.slug,
                                                                'logoUrl', l.logo_url,
                                                                'bannerUrl', l.banner_url
                                                     )) language_json

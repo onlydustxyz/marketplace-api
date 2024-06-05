@@ -24,187 +24,188 @@ import java.util.*;
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     private static final String BRETZEL_OVERVIEW_JSON = """
-            {
-            "id": "7d04163c-4187-4313-8066-61504d34fc56",
-            "slug": "bretzel",
-            "name": "Bretzel",
-            "createdAt": "2023-02-21T09:15:09.603Z",
-            "shortDescription": "A project for people who love fruits",
-            "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
-            "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-            "moreInfos": [],
-            "hiring": true,
-            "visibility": "PUBLIC",
-            "contributorCount": 4,
-            "topContributors": [
-              {
-                "githubUserId": 8642470,
-                "login": "gregcha",
-                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-              },
-              {
-                "githubUserId": 52197971,
-                "login": "jb1011",
-                "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
-              },
-              {
-                "githubUserId": 74653697,
-                "login": "antiyro",
-                "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
-              }
-            ],
-            "organizations": [
-              {
-                "githubUserId": 8642470,
-                "login": "gregcha",
-                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                "name": "Grégoire CHARLES",
-                "htmlUrl": "https://github.com/gregcha",
-                "repos": [
-                  {
-                    "id": 380954304,
-                    "owner": "gregcha",
-                    "name": "bretzel-app",
-                    "description": null,
-                    "htmlUrl": "https://github.com/gregcha/bretzel-app",
-                    "stars": 0,
-                    "forkCount": 0,
-                    "hasIssues": true,
-                    "isIncludedInProject": true,
-                    "isAuthorizedInGithubApp": true
-                  },
-                  {
-                    "id": 452047076,
-                    "owner": "gregcha",
-                    "name": "bretzel-site",
-                    "description": null,
-                    "htmlUrl": "https://github.com/gregcha/bretzel-site",
-                    "stars": 0,
-                    "forkCount": 0,
-                    "hasIssues": true,
-                    "isIncludedInProject": true,
-                    "isAuthorizedInGithubApp": true
-                  },
-                  {
-                    "id": 466482535,
-                    "owner": "gregcha",
-                    "name": "bretzel-ressources",
-                    "description": null,
-                    "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
-                    "stars": 0,
-                    "forkCount": 0,
-                    "hasIssues": true,
-                    "isIncludedInProject": true,
-                    "isAuthorizedInGithubApp": true
-                  }
-                ],
-                "installed": true,
-                "isCurrentUserAdmin": null,
-                "isPersonal": null,
-                "installationId": 44637372
-              },
-              {
-                "githubUserId": 119948009,
-                "login": "KasarLabs",
-                "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
-                "name": "KasarLabs",
-                "htmlUrl": "https://github.com/KasarLabs",
-                "repos": [
-                  {
-                    "id": 659718526,
-                    "owner": "KasarLabs",
-                    "name": "deoxys-telemetry",
-                    "description": "Deoxys Telemetry service",
-                    "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
-                    "stars": 0,
-                    "forkCount": 1,
-                    "hasIssues": false,
-                    "isIncludedInProject": true,
-                    "isAuthorizedInGithubApp": false
-                  }
-                ],
-                "installed": false,
-                "isCurrentUserAdmin": null,
-                "isPersonal": null,
-                "installationId": null
-              }
-            ],
-            "leaders": [
-              {
-                "githubUserId": 8642470,
-                "login": "gregcha",
-                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
-                "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
-              },
-              {
-                "githubUserId": 98735421,
-                "login": "pacovilletard",
-                "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
-                "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
-              }
-            ],
-            "invitedLeaders": [],
-            "ecosystems": [
-              {
-                "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
-                "name": "Aptos",
-                "url": "https://aptosfoundation.org/",
-                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
-                "bannerUrl": null,
-                "slug": "aptos"
-              },
-              {
-                "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
-                "name": "Ethereum",
-                "url": "https://ethereum.foundation/",
-                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
-                "bannerUrl": null,
-                "slug": "ethereum"
-              },
-              {
-                "id": "b599313c-a074-440f-af04-a466529ab2e7",
-                "name": "Zama",
-                "url": "https://www.zama.ai/",
-                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
-                "bannerUrl": null,
-                "slug": "zama"
-              }
-            ],
-            "categories": [],
-            "sponsors": [
-              {
-                "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
-                "name": "Coca Cola",
-                "url": null,
-                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-              },
-              {
-                "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
-                "name": "OGC Nissa Ineos",
-                "url": "https://www.ogcnice.com/fr/",
-                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
-              }
-            ],
-            "languages": [
-              {
-                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                "name": "Typescript",
-                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-              }
-            ],
-            "hasRemainingBudget": true,
-            "rewardSettings": {
-              "ignorePullRequests": false,
-              "ignoreIssues": false,
-              "ignoreCodeReviews": false,
-              "ignoreContributionsBefore": null
-            },
-            "indexingComplete": true,
-            "indexedAt": "2023-12-04T14:35:10.986567Z",
-            "tags": []
-                        }
-           """;
+             {
+             "id": "7d04163c-4187-4313-8066-61504d34fc56",
+             "slug": "bretzel",
+             "name": "Bretzel",
+             "createdAt": "2023-02-21T09:15:09.603Z",
+             "shortDescription": "A project for people who love fruits",
+             "longDescription": "[Bretzel](http://bretzel.club/) is your best chance to match with your secret crush      \\nEver liked someone but never dared to tell them?      \\n      \\n**Bretzel** is your chance to match with your secret crush      \\nAll you need is a LinkedIn profile.      \\n      \\n1. **Turn LinkedIn into a bretzel party:** Switch the bretzel mode ON — you'll see bretzels next to everyone. Switch it OFF anytime.      \\n2. **Give your bretzels under the radar:** Give a bretzel to your crush, they will never know about it, unless they give you a bretzel too. Maybe they already have?      \\n3. **Ooh la la, it's a match!**  You just got bretzel’d! See all your matches in a dedicated space, and start chatting!",
+             "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+             "moreInfos": [],
+             "hiring": true,
+             "visibility": "PUBLIC",
+             "contributorCount": 4,
+             "topContributors": [
+               {
+                 "githubUserId": 8642470,
+                 "login": "gregcha",
+                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
+               },
+               {
+                 "githubUserId": 52197971,
+                 "login": "jb1011",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
+               },
+               {
+                 "githubUserId": 74653697,
+                 "login": "antiyro",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
+               }
+             ],
+             "organizations": [
+               {
+                 "githubUserId": 8642470,
+                 "login": "gregcha",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                 "name": "Grégoire CHARLES",
+                 "htmlUrl": "https://github.com/gregcha",
+                 "repos": [
+                   {
+                     "id": 380954304,
+                     "owner": "gregcha",
+                     "name": "bretzel-app",
+                     "description": null,
+                     "htmlUrl": "https://github.com/gregcha/bretzel-app",
+                     "stars": 0,
+                     "forkCount": 0,
+                     "hasIssues": true,
+                     "isIncludedInProject": true,
+                     "isAuthorizedInGithubApp": true
+                   },
+                   {
+                     "id": 452047076,
+                     "owner": "gregcha",
+                     "name": "bretzel-site",
+                     "description": null,
+                     "htmlUrl": "https://github.com/gregcha/bretzel-site",
+                     "stars": 0,
+                     "forkCount": 0,
+                     "hasIssues": true,
+                     "isIncludedInProject": true,
+                     "isAuthorizedInGithubApp": true
+                   },
+                   {
+                     "id": 466482535,
+                     "owner": "gregcha",
+                     "name": "bretzel-ressources",
+                     "description": null,
+                     "htmlUrl": "https://github.com/gregcha/bretzel-ressources",
+                     "stars": 0,
+                     "forkCount": 0,
+                     "hasIssues": true,
+                     "isIncludedInProject": true,
+                     "isAuthorizedInGithubApp": true
+                   }
+                 ],
+                 "installed": true,
+                 "isCurrentUserAdmin": null,
+                 "isPersonal": null,
+                 "installationId": 44637372
+               },
+               {
+                 "githubUserId": 119948009,
+                 "login": "KasarLabs",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/119948009?v=4",
+                 "name": "KasarLabs",
+                 "htmlUrl": "https://github.com/KasarLabs",
+                 "repos": [
+                   {
+                     "id": 659718526,
+                     "owner": "KasarLabs",
+                     "name": "deoxys-telemetry",
+                     "description": "Deoxys Telemetry service",
+                     "htmlUrl": "https://github.com/KasarLabs/deoxys-telemetry",
+                     "stars": 0,
+                     "forkCount": 1,
+                     "hasIssues": false,
+                     "isIncludedInProject": true,
+                     "isAuthorizedInGithubApp": false
+                   }
+                 ],
+                 "installed": false,
+                 "isCurrentUserAdmin": null,
+                 "isPersonal": null,
+                 "installationId": null
+               }
+             ],
+             "leaders": [
+               {
+                 "githubUserId": 8642470,
+                 "login": "gregcha",
+                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                 "id": "45e98bf6-25c2-4edf-94da-e340daba8964"
+               },
+               {
+                 "githubUserId": 98735421,
+                 "login": "pacovilletard",
+                 "avatarUrl": "https://avatars.githubusercontent.com/u/98735421?v=4",
+                 "id": "f20e6812-8de8-432b-9c31-2920434fe7d0"
+               }
+             ],
+             "invitedLeaders": [],
+             "ecosystems": [
+               {
+                 "id": "9f82bdb4-22c2-455a-91a8-e3c7d96c47d7",
+                 "name": "Aptos",
+                 "url": "https://aptosfoundation.org/",
+                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8106946702216548210.png",
+                 "bannerUrl": null,
+                 "slug": "aptos"
+               },
+               {
+                 "id": "6ab7fa6c-c418-4997-9c5f-55fb021a8e5c",
+                 "name": "Ethereum",
+                 "url": "https://ethereum.foundation/",
+                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png",
+                 "bannerUrl": null,
+                 "slug": "ethereum"
+               },
+               {
+                 "id": "b599313c-a074-440f-af04-a466529ab2e7",
+                 "name": "Zama",
+                 "url": "https://www.zama.ai/",
+                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/599423013682223091.png",
+                 "bannerUrl": null,
+                 "slug": "zama"
+               }
+             ],
+             "categories": [],
+             "sponsors": [
+               {
+                 "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
+                 "name": "Coca Cola",
+                 "url": null,
+                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+               },
+               {
+                 "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
+                 "name": "OGC Nissa Ineos",
+                 "url": "https://www.ogcnice.com/fr/",
+                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
+               }
+             ],
+             "languages": [
+               {
+                 "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                 "name": "Typescript",
+                 "slug": "typescript",
+                 "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                 "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+               }
+             ],
+             "hasRemainingBudget": true,
+             "rewardSettings": {
+               "ignorePullRequests": false,
+               "ignoreIssues": false,
+               "ignoreCodeReviews": false,
+               "ignoreContributionsBefore": null
+             },
+             "indexingComplete": true,
+             "indexedAt": "2023-12-04T14:35:10.986567Z",
+             "tags": []
+                         }
+            """;
     private static final String BRETZEL_OVERVIEW_WITH_TAGS_JSON = """
             {
               "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -378,6 +379,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 }
@@ -608,6 +610,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -645,24 +648,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -676,24 +683,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                  {
                    "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                    "name": "Javascript",
+                   "slug": "javascript",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                  },
                  {
                    "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                    "name": "Python",
+                   "slug": "python",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                  },
                  {
                    "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                    "name": "Rust",
+                   "slug": "rust",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                  },
                  {
                    "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                    "name": "Typescript",
+                   "slug": "typescript",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                  }
@@ -787,6 +798,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -827,24 +839,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -860,24 +876,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                   "name": "Javascript",
+                  "slug": "javascript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                 },
                 {
                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                   "name": "Python",
+                  "slug": "python",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                 },
                 {
                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                   "name": "Rust",
+                  "slug": "rust",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                 },
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 }
@@ -941,6 +961,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1002,6 +1023,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1113,6 +1135,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1177,12 +1200,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1224,12 +1249,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                       "name": "Ruby",
+                      "slug": "ruby",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                     }
@@ -1261,30 +1288,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1333,24 +1365,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1391,24 +1427,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1440,6 +1480,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1464,12 +1505,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     }
@@ -1494,6 +1537,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1549,30 +1593,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1610,24 +1659,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1731,24 +1784,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -1797,12 +1854,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     }
@@ -1836,12 +1895,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     }
@@ -1873,6 +1934,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1904,6 +1966,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1935,6 +1998,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -1966,6 +2030,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     }
@@ -1979,42 +2044,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                   "name": "Cairo",
+                  "slug": "cairo",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                 },
                 {
                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                   "name": "Javascript",
+                  "slug": "javascript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                 },
                 {
                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                   "name": "Python",
+                  "slug": "python",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                 },
                 {
                   "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                   "name": "Ruby",
+                  "slug": "ruby",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                 },
                 {
                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                   "name": "Rust",
+                  "slug": "rust",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                 },
                 {
                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                   "name": "Solidity",
+                  "slug": "solidity",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                 },
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 }
@@ -2105,42 +2177,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                   "name": "Cairo",
+                  "slug": "cairo",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                 },
                 {
                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                   "name": "Javascript",
+                  "slug": "javascript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                 },
                 {
                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                   "name": "Python",
+                  "slug": "python",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                 },
                 {
                   "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                   "name": "Ruby",
+                  "slug": "ruby",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                 },
                 {
                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                   "name": "Rust",
+                  "slug": "rust",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                 },
                 {
                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                   "name": "Solidity",
+                  "slug": "solidity",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                 },
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 }
@@ -2235,6 +2314,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -2296,6 +2376,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -2422,6 +2503,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
@@ -2469,12 +2551,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                        "name": "Ruby",
+                       "slug": "ruby",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                      }
@@ -2506,30 +2590,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                        "name": "Cairo",
+                       "slug": "cairo",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2578,24 +2667,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2636,24 +2729,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2685,6 +2782,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -2709,12 +2807,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                        "name": "Solidity",
+                       "slug": "solidity",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                      }
@@ -2739,6 +2839,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2794,30 +2895,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                        "name": "Cairo",
+                       "slug": "cairo",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                      },
                      {
                        "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                        "name": "Solidity",
+                       "slug": "solidity",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2855,24 +2961,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -2976,24 +3086,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      },
                      {
                        "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                        "name": "Cairo",
+                       "slug": "cairo",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                      },
                      {
                        "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                        "name": "Solidity",
+                       "slug": "solidity",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                      },
                      {
                        "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                        "name": "Typescript",
+                       "slug": "typescript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                      }
@@ -3042,12 +3156,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                        "name": "Python",
+                       "slug": "python",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                      },
                      {
                        "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                        "name": "Cairo",
+                       "slug": "cairo",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                      }
@@ -3081,12 +3197,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      },
                      {
                        "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                        "name": "Solidity",
+                       "slug": "solidity",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                      }
@@ -3118,6 +3236,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -3149,6 +3268,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -3180,6 +3300,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                        "name": "Javascript",
+                       "slug": "javascript",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                      }
@@ -3211,6 +3332,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                      {
                        "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                        "name": "Rust",
+                       "slug": "rust",
                        "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                        "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                      }
@@ -3224,42 +3346,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                  {
                    "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                    "name": "Cairo",
+                   "slug": "cairo",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                  },
                  {
                    "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                    "name": "Javascript",
+                   "slug": "javascript",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                  },
                  {
                    "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                    "name": "Python",
+                   "slug": "python",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                  },
                  {
                    "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                    "name": "Ruby",
+                   "slug": "ruby",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                  },
                  {
                    "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                    "name": "Rust",
+                   "slug": "rust",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                  },
                  {
                    "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                    "name": "Solidity",
+                   "slug": "solidity",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                  },
                  {
                    "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                    "name": "Typescript",
+                   "slug": "typescript",
                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                  }
@@ -3371,42 +3500,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                   "name": "Python",
+                  "slug": "python",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                 },
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 },
                 {
                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                   "name": "Solidity",
+                  "slug": "solidity",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                 },
                 {
                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                   "name": "Javascript",
+                  "slug": "javascript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                 },
                 {
                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                   "name": "Cairo",
+                  "slug": "cairo",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                 },
                 {
                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                   "name": "Rust",
+                  "slug": "rust",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                 },
                 {
                   "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                   "name": "Ruby",
+                  "slug": "ruby",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                 }
@@ -3571,7 +3707,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
         // Rust id : "ca600cac-0f45-44e9-a6e8-25e21b0c6887"
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887", "search", "t", "ecosystemSlugs", "fake",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887", "search", "t",
+                        "ecosystemSlugs", "fake",
                         "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then
@@ -3762,12 +3899,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "name": "Javascript",
+                                  "slug": "javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "name": "Typescript",
+                                  "slug": "typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -3805,24 +3944,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "name": "Javascript",
+                                  "slug": "javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
                                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                   "name": "Python",
+                                  "slug": "python",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                 },
                                 {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                   "name": "Rust",
+                                  "slug": "rust",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "name": "Typescript",
+                                  "slug": "typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -3878,6 +4021,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "name": "Javascript",
+                                  "slug": "javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 }
@@ -3921,42 +4065,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                               "name": "Cairo",
+                              "slug": "cairo",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                             },
                             {
                               "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                               "name": "Javascript",
+                              "slug": "javascript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             },
                             {
                               "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                               "name": "Python",
+                              "slug": "python",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                             },
                             {
                               "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                               "name": "Ruby",
+                              "slug": "ruby",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                             },
                             {
                               "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                               "name": "Rust",
+                              "slug": "rust",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                             },
                             {
                               "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                               "name": "Solidity",
+                              "slug": "solidity",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                             },
                             {
                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                               "name": "Typescript",
+                              "slug": "typescript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                             }
@@ -4064,42 +4215,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                               "name": "Cairo",
+                              "slug": "cairo",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                             },
                             {
                               "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                               "name": "Javascript",
+                              "slug": "javascript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                             },
                             {
                               "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                               "name": "Python",
+                              "slug": "python",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                             },
                             {
                               "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                               "name": "Ruby",
+                              "slug": "ruby",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                             },
                             {
                               "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                               "name": "Rust",
+                              "slug": "rust",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                             },
                             {
                               "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                               "name": "Solidity",
+                              "slug": "solidity",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                             },
                             {
                               "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                               "name": "Typescript",
+                              "slug": "typescript",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                             }
@@ -4224,6 +4382,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                  {
                                    "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                    "name": "Typescript",
+                                   "slug": "typescript",
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                  }
@@ -4264,24 +4423,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                  {
                                    "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                    "name": "Javascript",
+                                   "slug": "javascript",
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                  },
                                  {
                                    "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                    "name": "Python",
+                                   "slug": "python",
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                  },
                                  {
                                    "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                    "name": "Rust",
+                                   "slug": "rust",
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                  },
                                  {
                                    "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                    "name": "Typescript",
+                                   "slug": "typescript",
                                    "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                    "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                  }
@@ -4297,42 +4460,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                              {
                                "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                                "name": "Cairo",
+                               "slug": "cairo",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                              },
                              {
                                "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                "name": "Javascript",
+                               "slug": "javascript",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                              },
                              {
                                "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                "name": "Python",
+                               "slug": "python",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                              },
                              {
                                "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                                "name": "Ruby",
+                               "slug": "ruby",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                              },
                              {
                                "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                "name": "Rust",
+                               "slug": "rust",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                              },
                              {
                                "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                "name": "Solidity",
+                               "slug": "solidity",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                              },
                              {
                                "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                "name": "Typescript",
+                               "slug": "typescript",
                                "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                              }
@@ -4457,6 +4627,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                       "name": "Typescript",
+                                      "slug": "typescript",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                     }
@@ -4497,24 +4668,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                       "name": "Javascript",
+                                      "slug": "javascript",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                     },
                                     {
                                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                       "name": "Python",
+                                      "slug": "python",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                     },
                                     {
                                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                       "name": "Rust",
+                                      "slug": "rust",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                     },
                                     {
                                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                       "name": "Typescript",
+                                      "slug": "typescript",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                     }
@@ -4530,42 +4705,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                                   "name": "Cairo",
+                                  "slug": "cairo",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                                 },
                                 {
                                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                   "name": "Javascript",
+                                  "slug": "javascript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                 },
                                 {
                                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                   "name": "Python",
+                                  "slug": "python",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                 },
                                 {
                                   "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                                   "name": "Ruby",
+                                  "slug": "ruby",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                                 },
                                 {
                                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                   "name": "Rust",
+                                  "slug": "rust",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                 },
                                 {
                                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                   "name": "Solidity",
+                                  "slug": "solidity",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                                 },
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                   "name": "Typescript",
+                                  "slug": "typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
@@ -4760,6 +4942,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -4794,6 +4977,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -4857,6 +5041,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -4921,12 +5106,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -4973,12 +5160,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                       "name": "Ruby",
+                      "slug": "ruby",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                     }
@@ -5014,30 +5203,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5093,24 +5287,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5156,24 +5354,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5210,6 +5412,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -5237,12 +5440,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     }
@@ -5272,6 +5477,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5327,30 +5533,35 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5395,24 +5606,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5524,24 +5739,28 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     },
                     {
                       "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                       "name": "Typescript",
+                      "slug": "typescript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                     }
@@ -5597,12 +5816,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                       "name": "Python",
+                      "slug": "python",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                     },
                     {
                       "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                       "name": "Cairo",
+                      "slug": "cairo",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                     }
@@ -5641,12 +5862,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     },
                     {
                       "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                       "name": "Solidity",
+                      "slug": "solidity",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                     }
@@ -5683,6 +5906,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -5714,6 +5938,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -5745,6 +5970,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                       "name": "Javascript",
+                      "slug": "javascript",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                     }
@@ -5778,6 +6004,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                     {
                       "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                       "name": "Rust",
+                      "slug": "rust",
                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                     }
@@ -5798,42 +6025,49 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
                   "name": "Cairo",
+                  "slug": "cairo",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                 },
                 {
                   "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                   "name": "Javascript",
+                  "slug": "javascript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                 },
                 {
                   "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                   "name": "Python",
+                  "slug": "python",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                 },
                 {
                   "id": "e0321e59-8633-46ee-bfbc-b1d84d845f83",
                   "name": "Ruby",
+                  "slug": "ruby",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-ruby.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-ruby.png"
                 },
                 {
                   "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                   "name": "Rust",
+                  "slug": "rust",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                 },
                 {
                   "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                   "name": "Solidity",
+                  "slug": "solidity",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                 },
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                   "name": "Typescript",
+                  "slug": "typescript",
                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                 }
