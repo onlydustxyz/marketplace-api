@@ -684,17 +684,19 @@ public interface BackOfficeMapper {
                 .url(ecosystemRequest.getUrl())
                 .logoUrl(ecosystemRequest.getLogoUrl())
                 .description(ecosystemRequest.getDescription())
+                .hidden(ecosystemRequest.getHidden())
                 .build();
     }
 
     static EcosystemResponse mapEcosystemToResponse(final Ecosystem ecosystem) {
         return new EcosystemResponse()
-                .id(ecosystem.getId())
-                .slug(ecosystem.getSlug())
-                .url(ecosystem.getUrl())
-                .name(ecosystem.getName())
-                .logoUrl(ecosystem.getLogoUrl())
-                .description(ecosystem.getDescription());
+                .id(ecosystem.id())
+                .slug(ecosystem.slug())
+                .url(ecosystem.url())
+                .name(ecosystem.name())
+                .logoUrl(ecosystem.logoUrl())
+                .description(ecosystem.description())
+                .hidden(ecosystem.hidden());
     }
 
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {

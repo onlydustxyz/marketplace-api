@@ -197,11 +197,12 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     void should_post_ecosystems() {
         // Given
-        final EcosystemRequest ecosystemRequest = new EcosystemRequest();
-        ecosystemRequest.setLogoUrl(faker.internet().url());
-        ecosystemRequest.setUrl(faker.internet().url());
-        ecosystemRequest.setName(faker.rickAndMorty().character());
-        ecosystemRequest.setDescription(faker.rickAndMorty().quote());
+        final EcosystemRequest ecosystemRequest = new EcosystemRequest()
+                .logoUrl(faker.internet().url())
+                .url(faker.internet().url())
+                .name(faker.rickAndMorty().character())
+                .description(faker.rickAndMorty().quote())
+                .hidden(false);
 
         // When
         client.post()
@@ -218,6 +219,7 @@ public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .jsonPath("$.url").isEqualTo(ecosystemRequest.getUrl())
                 .jsonPath("$.logoUrl").isEqualTo(ecosystemRequest.getLogoUrl())
                 .jsonPath("$.description").isEqualTo(ecosystemRequest.getDescription())
+                .jsonPath("$.hidden").isEqualTo(ecosystemRequest.getHidden())
                 .jsonPath("$.id").isNotEmpty();
     }
 

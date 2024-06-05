@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -21,12 +20,14 @@ import java.util.UUID;
 public class EcosystemViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
+    @NonNull
+    UUID id;
 
-    @NonNull String name;
+    @NonNull
+    String name;
     String url;
-    @Column(name = "logo_url")
     String logoUrl;
     String bannerUrl;
-    @NonNull String slug;
+    @NonNull
+    String slug;
 }
