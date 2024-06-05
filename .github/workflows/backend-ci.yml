@@ -26,7 +26,7 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw clean install -T 4 -DskipTests -DskipITs
+      - run: ./mvnw clean install -T 4 -DskipTests -DskipITs -DskipUTs
 
   unit_tests:
     name: Unit tests
@@ -48,6 +48,7 @@ jobs:
 
   integration_tests:
     strategy:
+      fail-fast: false
       matrix:
         suite: [ Accounting, BO, Me, Project, Reward, User, Others ]
     name: Integration tests [${{ matrix.suite }}]
