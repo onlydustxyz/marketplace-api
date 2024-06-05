@@ -39,6 +39,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                         group by pl.project_id) l on l.project_id = p.id
                     left join (select ppc.project_id, jsonb_agg(jsonb_build_object(
                                                                'id', pc.id,
+                                                               'slug', pc.slug,
                                                                'name', pc.name,
                                                                'iconSlug', pc.icon_slug
                                                     )) category_json
@@ -83,6 +84,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                                         group by pl.project_id) l on l.project_id = p.id
                     left join (select ppc.project_id, jsonb_agg(jsonb_build_object(
                                                                'id', pc.id,
+                                                               'slug', pc.slug,
                                                                'name', pc.name,
                                                                'iconSlug', pc.icon_slug
                                                     )) category_json

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.entities.project;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @Immutable
 @Table(name = "project_categories", schema = "public")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ProjectCategoryReadEntity {
     @Id
     @EqualsAndHashCode.Include
