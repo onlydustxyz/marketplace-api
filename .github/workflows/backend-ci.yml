@@ -64,7 +64,7 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw -Dfailsafe-include='**/${{ matrix.suite }}Suite.java' failsafe:integration-test -T 6
+      - run: ./mvnw verify -Dfailsafe-include='**/${{ matrix.suite }}Suite.java' -DskipUTs=true -T 6
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
