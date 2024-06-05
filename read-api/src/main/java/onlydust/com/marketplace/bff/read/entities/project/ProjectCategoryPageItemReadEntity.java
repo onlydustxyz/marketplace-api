@@ -21,7 +21,7 @@ public class ProjectCategoryPageItemReadEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID id;
-    private @NonNull String slug;
+    private String slug;
     private @NonNull String name;
     private String iconSlug;
     @Enumerated(EnumType.STRING)
