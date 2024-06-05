@@ -3706,8 +3706,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(5)
     void should_get_projects_given_anonymous_user_with_sorts_and_filters() {
-        // Rust id : "ca600cac-0f45-44e9-a6e8-25e21b0c6887"
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887", "search", "t",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "languageSlugs", "rust", "search", "t",
                         "ecosystemSlugs", "fake",
                         "pageIndex", "0", "pageSize", "100")))
                 .exchange()

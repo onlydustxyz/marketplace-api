@@ -77,7 +77,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final String search,
                                                            final List<ProjectTag> tags,
                                                            final List<String> ecosystemSlugs,
-                                                           final List<String> languages,
+                                                           final List<String> languageSlugs,
                                                            final List<UUID> categoryIds,
                                                            final String sort
     ) {
@@ -86,7 +86,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
-        final String languagesJsonPath = getLanguagesJsonPath(languages);
+        final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
                         categoryIds, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))

@@ -1193,7 +1193,7 @@ paths:
             items:
               $ref: '#/components/schemas/EcosystemSlug'
         - in: query
-          name: languages
+          name: languageSlugs
           required: false
           schema:
             type: array
