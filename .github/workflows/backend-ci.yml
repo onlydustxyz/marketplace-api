@@ -62,7 +62,7 @@ jobs:
           distribution: 'adopt'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw verify -T 6
+      - run: ./mvnw verify -T 32
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
