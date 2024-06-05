@@ -2160,6 +2160,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "categories": [
                 {
                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                  "slug": "ai",
                   "name": "AI",
                   "iconSlug": "brain"
                 }
@@ -2277,6 +2278,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "categories": [
                 {
                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                  "slug": "ai",
                   "name": "AI",
                   "iconSlug": "brain"
                 }
@@ -3600,6 +3602,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "categories": [
                 {
                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+                  "slug": "ai",
                   "name": "AI",
                   "iconSlug": "brain"
                 }
@@ -3624,9 +3627,9 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "AI", "brain");
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain");
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "Security", "lock"),
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock"),
                 categoryAI
         ));
         final var project = projectRepository.findById(UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c")).get();
@@ -3716,7 +3719,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json(GET_PROJECTS_FOR_ANONYMOUS_USER_WITH_SORTS_AND_FILTERS_JSON_RESPONSE);
 
-        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "categoryIds", "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
+        client.get().uri(getApiURI(PROJECTS_GET, Map.of("sort", "CONTRIBUTOR_COUNT", "categories", "ai",
                         "pageIndex", "0", "pageSize", "100")))
                 .exchange()
                 // Then

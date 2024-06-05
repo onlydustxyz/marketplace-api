@@ -25,12 +25,12 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "AI", "brain");
-        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "Security", "lock");
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain");
+        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock");
         projectCategoryRepository.saveAll(List.of(
                 categorySecurity,
                 categoryAI,
-                new ProjectCategoryEntity(UUID.fromString("d847060c-490c-482b-a3be-e48f93506b5d"), "Foo", "bar")
+                new ProjectCategoryEntity(UUID.fromString("d847060c-490c-482b-a3be-e48f93506b5d"), "foo", "Foo", "bar")
         ));
         final var project = projectRepository.findById(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56")).get();
         project.setCategories(Set.of(new ProjectProjectCategoryEntity(project.getId(), categoryAI.getId()),

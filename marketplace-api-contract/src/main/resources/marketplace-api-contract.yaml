@@ -1200,12 +1200,12 @@ paths:
             items:
               $ref: '#/components/schemas/LanguageSlug'
         - in: query
-          name: categoryIds
+          name: categories
           required: false
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProjectCategoryId'
+              $ref: '#/components/schemas/ProjectCategorySlug'
         - in: query
           name: hasGoodFirstIssues
           required: false
@@ -3794,6 +3794,10 @@ components:
       type: string
       format: uuid
 
+    ProjectCategorySlug:
+      type: string
+      description: OnlyDust project category pretty ID that is computed from its name.
+
     LanguageId:
       type: string
       format: uuid
@@ -6164,6 +6168,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectCategoryId'
+        slug:
+          $ref: '#/components/schemas/ProjectCategorySlug'
         name:
           type: string
         iconSlug:

@@ -21,6 +21,7 @@ public class ProjectCategoryPageItemReadEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID id;
+    private @NonNull String slug;
     private @NonNull String name;
     private String iconSlug;
     @Enumerated(EnumType.STRING)
@@ -30,6 +31,7 @@ public class ProjectCategoryPageItemReadEntity {
     public ProjectCategoryPageItemResponse toDto() {
         return new ProjectCategoryPageItemResponse()
                 .id(id)
+                .slug(slug)
                 .name(name)
                 .iconSlug(iconSlug)
                 .status(status)

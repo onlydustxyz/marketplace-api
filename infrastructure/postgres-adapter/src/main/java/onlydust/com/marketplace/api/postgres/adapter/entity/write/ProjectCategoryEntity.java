@@ -18,12 +18,14 @@ import java.util.UUID;
 public class ProjectCategoryEntity {
     @Id
     private @NonNull UUID id;
+    private @NonNull String slug;
     private @NonNull String name;
     private @NonNull String iconSlug;
 
     public static ProjectCategoryEntity fromDomain(ProjectCategory projectCategory) {
         return ProjectCategoryEntity.builder()
                 .id(projectCategory.id().value())
+                .slug(projectCategory.slug())
                 .name(projectCategory.name())
                 .iconSlug(projectCategory.iconSlug())
                 .build();

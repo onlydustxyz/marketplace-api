@@ -31,10 +31,10 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                 new ProjectCategorySuggestionEntity(UUID.fromString("d3af3bfc-5689-412a-8191-1466aa269830"), "DeFi"),
                 new ProjectCategorySuggestionEntity(UUID.fromString("d3df4dbf-850e-42a5-af16-ca8a0278489c"), "Art")
         ));
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "AI", "brain");
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain");
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "Security", "lock"),
-                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "NFT", "paint"),
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock"),
+                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "nft", "NFT", "paint"),
                 categoryAI
         ));
         final var project = projectRepository.findById(UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54")).get();
