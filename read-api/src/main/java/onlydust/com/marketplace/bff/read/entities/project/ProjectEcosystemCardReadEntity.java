@@ -20,8 +20,6 @@ import org.hibernate.type.SqlTypes;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Objects.nonNull;
-
 @Accessors(fluent = true)
 @Entity
 @NoArgsConstructor
@@ -50,28 +48,19 @@ public class ProjectEcosystemCardReadEntity {
 
 
     public EcosystemProjectPageItemResponse toContract() {
-        EcosystemProjectPageItemResponse contractResponse = new EcosystemProjectPageItemResponse();
-        contractResponse.setId(id);
-        contractResponse.setName(name);
-        contractResponse.setSlug(slug);
-        contractResponse.setShortDescription(shortDescription);
-        contractResponse.setLogoUrl(logoUrl);
-        contractResponse.setContributorsCount(contributorsCount);
-        if (nonNull(topContributors)) {
-            this.topContributors.stream()
-                    .map(githubUserLinkJson -> new GithubUserResponse()
-                            .avatarUrl(githubUserLinkJson.getAvatarUrl())
-                            .githubUserId(githubUserLinkJson.getGithubUserId())
-                            .login(githubUserLinkJson.getLogin())
-                    )
-                    .forEach(contractResponse::addTopContributorsItem);
-        }
-        // TODO remove ?
-        if (nonNull(languages)) {
-            this.languages.stream()
-                    .map(LanguageReadEntity::toDto)
-                    .forEach(contractResponse::addLanguagesItem);
-        }
-        return contractResponse;
+        return new EcosystemProjectPageItemResponse()
+                .id(id)
+                .name(name)
+                .slug(slug)
+                .shortDescription(shortDescription)
+                .logoUrl(logoUrl)
+                .contributorsCount(contributorsCount)
+                .topContributors(topContributors.stream()
+                        .map(githubUserLinkJson -> new GithubUserResponse()
+                                .avatarUrl(githubUserLinkJson.getAvatarUrl())
+                                .githubUserId(githubUserLinkJson.getGithubUserId())
+                                .login(githubUserLinkJson.getLogin())
+                        ).toList())
+                .languages(languages.stream().map(LanguageReadEntity::toDto).toList());
     }
 }

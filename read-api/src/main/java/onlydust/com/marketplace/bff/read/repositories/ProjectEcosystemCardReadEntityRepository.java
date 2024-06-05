@@ -21,14 +21,14 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                        p.logo_url,
                        cc.users                                                                                   top_contributors,
                        (select count(distinct github_user_id) from projects_contributors where project_id = p.id) contributors_count,
-                       (select jsonb_agg(
+                       coalesce((select jsonb_agg(
                                        jsonb_build_object(
                                                'id', l.id, 'name', l.name, 'slug', l.slug, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
                                        ) order by l.name
                                )
                         from project_languages pl
                         join languages l on pl.language_id = l.id
-                        where pl.project_id = p.id)                                                                languages
+                        where pl.project_id = p.id), '[]')                                                                languages
                 from ecosystems e
                          join projects_ecosystems pe on pe.ecosystem_id = e.id
                          join projects p on p.id = pe.project_id

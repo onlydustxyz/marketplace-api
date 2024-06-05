@@ -42,8 +42,9 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
-import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.*;
+import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity.Category;
 import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -149,9 +150,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                      List<ProjectPageItemFiltersQueryEntity> filters, int totalNumberOfPage, Long count) {
         return new ProjectPageResponse()
                 .projects(projects.stream().map(p -> p.toDto(userId)).toList())
-                .languages(languagesOf(filters).stream().toList())
-                .ecosystems(ecosystemsOf(filters).stream().toList())
-                .categories(categoriesOf(filters).stream().toList())
+                .languages(filters.stream().flatMap(e -> e.languages().stream().map(LanguageReadEntity::toDto)).collect(toSet()).stream().toList())
+                .ecosystems(filters.stream().flatMap(e1 -> e1.ecosystems().stream().map(Ecosystem::toDto)).collect(toSet()).stream().toList())
+                .categories(filters.stream().flatMap(e2 -> e2.categories().stream().map(Category::toDto)).collect(toSet()).stream().toList())
                 .totalPageNumber(totalNumberOfPage)
                 .totalItemNumber(count.intValue())
                 .hasMore(hasMore(pageIndex, totalNumberOfPage))

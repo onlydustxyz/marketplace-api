@@ -95,8 +95,7 @@ public class ProjectPageItemQueryEntity {
                         .avatarUrl(projectLead.avatarUrl)
                         .login(projectLead.login)
                 ).toList())
-                // TODO remove
-                .languages(isNull(this.languages) ? List.of() : this.languages.stream().map(LanguageReadEntity::toDto).toList())
+                .languages(languages.stream().map(LanguageReadEntity::toDto).toList())
                 .isInvitedAsProjectLead(this.isPendingProjectLead)
                 .hasMissingGithubAppInstallation(nonNull(userId) && nonNull(this.projectLeads)
                                                  && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId))
@@ -136,6 +135,15 @@ public class ProjectPageItemQueryEntity {
         String name;
         @JsonProperty("slug")
         String slug;
+
+        public EcosystemResponse toDto() {
+            return new EcosystemResponse()
+                    .id(id)
+                    .name(name)
+                    .slug(slug)
+                    .logoUrl(logoUrl)
+                    .url(url);
+        }
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)

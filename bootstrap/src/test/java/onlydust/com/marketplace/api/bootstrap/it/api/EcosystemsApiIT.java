@@ -447,7 +447,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "contributorsCount": 3,
-                              "languages": null
+                              "languages": []
                             }
                           ],
                           "hasMore": true,
@@ -532,7 +532,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "contributorsCount": 3,
-                              "languages": null
+                              "languages": []
                             },
                             {
                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
@@ -744,7 +744,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                        }
                                      ],
                                      "contributorsCount": 3,
-                                     "languages": null
+                                     "languages": []
                                    },
                                    {
                                      "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",

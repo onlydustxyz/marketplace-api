@@ -12,9 +12,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.id,
-                   s.ecosystem_json  as ecosystems,
-                   l.language_json   as languages,
-                   cat.category_json as categories
+                   coalesce(s.ecosystem_json , '[]') as ecosystems,
+                   coalesce(l.language_json  , '[]') as languages,
+                   coalesce(cat.category_json, '[]') as categories
             from projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
@@ -55,9 +55,9 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
 
     @Query(value = """
             select p.id,
-                   s.ecosystem_json  as ecosystems,
-                   l.language_json   as languages,
-                   cat.category_json as categories
+                   coalesce(s.ecosystem_json , '[]') as ecosystems,
+                   coalesce(l.language_json  , '[]') as languages,
+                   coalesce(cat.category_json, '[]') as categories
             from projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
