@@ -2,13 +2,16 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.service.UserService;
 import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class UnlockOpOnProjectApiIT extends AbstractMarketplaceApiIT {
 

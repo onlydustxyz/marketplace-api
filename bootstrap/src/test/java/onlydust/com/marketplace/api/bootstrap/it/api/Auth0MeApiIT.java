@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagUser;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
+@TagUser
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     Long githubUserId;
     String login;

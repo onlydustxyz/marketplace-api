@@ -49,20 +49,22 @@ jobs:
           flags: unit_tests
 
   integration_tests:
-    name: Integration tests
+    strategy:
+      matrix:
+        suite: [ Accounting, BO, Me, Project, Reward, User, Others ]
+    name: Integration tests [${{ matrix.suite }}]
     runs-on: ubuntu-latest
     needs: [ build ]
     steps:
       - uses: actions/checkout@v3
         with:
           lfs: true
-
       - uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '17'
           cache: 'maven'
-      - run: ./mvnw verify -T 32
+      - run: ./mvnw -Dfailsafe-include='**/${{ matrix.suite }}Suite.java' failsafe:integration-test -T 6
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:

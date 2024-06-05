@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@TagBO
 public class BackOfficeMeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     BoEcosystemRepository ecosystemRepository;

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 

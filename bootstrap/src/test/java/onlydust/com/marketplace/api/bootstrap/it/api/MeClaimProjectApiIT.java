@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -16,7 +18,8 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-
+@TagMe
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
 
@@ -42,8 +45,8 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
                 .userId(UUID.fromString("45e98bf6-25c2-4edf-94da-e340daba8964"))
                 .build());
         projectLeaderInvitationRepository.delete(new ProjectLeaderInvitationEntity(UUID.fromString("02615584-4ff6" +
-                                                                                                   "-4f82-82f7" +
-                                                                                                   "-0e136b676310"),
+                "-4f82-82f7" +
+                "-0e136b676310"),
                 projectId, 98735421L));
 
 

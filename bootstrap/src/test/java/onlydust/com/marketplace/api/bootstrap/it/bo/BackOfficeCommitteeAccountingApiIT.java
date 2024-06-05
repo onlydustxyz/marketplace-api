@@ -6,6 +6,7 @@ import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsCrea
 import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsUpdateRequest;
 import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.project.domain.model.Committee;
@@ -28,6 +29,7 @@ import java.util.stream.IntStream;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
