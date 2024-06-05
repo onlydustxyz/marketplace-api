@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.entities.project;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,10 +21,12 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @Immutable
 @Table(name = "project_categories", schema = "public")
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class ProjectCategoryReadEntity {
     @Id
     @EqualsAndHashCode.Include
     private @NonNull UUID id;
+    private @NonNull String slug;
     private @NonNull String name;
     private @NonNull String iconSlug;
 
@@ -36,6 +39,7 @@ public class ProjectCategoryReadEntity {
     public ProjectCategoryResponse toBoDto() {
         return new ProjectCategoryResponse()
                 .id(id)
+                .slug(slug)
                 .name(name)
                 .iconSlug(iconSlug)
                 ;
@@ -44,6 +48,7 @@ public class ProjectCategoryReadEntity {
     public onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse toDto() {
         return new onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse()
                 .id(id)
+                .slug(slug)
                 .name(name)
                 .iconSlug(iconSlug)
                 ;

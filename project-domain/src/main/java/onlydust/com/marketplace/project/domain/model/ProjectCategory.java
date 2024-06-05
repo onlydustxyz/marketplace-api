@@ -21,6 +21,12 @@ public class ProjectCategory {
         return new ProjectCategory(Id.random(), name, iconSlug);
     }
 
+    public String slug() {
+        return name.replaceAll("[^a-zA-Z0-9_\\- ]+", "")
+                .replaceAll("\s+", "-")
+                .toLowerCase();
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder
