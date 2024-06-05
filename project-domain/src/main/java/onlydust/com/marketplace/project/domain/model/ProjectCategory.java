@@ -8,6 +8,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -16,9 +18,10 @@ public class ProjectCategory {
     private final @NonNull Id id;
     private @NonNull String name;
     private @NonNull String iconSlug;
+    private @NonNull Set<UUID> projects;
 
     public static ProjectCategory of(@NonNull final String name, @NonNull final String iconSlug) {
-        return new ProjectCategory(Id.random(), name, iconSlug);
+        return new ProjectCategory(Id.random(), name, iconSlug, new HashSet<>());
     }
 
     public String slug() {

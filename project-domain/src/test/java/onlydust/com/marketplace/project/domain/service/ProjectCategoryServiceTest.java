@@ -89,7 +89,7 @@ class ProjectCategoryServiceTest {
         final var iconSlug = faker.rickAndMorty().location();
 
         // When
-        projectCategoryService.createCategory(name, iconSlug);
+        projectCategoryService.createCategory(name, iconSlug, null);
 
         // Then
         final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
@@ -99,6 +99,50 @@ class ProjectCategoryServiceTest {
         assertThat(projectCategory.id()).isNotNull();
         assertThat(projectCategory.name()).isEqualTo(name);
         assertThat(projectCategory.iconSlug()).isEqualTo(iconSlug);
+    }
+
+    @Test
+    void should_create_project_category_from_a_suggestion() {
+        // Given
+        final var name = faker.rickAndMorty().character();
+        final var iconSlug = faker.rickAndMorty().location();
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+        final var projectId = UUID.randomUUID();
+
+        when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(name, projectId)));
+
+        // When
+        projectCategoryService.createCategory(name, iconSlug, suggestionId);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isNotNull();
+        assertThat(projectCategory.name()).isEqualTo(name);
+        assertThat(projectCategory.iconSlug()).isEqualTo(iconSlug);
+        assertThat(projectCategory.projects()).contains(projectId);
+
+        verify(projectCategoryStoragePort).delete(suggestionId);
+    }
+
+    @Test
+    void should_fail_to_create_category_if_suggestion_not_found() {
+        // Given
+        final var name = faker.rickAndMorty().character();
+        final var iconSlug = faker.rickAndMorty().location();
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+
+        when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> projectCategoryService.createCategory(name, iconSlug, suggestionId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Project category suggestion %s not found".formatted(suggestionId));
+
+        verify(projectCategoryStoragePort, never()).delete(suggestionId);
     }
 
     @Test

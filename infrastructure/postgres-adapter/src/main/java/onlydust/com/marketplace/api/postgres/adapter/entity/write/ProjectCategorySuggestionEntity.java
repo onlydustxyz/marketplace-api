@@ -28,4 +28,8 @@ public class ProjectCategorySuggestionEntity {
                 .projectId(suggestion.projectId())
                 .build();
     }
+
+    public ProjectCategorySuggestion toDomain() {
+        return new ProjectCategorySuggestion(ProjectCategorySuggestion.Id.of(id), name, projectId);
+    }
 }

@@ -34,8 +34,16 @@ public class ProjectCategoryService implements ProjectCategoryFacadePort {
     }
 
     @Override
-    public ProjectCategory createCategory(@NonNull String categoryName, @NonNull String iconSlug) {
+    public ProjectCategory createCategory(@NonNull String categoryName, @NonNull String iconSlug, final ProjectCategorySuggestion.Id suggestionId) {
         final var projectCategory = ProjectCategory.of(categoryName, iconSlug);
+        
+        if (suggestionId != null) {
+            final var suggestion = projectCategoryStoragePort.get(suggestionId)
+                    .orElseThrow(() -> notFound("Project category suggestion %s not found".formatted(suggestionId)));
+            projectCategory.projects().add(suggestion.projectId());
+            projectCategoryStoragePort.delete(suggestionId);
+        }
+
         projectCategoryStoragePort.save(projectCategory);
         return projectCategory;
     }

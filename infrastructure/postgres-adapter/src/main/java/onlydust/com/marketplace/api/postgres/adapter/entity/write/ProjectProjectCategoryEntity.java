@@ -17,12 +17,12 @@ import java.util.UUID;
 public class ProjectProjectCategoryEntity {
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "project_id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     UUID projectId;
 
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "project_category_id", nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false)
     UUID projectCategoryId;
 
     @EqualsAndHashCode

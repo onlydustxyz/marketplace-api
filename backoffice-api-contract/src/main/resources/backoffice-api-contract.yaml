@@ -4864,7 +4864,9 @@ components:
           type: string
         iconSlug:
           type: string
-
+        suggestionId:
+          $ref: '#/components/schemas/ProjectCategoryId'
+    
     ProjectCategoryUpdateRequest:
       allOf:
         - $ref: '#/components/schemas/ProjectCategoryCreateRequest'

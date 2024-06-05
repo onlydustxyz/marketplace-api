@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
@@ -12,6 +9,7 @@ import java.util.UUID;
 
 @Value
 @Accessors(fluent = true)
+@AllArgsConstructor
 public class ProjectCategorySuggestion {
     private final @NonNull Id id;
     private final @NonNull String name;
