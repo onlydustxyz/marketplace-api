@@ -260,12 +260,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
-                !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
             contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
-                !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }
@@ -459,9 +459,9 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> suggestProjectCategory(SuggestProjectCategoryRequest suggestProjectCategoryRequest) {
+    public ResponseEntity<Void> suggestProjectCategory(SuggestProjectCategoryRequest request) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectCategoryFacadePort.suggest(suggestProjectCategoryRequest.getName(), authenticatedUser.getId());
+        projectCategoryFacadePort.suggest(request.getName(), authenticatedUser.getId(), request.getProjectId());
         return noContent().build();
     }
 }

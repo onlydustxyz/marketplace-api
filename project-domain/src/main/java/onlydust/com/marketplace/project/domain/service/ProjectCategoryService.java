@@ -10,16 +10,21 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStorag
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class ProjectCategoryService implements ProjectCategoryFacadePort {
     private final ProjectObserverPort projectObserverPort;
     private final ProjectCategoryStoragePort projectCategoryStoragePort;
+    private final PermissionService permissionService;
 
     @Override
-    public void suggest(String categoryName, UUID userId) {
-        projectCategoryStoragePort.save(ProjectCategorySuggestion.of(categoryName));
+    public void suggest(final @NonNull String categoryName, final @NonNull UUID userId, final @NonNull UUID projectId) {
+        if (!permissionService.isUserProjectLead(projectId, userId))
+            throw forbidden("Only project leads can suggest project categories");
+
+        projectCategoryStoragePort.save(ProjectCategorySuggestion.of(categoryName, projectId));
         projectObserverPort.onProjectCategorySuggested(categoryName, userId);
     }
 

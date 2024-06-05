@@ -19,11 +19,13 @@ public class ProjectCategorySuggestionEntity {
     @Id
     private @NonNull UUID id;
     private @NonNull String name;
+    private @NonNull UUID projectId;
 
-    public static ProjectCategorySuggestionEntity fromDomain(ProjectCategorySuggestion projectCategorySuggestion) {
+    public static ProjectCategorySuggestionEntity fromDomain(ProjectCategorySuggestion suggestion) {
         return ProjectCategorySuggestionEntity.builder()
-                .id(projectCategorySuggestion.id().value())
-                .name(projectCategorySuggestion.name())
+                .id(suggestion.id().value())
+                .name(suggestion.name())
+                .projectId(suggestion.projectId())
                 .build();
     }
 }

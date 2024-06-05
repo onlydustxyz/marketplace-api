@@ -7,7 +7,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 import java.util.UUID;
 
 public interface ProjectCategoryFacadePort {
-    void suggest(final @NonNull String categoryName, final @NonNull UUID userId);
+    void suggest(final @NonNull String categoryName, final @NonNull UUID userId, final @NonNull UUID projectId);
 
     void deleteCategorySuggestion(final @NonNull ProjectCategorySuggestion.Id id);
 

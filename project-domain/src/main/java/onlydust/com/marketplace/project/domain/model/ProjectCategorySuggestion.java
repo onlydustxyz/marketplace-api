@@ -15,9 +15,10 @@ import java.util.UUID;
 public class ProjectCategorySuggestion {
     private final @NonNull Id id;
     private final @NonNull String name;
+    private final @NonNull UUID projectId;
 
-    public static ProjectCategorySuggestion of(@NonNull final String name) {
-        return new ProjectCategorySuggestion(Id.random(), name);
+    public static ProjectCategorySuggestion of(@NonNull final String name, @NonNull final UUID projectId) {
+        return new ProjectCategorySuggestion(Id.random(), name, projectId);
     }
 
     @NoArgsConstructor(staticName = "random")
