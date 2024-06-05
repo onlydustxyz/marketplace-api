@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.Language;
 
 import java.io.InputStream;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface LanguageFacadePort {
-    Language createLanguage(String name, Set<String> fileExtensions);
+    Language createLanguage(final @NonNull String name, final @NonNull String slug, final @NonNull Set<String> fileExtensions);
 
     List<Language> listLanguages();
 

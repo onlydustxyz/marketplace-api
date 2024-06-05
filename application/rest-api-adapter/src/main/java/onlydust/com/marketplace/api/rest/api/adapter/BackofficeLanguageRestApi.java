@@ -29,7 +29,7 @@ public class BackofficeLanguageRestApi implements BackofficeLanguageManagementAp
 
     @Override
     public ResponseEntity<LanguageResponse> createLanguage(LanguageCreateRequest request) {
-        final var language = languageFacadePort.createLanguage(request.getName(), new HashSet<>(request.getFileExtensions()));
+        final var language = languageFacadePort.createLanguage(request.getName(), request.getSlug(), new HashSet<>(request.getFileExtensions()));
         return ResponseEntity.ok(mapLanguageResponse(language));
     }
 

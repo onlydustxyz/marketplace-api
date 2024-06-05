@@ -23,7 +23,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                        (select count(distinct github_user_id) from projects_contributors where project_id = p.id) contributors_count,
                        (select jsonb_agg(
                                        jsonb_build_object(
-                                               'id', l.id, 'name', l.name, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
+                                               'id', l.id, 'name', l.name, 'slug', l.slug, 'logoUrl', l.logo_url, 'bannerUrl', l.banner_url
                                        ) order by l.name
                                )
                         from project_languages pl

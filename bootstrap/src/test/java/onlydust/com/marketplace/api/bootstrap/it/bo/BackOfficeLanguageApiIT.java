@@ -41,6 +41,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "name": "Alphabetic",
+                            "slug": "alphabetic",
                             "fileExtensions": ["a", "B", "c"]
                         }
                         """)
@@ -52,6 +53,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .json("""
                         {
                             "name": "Alphabetic",
+                            "slug": "alphabetic",
                             "fileExtensions": ["a", "b", "c"],
                             "logoUrl": null,
                             "bannerUrl": null
@@ -77,6 +79,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                           "languages": [
                             {
                               "name": "Alphabetic",
+                              "slug": "alphabetic",
                               "fileExtensions": [
                                 "a",
                                 "b",
@@ -101,6 +104,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "name": "Alphabeticcc",
+                            "slug": "alphabeticcc",
                             "fileExtensions": ["b", "C", "d"],
                             "logoUrl": "https://example.com/logo.png",
                             "bannerUrl": "https://example.com/banner.png"
@@ -114,6 +118,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .json("""
                         {
                             "name": "Alphabeticcc",
+                            "slug": "alphabeticcc",
                             "fileExtensions": ["b", "c", "d"],
                             "logoUrl": "https://example.com/logo.png",
                             "bannerUrl": "https://example.com/banner.png"
@@ -134,6 +139,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                           "languages": [
                             {
                               "name": "Alphabeticcc",
+                              "slug": "alphabeticcc",
                               "fileExtensions": [
                                 "b",
                                 "c",
@@ -159,6 +165,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .bodyValue("""
                         {
                             "name": "Foo",
+                            "slug": "foo",
                             "fileExtensions": []
                         }
                         """)
@@ -170,6 +177,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .json("""
                         {
                             "name": "Foo",
+                            "slug": "foo",
                             "fileExtensions": [],
                             "logoUrl": null,
                             "bannerUrl": null
@@ -190,6 +198,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                           "languages": [
                             {
                               "name": "Alphabeticcc",
+                              "slug": "alphabeticcc",
                               "fileExtensions": [
                                 "b",
                                 "c",
@@ -199,6 +208,7 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "bannerUrl": "https://example.com/banner.png"
                             },{
                               "name": "Foo",
+                              "slug": "foo",
                               "fileExtensions": [],
                               "logoUrl": null,
                               "bannerUrl": null
@@ -222,10 +232,13 @@ public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.knownExtensions[?(@.extension == 'a')]").doesNotExist()
                 .jsonPath("$.knownExtensions[?(@.extension == 'b')]").exists()
                 .jsonPath("$.knownExtensions[?(@.extension == 'b')].language.name").isEqualTo("Alphabeticcc")
+                .jsonPath("$.knownExtensions[?(@.extension == 'b')].language.slug").isEqualTo("alphabeticcc")
                 .jsonPath("$.knownExtensions[?(@.extension == 'c')]").exists()
                 .jsonPath("$.knownExtensions[?(@.extension == 'c')].language.name").isEqualTo("Alphabeticcc")
+                .jsonPath("$.knownExtensions[?(@.extension == 'c')].language.slug").isEqualTo("alphabeticcc")
                 .jsonPath("$.knownExtensions[?(@.extension == 'd')]").exists()
                 .jsonPath("$.knownExtensions[?(@.extension == 'd')].language.name").isEqualTo("Alphabeticcc")
+                .jsonPath("$.knownExtensions[?(@.extension == 'd')].language.slug").isEqualTo("alphabeticcc")
                 .jsonPath("$.knownExtensions[?(@.extension == 'rs')]").exists()
                 .jsonPath("$.knownExtensions[?(@.extension == 'rs')].language").isEqualTo(null)
                 .jsonPath("$.knownExtensions[?(@.extension == 'java')]").exists()

@@ -18,20 +18,22 @@ import java.util.stream.Collectors;
 public class Language {
     @NonNull Id id;
     @NonNull String name;
+    @NonNull String slug;
     @NonNull Set<String> fileExtensions;
     URI logoUrl;
     URI bannerUrl;
 
-    public Language(@NonNull Id id, @NonNull String name, @NonNull Set<String> fileExtensions, URI logoUrl, URI bannerUrl) {
+    public Language(@NonNull Id id, @NonNull String name, @NonNull String slug, @NonNull Set<String> fileExtensions, URI logoUrl, URI bannerUrl) {
         this.id = id;
         this.name = name;
+        this.slug = slug;
         this.fileExtensions = fileExtensions.stream().map(e -> e.toLowerCase().trim()).collect(Collectors.toSet());
         this.logoUrl = logoUrl;
         this.bannerUrl = bannerUrl;
     }
 
-    public static Language of(@NonNull final String name, @NonNull final Set<String> fileExtensions) {
-        return new Language(Id.random(), name, fileExtensions, null, null);
+    public static Language of(@NonNull final String name, @NonNull final String slug, @NonNull final Set<String> fileExtensions) {
+        return new Language(Id.random(), name, slug, fileExtensions, null, null);
     }
 
     @NoArgsConstructor(staticName = "random")

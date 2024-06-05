@@ -11,7 +11,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemProjectPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
-import onlydust.com.marketplace.api.contract.model.LanguageResponse;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.GithubUserLinkJson;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -45,7 +45,7 @@ public class ProjectEcosystemCardReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<GithubUserLinkJson> topContributors;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<LanguageLinkJson> languages;
+    List<LanguageReadEntity> languages;
     Integer contributorsCount;
 
 
@@ -66,14 +66,10 @@ public class ProjectEcosystemCardReadEntity {
                     )
                     .forEach(contractResponse::addTopContributorsItem);
         }
+        // TODO remove ?
         if (nonNull(languages)) {
             this.languages.stream()
-                    .map(languageLinkJson -> new LanguageResponse()
-                            .id(languageLinkJson.id)
-                            .bannerUrl(languageLinkJson.getBannerUrl())
-                            .logoUrl(languageLinkJson.getLogoUrl())
-                            .name(languageLinkJson.getName())
-                    )
+                    .map(LanguageReadEntity::toDto)
                     .forEach(contractResponse::addLanguagesItem);
         }
         return contractResponse;

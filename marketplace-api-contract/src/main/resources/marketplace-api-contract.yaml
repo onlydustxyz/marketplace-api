@@ -3794,6 +3794,10 @@ components:
       format: uuid
       description: OnlyDust language ID
 
+    LanguageSlug:
+      type: string
+      description: OnlyDust language slug
+
     RewardId:
       type: string
       format: uuid
@@ -4271,7 +4275,7 @@ components:
     UserProfileEcosystemPage:
       type: object
       required:
-        - languages
+        - ecosystems
       properties:
         totalPageNumber:
           type: integer
@@ -4825,11 +4829,14 @@ components:
       type: object
       required:
         - id
+        - slug
         - name
         - logoUrl
       properties:
         id:
           $ref: '#/components/schemas/LanguageId'
+        slug:
+          $ref: '#/components/schemas/LanguageSlug'
         name:
           type: string
           description: Language name

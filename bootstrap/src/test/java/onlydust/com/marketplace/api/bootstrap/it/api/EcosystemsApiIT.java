@@ -774,24 +774,28 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                        {
                                          "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                          "name": "Javascript",
+                                         "slug": "javascript",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                        },
                                        {
                                          "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                                          "name": "Python",
+                                         "slug": "python",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
                                        },
                                        {
                                          "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                          "name": "Rust",
+                                         "slug": "rust",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                        },
                                        {
                                          "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
                                          "name": "Typescript",
+                                         "slug": "typescript",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                        }
@@ -825,12 +829,14 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                        {
                                          "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                          "name": "Javascript",
+                                         "slug": "javascript",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                        },
                                        {
                                          "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                          "name": "Solidity",
+                                         "slug": "solidity",
                                          "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
                                          "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
                                        }
@@ -842,7 +848,7 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                  "totalItemNumber": 4,
                                  "nextPageIndex": 0
                                }
-                        
+                                                
                         """, true);
     }
 }

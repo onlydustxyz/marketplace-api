@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
 import onlydust.com.marketplace.api.contract.model.LanguageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -32,7 +33,7 @@ public class ProjectPageItemFiltersQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectPageItemQueryEntity.Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<ProjectPageItemQueryEntity.Languages> languages;
+    List<LanguageReadEntity> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     List<Category> categories;
 
@@ -49,19 +50,14 @@ public class ProjectPageItemFiltersQueryEntity {
         String iconSlug;
     }
 
-
+    // TODO remove
     public static Set<LanguageResponse> languagesOf(final List<ProjectPageItemFiltersQueryEntity> entities) {
         final Set<LanguageResponse> languages = new HashSet<>();
         for (var entity : entities) {
             if (nonNull(entity.languages)) {
                 languages.addAll(entity.languages.stream()
-                        .filter(l -> nonNull(l.name))
-                        .map(l -> new LanguageResponse()
-                                .id(l.id())
-                                .name(l.name())
-                                .logoUrl(l.logoUrl())
-                                .bannerUrl(l.bannerUrl())
-                        ).toList());
+                        .filter(l -> nonNull(l.name()))
+                        .map(LanguageReadEntity::toDto).toList());
             }
         }
         return languages;

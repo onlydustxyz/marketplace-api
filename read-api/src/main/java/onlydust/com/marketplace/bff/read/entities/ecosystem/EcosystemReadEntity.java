@@ -9,9 +9,9 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemShortResponseBanners;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.LanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -59,7 +59,7 @@ public class EcosystemReadEntity {
     @JoinTable(name = "ecosystem_languages",
             joinColumns = @JoinColumn(name = "ecosystem_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id"))
-    private Set<LanguageViewEntity> languages;
+    private Set<LanguageReadEntity> languages;
 
     @ManyToMany
     @JoinTable(name = "ecosystem_project_categories",

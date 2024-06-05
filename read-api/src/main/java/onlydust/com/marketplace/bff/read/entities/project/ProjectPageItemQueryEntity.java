@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -46,7 +47,7 @@ public class ProjectPageItemQueryEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<Tag> tags;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<Languages> languages;
+    List<LanguageReadEntity> languages;
 
     public static String getEcosystemsJsonPath(List<String> ecosystemSlugs) {
         if (isNull(ecosystemSlugs) || ecosystemSlugs.isEmpty()) {
@@ -94,15 +95,11 @@ public class ProjectPageItemQueryEntity {
                         .avatarUrl(projectLead.avatarUrl)
                         .login(projectLead.login)
                 ).toList())
-                .languages(isNull(this.languages) ? List.of() : this.languages.stream().map(language -> new LanguageResponse()
-                        .id(language.id)
-                        .logoUrl(language.logoUrl)
-                        .bannerUrl(language.bannerUrl)
-                        .name(language.name)
-                ).toList())
+                // TODO remove
+                .languages(isNull(this.languages) ? List.of() : this.languages.stream().map(LanguageReadEntity::toDto).toList())
                 .isInvitedAsProjectLead(this.isPendingProjectLead)
                 .hasMissingGithubAppInstallation(nonNull(userId) && nonNull(this.projectLeads)
-                        && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId))
+                                                 && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId))
                         ?
                         this.isMissingGithubAppInstallation : null);
     }
@@ -139,21 +136,6 @@ public class ProjectPageItemQueryEntity {
         String name;
         @JsonProperty("slug")
         String slug;
-    }
-
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    @Getter
-    @Accessors(fluent = true)
-    public static class Languages {
-        @EqualsAndHashCode.Include
-        @JsonProperty("id")
-        UUID id;
-        @JsonProperty("name")
-        String name;
-        @JsonProperty("logoUrl")
-        String logoUrl;
-        @JsonProperty("bannerUrl")
-        String bannerUrl;
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)

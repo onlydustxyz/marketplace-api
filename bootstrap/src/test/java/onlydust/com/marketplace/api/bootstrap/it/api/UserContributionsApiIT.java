@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -406,7 +405,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
 
         // And given
         final var languageService = new LanguageService(languageStorage, imageStoragePort);
-        final var rust = languageService.createLanguage("Rust", Set.of("rs"));
+        final var rust = languageService.listLanguages().stream().filter(language -> language.slug().equals("rust")).findFirst().orElseThrow();
 
         // When
         client.get()
