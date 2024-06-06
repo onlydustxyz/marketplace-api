@@ -33,7 +33,7 @@
 
     <properties>
         <failsafe-include>**/*IT.java</failsafe-include>
-        <skipUTs>false</skipUTs>
+        <skipUTs>${skipTests}</skipUTs>
         <java.version>17</java.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
