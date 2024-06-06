@@ -15,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagConcurrency;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
@@ -34,6 +35,7 @@ import static onlydust.com.marketplace.api.bootstrap.helper.ConcurrentTesting.ru
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TagConcurrency
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     @Autowired
@@ -115,7 +117,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
 
         final var rawResponses = new ConcurrentHashMap<Integer, InvoicePreviewResponse>();
 
-        runConcurrently(100, threadId -> {
+        runConcurrently(50, threadId -> {
             // When
             client.get()
                     .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(

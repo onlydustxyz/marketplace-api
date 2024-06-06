@@ -50,8 +50,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [ Accounting, BO, Me, Project, Reward, User, Others ]
-    name: Integration tests [${{ matrix.suite }}]
+        suite: [ Accounting, BO, Concurrency, Me, Project, Reward, User, Others ]
+    name: ITs [${{ matrix.suite }}]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
