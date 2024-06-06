@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
@@ -23,6 +24,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
+@TagAccounting
 public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     AccountingHelper accountingHelper;

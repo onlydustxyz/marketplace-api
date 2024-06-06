@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
@@ -20,6 +21,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
 
@@ -4319,7 +4321,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 0,
                           "nextPageIndex": 0
                         }
-                        
+                                                
                         """);
 
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_AND_FURIOUS"))).exchange()

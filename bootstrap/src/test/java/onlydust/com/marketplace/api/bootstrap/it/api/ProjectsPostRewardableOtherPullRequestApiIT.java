@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagReward;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import org.junit.jupiter.api.MethodOrderer;
@@ -16,6 +17,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 
+@TagReward
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsPostRewardableOtherPullRequestApiIT extends AbstractMarketplaceApiIT {
 

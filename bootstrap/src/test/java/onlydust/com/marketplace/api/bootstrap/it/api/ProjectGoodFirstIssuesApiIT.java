@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 
+@TagProject
 public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
     private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
 

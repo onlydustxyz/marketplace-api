@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
@@ -24,6 +25,7 @@ import static java.lang.String.format;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApiIT {
 

@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagReward;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
+@TagReward
 public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser pierre;
 

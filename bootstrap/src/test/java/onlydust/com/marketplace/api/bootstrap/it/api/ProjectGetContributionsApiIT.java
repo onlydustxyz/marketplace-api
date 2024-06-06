@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -8,6 +9,7 @@ import java.util.Map;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
+@TagProject
 public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
 
 
