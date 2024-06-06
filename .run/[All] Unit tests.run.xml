@@ -5,7 +5,6 @@
     <toRun name="[Project] Unit tests" type="JUnit" />
     <toRun name="[REST API] Unit tests" type="JUnit" />
     <toRun name="[SumSub Webhook] Unit tests" type="JUnit" />
-    <toRun name="[User] Unit tests" type="JUnit" />
     <method v="2" />
   </configuration>
 </component>
