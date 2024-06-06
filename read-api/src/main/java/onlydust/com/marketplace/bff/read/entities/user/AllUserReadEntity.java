@@ -16,6 +16,7 @@ import org.hibernate.annotations.Immutable;
 import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -99,10 +100,10 @@ public class AllUserReadEntity {
                 .email(email)
                 .lastSeenAt(registered == null ? null : registered.lastSeenAt())
                 .signedUpAt(registered == null ? null : toZoneDateTime(registered.createdAt()))
-                .contacts(contacts.stream().map(ContactInformationReadEntity::toDto).toList())
+                .contacts(Optional.ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toDto).toList())
                 .leadedProjectCount(globalUsersRanks == null ? 0 : globalUsersRanks.leadedProjectCount().intValue())
                 .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
-                .billingProfiles(billingProfiles.stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
+                .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
                 ;
     }
 }
