@@ -1,21 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CI" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="echo Done" />
-    <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
-    <option name="SCRIPT_PATH" value="" />
-    <option name="SCRIPT_OPTIONS" value="" />
-    <option name="INDEPENDENT_SCRIPT_WORKING_DIRECTORY" value="true" />
-    <option name="SCRIPT_WORKING_DIRECTORY" value="$PROJECT_DIR$" />
-    <option name="INDEPENDENT_INTERPRETER_PATH" value="true" />
-    <option name="INTERPRETER_PATH" value="/bin/zsh" />
-    <option name="INTERPRETER_OPTIONS" value="" />
-    <option name="EXECUTE_IN_TERMINAL" value="true" />
-    <option name="EXECUTE_SCRIPT_FILE" value="false" />
-    <envs />
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Compile" run_configuration_type="MavenRunConfiguration" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="[All] Unit tests" run_configuration_type="CompoundRunConfigurationType" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="[All] Integration tests" run_configuration_type="CompoundRunConfigurationType" />
-    </method>
+  <configuration default="false" name="CI" type="Multirun" separateTabs="false" reuseTabsWithFailures="false" startOneByOne="true" markFailedProcess="true" hideSuccessProcess="true" delayTime="-0.1">
+    <runConfiguration name="Compile" type="Maven" />
+    <runConfiguration name="Unit tests" type="Multirun" />
+    <runConfiguration name="Integration tests" type="Multirun" />
+    <method v="2" />
   </configuration>
 </component>
