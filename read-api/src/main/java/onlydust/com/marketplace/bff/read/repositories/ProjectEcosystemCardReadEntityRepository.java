@@ -31,7 +31,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                         where pl.project_id = p.id), '[]')                                                                languages
                 from ecosystems e
                          join projects_ecosystems pe on pe.ecosystem_id = e.id
-                         join projects p on p.id = pe.project_id
+                         join public_projects p on p.id = pe.project_id
                          left join (select c.project_id,
                                            jsonb_agg(
                                                    jsonb_build_object(
@@ -64,7 +64,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                     select count(distinct p.id)
                             from ecosystems e
                             join projects_ecosystems pe on pe.ecosystem_id = e.id
-                            join projects p on p.id = pe.project_id
+                            join public_projects p on p.id = pe.project_id
                             left join has_gfi on has_gfi.project_id = p.id
                             left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags

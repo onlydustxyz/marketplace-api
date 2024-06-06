@@ -74,12 +74,6 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               },
                               "topProjects": [
                                 {
-                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                                  "slug": "b-conseil",
-                                  "name": "B Conseil",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
-                                },
-                                {
                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                   "slug": "mooooooonlight",
                                   "name": "Mooooooonlight",
@@ -90,9 +84,15 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "slug": "calcom",
                                   "name": "Cal.com",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                                },
+                                {
+                                  "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                  "slug": "zero-title-11",
+                                  "name": "Zero title 11",
+                                  "logoUrl": null
                                 }
                               ],
-                              "projectCount": 4,
+                              "projectCount": 3,
                               "topProjectCategories": [],
                               "projectCategoryCount": 0
                             },
@@ -150,14 +150,14 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               "topProjectCategories": [
                                 {
                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "name": "Security",
                                   "slug": "security",
+                                  "name": "Security",
                                   "iconSlug": "lock"
                                 },
                                 {
                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "name": "AI",
                                   "slug": "ai",
+                                  "name": "AI",
                                   "iconSlug": "brain"
                                 }
                               ],
@@ -178,15 +178,8 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "fontColor": "DARK"
                                 }
                               },
-                              "topProjects": [
-                                {
-                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                                  "slug": "b-conseil",
-                                  "name": "B Conseil",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
-                                }
-                              ],
-                              "projectCount": 1,
+                              "topProjects": [],
+                              "projectCount": 0,
                               "topProjectCategories": [],
                               "projectCategoryCount": 0
                             }
@@ -229,12 +222,6 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               },
                               "topProjects": [
                                 {
-                                  "id": "27ca7e18-9e71-468f-8825-c64fe6b79d66",
-                                  "slug": "b-conseil",
-                                  "name": "B Conseil",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11012050846615405488.png"
-                                },
-                                {
                                   "id": "594ca5ca-48f7-49a8-9c26-84b949d4fdd9",
                                   "slug": "mooooooonlight",
                                   "name": "Mooooooonlight",
@@ -245,9 +232,15 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                                   "slug": "calcom",
                                   "name": "Cal.com",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                                },
+                                {
+                                  "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                  "slug": "zero-title-11",
+                                  "name": "Zero title 11",
+                                  "logoUrl": null
                                 }
                               ],
-                              "projectCount": 4,
+                              "projectCount": 3,
                               "topProjectCategories": [],
                               "projectCategoryCount": 0
                             },
@@ -278,14 +271,14 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
                               "topProjectCategories": [
                                 {
                                   "id": "7a1c0dcb-2079-487c-adaa-88d425bf13ea",
-                                  "name": "Security",
                                   "slug": "security",
+                                  "name": "Security",
                                   "iconSlug": "lock"
                                 },
                                 {
                                   "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
-                                  "name": "AI",
                                   "slug": "ai",
+                                  "name": "AI",
                                   "iconSlug": "brain"
                                 }
                               ],

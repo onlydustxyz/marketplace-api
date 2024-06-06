@@ -44,9 +44,8 @@ public class CustomProjectRepository {
     public boolean isProjectPublic(UUID projectId) {
         final var isProjectPublic = entityManager.createNativeQuery("""
                         select 1
-                        from projects p
+                        from public_projects p
                         where p.id = :projectId
-                          and p.visibility = 'PUBLIC'
                         """)
                 .setParameter("projectId", projectId)
                 .getResultList();
@@ -56,9 +55,8 @@ public class CustomProjectRepository {
     public boolean isProjectPublic(String projectSlug) {
         final var isProjectPublic = entityManager.createNativeQuery("""
                         select 1
-                        from projects p
+                        from public_projects p
                         where p.slug = :projectSlug
-                          and p.visibility = 'PUBLIC'
                         """)
                 .setParameter("projectSlug", projectSlug)
                 .getResultList();
