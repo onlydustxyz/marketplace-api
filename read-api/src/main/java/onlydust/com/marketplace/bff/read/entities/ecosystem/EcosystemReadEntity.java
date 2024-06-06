@@ -9,9 +9,9 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.EcosystemDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemShortResponseBanners;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
-import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.NaturalId;
@@ -30,43 +30,49 @@ public class EcosystemReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
-    private UUID id;
+    UUID id;
 
     @NaturalId
-    private @NonNull String slug;
-    private @NonNull String name;
-    private String description;
-    private Integer featuredRank;
-    private Boolean hidden;
+    @NonNull
+    String slug;
+    @NonNull
+    String name;
+    String description;
+    Integer featuredRank;
+    Boolean hidden;
 
     @ManyToOne
-    private EcosystemBannerReadEntity mdBanner;
+    EcosystemBannerReadEntity mdBanner;
     @ManyToOne
-    private EcosystemBannerReadEntity xlBanner;
+    EcosystemBannerReadEntity xlBanner;
 
     @ManyToMany
     @JoinTable(name = "projects_ecosystems",
             joinColumns = @JoinColumn(name = "ecosystem_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
-    private Set<ProjectLinkViewEntity> projects;
+    @NonNull
+    Set<PublicProjectReadEntity> projects;
 
     @ManyToMany
     @JoinTable(name = "ecosystems_articles",
             joinColumns = @JoinColumn(name = "ecosystem_id"),
             inverseJoinColumns = @JoinColumn(name = "article_id"))
-    private Set<EcosystemArticleReadEntity> articles;
+    @NonNull
+    Set<EcosystemArticleReadEntity> articles;
 
     @ManyToMany
     @JoinTable(name = "ecosystem_languages",
             joinColumns = @JoinColumn(name = "ecosystem_id"),
             inverseJoinColumns = @JoinColumn(name = "language_id"))
-    private Set<LanguageReadEntity> languages;
+    @NonNull
+    Set<LanguageReadEntity> languages;
 
     @ManyToMany
     @JoinTable(name = "ecosystem_project_categories",
             joinColumns = @JoinColumn(name = "ecosystem_id"),
             inverseJoinColumns = @JoinColumn(name = "project_category_id"))
-    private Set<ProjectCategoryReadEntity> projectCategories;
+    @NonNull
+    Set<ProjectCategoryReadEntity> projectCategories;
 
     public EcosystemPageItemResponse toPageItemResponse() {
         return new EcosystemPageItemResponse()

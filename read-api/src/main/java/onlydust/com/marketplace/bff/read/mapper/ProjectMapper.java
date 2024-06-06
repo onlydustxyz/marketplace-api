@@ -5,8 +5,7 @@ import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectShortResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectShortViewEntity;
-
-import java.util.Objects;
+import onlydust.com.marketplace.bff.read.entities.project.PublicProjectReadEntity;
 
 public interface ProjectMapper {
     static ProjectLinkResponse map(final @NonNull ProjectLinkViewEntity projectLink) {
@@ -15,6 +14,14 @@ public interface ProjectMapper {
                 .slug(projectLink.slug())
                 .name(projectLink.name())
                 .logoUrl(projectLink.logoUrl());
+    }
+
+    static ProjectLinkResponse map(final @NonNull PublicProjectReadEntity project) {
+        return new ProjectLinkResponse()
+                .id(project.getId())
+                .slug(project.getSlug())
+                .name(project.getName())
+                .logoUrl(project.getLogoUrl());
     }
 
     static onlydust.com.backoffice.api.contract.model.ProjectLinkResponse mapBO(final @NonNull ProjectLinkViewEntity projectLink) {
@@ -34,25 +41,17 @@ public interface ProjectMapper {
                 .name(projectLink.name());
     }
 
-    public enum SortBy {
+    enum SortBy {
         CONTRIBUTORS_COUNT, REPOS_COUNT, RANK, NAME;
     }
 
     static SortBy mapSortByParameter(final String sort) {
-        if (Objects.nonNull(sort)) {
-            if (sort.equals("RANK")) {
-                return SortBy.RANK;
-            }
-            if (sort.equals("NAME")) {
-                return SortBy.NAME;
-            }
-            if (sort.equals("REPO_COUNT")) {
-                return SortBy.REPOS_COUNT;
-            }
-            if (sort.equals("CONTRIBUTOR_COUNT")) {
-                return SortBy.CONTRIBUTORS_COUNT;
-            }
-        }
-        return null;
+        return sort == null ? null : switch (sort) {
+            case "RANK" -> SortBy.RANK;
+            case "NAME" -> SortBy.NAME;
+            case "REPO_COUNT" -> SortBy.REPOS_COUNT;
+            case "CONTRIBUTOR_COUNT" -> SortBy.CONTRIBUTORS_COUNT;
+            default -> null;
+        };
     }
 }
