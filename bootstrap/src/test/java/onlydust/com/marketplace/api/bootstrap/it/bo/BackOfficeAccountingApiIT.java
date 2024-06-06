@@ -15,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
@@ -48,6 +49,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     static final SponsorId COCA_COLAX = SponsorId.of("44c6807c-48d1-4987-a0a6-ac63f958bdae");

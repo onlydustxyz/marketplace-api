@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.PayoutPreferenceService;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
@@ -30,6 +31,7 @@ import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 

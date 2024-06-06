@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagReward;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
@@ -17,6 +18,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 
+@TagReward
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApiIT {
 
@@ -207,8 +209,8 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         """, projectId)).header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Only project "
-                                                                                                       + "leads can " + "create " + "rewardable " + "issue on" +
-                                                                                                       " " + "their " + "projects");
+                        + "leads can " + "create " + "rewardable " + "issue on" +
+                        " " + "their " + "projects");
     }
 
     @Test
@@ -228,7 +230,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
                         """, projectId)).header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange().expectStatus().isEqualTo(403).expectBody().jsonPath("$.message").isEqualTo("Rewardable " + "issue can " + "only be " + "created " +
-                                                                                                       "on " + "repos linked " + "to this " + "project");
+                        "on " + "repos linked " + "to this " + "project");
     }
 
     @Test

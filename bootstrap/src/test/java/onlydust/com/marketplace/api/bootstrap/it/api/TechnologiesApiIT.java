@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.SuggestTechnologyRequest;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -8,7 +10,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-
+@TagProject
 public class TechnologiesApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_all_technologies() {

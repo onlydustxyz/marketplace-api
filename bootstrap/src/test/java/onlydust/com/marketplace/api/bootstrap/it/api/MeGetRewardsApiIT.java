@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
 import onlydust.com.marketplace.api.contract.model.MyRewardsPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
@@ -30,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 
+@TagMe
 public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     CurrencyRepository currencyRepository;

@@ -2,11 +2,13 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
+@TagProject
 public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
 
     @Test

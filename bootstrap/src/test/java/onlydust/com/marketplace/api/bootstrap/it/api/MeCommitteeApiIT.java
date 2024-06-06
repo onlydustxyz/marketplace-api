@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.project.domain.model.Committee;
@@ -19,6 +20,7 @@ import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TagMe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
 

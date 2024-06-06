@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -20,6 +21,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
@@ -156,7 +158,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
                 .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
-                                                                               "services")
+                        "services")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
@@ -505,7 +507,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(response.getMessage()).contains("Project leaders to keep must be a subset of current project " +
-                                                   "leaders");
+                "leaders");
     }
 
     @Test
@@ -772,7 +774,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.slug").isEqualTo("updated-project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice " +
-                                                         "description")
+                        "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
                 .jsonPath("$.moreInfos.length()").isEqualTo(2)

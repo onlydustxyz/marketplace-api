@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 

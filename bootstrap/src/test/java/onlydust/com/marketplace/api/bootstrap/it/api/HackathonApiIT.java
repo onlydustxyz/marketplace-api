@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.mockito.Mockito.verify;
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class HackathonApiIT extends AbstractMarketplaceApiIT {
     @Autowired

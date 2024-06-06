@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagUser;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-
+@TagUser
 public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
     private static final String GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE = """

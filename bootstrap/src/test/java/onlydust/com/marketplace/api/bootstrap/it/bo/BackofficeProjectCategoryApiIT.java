@@ -4,6 +4,7 @@ import onlydust.com.backoffice.api.contract.model.ProjectCategoryCreateRequest;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryUpdateRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
 import org.junit.jupiter.api.*;
@@ -12,6 +13,7 @@ import org.springframework.http.MediaType;
 
 import java.util.UUID;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOfficeApiIT {
     UserAuthHelper.AuthenticatedBackofficeUser emilie;

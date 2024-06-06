@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+@TagProject
 public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectCategorySuggestionRepository projectCategorySuggestionRepository;

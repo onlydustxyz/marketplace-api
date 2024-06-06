@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagUser;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-
+@TagUser
 public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     UserProfileInfoRepository userProfileInfoRepository;

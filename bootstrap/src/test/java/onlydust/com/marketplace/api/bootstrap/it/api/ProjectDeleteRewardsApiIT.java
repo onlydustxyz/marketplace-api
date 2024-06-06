@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagReward;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -30,7 +31,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-
+@TagReward
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Autowired

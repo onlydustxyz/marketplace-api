@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.CommitteeProjectAnswerRequest;
@@ -27,6 +28,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CommitteeApiIT extends AbstractMarketplaceApiIT {
 

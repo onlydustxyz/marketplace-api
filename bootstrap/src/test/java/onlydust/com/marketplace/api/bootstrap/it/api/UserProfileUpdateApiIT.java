@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagUser;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
-
+@TagUser
 public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
 

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.SuggestProjectCategoryRequest;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
@@ -15,6 +16,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectCategorySuggestionApiIT extends AbstractMarketplaceApiIT {
 

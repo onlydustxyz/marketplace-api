@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
+@TagMe
 public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;

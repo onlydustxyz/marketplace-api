@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
 import org.junit.jupiter.api.*;
@@ -23,6 +24,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     private final static SponsorId sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");

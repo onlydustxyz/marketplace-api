@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.EcosystemRequest;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -15,6 +16,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import java.util.List;
 import java.util.Map;
 
+@TagBO
 public class BackOfficeApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     BoEcosystemRepository ecosystemRepository;

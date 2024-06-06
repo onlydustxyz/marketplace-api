@@ -1,10 +1,12 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@TagProject
 public class ProjectCategoriesApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 
 import java.util.UUID;
 
+@TagAccounting
 public class BillingProfileEnableApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired

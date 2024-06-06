@@ -6,6 +6,7 @@ import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.bootstrap.helper.AccountingHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.*;
@@ -20,6 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Autowired

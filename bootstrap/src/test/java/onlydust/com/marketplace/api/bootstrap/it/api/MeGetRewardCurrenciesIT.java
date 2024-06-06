@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -10,6 +11,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 
+@TagMe
 public class MeGetRewardCurrenciesIT extends AbstractMarketplaceApiIT {
 
 

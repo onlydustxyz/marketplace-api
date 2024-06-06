@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.LanguageRepository;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
+@TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeLanguageApiIT extends AbstractMarketplaceBackOfficeApiIT {
 

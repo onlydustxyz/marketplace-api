@@ -32,6 +32,8 @@
     <description>Marketplace backend API for the frontend</description>
 
     <properties>
+        <failsafe-include>**/*IT.java</failsafe-include>
+        <skipUTs>false</skipUTs>
         <java.version>17</java.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
@@ -286,7 +288,7 @@
             <artifactId>datasource-proxy-spring-boot-starter</artifactId>
             <version>1.9.1</version>
         </dependency>
-        
+
         <!-- Test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -309,6 +311,18 @@
             <version>${javafaker.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-api</artifactId>
+            <version>1.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-suite-engine</artifactId>
+            <version>1.10.2</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -316,10 +330,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>${skipUTs}</skipTests>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>${failsafe-include}</include>
+                    </includes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

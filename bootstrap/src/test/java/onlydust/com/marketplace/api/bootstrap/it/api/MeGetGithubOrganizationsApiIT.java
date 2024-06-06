@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAuthorizedRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 
 
+@TagMe
 public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
     private static final String ONLYDUST_ACCOUNT_JSON = """
             {
