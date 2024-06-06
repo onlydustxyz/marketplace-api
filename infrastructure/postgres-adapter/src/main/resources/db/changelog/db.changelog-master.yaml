@@ -345,3 +345,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000258_add_project_id_to_category_suggestion.sql
   - include:
       file: db/changelog/changelogs/00000259_add_hidden_on_ecosystem_table.sql
+  - include:
+      file: db/changelog/changelogs/00000260_create_public_projects.sql

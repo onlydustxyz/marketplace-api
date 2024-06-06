@@ -17,7 +17,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    p.slug,
                    p.name,
                    p.short_description,
-                   p.visibility,
+                   'PUBLIC' as visibility,
                    r_count.repo_count  as repo_count,
                    coalesce(pc_count.contributors_count,0)                as contributors_count,
                    (select count(pl_count.user_id)
@@ -41,7 +41,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    s.ecosystem_json                                 ecosystems,
                    tags.names                                    tags,
                    coalesce(languages.json, '[]')   as languages
-            from projects p
+            from public_projects p
                 left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                             from project_technologies pt
                             group by pt.project_id)) as t on t.project_id = p.id
@@ -82,7 +82,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                     from projects_good_first_issues pgfi
                                     group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
             where r_count.repo_count > 0
-              and p.visibility = 'PUBLIC'
               and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
               and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
               and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))
@@ -239,7 +238,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
 
     @Query(value = """
                         select count(p.id)
-                        from projects p
+                        from public_projects p
                         left join ((select pt.project_id, jsonb_agg(jsonb_build_object(pt.technology, pt.line_count)) technologies
                                     from project_technologies pt
                                     group by pt.project_id)) as t on t.project_id = p.id
@@ -275,7 +274,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                                            from project_github_repos pgr_count
                                            join indexer_exp.github_repos gr2 on gr2.id = pgr_count.github_repo_id
                                            where pgr_count.project_id = p.id and gr2.visibility = 'PUBLIC') > 0
-                                       and p.visibility = 'PUBLIC'
                                        and (coalesce(:languagesJsonPath) is null or jsonb_path_exists(languages.json, cast(cast(:languagesJsonPath as text) as jsonpath )))
                                        and (coalesce(:ecosystemsJsonPath) is null or jsonb_path_exists(s.ecosystem_json, cast(cast(:ecosystemsJsonPath as text) as jsonpath )))
                                        and (coalesce(:tagsJsonPath) is null or jsonb_path_exists(tags.names, cast(cast(:tagsJsonPath as text) as jsonpath )))

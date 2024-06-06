@@ -15,7 +15,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    coalesce(s.ecosystem_json , '[]') as ecosystems,
                    coalesce(l.language_json  , '[]') as languages,
                    coalesce(cat.category_json, '[]') as categories
-            from projects p
+            from public_projects p
                      left join (select ps.project_id,
                                        jsonb_agg(jsonb_build_object(
                                                'url', ecosystem.url,
@@ -51,7 +51,7 @@ public interface ProjectsPageFiltersRepository extends JpaRepository<ProjectPage
                    join indexer_exp.github_repos gr on pgr_count.github_repo_id = gr.id
                    where pgr_count.project_id = p.id
                    and gr.visibility = 'PUBLIC') > 0
-              and p.visibility = 'PUBLIC'""",
+            """,
             nativeQuery = true)
     List<ProjectPageItemFiltersQueryEntity> findFiltersForAnonymousUser();
 
