@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import org.hibernate.annotations.Immutable;
@@ -101,6 +103,14 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )
     Set<LanguageReadEntity> languages;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            schema = "public",
+            name = "project_leads",
+            joinColumns = @JoinColumn(name = "project_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId")
+    )
+    Set<AllUserReadEntity> leads;
 
     public List<ProjectOrganizationView> organizations() {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
@@ -124,10 +134,18 @@ public class ProjectReadEntity {
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                entity.installation().getAuthorizedRepos().stream()
-                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                        entity.installation().getAuthorizedRepos().stream()
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();
+    }
+
+    public ProjectLinkResponse toLinkResponse() {
+        return new ProjectLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .slug(slug);
     }
 }

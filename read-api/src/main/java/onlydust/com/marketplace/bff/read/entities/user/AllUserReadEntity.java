@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonRegistrationReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -109,5 +110,12 @@ public class AllUserReadEntity {
                 .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
                 .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
                 ;
+    }
+
+    public GithubUserResponse toGithubUserResponse() {
+        return new GithubUserResponse()
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl);
     }
 }

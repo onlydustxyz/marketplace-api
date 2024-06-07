@@ -3653,6 +3653,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/public-activity:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadActivity
+      summary: Get latest public activity
+      operationId: getPublicActivity
+      description: |
+        Get latest public activity
+      parameters:
+        - in: query
+          name: pageIndex
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: false
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'List lastest public activities'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicActivityPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -7746,3 +7779,81 @@ components:
         telegramAdded:
           type: boolean
           description: True if the telegram contact method is added
+
+    PublicActivityPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - activities
+          properties:
+            activities:
+              type: array
+              items:
+                $ref: '#/components/schemas/PublicActivityPageItemResponse'
+
+    PublicActivityPageItemResponse:
+      type: object
+      required:
+        - type
+        - timestamp
+      properties:
+        type:
+          $ref: '#/components/schemas/PublicActivityType'
+        timestamp:
+          type: string
+          format: date-time
+        pullRequest:
+          type: object
+          required:
+            - project
+            - author
+          properties:
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            author:
+              $ref: '#/components/schemas/GithubUserResponse'
+        rewardCreated:
+          type: object
+          required:
+            - project
+            - recipient
+            - amount
+          properties:
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            recipient:
+              $ref: '#/components/schemas/GithubUserResponse'
+            amount:
+              $ref: '#/components/schemas/NewMoney'
+        rewardClaimed:
+          type: object
+          required:
+            - project
+            - recipient
+            - amount
+          properties:
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            recipient:
+              $ref: '#/components/schemas/GithubUserResponse'
+            amount:
+              $ref: '#/components/schemas/NewMoney'
+        projectCreated:
+          type: object
+          required:
+            - project
+            - createdBy
+          properties:
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            createdBy:
+              $ref: '#/components/schemas/GithubUserResponse'
+
+    PublicActivityType:
+      type: string
+      enum:
+        - 'PULL_REQUEST'
+        - 'REWARD_CREATED'
+        - 'REWARD_CLAIMED'
+        - 'PROJECT_CREATED'
