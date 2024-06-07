@@ -5017,6 +5017,7 @@ components:
         - hasRemainingBudget
         - indexingComplete
         - indexedAt
+        - goodFirstIssueCount
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -5104,6 +5105,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectTag'
+        goodFirstIssueCount:
+          type: integer
+          description: Number of good first issues in the project
+          example: 5
 
     ProjectMeResponse:
       type: object
