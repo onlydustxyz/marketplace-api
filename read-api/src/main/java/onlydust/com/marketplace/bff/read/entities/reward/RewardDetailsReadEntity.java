@@ -83,13 +83,14 @@ public class RewardDetailsReadEntity {
         return new Money()
                 .amount(amount)
                 .currency(new ShortCurrencyResponse()
+                        .name(currency.name())
                         .code(currency.code())
                         .decimals(currency.decimals())
                         .logoUrl(isNull(currency.logoUrl()) ? null : URI.create(currency.logoUrl()))
                         .id(currency.id())
                 )
                 .usdConversionRate(statusData.usdConversionRate())
-                .usdEquivalent(statusData.amountUsdEquivalent())
+                .usdEquivalent(AmountMapper.prettyUsd(statusData.amountUsdEquivalent()))
                 .prettyAmount(AmountMapper.pretty(amount, currency.decimals(), isNull(currency.latestUsdQuote()) ? null : currency.latestUsdQuote().getPrice()))
                 ;
     }

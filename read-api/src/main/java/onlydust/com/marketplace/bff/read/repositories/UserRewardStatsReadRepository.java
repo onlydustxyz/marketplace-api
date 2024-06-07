@@ -42,8 +42,8 @@ public interface UserRewardStatsReadRepository extends JpaRepository<UserRewardS
                   )
               AND (COALESCE(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (COALESCE(:projectIds) IS NULL OR r.project_id IN (:projectIds))
-              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (COALESCE(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (COALESCE(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             GROUP BY r.currency_id
             """, nativeQuery = true)
     List<UserRewardStatsReadEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
