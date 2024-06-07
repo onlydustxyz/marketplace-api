@@ -71,6 +71,10 @@ public class AllUserReadEntity {
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     ReceivedRewardStatsPerUserReadEntity receivedRewardStats;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    JourneyCompletionEntity journeyCompletion;
+
     public UserPageItemResponse toBoPageItemResponse() {
         return new UserPageItemResponse()
                 .id(userId)

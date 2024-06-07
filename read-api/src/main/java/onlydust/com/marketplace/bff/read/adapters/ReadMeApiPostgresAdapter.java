@@ -3,17 +3,11 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.contract.model.RecommendedProjectsPageResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.AllBillingProfileUserReadEntity;
-import onlydust.com.marketplace.bff.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.bff.read.entities.project.PublicProjectReadEntity;
-import onlydust.com.marketplace.bff.read.repositories.AllBillingProfileUserReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.RewardDetailsReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.UserRewardStatsReadRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import onlydust.com.marketplace.bff.read.repositories.PublicProjectReadRepository;
+import onlydust.com.marketplace.bff.read.mapper.RewardsMapper;
+import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
-
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -39,6 +31,16 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final UserRewardStatsReadRepository userRewardStatsReadRepository;
     private final PublicProjectReadRepository publicProjectReadRepository;
+    private final UserReadRepository userReadRepository;
+
+    @Override
+    public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var journeyCompletion = userReadRepository.findByUserId(authenticatedUser.getId())
+                .orElseThrow(() -> internalServerError("User not found"));
+
+        return ok(journeyCompletion.journeyCompletion().toResponse());
+    }
 
     @Override
     public ResponseEntity<RecommendedProjectsPageResponse> getRecommendedProjects(Integer pageIndex, Integer pageSize) {
@@ -91,5 +93,4 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ResponseEntity.ok(myRewardsPageResponse);
     }
-
 }
