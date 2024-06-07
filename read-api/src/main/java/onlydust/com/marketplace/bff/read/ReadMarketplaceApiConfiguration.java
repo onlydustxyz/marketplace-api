@@ -110,4 +110,9 @@ public class ReadMarketplaceApiConfiguration {
         return new ReadMeApiPostgresAdapter(authenticatedAppUserService, allBillingProfileUserReadRepository, rewardDetailsReadRepository,
                 userRewardStatsReadRepository, publicProjectReadRepository, userReadRepository);
     }
+
+    @Bean
+    public ReadActivityApiPostgresAdapter readActivityApiPostgresAdapter(final ActivityReadRepository activityReadRepository) {
+        return new ReadActivityApiPostgresAdapter(activityReadRepository);
+    }
 }
