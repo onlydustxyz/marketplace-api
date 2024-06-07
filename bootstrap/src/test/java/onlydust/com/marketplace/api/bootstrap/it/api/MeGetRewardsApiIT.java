@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDa
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,10 +22,8 @@ import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -969,9 +968,9 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.rewards[?(@.projectId in ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
+                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").exists()
                 .jsonPath("$.rewards[?(@.projectId nin ['5aabf0f1-7495-4bff-8de2-4396837ce6b4'," +
-                        "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
+                          "'298a547f-ecb6-4ab2-8975-68f4e9bf7b39'])]").doesNotExist()
                 .jsonPath("$.rewardedAmount.totalPerCurrency.length()").isEqualTo(1)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].amount").isEqualTo(12500)
                 .jsonPath("$.rewardedAmount.totalPerCurrency[0].currency.code").isEqualTo("USDC")
@@ -1000,7 +999,6 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent == null)]").exists()
                 .jsonPath("$.rewards[?(@.amount.currency.code == 'STRK' && @.amount.usdEquivalent != null)]").doesNotExist()
                 .json("""
@@ -1152,5 +1150,54 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         }
                         """)
         ;
+    }
+
+
+    @Test
+    void should_get_rewards_filtered_by_status() {
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "status", "COMPLETE"
+                )))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[*].status").value(o -> ((List<String>) o).forEach(status -> Assertions.assertEquals("COMPLETE", status)));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "status", "PROCESSING"
+                )))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[*].status").value(o -> ((List<String>) o).forEach(status -> Assertions.assertEquals("PROCESSING", status)));
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_GET_REWARDS, Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "10",
+                        "status", "PENDING_REQUEST"
+                )))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.rewards[*].status").value(o -> ((List<String>) o).forEach(status -> Assertions.assertEquals("PENDING_REQUEST", status)));
     }
 }

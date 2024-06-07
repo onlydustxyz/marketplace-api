@@ -274,9 +274,7 @@ paths:
         - in: query
           name: status
           schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/RewardStatusContract'
+            $ref: '#/components/schemas/RewardStatusContract'
         - in: query
           name: pageIndex
           required: true

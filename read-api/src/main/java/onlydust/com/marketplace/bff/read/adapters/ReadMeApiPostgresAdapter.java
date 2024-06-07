@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -74,14 +75,15 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize, RewardsSort sort, SortDirection direction,
                                                               List<UUID> currencies, List<UUID> projects, String fromDate, String toDate,
-                                                              List<RewardStatusContract> status) {
+                                                              RewardStatusContract status) {
         final var sanitizedPageSize = sanitizePageSize(pageSize);
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var sortBy = RewardDetailsReadRepository.sortBy(sort, direction);
 
         final var page = rewardDetailsReadRepository.findUserRewards(authenticatedUser.getGithubUserId(), currencies, projects,
-                authenticatedUser.getAdministratedBillingProfiles(), fromDate, toDate, PageRequest.of(sanitizedPageIndex, sanitizedPageSize, sortBy));
+                authenticatedUser.getAdministratedBillingProfiles(), Optional.ofNullable(status).map(Enum::name).orElse(null), fromDate, toDate,
+                PageRequest.of(sanitizedPageIndex, sanitizedPageSize, sortBy));
 
 
         final var rewardsStats = userRewardStatsReadRepository.findByUser(authenticatedUser.getGithubUserId(), currencies, projects,

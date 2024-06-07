@@ -80,8 +80,9 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
               AND (coalesce(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (COALESCE(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (coalesce(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (coalesce(:rewardStatus) is null or rs.status = cast(:rewardStatus as accounting.reward_status))
             """, nativeQuery = true)
     Page<RewardDetailsReadEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                                  String fromDate, String toDate, Pageable pageable);
+                                                  String rewardStatus, String fromDate, String toDate, Pageable pageable);
 }
