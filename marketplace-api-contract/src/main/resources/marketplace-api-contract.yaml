@@ -4247,12 +4247,13 @@ components:
         pullRequestCount:
           type: integer
 
-
-    UserProfileLanguagePage:
-      #A paginer
+    PageResponse:
       type: object
       required:
-        - languages
+        - totalPageNumber
+        - totalItemNumber
+        - hasMore
+        - nextPageIndex
       properties:
         totalPageNumber:
           type: integer
@@ -4262,11 +4263,18 @@ components:
           type: boolean
         nextPageIndex:
           description: if there is no next page, it will be equals to the last page
-          type: integer
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserProfileLanguagePageItem'
+
+    UserProfileLanguagePage:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - languages
+          properties:
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserProfileLanguagePageItem'
 
     UserProfileLanguagePageItem:
       allOf:
@@ -4280,23 +4288,16 @@ components:
 
 
     UserProfileEcosystemPage:
-      type: object
-      required:
-        - ecosystems
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserProfileEcosystemPageItem'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - ecosystems
+          properties:
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserProfileEcosystemPageItem'
 
     UserProfileEcosystemPageItem:
       allOf:
@@ -4520,31 +4521,20 @@ components:
               description: True if the user is registered on OnlyDust
 
     ContributorsPageResponse:
-      type: object
-      required:
-        - contributors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-        - hasHiddenContributors
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        hasHiddenContributors:
-          description: Whether there are hidden contributors in the project for the current user
-          type: boolean
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributorPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+            - hasHiddenContributors
+          properties:
+            hasHiddenContributors:
+              description: Whether there are hidden contributors in the project for the current user
+              type: boolean
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributorPageItemResponse'
 
     ContributorPageItemResponse:
       allOf:
@@ -4583,27 +4573,16 @@ components:
               description: Whether the contributor is hidden to the user
 
     GoodFirstIssuesPageResponse:
-      type: object
-      required:
-        - issues
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        issues:
-          type: array
-          items:
-            $ref: '#/components/schemas/GithubIssue'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - issues
+          properties:
+            issues:
+              type: array
+              items:
+                $ref: '#/components/schemas/GithubIssue'
 
     SponsorResponse:
       type: object
@@ -4787,50 +4766,28 @@ components:
           example: A short description of the article
 
     EcosystemLanguagesPageResponse:
-      type: object
-      required:
-        - languages
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - languages
+          properties:
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
 
     EcosystemProjectCategoriesPageResponse:
-      type: object
-      required:
-        - projectCategories
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        projectCategories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectCategoryResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projectCategories
+          properties:
+            projectCategories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
 
     LanguageResponse:
       type: object
@@ -4860,40 +4817,29 @@ components:
           example: 'https://rust.org/banner.png'
 
     ProjectPageResponse:
-      type: object
-      required:
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - projects
-      properties:
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectPageItemResponse'
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageResponse'
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemResponse'
-        categories:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectCategoryResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectPageItemResponse'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemResponse'
+            categories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
+
     ProjectPageItemResponse:
       type: object
       required:
@@ -5261,81 +5207,57 @@ components:
           $ref: '#/components/schemas/RewardId'
 
     RewardsPageResponse:
-      type: object
-      required:
-        - rewards
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/RewardPageItemResponse'
-        remainingBudget:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        spentAmount:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        sentRewardsCount:
-          type: integer
-          description: Number of rewards that have been sent
-        rewardedContributionsCount:
-          type: integer
-          description: Number of contributions that have been rewarded
-        rewardedContributorsCount:
-          type: integer
-          description: Number of contributors that have been rewarded
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewards
+          properties:
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardPageItemResponse'
+            remainingBudget:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            spentAmount:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            sentRewardsCount:
+              type: integer
+              description: Number of rewards that have been sent
+            rewardedContributionsCount:
+              type: integer
+              description: Number of contributions that have been rewarded
+            rewardedContributorsCount:
+              type: integer
+              description: Number of contributors that have been rewarded
 
     MyRewardsPageResponse:
-      type: object
-      required:
-        - rewards
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        rewards:
-          type: array
-          items:
-            $ref: '#/components/schemas/MyRewardPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        rewardedAmount:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        pendingAmount:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        receivedRewardsCount:
-          type: integer
-          description: Number of rewards that have been received
-        rewardedContributionsCount:
-          type: integer
-          description: Number of contributions that have been rewarded
-        rewardingProjectsCount:
-          type: integer
-          description: Number of projects the user has been rewarded for
-        pendingRequestCount:
-          type: integer
-          description: Number of rewards at pending request status
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewards
+          properties:
+            rewards:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyRewardPageItemResponse'
+            rewardedAmount:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            pendingAmount:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            receivedRewardsCount:
+              type: integer
+              description: Number of rewards that have been received
+            rewardedContributionsCount:
+              type: integer
+              description: Number of contributions that have been rewarded
+            rewardingProjectsCount:
+              type: integer
+              description: Number of projects the user has been rewarded for
+            pendingRequestCount:
+              type: integer
+              description: Number of rewards at pending request status
 
     RewardPageItemResponse:
       type: object
@@ -5644,28 +5566,16 @@ components:
           type: integer
 
     ContributionPageResponse:
-      type: object
-      required:
-        - contributions
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributionPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributions
+          properties:
+            contributions:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContributionPageItemResponse'
 
     ProjectListResponse:
       type: object
@@ -6330,28 +6240,17 @@ components:
               $ref: '#/components/schemas/ReceiptResponse'
 
     RewardItemsPageResponse:
-      type: object
-      required:
-        - rewardItems
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        rewardItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/RewardItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewardItems
+          properties:
+            rewardItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardItemResponse'
+
     RewardItemResponse:
       type: object
       required:
@@ -6408,28 +6307,16 @@ components:
           description: The body of the contribution.
 
     RewardableItemsPageResponse:
-      type: object
-      required:
-        - rewardItems
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        rewardableItems:
-          type: array
-          items:
-            $ref: '#/components/schemas/RewardableItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - rewardableItems
+          properties:
+            rewardableItems:
+              type: array
+              items:
+                $ref: '#/components/schemas/RewardableItemResponse'
 
     AllRewardableItemsResponse:
       type: object
@@ -6596,28 +6483,16 @@ components:
               $ref: '#/components/schemas/UserProfileCoverColor'
 
     ProjectNewcomersPageResponse:
-      type: object
-      required:
-        - contributors
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectNewcomersPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectNewcomersPageItemResponse'
 
     ProjectNewcomersPageItemResponse:
       allOf:
@@ -6638,28 +6513,16 @@ components:
               description: First contribution date to return if user not registered on OD
 
     ProjectChurnedContributorsPageResponse:
-      type: object
-      required:
-        - contributors
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectChurnedContributorsPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectChurnedContributorsPageItemResponse'
 
     ProjectChurnedContributorsPageItemResponse:
       allOf:
@@ -6684,28 +6547,16 @@ components:
                   $ref: '#/components/schemas/ShortGithubRepoResponse'
 
     ProjectContributorActivityPageResponse:
-      type: object
-      required:
-        - contributors
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectContributorActivityPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectContributorActivityPageItemResponse'
 
     ProjectContributorActivityPageItemResponse:
       allOf:
@@ -6935,27 +6786,16 @@ components:
           description: True if the invitation is accepted
 
     BillingProfileCoworkersPageResponse:
-      type: object
-      required:
-        - totalPageNumber
-        - totalItemNumber
-        - hasMore
-        - nextPageIndex
-        - coworkers
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        coworkers:
-          type: array
-          items:
-            $ref: '#/components/schemas/BillingProfileCoworkersPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - coworkers
+          properties:
+            coworkers:
+              type: array
+              items:
+                $ref: '#/components/schemas/BillingProfileCoworkersPageItemResponse'
 
     BillingProfileCoworkersPageItemResponse:
       type: object
@@ -7205,28 +7045,16 @@ components:
         - VAT_REVERSE_CHARGE
 
     BillingProfileInvoicesPageResponse:
-      type: object
-      required:
-        - invoices
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-      properties:
-        invoices:
-          type: array
-          items:
-            $ref: '#/components/schemas/BillingProfileInvoicesPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - invoices
+          properties:
+            invoices:
+              type: array
+              items:
+                $ref: '#/components/schemas/BillingProfileInvoicesPageItemResponse'
 
     BillingProfileInvoicesPageItemResponse:
       type: object
@@ -7253,74 +7081,40 @@ components:
         - COMPLETE
 
     EcosystemPage:
-      type: object
-      required:
-        - ecosystems
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - ecosystems
+          properties:
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemResponse'
 
     EcosystemPageV2:
-      type: object
-      required:
-        - ecosystems
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - ecosystems
+          properties:
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemPageItemResponse'
 
     EcosystemContributorsPage:
-      type: object
-      required:
-        - contributors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-        - hasHiddenContributors
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        contributors:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemContributorsPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemContributorsPageItemResponse'
 
     EcosystemContributorsPageItemResponse:
       allOf:
@@ -7382,27 +7176,16 @@ components:
                 $ref: '#/components/schemas/Money'
 
     TransactionHistoryPageResponse:
-      type: object
-      required:
-        - transactions
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        transactions:
-          type: array
-          items:
-            $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - transactions
+          properties:
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
 
     TransactionHistoryPageItemResponse:
       type: object
@@ -7783,28 +7566,17 @@ components:
                 type: integer
 
     EcosystemProjectPageResponse:
-      type: object
-      required:
-        - hasMore
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - projects
-      properties:
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemProjectPageItemResponse'
-        hasMore:
-          type: boolean
-          example: true
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemProjectPageItemResponse'
+
     EcosystemProjectPageItemResponse:
       type: object
       required:
