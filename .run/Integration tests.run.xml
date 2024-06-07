@@ -1,14 +1,31 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Integration tests" type="Multirun" separateTabs="false" reuseTabsWithFailures="false" startOneByOne="false" markFailedProcess="true" hideSuccessProcess="true" delayTime="0.0">
-    <runConfiguration name="[Me] Integration tests" type="JUnit" />
-    <runConfiguration name="[Others] Integration tests" type="JUnit" />
-    <runConfiguration name="[User] Integration tests" type="JUnit" />
-    <runConfiguration name="[Accounting] Integration tests" type="JUnit" />
-    <runConfiguration name="[Project] Integration tests" type="JUnit" />
-    <runConfiguration name="[Reward] Integration tests" type="JUnit" />
-    <runConfiguration name="[Concurrency] Integration tests" type="JUnit" />
-    <runConfiguration name="[BO] Integration tests" type="JUnit" />
-    <runConfiguration name="[Postgres] Infrastructure tests" type="JUnit" />
-    <method v="2" />
+  <configuration default="false" name="Integration tests" type="JUnit" factoryName="JUnit">
+    <module name="bootstrap" />
+    <extension name="net.ashald.envfile">
+      <option name="IS_ENABLED" value="false" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+      </ENTRIES>
+    </extension>
+    <option name="MAIN_CLASS_NAME" value="" />
+    <option name="METHOD_NAME" value="" />
+    <option name="TEST_OBJECT" value="pattern" />
+    <patterns>
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.ProjectSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.RewardSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.UserSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.ConcurrencySuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.AccountingSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.BOSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.MeSuite" />
+      <pattern testClass="onlydust.com.marketplace.api.bootstrap.suites.OthersSuite" />
+    </patterns>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
   </configuration>
 </component>
