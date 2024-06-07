@@ -1,13 +1,13 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardStatsQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.user.UserRewardStatsReadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardStatsRepository extends JpaRepository<RewardStatsQueryEntity, UUID> {
+public interface UserRewardStatsReadRepository extends JpaRepository<UserRewardStatsReadEntity, UUID> {
     @Query(value = """
             WITH reward_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids
                                      FROM reward_items ri
@@ -42,10 +42,12 @@ public interface RewardStatsRepository extends JpaRepository<RewardStatsQueryEnt
                   )
               AND (COALESCE(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (COALESCE(:projectIds) IS NULL OR r.project_id IN (:projectIds))
-              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (COALESCE(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (COALESCE(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             GROUP BY r.currency_id
             """, nativeQuery = true)
-    List<RewardStatsQueryEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                            String fromDate, String toDate);
+    List<UserRewardStatsReadEntity> findByUser(Long contributorId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
+                                               String fromDate, String toDate);
+
+
 }

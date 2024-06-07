@@ -1,9 +1,11 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.bff.read.entities.user;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CurrencyViewEntity;
+import onlydust.com.marketplace.project.domain.view.Money;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -17,7 +19,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Immutable
-public class RewardStatsQueryEntity {
+public class UserRewardStatsReadEntity {
     @Id
     @Column(name = "currency_id")
     UUID currencyId;
@@ -35,4 +37,15 @@ public class RewardStatsQueryEntity {
     Set<Set<String>> rewardItemIds;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<UUID> projectIds;
+
+    public Money toPendingMoney() {
+        return new Money(this.getPendingAmount(), this.getCurrency().toView())
+                .dollarsEquivalentValue(this.getPendingUsdAmount());
+    }
+
+    public Money toRewardedMoney() {
+        return new Money(this.getProcessedAmount(), this.getCurrency().toView())
+                .dollarsEquivalentValue(this.getProcessedUsdAmount());
+    }
+
 }

@@ -19,7 +19,10 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributionView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,10 +38,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MyRewardMapper.mapMyRewardsToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
 @RestController
@@ -103,34 +103,6 @@ public class MeRestApi implements MeApi {
         final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
         return ResponseEntity.ok(userProfileResponse);
     }
-
-    @Override
-    public ResponseEntity<MyRewardsPageResponse> getMyRewards(Integer pageIndex, Integer pageSize,
-                                                              String sort, String direction,
-                                                              List<UUID> currencies, List<UUID> projects,
-                                                              String fromDate, String toDate) {
-        final var sanitizedPageSize = sanitizePageSize(pageSize);
-        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sortBy = getSortBy(sort);
-        final var filters = UserRewardView.Filters.builder()
-                .currencies(Optional.ofNullable(currencies).orElse(List.of()))
-                .projectIds(Optional.ofNullable(projects).orElse(List.of()))
-                .administratedBillingProfilesIds(authenticatedUser.getAdministratedBillingProfiles())
-                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
-                .to(isNull(toDate) ? null : DateMapper.parse(toDate))
-                .build();
-
-        final var page = userFacadePort.getRewardsForUserId(authenticatedUser.getGithubUserId(), filters, sanitizedPageIndex,
-                sanitizedPageSize, sortBy, SortDirectionMapper.requestToDomain(direction));
-
-        final var myRewardsPageResponse = mapMyRewardsToResponse(sanitizedPageIndex, page, authenticatedUser.asAuthenticatedUser());
-
-        return myRewardsPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
-                ResponseEntity.ok(myRewardsPageResponse);
-    }
-
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyContributedProjects(List<Long> repositories) {

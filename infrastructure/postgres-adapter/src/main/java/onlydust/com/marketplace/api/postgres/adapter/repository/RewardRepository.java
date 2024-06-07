@@ -78,4 +78,13 @@ public interface RewardRepository extends JpaRepository<RewardEntity, UUID> {
             where r.status.status = 'COMPLETE'
             """)
     List<RewardEntity> findAllComplete();
+
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            update rewards
+            set payment_notified_at = now()
+            where id in (:rewardIds)
+            """)
+    void markRewardAsPaymentNotified(List<UUID> rewardIds);
 }

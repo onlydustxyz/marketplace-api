@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.postgres.adapter.entity.read;
+package onlydust.com.marketplace.bff.read.entities.project;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,6 +7,8 @@ import jakarta.persistence.ManyToOne;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CurrencyViewEntity;
+import onlydust.com.marketplace.project.domain.view.Money;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -20,7 +22,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Immutable
-public class BudgetStatsQueryEntity {
+public class BudgetStatsReadEntity {
     @Id
     UUID currencyId;
     @ManyToOne
@@ -36,4 +38,16 @@ public class BudgetStatsQueryEntity {
     Set<Set<String>> rewardItemIds;
     @JdbcTypeCode(SqlTypes.JSON)
     Set<Integer> rewardRecipientIds;
+
+    public Money toRemainingMoney() {
+        return new Money(this.getRemainingAmount(), this.getCurrency().toView())
+                .dollarsEquivalentValue(this.getRemainingUsdAmount());
+    }
+
+    public Money toSpentMoney() {
+        return new Money(this.getSpentAmount(), this.getCurrency().toView())
+                .dollarsEquivalentValue(this.getSpentUsdAmount());
+    }
+
+
 }

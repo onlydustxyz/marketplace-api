@@ -1,13 +1,13 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.project.BudgetStatsReadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface BudgetStatsRepository extends JpaRepository<BudgetStatsQueryEntity, UUID> {
+public interface BudgetStatsReadRepository extends JpaRepository<BudgetStatsReadEntity, UUID> {
     @Query(value = """
             WITH work_item_ids AS (SELECT ri.reward_id, JSONB_AGG(DISTINCT ri.id) as ids FROM reward_items ri GROUP BY ri.reward_id)
             SELECT
@@ -24,8 +24,8 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsQueryEnt
                     r.project_id = pa.project_id AND 
                     r.currency_id = pa.currency_id AND 
                     (COALESCE(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)) AND
-                    (:fromDate IS NULL OR r.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
-                    (:toDate IS NULL OR r.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+                    (COALESCE(:fromDate) IS NULL OR r.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
+                    (COALESCE(:toDate) IS NULL OR r.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
                 LEFT JOIN work_item_ids wii ON wii.reward_id = r.id
                 LEFT JOIN accounting.latest_usd_quotes luq ON luq.currency_id = pa.currency_id
             WHERE
@@ -37,6 +37,6 @@ public interface BudgetStatsRepository extends JpaRepository<BudgetStatsQueryEnt
                 pa.current_allowance, 
                 luq.price
             """, nativeQuery = true)
-    List<BudgetStatsQueryEntity> findByProject(UUID projectId, List<UUID> currencies, List<Long> contributorIds,
-                                               String fromDate, String toDate);
+    List<BudgetStatsReadEntity> findByProject(UUID projectId, List<UUID> currencies, List<Long> contributorIds,
+                                              String fromDate, String toDate);
 }

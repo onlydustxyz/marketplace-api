@@ -7,10 +7,7 @@ import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.it.api.AbstractMarketplaceApiIT;
-import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
-import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
-import onlydust.com.marketplace.api.contract.model.RewardRequest;
-import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.node.guardians.NodeGuardiansApiProperties;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BoostNodeGuardiansRewardsEventEntity;
@@ -22,15 +19,15 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.BoostNodeGuardia
 import onlydust.com.marketplace.api.postgres.adapter.repository.NodeGuardianBoostRewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.bff.read.entities.reward.RewardDetailsReadEntity;
+import onlydust.com.marketplace.bff.read.repositories.RewardDetailsReadRepository;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.reactive.function.BodyInserters;
 
 import java.math.BigDecimal;
@@ -117,6 +114,8 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     ProjectRepoRepository projectRepoRepository;
+    @Autowired
+    RewardDetailsReadRepository rewardDetailsReadRepository;
 
     @Test
     void should_boost_rewards() {
@@ -175,14 +174,15 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
             assertEquals(EventEntity.Status.PROCESSED, boostNodeGuardiansRewardsEventEntity.getStatus());
         }
 
-        final ProjectRewardsPageView rewardsOnMarketplaceForOlivier = rewardFacadePort.getRewards(marketplace, authenticatedUser.user().getId(),
-                ProjectRewardView.Filters.builder().contributors(List.of(oliver)).build(), 0, 50, Reward.SortBy.REQUESTED_AT, SortDirection.desc);
+        final Page<RewardDetailsReadEntity> projectRewards = rewardDetailsReadRepository.findProjectRewards(marketplace, null, List.of(oliver), null, null,
+                PageRequest.of(0, 50, RewardDetailsReadRepository.sortBy(RewardsSort.REQUESTED_AT,
+                        SortDirection.DESC)));
+
         final UUID finalBoostRewardId1 = boostRewardId1;
-        final ProjectRewardView rewardBoost1 =
-                rewardsOnMarketplaceForOlivier.getRewards().getContent().stream()
-                        .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId1)).findFirst().orElseThrow();
-        assertEquals(rewardBoost1.getAmount().amount().doubleValue(), 50.0D);
-        assertEquals(rewardBoost1.getAmount().currency().code(), "STRK");
+        final RewardDetailsReadEntity rewardBoost1 = projectRewards.getContent().stream()
+                .filter(readEntity -> readEntity.getId().equals(finalBoostRewardId1)).findFirst().orElseThrow();
+        assertEquals(rewardBoost1.amount().getAmount().doubleValue(), 50.0D);
+        assertEquals(rewardBoost1.amount().getCurrency().getCode(), "STRK");
 
     }
 
@@ -306,8 +306,8 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
               "performed_via_github_app": null,
               "state_reason": "completed"
             }
-
-                """;
+            
+            """;
     private static final String CREATE_ISSUE_RESPONSE_JSON = """
             {
                                   "url": "https://api.github.com/repos/onlydustxyz/marketplace-frontend/issues/25",

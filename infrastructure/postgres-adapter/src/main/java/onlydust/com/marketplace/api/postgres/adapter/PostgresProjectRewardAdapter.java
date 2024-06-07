@@ -2,29 +2,22 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BudgetStatsQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import onlydust.com.marketplace.project.domain.view.BudgetView;
+import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -33,46 +26,8 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
     private final ProjectAllowanceRepository projectAllowanceRepository;
     private final HistoricalQuoteRepository historicalQuoteRepository;
     private final CurrencyRepository currencyRepository;
-    private final BudgetStatsRepository budgetStatsRepository;
-    private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final RewardViewRepository rewardViewRepository;
     private final CustomRewardRepository customRewardRepository;
-
-    @Override
-    @org.springframework.transaction.annotation.Transactional(readOnly = true)
-    public ProjectRewardsPageView findRewards(UUID projectId, ProjectRewardView.Filters filters,
-                                              Reward.SortBy sort, SortDirection sortDirection,
-                                              int pageIndex, int pageSize) {
-        final var format = new SimpleDateFormat("yyyy-MM-dd");
-        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
-        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
-
-        final var pageRequest = PageRequest.of(pageIndex, pageSize,
-                RewardDetailsViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Sort.Direction.ASC : Sort.Direction.DESC));
-
-        final var page = rewardDetailsViewRepository.findProjectRewards(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate,
-                pageRequest);
-        final var budgetStats = budgetStatsRepository.findByProject(projectId, filters.getCurrencies(), filters.getContributors(), fromDate, toDate);
-
-        return ProjectRewardsPageView.builder().
-                rewards(Page.<ProjectRewardView>builder()
-                        .content(page.getContent().stream().map(RewardDetailsQueryEntity::toProjectReward).toList())
-                        .totalItemNumber((int) page.getTotalElements())
-                        .totalPageNumber(page.getTotalPages())
-                        .build())
-                .budgetStatsPerCurrency(budgetStats.stream()
-                        .map(budgetStatsEntity -> new ProjectRewardsPageView.BudgetStats(
-                                new Money(budgetStatsEntity.getRemainingAmount(), budgetStatsEntity.getCurrency().toView())
-                                        .dollarsEquivalentValue(budgetStatsEntity.getRemainingUsdAmount()),
-                                new Money(budgetStatsEntity.getSpentAmount(), budgetStatsEntity.getCurrency().toView())
-                                        .dollarsEquivalentValue(budgetStatsEntity.getSpentUsdAmount())
-                        ))
-                        .toList())
-                .sentRewardsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributorsCount(budgetStats.stream().map(BudgetStatsQueryEntity::getRewardRecipientIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .build();
-    }
 
     @Override
     @Transactional

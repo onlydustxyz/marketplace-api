@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -16,22 +19,18 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
-import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -51,8 +50,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
-    private final RewardStatsRepository rewardStatsRepository;
-    private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
     private final BillingProfileUserRepository billingProfileUserRepository;
@@ -180,7 +177,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                        " %s and user %d", projectId, githubUserId)));
+                                                   " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
@@ -199,7 +196,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
                             throw OnlyDustException.badRequest(format("Application already exists for project %s " +
-                                    "and user %s", projectId, userId));
+                                                                      "and user %s", projectId, userId));
                         },
                         () -> applicationRepository.saveAndFlush(ApplicationEntity.builder()
                                 .applicantId(userId)
@@ -209,46 +206,6 @@ public class PostgresUserAdapter implements UserStoragePort {
                                 .build())
                 );
         return applicationId;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UserRewardsPageView findRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
-                                                    int pageIndex, int pageSize,
-                                                    Reward.SortBy sort, SortDirection sortDirection) {
-
-        final var format = new SimpleDateFormat("yyyy-MM-dd");
-        final var fromDate = isNull(filters.getFrom()) ? null : format.format(filters.getFrom());
-        final var toDate = isNull(filters.getTo()) ? null : format.format(filters.getTo());
-
-        final var pageRequest = PageRequest.of(pageIndex, pageSize,
-                RewardDetailsViewRepository.sortBy(sort, sortDirection == SortDirection.asc ? Direction.ASC : Direction.DESC));
-
-        final var page = rewardDetailsViewRepository.findUserRewards(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
-                filters.getAdministratedBillingProfilesIds(), fromDate, toDate, pageRequest);
-
-        final var rewardsStats = rewardStatsRepository.findByUser(githubUserId, filters.getCurrencies(), filters.getProjectIds(),
-                filters.getAdministratedBillingProfilesIds(), fromDate, toDate);
-
-        return UserRewardsPageView.builder()
-                .rewards(Page.<UserRewardView>builder()
-                        .content(page.getContent().stream().map(RewardDetailsQueryEntity::toUserReward).toList())
-                        .totalItemNumber((int) page.getTotalElements())
-                        .totalPageNumber(page.getTotalPages())
-                        .build())
-                .rewardAmountsPerCurrency(rewardsStats.stream()
-                        .map(stats -> new UserRewardsPageView.RewardAmounts(
-                                new Money(stats.getProcessedAmount(), stats.getCurrency().toView())
-                                        .dollarsEquivalentValue(stats.getProcessedUsdAmount()),
-                                new Money(stats.getPendingAmount(), stats.getCurrency().toView())
-                                        .dollarsEquivalentValue(stats.getPendingUsdAmount())))
-                        .toList())
-                .pendingRequestCount(rewardsStats.size() == 1 ? rewardsStats.get(0).getPendingRequestCount() :
-                        rewardsStats.stream().map(RewardStatsQueryEntity::getPendingRequestCount).filter(Objects::nonNull).reduce(0, Integer::sum))
-                .receivedRewardsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardedContributionsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .rewardingProjectsCount(rewardsStats.stream().map(RewardStatsQueryEntity::getProjectIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
-                .build();
     }
 
     @Override

@@ -13,7 +13,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -36,8 +35,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContri
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapCreateProjectCommandToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapUpdateProjectCommandToDomain;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectRewardMapper.mapProjectRewardPageToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper.getSortBy;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -120,34 +117,6 @@ public class ProjectsRestApi implements ProjectsApi {
         return contributorsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
                 ResponseEntity.ok(contributorsPageResponse);
-    }
-
-    @Override
-    public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize,
-                                                                 List<UUID> currencies,
-                                                                 List<Long> contributors,
-                                                                 String fromDate, String toDate,
-                                                                 String sort, String direction) {
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Reward.SortBy sortBy = getSortBy(sort);
-        final var filters = ProjectRewardView.Filters.builder()
-                .currencies(Optional.ofNullable(currencies).orElse(List.of()))
-                .contributors(Optional.ofNullable(contributors).orElse(List.of()))
-                .from(isNull(fromDate) ? null : DateMapper.parse(fromDate))
-                .to(isNull(fromDate) ? null : DateMapper.parse(toDate))
-                .build();
-
-        final var page = projectRewardFacadePort.getRewards(projectId, authenticatedUser.getId(), filters,
-                sanitizedPageIndex, sanitizedPageSize,
-                sortBy, SortDirectionMapper.requestToDomain(direction));
-
-        final RewardsPageResponse rewardsPageResponse = mapProjectRewardPageToResponse(sanitizedPageIndex, page, authenticatedUser.asAuthenticatedUser());
-
-        return rewardsPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
-                ResponseEntity.ok(rewardsPageResponse);
     }
 
     @Override

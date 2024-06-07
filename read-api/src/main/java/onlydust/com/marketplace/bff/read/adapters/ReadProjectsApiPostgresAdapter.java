@@ -20,12 +20,10 @@ import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFilters
 import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.ProjectMapper;
+import onlydust.com.marketplace.bff.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.bff.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
-import onlydust.com.marketplace.bff.read.repositories.GithubIssueReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.ProjectReadRepository;
-import onlydust.com.marketplace.bff.read.repositories.ProjectsPageFiltersRepository;
-import onlydust.com.marketplace.bff.read.repositories.ProjectsPageRepository;
+import onlydust.com.marketplace.bff.read.repositories.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
@@ -33,6 +31,7 @@ import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +46,7 @@ import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
 import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
@@ -66,9 +66,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final ApplicationRepository applicationRepository;
     private final ContributionViewEntityRepository contributionViewEntityRepository;
-
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
+    private final RewardDetailsReadRepository rewardDetailsReadRepository;
+    private final BudgetStatsReadRepository budgetStatsReadRepository;
 
     @Override
     public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex,
@@ -320,4 +321,32 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .isContributor(me.isContributor())
                         .hasApplied(me.hasApplied()));
     }
+
+    @Override
+    public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize, List<UUID> currencies,
+                                                                 List<Long> contributors, String fromDate, String toDate, RewardsSort sort,
+                                                                 SortDirection direction) {
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId())) {
+            throw forbidden("Only project leads can read rewards on their projects");
+        }
+
+        final var pageRequest = PageRequest.of(sanitizePageIndex, sanitizePageSize,
+                RewardDetailsReadRepository.sortBy(sort, direction));
+
+        final var page = rewardDetailsReadRepository.findProjectRewards(projectId, currencies, contributors, fromDate, toDate,
+                pageRequest);
+        final var budgetStats = budgetStatsReadRepository.findByProject(projectId, currencies, contributors, fromDate, toDate);
+
+        final RewardsPageResponse rewardsPageResponse = RewardsMapper.mapProjectRewardPageToResponse(sanitizePageIndex, page, budgetStats,
+                authenticatedUser.asAuthenticatedUser());
+
+        return rewardsPageResponse.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
+                ResponseEntity.ok(rewardsPageResponse);
+    }
+
 }

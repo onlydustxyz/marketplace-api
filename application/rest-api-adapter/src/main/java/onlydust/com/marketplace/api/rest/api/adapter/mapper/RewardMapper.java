@@ -173,15 +173,6 @@ public interface RewardMapper {
                 .githubBody(view.getGithubBody());
     }
 
-    static Reward.SortBy getSortBy(String sort) {
-        sort = isNull(sort) ? "" : sort;
-        return switch (sort) {
-            case "STATUS" -> Reward.SortBy.STATUS;
-            case "AMOUNT" -> Reward.SortBy.AMOUNT;
-            case "CONTRIBUTION" -> Reward.SortBy.CONTRIBUTION;
-            default -> Reward.SortBy.REQUESTED_AT;
-        };
-    }
 
     static ShortCurrencyResponse mapCurrency(CurrencyView currency) {
         if (currency == null) return null;
