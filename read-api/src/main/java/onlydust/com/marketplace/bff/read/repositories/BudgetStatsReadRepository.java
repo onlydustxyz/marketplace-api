@@ -24,8 +24,8 @@ public interface BudgetStatsReadRepository extends JpaRepository<BudgetStatsRead
                     r.project_id = pa.project_id AND 
                     r.currency_id = pa.currency_id AND 
                     (COALESCE(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds)) AND
-                    (:fromDate IS NULL OR r.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
-                    (:toDate IS NULL OR r.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+                    (COALESCE(:fromDate) IS NULL OR r.requested_at >= TO_DATE(CAST(:fromDate AS TEXT), 'YYYY-MM-DD')) AND
+                    (COALESCE(:toDate) IS NULL OR r.requested_at < TO_DATE(CAST(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
                 LEFT JOIN work_item_ids wii ON wii.reward_id = r.id
                 LEFT JOIN accounting.latest_usd_quotes luq ON luq.currency_id = pa.currency_id
             WHERE

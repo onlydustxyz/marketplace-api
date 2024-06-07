@@ -14,6 +14,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 public interface RewardDetailsReadRepository extends JpaRepository<RewardDetailsReadEntity, UUID> {
 
     @Language("PostgreSQL")
@@ -46,15 +48,16 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
             """;
 
     static Sort sortBy(final RewardsSort sort, final SortDirection sortDirection) {
-        final Sort.Direction jpaSortDirection = switch (sortDirection) {
+        final Sort.Direction jpaSortDirection = isNull(sortDirection) ? Sort.Direction.ASC : switch (sortDirection) {
             case ASC -> Sort.Direction.ASC;
             case DESC -> Sort.Direction.DESC;
         };
-        return switch (sort) {
+        final Sort defaultSort = Sort.by(jpaSortDirection, "requested_at");
+        return isNull(sort) ? defaultSort : switch (sort) {
             case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
             case CONTRIBUTION -> Sort.by(jpaSortDirection, "contribution_count").and(Sort.by("requested_at").descending());
             case STATUS -> Sort.by(jpaSortDirection, "rs.status").and(Sort.by("requested_at").descending());
-            case REQUESTED_AT -> Sort.by(jpaSortDirection, "requested_at");
+            case REQUESTED_AT -> defaultSort;
         };
     }
 
@@ -62,8 +65,8 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
             WHERE r.project_id = :projectId
               AND (coalesce(:contributorIds) IS NULL OR r.recipient_id IN (:contributorIds))
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
-              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (coalesce(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (coalesce(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
     Page<RewardDetailsReadEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
                                                      Pageable pageable);
@@ -76,8 +79,8 @@ public interface RewardDetailsReadRepository extends JpaRepository<RewardDetails
               )
               AND (coalesce(:currencyIds) IS NULL OR r.currency_id IN (:currencyIds))
               AND (coalesce(:projectIds) IS NULL OR r.project_id IN (:projectIds))
-              AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
-              AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
+              AND (coalesce(:fromDate) IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
+              AND (COALESCE(:toDate) IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
     Page<RewardDetailsReadEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
                                                   String fromDate, String toDate, Pageable pageable);
