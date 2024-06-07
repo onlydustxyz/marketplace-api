@@ -24,7 +24,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     from project_leads pl_count
                     where pl_count.project_id = p.id) as project_lead_count,
                    false                                      as   is_pending_project_lead,
-                   false                                      as   is_missing_github_app_installation,
                    (select json_agg(jsonb_build_object(
                            'id', pl.user_id,
                            'githubId', u.github_user_id,
@@ -134,11 +133,6 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                    t.technologies                               as technologies,
                    s.ecosystem_json                               as ecosystems,
                    coalesce(is_pending_pl.is_p_pl, false)       as is_pending_project_lead,
-                   (select count(pgr.github_repo_id) > count(agr.repo_id)
-                           from project_github_repos pgr
-                                    join indexer_exp.github_repos gr2 on gr2.id = pgr.github_repo_id
-                                    left join indexer_exp.authorized_github_repos agr on agr.repo_id = pgr.github_repo_id
-                           where pgr.project_id = p.id and gr2.visibility = 'PUBLIC')        as is_missing_github_app_installation,
                    tags.names                                    tags,
                    coalesce(languages.json, '[]')   as languages
             from projects p

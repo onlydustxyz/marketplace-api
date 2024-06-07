@@ -4972,6 +4972,10 @@ components:
           type: integer
           description: Total number of contributors within the project
           example: 163
+        remainingUsdBudget:
+          type: number
+          description: Remaining budget of the project in USD
+          example: 1223.40
         leaders:
           type: array
           items:
