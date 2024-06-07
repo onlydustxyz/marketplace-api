@@ -39,7 +39,6 @@ public class ProjectPageItemQueryEntity {
     Integer repoCount;
     Integer contributorsCount;
     Boolean isPendingProjectLead;
-    Boolean isMissingGithubAppInstallation;
     @JdbcTypeCode(SqlTypes.JSON)
     List<Ecosystem> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -48,6 +47,10 @@ public class ProjectPageItemQueryEntity {
     List<Tag> tags;
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageReadEntity> languages;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", insertable = false, updatable = false)
+    ProjectLeadInfoQueryEntity projectLeadInfo;
 
     public static String getEcosystemsJsonPath(List<String> ecosystemSlugs) {
         if (isNull(ecosystemSlugs) || ecosystemSlugs.isEmpty()) {
@@ -71,6 +74,8 @@ public class ProjectPageItemQueryEntity {
     }
 
     public ProjectPageItemResponse toDto(UUID userId) {
+        final var isProjectLead = nonNull(userId) && nonNull(this.projectLeads) && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId));
+
         return new ProjectPageItemResponse()
                 .id(this.projectId)
                 .slug(this.slug)
@@ -80,6 +85,7 @@ public class ProjectPageItemQueryEntity {
                 .hiring(this.hiring)
                 .visibility(this.visibility)
                 .contributorCount(this.contributorsCount)
+                .remainingUsdBudget(isProjectLead ? projectLeadInfo.getRemainingUsdBudget() : null)
                 .repoCount(this.repoCount)
                 .tags(isNull(this.tags) ? List.of() : this.tags.stream().map(Tag::name).map(ProjectTag::valueOf).toList())
                 .ecosystems(isNull(this.ecosystems) ? List.of() : this.ecosystems.stream().map(ecosystem -> new EcosystemResponse()
@@ -97,10 +103,7 @@ public class ProjectPageItemQueryEntity {
                 ).toList())
                 .languages(languages.stream().map(LanguageReadEntity::toDto).toList())
                 .isInvitedAsProjectLead(this.isPendingProjectLead)
-                .hasMissingGithubAppInstallation(nonNull(userId) && nonNull(this.projectLeads)
-                                                 && this.projectLeads.stream().anyMatch(lead -> lead.id().equals(userId))
-                        ?
-                        this.isMissingGithubAppInstallation : null);
+                .hasMissingGithubAppInstallation(isProjectLead ? projectLeadInfo.getIsMissingGithubAppInstallation() : null);
     }
 
     @EqualsAndHashCode(onlyExplicitlyIncluded = true)

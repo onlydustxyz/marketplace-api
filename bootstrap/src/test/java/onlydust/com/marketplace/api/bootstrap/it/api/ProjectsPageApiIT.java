@@ -39,6 +39,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                    "visibility": "PUBLIC",
                    "repoCount": 4,
                    "contributorCount": 4,
+                   "remainingUsdBudget": null,
                    "leaders": [
                      {
                        "githubUserId": 8642470,
@@ -102,6 +103,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                    "visibility": "PUBLIC",
                    "repoCount": 1,
                    "contributorCount": 18,
+                   "remainingUsdBudget": 4040.00,
                    "leaders": [
                      {
                        "githubUserId": 16590657,
@@ -227,6 +229,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC",
                   "repoCount": 4,
                   "contributorCount": 4,
+                  "remainingUsdBudget": null,
                   "leaders": [
                     {
                       "githubUserId": 8642470,
@@ -293,6 +296,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                   "visibility": "PUBLIC",
                   "repoCount": 1,
                   "contributorCount": 18,
+                  "remainingUsdBudget": 4040.00,
                   "leaders": [
                     {
                       "githubUserId": 16590657,
