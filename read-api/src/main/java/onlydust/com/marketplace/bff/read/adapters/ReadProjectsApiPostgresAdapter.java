@@ -325,7 +325,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<RewardsPageResponse> getProjectRewards(UUID projectId, Integer pageIndex, Integer pageSize, List<UUID> currencies,
-                                                                 List<Long> contributors, String from, String to, RewardsSort sort,
+                                                                 List<Long> contributors, String fromDate, String toDate, RewardsSort sort,
                                                                  SortDirection direction) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
@@ -334,10 +334,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId())) {
             throw forbidden("Only project leads can read rewards on their projects");
         }
-
-        final var format = new SimpleDateFormat("yyyy-MM-dd");
-        final var fromDate = isNull(from) ? null : format.format(from);
-        final var toDate = isNull(to) ? null : format.format(to);
 
         final var pageRequest = PageRequest.of(sanitizePageIndex, sanitizePageSize,
                 RewardDetailsReadRepository.sortBy(sort, direction));
