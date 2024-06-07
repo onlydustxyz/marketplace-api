@@ -1,1 +1,0 @@
-web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=api
