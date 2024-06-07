@@ -1,20 +1,20 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardDetailsQueryEntity;
-import onlydust.com.marketplace.project.domain.model.Reward;
+import onlydust.com.marketplace.api.contract.model.RewardsSort;
+import onlydust.com.marketplace.api.contract.model.SortDirection;
+import onlydust.com.marketplace.bff.read.entities.reward.RewardDetailsReadEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface RewardDetailsViewRepository extends JpaRepository<RewardDetailsQueryEntity, UUID> {
+public interface RewardDetailsReadRepository extends JpaRepository<RewardDetailsReadEntity, UUID> {
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -45,13 +45,16 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
                  JOIN indexer_exp.github_accounts github_requestor ON github_requestor.id = requestor.github_user_id
             """;
 
-    static Sort sortBy(final Reward.SortBy sortBy, final Sort.Direction direction) {
-        return switch (sortBy) {
-            case AMOUNT ->
-                    JpaSort.unsafe(direction, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
-            case CONTRIBUTION -> Sort.by(direction, "contribution_count").and(Sort.by("requested_at").descending());
-            case STATUS -> Sort.by(direction, "rs.status").and(Sort.by("requested_at").descending());
-            case REQUESTED_AT -> Sort.by(direction, "requested_at");
+    static Sort sortBy(final RewardsSort sort, final SortDirection sortDirection) {
+        final Sort.Direction jpaSortDirection = switch (sortDirection) {
+            case ASC -> Sort.Direction.ASC;
+            case DESC -> Sort.Direction.DESC;
+        };
+        return switch (sort) {
+            case AMOUNT -> JpaSort.unsafe(jpaSortDirection, "coalesce(rsd.amount_usd_equivalent, 0)").and(Sort.by("requested_at").descending());
+            case CONTRIBUTION -> Sort.by(jpaSortDirection, "contribution_count").and(Sort.by("requested_at").descending());
+            case STATUS -> Sort.by(jpaSortDirection, "rs.status").and(Sort.by("requested_at").descending());
+            case REQUESTED_AT -> Sort.by(jpaSortDirection, "requested_at");
         };
     }
 
@@ -62,8 +65,8 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
               AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<RewardDetailsQueryEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
-                                                      Pageable pageable);
+    Page<RewardDetailsReadEntity> findProjectRewards(UUID projectId, List<UUID> currencyIds, List<Long> contributorIds, String fromDate, String toDate,
+                                                     Pageable pageable);
 
     @Query(value = SELECT + """
             WHERE (
@@ -76,14 +79,6 @@ public interface RewardDetailsViewRepository extends JpaRepository<RewardDetails
               AND (:fromDate IS NULL OR r.requested_at >= to_date(cast(:fromDate AS TEXT), 'YYYY-MM-DD'))
               AND (:toDate IS NULL OR r.requested_at < to_date(cast(:toDate AS TEXT), 'YYYY-MM-DD') + 1)
             """, nativeQuery = true)
-    Page<RewardDetailsQueryEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
-                                                   String fromDate, String toDate, Pageable pageable);
-
-    @Modifying
-    @Query(nativeQuery = true, value = """
-            update rewards
-            set payment_notified_at = now()
-            where id in (:rewardIds)
-            """)
-    void markRewardAsPaymentNotified(List<UUID> rewardIds);
+    Page<RewardDetailsReadEntity> findUserRewards(Long githubUserId, List<UUID> currencyIds, List<UUID> projectIds, List<UUID> administratedBillingProfileIds,
+                                                  String fromDate, String toDate, Pageable pageable);
 }

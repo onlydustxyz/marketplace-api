@@ -2,11 +2,11 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ProjectBudgetsView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
 
 import java.util.UUID;
 
@@ -16,18 +16,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbid
 public class ProjectRewardService implements ProjectRewardFacadePort {
     private final ProjectRewardStoragePort projectRewardStoragePort;
     private final PermissionService permissionService;
-
-    @Override
-    public ProjectRewardsPageView getRewards(UUID projectId,
-                                             UUID projectLeadId,
-                                             ProjectRewardView.Filters filters, Integer pageIndex, Integer pageSize,
-                                             Reward.SortBy sortBy, SortDirection sortDirection) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectRewardStoragePort.findRewards(projectId, filters, sortBy, sortDirection, pageIndex, pageSize);
-        } else {
-            throw forbidden("Only project leads can read rewards on their projects");
-        }
-    }
 
     @Override
     public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {

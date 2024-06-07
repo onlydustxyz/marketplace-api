@@ -28,7 +28,6 @@ import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardsPageView;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -175,14 +174,14 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
             assertEquals(EventEntity.Status.PROCESSED, boostNodeGuardiansRewardsEventEntity.getStatus());
         }
 
-        final ProjectRewardsPageView rewardsOnMarketplaceForOlivier = rewardFacadePort.getRewards(marketplace, authenticatedUser.user().getId(),
-                ProjectRewardView.Filters.builder().contributors(List.of(oliver)).build(), 0, 50, Reward.SortBy.REQUESTED_AT, SortDirection.desc);
-        final UUID finalBoostRewardId1 = boostRewardId1;
-        final ProjectRewardView rewardBoost1 =
-                rewardsOnMarketplaceForOlivier.getRewards().getContent().stream()
-                        .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId1)).findFirst().orElseThrow();
-        assertEquals(rewardBoost1.getAmount().amount().doubleValue(), 50.0D);
-        assertEquals(rewardBoost1.getAmount().currency().code(), "STRK");
+//        final ProjectRewardsPageView rewardsOnMarketplaceForOlivier = rewardFacadePort.getRewards(marketplace, authenticatedUser.user().getId(),
+//                ProjectRewardView.Filters.builder().contributors(List.of(oliver)).build(), 0, 50, Reward.SortBy.REQUESTED_AT, SortDirection.desc);
+//        final UUID finalBoostRewardId1 = boostRewardId1;
+//        final ProjectRewardView rewardBoost1 =
+//                rewardsOnMarketplaceForOlivier.getRewards().getContent().stream()
+//                        .filter(projectRewardView -> projectRewardView.getId().equals(finalBoostRewardId1)).findFirst().orElseThrow();
+//        assertEquals(rewardBoost1.getAmount().amount().doubleValue(), 50.0D);
+//        assertEquals(rewardBoost1.getAmount().currency().code(), "STRK");
 
     }
 

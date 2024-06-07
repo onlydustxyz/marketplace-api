@@ -33,10 +33,6 @@ public interface UserStoragePort {
 
     UUID createApplicationOnProject(UUID userId, UUID projectId);
 
-    UserRewardsPageView findRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
-                                             int pageIndex, int pageSize,
-                                             Reward.SortBy sortBy, SortDirection sortDirection);
-
     RewardDetailsView findRewardById(UUID rewardId);
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);

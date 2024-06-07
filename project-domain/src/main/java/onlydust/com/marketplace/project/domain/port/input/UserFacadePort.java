@@ -32,10 +32,6 @@ public interface UserFacadePort {
 
     void applyOnProject(UUID id, UUID projectId);
 
-    UserRewardsPageView getRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
-                                            int pageIndex, int sanitizedPageSize,
-                                            Reward.SortBy sortBy, SortDirection sortDirection);
-
     RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, List<UUID> companyAdminBillingProfileIds);
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,

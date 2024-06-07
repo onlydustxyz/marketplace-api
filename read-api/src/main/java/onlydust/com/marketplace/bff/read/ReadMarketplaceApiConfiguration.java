@@ -77,7 +77,9 @@ public class ReadMarketplaceApiConfiguration {
                                                                          final ApplicationRepository applicationRepository,
                                                                          final ContributionViewEntityRepository contributionViewEntityRepository,
                                                                          final ProjectsPageRepository projectsPageRepository,
-                                                                         final ProjectsPageFiltersRepository projectsPageFiltersRepository) {
+                                                                         final ProjectsPageFiltersRepository projectsPageFiltersRepository,
+                                                                         final RewardDetailsReadRepository rewardDetailsReadRepository,
+                                                                         final BudgetStatsReadRepository budgetStatsReadRepository) {
         return new ReadProjectsApiPostgresAdapter(authenticatedAppUserService,
                 permissionService,
                 githubIssueReadRepository,
@@ -88,7 +90,9 @@ public class ReadMarketplaceApiConfiguration {
                 applicationRepository,
                 contributionViewEntityRepository,
                 projectsPageRepository,
-                projectsPageFiltersRepository);
+                projectsPageFiltersRepository,
+                rewardDetailsReadRepository,
+                budgetStatsReadRepository);
     }
 
     @Bean
@@ -98,8 +102,11 @@ public class ReadMarketplaceApiConfiguration {
 
     @Bean
     public ReadMeApiPostgresAdapter readMeApiPostgresAdapter(final AuthenticatedAppUserService authenticatedAppUserService,
-                                                             final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository) {
-        return new ReadMeApiPostgresAdapter(authenticatedAppUserService, allBillingProfileUserReadRepository);
+                                                             final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository,
+                                                             final RewardDetailsReadRepository rewardDetailsReadRepository,
+                                                             final UserRewardStatsReadRepository userRewardStatsReadRepository) {
+        return new ReadMeApiPostgresAdapter(authenticatedAppUserService, allBillingProfileUserReadRepository, rewardDetailsReadRepository,
+                userRewardStatsReadRepository);
     }
 
 }

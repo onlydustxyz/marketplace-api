@@ -40,7 +40,6 @@ import java.util.stream.Collectors;
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort, BoostedRewardStoragePort {
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final BatchPaymentRepository batchPaymentRepository;
-    private final RewardDetailsViewRepository rewardDetailsViewRepository;
     private final BackofficeRewardViewRepository backofficeRewardViewRepository;
     private final RewardRepository rewardRepository;
     private final PaymentShortViewRepository paymentShortViewRepository;
@@ -176,7 +175,7 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Override
     @Transactional
     public void markRewardsAsPaymentNotified(List<RewardId> rewardIds) {
-        rewardDetailsViewRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
+        rewardRepository.markRewardAsPaymentNotified(rewardIds.stream().map(UuidWrapper::value).toList());
     }
 
     @Override

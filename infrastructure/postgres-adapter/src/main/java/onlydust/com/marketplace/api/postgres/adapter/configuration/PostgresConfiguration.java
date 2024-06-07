@@ -128,12 +128,10 @@ public class PostgresConfiguration {
                                                                      final HistoricalQuoteRepository historicalQuoteRepository,
                                                                      final CurrencyRepository currencyRepository,
                                                                      final CustomRewardRepository customRewardRepository,
-                                                                     final BudgetStatsRepository budgetStatsRepository,
-                                                                     final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                                      final RewardViewRepository rewardViewRepository
     ) {
-        return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, budgetStatsRepository,
-                rewardDetailsViewRepository, rewardViewRepository, customRewardRepository);
+        return new PostgresProjectRewardAdapter(projectAllowanceRepository, historicalQuoteRepository, currencyRepository, rewardViewRepository,
+                customRewardRepository);
     }
 
     @Bean
@@ -161,8 +159,6 @@ public class PostgresConfiguration {
                                                    final UserProfileInfoRepository userProfileInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
-                                                   final RewardStatsRepository rewardStatsRepository,
-                                                   final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                    final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
                                                    final BillingProfileUserRepository billingProfileUserRepository) {
@@ -180,8 +176,6 @@ public class PostgresConfiguration {
                 userProfileInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
-                rewardStatsRepository,
-                rewardDetailsViewRepository,
                 rewardViewRepository,
                 currencyRepository,
                 billingProfileUserRepository);
@@ -206,7 +200,6 @@ public class PostgresConfiguration {
     @Bean
     public PostgresRewardAdapter postgresRewardAdapter(final ShortProjectViewEntityRepository shortProjectViewEntityRepository,
                                                        final BatchPaymentRepository batchPaymentRepository,
-                                                       final RewardDetailsViewRepository rewardDetailsViewRepository,
                                                        final BackofficeRewardViewRepository backofficeRewardViewRepository,
                                                        final RewardRepository rewardRepository,
                                                        final PaymentShortViewRepository paymentShortViewRepository,
@@ -215,7 +208,6 @@ public class PostgresConfiguration {
                                                        final NodeGuardianBoostRewardRepository nodeGuardianBoostRewardRepository) {
         return new PostgresRewardAdapter(shortProjectViewEntityRepository,
                 batchPaymentRepository,
-                rewardDetailsViewRepository,
                 backofficeRewardViewRepository,
                 rewardRepository,
                 paymentShortViewRepository,

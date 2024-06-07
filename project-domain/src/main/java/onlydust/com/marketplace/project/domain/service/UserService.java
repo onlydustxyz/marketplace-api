@@ -149,13 +149,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserRewardsPageView getRewardsForUserId(Long githubUserId, UserRewardView.Filters filters,
-                                                   int pageIndex, int pageSize,
-                                                   Reward.SortBy sortBy, SortDirection sortDirection) {
-        return userStoragePort.findRewardsForUserId(githubUserId, filters, pageIndex, pageSize, sortBy, sortDirection);
-    }
-
-    @Override
     public RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId,
                                                                                           List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
