@@ -15,6 +15,7 @@ import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -111,6 +112,9 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId")
     )
     Set<AllUserReadEntity> leads;
+
+    @Formula("(select count(pgfi.issue_id) from projects_good_first_issues pgfi where pgfi.project_id = id)")
+    Integer goodFirstIssueCount;
 
     public List<ProjectOrganizationView> organizations() {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
