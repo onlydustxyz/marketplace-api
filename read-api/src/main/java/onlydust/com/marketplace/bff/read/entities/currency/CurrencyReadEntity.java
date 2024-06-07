@@ -37,7 +37,7 @@ public class CurrencyReadEntity {
     private String description;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
+    @JoinColumn(name = "id", referencedColumnName = "currencyId", insertable = false, updatable = false)
     LatestUsdQuoteReadEntity latestUsdQuote;
 
     public ShortCurrencyResponse toShortResponse() {
