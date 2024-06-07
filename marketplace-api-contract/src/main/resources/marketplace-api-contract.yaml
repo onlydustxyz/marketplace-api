@@ -4295,6 +4295,7 @@ components:
         hasMore:
           type: boolean
         nextPageIndex:
+          type: integer
           description: if there is no next page, it will be equals to the last page
 
     UserProfileLanguagePage:
