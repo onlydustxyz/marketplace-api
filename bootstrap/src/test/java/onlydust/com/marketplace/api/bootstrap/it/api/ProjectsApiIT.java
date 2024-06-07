@@ -1,11 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.project.domain.model.Project;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -565,6 +569,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     ProjectCategoryRepository projectCategoryRepository;
     @Autowired
     ProjectRepository projectRepository;
+    @Autowired
+    public ProjectTagRepository projectTagRepository;
 
     @BeforeEach
     void setUp() {
@@ -747,6 +753,33 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     public void should_get_a_project_by_slug_with_tags() {
         // Given
         final String slug = "bretzel";
+        final ProjectViewEntity bretzel = projectViewRepository.findBySlug(slug).orElseThrow();
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(), userAuthHelper.authenticatePierre().user().getGithubUserId()));
+
+        projectTagRepository.saveAll(List.of(
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
+                                                .tag(Project.Tag.NEWBIES_WELCOME)
+                                                .build()
+                                ).build(),
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"))
+                                                .tag(Project.Tag.FAST_AND_FURIOUS)
+                                                .build()
+                                ).build(),
+                        ProjectTagEntity.builder()
+                                .id(
+                                        ProjectTagEntity.Id.builder()
+                                                .projectId(UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"))
+                                                .tag(Project.Tag.FAST_AND_FURIOUS)
+                                                .build()
+                                ).build()
+                )
+        );
 
         // When
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
