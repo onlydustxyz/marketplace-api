@@ -4500,7 +4500,6 @@ components:
         - id
         - name
         - isLead
-        - logoUrl
         - contributorCount
         - totalGranted
         - userContributionCount
@@ -4934,7 +4933,6 @@ components:
         - slug
         - name
         - shortDescription
-        - logoUrl
         - hiring
         - visibility
         - repoCount
@@ -5007,7 +5005,6 @@ components:
         - createdAt
         - shortDescription
         - longDescription
-        - logoUrl
         - moreInfos
         - hiring
         - visibility
@@ -5139,7 +5136,6 @@ components:
         - id
         - slug
         - name
-        - logoUrl
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'
@@ -5167,8 +5163,6 @@ components:
         - type: object
           required:
             - shortDescription
-            - logoUrl
-            - visibility
           properties:
             id:
               $ref: '#/components/schemas/ProjectId'
