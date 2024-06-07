@@ -102,4 +102,31 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """, true);
     }
+
+    @Test
+    void should_get_caller_journey() {
+        // Given
+        final var anthony = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_JOURNEY))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + anthony.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "completed": false,
+                          "completion": 80,
+                          "individualBillingProfileSetup": false,
+                          "firstContributionMade": true,
+                          "firstRewardClaimed": true,
+                          "descriptionUpdated": true,
+                          "telegramAdded": true
+                        }
+                        """);
+    }
 }

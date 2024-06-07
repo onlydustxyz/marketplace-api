@@ -790,6 +790,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/journey:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get the caller's journey completion
+      operationId: getJourneyCompletion
+      description: |
+        Get the caller's journey completion
+      responses:
+        "200":
+          description: 'Journey completion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JourneyCompletionResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -7680,7 +7702,6 @@ components:
         - AMOUNT
         - STATUS
 
-
     RecommendedProjectsPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -7692,3 +7713,37 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectLinkWithDescriptionResponse'
+
+    JourneyCompletionResponse:
+      type: object
+      required:
+        - completed
+        - completion
+        - individualBillingProfileSetup
+        - firstContributionMade
+        - firstRewardClaimed
+        - descriptionUpdated
+        - telegramAdded
+      properties:
+        completed:
+          type: boolean
+          description: True if the journey is completed
+        completion:
+          type: number
+          format: int32
+          description: Completion percentage of the journey
+        individualBillingProfileSetup:
+          type: boolean
+          description: True if the individual billing profile is set up
+        firstContributionMade:
+          type: boolean
+          description: True if the first contribution is made
+        firstRewardClaimed:
+          type: boolean
+          description: True if the first reward is claimed
+        descriptionUpdated:
+          type: boolean
+          description: True if the description is updated
+        telegramAdded:
+          type: boolean
+          description: True if the telegram contact method is added

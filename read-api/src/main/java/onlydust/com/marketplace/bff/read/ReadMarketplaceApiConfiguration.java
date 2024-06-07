@@ -105,8 +105,9 @@ public class ReadMarketplaceApiConfiguration {
                                                              final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository,
                                                              final RewardDetailsReadRepository rewardDetailsReadRepository,
                                                              final UserRewardStatsReadRepository userRewardStatsReadRepository,
-                                                             final PublicProjectReadRepository publicProjectReadRepository) {
+                                                             final PublicProjectReadRepository publicProjectReadRepository,
+                                                             final UserReadRepository userReadRepository) {
         return new ReadMeApiPostgresAdapter(authenticatedAppUserService, allBillingProfileUserReadRepository, rewardDetailsReadRepository,
-                userRewardStatsReadRepository, publicProjectReadRepository);
+                userRewardStatsReadRepository, publicProjectReadRepository, userReadRepository);
     }
 }
