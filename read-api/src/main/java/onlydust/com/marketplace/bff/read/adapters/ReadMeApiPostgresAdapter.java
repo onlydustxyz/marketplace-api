@@ -3,12 +3,17 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.RecommendedProjectsPageResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.RewardsMapper;
+import onlydust.com.marketplace.bff.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.AllBillingProfileUserReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.RewardDetailsReadRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserRewardStatsReadRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import onlydust.com.marketplace.bff.read.repositories.PublicProjectReadRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +26,10 @@ import java.util.UUID;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
+
 @RestController
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -29,6 +38,26 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository;
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final UserRewardStatsReadRepository userRewardStatsReadRepository;
+    private final PublicProjectReadRepository publicProjectReadRepository;
+
+    @Override
+    public ResponseEntity<RecommendedProjectsPageResponse> getRecommendedProjects(Integer pageIndex, Integer pageSize) {
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var page = publicProjectReadRepository.findAllRecommendedForUser(authenticatedUser.getGithubUserId(),
+                PageRequest.of(sanitizePageIndex, sanitizePageSize));
+
+        final var response = new RecommendedProjectsPageResponse()
+                .projects(page.getContent().stream().map(PublicProjectReadEntity::toProjectLinkWithDescription).toList())
+                .hasMore(hasMore(sanitizePageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(sanitizePageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages());
+
+        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
 
     @Override
     public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
@@ -37,7 +66,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
 
         final var response = new MyBillingProfilesResponse()
                 .billingProfiles(billingProfiles.stream().map(AllBillingProfileUserReadEntity::toShortResponse).toList());
-        return ResponseEntity.ok(response);
+        return ok(response);
     }
 
     @Override

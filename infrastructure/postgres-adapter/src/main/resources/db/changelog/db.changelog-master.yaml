@@ -349,3 +349,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000260_create_public_projects.sql
   - include:
       file: db/changelog/changelogs/00000261_fix_project_lead_count_null.sql
+  - include:
+      file: db/changelog/changelogs/00000262_create_project_similarities_view.sql

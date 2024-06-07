@@ -757,6 +757,39 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/recommended-projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get some recommended projects for the caller
+      operationId: getRecommendedProjects
+      description: |
+        Get a paginated list of recommended projects for the caller
+      parameters:
+        - in: query
+          name: pageIndex
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: 'Page of recommended projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendedProjectsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/technologies:
     get:
       tags:
@@ -5054,6 +5087,17 @@ components:
         logoUrl:
           type: string
 
+    ProjectLinkWithDescriptionResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - shortDescription
+          properties:
+            shortDescription:
+              type: string
+              example: A short project description
+
     ProjectShortResponse:
       allOf:
         - $ref: '#/components/schemas/ProjectLinkResponse'
@@ -7635,3 +7679,16 @@ components:
         - CONTRIBUTION
         - AMOUNT
         - STATUS
+
+
+    RecommendedProjectsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLinkWithDescriptionResponse'
