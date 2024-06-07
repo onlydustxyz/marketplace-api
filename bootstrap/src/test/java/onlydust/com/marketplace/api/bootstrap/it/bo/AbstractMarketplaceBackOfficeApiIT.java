@@ -126,10 +126,11 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
-        if (!postgresSQLContainer.isRunning()) {
+        final var firstRun = !postgresSQLContainer.isRunning();
+        if (firstRun)
             postgresSQLContainer.start();
-        }
-        assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh").getExitCode()).isEqualTo(0);
+
+        assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh", Boolean.toString(firstRun)).getExitCode()).isEqualTo(0);
     }
 
     @BeforeEach
