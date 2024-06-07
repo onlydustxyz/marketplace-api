@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.contract.model.ProjectLinkWithDescriptionResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.Date;
@@ -46,4 +47,14 @@ public class PublicProjectReadEntity {
     Boolean ignoreCodeReviews;
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
+
+
+    public ProjectLinkWithDescriptionResponse toProjectLinkWithDescription() {
+        return new ProjectLinkWithDescriptionResponse()
+                .id(id)
+                .name(name)
+                .shortDescription(shortDescription)
+                .logoUrl(logoUrl)
+                .slug(slug);
+    }
 }

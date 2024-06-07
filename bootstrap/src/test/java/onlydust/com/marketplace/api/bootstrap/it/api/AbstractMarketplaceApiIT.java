@@ -121,6 +121,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_BILLING_PROFILES = "/api/v1/me/billing-profiles";
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String ME_PUT_HACKATHON_REGISTRATIONS = "/api/v1/me/hackathons/%s/registrations";
+    protected static final String ME_RECOMMENDED_PROJECTS = "/api/v1/me/recommended-projects";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String USERS_GET_CONTRIBUTIONS = "/api/v2/users/%s/contributions";
