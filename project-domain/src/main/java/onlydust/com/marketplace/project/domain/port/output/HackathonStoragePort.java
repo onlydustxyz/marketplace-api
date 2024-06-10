@@ -15,18 +15,12 @@ public interface HackathonStoragePort {
 
     void saveStatus(@NonNull Hackathon.Id hackathonId, @NonNull Hackathon.Status status);
 
-    Optional<HackathonDetailsView> findById(@NonNull Hackathon.Id id);
-
-    Optional<HackathonDetailsView> findBySlug(String hackathonSlug);
+    Optional<Hackathon> findById(@NonNull Hackathon.Id id);
 
     boolean exists(Hackathon.Id id);
-
-    Page<HackathonShortView> findByStatuses(int pageIndex, int pageSize, Set<Hackathon.Status> statuses);
 
     void delete(Hackathon.Id hackathonId);
 
     void registerUser(UUID userId, Hackathon.Id hackathonId);
-
-    boolean isRegisteredToHackathon(UUID userId, Hackathon.Id hackathonId);
 
 }

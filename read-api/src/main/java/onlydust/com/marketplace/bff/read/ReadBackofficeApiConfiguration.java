@@ -21,8 +21,10 @@ public class ReadBackofficeApiConfiguration {
     }
 
     @Bean
-    public BackofficeHackathonsReadApiPostgresAdapter backofficeHackathonsReadApiPostgresAdapter(final UserReadRepository userReadRepository) {
-        return new BackofficeHackathonsReadApiPostgresAdapter(userReadRepository);
+    public BackofficeHackathonsReadApiPostgresAdapter backofficeHackathonsReadApiPostgresAdapter(final UserReadRepository userReadRepository,
+                                                                                                 final HackathonShortReadRepository hackathonShortReadRepository,
+                                                                                                 final HackathonDetailsReadRepository hackathonDetailsReadRepository) {
+        return new BackofficeHackathonsReadApiPostgresAdapter(userReadRepository, hackathonShortReadRepository, hackathonDetailsReadRepository);
     }
 
     @Bean
@@ -41,4 +43,5 @@ public class ReadBackofficeApiConfiguration {
                                                                                                                final ProjectCategoryReadRepository projectCategoryReadRepository) {
         return new BackofficeReadProjectCategoriesApiPostgresAdapter(projectCategoryPageItemReadRepository, projectCategoryReadRepository);
     }
+
 }

@@ -13,9 +13,13 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static java.util.Objects.nonNull;
 
 @Entity
 @AllArgsConstructor
@@ -78,4 +82,26 @@ public class HackathonEntity {
                 .build();
     }
 
+    public Hackathon toDomain() {
+        final Hackathon hackathon = Hackathon.builder()
+                .id(Hackathon.Id.of(id))
+                .description(description)
+                .title(title)
+                .subtitle(subtitle)
+                .totalBudget(budget)
+                .status(Hackathon.Status.valueOf(status.name()))
+                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
+                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
+                .build();
+        if (nonNull(tracks)) {
+            hackathon.tracks().addAll(tracks.stream().map(HackathonTrack::toDomain).toList());
+        }
+        if (nonNull(sponsorIds)) {
+            hackathon.sponsorIds().addAll(List.of(sponsorIds));
+        }
+        if (nonNull(links)) {
+            hackathon.links().addAll(links);
+        }
+        return hackathon;
+    }
 }

@@ -1,7 +1,8 @@
-package onlydust.com.marketplace.api.postgres.adapter.repository;
+package onlydust.com.marketplace.bff.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.HackathonDetailsQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonDetailsReadEntity;
+import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonShortReadEntity;
 import org.intellij.lang.annotations.Language;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -9,7 +10,8 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface HackathonDetailsViewRepository extends JpaRepository<HackathonDetailsQueryEntity, UUID> {
+public interface HackathonDetailsReadRepository extends JpaRepository<HackathonDetailsReadEntity, UUID> {
+
 
     @Language("PostgreSQL")
     String SELECT = """
@@ -57,8 +59,8 @@ public interface HackathonDetailsViewRepository extends JpaRepository<HackathonD
 
     @Query(value = SELECT + " WHERE h.id = :id ", nativeQuery = true)
     @NonNull
-    Optional<HackathonDetailsQueryEntity> findById(@NonNull UUID id);
+    Optional<HackathonDetailsReadEntity> findById(@NonNull UUID id);
 
     @Query(value = SELECT + " WHERE h.slug = :slug ", nativeQuery = true)
-    Optional<HackathonDetailsQueryEntity> findBySlug(String slug);
+    Optional<HackathonDetailsReadEntity> findBySlug(String slug);
 }

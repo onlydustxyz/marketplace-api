@@ -17,7 +17,6 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.util.Set;
@@ -35,7 +34,8 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     private final ProjectStoragePort projectStoragePort;
     private final HackathonStoragePort hackathonStoragePort;
 
-    public SlackApiAdapter(final SlackProperties slackProperties, final MethodsClient slackClient, final UserStoragePort userStoragePort, final ProjectStoragePort projectStoragePort,
+    public SlackApiAdapter(final SlackProperties slackProperties, final MethodsClient slackClient, final UserStoragePort userStoragePort,
+                           final ProjectStoragePort projectStoragePort,
                            final HackathonStoragePort hackathonStoragePort) {
         this.slackProperties = slackProperties;
         this.slackClient = slackClient;
@@ -47,11 +47,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     @Override
     public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
         final UserProfileView userProfileView = userStoragePort.getProfileById(userId);
-        final HackathonDetailsView hackathonDetailsView =
-                hackathonStoragePort.findById(hackathonId).orElseThrow(() -> OnlyDustException.internalServerError(
-                        "Hackathon %s not found".formatted(hackathonId.value())));
+
+        final Hackathon hackathon = hackathonStoragePort.findById(hackathonId).orElseThrow(() -> OnlyDustException.internalServerError(
+                "Hackathon %s not found".formatted(hackathonId.value())));
         sendNotification(slackProperties.getDevRelChannel(), "New user registration on hackathon",
-                UserRegisteredOnHackathonEventMapper.mapToSlackBlock(userProfileView, hackathonDetailsView, slackProperties.getEnvironment()));
+                UserRegisteredOnHackathonEventMapper.mapToSlackBlock(userProfileView, hackathon, slackProperties.getEnvironment()));
     }
 
     @Override

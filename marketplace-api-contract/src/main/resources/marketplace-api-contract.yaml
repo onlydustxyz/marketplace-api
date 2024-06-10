@@ -3434,7 +3434,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - ReadHackathons
       summary: Get hackathons list
       operationId: getHackathons
       description: |
@@ -3456,7 +3456,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Hackathons
+        - ReadHackathons
       summary: Get hackathon by slug
       operationId: getHackathonBySlug
       description: |

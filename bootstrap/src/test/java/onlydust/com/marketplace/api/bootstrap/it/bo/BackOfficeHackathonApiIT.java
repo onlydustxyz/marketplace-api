@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -169,27 +170,22 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .exchange()
                 // Then
                 .expectStatus()
+                .isNoContent();
+
+        final HackathonsPageResponse hackathonsPageResponse = client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
                 .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").value(hackathonId1::setValue)
-                .json("""
-                        {
-                            "slug": "hackathon-2021",
-                            "status": "DRAFT",
-                            "title": "Hackathon 2021",
-                            "subtitle": "subtitle",
-                            "description": null,
-                            "location": null,
-                            "totalBudget": null,
-                            "startDate": "2024-01-01T10:10:00Z",
-                            "endDate": "2024-01-05T20:20:00Z",
-                            "links": [],
-                            "sponsors": [],
-                            "tracks": []
-                        }
-                        """);
+                .expectBody(HackathonsPageResponse.class)
+                .returnResult()
+                .getResponseBody();
+        hackathonId1.setValue(hackathonsPageResponse.getHackathons().get(0).getId().toString());
         assertThat(hackathonId1.getValue()).isNotEmpty();
         assertThat(UUID.fromString(hackathonId1.getValue())).isNotNull();
+
     }
 
     @Test
@@ -824,7 +820,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             }
                           ]
                         }
-                                                
+                        
                         """);
     }
 
