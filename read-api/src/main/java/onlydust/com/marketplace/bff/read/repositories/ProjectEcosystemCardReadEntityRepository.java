@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<ProjectEcosystemCardReadEntity, UUID> {
 
     @Query(nativeQuery = true, value = """
-                with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id order by pc.total_contribution_count desc) rank
+                with contributors as (select pc.project_id, ga.*, row_number() over (partition by pc.project_id order by pc.total_contribution_count desc, pc.completed_contribution_count desc, github_user_id) rank
                                       from projects_contributors pc
                                                join indexer_exp.github_accounts ga on ga.id = pc.github_user_id),
                      has_gfi as (select project_id, count(issue_id) > 0 as exist from projects_good_first_issues group by project_id)
@@ -40,7 +40,7 @@ public interface ProjectEcosystemCardReadEntityRepository extends JpaRepository<
                                            ) users
                                     from contributors c
                                     where c.rank <= 3
-                                    group by c.project_id ) cc on cc.project_id = p.id
+                                    group by c.project_id) cc on cc.project_id = p.id
                         left join has_gfi on has_gfi.project_id = p.id
                         left join (select p_tags.project_id, jsonb_agg(jsonb_build_object('name', p_tags.tag)) names
                                     from projects_tags p_tags
