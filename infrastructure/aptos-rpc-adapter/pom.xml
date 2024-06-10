@@ -25,9 +25,8 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>kernel</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <groupId>onlydust.com.marketplace.kernel</groupId>
+            <artifactId>marketplace-kernel</artifactId>
         </dependency>
         <dependency>
             <groupId>org.wiremock</groupId>
