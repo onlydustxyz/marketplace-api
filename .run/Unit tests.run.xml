@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Unit tests" type="Multirun" separateTabs="false" reuseTabsWithFailures="false" startOneByOne="false" markFailedProcess="true" hideSuccessProcess="false" delayTime="0.0">
-    <runConfiguration name="[Accounting] Unit tests" type="JUnit" />
-    <runConfiguration name="[Project] Unit tests" type="JUnit" />
-    <runConfiguration name="[SumSub Webhook] Unit tests" type="JUnit" />
-    <runConfiguration name="[REST API] Unit tests" type="JUnit" />
-    <method v="2" />
-  </configuration>
-</component>

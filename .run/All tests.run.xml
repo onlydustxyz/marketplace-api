@@ -1,12 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="[Concurrency] Integration tests" type="JUnit" factoryName="JUnit">
-    <module name="bootstrap" />
-    <extension name="coverage">
-      <pattern>
-        <option name="PATTERN" value="onlydust.com.marketplace.api.bootstrap.suites.*" />
-        <option name="ENABLED" value="true" />
-      </pattern>
-    </extension>
+  <configuration default="false" name="All tests" type="JUnit" factoryName="JUnit">
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="false" />
       <option name="IS_SUBST" value="false" />
@@ -17,10 +10,13 @@
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
       </ENTRIES>
     </extension>
-    <option name="PACKAGE_NAME" value="onlydust.com.marketplace.api.bootstrap.suites" />
-    <option name="MAIN_CLASS_NAME" value="onlydust.com.marketplace.api.bootstrap.suites.ConcurrencySuite" />
+    <option name="PACKAGE_NAME" value="" />
+    <option name="MAIN_CLASS_NAME" value="" />
     <option name="METHOD_NAME" value="" />
-    <option name="TEST_OBJECT" value="class" />
+    <option name="TEST_OBJECT" value="package" />
+    <option name="TEST_SEARCH_SCOPE">
+      <value defaultName="wholeProject" />
+    </option>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

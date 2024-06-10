@@ -1,9 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="CI" type="Multirun" separateTabs="false" reuseTabsWithFailures="false" startOneByOne="true" markFailedProcess="true" hideSuccessProcess="true" delayTime="-0.1">
-    <runConfiguration name="Compile" type="Maven" />
-    <runConfiguration name="Unit tests" type="Multirun" />
-    <runConfiguration name="[Postgres] Infrastructure tests" type="JUnit" />
-    <runConfiguration name="Integration tests" type="JUnit" />
-    <method v="2" />
-  </configuration>
-</component>
