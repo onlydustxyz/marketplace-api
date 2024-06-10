@@ -262,12 +262,6 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
-        return sponsorAccountStorage.get(sponsorAccountId).map(sponsorAccount -> sponsorAccountStatement(sponsorAccount,
-                getAccountBook(sponsorAccount.currency()).state()));
-    }
-
-    @Override
     public Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
         return sponsorAccountStorage.get(sponsorAccountId);
     }
@@ -293,6 +287,11 @@ public class AccountingService implements AccountingFacadePort {
         return currencyStorage.all().stream()
                 .flatMap(currency -> new PayableRewardAggregator(sponsorAccountStorage, currency).getPayableRewards(rewardIds))
                 .toList();
+    }
+
+    public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
+        return sponsorAccountStorage.get(sponsorAccountId).map(sponsorAccount -> sponsorAccountStatement(sponsorAccount,
+                getAccountBook(sponsorAccount.currency()).state()));
     }
 
     private List<PayableReward> filterPayableRewards(@NonNull Network network, @NonNull Set<RewardId> rewardIds) {

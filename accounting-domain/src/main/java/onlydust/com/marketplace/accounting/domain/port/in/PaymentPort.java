@@ -15,10 +15,13 @@ public interface PaymentPort {
 
     void markPaymentAsPaid(Payment.Id batchPaymentId, String transactionHash);
 
+    // TODO: move to read-api
     Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses);
 
+    // TODO: move to read-api
     List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> ids);
 
+    // TODO: move to read-api
     BatchPaymentDetailsView findPaymentById(Payment.Id batchPaymentId);
 
     void deletePaymentById(Payment.Id paymentId);

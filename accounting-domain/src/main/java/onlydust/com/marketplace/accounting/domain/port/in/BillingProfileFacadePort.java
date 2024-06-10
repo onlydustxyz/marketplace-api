@@ -23,6 +23,7 @@ public interface BillingProfileFacadePort {
 
     Invoice previewInvoice(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull List<RewardId> rewardIds);
 
+    // TODO: move to read-api
     Page<InvoiceView> invoicesOf(final @NonNull UserId userId, final @NonNull BillingProfile.Id billingProfileId, final @NonNull Integer pageNumber,
                                  final @NonNull Integer pageSize, final @NonNull Invoice.Sort sort, final @NonNull SortDirection direction);
 
@@ -38,10 +39,13 @@ public interface BillingProfileFacadePort {
 
     void acceptInvoiceMandate(UserId userId, BillingProfile.Id billingProfileId);
 
+    // TODO: move to read-api
     List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId);
 
+    // TODO: move to read-api
     BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId, GithubUserId githubUserId);
 
+    // TODO: move to read-api
     PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
 
     void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo);
@@ -64,7 +68,9 @@ public interface BillingProfileFacadePort {
 
     void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type);
 
+    // TODO: move to read-api
     List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
 
+    // TODO: move to read-api
     BillingProfileView getById(BillingProfile.Id id);
 }

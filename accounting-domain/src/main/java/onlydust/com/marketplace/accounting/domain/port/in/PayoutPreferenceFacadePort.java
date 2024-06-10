@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface PayoutPreferenceFacadePort {
 
+    // TODO: move to read-api
     List<PayoutPreferenceView> getPayoutPreferences(UserId userId);
 
     void setPayoutPreference(ProjectId projectId, BillingProfile.Id billingProfileId, UserId userId);

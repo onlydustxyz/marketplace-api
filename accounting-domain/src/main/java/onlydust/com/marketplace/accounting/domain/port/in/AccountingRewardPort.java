@@ -14,6 +14,7 @@ import java.util.List;
 
 public interface AccountingRewardPort {
 
+    // TODO: move to read-api
     Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
                                        List<RewardStatus.Input> statuses,
                                        List<BillingProfile.Id> billingProfileIds,
@@ -36,5 +37,4 @@ public interface AccountingRewardPort {
     void notifyAllNewPaidRewards();
 
     RewardDetailsView getReward(RewardId id);
-
 }

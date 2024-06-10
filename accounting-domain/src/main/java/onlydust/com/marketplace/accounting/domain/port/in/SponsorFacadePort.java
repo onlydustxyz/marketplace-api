@@ -9,8 +9,10 @@ import java.io.InputStream;
 import java.net.URL;
 
 public interface SponsorFacadePort {
+    // TODO: move to read-api
     SponsorView getSponsor(UserId userId, SponsorId sponsorId);
 
+    // TODO: move to read-api
     Page<SponsorView> listSponsors(String search, int sanitizedPageIndex, int sanitizedPageSize);
 
     URL uploadLogo(InputStream imageInputStream);
