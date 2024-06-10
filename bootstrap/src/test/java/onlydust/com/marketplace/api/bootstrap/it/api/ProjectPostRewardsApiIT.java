@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,6 +166,8 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     AccountingService accountingService;
     @Autowired
     CustomerIOProperties customerIOProperties;
+    @Autowired
+    PosthogProperties posthogProperties;
 
     @Test
     void should_create_reward() {
@@ -224,5 +227,18 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New reward received ✨")))
         );
+
+        trackingOutboxJob.run();
+
+        posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
+                .withRequestBody(matchingJsonPath("$.event", equalTo("reward_received")))
+                .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(pierre.user().getId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))
+                .withRequestBody(matchingJsonPath("$.properties['amount']", equalTo("12.95")))
+                .withRequestBody(matchingJsonPath("$.properties['project_id']", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['sender_id']", equalTo(pierre.user().getId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['currency']", equalTo("ETH"))));
     }
 }

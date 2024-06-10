@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
 
@@ -19,7 +18,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @EventType("RewardCreated")
-public class RewardCreated extends Event {
+public class RewardCreatedMailEvent extends Event {
     @NonNull
     String email;
     @NonNull

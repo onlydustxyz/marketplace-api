@@ -22,6 +22,10 @@
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>project-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>accounting-domain</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

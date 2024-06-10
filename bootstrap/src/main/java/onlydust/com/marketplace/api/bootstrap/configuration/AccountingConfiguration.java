@@ -116,8 +116,9 @@ public class AccountingConfiguration {
 
     @Bean
     public AccountingObserverPort accountingObserver(final RewardStatusUpdater rewardStatusUpdater,
-                                                     final AccountingMailNotifier accountingMailNotifier) {
-        return new AccountingObserverComposite(accountingMailNotifier, rewardStatusUpdater);
+                                                     final AccountingMailNotifier accountingMailNotifier,
+                                                     final AccountingTrackingNotifier accountingTrackingNotifier) {
+        return new AccountingObserverComposite(accountingMailNotifier, rewardStatusUpdater, accountingTrackingNotifier);
     }
 
     @Bean
@@ -161,5 +162,11 @@ public class AccountingConfiguration {
     @Bean
     public OutboxConsumer accountingMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
         return new RetriedOutboxConsumer(customerIOAdapter);
+    }
+
+    @Bean
+    public AccountingTrackingNotifier accountingTrackingNotifier(final OutboxPort trackingOutbox,
+                                                                 final AccountingRewardStoragePort accountingRewardStoragePort) {
+        return new AccountingTrackingNotifier(trackingOutbox, accountingRewardStoragePort);
     }
 }

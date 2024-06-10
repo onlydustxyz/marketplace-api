@@ -113,7 +113,7 @@ public class AccountingMailNotifierTest {
             accountingMailNotifier.onRewardCreated(rewardId, mock(AccountBookFacade.class));
 
             // Then
-            verify(mailOutbox).push(new RewardCreated(recipient.email(), rewardDetailsView.githubUrls().size(),
+            verify(mailOutbox).push(new RewardCreatedMailEvent(recipient.email(), rewardDetailsView.githubUrls().size(),
                     requester.login(), recipient.login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())
