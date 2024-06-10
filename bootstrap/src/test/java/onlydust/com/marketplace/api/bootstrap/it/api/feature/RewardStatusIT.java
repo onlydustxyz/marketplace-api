@@ -46,6 +46,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -132,6 +133,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         Mockito.reset(authenticatedBackofficeUserService);
         when(authenticatedBackofficeUserService.getAuthenticatedBackofficeUser()).thenReturn(new BackofficeUser(BackofficeUser.Id.random(),
                 faker.internet().emailAddress(), faker.internet().slug(), Set.of(BackofficeUser.Role.BO_FINANCIAL_ADMIN), faker.internet().avatar()));
+    }
+
+    @AfterAll
+    static void tearDown() throws IOException, InterruptedException {
+        restoreIndexerDump();
     }
 
     public void resetAuth0Mock() {
