@@ -44,7 +44,7 @@ public class AccountingMailNotifier implements AccountingObserverPort, BillingPr
         final var rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingOutbox.push(new RewardCreated(rewardDetailsView.recipient().email(),
+            accountingOutbox.push(new MailRewardCreated(rewardDetailsView.recipient().email(),
                     rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
                     .amount(rewardDetailsView.money().amount())
                     .currencyCode(rewardDetailsView.money().currency().code().toString())

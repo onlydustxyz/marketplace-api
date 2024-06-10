@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.posthog.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,12 +15,5 @@ public class EventDTO {
     String distinctId;
     // ISO 8601 format
     String timestamp;
-    PropertiesDTO properties;
-
-    @Builder
-    @Data
-    public static class PropertiesDTO {
-        @JsonProperty("$lib")
-        String userAgent;
-    }
+    JsonNode properties;
 }

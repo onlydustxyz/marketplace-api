@@ -23,7 +23,7 @@ public class CustomerIOAdapter implements OutboxConsumer {
     public void process(@NonNull Event event) {
         if (event instanceof InvoiceRejected invoiceRejected) {
             sendEmail(MailDTO.fromInvoiceRejected(customerIOProperties, invoiceRejected));
-        } else if (event instanceof RewardCreated rewardCreated) {
+        } else if (event instanceof MailRewardCreated rewardCreated) {
             sendEmail(MailDTO.fromRewardCreated(customerIOProperties, rewardCreated));
         } else if (event instanceof RewardCanceled rewardCanceled) {
             sendEmail(MailDTO.fromRewardCanceled(customerIOProperties, rewardCanceled));
