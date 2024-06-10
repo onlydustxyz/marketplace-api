@@ -49,7 +49,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
 
     public static MailDTO<RewardCreatedDTO> fromRewardCreated(
             @NonNull CustomerIOProperties customerIOProperties,
-            @NonNull MailRewardCreated rewardCreated
+            @NonNull RewardCreatedMailEvent rewardCreated
     ) {
         return new MailDTO<>(customerIOProperties.getNewRewardReceivedEmailId().toString(), mapIdentifiers(rewardCreated.email(),
                 rewardCreated.recipientId())

@@ -18,7 +18,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @EventType("RewardCreated")
-public class MailRewardCreated extends Event {
+public class RewardCreatedMailEvent extends Event {
     @NonNull
     String email;
     @NonNull
