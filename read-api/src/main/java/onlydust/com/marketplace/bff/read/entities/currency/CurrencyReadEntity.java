@@ -48,4 +48,13 @@ public class CurrencyReadEntity {
                 .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
                 .decimals(decimals);
     }
+
+    public onlydust.com.backoffice.api.contract.model.ShortCurrencyResponse toBoShortResponse() {
+        return new onlydust.com.backoffice.api.contract.model.ShortCurrencyResponse()
+                .id(id)
+                .name(name)
+                .code(code)
+                .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
+                .decimals(decimals);
+    }
 }

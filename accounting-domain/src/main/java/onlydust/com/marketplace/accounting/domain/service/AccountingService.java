@@ -289,6 +289,7 @@ public class AccountingService implements AccountingFacadePort {
                 .toList();
     }
 
+    @Override
     public Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId) {
         return sponsorAccountStorage.get(sponsorAccountId).map(sponsorAccount -> sponsorAccountStatement(sponsorAccount,
                 getAccountBook(sponsorAccount.currency()).state()));

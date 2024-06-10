@@ -298,7 +298,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get sponsor accounts
       operationId: getSponsorAccounts
       parameters:

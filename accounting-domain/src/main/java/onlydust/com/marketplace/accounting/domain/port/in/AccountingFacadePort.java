@@ -48,6 +48,8 @@ public interface AccountingFacadePort {
 
     Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
 
+    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
+
     // TODO: move to read-api
     List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
 
