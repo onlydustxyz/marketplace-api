@@ -238,6 +238,14 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         // And When
         client.put()
@@ -292,6 +300,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         assertProjectWasUpdated();
 
         runJobs();
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+        );
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/16590657"))
+                .withHeader("Content-Type", equalTo("application/json"))
+        );
         indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(equalToJson("""
@@ -591,6 +605,14 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/595505"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        indexerApiWireMockServer.stubFor(WireMock.put(WireMock.urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader("Api-Key", equalTo("some-indexer-api-key"))
+                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
 
         // When
         final CreateProjectResponse responseBody = client.post()
@@ -629,6 +651,24 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.moreInfos").isEmpty();
 
         projectId2 = responseBody.getProjectId();
+
+        runJobs();
+
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/43467246"))
+                .withHeader("Content-Type", equalTo("application/json"))
+        );
+        indexerApiWireMockServer.verify(1, putRequestedFor(urlEqualTo("/api/v1/users/595505"))
+                .withHeader("Content-Type", equalTo("application/json"))
+        );
+        indexerApiWireMockServer.verify(1, postRequestedFor(urlEqualTo("/api/v1/events/on-repo-link-changed"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "linkedRepoIds": [602953043,498695724],
+                          "unlinkedRepoIds": []
+                        }
+                        """))
+        );
     }
 
     @SneakyThrows
