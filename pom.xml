@@ -30,6 +30,20 @@
     <packaging>pom</packaging>
     <description>Marketplace backend API for the frontend</description>
 
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/onlydustxyz/*</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <properties>
         <failsafe-include>**/*IT.java</failsafe-include>
         <skipUTs>${skipTests}</skipUTs>
