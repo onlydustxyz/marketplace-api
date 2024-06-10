@@ -36,6 +36,10 @@ public class CurrencyReadEntity {
     private @NonNull Integer decimals;
     private String description;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
+    LatestUsdQuoteReadEntity latestUsdQuote;
+
     public ShortCurrencyResponse toShortResponse() {
         return new ShortCurrencyResponse()
                 .id(id)

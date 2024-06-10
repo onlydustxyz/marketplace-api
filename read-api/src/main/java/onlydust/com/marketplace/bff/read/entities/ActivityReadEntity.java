@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.bff.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
+import onlydust.com.marketplace.bff.read.mapper.MoneyMapper;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Immutable;
 
@@ -63,13 +64,13 @@ public class ActivityReadEntity {
                 dto.setRewardCreated(new PublicActivityPageItemResponseRewardCreated()
                         .project(project.toLinkResponse())
                         .recipient(reward.recipient().toGithubUserResponse())
-                        .amount(new NewMoney(reward.amount(), reward.currency().toShortResponse())));
+                        .amount(MoneyMapper.map(reward.amount(), reward.currency())));
                 break;
             case REWARD_CLAIMED:
                 dto.setRewardClaimed(new PublicActivityPageItemResponseRewardCreated()
                         .project(project.toLinkResponse())
                         .recipient(reward.recipient().toGithubUserResponse())
-                        .amount(new NewMoney(reward.amount(), reward.currency().toShortResponse())));
+                        .amount(MoneyMapper.map(reward.amount(), reward.currency())));
                 break;
             case PROJECT_CREATED:
                 dto.setProjectCreated(new PublicActivityPageItemResponseProjectCreated()
