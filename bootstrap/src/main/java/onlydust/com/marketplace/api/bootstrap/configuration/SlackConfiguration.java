@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.configuration;
 
+import com.slack.api.Slack;
+import com.slack.api.methods.MethodsClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
@@ -19,10 +21,16 @@ public class SlackConfiguration {
     }
 
     @Bean
+    public MethodsClient slackClient(final SlackProperties slackProperties) {
+        return Slack.getInstance().methods(slackProperties.getToken());
+    }
+
+    @Bean
     public SlackApiAdapter slackApiAdapter(final SlackProperties slackProperties,
+                                           final MethodsClient slackClient,
                                            final UserStoragePort userStoragePort,
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort) {
-        return new SlackApiAdapter(slackProperties, userStoragePort, projectStoragePort, hackathonStoragePort);
+        return new SlackApiAdapter(slackProperties, slackClient, userStoragePort, projectStoragePort, hackathonStoragePort);
     }
 }

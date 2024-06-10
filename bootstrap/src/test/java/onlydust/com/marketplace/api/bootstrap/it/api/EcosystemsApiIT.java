@@ -282,6 +282,10 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "projects": [
                             {
                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -301,26 +305,23 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
                                 },
                                 {
-                                  "githubUserId": 117665867,
-                                  "login": "gilbertVDB17",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4"
+                                  "githubUserId": 74653697,
+                                  "login": "antiyro",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
                                 }
                               ],
                               "contributorsCount": 4,
                               "languages": [
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
                                   "name": "Typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
                               ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """);
 
@@ -664,6 +665,10 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "projects": [
                             {
                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -683,26 +688,23 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/52197971?v=4"
                                 },
                                 {
-                                  "githubUserId": 117665867,
-                                  "login": "gilbertVDB17",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/117665867?v=4"
+                                  "githubUserId": 74653697,
+                                  "login": "antiyro",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/74653697?v=4"
                                 }
                               ],
                               "contributorsCount": 4,
                               "languages": [
                                 {
                                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
                                   "name": "Typescript",
                                   "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
                                   "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                                 }
                               ]
                             }
-                          ],
-                          "hasMore": false,
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "nextPageIndex": 0
+                          ]
                         }
                         """);
 

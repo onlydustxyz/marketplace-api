@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.slack;
 
-import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import lombok.NonNull;
@@ -36,10 +35,10 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     private final ProjectStoragePort projectStoragePort;
     private final HackathonStoragePort hackathonStoragePort;
 
-    public SlackApiAdapter(final SlackProperties slackProperties, final UserStoragePort userStoragePort, final ProjectStoragePort projectStoragePort,
+    public SlackApiAdapter(final SlackProperties slackProperties, final MethodsClient slackClient, final UserStoragePort userStoragePort, final ProjectStoragePort projectStoragePort,
                            final HackathonStoragePort hackathonStoragePort) {
         this.slackProperties = slackProperties;
-        this.slackClient = Slack.getInstance().methods(slackProperties.getToken());
+        this.slackClient = slackClient;
         this.userStoragePort = userStoragePort;
         this.projectStoragePort = projectStoragePort;
         this.hackathonStoragePort = hackathonStoragePort;

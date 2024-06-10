@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 
 @Entity
 @AllArgsConstructor
@@ -99,7 +101,7 @@ public class ProjectEntity {
                 .shortDescription(shortDescription)
                 .longDescription(longDescription)
                 .logoUrl(logoUrl)
-                .moreInfoUrl(moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
+                .moreInfoUrl(isNull(moreInfos) ? null : moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
                 .hiring(hiring)
                 .visibility(visibility)
                 .build();
