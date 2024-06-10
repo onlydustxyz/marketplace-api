@@ -13,7 +13,6 @@
         <module>coverage</module>
         <module>backoffice-api-contract</module>
         <module>accounting-domain</module>
-        <module>kernel</module>
         <module>user-domain</module>
     </modules>
 
@@ -30,6 +29,20 @@
     <name>marketplace-api</name>
     <packaging>pom</packaging>
     <description>Marketplace backend API for the frontend</description>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo1.maven.org/maven2</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/onlydustxyz/*</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <properties>
         <failsafe-include>**/*IT.java</failsafe-include>
@@ -93,6 +106,11 @@
                 <groupId>onlydust.com.marketplace.api</groupId>
                 <artifactId>od-rust-api-client-adapter</artifactId>
                 <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>onlydust.com.marketplace.kernel</groupId>
+                <artifactId>marketplace-kernel</artifactId>
+                <version>0.6.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
