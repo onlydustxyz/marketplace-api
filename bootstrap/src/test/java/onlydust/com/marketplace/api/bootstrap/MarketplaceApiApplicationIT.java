@@ -1,12 +1,17 @@
 package onlydust.com.marketplace.api.bootstrap;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.slack.api.methods.MethodsClient;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -49,7 +54,10 @@ public class MarketplaceApiApplicationIT {
     }
 
     @Bean
-    public SlackApiAdapter slackApiAdapter() {
-        return mock(SlackApiAdapter.class);
+    public SlackApiAdapter slackApiAdapter(final SlackProperties slackProperties,
+                                           final UserStoragePort userStoragePort,
+                                           final ProjectStoragePort projectStoragePort,
+                                           final HackathonStoragePort hackathonStoragePort) {
+        return new SlackApiAdapter(slackProperties, mock(MethodsClient.class), userStoragePort, projectStoragePort, hackathonStoragePort);
     }
 }
