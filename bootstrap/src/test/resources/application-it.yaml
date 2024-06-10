@@ -41,7 +41,7 @@ infrastructure:
     kyc-questionnaire-name: odKycUsPersonDevelop
     kyb-questionnaire-name: odKybFormDevelop
   slack:
-    environment: local-it
+    environment: develop
     token: fake-slack-token
     tag-all-channel: false
   node-guardians:
