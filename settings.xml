@@ -6,7 +6,7 @@
         <server>
             <id>github</id>
             <username>onlydust</username>
-            <password>${env.GITHUB_TOKEN}</password>
+            <password>${env.GITHUB_PAT}</password>
         </server>
     </servers>
 </settings>
