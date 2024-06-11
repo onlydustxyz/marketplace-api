@@ -29,6 +29,7 @@ import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
+import onlydust.com.marketplace.project.domain.job.IndexingEventConsumer;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
@@ -175,8 +176,19 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public OutboxConsumerJob indexingEventsOutboxJob(final OutboxPort indexingEventsOutbox,
+                                                     final OutboxConsumer indexingEventsOutboxConsumer) {
+        return new OutboxConsumerJob(indexingEventsOutbox, indexingEventsOutboxConsumer);
+    }
+
+    @Bean
     public OutboxConsumer webhookTrackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter) {
         return new RetriedOutboxConsumer(posthogApiClientAdapter);
+    }
+
+    @Bean
+    public OutboxConsumer indexingEventsOutboxConsumer(final ContributionObserverPort contributionObserverPort) {
+        return new RetriedOutboxConsumer(new IndexingEventConsumer(contributionObserverPort));
     }
 
     @Bean

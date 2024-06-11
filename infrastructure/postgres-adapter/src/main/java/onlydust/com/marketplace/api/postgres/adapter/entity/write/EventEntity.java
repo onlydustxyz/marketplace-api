@@ -10,14 +10,10 @@ import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventIdResolver;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
-
-import java.time.Instant;
 
 @MappedSuperclass
 @NoArgsConstructor
@@ -38,16 +34,6 @@ public abstract class EventEntity {
     Status status;
 
     String error;
-
-    @EqualsAndHashCode.Exclude
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false, updatable = false)
-    Instant createdAt;
-
-    @EqualsAndHashCode.Exclude
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    Instant updatedAt;
 
     public EventEntity(Event event) {
         this.payload = new Payload(event);

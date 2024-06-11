@@ -4,7 +4,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
-import onlydust.com.marketplace.project.domain.service.ContributionService;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -70,11 +69,6 @@ public class RestApiConfiguration {
                                                 final CurrencyFacadePort currencyFacadePort,
                                                 final AccountingFacadePort accountingFacadePort) {
         return new BillingProfileRestApi(authenticatedAppUserService, billingProfileFacadePort, currencyFacadePort, accountingFacadePort);
-    }
-
-    @Bean
-    public EventsRestApi eventsRestApi(final ContributionService contributionService) {
-        return new EventsRestApi(contributionService);
     }
 
     @Bean
