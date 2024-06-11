@@ -8,7 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredCon
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.model.event.OnNewContribution;
+import onlydust.com.marketplace.kernel.model.event.OnContributionChanged;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,9 +73,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
-        indexingEventRepository.saveEvent(OnNewContribution.builder()
-                .repoIds(Set.of(repo1))
-                .build());
+        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo1).build());
 
         // When
         indexingEventsOutboxJob.run();
@@ -119,9 +116,8 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
-        indexingEventRepository.saveEvent(OnNewContribution.builder()
-                .repoIds(Set.of(repo1, repo2))
-                .build());
+        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo1).build());
+        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo2).build());
 
         // When
         indexingEventsOutboxJob.run();
@@ -162,9 +158,8 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
-        indexingEventRepository.saveEvent(OnNewContribution.builder()
-                .repoIds(Set.of(repo1, repo2))
-                .build());
+        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo1).build());
+        indexingEventRepository.saveEvent(OnContributionChanged.builder().repoId(repo2).build());
 
         // When
         indexingEventsOutboxJob.run();
