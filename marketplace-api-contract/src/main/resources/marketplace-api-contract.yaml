@@ -2425,30 +2425,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/events/on-contributions-change:
-    post:
-      security:
-        - apiKey: [ ]
-      tags:
-        - Events
-      summary: On contributions change
-      operationId: onContributionsChange
-      description: |
-        Should be called when (at least) a contribution is added or removed from a repo.
-      requestBody:
-        description: 'Contributions change event'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OnContributionsChangeEvent'
-      responses:
-        "204":
-          description: 'Event processed'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/billing-profiles:
     post:
       security:
