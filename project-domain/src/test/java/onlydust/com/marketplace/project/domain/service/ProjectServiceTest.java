@@ -11,7 +11,6 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
-import onlydust.com.marketplace.project.domain.view.ProjectContributorsLinkView;
 import onlydust.com.marketplace.project.domain.view.RewardableItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -194,53 +193,6 @@ public class ProjectServiceTest {
 
         // Then
         assertThat(url.toString()).isEqualTo(imageUrl);
-    }
-
-    @Test
-    void should_check_project_lead_permissions_when_getting_project_contributors_given_an_invalid_project_lead() {
-        // Given
-        final UUID projectId = UUID.randomUUID();
-        final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
-        final UUID projectLeadId = UUID.randomUUID();
-        final int pageIndex = 1;
-        final int pageSize = 1;
-        final SortDirection sortDirection = SortDirection.asc;
-
-        // When
-        when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
-        projectService.getContributorsForProjectLeadId(projectId, null, projectLeadId, false, sortBy, sortDirection, pageIndex,
-                pageSize);
-
-        // Then
-        verify(projectStoragePort, times(1)).findContributors(projectId, null, sortBy, sortDirection, pageIndex,
-                pageSize);
-        verify(projectStoragePort, times(0)).findContributorsForProjectLead(projectId, projectLeadId, null, false, sortBy, sortDirection,
-                pageIndex, pageSize);
-    }
-
-    @Test
-    void should_check_project_lead_permissions_when_getting_project_contributors_given_a_valid_project_lead() {
-        // Given
-        final UUID projectId = UUID.randomUUID();
-        final ProjectContributorsLinkView.SortBy sortBy = ProjectContributorsLinkView.SortBy.login;
-        final String login = faker.name().username();
-        final UUID projectLeadId = UUID.randomUUID();
-        final int pageIndex = 1;
-        final int pageSize = 1;
-        final SortDirection sortDirection = SortDirection.desc;
-
-        // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
-        projectService.getContributorsForProjectLeadId(projectId, login, projectLeadId, true, sortBy, sortDirection,
-                pageIndex,
-                pageSize);
-
-        // Then
-        verify(projectStoragePort, times(0)).findContributors(projectId, login, sortBy, sortDirection, pageIndex,
-                pageSize);
-        verify(projectStoragePort, times(1)).findContributorsForProjectLead(projectId, projectLeadId, login, true, sortBy, sortDirection,
-                pageIndex, pageSize);
     }
 
     @Test

@@ -174,29 +174,6 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public ProjectContributorsLinkViewPage getContributors(UUID projectId, String login,
-                                                           ProjectContributorsLinkView.SortBy sortBy,
-                                                           SortDirection sortDirection,
-                                                           Integer pageIndex, Integer pageSize) {
-        return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
-    }
-
-    @Override
-    public ProjectContributorsLinkViewPage getContributorsForProjectLeadId(UUID projectId, String login,
-                                                                           UUID projectLeadId, Boolean showHidden,
-                                                                           ProjectContributorsLinkView.SortBy sortBy,
-                                                                           SortDirection sortDirection,
-                                                                           Integer pageIndex,
-                                                                           Integer pageSize) {
-        if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
-            return projectStoragePort.findContributorsForProjectLead(projectId, projectLeadId, login, showHidden, sortBy, sortDirection, pageIndex,
-                    pageSize);
-        } else {
-            return projectStoragePort.findContributors(projectId, login, sortBy, sortDirection, pageIndex, pageSize);
-        }
-    }
-
-    @Override
     public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                                ContributionType contributionType,
                                                                                                ContributionStatus contributionStatus,

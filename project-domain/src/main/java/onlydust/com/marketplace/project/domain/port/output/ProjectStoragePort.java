@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.*;
 
@@ -22,16 +21,6 @@ public interface ProjectStoragePort {
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                        List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds);
-
-    ProjectContributorsLinkViewPage findContributors(UUID projectId, String login,
-                                                     ProjectContributorsLinkView.SortBy sortBy,
-                                                     SortDirection sortDirection,
-                                                     int pageIndex, int pageSize);
-
-    ProjectContributorsLinkViewPage findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
-                                                                   ProjectContributorsLinkView.SortBy sortBy,
-                                                                   SortDirection sortDirection,
-                                                                   int pageIndex, int pageSize);
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
