@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.slack.mapper;
 
 import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 public interface UserRegisteredOnHackathonEventMapper {

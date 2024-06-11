@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.HackathonsListItemResponse;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -66,6 +67,7 @@ public class HackathonShortReadEntity {
                 .slug(slug)
                 .title(title)
                 .location(location)
+                .status(HackathonStatus.valueOf(status.name()))
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC));
     }

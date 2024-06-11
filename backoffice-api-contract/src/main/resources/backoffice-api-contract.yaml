@@ -4327,10 +4327,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HackathonsTrackResponse'
-        registeredUsers:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserLinkResponse'
 
     UpdateTracksRequest:
       type: object

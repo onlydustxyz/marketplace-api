@@ -1,13 +1,9 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.view.HackathonDetailsView;
-import onlydust.com.marketplace.project.domain.view.HackathonShortView;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public interface HackathonStoragePort {

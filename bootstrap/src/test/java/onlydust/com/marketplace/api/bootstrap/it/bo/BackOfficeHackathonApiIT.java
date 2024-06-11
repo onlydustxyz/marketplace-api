@@ -285,95 +285,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .exchange()
                 // Then
                 .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.id").isEqualTo(hackathonId1.getValue())
-                .json("""
-                        {
-                          "slug": "hackathon-2021-updated",
-                          "status": "PUBLISHED",
-                          "title": "Hackathon 2021 updated",
-                          "subtitle": "subtitle updated",
-                          "description": "My hackathon description",
-                          "location": "Paris",
-                          "totalBudget": "$1.000.000",
-                          "startDate": "2024-04-19T11:00:00Z",
-                          "endDate": "2024-04-22T13:00:00Z",
-                          "links": [
-                            {
-                              "url": "https://www.google.com",
-                              "value": "Google"
-                            },
-                            {
-                              "url": "https://www.facebook.com",
-                              "value": "Facebook"
-                            }
-                          ],
-                          "sponsors": [
-                            {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                            },
-                            {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "url": null,
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                            }
-                          ],
-                          "tracks": [
-                            {
-                              "name": "First track",
-                              "subtitle": "First track subtitle",
-                              "description": "First track description",
-                              "iconSlug": "icon-1",
-                              "projects": [
-                                {
-                                  "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
-                                  "slug": "cairo-foundry",
-                                  "name": "Cairo foundry",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
-                                  "slug": "cairo-streams",
-                                  "name": "Cairo streams",
-                                  "logoUrl": null
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Second track",
-                              "subtitle": "Second track subtitle",
-                              "description": "Second track description",
-                              "iconSlug": "icon-2",
-                              "projects": [
-                                {
-                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
-                                  "slug": "red-bull",
-                                  "name": "Red bull",
-                                  "logoUrl": "https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A"
-                                },
-                                {
-                                  "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
-                                  "slug": "cairo-streams",
-                                  "name": "Cairo streams",
-                                  "logoUrl": null
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Third track",
-                              "subtitle": "Third track subtitle",
-                              "description": "Third track description",
-                              "iconSlug": "icon-3",
-                              "projects": []
-                            }
-                          ]
-                        }
-                        """);
+                .isEqualTo(204);
     }
 
     @Autowired
@@ -477,15 +389,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "iconSlug": "icon-3",
                               "projects": []
                             }
-                          ],
-                          "registeredUsers": [
-                              {
-                                "githubUserId": 16590657,
-                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
-                              }
-                            ]
+                          ]
                         }
                         """);
     }
@@ -538,6 +442,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           ]
                         }
                         """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -595,6 +507,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           ]
                         }
                         """);
+
     }
 
     @Test
@@ -616,9 +529,32 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .exchange()
                 // Then
                 .expectStatus()
+                .isNoContent();
+
+        final HackathonsPageResponse hackathonsPageResponse = client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(HackathonsPageResponse.class)
+                .returnResult()
+                .getResponseBody();
+        hackathonId2.setValue(hackathonsPageResponse.getHackathons().get(1).getId().toString());
+        assertThat(hackathonId2.getValue()).isNotEmpty();
+        assertThat(UUID.fromString(hackathonId2.getValue())).isNotNull();
+        assertThat(hackathonId2.getValue()).isNotEqualTo(hackathonId1.getValue());
+
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId2.getValue())))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.id").value(hackathonId2::setValue)
+                .jsonPath("$.id").isEqualTo(hackathonId2.getValue())
                 .json("""
                         {
                             "slug": "od-hack",
@@ -635,9 +571,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "tracks": []
                         }
                         """);
-        assertThat(hackathonId2.getValue()).isNotEmpty();
-        assertThat(UUID.fromString(hackathonId2.getValue())).isNotNull();
-        assertThat(hackathonId2.getValue()).isNotEqualTo(hackathonId1.getValue());
     }
 
     @Test
@@ -728,24 +661,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .exchange()
                 .expectStatus()
                 // Then
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "slug": "od-hack",
-                          "status": "PUBLISHED",
-                          "title": "OD Hack",
-                          "subtitle": "The best hackathon",
-                          "description": null,
-                          "location": null,
-                          "totalBudget": null,
-                          "startDate": "2024-06-01T00:00:00Z",
-                          "endDate": "2024-06-05T00:00:00Z",
-                          "links": [],
-                          "sponsors": [],
-                          "tracks": []
-                        }
-                        """);
+                .isNoContent();
 
         // And when
         client.get()
