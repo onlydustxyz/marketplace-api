@@ -18,15 +18,16 @@ from rewards r
 group by r.id, rsd.reward_id;
 
 
--- add missing index
+-- add missing indexes
 create index contributions_github_author_id_index
     on indexer_exp.contributions (github_author_id);
 
+create index contributions_pull_request_id_index
+    on indexer_exp.contributions (pull_request_id asc nulls last);
 
--- make public_activity a materialized view
+-- improve public_activity view
 drop view public_activity;
-
-create materialized view public_activity as
+create view recent_public_activity as
 (select distinct on (c.repo_id) cast('PULL_REQUEST' as activity_type) as type,
                                 c.completed_at                        as timestamp,
                                 c.github_author_id                    as pull_request_author_id,
@@ -36,7 +37,8 @@ create materialized view public_activity as
        from (select distinct on (c.pull_request_id) c.*
              from public_contributions c
                       join iam.users u on u.github_user_id = c.github_author_id
-             where c.type = 'PULL_REQUEST'
+             where c.completed_at > now() - interval '1 week'
+               and c.type = 'PULL_REQUEST'
                and c.status = 'COMPLETED'
                and array_length(c.main_file_extensions, 1) > 0) c
        order by c.github_author_id, c.completed_at desc) c
@@ -50,6 +52,7 @@ UNION
                                      r.project_id                            as project_id,
                                      r.id                                    as reward_id
  from public_received_rewards r
+ where r.requested_at > now() - interval '1 week'
  order by r.requestor_id, r.requested_at desc)
 
 UNION
@@ -60,7 +63,7 @@ UNION
                                    r.project_id                            as project_id,
                                    r.id                                    as reward_id
  from public_received_rewards r
- where r.invoice_received_at is not null
+ where r.invoice_received_at > now() - interval '1 week'
  order by r.invoice_id, r.invoice_received_at desc)
 
 UNION
@@ -71,11 +74,6 @@ UNION
         p.id                                     as project_id,
         cast(NULL as uuid)                       as reward_id
  from projects p
+ where p.created_at > now() - interval '1 week'
  order by p.created_at desc)
 ;
-
-
-create unique index public_activity_pk
-    on public_activity (timestamp desc, type, project_id, pull_request_author_id, reward_id);
-
-refresh materialized view public_activity;

@@ -45,7 +45,5 @@ public interface UserFacadePort {
 
     void refreshUserRanksAndStats();
 
-    void refreshPublicActivity();
-
     void historizeUserRanks();
 }

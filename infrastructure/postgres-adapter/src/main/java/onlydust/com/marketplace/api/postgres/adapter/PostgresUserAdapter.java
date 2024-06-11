@@ -305,12 +305,6 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public void refreshPublicActivity() {
-        userRepository.refreshPublicActivity();
-    }
-
-    @Override
-    @Transactional
     public void historizeUserRanks() {
         userRepository.historizeGlobalUsersRanks(new Date());
     }

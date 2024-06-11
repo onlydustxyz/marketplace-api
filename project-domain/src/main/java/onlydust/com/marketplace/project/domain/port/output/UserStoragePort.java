@@ -51,7 +51,5 @@ public interface UserStoragePort {
 
     void refreshUserRanksAndStats();
 
-    void refreshPublicActivity();
-
     void historizeUserRanks();
 }
