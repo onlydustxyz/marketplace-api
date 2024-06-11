@@ -10,14 +10,12 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectContributorsMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -255,46 +253,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         }
 
         this.projectRepository.saveAndFlush(project);
-    }
-
-
-    @Override
-    @Transactional(readOnly = true)
-    public ProjectContributorsLinkViewPage findContributors(UUID projectId, String login,
-                                                            ProjectContributorsLinkView.SortBy sortBy,
-                                                            SortDirection sortDirection,
-                                                            int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
-        final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, login, null, true, sortBy, sortDirection,
-                                pageIndex, pageSize)
-                        .stream().map(ProjectContributorsMapper::mapToDomainWithoutProjectLeadData)
-                        .toList();
-        return ProjectContributorsLinkViewPage.builder()
-                .content(projectContributorsLinkViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public ProjectContributorsLinkViewPage findContributorsForProjectLead(UUID projectId, UUID projectLeadId, String login, Boolean showHidden,
-                                                                          ProjectContributorsLinkView.SortBy sortBy,
-                                                                          SortDirection sortDirection,
-                                                                          int pageIndex, int pageSize) {
-        final Integer count = customContributorRepository.getProjectContributorCount(projectId, login);
-        final List<ProjectContributorsLinkView> projectContributorsLinkViews =
-                customContributorRepository.getProjectContributorViewEntity(projectId, login, projectLeadId, showHidden, sortBy, sortDirection,
-                                pageIndex, pageSize)
-                        .stream().map(ProjectContributorsMapper::mapToDomainWithProjectLeadData)
-                        .toList();
-        return ProjectContributorsLinkViewPage.builder()
-                .content(projectContributorsLinkViews)
-                .totalItemNumber(count)
-                .totalPageNumber(PaginationHelper.calculateTotalNumberOfPage(pageSize, count))
-                .hasHiddenContributors(hiddenContributorRepository.existsByProjectIdAndProjectLeadId(projectId, projectLeadId))
-                .build();
     }
 
     @Override

@@ -70,6 +70,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final BudgetStatsReadRepository budgetStatsReadRepository;
+    private final ProjectContributorQueryRepository projectContributorQueryRepository;
 
     @Override
     public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex,
@@ -350,4 +351,50 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 ResponseEntity.ok(rewardsPageResponse);
     }
 
+    @Override
+    public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId,
+                                                                           Integer pageIndex,
+                                                                           Integer pageSize,
+                                                                           String login,
+                                                                           ContributorsPageSortBy sort,
+                                                                           SortDirection direction,
+                                                                           Boolean showHidden) {
+        final int sanitizePageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+        final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(projectId, authenticatedUser.get().getId());
+        final var sortBy = switch (sort) {
+            case LOGIN -> "login";
+            case CONTRIBUTION_COUNT -> "contribution_count";
+            case REWARD_COUNT -> "reward_count";
+            case EARNED -> "earned";
+            case TO_REWARD_COUNT -> "to_reward_count";
+        };
+        final var sortDirection = isNull(direction) ? Sort.Direction.ASC : switch (direction) {
+            case ASC -> Sort.Direction.ASC;
+            case DESC -> Sort.Direction.DESC;
+        };
+        final var pageable = PageRequest.of(sanitizePageIndex, sanitizePageSize,
+                Sort.by(new Sort.Order(sortDirection, sortBy),
+                        new Sort.Order(Sort.Direction.ASC, "login")));
+
+        final var contributors = projectContributorQueryRepository.findProjectContributors(projectId,
+                login,
+                authenticatedUser.map(User::getId).orElse(null),
+                showHidden,
+                pageable);
+        final var hasHiddenContributors = callerIsLead && projectContributorQueryRepository.hasHiddenContributors(projectId);
+
+        final var response = new ContributorsPageResponse()
+                .contributors(contributors.stream().map(c -> c.toDto(callerIsLead)).toList())
+                .hasHiddenContributors(hasHiddenContributors)
+                .totalPageNumber(contributors.getTotalPages())
+                .totalItemNumber((int) contributors.getTotalElements())
+                .hasMore(hasMore(pageIndex, contributors.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, contributors.getTotalPages()));
+
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
 }

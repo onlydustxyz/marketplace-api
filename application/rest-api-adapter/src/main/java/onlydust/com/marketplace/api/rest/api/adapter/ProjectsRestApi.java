@@ -31,8 +31,6 @@ import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectBudgetMapper.mapProjectBudgetsViewToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapProjectContributorsLinkViewPageToResponse;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectContributorsMapper.mapSortBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapCreateProjectCommandToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapUpdateProjectCommandToDomain;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
@@ -90,33 +88,6 @@ public class ProjectsRestApi implements ProjectsApi {
         final UploadImageResponse response = new UploadImageResponse();
         response.url(imageUrl.toString());
         return ResponseEntity.ok(response);
-    }
-
-    @Override
-    public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId,
-                                                                           Integer pageIndex,
-                                                                           Integer pageSize,
-                                                                           String login,
-                                                                           String sort,
-                                                                           String direction,
-                                                                           Boolean showHidden) {
-
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final ProjectContributorsLinkView.SortBy sortBy = mapSortBy(sort);
-        final var projectContributorsLinkViewPage =
-                authenticatedAppUserService.tryGetAuthenticatedUser()
-                        .map(user -> projectFacadePort.getContributorsForProjectLeadId(projectId, login, user.getId(), showHidden,
-                                sortBy, SortDirectionMapper.requestToDomain(direction),
-                                pageIndex, sanitizedPageSize))
-                        .orElseGet(() -> projectFacadePort.getContributors(projectId, login,
-                                sortBy, SortDirectionMapper.requestToDomain(direction),
-                                pageIndex, sanitizedPageSize));
-        final ContributorsPageResponse contributorsPageResponse =
-                mapProjectContributorsLinkViewPageToResponse(projectContributorsLinkViewPage,
-                        pageIndex);
-        return contributorsPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(contributorsPageResponse) :
-                ResponseEntity.ok(contributorsPageResponse);
     }
 
     @Override
@@ -229,12 +200,12 @@ public class ProjectsRestApi implements ProjectsApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
             contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
-            !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
+                !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
             contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }

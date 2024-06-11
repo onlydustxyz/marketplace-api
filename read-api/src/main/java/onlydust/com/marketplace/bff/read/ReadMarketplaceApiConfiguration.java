@@ -79,7 +79,8 @@ public class ReadMarketplaceApiConfiguration {
                                                                          final ProjectsPageRepository projectsPageRepository,
                                                                          final ProjectsPageFiltersRepository projectsPageFiltersRepository,
                                                                          final RewardDetailsReadRepository rewardDetailsReadRepository,
-                                                                         final BudgetStatsReadRepository budgetStatsReadRepository) {
+                                                                         final BudgetStatsReadRepository budgetStatsReadRepository,
+                                                                         final ProjectContributorQueryRepository projectContributorQueryRepository) {
         return new ReadProjectsApiPostgresAdapter(authenticatedAppUserService,
                 permissionService,
                 githubIssueReadRepository,
@@ -92,7 +93,8 @@ public class ReadMarketplaceApiConfiguration {
                 projectsPageRepository,
                 projectsPageFiltersRepository,
                 rewardDetailsReadRepository,
-                budgetStatsReadRepository);
+                budgetStatsReadRepository,
+                projectContributorQueryRepository);
     }
 
     @Bean

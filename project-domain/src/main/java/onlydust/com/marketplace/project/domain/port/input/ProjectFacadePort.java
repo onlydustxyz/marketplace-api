@@ -19,19 +19,6 @@ public interface ProjectFacadePort {
 
     URL saveLogoImage(InputStream imageInputStream);
 
-    ProjectContributorsLinkViewPage getContributors(UUID projectId, String login,
-                                                    ProjectContributorsLinkView.SortBy sortBy,
-                                                    SortDirection sortDirection,
-                                                    Integer pageIndex,
-                                                    Integer pageSize);
-
-    ProjectContributorsLinkViewPage getContributorsForProjectLeadId(UUID projectId, String login,
-                                                                    UUID projectLeadId, Boolean showHidden,
-                                                                    ProjectContributorsLinkView.SortBy sortBy,
-                                                                    SortDirection sortDirection,
-                                                                    Integer pageIndex,
-                                                                    Integer pageSize);
-
     Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
                                                                                         ContributionType contributionType,
                                                                                         ContributionStatus contributionStatus,

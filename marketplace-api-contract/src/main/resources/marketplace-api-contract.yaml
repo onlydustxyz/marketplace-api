@@ -1556,7 +1556,7 @@ paths:
         - { }
         - bearerAuth: [ ]
       tags:
-        - Projects
+        - ReadProjects
       summary: Get all project contributors
       operationId: getProjectContributors
       description: |
@@ -1576,20 +1576,11 @@ paths:
           name: sort
           description: Sort order
           schema:
-            type: string
-            enum:
-              - LOGIN
-              - CONTRIBUTION_COUNT
-              - REWARD_COUNT
-              - EARNED
-              - TO_REWARD_COUNT
+            $ref: '#/components/schemas/ContributorsPageSortBy'
         - in: query
           name: direction
           schema:
-            type: string
-            enum:
-              - ASC
-              - DESC
+            $ref: '#/components/schemas/SortDirection'
         - in: query
           name: pageIndex
           required: true
@@ -4605,6 +4596,15 @@ components:
             isRegistered:
               type: boolean
               description: True if the user is registered on OnlyDust
+
+    ContributorsPageSortBy:
+      type: string
+      enum:
+        - LOGIN
+        - CONTRIBUTION_COUNT
+        - REWARD_COUNT
+        - EARNED
+        - TO_REWARD_COUNT
 
     ContributorsPageResponse:
       allOf:
