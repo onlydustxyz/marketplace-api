@@ -133,6 +133,12 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
+    public void refreshPublicActivity() {
+        userStoragePort.refreshPublicActivity();
+    }
+
+    @Override
+    @Transactional
     public void historizeUserRanks() {
         userStoragePort.historizeUserRanks();
     }

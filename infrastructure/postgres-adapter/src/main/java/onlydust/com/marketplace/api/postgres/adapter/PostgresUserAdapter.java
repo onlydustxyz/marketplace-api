@@ -177,7 +177,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                                                   " %s and user %d", projectId, githubUserId)));
+                        " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
@@ -196,7 +196,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
                             throw OnlyDustException.badRequest(format("Application already exists for project %s " +
-                                                                      "and user %s", projectId, userId));
+                                    "and user %s", projectId, userId));
                         },
                         () -> applicationRepository.saveAndFlush(ApplicationEntity.builder()
                                 .applicantId(userId)
@@ -301,6 +301,12 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void refreshUserRanksAndStats() {
         userRepository.refreshUsersRanksAndStats();
+    }
+
+    @Override
+    @Transactional
+    public void refreshPublicActivity() {
+        userRepository.refreshPublicActivity();
     }
 
     @Override

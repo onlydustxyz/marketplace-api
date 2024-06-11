@@ -30,6 +30,7 @@ application:
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
     send-emails: 60000 # 1 minute
     refresh-user-ranks: 300000 # 5 minutes
+    refresh-public-activity: 60000 # 1 minute
     historize-user-ranks-cron-expression: "0 0 0 * * *" # every day at midnight
     process-boosted-rewards-cron-expression: ${NODE_GUARDIANS_PROCESS_BOOSTED_REWARDS_CRON_EXPRESSION}
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}

@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -44,6 +44,8 @@ public interface UserFacadePort {
     void updateGithubProfile(User authenticatedUser);
 
     void refreshUserRanksAndStats();
+
+    void refreshPublicActivity();
 
     void historizeUserRanks();
 }

@@ -116,6 +116,12 @@ public class JobScheduler {
         userFacadePort.refreshUserRanksAndStats();
     }
 
+    @Scheduled(fixedDelayString = "${application.cron.refresh-public-activity}")
+    public void refreshPublicActivity() {
+        LOGGER.info("Refreshing public activity");
+        userFacadePort.refreshPublicActivity();
+    }
+
     @Scheduled(cron = "${application.cron.historize-user-ranks-cron-expression}")
     public void historizeUserRanks() {
         LOGGER.info("Historizing user ranks");
