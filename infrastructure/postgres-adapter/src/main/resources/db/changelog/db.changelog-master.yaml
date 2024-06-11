@@ -353,3 +353,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000262_create_project_similarities_view.sql
   - include:
       file: db/changelog/changelogs/00000262_activity_view.sql
+  - include:
+      file: db/changelog/changelogs/00000263_auto_technical_columns_in_db.sql
