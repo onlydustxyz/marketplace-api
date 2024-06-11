@@ -241,6 +241,12 @@ public class PostgresConfiguration {
         return new PostgresOutboxAdapter<>(trackingEventRepository);
     }
 
+
+    @Bean
+    public PostgresOutboxAdapter<IndexingEventEntity> indexingEventsOutbox(final IndexingEventRepository indexingEventRepository) {
+        return new PostgresOutboxAdapter<>(indexingEventRepository);
+    }
+
     @Bean
     public PostgresOutboxAdapter<BillingProfileVerificationEventEntity> billingProfileVerificationOutbox(final BillingProfileVerificationEventRepository billingProfileVerificationEventRepository) {
         return new PostgresOutboxAdapter<>(billingProfileVerificationEventRepository);
