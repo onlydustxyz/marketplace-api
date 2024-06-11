@@ -203,6 +203,10 @@
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.kernel</groupId>
+            <artifactId>marketplace-kernel</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>

@@ -127,7 +127,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String USERS_GET_CONTRIBUTIONS = "/api/v2/users/%s/contributions";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
-    protected static final String EVENT_ON_CONTRIBUTIONS_CHANGE_POST = "/api/v1/events/on-contributions-change";
     protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
     protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";

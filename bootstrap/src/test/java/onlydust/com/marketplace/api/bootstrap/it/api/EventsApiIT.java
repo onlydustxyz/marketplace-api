@@ -6,6 +6,9 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgno
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.event.OnNewContribution;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
@@ -13,10 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TagProject
 public class EventsApiIT extends AbstractMarketplaceApiIT {
@@ -56,6 +59,10 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     CustomIgnoredContributionsRepository customIgnoredContributionsRepository;
     @Autowired
     PostgresProjectAdapter projectStoragePort;
+    @Autowired
+    IndexingEventRepository indexingEventRepository;
+    @Autowired
+    OutboxConsumerJob indexingEventsOutboxJob;
 
     @Test
     public void should_refresh_ignored_contributions_on_contributions_change_event() {
@@ -67,20 +74,12 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
+        indexingEventRepository.saveEvent(OnNewContribution.builder()
+                .repoIds(Set.of(repo1))
+                .build());
+
         // When
-        client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
-                .header("Api-Key", API_KEY)
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "repoIds": [86943508]
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
+        indexingEventsOutboxJob.run();
 
         // Then
         // @formatter:off
@@ -120,20 +119,12 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
+        indexingEventRepository.saveEvent(OnNewContribution.builder()
+                .repoIds(Set.of(repo1, repo2))
+                .build());
+
         // When
-        client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
-                .header("Api-Key", API_KEY)
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "repoIds": [86943508, 602953043]
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
+        indexingEventsOutboxJob.run();
 
         // Then
         // @formatter:off
@@ -171,41 +162,16 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
         // For now, nothing is ignored
         assertIgnored(projectId);
 
+        indexingEventRepository.saveEvent(OnNewContribution.builder()
+                .repoIds(Set.of(repo1, repo2))
+                .build());
+
         // When
-        client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
-                .header("Api-Key", API_KEY)
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "repoIds": [86943508, 602953043]
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .is2xxSuccessful();
+        indexingEventsOutboxJob.run();
 
         // Then
         assertIgnored(projectId);
     }
-
-    @Test
-    public void should_return_401_when_api_key_is_missing() {
-        client.post()
-                .uri(getApiURI(EVENT_ON_CONTRIBUTIONS_CHANGE_POST))
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "repoIds": [1, 2, 3]
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isUnauthorized();
-    }
-
 
     private UUID createProject(ProjectRewardSettings rewardSettings) {
         final UUID projectId = UUID.randomUUID();
