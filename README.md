@@ -2,6 +2,25 @@
 
 ## Development
 
+### Credentials
+
+In order to be able to download dependencies from the GitHub Maven repository, you need to provide your GitHub username and a personal access token.
+Create a file named `settings.xml` in the `~/.m2` directory with the following content:
+
+```xml'
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>YOUR_GITHUB_USERNAME</username>
+            <password>YOUR_GITHUB_TOKEN</password>
+        </server>
+    </servers>
+</settings>
+```
+
 ### API contracts
 
 We follow a design-first approach.
