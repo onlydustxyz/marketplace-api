@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.posthog.processors;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
 
-import java.util.UUID;
-
 public class PullRequestCreatedEventReader implements EventReader<OnPullRequestCreatedTrackingEvent> {
     @Override
     public void addProperties(final OnPullRequestCreatedTrackingEvent event, final ObjectNode properties) {
@@ -21,7 +19,7 @@ public class PullRequestCreatedEventReader implements EventReader<OnPullRequestC
 
     @Override
     public Object distinctId(OnPullRequestCreatedTrackingEvent event) {
-        return UUID.randomUUID();
+        return event.authorUserId();
     }
 
     @Override

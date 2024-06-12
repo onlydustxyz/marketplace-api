@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.posthog.processors;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
 
-import java.util.UUID;
-
 public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssueAssignedTrackingEvent> {
     @Override
     public void addProperties(final OnGithubIssueAssignedTrackingEvent event, final ObjectNode properties) {
@@ -22,7 +20,7 @@ public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssue
 
     @Override
     public Object distinctId(OnGithubIssueAssignedTrackingEvent event) {
-        return UUID.randomUUID();
+        return event.assigneeUserId();
     }
 
     @Override
