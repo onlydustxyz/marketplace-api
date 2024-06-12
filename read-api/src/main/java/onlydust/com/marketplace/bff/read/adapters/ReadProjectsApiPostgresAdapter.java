@@ -31,6 +31,7 @@ import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -364,19 +365,18 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(projectId, authenticatedUser.get().getId());
         final var sortBy = switch (sort) {
-            case LOGIN -> "login";
-            case CONTRIBUTION_COUNT -> "contribution_count";
-            case REWARD_COUNT -> "reward_count";
-            case EARNED -> "earned";
-            case TO_REWARD_COUNT -> "to_reward_count";
+            case LOGIN -> "(login)";
+            case CONTRIBUTION_COUNT -> "(contribution_count)";
+            case REWARD_COUNT -> "(reward_count)";
+            case EARNED -> "(earned)";
+            case TO_REWARD_COUNT -> "(to_reward_count)";
         };
-        final var sortDirection = isNull(direction) ? Sort.Direction.ASC : switch (direction) {
+        final var sortDirection = switch (direction) {
             case ASC -> Sort.Direction.ASC;
             case DESC -> Sort.Direction.DESC;
         };
         final var pageable = PageRequest.of(sanitizePageIndex, sanitizePageSize,
-                Sort.by(new Sort.Order(sortDirection, sortBy),
-                        new Sort.Order(Sort.Direction.ASC, "login")));
+                JpaSort.unsafe(sortDirection, sortBy).andUnsafe(Sort.Direction.ASC, "(login)"));
 
         final var contributors = projectContributorQueryRepository.findProjectContributors(projectId,
                 login,
