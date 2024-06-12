@@ -22,7 +22,7 @@ import java.time.ZonedDateTime;
 public class JobScheduler {
     private final OutboxConsumerJob indexerOutboxJob;
     private final OutboxConsumerJob trackingOutboxJob;
-    private final OutboxConsumerJob indexingEventOutboxJob;
+    private final OutboxConsumerJob indexingEventsOutboxJob;
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
@@ -51,7 +51,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.indexing-event-job-delay}")
     public void processPendingIndexingEvents() {
         LOGGER.info("Processing indexing events");
-        indexingEventOutboxJob.run();
+        indexingEventsOutboxJob.run();
     }
 
     @Scheduled(fixedDelayString = "${application.cron.update-projects-ranking}")
