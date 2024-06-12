@@ -180,10 +180,11 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter) {
-        return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter));
+    public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter,
+                                                 final UserStoragePort userStoragePort) {
+        return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter, userStoragePort));
     }
-    
+
     @Bean
     public OutboxConsumer contributionRefresher(final ContributionObserverPort contributionObserverPort) {
         return new RetriedOutboxConsumer(new ContributionRefresher(contributionObserverPort));

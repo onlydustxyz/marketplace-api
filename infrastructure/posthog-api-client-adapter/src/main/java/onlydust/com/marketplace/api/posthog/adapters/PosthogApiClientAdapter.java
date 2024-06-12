@@ -7,11 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.TrackingRewardCreated;
 import onlydust.com.marketplace.api.posthog.client.PosthogHttpClient;
 import onlydust.com.marketplace.api.posthog.dto.EventDTO;
-import onlydust.com.marketplace.api.posthog.processors.EventReader;
-import onlydust.com.marketplace.api.posthog.processors.TrackingRewardCreatedEventReader;
-import onlydust.com.marketplace.api.posthog.processors.UserSignedUpEventReader;
+import onlydust.com.marketplace.api.posthog.processors.*;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 
@@ -30,6 +31,15 @@ public class PosthogApiClientAdapter implements TrackingEventPublisher {
 
         else if (event instanceof TrackingRewardCreated rewardCreated)
             publish(new TrackingRewardCreatedEventReader(), rewardCreated);
+
+        else if (event instanceof OnGithubIssueAssignedTrackingEvent onGithubIssueAssigned)
+            publish(new GithubIssueAssignedEventReader(), onGithubIssueAssigned);
+
+        else if (event instanceof OnPullRequestCreatedTrackingEvent onPullRequestCreated)
+            publish(new PullRequestCreatedEventReader(), onPullRequestCreated);
+
+        else if (event instanceof OnPullRequestMergedTrackingEvent onPullRequestMerged)
+            publish(new PullRequestMergedEventReader(), onPullRequestMerged);
 
         else
             LOGGER.warn("Event type {} not handle by Posthog event tracking consumer", event.getClass());
