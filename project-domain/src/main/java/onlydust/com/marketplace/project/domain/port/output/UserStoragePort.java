@@ -2,12 +2,12 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.time.ZonedDateTime;
 import java.util.*;

@@ -1,33 +1,98 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
 
 
 public class ActivityApiIT extends AbstractMarketplaceApiIT {
 
 
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+
+    @AfterAll
+    static void tearDown() throws IOException, InterruptedException {
+        restoreIndexerDump();
+    }
+
     @Test
     void should_return_server_starting_date() {
         // Given
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("""
+                        UPDATE indexer_exp.contributions c
+                        SET completed_at = now() - CAST(subquery.row_number || ' minutes' as interval)
+                        FROM (
+                            SELECT public_contributions.id, ROW_NUMBER() OVER(ORDER BY completed_at DESC NULLS LAST, pull_request_id DESC NULLS LAST, github_user_id ASC NULLS LAST) as row_number
+                            FROM public_contributions
+                                JOIN iam.users u on u.github_user_id = github_author_id
+                            WHERE type = 'PULL_REQUEST'
+                            ORDER BY completed_at DESC NULLS LAST, pull_request_id DESC NULLS LAST, github_user_id ASC NULLS LAST
+                            LIMIT 2000) as subquery
+                        WHERE c.id = subquery.id
+                        """)
+                .executeUpdate();
+        em.createNativeQuery("""
+                        UPDATE rewards r
+                        SET requested_at = now() - CAST(subquery.row_number || ' minutes' as interval) - interval '5 second'
+                        FROM (
+                            SELECT id, ROW_NUMBER() OVER(ORDER BY requested_at DESC NULLS LAST) as row_number
+                            FROM rewards
+                            ORDER BY requested_at DESC NULLS LAST
+                            LIMIT 2000) as subquery
+                        WHERE r.id = subquery.id
+                        """)
+                .executeUpdate();
+        em.createNativeQuery("""
+                        UPDATE accounting.reward_status_data rsd
+                        SET invoice_received_at = now() - CAST(subquery.row_number || ' minutes' as interval) - interval '10 second'
+                        FROM (
+                            SELECT reward_id, ROW_NUMBER() OVER(ORDER BY invoice_received_at DESC NULLS LAST) as row_number
+                            FROM accounting.reward_status_data
+                            ORDER BY invoice_received_at DESC NULLS LAST
+                            LIMIT 2000) as subquery
+                        WHERE rsd.reward_id = subquery.reward_id
+                        """)
+                .executeUpdate();
+        em.createNativeQuery("""
+                        UPDATE projects p
+                        SET created_at = now() - CAST(subquery.row_number || ' minutes' as interval) - interval '15 second'
+                        FROM (
+                            SELECT id, ROW_NUMBER() OVER(ORDER BY created_at DESC NULLS LAST) as row_number
+                            FROM projects
+                            ORDER BY created_at DESC NULLS LAST
+                            LIMIT 2000) as subquery
+                        WHERE p.id = subquery.id
+                        """)
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
 
         // When
         client.get()
-                .uri("/api/v1/public-activity")
+                .uri(getApiURI("/api/v1/public-activity", "pageSize", "5"))
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.activities[?(@.timestamp.length() == 0)]").doesNotExist()
                 .json("""
                         {
                           "totalPageNumber": 18,
-                          "totalItemNumber": 89,
+                          "totalItemNumber": 90,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "activities": [
                             {
                               "type": "PULL_REQUEST",
-                              "timestamp": "2023-12-04T14:12:51Z",
                               "pullRequest": {
                                 "project": {
                                   "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
@@ -46,28 +111,7 @@ public class ActivityApiIT extends AbstractMarketplaceApiIT {
                               "projectCreated": null
                             },
                             {
-                              "type": "PULL_REQUEST",
-                              "timestamp": "2023-11-29T16:20:44Z",
-                              "pullRequest": {
-                                "project": {
-                                  "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                  "slug": "bretzel",
-                                  "name": "Bretzel",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                                },
-                                "author": {
-                                  "githubUserId": 8642470,
-                                  "login": "gregcha",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp"
-                                }
-                              },
-                              "rewardCreated": null,
-                              "rewardClaimed": null,
-                              "projectCreated": null
-                            },
-                            {
                               "type": "REWARD_CREATED",
-                              "timestamp": "2023-10-08T10:09:31.842Z",
                               "pullRequest": null,
                               "rewardCreated": {
                                 "project": {
@@ -96,8 +140,36 @@ public class ActivityApiIT extends AbstractMarketplaceApiIT {
                               "projectCreated": null
                             },
                             {
+                              "type": "REWARD_CLAIMED",
+                              "pullRequest": null,
+                              "rewardCreated": null,
+                              "rewardClaimed": {
+                                "project": {
+                                  "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                                  "slug": "aldbaran-du-taureau",
+                                  "name": "Aldébaran du Taureau",
+                                  "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed"
+                                },
+                                "recipient": {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                },
+                                "amount": {
+                                  "amount": 1000,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
+                                  }
+                                }
+                              },
+                              "projectCreated": null
+                            },
+                            {
                               "type": "PROJECT_CREATED",
-                              "timestamp": "2023-10-04T10:40:58.413Z",
                               "pullRequest": null,
                               "rewardCreated": null,
                               "rewardClaimed": null,
@@ -117,7 +189,6 @@ public class ActivityApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "type": "PROJECT_CREATED",
-                              "timestamp": "2023-09-28T13:57:48.257Z",
                               "pullRequest": null,
                               "rewardCreated": null,
                               "rewardClaimed": null,

@@ -19,11 +19,11 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Value
-@Table(name = "public_activity", schema = "public")
+@Table(name = "recent_public_activity", schema = "public")
 @Immutable
 @Accessors(fluent = true)
-@IdClass(ActivityReadEntity.PrimaryKey.class)
-public class ActivityReadEntity {
+@IdClass(RecentPublicActivityReadEntity.PrimaryKey.class)
+public class RecentPublicActivityReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
