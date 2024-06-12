@@ -110,6 +110,7 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.issueId()).isEqualTo(event.id());
             assertThat(capturedTrackingEvent.assigneeGithubId()).isEqualTo(event.assigneeId());
             assertThat(capturedTrackingEvent.assigneeUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
         }
@@ -161,6 +162,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     .id(faker.number().randomNumber())
                     .assigneeId(githubUserId)
                     .labels(Set.of(faker.lorem().word(), faker.lorem().word(), goodFirstIssueLabel, faker.lorem().word()))
+                    .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .assignedAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .build();
 
@@ -182,6 +184,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     .id(faker.number().randomNumber())
                     .assigneeId(githubUserId)
                     .labels(new HashSet<>(faker.lorem().words()))
+                    .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .assignedAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .build();
 

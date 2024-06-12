@@ -31,12 +31,14 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     void should_publish_github_issue_assigned_event() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();
+        final var createdAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final var assignedAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final Long issueId = faker.number().randomNumber();
 
         indexingEventRepository.saveEvent(OnGithubIssueAssigned.builder()
                 .id(issueId)
                 .assigneeId(antho.user().getGithubUserId())
+                .createdAt(createdAt)
                 .assignedAt(assignedAt)
                 .labels(Set.of("documentation", "good first issue"))
                 .build());
@@ -52,6 +54,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.timestamp", equalTo(assignedAt.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))
                 .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['created_at']", equalTo(createdAt.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['assignee_github_id']", equalTo(antho.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['assignee_user_id']", equalTo(antho.user().getId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['is_good_first_issue']", equalTo("true")))

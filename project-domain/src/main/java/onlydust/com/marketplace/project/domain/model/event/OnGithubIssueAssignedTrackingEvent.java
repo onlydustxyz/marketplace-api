@@ -21,6 +21,8 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     UUID assigneeUserId;
     @NonNull
+    ZonedDateTime createdAt;
+    @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
 
@@ -29,6 +31,7 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
                 .assigneeUserId(user.getId())
+                .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
                 .build();
