@@ -12,19 +12,19 @@ import onlydust.com.marketplace.api.posthog.processors.TrackingRewardCreatedEven
 import onlydust.com.marketplace.api.posthog.processors.UserSignedUpEventReader;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
+import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 
 @AllArgsConstructor
 @Slf4j
-public class PosthogApiClientAdapter implements OutboxConsumer {
+public class PosthogApiClientAdapter implements TrackingEventPublisher {
     PosthogProperties posthogProperties;
     PosthogHttpClient posthogHttpClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void process(Event event) {
+    public void publish(Event event) {
         if (event instanceof UserSignedUp userSignedUp)
             publish(new UserSignedUpEventReader(), userSignedUp);
 

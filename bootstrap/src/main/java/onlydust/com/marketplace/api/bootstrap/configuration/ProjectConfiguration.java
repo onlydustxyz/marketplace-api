@@ -23,13 +23,11 @@ import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
-import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
+import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.job.IndexingEventConsumer;
+import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
@@ -171,8 +169,8 @@ public class ProjectConfiguration {
 
     @Bean
     public OutboxConsumerJob trackingOutboxJob(final OutboxPort trackingOutbox,
-                                               final OutboxConsumer webhookTrackingOutboxConsumer) {
-        return new OutboxConsumerJob(trackingOutbox, webhookTrackingOutboxConsumer);
+                                               final OutboxConsumer trackingOutboxConsumer) {
+        return new OutboxConsumerJob(trackingOutbox, trackingOutboxConsumer);
     }
 
     @Bean
@@ -182,13 +180,19 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer webhookTrackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter) {
-        return new RetriedOutboxConsumer(posthogApiClientAdapter);
+    public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter) {
+        return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter));
+    }
+    
+    @Bean
+    public OutboxConsumer contributionRefresher(final ContributionObserverPort contributionObserverPort) {
+        return new RetriedOutboxConsumer(new ContributionRefresher(contributionObserverPort));
     }
 
     @Bean
-    public OutboxConsumer indexingEventsOutboxConsumer(final ContributionObserverPort contributionObserverPort) {
-        return new RetriedOutboxConsumer(new IndexingEventConsumer(contributionObserverPort));
+    public OutboxConsumer indexingEventsOutboxConsumer(final OutboxConsumer contributionRefresher,
+                                                       final OutboxConsumer trackingOutboxConsumer) {
+        return new OutboxConsumerComposite(contributionRefresher, trackingOutboxConsumer);
     }
 
     @Bean
