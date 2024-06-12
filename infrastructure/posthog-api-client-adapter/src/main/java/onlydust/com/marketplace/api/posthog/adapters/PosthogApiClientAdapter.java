@@ -1,68 +1,65 @@
 package onlydust.com.marketplace.api.posthog.adapters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.TrackingRewardCreated;
 import onlydust.com.marketplace.api.posthog.client.PosthogHttpClient;
 import onlydust.com.marketplace.api.posthog.dto.EventDTO;
+import onlydust.com.marketplace.api.posthog.processors.*;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
-
-import java.time.Instant;
-import java.util.Objects;
-import java.util.UUID;
+import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 
 @AllArgsConstructor
 @Slf4j
-public class PosthogApiClientAdapter implements OutboxConsumer {
+public class PosthogApiClientAdapter implements TrackingEventPublisher {
     PosthogProperties posthogProperties;
     PosthogHttpClient posthogHttpClient;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public void process(Event event) {
-        if (event instanceof UserSignedUp userSignedUp) {
-            final ObjectNode objectNode = objectMapper.createObjectNode();
-            objectNode.put("$lib", posthogProperties.getUserAgent());
-            posthogHttpClient.send("/capture/", HttpMethod.POST,
-                    EventDTO.builder()
-                            .apiKey(posthogProperties.getApiKey())
-                            .event("user_signed_up")
-                            .distinctId(userSignedUp.getUserId().toString())
-                            .timestamp(userSignedUp.getSignedUpAt().toInstant().toString())
-                            .properties(objectNode)
-                            .build(),
-                    Void.class);
-        } else if (event instanceof TrackingRewardCreated rewardCreated) {
-            final ObjectNode objectNode = objectMapper.createObjectNode();
-            objectNode.put("amount", rewardCreated.amount().doubleValue());
-            objectNode.put("count_contributions", rewardCreated.contributionsCount());
-            objectNode.put("project_id", rewardCreated.projectId().toString());
-            objectNode.put("sender_id", rewardCreated.senderId().toString());
-            objectNode.put("currency", rewardCreated.currencyCode());
-            objectNode.put("contributions_count", rewardCreated.contributionsCount());
-            objectNode.put("$lib", posthogProperties.getUserAgent());
-            if (Objects.nonNull(rewardCreated.dollarsEquivalent())) {
-                objectNode.put("amount_in_dollars", rewardCreated.dollarsEquivalent().doubleValue());
-            }
-            posthogHttpClient.send("/capture/", HttpMethod.POST,
-                    EventDTO.builder()
-                            .apiKey(posthogProperties.getApiKey())
-                            .distinctId(Objects.isNull(rewardCreated.recipientId()) ? UUID.randomUUID().toString() : rewardCreated.recipientId().toString())
-                            .event("reward_received")
-                            .timestamp(Instant.now().toString())
-                            .properties(objectNode)
-                            .build(),
-                    Void.class
-            );
-        } else {
+    public void publish(Event event) {
+        if (event instanceof UserSignedUp userSignedUp)
+            publish(new UserSignedUpEventReader(), userSignedUp);
+
+        else if (event instanceof TrackingRewardCreated rewardCreated)
+            publish(new TrackingRewardCreatedEventReader(), rewardCreated);
+
+        else if (event instanceof OnGithubIssueAssignedTrackingEvent onGithubIssueAssigned)
+            publish(new GithubIssueAssignedEventReader(), onGithubIssueAssigned);
+
+        else if (event instanceof OnPullRequestCreatedTrackingEvent onPullRequestCreated)
+            publish(new PullRequestCreatedEventReader(), onPullRequestCreated);
+
+        else if (event instanceof OnPullRequestMergedTrackingEvent onPullRequestMerged)
+            publish(new PullRequestMergedEventReader(), onPullRequestMerged);
+
+        else
             LOGGER.warn("Event type {} not handle by Posthog event tracking consumer", event.getClass());
-        }
     }
 
+    private <E extends Event> void publish(EventReader<E> reader, E event) {
+        final var properties = objectMapper.createObjectNode();
+        properties.put("$lib", posthogProperties.getUserAgent());
+        reader.addProperties(event, properties);
+
+        posthogHttpClient.send(
+                "/capture/",
+                HttpMethod.POST,
+                EventDTO.builder()
+                        .apiKey(posthogProperties.getApiKey())
+                        .event(reader.eventType(event))
+                        .distinctId(reader.distinctId(event).toString())
+                        .timestamp(reader.timestamp(event).toString())
+                        .properties(properties)
+                        .build(),
+                Void.class);
+    }
 }
