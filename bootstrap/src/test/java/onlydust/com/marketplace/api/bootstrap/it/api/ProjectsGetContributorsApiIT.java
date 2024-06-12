@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -1531,16 +1533,24 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
 
     @ParameterizedTest
     @CsvSource({
+            ",",
+            ",DESC",
+            ",ASC",
             "LOGIN, DESC",
             "LOGIN, ASC",
+            "LOGIN,",
             "CONTRIBUTION_COUNT, DESC",
             "CONTRIBUTION_COUNT, ASC",
+            "CONTRIBUTION_COUNT,",
             "REWARD_COUNT, DESC",
             "REWARD_COUNT, ASC",
+            "REWARD_COUNT,",
             "EARNED, DESC",
             "EARNED, ASC",
+            "EARNED,",
             "TO_REWARD_COUNT, DESC",
-            "TO_REWARD_COUNT, ASC"
+            "TO_REWARD_COUNT, ASC",
+            "TO_REWARD_COUNT,"
     })
     @Order(10)
     void should_find_project_contributors_with_sorting(String sort, String direction) {
@@ -1548,10 +1558,17 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
+        final var queryParams = new HashMap<>(Map.of("pageIndex", "0", "pageSize", "10000"));
+        if (sort != null) {
+            queryParams.put("sort", sort);
+        }
+        if (direction != null) {
+            queryParams.put("direction", direction);
+        }
+
         // When
         final var contributors = client.get()
-                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
-                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", sort, "direction", direction)))
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId), queryParams))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -1561,10 +1578,11 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .returnResult()
                 .getResponseBody().getContributors();
 
-        final var first = direction.equals("ASC") ? contributors.get(0) : contributors.get(contributors.size() - 1);
-        final var last = direction.equals("ASC") ? contributors.get(contributors.size() - 1) : contributors.get(0);
+        final var first = "DESC".equals(direction) ? contributors.get(contributors.size() - 1) : contributors.get(0);
+        final var last = "DESC".equals(direction) ? contributors.get(0) : contributors.get(contributors.size() - 1);
 
-        switch (sort) {
+        switch (Optional.ofNullable(sort).orElse("")) {
+            default:
             case "LOGIN":
                 assertThat(first.getLogin().compareTo(last.getLogin())).isLessThanOrEqualTo(0);
                 break;

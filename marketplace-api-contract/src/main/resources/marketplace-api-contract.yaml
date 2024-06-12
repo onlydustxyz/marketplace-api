@@ -4581,6 +4581,7 @@ components:
         - REWARD_COUNT
         - EARNED
         - TO_REWARD_COUNT
+      default: LOGIN
 
     ContributorsPageResponse:
       allOf:
@@ -7704,6 +7705,7 @@ components:
       enum:
         - ASC
         - DESC
+      default: ASC
 
     RewardsSort:
       type: string

@@ -371,7 +371,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
             case EARNED -> "(earned)";
             case TO_REWARD_COUNT -> "(to_reward_count)";
         };
-        final var sortDirection = isNull(direction) ? Sort.Direction.ASC : switch (direction) {
+        final var sortDirection = switch (direction) {
             case ASC -> Sort.Direction.ASC;
             case DESC -> Sort.Direction.DESC;
         };
