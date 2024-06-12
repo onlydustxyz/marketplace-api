@@ -16,4 +16,8 @@ public record HackathonTrack(
     public static HackathonTrack of(Hackathon.Track track) {
         return new HackathonTrack(track.name(), track.subtitle(), track.description(), track.iconSlug(), track.projectIds());
     }
+
+    public Hackathon.Track toDomain() {
+        return new Hackathon.Track(this.name, this.subtitle, this.description, this.iconSlug, this.projectIds());
+    }
 }

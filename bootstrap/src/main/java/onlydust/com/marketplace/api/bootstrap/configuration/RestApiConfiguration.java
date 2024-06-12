@@ -77,12 +77,6 @@ public class RestApiConfiguration {
     }
 
     @Bean
-    public HackathonRestApi hackathonsApi(final AuthenticatedAppUserService authenticatedAppUserService,
-                                          final HackathonFacadePort hackathonFacadePort) {
-        return new HackathonRestApi(authenticatedAppUserService, hackathonFacadePort);
-    }
-
-    @Bean
     public CommitteeRestApi committeeRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                              final CommitteeFacadePort committeeFacadePort) {
         return new CommitteeRestApi(authenticatedAppUserService, committeeFacadePort);
