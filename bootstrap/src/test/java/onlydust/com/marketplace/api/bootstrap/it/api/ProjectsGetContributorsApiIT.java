@@ -1,12 +1,15 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
+import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
@@ -15,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
@@ -1523,5 +1527,59 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .json(GET_PROJECTS_CONTRIBUTORS_WITH_MULTI_CURRENCIES_AND_IGNORED_CONTRIBUTIONS);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "LOGIN, DESC",
+            "LOGIN, ASC",
+            "CONTRIBUTION_COUNT, DESC",
+            "CONTRIBUTION_COUNT, ASC",
+            "REWARD_COUNT, DESC",
+            "REWARD_COUNT, ASC",
+            "EARNED, DESC",
+            "EARNED, ASC",
+            "TO_REWARD_COUNT, DESC",
+            "TO_REWARD_COUNT, ASC"
+    })
+    @Order(10)
+    void should_find_project_contributors_with_sorting(String sort, String direction) {
+        // Given
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
+        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+
+        // When
+        final var contributors = client.get()
+                .uri(getApiURI(String.format(PROJECTS_GET_CONTRIBUTORS, projectId),
+                        Map.of("pageIndex", "0", "pageSize", "10000", "sort", sort, "direction", direction)))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ContributorsPageResponse.class)
+                .returnResult()
+                .getResponseBody().getContributors();
+
+        final var first = direction.equals("ASC") ? contributors.get(0) : contributors.get(contributors.size() - 1);
+        final var last = direction.equals("ASC") ? contributors.get(contributors.size() - 1) : contributors.get(0);
+
+        switch (sort) {
+            case "LOGIN":
+                assertThat(first.getLogin().compareTo(last.getLogin())).isLessThanOrEqualTo(0);
+                break;
+            case "CONTRIBUTION_COUNT":
+                assertThat(first.getContributionCount()).isLessThanOrEqualTo(last.getContributionCount());
+                break;
+            case "REWARD_COUNT":
+                assertThat(first.getRewardCount()).isLessThanOrEqualTo(last.getRewardCount());
+                break;
+            case "EARNED":
+                assertThat(first.getEarned().getTotalAmount()).isLessThanOrEqualTo(last.getEarned().getTotalAmount());
+                break;
+            case "TO_REWARD_COUNT":
+                assertThat(first.getContributionToRewardCount()).isLessThanOrEqualTo(last.getContributionToRewardCount());
+                break;
+        }
     }
 }
