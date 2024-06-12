@@ -4327,6 +4327,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HackathonsTrackResponse'
+        registeredUsersCount:
+          type: integer
 
     UpdateTracksRequest:
       type: object

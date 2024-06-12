@@ -69,8 +69,7 @@ public class HackathonDetailsReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     Set<Project> projects;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    List<RegisteredContributorLinkView> registeredUsers;
+    Integer registeredUsersCount;
 
     public record Project(@NonNull UUID id,
                           @NonNull String slug,
@@ -147,6 +146,7 @@ public class HackathonDetailsReadEntity {
                 .status(HackathonStatus.valueOf(this.status.name()))
                 .startDate(ZonedDateTime.ofInstant(this.startDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(this.endDate.toInstant(), ZoneOffset.UTC))
+                .registeredUsersCount(this.registeredUsersCount)
                 .links(isNull(this.links) ? List.of() : this.links.stream().map(link -> new onlydust.com.backoffice.api.contract.model.SimpleLink()
                         .value(link.getValue())
                         .url(link.getUrl())
