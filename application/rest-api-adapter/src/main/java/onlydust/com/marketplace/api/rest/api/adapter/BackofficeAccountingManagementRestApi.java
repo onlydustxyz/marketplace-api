@@ -67,12 +67,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<AccountListResponse> getSponsorAccounts(UUID sponsorId) {
-        final var sponsorAccounts = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
-        return ResponseEntity.ok(new AccountListResponse().accounts(sponsorAccounts.stream().map(BackOfficeMapper::mapAccountToResponse).toList()));
-    }
-
-    @Override
     public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final var page = accountingFacadePort.transactionHistory(

@@ -37,11 +37,20 @@ public class CurrencyReadEntity {
     private String description;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
+    @JoinColumn(name = "id", referencedColumnName = "currencyId", insertable = false, updatable = false)
     LatestUsdQuoteReadEntity latestUsdQuote;
 
     public ShortCurrencyResponse toShortResponse() {
         return new ShortCurrencyResponse()
+                .id(id)
+                .name(name)
+                .code(code)
+                .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
+                .decimals(decimals);
+    }
+
+    public onlydust.com.backoffice.api.contract.model.ShortCurrencyResponse toBoShortResponse() {
+        return new onlydust.com.backoffice.api.contract.model.ShortCurrencyResponse()
                 .id(id)
                 .name(name)
                 .code(code)

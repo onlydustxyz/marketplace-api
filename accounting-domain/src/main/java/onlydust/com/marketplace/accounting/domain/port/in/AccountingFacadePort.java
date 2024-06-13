@@ -46,14 +46,16 @@ public interface AccountingFacadePort {
 
     void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId);
 
-    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
-
     Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
 
+    Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
+
+    // TODO: move to read-api
     List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 
+    // TODO: move to read-api
     Page<HistoricalTransaction> transactionHistory(@NonNull SponsorId sponsorId,
                                                    @NonNull HistoricalTransaction.Filters filters,
                                                    @NonNull Integer pageIndex,

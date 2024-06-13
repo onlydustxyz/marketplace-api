@@ -13,11 +13,14 @@ import java.util.Optional;
 
 public interface InvoiceFacadePort {
 
+    // TODO: move to read-api
     Optional<InvoiceView> find(final @NonNull Invoice.Id id);
 
+    // TODO: move to read-api
     Page<Invoice> findAll(final @NonNull List<Invoice.Id> ids, final @NonNull List<Invoice.Status> statuses,
                           final @NonNull List<Currency.Id> currencyIds, final @NonNull List<BillingProfile.Type> billingProfileTypes,
-                          final @NonNull List<BillingProfile.Id> billingProfileIds, final String search, final @NonNull Integer pageIndex, final @NonNull Integer pageSize);
+                          final @NonNull List<BillingProfile.Id> billingProfileIds, final String search, final @NonNull Integer pageIndex,
+                          final @NonNull Integer pageSize);
 
     void update(@NonNull Invoice.Id id, @NonNull Invoice.Status status, String rejectionReason);
 

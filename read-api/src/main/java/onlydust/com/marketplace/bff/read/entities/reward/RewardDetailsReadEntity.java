@@ -9,7 +9,8 @@ import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.Money;
 import onlydust.com.marketplace.api.contract.model.RewardStatusContract;
 import onlydust.com.marketplace.api.contract.model.ShortCurrencyResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
+import onlydust.com.marketplace.bff.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.kernel.mapper.AmountMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -42,7 +43,7 @@ public class RewardDetailsReadEntity {
     BigDecimal amount;
     @ManyToOne
     @NonNull
-    CurrencyViewEntity currency;
+    CurrencyReadEntity currency;
     Integer contributionCount;
     @NonNull
     Long recipientId;
@@ -54,22 +55,24 @@ public class RewardDetailsReadEntity {
     Long requestorId;
     String requestorLogin;
     String requestorAvatarUrl;
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull
-    RewardStatusViewEntity status;
-    @OneToOne
-    @JoinColumn(name = "id", referencedColumnName = "reward_id")
-    @NonNull
-    RewardStatusDataViewEntity statusData;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull
+    RewardStatusReadEntity status;
+
+    @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull
+    RewardStatusDataReadEntity statusData;
+
+    @ManyToMany
     @JoinTable(
             name = "rewards_receipts",
             schema = "accounting",
             joinColumns = @JoinColumn(name = "reward_id"),
             inverseJoinColumns = @JoinColumn(name = "receipt_id"))
-    Set<ReceiptViewEntity> receipts = Set.of();
+    Set<ReceiptReadEntity> receipts = Set.of();
 
     public ContributorResponse toContributorResponse() {
         return new ContributorResponse()
@@ -100,7 +103,7 @@ public class RewardDetailsReadEntity {
                 .projectId(project.getId())
                 .billingProfileId(billingProfileId)
                 .recipientId(recipientId)
-                .status(status.toDomain())
+                .status(status.status())
                 .build().as(user);
         return switch (output) {
             case PENDING_COMPANY -> RewardStatusContract.PENDING_COMPANY;
