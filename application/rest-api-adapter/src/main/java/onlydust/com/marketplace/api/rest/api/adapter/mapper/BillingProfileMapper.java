@@ -102,6 +102,7 @@ public interface BillingProfileMapper {
                 .taxRate(preview.taxRate())
                 .totalTax(map(preview.totalTax()))
                 .totalAfterTax(map(preview.totalAfterTax()))
+                .totalAfterTaxPerCurrency(preview.totalAfterTaxPerCurrency().stream().map(BillingProfileMapper::map).toList())
                 ;
     }
 
