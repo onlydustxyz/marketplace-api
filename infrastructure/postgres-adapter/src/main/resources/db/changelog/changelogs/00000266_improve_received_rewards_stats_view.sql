@@ -89,7 +89,9 @@ CREATE UNIQUE INDEX received_rewards_stats_per_project_per_user_rpk ON received_
 REFRESH MATERIALIZED VIEW received_rewards_stats_per_project_per_user;
 
 
--- re-create view as-is
+
+-- ##################################################################################################
+-- re-create existing views as-is
 CREATE VIEW users_rank_per_reward_received as
 WITH ranks AS (SELECT u.github_user_id                                               AS github_user_id,
                       rank() OVER (ORDER BY rr.reward_count DESC NULLS LAST)         AS reward_count,
@@ -157,3 +159,57 @@ order by rank
 ;
 CREATE UNIQUE INDEX global_users_ranks_pk ON global_users_ranks (github_user_id);
 REFRESH MATERIALIZED VIEW global_users_ranks;
+
+
+
+-- ##################################################################################################
+-- New RSQL-specific views
+CREATE VIEW united_stats_per_language_per_user AS
+SELECT coalesce(c.contributor_id, r.recipient_id, ranks.contributor_id) as github_user_id,
+       coalesce(c.language_id, r.language_id, ranks.language_id)        as language_id,
+       c.contribution_count,
+       r.reward_count,
+       r.pending_request_reward_count,
+       r.usd_total,
+       r.max_usd,
+       ranks.rank
+FROM contributions_stats_per_language_per_user c
+         FULL JOIN received_rewards_stats_per_language_per_user r
+                   ON r.recipient_id = c.contributor_id AND r.language_id = c.language_id
+         FULL JOIN users_languages_ranks ranks
+                   ON ranks.contributor_id = coalesce(c.contributor_id, r.recipient_id) AND
+                      ranks.language_id = coalesce(c.language_id, r.language_id);
+
+
+
+CREATE VIEW united_stats_per_ecosystem_per_user AS
+SELECT coalesce(c.contributor_id, r.recipient_id, ranks.contributor_id) as github_user_id,
+       coalesce(c.ecosystem_id, r.ecosystem_id, ranks.ecosystem_id)     as ecosystem_id,
+       c.contribution_count,
+       r.reward_count,
+       r.pending_request_reward_count,
+       r.usd_total,
+       r.max_usd,
+       ranks.rank
+FROM contributions_stats_per_ecosystem_per_user c
+         FULL JOIN received_rewards_stats_per_ecosystem_per_user r
+                   ON r.recipient_id = c.contributor_id AND r.ecosystem_id = c.ecosystem_id
+         FULL JOIN users_ecosystems_ranks ranks
+                   ON ranks.contributor_id = coalesce(c.contributor_id, r.recipient_id) AND
+                      ranks.ecosystem_id = coalesce(c.ecosystem_id, r.ecosystem_id);
+
+
+
+CREATE VIEW united_stats_per_user AS
+SELECT coalesce(c.contributor_id, r.recipient_id, ranks.github_user_id) as github_user_id,
+       c.contribution_count,
+       r.reward_count,
+       r.pending_request_reward_count,
+       r.usd_total,
+       r.max_usd,
+       ranks.rank
+FROM contributions_stats_per_user c
+         FULL JOIN received_rewards_stats_per_user r
+                   ON r.recipient_id = c.contributor_id
+         FULL JOIN global_users_ranks ranks
+                   ON ranks.github_user_id = coalesce(c.contributor_id, r.recipient_id);

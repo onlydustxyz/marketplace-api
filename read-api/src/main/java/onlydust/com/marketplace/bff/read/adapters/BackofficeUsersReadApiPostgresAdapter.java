@@ -59,24 +59,11 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
     @Override
     public ResponseEntity<UserSearchPage> searchUsers(Integer pageIndex, Integer pageSize, String query) {
         final Map<String, String> propertyMapping = new HashMap<>();
-        // Contributions
-        propertyMapping.put("globalContributions", "contributionsStats");
-        propertyMapping.put("perLanguageContributions", "contributionsStatsPerLanguages");
-        propertyMapping.put("perLanguageContributions.name", "contributionsStatsPerLanguages.language.name");
-        propertyMapping.put("perEcosystemContributions", "contributionsStatsPerEcosystems");
-        propertyMapping.put("perEcosystemContributions.name", "contributionsStatsPerEcosystems.language.name");
-        // Received rewards
-        propertyMapping.put("globalReceivedRewards", "receivedRewardsStats");
-        propertyMapping.put("perLanguageReceivedRewards", "receivedRewardsStatsPerLanguages");
-        propertyMapping.put("perLanguageReceivedRewards.name", "receivedRewardsStatsPerLanguages.language.name");
-        propertyMapping.put("perEcosystemReceivedRewards", "receivedRewardsStatsPerEcosystems");
-        propertyMapping.put("perEcosystemReceivedRewards.name", "receivedRewardsStatsPerEcosystems.language.name");
-        // Ranking
-        propertyMapping.put("globalRank", "globalUsersRank");
-        propertyMapping.put("perLanguageRank", "perLanguageUsersRanks");
-        propertyMapping.put("perLanguageRank.name", "perLanguageUsersRanks.language.name");
-        propertyMapping.put("perEcosystemRank", "perEcosystemUsersRanks");
-        propertyMapping.put("perEcosystemRank.name", "perEcosystemUsersRanks.language.name");
+        propertyMapping.put("language.id", "language.language.id");
+        propertyMapping.put("language.name", "language.language.name");
+        propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
+        propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
+
         final var page = allUserRSQLRepository.findAll(RSQLJPASupport.toSpecification(query, propertyMapping), PageRequest.of(pageIndex, pageSize));
 
         final var response = new UserSearchPage()

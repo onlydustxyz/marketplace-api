@@ -3136,66 +3136,30 @@ components:
         signedUpAt:
           type: string
           format: date-time
-        globalContributions:
-          $ref: '#/components/schemas/UserSearchContributions'
-        perLanguageContributions:
+        global:
+          $ref: '#/components/schemas/UserSearchStats'
+        language:
           type: array
-          description: Number of contributions the user has made to the platform per language
           items:
             type: object
             allOf:
               - $ref: '#/components/schemas/UserSearchLanguage'
-              - $ref: '#/components/schemas/UserSearchContributions'
-        perEcosystemContributions:
+              - $ref: '#/components/schemas/UserSearchStats'
+        ecosystem:
           type: array
-          description: Number of contributions the user has made to the platform per ecosystem
           items:
             type: object
             allOf:
               - $ref: '#/components/schemas/UserSearchEcosystem'
-              - $ref: '#/components/schemas/UserSearchContributions'
-        globalReceivedRewards:
-          $ref: '#/components/schemas/UserSearchReceivedRewards'
-        perLanguageReceivedRewards:
-          type: array
-          description: Number of contributions the user has made to the platform per language
-          items:
-            type: object
-            allOf:
-              - $ref: '#/components/schemas/UserSearchLanguage'
-              - $ref: '#/components/schemas/UserSearchReceivedRewards'
-        perEcosystemReceivedRewards:
-          type: array
-          description: Number of contributions the user has made to the platform per ecosystem
-          items:
-            type: object
-            allOf:
-              - $ref: '#/components/schemas/UserSearchEcosystem'
-              - $ref: '#/components/schemas/UserSearchReceivedRewards'
-        globalRank:
-          $ref: '#/components/schemas/UserSearchRanking'
-        perLanguageRank:
-          type: array
-          description: User's rank per language
-          items:
-            type: object
-            allOf:
-              - $ref: '#/components/schemas/UserSearchLanguage'
-              - $ref: '#/components/schemas/UserSearchRanking'
-        perEcosystemRank:
-          type: array
-          description: User's rank per ecosystem
-          items:
-            type: object
-            allOf:
-              - $ref: '#/components/schemas/UserSearchEcosystem'
-              - $ref: '#/components/schemas/UserSearchRanking'
+              - $ref: '#/components/schemas/UserSearchStats'
 
     UserSearchLanguage:
       type: object
       required:
         - name
       properties:
+        id:
+          $ref: '#/components/schemas/LanguageId'
         name:
           type: string
           description: Language name
@@ -3205,33 +3169,24 @@ components:
       required:
         - name
       properties:
+        id:
+          $ref: '#/components/schemas/EcosystemId'
         name:
           type: string
           description: Ecosystem name
 
-    UserSearchContributions:
+    UserSearchStats:
       type: object
-      required:
-        - count
       properties:
-        count:
+        contributionCount:
           type: integer
           description: Number of contributions the user has made
           example: 42
-
-    UserSearchReceivedRewards:
-      type: object
-      required:
-        - count
-        - pendingCount
-        - totalUsdAmount
-        - maxUsdAmount
-      properties:
-        count:
+        rewardCount:
           type: integer
           description: Number of rewards the user has received
           example: 3
-        pendingCount:
+        pendingRewardCount:
           type: integer
           description: Number of rewards the user has received but not yet requested
           example: 1
@@ -3243,11 +3198,7 @@ components:
           type: number
           description: Maximum amount earned by the user on a single reward, in USD
           example: 1000
-
-    UserSearchRanking:
-      type: object
-      properties:
-        value:
+        rank:
           type: integer
           description: User's rank
           example: 3
@@ -4047,6 +3998,10 @@ components:
         - ERC20
 
     LanguageId:
+      type: string
+      format: uuid
+
+    EcosystemId:
       type: string
       format: uuid
 
