@@ -14,8 +14,9 @@ import org.springframework.context.annotation.Profile;
 public class ReadBackofficeApiConfiguration {
 
     @Bean
-    public BackofficeUsersReadApiPostgresAdapter backofficeUsersReadApiPostgresAdapter(final UserReadRepository userReadRepository) {
-        return new BackofficeUsersReadApiPostgresAdapter(userReadRepository);
+    public BackofficeUsersReadApiPostgresAdapter backofficeUsersReadApiPostgresAdapter(final UserReadRepository userReadRepository,
+                                                                                       final AllUserRSQLRepository allUserRSQLRepository) {
+        return new BackofficeUsersReadApiPostgresAdapter(userReadRepository, allUserRSQLRepository);
     }
 
     @Bean
