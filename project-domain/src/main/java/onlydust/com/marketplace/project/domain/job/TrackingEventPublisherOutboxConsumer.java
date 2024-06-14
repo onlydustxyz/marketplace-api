@@ -10,6 +10,7 @@ import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
@@ -18,18 +19,22 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
     private final TrackingEventPublisher trackingEventPublisher;
     private final UserStoragePort userStoragePort;
+    private final ProjectStoragePort projectStoragePort;
 
     @Override
     public void process(Event event) {
         if (event instanceof OnGithubIssueAssigned onGithubIssueAssigned) {
-            userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId())
-                    .ifPresent(user -> trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user)));
+            if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId()))
+                userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId())
+                        .ifPresent(user -> trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user)));
         } else if (event instanceof OnPullRequestCreated onPullRequestCreated) {
-            userStoragePort.getUserByGithubId(onPullRequestCreated.authorId())
-                    .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestCreatedTrackingEvent.of(onPullRequestCreated, user)));
+            if (projectStoragePort.isLinkedToAProject(onPullRequestCreated.repoId()))
+                userStoragePort.getUserByGithubId(onPullRequestCreated.authorId())
+                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestCreatedTrackingEvent.of(onPullRequestCreated, user)));
         } else if (event instanceof OnPullRequestMerged onPullRequestMerged) {
-            userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
-                    .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
+            if (projectStoragePort.isLinkedToAProject(onPullRequestMerged.repoId()))
+                userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
+                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
         } else {
             trackingEventPublisher.publish(event);
         }

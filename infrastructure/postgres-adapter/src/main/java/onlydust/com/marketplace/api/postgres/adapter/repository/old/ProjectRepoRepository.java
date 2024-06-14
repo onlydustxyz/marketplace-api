@@ -4,10 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRep
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Collection;
-import java.util.Set;
-
 public interface ProjectRepoRepository extends JpaRepository<ProjectRepoEntity, ProjectRepoEntity.PrimaryKey> {
-    @Query("SELECT pr FROM ProjectRepoEntity pr WHERE pr.repoId IN :repoIds")
-    Set<ProjectRepoEntity> findAllByRepoId(Collection<Long> repoIds);
+    @Query("SELECT EXISTS (SELECT 1 FROM ProjectRepoEntity p WHERE p.repoId = :repoId)")
+    boolean existsByRepoId(Long repoId);
 }

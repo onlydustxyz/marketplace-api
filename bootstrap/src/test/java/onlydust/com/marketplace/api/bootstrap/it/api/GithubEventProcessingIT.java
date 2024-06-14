@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.bootstrap.suites.tags.TagReward;
+import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
-@TagReward
+@TagProject
 public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     @Autowired
     IndexingEventRepository indexingEventRepository;
@@ -26,6 +26,8 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     OutboxConsumerJob indexingEventsOutboxJob;
 
     final Faker faker = new Faker();
+
+    private static final Long kaaperRepoId = 493591124L;
 
     @Test
     void should_publish_github_issue_assigned_event() {
@@ -37,6 +39,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
 
         indexingEventRepository.saveEvent(OnGithubIssueAssigned.builder()
                 .id(issueId)
+                .repoId(kaaperRepoId)
                 .assigneeId(antho.user().getGithubUserId())
                 .createdAt(createdAt)
                 .assignedAt(assignedAt)
@@ -70,6 +73,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
 
         indexingEventRepository.saveEvent(OnPullRequestCreated.builder()
                 .id(pullRequestId)
+                .repoId(kaaperRepoId)
                 .authorId(antho.user().getGithubUserId())
                 .createdAt(createdAt)
                 .build());
@@ -100,6 +104,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
 
         indexingEventRepository.saveEvent(OnPullRequestMerged.builder()
                 .id(pullRequestId)
+                .repoId(kaaperRepoId)
                 .authorId(antho.user().getGithubUserId())
                 .createdAt(createdAt)
                 .mergedAt(mergedAt)
