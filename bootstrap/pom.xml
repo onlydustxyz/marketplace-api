@@ -162,12 +162,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.api</groupId>
-            <artifactId>linear-adapter</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>com.onlydust.marketplace.indexer</groupId>
             <artifactId>infura-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>

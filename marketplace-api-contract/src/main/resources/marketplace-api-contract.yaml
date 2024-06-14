@@ -828,27 +828,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-    post:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Technologies
-      summary: Suggest a new technology
-      operationId: suggestTechnology
-      description: Suggestions are reviewed by OnlyDust team before being added to the platform.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SuggestTechnologyRequest'
-      responses:
-        "201":
-          description: 'Technology suggestion successfully recorded'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/users/search:
     get:
       security:
@@ -6509,16 +6488,6 @@ components:
           description: List of Github repos on which contributions have changed
           items:
             $ref: '#/components/schemas/GithubRepoId'
-
-    SuggestTechnologyRequest:
-      type: object
-      required:
-        - technology
-      properties:
-        technology:
-          type: string
-          description: Technology name
-          example: Rust
 
     AddOtherWorkRequest:
       type: object
