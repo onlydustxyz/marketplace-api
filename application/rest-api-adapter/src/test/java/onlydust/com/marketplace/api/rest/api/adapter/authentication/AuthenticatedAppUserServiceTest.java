@@ -22,20 +22,22 @@ public class AuthenticatedAppUserServiceTest {
 
     private static final Faker faker = new Faker();
 
+    final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
+    final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
+
+    final UUID userId = UUID.randomUUID();
+    final long githubUserId = faker.number().randomNumber();
+    final User user = User.builder()
+            .githubUserId(githubUserId)
+            .id(userId)
+            .githubLogin(faker.name().username())
+            .roles(List.of(AuthenticatedUser.Role.USER))
+            .build();
+
     @Test
     void should_return_authenticated_user() {
         // Given
-        final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
-        final UUID userId = UUID.randomUUID();
-        final long githubUserId = faker.number().randomNumber();
         final List<AuthenticatedUser.Role> allowedRoles = List.of(AuthenticatedUser.Role.USER);
-        final User user = User.builder()
-                .githubUserId(githubUserId)
-                .id(userId)
-                .githubLogin(faker.name().username())
-                .roles(List.of(AuthenticatedUser.Role.USER))
-                .build();
 
         // When
         when(authenticationContext.getAuthenticationFromContext())
@@ -54,10 +56,6 @@ public class AuthenticatedAppUserServiceTest {
 
     @Test
     void should_throw_exception_for_unauthenticated_user() {
-        // Given
-        final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
-
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(mock(AnonymousAuthenticationToken.class));
@@ -75,10 +73,6 @@ public class AuthenticatedAppUserServiceTest {
 
     @Test
     void should_throw_exception_for_invalid_jwt() {
-        // Given
-        final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-        final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
-
         // When
         when(authenticationContext.getAuthenticationFromContext())
                 .thenReturn(Auth0OnlyDustAppAuthentication.builder().build());

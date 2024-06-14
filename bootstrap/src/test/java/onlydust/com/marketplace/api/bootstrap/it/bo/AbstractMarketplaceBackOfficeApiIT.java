@@ -53,6 +53,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(initializers = WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
+        @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
 })
@@ -82,6 +83,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")
     protected WireMockServer auth0WireMockServer;
+    @InjectWireMock("github")
+    protected WireMockServer githubWireMockServer;
     @InjectWireMock("indexer-api")
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("customer-io")
@@ -106,7 +109,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @BeforeEach
     void setupUserAuthHelper() {
-        userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer);
+        userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
+                githubWireMockServer);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

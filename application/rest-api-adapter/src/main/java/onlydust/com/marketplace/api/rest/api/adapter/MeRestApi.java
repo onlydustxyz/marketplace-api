@@ -53,11 +53,13 @@ public class MeRestApi implements MeApi {
     private final PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     private final HackathonFacadePort hackathonFacadePort;
     private final CommitteeFacadePort committeeFacadePort;
+    private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser);
+        final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser,
+                githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(authenticatedUser.getGithubUserId()));
         return ResponseEntity.ok(getMeResponse);
     }
 
