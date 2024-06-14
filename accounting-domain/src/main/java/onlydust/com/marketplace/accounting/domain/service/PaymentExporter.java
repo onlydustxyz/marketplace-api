@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
@@ -14,7 +15,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 
 public class PaymentExporter {
 
-    public static String csv(List<PayableReward> payableRewards, Map<RewardId, Wallet> wallets) {
+    public static String csv(List<PayableReward> payableRewards, Map<RewardId, Wallet> wallets, Map<RewardId, Invoice> rewardInvoices) {
         final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().build();
 
         final StringWriter sw = new StringWriter();
@@ -24,7 +25,7 @@ public class PaymentExporter {
                         reward.currency().standard().map(s -> s.name().toLowerCase()).orElse("native"),
                         reward.currency().address().map(Object::toString).orElse(""),
                         wallets.get(reward.id()).address(),
-                        reward.amount(),
+                        rewardInvoices.get(reward.id()).applyTaxes(reward.amount().getValue()),
                         ""
                 );
             }
