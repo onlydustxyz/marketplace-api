@@ -33,28 +33,20 @@ public class JourneyCompletionEntity {
             exists(select 1
                    from accounting.billing_profiles_users bpu
                             join accounting.billing_profiles bp
-                                 on bpu.billing_profile_id = bp.id and bp.type = 'INDIVIDUAL' and
-                                    bp.verification_status = 'VERIFIED'
+                                 on bpu.billing_profile_id = bp.id and bp.verification_status = 'VERIFIED'
                    where bpu.user_id = id)
             """)
-    boolean individualBillingProfileSetup;
+    boolean billingProfileVerified;
 
     @Formula("""
             exists(select 1
-                   from iam.users u
-                            join projects_contributors pc on pc.github_user_id = u.github_user_id
-                   where u.id = id)
+            from accounting.billing_profiles_users bpu
+                     join accounting.billing_profiles bp
+                          on bpu.billing_profile_id = bp.id and bp.type in ('COMPANY', 'SELF_EMPLOYED') and
+                             bp.verification_status = 'VERIFIED'
+            where bpu.user_id = id)
             """)
-    boolean firstContributionMade;
-
-    @Formula("""
-            exists(select 1
-                   from iam.users u
-                            join rewards r on r.recipient_id = u.github_user_id
-                            join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status > 'PENDING_REQUEST'
-                   where u.id = id)
-            """)
-    boolean firstRewardClaimed;
+    boolean companyBillingProfileVerified;
 
     @Formula("""
             exists(select 1
@@ -73,18 +65,37 @@ public class JourneyCompletionEntity {
             """)
     boolean telegramAdded;
 
+    @Formula("""
+            exists(select 1
+                   from iam.users u
+                            join rewards r on r.recipient_id = u.github_user_id
+                   where u.id = id)
+            """)
+    boolean rewardReceived;
+
+    @Formula("""
+            exists(select 1
+                   from iam.users u
+                            join rewards r on r.recipient_id = u.github_user_id
+                            join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status > 'PENDING_REQUEST'
+                   where u.id = id)
+            """)
+    boolean rewardClaimed;
+
+
     public JourneyCompletionResponse toResponse() {
-        final var allItems = List.of(individualBillingProfileSetup, firstContributionMade, firstRewardClaimed, descriptionUpdated, telegramAdded);
+        final var allItems = List.of(billingProfileVerified, companyBillingProfileVerified, descriptionUpdated, telegramAdded, rewardReceived, rewardClaimed);
         final var completedItems = allItems.stream().filter(Boolean::booleanValue).count();
 
         return new JourneyCompletionResponse()
                 .completion(BigDecimal.valueOf(completedItems * 100 / allItems.size()))
                 .completed(completedItems == allItems.size())
-                .individualBillingProfileSetup(individualBillingProfileSetup)
-                .firstContributionMade(firstContributionMade)
-                .firstRewardClaimed(firstRewardClaimed)
+                .billingProfileVerified(billingProfileVerified)
+                .companyBillingProfileVerified(companyBillingProfileVerified)
                 .descriptionUpdated(descriptionUpdated)
                 .telegramAdded(telegramAdded)
+                .rewardReceived(rewardReceived)
+                .rewardClaimed(rewardClaimed)
                 ;
     }
 }

@@ -122,12 +122,13 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "completed": false,
-                          "completion": 80,
-                          "individualBillingProfileSetup": false,
-                          "firstContributionMade": true,
-                          "firstRewardClaimed": true,
+                          "completion": 66,
+                          "billingProfileVerified": false,
+                          "companyBillingProfileVerified": false,
                           "descriptionUpdated": true,
-                          "telegramAdded": true
+                          "telegramAdded": true,
+                          "rewardReceived": true,
+                          "rewardClaimed": true
                         }
                         """);
     }
@@ -151,11 +152,12 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                         {
                           "completed": false,
                           "completion": 0,
-                          "individualBillingProfileSetup": false,
-                          "firstContributionMade": false,
-                          "firstRewardClaimed": false,
+                          "billingProfileVerified": false,
+                          "companyBillingProfileVerified": false,
                           "descriptionUpdated": false,
-                          "telegramAdded": false
+                          "telegramAdded": false,
+                          "rewardReceived": false,
+                          "rewardClaimed": false
                         }
                         """);
     }
