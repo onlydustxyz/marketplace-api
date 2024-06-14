@@ -269,6 +269,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
+                                "prettyAmount": 1000,
                                 "target": {
                                   "amount": 1010.00,
                                   "currency": {
@@ -314,7 +315,19 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "decimals": 2
                             }
                           },
-                          "usdToEurConversionRate": 0.92
+                          "usdToEurConversionRate": 0.92,
+                          "totalAfterTaxPerCurrency": [
+                            {
+                              "amount": 1200.0,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              }
+                            }
+                          ]
                         }
                         """
                 );
@@ -473,10 +486,23 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "prettyAmount": 1000,
                                 "target": {
                                   "amount": 1010.00,
-                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  },
                                   "conversionRate": 1.01
                                 }
                               }
@@ -487,10 +513,23 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "projectName": "kaaper",
                               "amount": {
                                 "amount": 1000,
-                                "currency": {"id":"562bbf65-8a71-4d30-ad63-520c0d68ba27","code":"USDC","name":"USD Coin","logoUrl":"https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png","decimals":6},
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "prettyAmount": 1000,
                                 "target": {
                                   "amount": 1010.00,
-                                  "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2},
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  },
                                   "conversionRate": 1.01
                                 }
                               }
@@ -498,18 +537,48 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "totalBeforeTax": {
                             "amount": 2020.00,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
                           "taxRate": 0.2,
                           "totalTax": {
                             "amount": 404.000,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
                           "totalAfterTax": {
                             "amount": 2424.000,
-                            "currency": {"id":"f35155b5-6107-4677-85ac-23f8c2a63193","code":"USD","name":"US Dollar","logoUrl":null,"decimals":2}
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
                           },
-                          "usdToEurConversionRate": 0.92
+                          "usdToEurConversionRate": 0.92,
+                          "totalAfterTaxPerCurrency": [
+                            {
+                              "amount": 2400.0,
+                              "currency": {
+                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                "code": "USDC",
+                                "name": "USD Coin",
+                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                "decimals": 6
+                              }
+                            }
+                          ]
                         }
                         """
                 );

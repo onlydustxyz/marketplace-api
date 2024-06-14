@@ -7025,6 +7025,10 @@ components:
         usdToEurConversionRate:
           type: number
           description: The conversion rate from USD to EUR
+        totalAfterTaxPerCurrency:
+          type: array
+          items:
+            $ref: '#/components/schemas/NewMoney'
 
     NewMoney: # TODO: rename when legacy 'Money' type is removed
       type: object
