@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -190,29 +189,8 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public UUID createApplicationOnProject(@NonNull UUID userId,
-                                           @NonNull UUID projectId,
-                                           @NonNull GithubIssue.Id issueId,
-                                           @NonNull GithubComment.Id commentId,
-                                           @NonNull ZonedDateTime appliedAt,
-                                           @NonNull String motivation,
-                                           String problemSolvingApproach) {
-        final var applicationId = UUID.randomUUID();
-        projectRepository.findById(projectId)
-                .orElseThrow(() -> notFound(format("Project with id %s not found", projectId)));
-        applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
-                .ifPresentOrElse(applicationEntity -> {
-                            throw OnlyDustException.badRequest(format("Application already exists for project %s " +
-                                                                      "and user %s", projectId, userId));
-                        },
-                        () -> applicationRepository.saveAndFlush(ApplicationEntity.builder()
-                                .applicantId(userId)
-                                .projectId(projectId)
-                                .id(applicationId)
-                                .receivedAt(new Date())
-                                .build())
-                );
-        return applicationId;
+    public void save(@NonNull Application application) {
+        applicationRepository.save(ApplicationEntity.fromDomain(application));
     }
 
     @Override
@@ -314,5 +292,13 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void historizeUserRanks() {
         userRepository.historizeGlobalUsersRanks(new Date());
+    }
+
+    @Override
+    public List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId) {
+        return applicationRepository.findAllByApplicantIdAndProjectIdAndIssueId(userId, projectId, issueId.value())
+                .stream()
+                .map(ApplicationEntity::toDomain)
+                .toList();
     }
 }

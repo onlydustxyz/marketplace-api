@@ -128,8 +128,9 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresGithubAdapter postgresGithubAdapter(final GithubAppInstallationRepository githubAppInstallationRepository,
-                                                       final GithubRepoViewEntityRepository githubRepoViewEntityRepository) {
-        return new PostgresGithubAdapter(githubAppInstallationRepository, githubRepoViewEntityRepository);
+                                                       final GithubRepoViewEntityRepository githubRepoViewEntityRepository,
+                                                       final GithubIssueViewRepository githubIssueViewRepository) {
+        return new PostgresGithubAdapter(githubAppInstallationRepository, githubRepoViewEntityRepository, githubIssueViewRepository);
     }
 
     @Bean

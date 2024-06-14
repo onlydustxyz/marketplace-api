@@ -1,13 +1,15 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import lombok.*;
-
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.*;
+import lombok.experimental.Accessors;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -15,17 +17,50 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
-@Builder
+@Builder(access = AccessLevel.PRIVATE)
 @Table(name = "applications", schema = "public")
+@Accessors(fluent = true, chain = true)
 public class ApplicationEntity {
-
     @Id
-    @Column(name = "id")
+    @EqualsAndHashCode.Include
+    @NonNull
     UUID id;
-    @Column(name = "received_at", nullable = false)
-    Date receivedAt;
-    @Column(name = "project_id", nullable = false)
+    @NonNull
+    ZonedDateTime receivedAt;
+    @NonNull
     UUID projectId;
-    @Column(name = "applicant_id", nullable = false)
+    @NonNull
     UUID applicantId;
+    @NonNull
+    Long issueId;
+    @NonNull
+    Long commentId;
+    @NonNull
+    String motivations;
+    String problemSolvingApproach;
+
+    public static ApplicationEntity fromDomain(Application application) {
+        return ApplicationEntity.builder()
+                .id(application.id().value())
+                .receivedAt(application.appliedAt())
+                .projectId(application.projectId())
+                .applicantId(application.applicantId())
+                .issueId(application.issueId().value())
+                .commentId(application.commentId().value())
+                .motivations(application.motivations())
+                .problemSolvingApproach(application.problemSolvingApproach())
+                .build();
+    }
+
+    public Application toDomain() {
+        return new Application(
+                Application.Id.of(id),
+                projectId,
+                applicantId,
+                receivedAt,
+                GithubIssue.Id.of(issueId),
+                GithubComment.Id.of(commentId),
+                motivations,
+                problemSolvingApproach);
+    }
 }
