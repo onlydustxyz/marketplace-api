@@ -203,9 +203,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public TechnologiesPort technologiesPort(final TrackingIssuePort trackingIssuePort,
-                                             final TechnologyStoragePort technologyStoragePort) {
-        return new TechnologiesService(trackingIssuePort, technologyStoragePort);
+    public TechnologiesPort technologiesPort(final TechnologyStoragePort technologyStoragePort) {
+        return new TechnologiesService(technologyStoragePort);
     }
 
     @Bean
