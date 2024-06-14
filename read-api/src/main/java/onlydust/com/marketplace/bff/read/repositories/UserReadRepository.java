@@ -37,7 +37,7 @@ public interface UserReadRepository extends JpaRepository<AllUserReadEntity, UUI
             SELECT u
             FROM AllUserReadEntity u
             JOIN FETCH u.registered
-            JOIN FETCH u.globalUsersRanks
+            LEFT JOIN FETCH u.globalUsersRanks
             LEFT JOIN FETCH u.receivedRewardStats
             LEFT JOIN FETCH u.billingProfiles bp
             LEFT JOIN FETCH bp.kyc

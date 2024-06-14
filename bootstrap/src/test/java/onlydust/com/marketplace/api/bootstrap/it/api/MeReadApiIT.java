@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.util.UUID;
+
 @TagMe
 public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
@@ -126,6 +128,34 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                           "firstRewardClaimed": true,
                           "descriptionUpdated": true,
                           "telegramAdded": true
+                        }
+                        """);
+    }
+
+
+    @Test
+    void should_get_caller_journey_for_non_indexed_users() {
+        // Given
+        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 666, "DeViL", "https://devil.com/avatar.jpg", false);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_JOURNEY))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + newUser.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "completed": false,
+                          "completion": 0,
+                          "individualBillingProfileSetup": false,
+                          "firstContributionMade": false,
+                          "firstRewardClaimed": false,
+                          "descriptionUpdated": false,
+                          "telegramAdded": false
                         }
                         """);
     }
