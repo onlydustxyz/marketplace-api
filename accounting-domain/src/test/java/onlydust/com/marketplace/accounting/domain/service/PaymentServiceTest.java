@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -30,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyc;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
@@ -63,7 +61,7 @@ public class PaymentServiceTest {
     Currency USDC;
     Currency STRK;
     IndividualBillingProfile billingProfile1;
-    IndividualBillingProfile billingProfile2;
+    CompanyBillingProfile billingProfile2;
 
     @BeforeEach
     void setUp() {
@@ -92,13 +90,13 @@ public class PaymentServiceTest {
                 .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
                 .build();
         final var billingProfileId2 = BillingProfile.Id.random();
-        billingProfile2 = IndividualBillingProfile.builder()
+        billingProfile2 = CompanyBillingProfile.builder()
                 .id(billingProfileId2)
                 .status(VerificationStatus.VERIFIED)
                 .name("John")
-                .kyc(newKyc(billingProfileId2, UserId.random()))
+                .kyb(newKyb(billingProfileId2, UserId.random()))
                 .enabled(true)
-                .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                .members(Set.of(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now())))
                 .build();
 
         invoices = List.of(
@@ -171,27 +169,26 @@ public class PaymentServiceTest {
             assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,vitalik.eth,100,");
             assertThat(ethereumBatch.csv()).contains("erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,vitalik.eth,300,");
             assertThat(ethereumBatch.csv()).contains("native,,vitalik.eth,500,");
-            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,600,");
+            assertThat(ethereumBatch.csv()).contains("erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,foo.eth,720.0,");
         }
         {
             final var optimismBatch = batches.stream().filter(batch -> batch.network().equals(Network.OPTIMISM)).findFirst().orElseThrow();
             assertThat(optimismBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(1));
             assertThat(optimismBatch.csv()).isEqualToIgnoringWhitespace("""
-                    erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,200,
+                    erc20,0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85,0x0222,240.0,
                     """);
         }
         {
             final var starknetBatch = batches.stream().filter(batch -> batch.network().equals(Network.STARKNET)).findFirst().orElseThrow();
             assertThat(starknetBatch.rewards()).containsExactlyInAnyOrder(payableRewards.get(3));
             assertThat(starknetBatch.csv()).isEqualToIgnoringWhitespace("""
-                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,400,
+                    erc20,0xCa14007Eff0dB1f8135f4C25B34De49AB0d42766,0x0666,480.0,
                     """);
         }
         final var savedBatches = ArgumentCaptor.forClass(List.class);
         verify(accountingRewardStoragePort).saveAll(savedBatches.capture());
         assertThat(savedBatches.getValue()).containsAll(batches);
     }
-
 
     @Test
     void should_raise_not_found_exception_given_not_existing_batch_payment() {
