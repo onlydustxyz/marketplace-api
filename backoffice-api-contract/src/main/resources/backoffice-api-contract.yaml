@@ -1346,6 +1346,7 @@ paths:
             type: integer
         - in: query
           name: query
+          required: true
           schema:
             type: string
       responses:
@@ -3105,12 +3106,12 @@ components:
     UserSearchPageItemResponse:
       type: object
       required:
-        - id
         - githubUserId
         - login
         - avatarUrl
-        - email
-        - lastSeenAt
+        - global
+        - language
+        - ecosystem
       properties:
         id:
           $ref: '#/components/schemas/UserId'
@@ -3156,6 +3157,7 @@ components:
     UserSearchLanguage:
       type: object
       required:
+        - id
         - name
       properties:
         id:
@@ -3167,6 +3169,7 @@ components:
     UserSearchEcosystem:
       type: object
       required:
+        - id
         - name
       properties:
         id:
@@ -3177,6 +3180,12 @@ components:
 
     UserSearchStats:
       type: object
+      required:
+        - contributionCount
+        - rewardCount
+        - pendingRewardCount
+        - totalUsdAmount
+        - maxUsdAmount
       properties:
         contributionCount:
           type: integer
