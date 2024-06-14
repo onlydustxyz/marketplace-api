@@ -90,7 +90,7 @@ public class PaymentService implements PaymentPort {
         payments.forEach(payment -> {
             final Map<RewardId, Wallet> wallets = walletsPerRewardForNetwork(rewardInvoices, payment.network());
             final var rewards = payment.rewards().stream().sorted(Comparator.comparing(r -> r.id().value())).toList();
-            payment.csv(PaymentExporter.csv(rewards, wallets));
+            payment.csv(PaymentExporter.csv(rewards, wallets, rewardInvoices));
         });
 
         accountingRewardStoragePort.saveAll(payments);

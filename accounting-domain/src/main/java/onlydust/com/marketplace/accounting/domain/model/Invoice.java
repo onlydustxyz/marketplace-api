@@ -98,10 +98,14 @@ public class Invoice {
                 .toList();
     }
 
+    public BigDecimal applyTaxes(BigDecimal amount) {
+        return amount.multiply(taxRate().add(BigDecimal.ONE));
+    }
+
     public Set<Money> totalAfterTaxPerCurrency() {
         return rewards.stream()
                 .collect(groupingBy(r -> r.amount.currency,
-                        mapping(r -> r.amount.value.multiply(taxRate().add(BigDecimal.ONE)),
+                        mapping(r -> applyTaxes(r.amount.value),
                                 reducing(BigDecimal.ZERO, BigDecimal::add))))
                 .entrySet().stream()
                 .map(e -> new Money(e.getValue(), e.getKey()))
