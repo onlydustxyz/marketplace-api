@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -93,8 +94,18 @@ public class Invoice {
                         mapping(r -> new TotalMoneyView(r.amount.value, r.amount.currency.toView(), r.target.value),
                                 reducing(null, TotalMoneyView::add))))
                 .values().stream()
-                .sorted(Comparator.comparing(r -> r.currency().code().toString()))
+                .sorted(comparing(r -> r.currency().code()))
                 .toList();
+    }
+
+    public Set<Money> totalAfterTaxPerCurrency() {
+        return rewards.stream()
+                .collect(groupingBy(r -> r.amount.currency,
+                        mapping(r -> r.amount.value.multiply(taxRate().add(BigDecimal.ONE)),
+                                reducing(BigDecimal.ZERO, BigDecimal::add))))
+                .entrySet().stream()
+                .map(e -> new Money(e.getValue(), e.getKey()))
+                .collect(toSet());
     }
 
     public enum Status {
