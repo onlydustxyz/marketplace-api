@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -30,7 +29,12 @@ public interface UserFacadePort {
 
     void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
 
-    void applyOnProject(UUID id, UUID projectId);
+    Application applyOnProject(@NonNull UUID userId,
+                               @NonNull Long githubUserId,
+                               @NonNull UUID projectId,
+                               @NonNull GithubIssue.Id issueId,
+                               @NonNull String motivation,
+                               String problemSolvingApproach);
 
     RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, List<UUID> companyAdminBillingProfileIds);
 

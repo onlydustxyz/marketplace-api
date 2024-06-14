@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserQueryEntity;
@@ -177,7 +178,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                        " %s and user %d", projectId, githubUserId)));
+                                                   " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
@@ -189,14 +190,20 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public UUID createApplicationOnProject(UUID userId, UUID projectId) {
+    public UUID createApplicationOnProject(@NonNull UUID userId,
+                                           @NonNull UUID projectId,
+                                           @NonNull GithubIssue.Id issueId,
+                                           @NonNull GithubComment.Id commentId,
+                                           @NonNull ZonedDateTime appliedAt,
+                                           @NonNull String motivation,
+                                           String problemSolvingApproach) {
         final var applicationId = UUID.randomUUID();
         projectRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project with id %s not found", projectId)));
         applicationRepository.findByProjectIdAndApplicantId(projectId, userId)
                 .ifPresentOrElse(applicationEntity -> {
                             throw OnlyDustException.badRequest(format("Application already exists for project %s " +
-                                    "and user %s", projectId, userId));
+                                                                      "and user %s", projectId, userId));
                         },
                         () -> applicationRepository.saveAndFlush(ApplicationEntity.builder()
                                 .applicantId(userId)

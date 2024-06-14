@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 
 import java.util.List;
@@ -12,4 +13,6 @@ public interface GithubStoragePort {
     Optional<GithubRepo> findRepoById(Long repoId);
 
     List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
+
+    Optional<GithubIssue> findIssueById(GithubIssue.Id issueId);
 }

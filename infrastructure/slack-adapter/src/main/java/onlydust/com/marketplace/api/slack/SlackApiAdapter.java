@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
@@ -74,7 +75,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onUserApplied(UUID projectId, UUID userId, UUID applicationId) {
+    public void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId) {
         final User user = userStoragePort.getUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
         final var project = projectStoragePort.getById(projectId)
