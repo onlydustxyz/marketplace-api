@@ -181,8 +181,9 @@ public class ProjectConfiguration {
 
     @Bean
     public OutboxConsumer trackingOutboxConsumer(final PosthogApiClientAdapter posthogApiClientAdapter,
-                                                 final UserStoragePort userStoragePort) {
-        return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter, userStoragePort));
+                                                 final UserStoragePort userStoragePort,
+                                                 final ProjectStoragePort projectStoragePort) {
+        return new RetriedOutboxConsumer(new TrackingEventPublisherOutboxConsumer(posthogApiClientAdapter, userStoragePort, projectStoragePort));
     }
 
     @Bean

@@ -44,13 +44,13 @@ public interface ProjectStoragePort {
 
     RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 
-    Set<Long> removeUsedRepos(Collection<Long> repoIds);
-
     boolean hasUserAccessToProject(UUID projectId, UUID userId);
 
     boolean hasUserAccessToProject(String projectSlug, UUID userId);
 
     void updateProjectsRanking();
+
+    boolean isLinkedToAProject(Long repoId);
 
     Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 

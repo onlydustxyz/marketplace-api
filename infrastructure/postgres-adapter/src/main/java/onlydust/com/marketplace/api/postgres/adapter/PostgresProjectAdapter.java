@@ -44,7 +44,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectRepoRepository projectRepoRepository;
     private final CustomProjectRepository customProjectRepository;
-    private final CustomContributorRepository customContributorRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
     private final RewardableItemRepository rewardableItemRepository;
     private final CustomProjectRankingRepository customProjectRankingRepository;
@@ -78,26 +77,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Set<Long> removeUsedRepos(Collection<Long> repoIds) {
-        final var usedRepos = projectRepoRepository.findAllByRepoId(repoIds).stream()
-                .map(ProjectRepoEntity::getRepoId)
-                .collect(Collectors.toUnmodifiableSet());
-
-        return repoIds.stream()
-                .filter(repoId -> !usedRepos.contains(repoId))
-                .collect(Collectors.toSet());
-    }
-
-    @Override
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
         return customProjectRepository.isProjectPublic(projectId) ||
-                (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
     }
 
     @Override
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         return customProjectRepository.isProjectPublic(projectSlug) ||
-                (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
     }
 
 
@@ -189,12 +177,12 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(projectLeaderInvitations)) {
                 projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
                         .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
-                                invitation.getProjectId().equals(projectId)));
+                                                   invitation.getProjectId().equals(projectId)));
 
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
                         .filter(githubUserId -> projectLeaderInvitations.stream()
                                 .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
-                                        invitation.getProjectId().equals(projectId)))
+                                                         invitation.getProjectId().equals(projectId)))
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
                                 githubUserId)).toList());
             } else {
@@ -306,7 +294,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public Set<Long> getProjectRepoIds(UUID projectId) {
-        final var project = projectRepository.getById(projectId);
+        final var project = projectRepository.findById(projectId)
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
                 .map(ProjectRepoEntity::getRepoId)
                 .collect(Collectors.toSet());
@@ -324,6 +314,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Transactional
     public void updateProjectsRanking() {
         customProjectRankingRepository.updateProjectsRanking();
+    }
+
+    @Override
+    public boolean isLinkedToAProject(Long repoId) {
+        return projectRepoRepository.existsByRepoId(repoId);
     }
 
     @Override
