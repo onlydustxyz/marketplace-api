@@ -13,9 +13,7 @@ import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
-import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
-import onlydust.com.marketplace.api.contract.model.RewardRequest;
-import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
@@ -197,28 +195,52 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_apply_to_project() {
         // Given
-        final var githubUserId = faker.number().numberBetween(10000, 200000);
-        final var login = faker.name().username() + faker.cat().name();
-        final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final var user = userAuthHelper.newFakeUser(UUID.randomUUID(),
+                faker.number().numberBetween(10000, 200000),
+                faker.name().username() + faker.cat().name(),
+                faker.internet().avatar(),
+                false);
 
-        final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
+        final var issueId = 1974127467L;
+        final var motivations = faker.lorem().paragraph();
+        final var problemSolvingApproach = faker.lorem().paragraph();
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        final var request = new ApplicationRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .motivation(motivations)
+                .problemSolvingApproach(problemSolvingApproach);
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/repository/380954304/issues/7/comments"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)));
 
         // When
-        client.post()
+        final var applicationId = client.post()
                 .uri(getApiURI(ME_APPLY_TO_PROJECT))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "projectId": "%s"
-                        }
-                        """.formatted(projectId))
+                .bodyValue(request)
                 // Then
                 .exchange()
                 .expectStatus()
-                .is2xxSuccessful();
+                .isOk()
+                .expectBody(ApplicationResponse.class)
+                .returnResult().getResponseBody().getId();
+
+        final var application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.projectId()).isEqualTo(projectId);
+        assertThat(application.applicantId()).isEqualTo(user.user().getId());
+        assertThat(application.issueId()).isEqualTo(issueId);
+        assertThat(application.commentId()).isEqualTo(123456789L);
+        assertThat(application.motivations()).isEqualTo(motivations);
+        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
     }
 
     @Test
@@ -229,31 +251,41 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final var issueId = 1736474921L;
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
-        final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
+        applicationRepository.save(new ApplicationEntity(
+                UUID.randomUUID(),
+                ZonedDateTime.now(),
+                projectId,
+                userId,
+                issueId,
+                111L,
+                "My motivations",
+                null
+        ));
 
-        applicationRepository.save(ApplicationEntity.builder()
-                .id(UUID.randomUUID())
-                .projectId(UUID.fromString(projectId))
-                .applicantId(userId)
-                .receivedAt(new Date())
-                .build());
+        final var motivations = faker.lorem().paragraph();
+        final var problemSolvingApproach = faker.lorem().paragraph();
+
+        final var request = new ApplicationRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .motivation(motivations)
+                .problemSolvingApproach(problemSolvingApproach);
 
         // When
         client.post()
                 .uri(getApiURI(ME_APPLY_TO_PROJECT))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "projectId": "%s"
-                        }
-                        """.formatted(projectId))
+                .bodyValue(request)
                 // Then
                 .exchange()
                 .expectStatus()
-                .is4xxClientError();
+                .isBadRequest();
     }
+
 
     @Test
     void should_not_be_able_to_apply_to_non_existing_project() {
@@ -264,18 +296,23 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var userId = UUID.randomUUID();
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
-        final String projectId = "77777777-4444-4444-4444-61504d34fc56";
+        final var projectId = UUID.fromString("77777777-4444-4444-4444-61504d34fc56");
+        final var issueId = 1736474921L;
+        final var motivations = faker.lorem().paragraph();
+        final var problemSolvingApproach = faker.lorem().paragraph();
+
+        final var request = new ApplicationRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .motivation(motivations)
+                .problemSolvingApproach(problemSolvingApproach);
 
         // When
         client.post()
                 .uri(getApiURI(ME_APPLY_TO_PROJECT))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "projectId": "%s"
-                        }
-                        """.formatted(projectId))
+                .bodyValue(request)
                 // Then
                 .exchange()
                 .expectStatus()
@@ -294,20 +331,31 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                 projectIdWithoutRepo, pierre.user().getGithubUserId()));
 
-        final var projectAppliedTo1 = UUID.randomUUID();
-        final var projectAppliedTo2 = UUID.randomUUID();
-        applicationRepository.save(ApplicationEntity.builder()
-                .id(UUID.randomUUID())
-                .projectId(projectAppliedTo1)
-                .applicantId(pierre.user().getId())
-                .receivedAt(new Date())
-                .build());
-        applicationRepository.save(ApplicationEntity.builder()
-                .id(UUID.randomUUID())
-                .projectId(projectAppliedTo2)
-                .applicantId(pierre.user().getId())
-                .receivedAt(new Date())
-                .build());
+        final var projectAppliedTo1 = UUID.fromString("dcb3548a-977a-480e-8fb4-423d3f890c04");
+        final var projectAppliedTo2 = UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c");
+
+        applicationRepository.saveAll(List.of(
+                new ApplicationEntity(
+                        UUID.randomUUID(),
+                        ZonedDateTime.now(),
+                        projectAppliedTo1,
+                        pierre.user().getId(),
+                        1736474921L,
+                        112L,
+                        "My motivations",
+                        null
+                ),
+                new ApplicationEntity(
+                        UUID.randomUUID(),
+                        ZonedDateTime.now(),
+                        projectAppliedTo2,
+                        pierre.user().getId(),
+                        1736504583L,
+                        113L,
+                        "My motivations",
+                        null
+                )
+        ));
 
         // When
         client.get()
