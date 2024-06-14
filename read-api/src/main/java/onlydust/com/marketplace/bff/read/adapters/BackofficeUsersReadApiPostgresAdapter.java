@@ -64,7 +64,7 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
         propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
         propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
 
-        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.toSpecification(query, propertyMapping), PageRequest.of(pageIndex, pageSize));
+        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.toSpecification(query, propertyMapping), PageRequest.of(pageIndex, pageSize, Sort.by("login")));
 
         final var response = new UserSearchPage()
                 .users(page.getContent().stream().map(AllUserRSQLEntity::toBoPageItemResponse).toList())

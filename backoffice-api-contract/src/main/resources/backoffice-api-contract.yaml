@@ -1323,7 +1323,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/users/search:
+  /bo/v1/search/users:
     get:
       security:
         - bearerAuth: [ ]
