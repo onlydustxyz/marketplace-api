@@ -7736,11 +7736,12 @@ components:
       required:
         - completed
         - completion
-        - individualBillingProfileSetup
-        - firstContributionMade
-        - firstRewardClaimed
+        - billingProfileVerified
+        - companyBillingProfileVerified
         - descriptionUpdated
         - telegramAdded
+        - rewardReceived
+        - rewardClaimed
       properties:
         completed:
           type: boolean
@@ -7749,21 +7750,24 @@ components:
           type: number
           format: int32
           description: Completion percentage of the journey
-        individualBillingProfileSetup:
+        billingProfileVerified:
           type: boolean
-          description: True if the individual billing profile is set up
-        firstContributionMade:
+          description: True if the user has at least one verified billing profile
+        companyBillingProfileVerified:
           type: boolean
-          description: True if the first contribution is made
-        firstRewardClaimed:
-          type: boolean
-          description: True if the first reward is claimed
+          description: True if the user has at least one verified billing profile of type COMPANY or SELF_EMPLOYED
         descriptionUpdated:
           type: boolean
-          description: True if the description is updated
+          description: True if the user has a bio in his profile
         telegramAdded:
           type: boolean
-          description: True if the telegram contact method is added
+          description: True if the user has filled its telegram contact
+        rewardReceived:
+          type: boolean
+          description: True if the user has been rewarded at least once
+        rewardClaimed:
+          type: boolean
+          description: True if the user has requested the payment for at least one reward
 
     PublicActivityPageResponse:
       allOf:
