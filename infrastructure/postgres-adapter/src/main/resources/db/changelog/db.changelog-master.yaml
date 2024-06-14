@@ -361,3 +361,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000265_fix_project_similarities_view.sql
   - include:
       file: db/changelog/changelogs/00000266_modify-individual-limit-columns.sql
+  - include:
+      file: db/changelog/changelogs/00000266_improve_received_rewards_stats_view.sql
