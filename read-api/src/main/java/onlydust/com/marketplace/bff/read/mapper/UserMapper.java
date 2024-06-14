@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.bff.read.mapper;
 
 import onlydust.com.backoffice.api.contract.model.UserPage;
-import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
-import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLeadQueryEntity;
+import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import org.springframework.data.domain.Page;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;

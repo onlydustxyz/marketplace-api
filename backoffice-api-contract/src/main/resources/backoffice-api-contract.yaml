@@ -1323,6 +1323,43 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/users/search:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeUsersRead
+      summary: Search users
+      operationId: searchUsers
+      description: |
+        Search users
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'User page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSearchPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/earnings:
     get:
       security:
@@ -3041,6 +3078,179 @@ components:
         signedUpAt:
           type: string
           format: date-time
+
+    UserSearchPage:
+      type: object
+      required:
+        - users
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSearchPageItemResponse'
+
+    UserSearchPageItemResponse:
+      type: object
+      required:
+        - id
+        - githubUserId
+        - login
+        - avatarUrl
+        - email
+        - lastSeenAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UserId'
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        login:
+          type: string
+          description: User's Github login
+          example: ofux
+        avatarUrl:
+          type: string
+          format: url
+          description: Direct URL to user's avatar image
+          example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        email:
+          type: string
+          format: email
+          description: User's email
+        lastSeenAt:
+          type: string
+          format: date-time
+          description: Last time the user interacted with the platform
+        signedUpAt:
+          type: string
+          format: date-time
+        globalContributions:
+          $ref: '#/components/schemas/UserSearchContributions'
+        perLanguageContributions:
+          type: array
+          description: Number of contributions the user has made to the platform per language
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchLanguage'
+              - $ref: '#/components/schemas/UserSearchContributions'
+        perEcosystemContributions:
+          type: array
+          description: Number of contributions the user has made to the platform per ecosystem
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchEcosystem'
+              - $ref: '#/components/schemas/UserSearchContributions'
+        globalReceivedRewards:
+          $ref: '#/components/schemas/UserSearchReceivedRewards'
+        perLanguageReceivedRewards:
+          type: array
+          description: Number of contributions the user has made to the platform per language
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchLanguage'
+              - $ref: '#/components/schemas/UserSearchReceivedRewards'
+        perEcosystemReceivedRewards:
+          type: array
+          description: Number of contributions the user has made to the platform per ecosystem
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchEcosystem'
+              - $ref: '#/components/schemas/UserSearchReceivedRewards'
+        globalRank:
+          $ref: '#/components/schemas/UserSearchRanking'
+        perLanguageRank:
+          type: array
+          description: User's rank per language
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchLanguage'
+              - $ref: '#/components/schemas/UserSearchRanking'
+        perEcosystemRank:
+          type: array
+          description: User's rank per ecosystem
+          items:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/UserSearchEcosystem'
+              - $ref: '#/components/schemas/UserSearchRanking'
+
+    UserSearchLanguage:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Language name
+
+    UserSearchEcosystem:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: Ecosystem name
+
+    UserSearchContributions:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          description: Number of contributions the user has made
+          example: 42
+
+    UserSearchReceivedRewards:
+      type: object
+      required:
+        - count
+        - pendingCount
+        - totalUsdAmount
+        - maxUsdAmount
+      properties:
+        count:
+          type: integer
+          description: Number of rewards the user has received
+          example: 3
+        pendingCount:
+          type: integer
+          description: Number of rewards the user has received but not yet requested
+          example: 1
+        totalUsdAmount:
+          type: number
+          description: Total amount earned by the user, in USD
+          example: 3000
+        maxUsdAmount:
+          type: number
+          description: Maximum amount earned by the user on a single reward, in USD
+          example: 1000
+
+    UserSearchRanking:
+      type: object
+      properties:
+        value:
+          type: integer
+          description: User's rank
+          example: 3
 
     UserDetailsResponse:
       type: object

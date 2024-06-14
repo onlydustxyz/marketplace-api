@@ -1,10 +1,15 @@
 package onlydust.com.marketplace.bff.read.adapters;
 
+import io.github.perplexhub.rsql.RSQLJPASupport;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.BackofficeUsersReadApi;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
+import onlydust.com.backoffice.api.contract.model.UserSearchPage;
+import onlydust.com.marketplace.bff.read.entities.user.rsql.AllUserRSQLEntity;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
+import onlydust.com.marketplace.bff.read.repositories.AllUserRSQLRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserReadRepository;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -13,11 +18,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
 @RestController
 @AllArgsConstructor
@@ -25,6 +31,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersReadApi {
 
     private UserReadRepository userReadRepository;
+    private AllUserRSQLRepository allUserRSQLRepository;
 
     @Override
     public ResponseEntity<UserDetailsResponse> getUserById(UUID userId) {
@@ -47,4 +54,39 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
                 ResponseEntity.ok(response);
     }
 
+    //(contributionLanguage:name==Rust and contributionLanguage:count>20) or (contribution-language:name==Java and contribution-language:count>100) and (rank-global:value<100 or (rank-language:name==Rust and rank-language:value<30) or (rank-language:name==Java and rank-language:value<10))
+    @SneakyThrows
+    @Override
+    public ResponseEntity<UserSearchPage> searchUsers(Integer pageIndex, Integer pageSize, String query) {
+        final Map<String, String> propertyMapping = new HashMap<>();
+        // Contributions
+        propertyMapping.put("globalContributions", "contributionsStats");
+        propertyMapping.put("perLanguageContributions", "contributionsStatsPerLanguages");
+        propertyMapping.put("perLanguageContributions.name", "contributionsStatsPerLanguages.language.name");
+        propertyMapping.put("perEcosystemContributions", "contributionsStatsPerEcosystems");
+        propertyMapping.put("perEcosystemContributions.name", "contributionsStatsPerEcosystems.language.name");
+        // Received rewards
+        propertyMapping.put("globalReceivedRewards", "receivedRewardsStats");
+        propertyMapping.put("perLanguageReceivedRewards", "receivedRewardsStatsPerLanguages");
+        propertyMapping.put("perLanguageReceivedRewards.name", "receivedRewardsStatsPerLanguages.language.name");
+        propertyMapping.put("perEcosystemReceivedRewards", "receivedRewardsStatsPerEcosystems");
+        propertyMapping.put("perEcosystemReceivedRewards.name", "receivedRewardsStatsPerEcosystems.language.name");
+        // Ranking
+        propertyMapping.put("globalRank", "globalUsersRank");
+        propertyMapping.put("perLanguageRank", "perLanguageUsersRanks");
+        propertyMapping.put("perLanguageRank.name", "perLanguageUsersRanks.language.name");
+        propertyMapping.put("perEcosystemRank", "perEcosystemUsersRanks");
+        propertyMapping.put("perEcosystemRank.name", "perEcosystemUsersRanks.language.name");
+        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.toSpecification(query, propertyMapping), PageRequest.of(pageIndex, pageSize));
+
+        final var response = new UserSearchPage()
+                .users(page.getContent().stream().map(AllUserRSQLEntity::toBoPageItemResponse).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
+        return response.getTotalPageNumber() > 1 ?
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                ResponseEntity.ok(response);
+    }
 }

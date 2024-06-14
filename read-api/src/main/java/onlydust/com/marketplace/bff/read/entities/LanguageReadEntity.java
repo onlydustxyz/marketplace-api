@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.bff.read.entities;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -25,8 +26,11 @@ import java.util.UUID;
 public class LanguageReadEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull String name;
+    @NonNull
+    UUID id;
+    @JsonProperty("name")
+    @NonNull
+    String name;
     @NonNull String slug;
     String logoUrl;
     String bannerUrl;
