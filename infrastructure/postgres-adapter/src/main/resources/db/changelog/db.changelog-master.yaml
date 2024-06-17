@@ -365,3 +365,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000266_improve_received_rewards_stats_view.sql
   - include:
       file: db/changelog/changelogs/00000267_update_applications_table.sql
+  - include:
+      file: db/changelog/changelogs/00000268_add_application_origin.sql

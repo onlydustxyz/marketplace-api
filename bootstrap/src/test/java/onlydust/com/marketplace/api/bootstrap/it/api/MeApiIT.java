@@ -23,6 +23,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -238,6 +239,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(application.projectId()).isEqualTo(projectId);
         assertThat(application.applicantId()).isEqualTo(user.user().getId());
         assertThat(application.issueId()).isEqualTo(issueId);
+        assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.commentId()).isEqualTo(123456789L);
         assertThat(application.motivations()).isEqualTo(motivations);
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
@@ -259,6 +261,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 ZonedDateTime.now(),
                 projectId,
                 userId,
+                Application.Origin.MARKETPLACE,
                 issueId,
                 111L,
                 "My motivations",
@@ -340,6 +343,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         ZonedDateTime.now(),
                         projectAppliedTo1,
                         pierre.user().getId(),
+                        Application.Origin.MARKETPLACE,
                         1736474921L,
                         112L,
                         "My motivations",
@@ -350,6 +354,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         ZonedDateTime.now(),
                         projectAppliedTo2,
                         pierre.user().getId(),
+                        Application.Origin.MARKETPLACE,
                         1736504583L,
                         113L,
                         "My motivations",

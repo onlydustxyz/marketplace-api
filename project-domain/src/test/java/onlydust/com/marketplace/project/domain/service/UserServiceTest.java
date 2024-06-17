@@ -57,31 +57,18 @@ public class UserServiceTest {
         githubApiPort = mock(GithubApiPort.class);
         githubAuthenticationPort = mock(GithubAuthenticationPort.class);
 
-        userService = new UserService(userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, projectObserverPort,
-                githubUserPermissionsService, githubStoragePort, githubApiPort, githubAuthenticationPort);
+        userService = new UserService(userObserverPort, userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort,
+                projectObserverPort, githubUserPermissionsService, githubStoragePort, githubApiPort, githubAuthenticationPort);
     }
 
     @Test
     void should_find_user_given_a_github_id_and_update_it() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder()
-                        .githubUserId(faker.number().randomNumber())
-                        .githubAvatarUrl(faker.internet().avatar())
-                        .githubLogin(faker.hacker().verb())
-                        .email(faker.internet().emailAddress())
-                        .build();
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
-        final User user = User.builder()
-                .id(UUID.randomUUID())
-                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .githubLogin(githubUserIdentity.getGithubLogin())
-                .githubEmail(githubUserIdentity.getEmail())
-                .hasAcceptedLatestTermsAndConditions(true)
-                .hasSeenOnboardingWizard(true)
-                .build();
+        final User user =
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -97,22 +84,10 @@ public class UserServiceTest {
     void should_find_user_given_a_github_id_and_update_it_with_a_billing_profile() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder()
-                        .githubUserId(faker.number().randomNumber())
-                        .githubAvatarUrl(faker.internet().avatar())
-                        .githubLogin(faker.hacker().verb())
-                        .email(faker.internet().emailAddress())
-                        .build();
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
-        final User user = User.builder()
-                .id(UUID.randomUUID())
-                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .githubLogin(githubUserIdentity.getGithubLogin())
-                .githubEmail(githubUserIdentity.getEmail())
-                .hasAcceptedLatestTermsAndConditions(true)
-                .hasSeenOnboardingWizard(true)
-                .build();
+        final User user =
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -146,36 +121,18 @@ public class UserServiceTest {
     void should_create_user_on_the_fly_when_user_with_github_id_doesnt_exist() {
         // Given
         final GithubUserIdentity githubUserIdentity =
-                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber())
-                        .githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
+                GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final Date createdAt = new Date();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.createUser(any())).thenReturn(User.builder()
-                .id(UUID.randomUUID())
-                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .githubLogin(githubUserIdentity.getGithubLogin())
-                .roles(List.of(AuthenticatedUser.Role.USER))
-                .hasAcceptedLatestTermsAndConditions(false)
-                .hasSeenOnboardingWizard(false)
-                .createdAt(createdAt)
-                .build());
+        when(userStoragePort.createUser(any())).thenReturn(User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).createdAt(createdAt).build());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertThat(userByGithubIdentity.getId()).isNotNull();
-        assertEquals(User.builder().id(userByGithubIdentity.getId())
-                .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                .githubUserId(githubUserIdentity.getGithubUserId())
-                .githubLogin(githubUserIdentity.getGithubLogin())
-                .roles(List.of(AuthenticatedUser.Role.USER))
-                .hasAcceptedLatestTermsAndConditions(false)
-                .createdAt(createdAt)
-                .hasSeenOnboardingWizard(false)
-                .build(), userByGithubIdentity);
+        assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).hasAcceptedLatestTermsAndConditions(false).createdAt(createdAt).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
     }
 
     @Test
@@ -189,9 +146,9 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
-        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
+        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true)).isInstanceOf(OnlyDustException.class).hasMessage(("User %d " +
+                                                                                                                                                  "not" +
+                                                                                                                                                  " found").formatted(githubUserIdentity.getGithubUserId()));
     }
 
 
@@ -255,13 +212,7 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         final UserProfile profile =
-                UserProfile.builder()
-                        .avatarUrl(faker.internet().avatar())
-                        .bio(faker.lorem().sentence())
-                        .website(faker.internet().url()).location(faker.address().city())
-                        .technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(),
-                                faker.programmingLanguage().name(), faker.number().randomNumber()))
-                        .contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
+                UserProfile.builder().avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(), faker.programmingLanguage().name(), faker.number().randomNumber())).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
 
         final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
 
@@ -284,8 +235,7 @@ public class UserServiceTest {
         final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
-        when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(expectedReward);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(expectedReward);
         final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId,
                 companyAdminBillingProfileIds);
 
@@ -301,14 +251,10 @@ public class UserServiceTest {
         final long recipientId = 1L;
         final List<UUID> companyAdminBillingProfileIds = List.of(UUID.randomUUID());
         final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId)
-                        .billingProfileId(companyAdminBillingProfileIds.get(0))
-                        .to(ContributorLinkView.builder()
-                                .githubUserId(recipientId).build()).build();
+                RewardDetailsView.builder().id(rewardId).billingProfileId(companyAdminBillingProfileIds.get(0)).to(ContributorLinkView.builder().githubUserId(recipientId).build()).build();
 
         // When
-        when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(expectedReward);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(expectedReward);
         final RewardDetailsView rewardDetailsView = userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, 2L,
                 companyAdminBillingProfileIds);
 
@@ -323,13 +269,11 @@ public class UserServiceTest {
         // Given
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
-        final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
+        final RewardDetailsView expectedReward = RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
         final List<UUID> companyAdminBillingProfileIds = List.of();
 
         // When
-        when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(expectedReward);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(expectedReward);
         OnlyDustException onlyDustException = null;
         try {
             userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
@@ -349,12 +293,10 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 1L;
         final List<UUID> companyAdminBillingProfileIds = List.of(UUID.randomUUID());
-        final RewardDetailsView expectedReward =
-                RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
+        final RewardDetailsView expectedReward = RewardDetailsView.builder().id(rewardId).to(ContributorLinkView.builder().githubUserId(2L).build()).build();
 
         // When
-        when(userStoragePort.findRewardById(rewardId))
-                .thenReturn(expectedReward);
+        when(userStoragePort.findRewardById(rewardId)).thenReturn(expectedReward);
         OnlyDustException onlyDustException = null;
         try {
             userService.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, companyAdminBillingProfileIds);
@@ -375,18 +317,13 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 5L;
         final List<UUID> companyAdminBillingProfiles = List.of(UUID.randomUUID(), UUID.randomUUID());
-        final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
-                .content(List.of(
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(0)).build(),
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(1)).build()
-                ))
-                .build();
+        final Page<RewardItemView> expectedPage =
+                Page.<RewardItemView>builder().content(List.of(RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(0)).build(), RewardItemView.builder().githubAuthorId(1L).recipientId(2L).billingProfileId(companyAdminBillingProfiles.get(1)).build())).build();
 
         // When
-        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
-                .thenReturn(expectedPage);
-        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
-                20, companyAdminBillingProfiles);
+        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20)).thenReturn(expectedPage);
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0, 20,
+                companyAdminBillingProfiles);
 
         // Then
         assertNotNull(page);
@@ -400,18 +337,14 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 2L;
         final List<UUID> companyAdminBillingProfiles = List.of();
-        final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
-                .content(List.of(
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).build(),
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).build()
-                ))
-                .build();
+        final Page<RewardItemView> expectedPage =
+                Page.<RewardItemView>builder().content(List.of(RewardItemView.builder().githubAuthorId(1L).recipientId(2L).build(),
+                        RewardItemView.builder().githubAuthorId(1L).recipientId(2L).build())).build();
 
         // When
-        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
-                .thenReturn(expectedPage);
-        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
-                20, companyAdminBillingProfiles);
+        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20)).thenReturn(expectedPage);
+        final Page<RewardItemView> page = userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0, 20,
+                companyAdminBillingProfiles);
 
         // Then
         assertNotNull(page);
@@ -423,20 +356,15 @@ public class UserServiceTest {
         final UUID rewardId = UUID.randomUUID();
         final long recipientId = 3L;
         final List<UUID> companyAdminBillingProfiles = List.of();
-        final Page<RewardItemView> expectedPage = Page.<RewardItemView>builder()
-                .content(List.of(
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(3L).build(),
-                        RewardItemView.builder().githubAuthorId(1L).recipientId(4L).build()
-                ))
-                .build();
+        final Page<RewardItemView> expectedPage =
+                Page.<RewardItemView>builder().content(List.of(RewardItemView.builder().githubAuthorId(1L).recipientId(3L).build(),
+                        RewardItemView.builder().githubAuthorId(1L).recipientId(4L).build())).build();
 
         // When
-        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20))
-                .thenReturn(expectedPage);
+        when(userStoragePort.findRewardItemsPageById(rewardId, 0, 20)).thenReturn(expectedPage);
         OnlyDustException onlyDustException = null;
         try {
-            userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0,
-                    20, companyAdminBillingProfiles);
+            userService.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId, recipientId, 0, 20, companyAdminBillingProfiles);
         } catch (OnlyDustException e) {
             onlyDustException = e;
         }
@@ -454,12 +382,9 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID()));
-        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
-                .thenReturn(Set.of());
-        when(projectStoragePort.getProjectOrganizations(projectId))
-                .thenReturn(List.of());
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -480,12 +405,9 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of());
-        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
-                .thenReturn(Set.of(1L, 2L));
-        when(projectStoragePort.getProjectOrganizations(projectId))
-                .thenReturn(List.of());
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of(1L, 2L));
+        when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -506,12 +428,9 @@ public class UserServiceTest {
         final var caller = User.builder().build();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of());
-        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
-                .thenReturn(Set.of());
-        when(projectStoragePort.getProjectOrganizations(projectId))
-                .thenReturn(List.of());
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of());
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, caller);
@@ -532,52 +451,20 @@ public class UserServiceTest {
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of());
-        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
-                .thenReturn(Set.of());
-        when(projectStoragePort.getProjectOrganizations(projectId))
-                .thenReturn(List.of(
-                        ProjectOrganizationView.builder()
-                                .login("org1")
-                                .id(1L)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org2")
-                                .id(2L)
-                                .isInstalled(true)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org3")
-                                .id(3L)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org4")
-                                .id(4L)
-                                .isInstalled(true)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org5")
-                                .id(5L)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org6")
-                                .id(6L)
-                                .isInstalled(true)
-                                .build()
-                ));
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org4")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org5")).thenReturn(GithubMembership.EXTERNAL);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org6")).thenReturn(GithubMembership.EXTERNAL);
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of(ProjectOrganizationView.builder().login("org1").id(1L).build(),
+                ProjectOrganizationView.builder().login("org2").id(2L).isInstalled(true).build(),
+                ProjectOrganizationView.builder().login("org3").id(3L).build(),
+                ProjectOrganizationView.builder().login("org4").id(4L).isInstalled(true).build(),
+                ProjectOrganizationView.builder().login("org5").id(5L).build(),
+                ProjectOrganizationView.builder().login("org6").id(6L).isInstalled(true).build()));
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org4")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org5")).thenReturn(GithubMembership.EXTERNAL);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org6")).thenReturn(GithubMembership.EXTERNAL);
         OnlyDustException onlyDustException = null;
         try {
             userService.claimProjectForAuthenticatedUser(projectId, user);
@@ -588,54 +475,26 @@ public class UserServiceTest {
         // Then
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
-        assertEquals("User must be github admin on every organizations not installed and at least member on every " +
-                     "organization already installed linked to the project",
-                onlyDustException.getMessage());
+        assertEquals("User must be github admin on every organizations not installed and at least member on every " + "organization already installed linked " +
+                     "to the project", onlyDustException.getMessage());
     }
 
     @Test
     void should_claim_project() {
-        final User user = User.builder().id(UUID.randomUUID())
-                .githubUserId(faker.random().nextLong())
-                .githubLogin(faker.pokemon().name()).build();
+        final User user = User.builder().id(UUID.randomUUID()).githubUserId(faker.random().nextLong()).githubLogin(faker.pokemon().name()).build();
         final UUID projectId = UUID.randomUUID();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of());
-        when(projectStoragePort.getProjectInvitedLeadIds(projectId))
-                .thenReturn(Set.of());
-        when(projectStoragePort.getProjectOrganizations(projectId))
-                .thenReturn(List.of(
-                        ProjectOrganizationView.builder()
-                                .login("org1")
-                                .id(1L)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org2")
-                                .id(2L)
-                                .isInstalled(true)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org3")
-                                .id(3l)
-                                .isInstalled(true)
-                                .build(),
-                        ProjectOrganizationView.builder()
-                                .login("org4")
-                                .id(4L)
-                                .isInstalled(true)
-                                .id(user.getGithubUserId())
-                                .build()
-                ));
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org1")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org2")).thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org3")).thenReturn(GithubMembership.MEMBER);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(),
-                "org4")).thenReturn(GithubMembership.EXTERNAL);
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());
+        when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of());
+        when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of(ProjectOrganizationView.builder().login("org1").id(1L).build(),
+                ProjectOrganizationView.builder().login("org2").id(2L).isInstalled(true).build(),
+                ProjectOrganizationView.builder().login("org3").id(3l).isInstalled(true).build(),
+                ProjectOrganizationView.builder().login("org4").id(4L).isInstalled(true).id(user.getGithubUserId()).build()));
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org1")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org2")).thenReturn(GithubMembership.ADMIN);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org3")).thenReturn(GithubMembership.MEMBER);
+        when(githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(), user.getGithubLogin(), "org4")).thenReturn(GithubMembership.EXTERNAL);
         userService.claimProjectForAuthenticatedUser(projectId, user);
 
         // Then
@@ -660,19 +519,14 @@ public class UserServiceTest {
     void should_refresh_active_user_profiles() {
         // Given
         final var since = ZonedDateTime.now().minusDays(30);
-        final var users = List.of(
+        final var users = List.of(User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build(),
                 User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build(),
-                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build(),
-                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build()
-        );
-        final var githubUserIdentities = List.of(
-                GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
-                GithubUserIdentity.builder().githubUserId(users.get(2).getGithubUserId()).email(faker.internet().emailAddress()).build()
-        );
-        final var updatedUserProfiles = List.of(
-                User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).githubEmail(githubUserIdentities.get(0).getEmail()).build(),
-                User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build()
-        );
+                User.builder().githubUserId(faker.number().randomNumber() + faker.number().randomNumber()).build());
+        final var githubUserIdentities =
+                List.of(GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
+                        GithubUserIdentity.builder().githubUserId(users.get(2).getGithubUserId()).email(faker.internet().emailAddress()).build());
+        final var updatedUserProfiles =
+                List.of(User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).githubEmail(githubUserIdentities.get(0).getEmail()).build(), User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build());
 
         when(userStoragePort.getUsersLastSeenSince(since)).thenReturn(users);
 
@@ -691,22 +545,12 @@ public class UserServiceTest {
     void should_update_user_github_profile() {
         // Given
         final long githubUserId = 1L;
-        final User user = User.builder()
-                .githubUserId(githubUserId)
-                .githubLogin("a")
-                .githubAvatarUrl("b")
-                .githubEmail("c")
-                .build();
-        final GithubUserIdentity githubUserIdentity = GithubUserIdentity.builder()
-                .email(faker.harryPotter().book())
-                .githubLogin(faker.rickAndMorty().character())
-                .githubAvatarUrl(faker.gameOfThrones().character())
-                .build();
+        final User user = User.builder().githubUserId(githubUserId).githubLogin("a").githubAvatarUrl("b").githubEmail("c").build();
+        final GithubUserIdentity githubUserIdentity =
+                GithubUserIdentity.builder().email(faker.harryPotter().book()).githubLogin(faker.rickAndMorty().character()).githubAvatarUrl(faker.gameOfThrones().character()).build();
 
         // When
-        when(githubSearchPort.getUserProfile(githubUserId))
-                .thenReturn(Optional.of(githubUserIdentity
-                ));
+        when(githubSearchPort.getUserProfile(githubUserId)).thenReturn(Optional.of(githubUserIdentity));
         userService.updateGithubProfile(user);
 
         // Then
@@ -723,8 +567,7 @@ public class UserServiceTest {
         final long githubUserId = 2L;
 
         // When
-        when(githubSearchPort.getUserProfile(githubUserId))
-                .thenReturn(Optional.empty());
+        when(githubSearchPort.getUserProfile(githubUserId)).thenReturn(Optional.empty());
         OnlyDustException onlyDustException = null;
         try {
             userService.updateGithubProfile(User.builder().githubUserId(githubUserId).build());
@@ -765,8 +608,7 @@ public class UserServiceTest {
             // When
             assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
                     // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("User is not authorized to apply on project");
+                    .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to apply on project");
         }
 
         @Test
@@ -777,37 +619,32 @@ public class UserServiceTest {
             // When
             assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
                     // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Issue %s not found".formatted(issue.id()));
+                    .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s not found".formatted(issue.id()));
         }
 
         @Test
         void should_reject_application_if_issue_is_already_assigned() {
             // Given
-            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(),
-                    faker.number().randomNumber(),
-                    faker.number().randomNumber(),
-                    1)));
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(), faker.number().randomNumber(),
+                    faker.number().randomNumber(), 1)));
 
             // When
             assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
                     // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Issue %s is already assigned".formatted(issue.id()));
+                    .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s is already assigned".formatted(issue.id()));
         }
 
         @Test
         void should_reject_duplicate_applications() {
             // Given
-            final var application = new Application(Application.Id.random(), projectId, userId, ZonedDateTime.now(),
+            final var application = new Application(Application.Id.random(), projectId, userId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
                     issue.id(), comment.id(), motivation, problemSolvingApproach);
             when(userStoragePort.findApplications(userId, projectId, issue.id())).thenReturn(List.of(application));
 
             // When
             assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
                     // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("User already applied to this issue");
+                    .isInstanceOf(OnlyDustException.class).hasMessage("User already applied to this issue");
         }
 
         @Test
@@ -818,8 +655,7 @@ public class UserServiceTest {
             // When
             assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
                     // Then
-                    .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Issue %s does not belong to project %s".formatted(issue.id(), projectId));
+                    .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s does not belong to project %s".formatted(issue.id(), projectId));
         }
 
         @Test
@@ -835,6 +671,7 @@ public class UserServiceTest {
             assertThat(application.projectId()).isEqualTo(projectId);
             assertThat(application.applicantId()).isEqualTo(userId);
             assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
+            assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
             assertThat(application.issueId()).isEqualTo(issue.id());
             assertThat(application.commentId()).isEqualTo(comment.id());
             assertThat(application.motivations()).isEqualTo(motivation);
