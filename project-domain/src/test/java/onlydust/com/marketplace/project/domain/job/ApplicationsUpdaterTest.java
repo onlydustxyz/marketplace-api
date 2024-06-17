@@ -7,6 +7,7 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,8 @@ import static org.mockito.Mockito.*;
 class ApplicationsUpdaterTest {
     final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort);
+    final LLMPort llmPort = mock(LLMPort.class);
+    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, llmPort);
 
     final Faker faker = new Faker();
 
@@ -42,7 +44,7 @@ class ApplicationsUpdaterTest {
 
     @BeforeEach
     void setup() {
-        reset(userStoragePort, projectStoragePort);
+        reset(userStoragePort, projectStoragePort, llmPort);
     }
 
     @Nested
@@ -60,6 +62,7 @@ class ApplicationsUpdaterTest {
         void setup() {
             when(projectStoragePort.findProjectsByRepoId(event.repoId())).thenReturn(List.of(project1, project2));
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
+            when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
         }
 
         @Test
@@ -88,6 +91,18 @@ class ApplicationsUpdaterTest {
                     faker.lorem().sentence());
 
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of(existingApplication));
+
+            // When
+            applicationsUpdater.process(event);
+
+            // Then
+            verify(userStoragePort, never()).save(any(Application[].class));
+        }
+
+        @Test
+        void should_not_create_application_if_it_does_not_express_interest() {
+            // Given
+            when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(false);
 
             // When
             applicationsUpdater.process(event);
@@ -126,11 +141,6 @@ class ApplicationsUpdaterTest {
 
         @BeforeEach
         void setup() {
-        }
-
-        @Test
-        void should_not_update_applications_modified_on_the_marketplace() {
-            
         }
 
     }

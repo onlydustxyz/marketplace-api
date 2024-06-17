@@ -11,6 +11,7 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
@@ -19,6 +20,7 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
     private final UserStoragePort userStoragePort;
+    private final LLMPort llmPort;
 
     @Override
     public void process(Event event) {
@@ -42,10 +44,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
                 .map(project -> newApplication(onGithubCommentCreated, project))
                 .toArray(Application[]::new);
 
-        if (applications.length > 0) {
-            // TODO: ask LLM if the comment expresses interest in the project
+        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(onGithubCommentCreated.body()))
             userStoragePort.save(applications);
-        }
     }
 
     private void process(OnGithubCommentEdited onGithubCommentEdited) {
