@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
@@ -9,8 +8,6 @@ import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -32,31 +29,37 @@ public class ApplicationsUpdater implements OutboxConsumer {
             LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
 
-    private void process(OnGithubCommentCreated onGithubCommentCreated) {
-        final var issueId = GithubIssue.Id.of(onGithubCommentCreated.issueId());
+    private void process(OnGithubCommentCreated event) {
+        createMissingApplications(GithubComment.of(event));
+    }
 
-        if (!userStoragePort.findApplications(onGithubCommentCreated.authorId(), issueId).isEmpty()) {
-            LOGGER.debug("Skipping comment {} as user already applied to this issue", onGithubCommentCreated.id());
+    private void process(OnGithubCommentEdited event) {
+        final var comment = GithubComment.of(event);
+        createMissingApplications(comment);
+        deleteObsoleteApplications(comment);
+    }
+
+    private void createMissingApplications(GithubComment comment) {
+        if (!userStoragePort.findApplications(comment.authorId(), comment.issueId()).isEmpty()) {
+            LOGGER.debug("Skipping comment {} as user already applied to this issue", comment.id());
             return;
         }
 
-        final var applications = projectStoragePort.findProjectsByRepoId(onGithubCommentCreated.repoId()).stream()
-                .map(project -> newApplication(onGithubCommentCreated, project))
+        final var applications = projectStoragePort.findProjectsByRepoId(comment.repoId()).stream()
+                .map(project -> Application.fromGithubComment(comment, project.getId()))
                 .toArray(Application[]::new);
 
-        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(onGithubCommentCreated.body()))
+        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(comment.body()))
             userStoragePort.save(applications);
     }
 
-    private void process(OnGithubCommentEdited onGithubCommentEdited) {
-        final var commentId = GithubComment.Id.of(onGithubCommentEdited.id());
-    }
+    private void deleteObsoleteApplications(GithubComment comment) {
+        final var githubApplicationIds = userStoragePort.findApplications(comment.authorId(), comment.issueId()).stream()
+                .filter(a -> a.origin() == Application.Origin.GITHUB)
+                .map(Application::id)
+                .toArray(Application.Id[]::new);
 
-    private static @NonNull Application newApplication(OnGithubCommentCreated onGithubCommentCreated, Project project) {
-        return Application.fromGithub(project.getId(),
-                onGithubCommentCreated.authorId(),
-                onGithubCommentCreated.createdAt(),
-                GithubIssue.Id.of(onGithubCommentCreated.issueId()),
-                GithubComment.Id.of(onGithubCommentCreated.id()));
+        if (githubApplicationIds.length > 0 && !llmPort.isCommentShowingInterestToContribute(comment.body()))
+            userStoragePort.deleteApplications(githubApplicationIds);
     }
 }

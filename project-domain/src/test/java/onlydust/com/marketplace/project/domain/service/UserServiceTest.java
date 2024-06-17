@@ -586,7 +586,12 @@ public class UserServiceTest {
     class ProjectApplication {
         final Long githubUserId = faker.number().randomNumber();
         final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
-        final GithubComment comment = new GithubComment(GithubComment.Id.random());
+        final GithubComment comment = new GithubComment(GithubComment.Id.random(),
+                issue.id(),
+                faker.number().randomNumber(),
+                faker.number().randomNumber(),
+                faker.date().past(1, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                faker.lorem().sentence());
         final String motivation = faker.lorem().sentence();
         final String problemSolvingApproach = faker.lorem().sentence();
         final String personalAccessToken = faker.internet().password();
@@ -720,12 +725,13 @@ public class UserServiceTest {
         @Test
         void should_update_application() {
             // Given
-            final var application = Application.fromGithub(
-                    projectId,
-                    githubUserId,
-                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                    issue.id(),
-                    GithubComment.Id.random()
+            final var application = Application.fromGithubComment(
+                    new GithubComment(GithubComment.Id.random(), issue.id(),
+                            faker.number().randomNumber(),
+                            githubUserId,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            faker.lorem().sentence()),
+                    projectId
             );
 
             when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));

@@ -43,12 +43,8 @@ public record Application(@NonNull Id id,
     }
 
 
-    public static Application fromGithub(@NonNull UUID projectId,
-                                         @NonNull Long applicantId,
-                                         @NonNull ZonedDateTime appliedAt,
-                                         @NonNull GithubIssue.Id issueId,
-                                         @NonNull GithubComment.Id commentId) {
-        return new Application(Id.random(), projectId, applicantId, Origin.GITHUB, appliedAt, issueId, commentId, null, null);
+    public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull UUID projectId) {
+        return new Application(Id.random(), projectId, comment.authorId(), Origin.GITHUB, comment.updatedAt(), comment.issueId(), comment.id(), null, null);
     }
 
     public Application update(@NonNull String motivations,

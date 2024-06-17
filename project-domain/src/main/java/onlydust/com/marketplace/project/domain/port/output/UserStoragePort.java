@@ -57,4 +57,6 @@ public interface UserStoragePort {
     Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId);
 
     List<Application> findApplications(Long applicantId, GithubIssue.Id issueId);
+
+    void deleteApplications(Application.Id... applicationIds);
 }
