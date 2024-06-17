@@ -126,7 +126,7 @@ public interface UserMapper {
         };
     }
 
-    static GetMeResponse userToGetMeResponse(final User authenticatedUser) {
+    static GetMeResponse userToGetMeResponse(final User authenticatedUser, boolean userAuthorizedToApplyOnGithubIssues) {
         final GetMeResponse getMeResponse = new GetMeResponse();
         getMeResponse.setId(authenticatedUser.getId());
         getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
@@ -134,6 +134,7 @@ public interface UserMapper {
         getMeResponse.setLogin(authenticatedUser.getGithubLogin());
         getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
         getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
+        getMeResponse.setIsAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues);
         getMeResponse.setProjectsLed(authenticatedUser.getProjectsLed()
                 .stream().map(projectLedView -> new ProjectLedShortResponse()
                         .id(projectLedView.getId())

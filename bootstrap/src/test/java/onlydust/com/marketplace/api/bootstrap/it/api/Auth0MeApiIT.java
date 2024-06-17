@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
-import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.bootstrap.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.bootstrap.helper.JwtVerifierStub;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagUser;
 import onlydust.com.marketplace.api.contract.model.GetMeResponse;
@@ -23,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import java.util.Date;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForEmptyJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
@@ -44,6 +45,8 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     EntityManagerFactory entityManagerFactory;
     @Autowired
     PosthogProperties posthogProperties;
+    @Autowired
+    Auth0ApiClientStub auth0ApiClientStub;
 
     @BeforeEach
     void setup() {
@@ -54,12 +57,17 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId, 500L);
 
         userAuthHelper.mockAuth0UserInfo(githubUserId, login, login, avatarUrl, email);
+        auth0ApiClientStub.withPat(githubUserId, token);
+
+        githubWireMockServer.stubFor(WireMock.get(urlEqualTo("/"))
+                .withHeader("Authorization", equalTo("Bearer %s".formatted(token)))
+                .willReturn(okForEmptyJson().withHeader("x-oauth-scopes", "read:org, read:packages, public_repo")));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(githubUserId)))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
-                .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+                .willReturn(okForEmptyJson()));
     }
 
     @Test
@@ -177,6 +185,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         assertThat(me.getHasAcceptedLatestTermsAndConditions()).isEqualTo(false);
         assertThat(me.getIsAdmin()).isEqualTo(false);
         assertThat(me.getId()).isNotNull();
+        assertThat(me.getIsAuthorizedToApplyOnGithubIssues()).isTrue();
     }
 
     @Test
@@ -233,9 +242,10 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .build();
         userRepository.save(impersonatorUser);
 
+        long impresonatedGithubUserId = githubUserId + faker.number().numberBetween(1, 1000);
         final UserEntity impersonatedUser = UserEntity.builder()
                 .id(UUID.randomUUID())
-                .githubUserId(githubUserId + faker.number().numberBetween(1, 1000))
+                .githubUserId(impresonatedGithubUserId)
                 .githubLogin(faker.name().username())
                 .githubAvatarUrl(faker.internet().avatar())
                 .githubEmail(faker.internet().emailAddress())
@@ -243,6 +253,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER})
                 .build();
         userRepository.save(impersonatedUser);
+        auth0ApiClientStub.withPat(impresonatedGithubUserId, token);
 
         // When
         client.get()

@@ -331,4 +331,10 @@ public class ProjectConfiguration {
     public LanguageFacadePort languageFacadePort(final LanguageStorage languageStorage, final ImageStoragePort imageStoragePort) {
         return new LanguageService(languageStorage, imageStoragePort);
     }
+
+    @Bean
+    public GithubUserPermissionsService githubUserPermissionsService(final GithubAuthenticationPort githubAuthenticationPort,
+                                                                     final GithubAuthenticationInfoPort githubAuthenticationInfoPort) {
+        return new GithubUserPermissionsService(githubAuthenticationPort, githubAuthenticationInfoPort);
+    }
 }

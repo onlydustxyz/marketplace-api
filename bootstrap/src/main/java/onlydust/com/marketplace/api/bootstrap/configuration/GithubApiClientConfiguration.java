@@ -3,13 +3,14 @@ package onlydust.com.marketplace.api.bootstrap.configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.project.domain.service.RetriedGithubInstallationFacade;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
+import onlydust.com.marketplace.api.github_api.adapters.GithubAuthenticationInfoAdapter;
 import onlydust.com.marketplace.api.github_api.adapters.GithubDustyBotAdapter;
 import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.project.domain.service.RetriedGithubInstallationFacade;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -75,5 +76,8 @@ public class GithubApiClientConfiguration {
         return new GithubDustyBotAdapter(dustyBotClient);
     }
 
-
+    @Bean
+    public GithubAuthenticationInfoAdapter githubAuthenticationInfoAdapter(final GithubHttpClient githubHttpClient) {
+        return new GithubAuthenticationInfoAdapter(githubHttpClient);
+    }
 }
