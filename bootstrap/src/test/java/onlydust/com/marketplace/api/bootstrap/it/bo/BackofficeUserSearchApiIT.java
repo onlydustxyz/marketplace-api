@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
 import lombok.NonNull;
+import onlydust.com.backoffice.api.contract.model.OnlyDustError;
 import onlydust.com.backoffice.api.contract.model.UserSearchPage;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
@@ -116,6 +117,18 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         });
     }
 
+    @Test
+    void should_return_400_when_query_is_invalid() {
+        var error = searchUsersWithWrongQuery("foo.bar<200", null);
+        assertThat(error.getMessage()).isEqualTo("Invalid query: 'foo.bar<200' and/or sort: 'login' (UnknownProperty error)");
+
+        error = searchUsersWithWrongQuery("global.rank>foo", null);
+        assertThat(error.getMessage()).isEqualTo("Invalid query: 'global.rank>foo' and/or sort: 'login' (Conversion error)");
+
+        error = searchUsersWithWrongQuery("login==ofux", "foo");
+        assertThat(error.getMessage()).isEqualTo("Invalid query: 'login==ofux' and/or sort: 'foo' (UnknownProperty error)");
+    }
+
     private UserSearchPage searchUsers(@NonNull String query) {
         return searchUsers(query, null, 5, 0);
     }
@@ -140,6 +153,21 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody(UserSearchPage.class).returnResult().getResponseBody();
+        return response;
+    }
+
+    private OnlyDustError searchUsersWithWrongQuery(@NonNull String query, String sort) {
+        final var queryParams = new HashMap<>(Map.of("pageIndex", "0", "pageSize", "5", "query", query));
+        if (sort != null) {
+            queryParams.put("sort", sort);
+        }
+        final var response = client.get()
+                .uri(getApiURI(GET_SEARCH_USERS, queryParams))
+                .header("Authorization", "Bearer " + mehdi.jwt())
+                .exchange()
+                .expectStatus()
+                .is4xxClientError()
+                .expectBody(OnlyDustError.class).returnResult().getResponseBody();
         return response;
     }
 }

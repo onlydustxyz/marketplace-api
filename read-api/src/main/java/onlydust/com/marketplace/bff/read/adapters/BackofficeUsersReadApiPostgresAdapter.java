@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.bff.read.adapters;
 
+import io.github.perplexhub.rsql.RSQLException;
 import io.github.perplexhub.rsql.RSQLJPASupport;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.bff.read.entities.user.rsql.AllUserRSQLEntity;
 import onlydust.com.marketplace.bff.read.mapper.UserMapper;
 import onlydust.com.marketplace.bff.read.repositories.AllUserRSQLRepository;
 import onlydust.com.marketplace.bff.read.repositories.UserReadRepository;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static io.github.perplexhub.rsql.RSQLJPASupport.toSort;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
@@ -65,9 +68,15 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
         propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
         propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
 
-        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping)
-                        .and(toSort(sort, propertyMapping)),
-                PageRequest.of(pageIndex, pageSize));
+        Page<AllUserRSQLEntity> page;
+        try {
+            page = allUserRSQLRepository.findAll(
+                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping).and(toSort(sort, propertyMapping)),
+                    PageRequest.of(pageIndex, pageSize));
+        } catch (RSQLException e) {
+            throw badRequest("Invalid query: '%s' and/or sort: '%s' (%s error)"
+                    .formatted(query, sort, e.getClass().getSimpleName().replaceAll("Exception", "")));
+        }
 
         final var response = new UserSearchPage()
                 .users(page.getContent().stream().map(AllUserRSQLEntity::toBoPageItemResponse).toList())
