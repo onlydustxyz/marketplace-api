@@ -391,7 +391,7 @@ paths:
       summary: Apply to become a project contributor
       operationId: applyOnProject
       description: |
-        Apply to become a project contributor
+        Apply on a project. This endpoint will comment on the given GitHub issue on behalf of the user and register its application internally.
       requestBody:
         description: 'Application'
         content:
@@ -399,8 +399,12 @@ paths:
             schema:
               $ref: '#/components/schemas/ApplicationRequest'
       responses:
-        "204":
+        "200":
           description: 'The application was sent successfully.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3785,6 +3789,11 @@ components:
       format: uuid
       description: OnlyDust project ID
 
+    ApplicationId:
+      type: string
+      format: uuid
+      description: Application ID
+
     TransactionId:
       type: string
       format: uuid
@@ -5984,9 +5993,27 @@ components:
       type: object
       required:
         - projectId
+        - issueId
+        - motivation
       properties:
         projectId:
           $ref: '#/components/schemas/ProjectId'
+        issueId:
+          $ref: '#/components/schemas/IssueId'
+        motivation:
+          type: string
+          description: The applicant's motivation to work on the issue
+        problemSolvingApproach:
+          type: string
+          description: The applicant's approach to solving the issue
+
+    ApplicationResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/ApplicationId'
 
     CreateProjectRequest:
       type: object

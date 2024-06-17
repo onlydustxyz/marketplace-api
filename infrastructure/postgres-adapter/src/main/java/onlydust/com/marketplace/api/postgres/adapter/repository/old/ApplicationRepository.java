@@ -11,4 +11,6 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
     Optional<ApplicationEntity> findByProjectIdAndApplicantId(UUID projectId, UUID applicantId);
 
     List<ApplicationEntity> findAllByApplicantId(UUID id);
+
+    List<ApplicationEntity> findAllByApplicantIdAndProjectIdAndIssueId(UUID userId, UUID projectId, Long value);
 }

@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -40,6 +41,8 @@ import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Tags(@Tag(name = "Me"))
@@ -72,21 +75,26 @@ public class MeRestApi implements MeApi {
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
             userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
         }
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.acceptInvitationToLeadProject(authenticatedUser.getGithubUserId(), projectId);
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
-    public ResponseEntity<Void> applyOnProject(ApplicationRequest applicationRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.applyOnProject(authenticatedUser.getId(), applicationRequest.getProjectId());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ApplicationResponse> applyOnProject(ApplicationRequest applicationRequest) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var application = userFacadePort.applyOnProject(authenticatedUser.getId(),
+                authenticatedUser.getGithubUserId(),
+                applicationRequest.getProjectId(),
+                GithubIssue.Id.of(applicationRequest.getIssueId()),
+                applicationRequest.getMotivation(),
+                applicationRequest.getProblemSolvingApproach());
+        return ok(new ApplicationResponse().id(application.id().value()));
     }
 
     @Override
@@ -202,7 +210,7 @@ public class MeRestApi implements MeApi {
         userFacadePort.claimProjectForAuthenticatedUser(
                 projectId, authenticatedUser
         );
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -258,14 +266,14 @@ public class MeRestApi implements MeApi {
                     BillingProfile.Id.of(billingProfileId),
                     GithubUserId.of(authenticatedUser.getGithubUserId()));
         }
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> registerToHackathon(UUID hackathonId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         hackathonFacadePort.registerToHackathon(authenticatedUser.getId(), Hackathon.Id.of(hackathonId));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -276,6 +284,6 @@ public class MeRestApi implements MeApi {
                 voteForCommitteeAssignmentRequest.getVotes().stream()
                         .collect(Collectors.toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), v -> v.getVote())));
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 }

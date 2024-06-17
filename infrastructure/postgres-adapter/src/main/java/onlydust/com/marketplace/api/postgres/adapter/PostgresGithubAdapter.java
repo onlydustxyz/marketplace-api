@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubAccountMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubAppInstallationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.GithubIssueViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GithubRepoViewEntityRepository;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,7 @@ public class PostgresGithubAdapter implements GithubStoragePort {
 
     private final GithubAppInstallationRepository githubAppInstallationRepository;
     private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
+    private final GithubIssueViewRepository githubIssueViewRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -40,5 +44,11 @@ public class PostgresGithubAdapter implements GithubStoragePort {
                 .stream()
                 .map(GithubAccountMapper::map)
                 .toList();
+    }
+
+    @Override
+    public Optional<GithubIssue> findIssueById(GithubIssue.Id issueId) {
+        return githubIssueViewRepository.findById(issueId.value())
+                .map(GithubIssueViewEntity::toDomain);
     }
 }

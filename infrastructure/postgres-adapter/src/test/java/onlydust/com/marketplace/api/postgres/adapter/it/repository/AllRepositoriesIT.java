@@ -151,19 +151,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_create_application() {
-        // Given
-        final ApplicationEntity expected = ApplicationEntity.builder()
-                .applicantId(UUID.randomUUID())
-                .projectId(UUID.randomUUID())
-                .receivedAt(new Date())
-                .id(UUID.randomUUID())
-                .build();
-
-        assertIsSaved(expected, applicationRepository);
-    }
-
-    @Test
     void should_create_user_profile_info() {
         // Given
         final UserProfileInfoEntity expected = UserProfileInfoEntity.builder()

@@ -1,22 +1,17 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
-import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
@@ -31,7 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
 @AllArgsConstructor
 @Slf4j
@@ -44,6 +39,10 @@ public class UserService implements UserFacadePort {
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
     private final ProjectObserverPort projectObserverPort;
+    private final GithubUserPermissionsService githubUserPermissionsService;
+    private final GithubStoragePort githubStoragePort;
+    private final GithubApiPort githubApiPort;
+    private final GithubAuthenticationPort githubAuthenticationPort;
 
     @Override
     @Transactional
@@ -157,9 +156,40 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void applyOnProject(UUID userId, UUID projectId) {
-        final var applicationId = userStoragePort.createApplicationOnProject(userId, projectId);
-        projectObserverPort.onUserApplied(projectId, userId, applicationId);
+    public Application applyOnProject(@NonNull UUID userId,
+                                      @NonNull Long githubUserId,
+                                      @NonNull UUID projectId,
+                                      @NonNull GithubIssue.Id issueId,
+                                      @NonNull String motivation,
+                                      String problemSolvingApproach) {
+        if (!githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId))
+            throw forbidden("User is not authorized to apply on project");
+
+        final var issue = githubStoragePort.findIssueById(issueId)
+                .orElseThrow(() -> notFound("Issue %s not found".formatted(issueId)));
+
+        if (issue.isAssigned())
+            throw forbidden("Issue %s is already assigned".formatted(issueId));
+
+        if (!userStoragePort.findApplications(userId, projectId, issueId).isEmpty())
+            throw badRequest("User already applied to this issue");
+
+        if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))
+            throw badRequest("Issue %s does not belong to project %s".formatted(issueId, projectId));
+
+        final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+
+        final var comment = githubApiPort.createComment(personalAccessToken, issue, """
+                I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
+                """);
+
+        final var application = new Application(Application.Id.random(), projectId, userId, ZonedDateTime.now(),
+                issueId, comment.id(), motivation, problemSolvingApproach);
+
+        userStoragePort.save(application);
+        projectObserverPort.onUserApplied(projectId, userId, application.id());
+
+        return application;
     }
 
     @Override
@@ -168,8 +198,8 @@ public class UserService implements UserFacadePort {
                                                                                           List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
         if (!reward.getTo().getGithubUserId().equals(recipientId) &&
-                (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
-            throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
+            (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
+            throw forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return reward;
     }
@@ -178,9 +208,9 @@ public class UserService implements UserFacadePort {
                                                                                                       int pageSize, List<UUID> companyAdminBillingProfileIds) {
         final Page<RewardItemView> page = userStoragePort.findRewardItemsPageById(rewardId, pageIndex, pageSize);
         if (page.getContent().stream().anyMatch(rewardItemView -> !rewardItemView.getRecipientId().equals(recipientId)) &&
-                page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())
-                        || !companyAdminBillingProfileIds.contains(rewardItemView.getBillingProfileId()))) {
-            throw OnlyDustException.forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
+            page.getContent().stream().anyMatch(rewardItemView -> isNull(rewardItemView.getBillingProfileId())
+                                                                  || !companyAdminBillingProfileIds.contains(rewardItemView.getBillingProfileId()))) {
+            throw forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
         return page;
     }
@@ -191,20 +221,20 @@ public class UserService implements UserFacadePort {
         final var projectLeaders = projectStoragePort.getProjectLeadIds(projectId);
         final var projectInvitedLeaders = projectStoragePort.getProjectInvitedLeadIds(projectId);
         if (!projectLeaders.isEmpty() || !projectInvitedLeaders.isEmpty()) {
-            throw OnlyDustException.forbidden("Project must have no project (pending) leads to be claimable");
+            throw forbidden("Project must have no project (pending) leads to be claimable");
         }
 
         final var projectOrganizations = projectStoragePort.getProjectOrganizations(projectId);
         if (projectOrganizations.isEmpty()) {
-            throw OnlyDustException.forbidden("Project must have at least one organization to be claimable");
+            throw forbidden("Project must have at least one organization to be claimable");
         }
 
         final boolean isNotClaimable = projectOrganizations.stream()
                 .anyMatch(org -> cannotBeClaimedByUser(user, org));
         if (isNotClaimable) {
-            throw OnlyDustException.forbidden("User must be github admin on every organizations not installed and at " +
-                    "least member on every organization already installed linked to the " +
-                    "project");
+            throw forbidden("User must be github admin on every organizations not installed and at " +
+                            "least member on every organization already installed linked to the " +
+                            "project");
 
         }
         userStoragePort.saveProjectLead(user.getId(), projectId);

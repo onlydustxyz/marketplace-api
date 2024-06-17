@@ -363,3 +363,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000266_modify-individual-limit-columns.sql
   - include:
       file: db/changelog/changelogs/00000266_improve_received_rewards_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000267_update_applications_table.sql

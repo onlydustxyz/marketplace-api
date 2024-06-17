@@ -114,7 +114,12 @@ public class ProjectConfiguration {
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort,
-                                         final ProjectObserverPort projectObservers) {
+                                         final ProjectObserverPort projectObservers,
+                                         final GithubUserPermissionsService githubUserPermissionsService,
+                                         final GithubStoragePort githubStoragePort,
+                                         final GithubApiPort githubApiPort,
+                                         final GithubAuthenticationPort githubAuthenticationPort
+    ) {
         return new UserService(
                 userObservers,
                 postgresUserAdapter,
@@ -122,7 +127,11 @@ public class ProjectConfiguration {
                 projectStoragePort,
                 githubSearchPort,
                 imageStoragePort,
-                projectObservers);
+                projectObservers,
+                githubUserPermissionsService,
+                githubStoragePort,
+                githubApiPort,
+                githubAuthenticationPort);
     }
 
     @Bean
