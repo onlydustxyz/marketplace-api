@@ -162,6 +162,68 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_delete_my_application() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+        final var applicationId = UUID.randomUUID();
+
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                user.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1952203217L,
+                111L,
+                "My motivations",
+                null
+        ));
+
+        // When
+        client.delete()
+                .uri(getApiURI(APPLICATION.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        assertThat(applicationRepository.findById(applicationId)).isEmpty();
+    }
+
+
+    @Test
+    void should_delete_an_application_as_project_lead() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+        final var projectLead = userAuthHelper.authenticateGregoire();
+        final var applicationId = UUID.randomUUID();
+
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                user.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1974125983L,
+                111L,
+                "My motivations",
+                null
+        ));
+
+        // When
+        client.delete()
+                .uri(getApiURI(APPLICATION.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        assertThat(applicationRepository.findById(applicationId)).isEmpty();
+    }
+
+    @Test
     void should_detect_github_application() {
         // Given
         final var commentId = faker.number().randomNumber(10, true);

@@ -61,6 +61,12 @@ public class RestApiConfiguration {
     }
 
     @Bean
+    public ApplicationsRestApi applicationsRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
+                                                   final UserFacadePort userFacadePort) {
+        return new ApplicationsRestApi(authenticatedAppUserService, userFacadePort);
+    }
+
+    @Bean
     public TechnologiesRestApi technologiesRestApi(final TechnologiesPort technologiesPort) {
         return new TechnologiesRestApi(technologiesPort);
     }

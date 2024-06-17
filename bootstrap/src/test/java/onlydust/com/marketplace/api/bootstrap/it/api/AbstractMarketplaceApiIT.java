@@ -112,6 +112,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_CLAIM_PROJECT = "/api/v1/me/project-claims/%s";
     protected static final String ME_APPLICATIONS = "/api/v1/me/applications";
     protected static final String ME_APPLICATION = "/api/v1/me/applications/%s";
+    protected static final String APPLICATION = "/api/v1/applications/%s";
     protected static final String ME_GET_REWARDS = "/api/v1/me/rewards";
     protected static final String ME_GET_CONTRIBUTED_PROJECTS = "/api/v1/me/contributed-projects";
     protected static final String ME_GET_CONTRIBUTED_REPOS = "/api/v1/me/contributed-repos";
