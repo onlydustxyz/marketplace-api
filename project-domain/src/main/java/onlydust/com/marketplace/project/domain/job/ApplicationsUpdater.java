@@ -69,8 +69,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
             return;
         }
 
-        final var applications = projectStoragePort.findProjectsByRepoId(comment.repoId()).stream()
-                .map(project -> Application.fromGithubComment(comment, project.getId()))
+        final var applications = projectStoragePort.findProjectIdsByRepoId(comment.repoId()).stream()
+                .map(projectId -> Application.fromGithubComment(comment, projectId))
                 .toArray(Application[]::new);
 
         if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(comment.body()))

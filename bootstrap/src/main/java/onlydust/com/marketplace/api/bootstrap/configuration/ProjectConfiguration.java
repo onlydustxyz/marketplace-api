@@ -204,7 +204,7 @@ public class ProjectConfiguration {
     @Bean
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
                                               final UserStoragePort userStoragePort) {
-        return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort));
+        return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort, comment -> true));
     }
 
     @Bean

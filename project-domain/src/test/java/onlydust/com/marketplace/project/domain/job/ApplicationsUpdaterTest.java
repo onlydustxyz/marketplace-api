@@ -5,7 +5,6 @@ import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -31,15 +30,8 @@ class ApplicationsUpdaterTest {
 
     final Faker faker = new Faker();
 
-    final Project project1 = Project.builder()
-            .id(UUID.randomUUID())
-            .name(faker.app().name())
-            .build();
-
-    final Project project2 = Project.builder()
-            .id(UUID.randomUUID())
-            .name(faker.app().name())
-            .build();
+    final UUID projectId1 = UUID.randomUUID();
+    final UUID projectId2 = UUID.randomUUID();
 
     @BeforeEach
     void setup() {
@@ -59,14 +51,14 @@ class ApplicationsUpdaterTest {
 
         @BeforeEach
         void setup() {
-            when(projectStoragePort.findProjectsByRepoId(event.repoId())).thenReturn(List.of(project1, project2));
+            when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
         }
 
         @Test
         void should_not_create_applications_without_project() {
             // Given
-            when(projectStoragePort.findProjectsByRepoId(event.repoId())).thenReturn(List.of());
+            when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of());
 
             // When
             applicationsUpdater.process(event);
@@ -80,7 +72,7 @@ class ApplicationsUpdaterTest {
         void should_not_create_application_if_already_applied() {
             // Given
             final var existingApplication = new Application(Application.Id.random(),
-                    project1.getId(),
+                    projectId1,
                     event.authorId(),
                     Application.Origin.MARKETPLACE,
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -125,7 +117,7 @@ class ApplicationsUpdaterTest {
             final var applications = applicationsCaptor.getValue();
             assertThat(applications).hasSize(2);
 
-            assertThat(Arrays.stream(applications).map(Application::projectId)).containsExactlyInAnyOrder(project1.getId(), project2.getId());
+            assertThat(Arrays.stream(applications).map(Application::projectId)).containsExactlyInAnyOrder(projectId1, projectId2);
             assertThat(applications).allMatch(application -> application.issueId().value().equals(event.issueId()));
             assertThat(applications).allMatch(application -> application.applicantId().equals(event.authorId()));
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
@@ -151,7 +143,7 @@ class ApplicationsUpdaterTest {
             final var commentId = GithubComment.Id.of(event.id());
             final var existingApplications = List.of(
                     new Application(Application.Id.random(),
-                            project1.getId(),
+                            projectId1,
                             event.authorId(),
                             Application.Origin.MARKETPLACE,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -160,7 +152,7 @@ class ApplicationsUpdaterTest {
                             faker.lorem().sentence(),
                             faker.lorem().sentence()),
                     new Application(Application.Id.random(),
-                            project2.getId(),
+                            projectId2,
                             event.authorId(),
                             Application.Origin.GITHUB,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -186,7 +178,7 @@ class ApplicationsUpdaterTest {
         void should_create_applications_if_none_yet_and_new_comment_expresses_interest() {
             // Given
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
-            when(projectStoragePort.findProjectsByRepoId(event.repoId())).thenReturn(List.of(project1, project2));
+            when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
             when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
 
             // When
@@ -198,7 +190,7 @@ class ApplicationsUpdaterTest {
             final var applications = applicationsCaptor.getValue();
             assertThat(applications).hasSize(2);
 
-            assertThat(Arrays.stream(applications).map(Application::projectId)).containsExactlyInAnyOrder(project1.getId(), project2.getId());
+            assertThat(Arrays.stream(applications).map(Application::projectId)).containsExactlyInAnyOrder(projectId1, projectId2);
             assertThat(applications).allMatch(application -> application.issueId().value().equals(event.issueId()));
             assertThat(applications).allMatch(application -> application.applicantId().equals(event.authorId()));
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
@@ -211,7 +203,7 @@ class ApplicationsUpdaterTest {
             // Given
             final var existingApplications = List.of(
                     new Application(Application.Id.random(),
-                            project1.getId(),
+                            projectId1,
                             event.authorId(),
                             Application.Origin.MARKETPLACE,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -246,7 +238,7 @@ class ApplicationsUpdaterTest {
 
             final var existingApplications = List.of(
                     new Application(Application.Id.random(),
-                            project1.getId(),
+                            projectId1,
                             authorId,
                             Application.Origin.MARKETPLACE,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -255,7 +247,7 @@ class ApplicationsUpdaterTest {
                             faker.lorem().sentence(),
                             faker.lorem().sentence()),
                     new Application(Application.Id.random(),
-                            project2.getId(),
+                            projectId2,
                             authorId,
                             Application.Origin.GITHUB,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
