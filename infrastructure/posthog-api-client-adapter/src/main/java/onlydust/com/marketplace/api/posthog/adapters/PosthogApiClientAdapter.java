@@ -42,7 +42,7 @@ public class PosthogApiClientAdapter implements TrackingEventPublisher {
             publish(new PullRequestMergedEventReader(), onPullRequestMerged);
 
         else
-            LOGGER.warn("Event type {} not handle by Posthog event tracking consumer", event.getClass());
+            LOGGER.debug("Event type {} not handle by Posthog event tracking consumer", event.getClass());
     }
 
     private <E extends Event> void publish(EventReader<E> reader, E event) {
