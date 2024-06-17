@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -31,7 +30,7 @@ public interface UserStoragePort {
 
     UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
-    UUID createApplicationOnProject(UUID userId, UUID projectId);
+    void save(@NonNull Application application);
 
     RewardDetailsView findRewardById(UUID rewardId);
 
@@ -52,4 +51,6 @@ public interface UserStoragePort {
     void refreshUserRanksAndStats();
 
     void historizeUserRanks();
+
+    List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId);
 }

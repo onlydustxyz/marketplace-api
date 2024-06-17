@@ -9,11 +9,10 @@ import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -40,6 +39,10 @@ public class UserServiceTest {
     private UserService userService;
     private UserObserverPort userObserverPort;
     private ProjectObserverPort projectObserverPort;
+    private GithubUserPermissionsService githubUserPermissionsService;
+    private GithubStoragePort githubStoragePort;
+    private GithubApiPort githubApiPort;
+    private GithubAuthenticationPort githubAuthenticationPort;
 
     @BeforeEach
     void setUp() {
@@ -49,9 +52,14 @@ public class UserServiceTest {
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
         projectObserverPort = mock(ProjectObserverPort.class);
+        githubUserPermissionsService = mock(GithubUserPermissionsService.class);
+        githubStoragePort = mock(GithubStoragePort.class);
+        githubApiPort = mock(GithubApiPort.class);
+        githubAuthenticationPort = mock(GithubAuthenticationPort.class);
 
         userService = new UserService(userObserverPort, userStoragePort, dateProvider,
-                projectStoragePort, githubSearchPort, imageStoragePort, projectObserverPort);
+                projectStoragePort, githubSearchPort, imageStoragePort, projectObserverPort,
+                githubUserPermissionsService, githubStoragePort, githubApiPort, githubAuthenticationPort);
     }
 
     @Test
@@ -239,22 +247,6 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, times(1)).acceptProjectLeaderInvitation(githubUserId, projectId);
-    }
-
-    @Test
-    void should_apply_on_project() {
-        // Given
-        final UUID projectId = UUID.randomUUID();
-        final UUID userId = UUID.randomUUID();
-        final UUID applicationId = UUID.randomUUID();
-
-        // When
-        when(userStoragePort.createApplicationOnProject(userId, projectId)).thenReturn(applicationId);
-        userService.applyOnProject(userId, projectId);
-
-        // Then
-        verify(userStoragePort, times(1)).createApplicationOnProject(userId, projectId);
-        verify(projectObserverPort, times(1)).onUserApplied(projectId, userId, applicationId);
     }
 
     @Test
@@ -597,7 +589,7 @@ public class UserServiceTest {
         assertNotNull(onlyDustException);
         assertEquals(403, onlyDustException.getStatus());
         assertEquals("User must be github admin on every organizations not installed and at least member on every " +
-                        "organization already installed linked to the project",
+                     "organization already installed linked to the project",
                 onlyDustException.getMessage());
     }
 
@@ -743,5 +735,113 @@ public class UserServiceTest {
         assertNotNull(onlyDustException);
         assertEquals("Github user 2 to update was not found", onlyDustException.getMessage());
         assertEquals(404, onlyDustException.getStatus());
+    }
+
+    @Nested
+    class ProjectApplication {
+        final UUID userId = UUID.randomUUID();
+        final Long githubUserId = faker.number().randomNumber();
+        final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
+        final GithubComment comment = new GithubComment(GithubComment.Id.random());
+        final String motivation = faker.lorem().sentence();
+        final String problemSolvingApproach = faker.lorem().sentence();
+        final String personalAccessToken = faker.internet().password();
+        final UUID projectId = UUID.randomUUID();
+
+        @BeforeEach
+        void setUp() {
+            when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
+            when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(personalAccessToken);
+            when(userStoragePort.findApplications(userId, projectId, issue.id())).thenReturn(List.of());
+            when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber(), issue.repoId()));
+        }
+
+        @Test
+        void should_reject_application_if_user_is_not_allowed_to_comment_on_issues() {
+            // Given
+            when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
+
+            // When
+            assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User is not authorized to apply on project");
+        }
+
+        @Test
+        void should_reject_application_if_issue_does_not_exists() {
+            // Given
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Issue %s not found".formatted(issue.id()));
+        }
+
+        @Test
+        void should_reject_application_if_issue_is_already_assigned() {
+            // Given
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(),
+                    faker.number().randomNumber(),
+                    faker.number().randomNumber(),
+                    1)));
+
+            // When
+            assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Issue %s is already assigned".formatted(issue.id()));
+        }
+
+        @Test
+        void should_reject_duplicate_applications() {
+            // Given
+            final var application = new Application(Application.Id.random(), projectId, userId, ZonedDateTime.now(),
+                    issue.id(), comment.id(), motivation, problemSolvingApproach);
+            when(userStoragePort.findApplications(userId, projectId, issue.id())).thenReturn(List.of(application));
+
+            // When
+            assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User already applied to this issue");
+        }
+
+        @Test
+        void should_reject_applications_if_repo_does_not_belong_to_project() {
+            // Given
+            when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
+
+            // When
+            assertThatThrownBy(() -> userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Issue %s does not belong to project %s".formatted(issue.id(), projectId));
+        }
+
+        @Test
+        void should_apply_on_project() {
+            // Given
+            when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(comment);
+
+            // When
+            final var application = userService.applyOnProject(userId, githubUserId, projectId, issue.id(), motivation, problemSolvingApproach);
+
+            // Then
+            assertThat(application.id()).isNotNull();
+            assertThat(application.projectId()).isEqualTo(projectId);
+            assertThat(application.applicantId()).isEqualTo(userId);
+            assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
+            assertThat(application.issueId()).isEqualTo(issue.id());
+            assertThat(application.commentId()).isEqualTo(comment.id());
+            assertThat(application.motivations()).isEqualTo(motivation);
+            assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+
+            verify(userStoragePort).save(application);
+            verify(projectObserverPort).onUserApplied(projectId, userId, application.id());
+        }
     }
 }

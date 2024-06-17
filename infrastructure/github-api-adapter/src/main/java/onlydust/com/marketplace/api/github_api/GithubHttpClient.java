@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,12 +61,16 @@ public class GithubHttpClient {
     }
 
 
+    public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody, Class<ResponseBody> responseClass) {
+        return post(path, requestBody, config.personalAccessToken, responseClass);
+    }
+
     public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody,
-                                                                   Class<ResponseBody> responseClass) {
+                                                                   @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {
             final HttpResponse<byte[]> httpResponse =
-                    httpClient.send(HttpRequest.newBuilder().uri(buildURI(path)).headers("Authorization",
-                                    "Bearer " + config.personalAccessToken)
+                    httpClient.send(HttpRequest.newBuilder().uri(buildURI(path))
+                            .headers("Authorization", "Bearer " + personalAccessToken)
                             .POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
@@ -73,7 +78,7 @@ public class GithubHttpClient {
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
-                    yield post(URI.create(location).getPath(), requestBody, responseClass);
+                    yield post(URI.create(location).getPath(), requestBody, personalAccessToken, responseClass);
                 }
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or

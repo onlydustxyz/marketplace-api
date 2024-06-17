@@ -89,7 +89,7 @@ public interface UserMapper {
                                 .contributorCount(projectLedIdQueryEntity.getContributorCount())
                                 .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
                                 .build()).toList())
-                .projectsAppliedTo(applications.stream().map(ApplicationEntity::getProjectId).toList())
+                .projectsAppliedTo(applications.stream().map(ApplicationEntity::projectId).toList())
                 .createdAt(user.createdAt())
                 .billingProfiles(billingProfiles)
                 .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)

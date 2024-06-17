@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import onlydust.com.marketplace.project.domain.model.Application;
+
 import java.util.Set;
 import java.util.UUID;
 
@@ -8,7 +10,7 @@ public interface ProjectObserverPort {
 
     void onRewardSettingsChanged(UUID projectId);
 
-    void onUserApplied(UUID projectId, UUID userId, UUID applicationId);
+    void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId);
 
     void onProjectCreated(UUID projectId, UUID projectLeadId);
 
