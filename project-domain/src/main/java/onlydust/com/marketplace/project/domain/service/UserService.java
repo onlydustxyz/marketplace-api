@@ -183,8 +183,8 @@ public class UserService implements UserFacadePort {
                 I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
                 """);
 
-        final var application = new Application(Application.Id.random(), projectId, userId, ZonedDateTime.now(),
-                issueId, comment.id(), motivation, problemSolvingApproach);
+        final var application = new Application(Application.Id.random(), projectId, userId, Application.Origin.MARKETPLACE,
+                ZonedDateTime.now(), issueId, comment.id(), motivation, problemSolvingApproach);
 
         userStoragePort.save(application);
         projectObserverPort.onUserApplied(projectId, userId, application.id());

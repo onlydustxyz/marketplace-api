@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -32,6 +32,10 @@ public class ApplicationEntity {
     @NonNull
     UUID applicantId;
     @NonNull
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    Application.Origin origin;
+    @NonNull
     Long issueId;
     @NonNull
     Long commentId;
@@ -45,6 +49,7 @@ public class ApplicationEntity {
                 .receivedAt(application.appliedAt())
                 .projectId(application.projectId())
                 .applicantId(application.applicantId())
+                .origin(application.origin())
                 .issueId(application.issueId().value())
                 .commentId(application.commentId().value())
                 .motivations(application.motivations())
@@ -57,6 +62,7 @@ public class ApplicationEntity {
                 Application.Id.of(id),
                 projectId,
                 applicantId,
+                origin,
                 receivedAt,
                 GithubIssue.Id.of(issueId),
                 GithubComment.Id.of(commentId),
