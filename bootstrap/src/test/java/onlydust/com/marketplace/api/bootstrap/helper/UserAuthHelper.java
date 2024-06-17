@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.bootstrap.helper;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -15,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForEmptyJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @AllArgsConstructor
@@ -24,10 +26,10 @@ public class UserAuthHelper {
     JWTVerifier jwtVerifier;
     GithubAuthenticationPort githubAuthenticationPort;
     WireMockServer auth0WireMockServer;
+    WireMockServer githubWireMockServer;
 
     @NonNull
-    public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl,
-                                         boolean isAdmin) {
+    public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl, boolean isAdmin) {
         return authenticateUser(signUpUser(userId, githubUserId, login, avatarUrl, isAdmin));
     }
 
@@ -95,7 +97,7 @@ public class UserAuthHelper {
 
     @NonNull
     public AuthenticatedUser authenticatePierre() {
-        return authenticateUser(16590657L, null);
+        return authenticateUser(16590657L);
     }
 
     @NonNull
@@ -164,7 +166,7 @@ public class UserAuthHelper {
 
     @NonNull
     public AuthenticatedUser authenticateUser(UserEntity user) {
-        return authenticateUser(user, null);
+        return authenticateUser(user, "github-pat-for-%s".formatted(user.getGithubUserId()));
     }
 
     public AuthenticatedUser authenticateUser(UserEntity user, String githubPAT) {
@@ -172,6 +174,9 @@ public class UserAuthHelper {
 
         if (githubPAT != null) {
             ((Auth0ApiClientStub) githubAuthenticationPort).withPat(user.getGithubUserId(), githubPAT);
+            githubWireMockServer.stubFor(WireMock.get(urlEqualTo("/"))
+                    .withHeader("Authorization", equalTo("Bearer %s".formatted(githubPAT)))
+                    .willReturn(okForEmptyJson().withHeader("x-oauth-scopes", "public_repo")));
         }
 
         return new AuthenticatedUser(token, user);

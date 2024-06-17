@@ -329,7 +329,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.projectsLed[0].contributorCount").isEqualTo(4)
                 .jsonPath("$.projectsLed[0].hasMissingGithubAppInstallation").isEqualTo(true)
                 .jsonPath("$.projectsLed[0].logoUrl").isEqualTo("https://onlydust-app-images.s3.eu-west-1.amazonaws" +
-                        ".com/5003677688814069549.png")
+                                                                ".com/5003677688814069549.png")
                 .jsonPath("$.createdAt").isEqualTo(DateMapper.toZoneDateTime(pierre.user().getCreatedAt()).format(DateTimeFormatter.ISO_INSTANT))
                 .jsonPath("$.projectsLed[0].slug").isEqualTo("bretzel")
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(0)
@@ -353,7 +353,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.pendingProjectsLed[0].name").isEqualTo("Red bull")
                 .jsonPath("$.pendingProjectsLed[0].contributorCount").isEqualTo(0)
                 .jsonPath("$.pendingProjectsLed[0].logoUrl").isEqualTo("https://cdn.filestackcontent" +
-                        ".com/cZCHED10RzuEloOXuk7A")
+                                                                       ".com/cZCHED10RzuEloOXuk7A")
                 .jsonPath("$.pendingProjectsLed[0].slug").isEqualTo("red-bull")
                 .jsonPath("$.pendingProjectsLed[0].hasMissingGithubAppInstallation").isEqualTo(false)
                 .jsonPath("$.pendingProjectsLed.length()").isEqualTo(1)
@@ -412,8 +412,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
                 faker.number().numberBetween(1, 100) + faker.number().numberBetween(200, 1000), "fake-user",
                 faker.internet().url(), false);
-        final String githubPat = faker.rickAndMorty().character();
-        auth0ApiClientStub.withPat(authenticatedUser.user().getGithubUserId(), githubPat);
+        final String githubPat = "github-pat-for-%s".formatted(authenticatedUser.user().getGithubUserId());
         final String newUrl = faker.internet().url() + "/test";
         final String newLogin = faker.gameOfThrones().character();
         final String newEmail = faker.internet().emailAddress();

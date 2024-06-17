@@ -5820,6 +5820,9 @@ components:
             hasAcceptedLatestTermsAndConditions:
               type: boolean
               description: True if the user has accepted the latest version of terms and conditions
+            isAuthorizedToApplyOnGithubIssues:
+              type: boolean
+              description: True if the user is authorized to apply on Github issues
             projectsLed:
               type: array
               items:
