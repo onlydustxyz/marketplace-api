@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentDeleted;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
-import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
+import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -35,6 +32,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
             process(onGithubCommentDeleted);
         else if (event instanceof OnGithubIssueDeleted onGithubIssueDeleted)
             process(onGithubIssueDeleted);
+        else if (event instanceof OnGithubIssueTransferred onGithubIssueTransferred)
+            process(onGithubIssueTransferred);
         else
             LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
@@ -55,6 +54,11 @@ public class ApplicationsUpdater implements OutboxConsumer {
     }
 
     private void process(OnGithubIssueDeleted event) {
+        final var issueId = GithubIssue.Id.of(event.id());
+        userStoragePort.deleteApplicationsByIssueId(issueId);
+    }
+
+    private void process(OnGithubIssueTransferred event) {
         final var issueId = GithubIssue.Id.of(event.id());
         userStoragePort.deleteApplicationsByIssueId(issueId);
     }

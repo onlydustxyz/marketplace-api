@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentDeleted;
-import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
-import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
+import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -282,6 +279,23 @@ class ApplicationsUpdaterTest {
     @Nested
     class OnGithubIssueDeletedProcessing {
         final OnGithubIssueDeleted event = OnGithubIssueDeleted.builder()
+                .id(GithubIssue.Id.random().value())
+                .build();
+
+        @Test
+        void should_delete_github_applications() {
+            // When
+            applicationsUpdater.process(event);
+
+            // Then
+            verifyNoInteractions(llmPort);
+            verify(userStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
+        }
+    }
+
+    @Nested
+    class OnGithubIssueTransferredProcessing {
+        final OnGithubIssueTransferred event = OnGithubIssueTransferred.builder()
                 .id(GithubIssue.Id.random().value())
                 .build();
 
