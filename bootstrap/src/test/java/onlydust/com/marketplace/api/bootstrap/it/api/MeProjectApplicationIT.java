@@ -164,7 +164,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_detect_github_application() {
         // Given
-        final var commentId = faker.number().randomNumber();
+        final var commentId = faker.number().randomNumber(10, true);
         final var issueId = 1930092330L;
         final var repoId = 466482535L;
         final var antho = userAuthHelper.authenticateAnthony();
@@ -207,7 +207,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 antho.user().getGithubUserId(),
                 Application.Origin.GITHUB,
                 issueId,
-                faker.number().randomNumber(),
+                faker.number().randomNumber(10, true),
                 "My motivations",
                 null
         ));
@@ -227,7 +227,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_be_able_to_apply_to_non_existing_project() {
         // Given
-        final var githubUserId = faker.number().randomNumber();
+        final var githubUserId = faker.number().randomNumber(10, true);
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
         final var userId = UUID.randomUUID();
