@@ -42,7 +42,6 @@ public record Application(@NonNull Id id,
                 problemSolvingApproach);
     }
 
-
     public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull UUID projectId) {
         return new Application(Id.random(), projectId, comment.authorId(), Origin.GITHUB, comment.updatedAt(), comment.issueId(), comment.id(), null, null);
     }

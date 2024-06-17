@@ -13,4 +13,10 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
     List<ApplicationEntity> findAllByApplicantId(Long applicantId);
 
     Optional<ApplicationEntity> findByApplicantIdAndProjectIdAndIssueId(Long applicantId, UUID projectId, Long value);
+
+    List<ApplicationEntity> findAllByApplicantIdAndIssueId(Long applicantId, Long issueId);
+
+    List<ApplicationEntity> findAllByCommentId(Long commentId);
+
+    void deleteAllByIssueId(Long issueId);
 }

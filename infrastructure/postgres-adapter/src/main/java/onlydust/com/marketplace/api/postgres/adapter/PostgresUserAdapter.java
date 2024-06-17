@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -297,6 +298,29 @@ public class PostgresUserAdapter implements UserStoragePort {
     public Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
         return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
                 .map(ApplicationEntity::toDomain);
+    }
+
+    @Override
+    public List<Application> findApplications(Long applicantId, GithubIssue.Id issueId) {
+        return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
+                .map(ApplicationEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<Application> findApplications(GithubComment.Id commentId) {
+        return applicationRepository.findAllByCommentId(commentId.value()).stream()
+                .map(ApplicationEntity::toDomain).toList();
+    }
+
+    @Override
+    public void deleteApplications(Application.Id... applicationIds) {
+        applicationRepository.deleteAllById(Arrays.stream(applicationIds).map(UuidWrapper::value).toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteApplicationsByIssueId(GithubIssue.Id issueId) {
+        applicationRepository.deleteAllByIssueId(issueId.value());
     }
 
     @Override
