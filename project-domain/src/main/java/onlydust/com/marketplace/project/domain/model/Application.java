@@ -11,12 +11,12 @@ import java.util.UUID;
 
 public record Application(@NonNull Id id,
                           @NonNull UUID projectId,
-                          @NonNull UUID applicantId,
+                          @NonNull Long applicantId,
                           @NonNull Origin origin,
                           @NonNull ZonedDateTime appliedAt,
                           @NonNull GithubIssue.Id issueId,
                           @NonNull GithubComment.Id commentId,
-                          @NonNull String motivations,
+                          String motivations,
                           String problemSolvingApproach) {
 
     @NoArgsConstructor(staticName = "random")
@@ -33,7 +33,7 @@ public record Application(@NonNull Id id,
     }
 
     public static Application fromMarketplace(@NonNull UUID projectId,
-                                              @NonNull UUID applicantId,
+                                              @NonNull Long applicantId,
                                               @NonNull GithubIssue.Id issueId,
                                               @NonNull GithubComment.Id commentId,
                                               @NonNull String motivations,
@@ -42,16 +42,8 @@ public record Application(@NonNull Id id,
                 problemSolvingApproach);
     }
 
-
-    public static Application fromGithub(@NonNull UUID projectId,
-                                         @NonNull UUID applicantId,
-                                         @NonNull ZonedDateTime appliedAt,
-                                         @NonNull GithubIssue.Id issueId,
-                                         @NonNull GithubComment.Id commentId,
-                                         @NonNull String motivations,
-                                         String problemSolvingApproach) {
-        return new Application(Id.random(), projectId, applicantId, Origin.GITHUB, appliedAt, issueId, commentId, motivations,
-                problemSolvingApproach);
+    public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull UUID projectId) {
+        return new Application(Id.random(), projectId, comment.authorId(), Origin.GITHUB, comment.updatedAt(), comment.issueId(), comment.id(), null, null);
     }
 
     public Application update(@NonNull String motivations,

@@ -28,7 +28,7 @@ public class OutboxService implements ProjectObserverPort, UserObserverPort {
     }
 
     @Override
-    public void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId) {
+    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
     }
 
     @Override

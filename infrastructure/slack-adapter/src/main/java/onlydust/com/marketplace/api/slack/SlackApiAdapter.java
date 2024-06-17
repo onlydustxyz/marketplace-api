@@ -75,9 +75,9 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId) {
-        final User user = userStoragePort.getUserById(userId)
-                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
+    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
+        final User user = userStoragePort.getUserByGithubId(applicantId)
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(applicantId)));
         final var project = projectStoragePort.getById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(projectId)));
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project", UserAppliedOnProjectEventMapper.mapToSlackBlock(user,

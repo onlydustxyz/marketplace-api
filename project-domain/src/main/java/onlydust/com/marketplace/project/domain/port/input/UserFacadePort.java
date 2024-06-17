@@ -29,15 +29,14 @@ public interface UserFacadePort {
 
     void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
 
-    Application applyOnProject(@NonNull UUID userId,
-                               @NonNull Long githubUserId,
+    Application applyOnProject(@NonNull Long githubUserId,
                                @NonNull UUID projectId,
                                @NonNull GithubIssue.Id issueId,
                                @NonNull String motivation,
                                String problemSolvingApproach);
 
     Application updateApplication(@NonNull Application.Id applicationId,
-                                  @NonNull UUID userId,
+                                  @NonNull Long githubUserId,
                                   @NonNull String motivation,
                                   String problemSolvingApproach);
 

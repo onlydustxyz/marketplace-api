@@ -30,7 +30,7 @@ public interface UserStoragePort {
 
     UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
-    void save(@NonNull Application application);
+    void save(@NonNull Application... applications);
 
     RewardDetailsView findRewardById(UUID rewardId);
 
@@ -52,7 +52,15 @@ public interface UserStoragePort {
 
     void historizeUserRanks();
 
-    List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId);
+    Optional<Application> findApplication(Application.Id id);
 
-    Optional<Application> find(Application.Id id);
+    Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId);
+
+    List<Application> findApplications(Long applicantId, GithubIssue.Id issueId);
+
+    List<Application> findApplications(GithubComment.Id commentId);
+
+    void deleteApplications(Application.Id... applicationIds);
+
+    void deleteApplicationsByIssueId(GithubIssue.Id issueId);
 }

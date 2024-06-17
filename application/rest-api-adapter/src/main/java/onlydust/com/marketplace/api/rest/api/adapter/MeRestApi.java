@@ -88,8 +88,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<ApplicationResponse> applyOnProject(ApplicationRequest applicationRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var application = userFacadePort.applyOnProject(authenticatedUser.getId(),
-                authenticatedUser.getGithubUserId(),
+        final var application = userFacadePort.applyOnProject(authenticatedUser.getGithubUserId(),
                 applicationRequest.getProjectId(),
                 GithubIssue.Id.of(applicationRequest.getIssueId()),
                 applicationRequest.getMotivation(),
@@ -101,7 +100,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> updateApplication(UUID applicationId, ApplicationUpdateRequest applicationUpdateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.updateApplication(Application.Id.of(applicationId),
-                authenticatedUser.getId(),
+                authenticatedUser.getGithubUserId(),
                 applicationUpdateRequest.getMotivation(),
                 applicationUpdateRequest.getProblemSolvingApproach());
         return noContent().build();

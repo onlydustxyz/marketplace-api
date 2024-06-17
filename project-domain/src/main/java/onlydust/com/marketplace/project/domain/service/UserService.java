@@ -156,8 +156,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public Application applyOnProject(@NonNull UUID userId,
-                                      @NonNull Long githubUserId,
+    public Application applyOnProject(@NonNull Long githubUserId,
                                       @NonNull UUID projectId,
                                       @NonNull GithubIssue.Id issueId,
                                       @NonNull String motivation,
@@ -171,7 +170,7 @@ public class UserService implements UserFacadePort {
         if (issue.isAssigned())
             throw forbidden("Issue %s is already assigned".formatted(issueId));
 
-        if (!userStoragePort.findApplications(userId, projectId, issueId).isEmpty())
+        if (userStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
             throw badRequest("User already applied to this issue");
 
         if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))
@@ -179,25 +178,25 @@ public class UserService implements UserFacadePort {
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        final var comment = githubApiPort.createComment(personalAccessToken, issue, """
+        final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
                 """);
 
-        final var application = Application.fromMarketplace(projectId, userId, issueId, comment.id(), motivation, problemSolvingApproach);
+        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
         userStoragePort.save(application);
-        projectObserverPort.onUserApplied(projectId, userId, application.id());
+        projectObserverPort.onUserApplied(projectId, githubUserId, application.id());
 
         return application;
     }
 
     @Override
-    public Application updateApplication(@NonNull Application.Id applicationId, @NonNull UUID userId, @NonNull String motivation,
+    public Application updateApplication(@NonNull Application.Id applicationId, @NonNull Long githubUserId, @NonNull String motivation,
                                          String problemSolvingApproach) {
-        final var application = userStoragePort.find(applicationId)
+        final var application = userStoragePort.findApplication(applicationId)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
 
-        if (!application.applicantId().equals(userId))
+        if (!application.applicantId().equals(githubUserId))
             throw forbidden("User is not authorized to update this application");
 
         final var updated = application.update(motivation, problemSolvingApproach);

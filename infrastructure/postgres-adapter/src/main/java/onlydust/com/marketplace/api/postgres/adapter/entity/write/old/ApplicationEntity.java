@@ -30,7 +30,7 @@ public class ApplicationEntity {
     @NonNull
     UUID projectId;
     @NonNull
-    UUID applicantId;
+    Long applicantId;
     @NonNull
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -39,7 +39,6 @@ public class ApplicationEntity {
     Long issueId;
     @NonNull
     Long commentId;
-    @NonNull
     String motivations;
     String problemSolvingApproach;
 

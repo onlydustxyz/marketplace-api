@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -69,7 +70,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var applications = applicationRepository.findAllByApplicantId(user.id());
+        final var applications = applicationRepository.findAllByApplicantId(user.githubUserId());
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
@@ -188,8 +189,8 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public void save(@NonNull Application application) {
-        applicationRepository.save(ApplicationEntity.fromDomain(application));
+    public void save(@NonNull Application... applications) {
+        applicationRepository.saveAll(Arrays.stream(applications).map(ApplicationEntity::fromDomain).toList());
     }
 
     @Override
@@ -294,15 +295,36 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId) {
-        return applicationRepository.findAllByApplicantIdAndProjectIdAndIssueId(userId, projectId, issueId.value())
-                .stream()
-                .map(ApplicationEntity::toDomain)
-                .toList();
+    public Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
+        return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
+                .map(ApplicationEntity::toDomain);
     }
 
     @Override
-    public Optional<Application> find(Application.Id id) {
+    public List<Application> findApplications(Long applicantId, GithubIssue.Id issueId) {
+        return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
+                .map(ApplicationEntity::toDomain).toList();
+    }
+
+    @Override
+    public List<Application> findApplications(GithubComment.Id commentId) {
+        return applicationRepository.findAllByCommentId(commentId.value()).stream()
+                .map(ApplicationEntity::toDomain).toList();
+    }
+
+    @Override
+    public void deleteApplications(Application.Id... applicationIds) {
+        applicationRepository.deleteAllById(Arrays.stream(applicationIds).map(UuidWrapper::value).toList());
+    }
+
+    @Override
+    @Transactional
+    public void deleteApplicationsByIssueId(GithubIssue.Id issueId) {
+        applicationRepository.deleteAllByIssueId(issueId.value());
+    }
+
+    @Override
+    public Optional<Application> findApplication(Application.Id id) {
         return applicationRepository.findById(id.value())
                 .map(ApplicationEntity::toDomain);
     }

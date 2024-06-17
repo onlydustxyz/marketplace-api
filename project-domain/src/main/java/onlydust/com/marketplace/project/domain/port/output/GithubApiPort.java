@@ -5,5 +5,5 @@ import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 
 public interface GithubApiPort {
-    GithubComment createComment(@NonNull String personalAccessToken, @NonNull GithubIssue issue, @NonNull String body);
+    GithubComment.Id createComment(@NonNull String personalAccessToken, @NonNull GithubIssue issue, @NonNull String body);
 }

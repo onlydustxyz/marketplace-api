@@ -8,9 +8,15 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ApplicationRepository extends JpaRepository<ApplicationEntity, UUID> {
-    Optional<ApplicationEntity> findByProjectIdAndApplicantId(UUID projectId, UUID applicantId);
+    Optional<ApplicationEntity> findByProjectIdAndApplicantId(UUID projectId, Long applicantId);
 
-    List<ApplicationEntity> findAllByApplicantId(UUID id);
+    List<ApplicationEntity> findAllByApplicantId(Long applicantId);
 
-    List<ApplicationEntity> findAllByApplicantIdAndProjectIdAndIssueId(UUID userId, UUID projectId, Long value);
+    Optional<ApplicationEntity> findByApplicantIdAndProjectIdAndIssueId(Long applicantId, UUID projectId, Long value);
+
+    List<ApplicationEntity> findAllByApplicantIdAndIssueId(Long applicantId, Long issueId);
+
+    List<ApplicationEntity> findAllByCommentId(Long commentId);
+
+    void deleteAllByIssueId(Long issueId);
 }

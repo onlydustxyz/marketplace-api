@@ -58,7 +58,7 @@ public class ContributionService implements ContributionFacadePort, Contribution
     }
 
     @Override
-    public void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId) {
+    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
     }
 
     @Override

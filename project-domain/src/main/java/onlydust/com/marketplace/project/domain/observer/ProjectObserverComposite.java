@@ -26,8 +26,8 @@ public class ProjectObserverComposite implements ProjectObserverPort {
     }
 
     @Override
-    public void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId) {
-        observers.forEach(observer -> observer.onUserApplied(projectId, userId, applicationId));
+    public void onUserApplied(UUID projectId, Long githubUserId, Application.Id applicationId) {
+        observers.forEach(observer -> observer.onUserApplied(projectId, githubUserId, applicationId));
     }
 
     @Override

@@ -228,7 +228,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),
                 contributionViewEntityRepository.countBy(caller.getGithubUserId(), project.getId()) > 0,
-                applicationRepository.findByProjectIdAndApplicantId(project.getId(), caller.getId()).isPresent()
+                applicationRepository.findByProjectIdAndApplicantId(project.getId(), caller.getGithubUserId()).isPresent()
         );
 
         return new ProjectResponse()
