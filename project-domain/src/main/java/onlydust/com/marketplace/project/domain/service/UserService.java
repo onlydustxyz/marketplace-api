@@ -170,7 +170,7 @@ public class UserService implements UserFacadePort {
         if (issue.isAssigned())
             throw forbidden("Issue %s is already assigned".formatted(issueId));
 
-        if (!userStoragePort.findApplications(githubUserId, projectId, issueId).isEmpty())
+        if (userStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
             throw badRequest("User already applied to this issue");
 
         if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))

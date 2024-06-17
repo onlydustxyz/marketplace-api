@@ -71,4 +71,6 @@ public interface ProjectStoragePort {
     List<UUID> getProjectLedIdsForUser(UUID userId);
 
     List<UUID> getProjectContributedOnIdsForUser(UUID userId);
+
+    List<Project> findProjectsByRepoId(Long repoId);
 }

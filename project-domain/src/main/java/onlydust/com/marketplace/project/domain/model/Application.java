@@ -16,7 +16,7 @@ public record Application(@NonNull Id id,
                           @NonNull ZonedDateTime appliedAt,
                           @NonNull GithubIssue.Id issueId,
                           @NonNull GithubComment.Id commentId,
-                          @NonNull String motivations,
+                          String motivations,
                           String problemSolvingApproach) {
 
     @NoArgsConstructor(staticName = "random")
@@ -47,11 +47,8 @@ public record Application(@NonNull Id id,
                                          @NonNull Long applicantId,
                                          @NonNull ZonedDateTime appliedAt,
                                          @NonNull GithubIssue.Id issueId,
-                                         @NonNull GithubComment.Id commentId,
-                                         @NonNull String motivations,
-                                         String problemSolvingApproach) {
-        return new Application(Id.random(), projectId, applicantId, Origin.GITHUB, appliedAt, issueId, commentId, motivations,
-                problemSolvingApproach);
+                                         @NonNull GithubComment.Id commentId) {
+        return new Application(Id.random(), projectId, applicantId, Origin.GITHUB, appliedAt, issueId, commentId, null, null);
     }
 
     public Application update(@NonNull String motivations,

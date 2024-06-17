@@ -39,7 +39,6 @@ public class ApplicationEntity {
     Long issueId;
     @NonNull
     Long commentId;
-    @NonNull
     String motivations;
     String problemSolvingApproach;
 

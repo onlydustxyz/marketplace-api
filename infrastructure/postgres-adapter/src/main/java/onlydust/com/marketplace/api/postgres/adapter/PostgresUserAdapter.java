@@ -188,8 +188,8 @@ public class PostgresUserAdapter implements UserStoragePort {
 
     @Override
     @Transactional
-    public void save(@NonNull Application application) {
-        applicationRepository.save(ApplicationEntity.fromDomain(application));
+    public void save(@NonNull Application... applications) {
+        applicationRepository.saveAll(Arrays.stream(applications).map(ApplicationEntity::fromDomain).toList());
     }
 
     @Override
@@ -294,15 +294,13 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<Application> findApplications(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
-        return applicationRepository.findAllByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
-                .stream()
-                .map(ApplicationEntity::toDomain)
-                .toList();
+    public Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
+        return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
+                .map(ApplicationEntity::toDomain);
     }
 
     @Override
-    public Optional<Application> find(Application.Id id) {
+    public Optional<Application> findApplication(Application.Id id) {
         return applicationRepository.findById(id.value())
                 .map(ApplicationEntity::toDomain);
     }

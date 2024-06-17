@@ -25,6 +25,7 @@ import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
+import onlydust.com.marketplace.project.domain.job.ApplicationsUpdater;
 import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
@@ -201,9 +202,16 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
+                                              final UserStoragePort userStoragePort) {
+        return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort));
+    }
+
+    @Bean
     public OutboxConsumer indexingEventsOutboxConsumer(final OutboxConsumer contributionRefresher,
+                                                       final OutboxConsumer applicationsUpdater,
                                                        final OutboxConsumer trackingOutboxConsumer) {
-        return new OutboxConsumerComposite(contributionRefresher, trackingOutboxConsumer);
+        return new OutboxConsumerComposite(contributionRefresher, applicationsUpdater, trackingOutboxConsumer);
     }
 
     @Bean

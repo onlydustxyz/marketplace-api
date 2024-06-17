@@ -597,7 +597,7 @@ public class UserServiceTest {
             when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(personalAccessToken);
-            when(userStoragePort.findApplications(githubUserId, projectId, issue.id())).thenReturn(List.of());
+            when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.empty());
             when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber(), issue.repoId()));
         }
 
@@ -640,7 +640,7 @@ public class UserServiceTest {
             // Given
             final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
                     issue.id(), comment.id(), motivation, problemSolvingApproach);
-            when(userStoragePort.findApplications(githubUserId, projectId, issue.id())).thenReturn(List.of(application));
+            when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
 
             // When
             assertThatThrownBy(() -> userService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
@@ -687,7 +687,7 @@ public class UserServiceTest {
             // Given
             final var applicationId = Application.Id.random();
 
-            when(userStoragePort.find(applicationId)).thenReturn(Optional.empty());
+            when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> userService.updateApplication(applicationId, githubUserId, faker.lorem().sentence(), faker.lorem().sentence()))
@@ -707,7 +707,7 @@ public class UserServiceTest {
                     faker.lorem().sentence()
             );
 
-            when(userStoragePort.find(application.id())).thenReturn(Optional.of(application));
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
             // When
             final var newMotivation = faker.lorem().sentence();
@@ -725,17 +725,15 @@ public class UserServiceTest {
                     githubUserId,
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                     issue.id(),
-                    GithubComment.Id.random(),
-                    faker.lorem().sentence(),
-                    faker.lorem().sentence()
+                    GithubComment.Id.random()
             );
 
-            when(userStoragePort.find(application.id())).thenReturn(Optional.of(application));
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
             // When
-            final var newMotivation = faker.lorem().sentence();
-            final var newProblemSolvingApproach = faker.lorem().sentence();
-            final var updatedApplication = userService.updateApplication(application.id(), githubUserId, newMotivation, newProblemSolvingApproach);
+            final var motivations = faker.lorem().sentence();
+            final var problemSolvingApproach = faker.lorem().sentence();
+            final var updatedApplication = userService.updateApplication(application.id(), githubUserId, motivations, problemSolvingApproach);
 
             // Then
             assertThat(updatedApplication.id()).isEqualTo(application.id());
@@ -743,8 +741,8 @@ public class UserServiceTest {
             assertThat(updatedApplication.applicantId()).isEqualTo(application.applicantId());
             assertThat(updatedApplication.appliedAt()).isEqualTo(application.appliedAt());
             assertThat(updatedApplication.origin()).isEqualTo(Application.Origin.MARKETPLACE);
-            assertThat(updatedApplication.motivations()).isEqualTo(newMotivation);
-            assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(newProblemSolvingApproach);
+            assertThat(updatedApplication.motivations()).isEqualTo(motivations);
+            assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
             verify(userStoragePort).save(updatedApplication);
         }
     }
