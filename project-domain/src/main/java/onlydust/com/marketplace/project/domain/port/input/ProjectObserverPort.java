@@ -10,7 +10,7 @@ public interface ProjectObserverPort {
 
     void onRewardSettingsChanged(UUID projectId);
 
-    void onUserApplied(UUID projectId, UUID userId, Application.Id applicationId);
+    void onUserApplied(UUID projectId, Long githubUserId, Application.Id applicationId);
 
     void onProjectCreated(UUID projectId, UUID projectLeadId);
 

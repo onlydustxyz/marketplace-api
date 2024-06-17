@@ -196,12 +196,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_apply_to_project() {
         // Given
-        final var user = userAuthHelper.newFakeUser(UUID.randomUUID(),
-                faker.number().numberBetween(10000, 200000),
-                faker.name().username() + faker.cat().name(),
-                faker.internet().avatar(),
-                false);
-
+        final var user = userAuthHelper.authenticateAnthony();
         final var issueId = 1974127467L;
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
@@ -237,7 +232,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         final var application = applicationRepository.findById(applicationId).orElseThrow();
         assertThat(application.projectId()).isEqualTo(projectId);
-        assertThat(application.applicantId()).isEqualTo(user.user().getId());
+        assertThat(application.applicantId()).isEqualTo(user.user().getGithubUserId());
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.commentId()).isEqualTo(123456789L);
@@ -248,11 +243,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_be_able_to_apply_twice() {
         // Given
-        final var githubUserId = faker.number().numberBetween(100000, 2000000);
-        final var login = faker.name().username() + faker.code().asin();
-        final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final var user = userAuthHelper.authenticateAnthony();
         final var issueId = 1736474921L;
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
@@ -260,7 +251,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 UUID.randomUUID(),
                 ZonedDateTime.now(),
                 projectId,
-                userId,
+                user.user().getGithubUserId(),
                 Application.Origin.MARKETPLACE,
                 issueId,
                 111L,
@@ -280,7 +271,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When
         client.post()
                 .uri(getApiURI(ME_APPLICATIONS))
-                .header("Authorization", BEARER_PREFIX + jwt)
+                .header("Authorization", BEARER_PREFIX + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 // Then
@@ -292,15 +283,14 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_application() {
         // Given
-        final var githubUserId = faker.number().numberBetween(100000, 2000000);
-        final var user = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId, faker.name().username(), faker.internet().avatar(), false);
+        final var user = userAuthHelper.authenticateAnthony();
         final var applicationId = UUID.randomUUID();
 
         applicationRepository.save(new ApplicationEntity(
                 applicationId,
                 ZonedDateTime.now(),
                 UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
-                user.user().getId(),
+                user.user().getGithubUserId(),
                 Application.Origin.GITHUB,
                 1974137199L,
                 111L,
@@ -384,7 +374,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         UUID.randomUUID(),
                         ZonedDateTime.now(),
                         projectAppliedTo1,
-                        pierre.user().getId(),
+                        pierre.user().getGithubUserId(),
                         Application.Origin.MARKETPLACE,
                         1736474921L,
                         112L,
@@ -395,7 +385,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         UUID.randomUUID(),
                         ZonedDateTime.now(),
                         projectAppliedTo2,
-                        pierre.user().getId(),
+                        pierre.user().getGithubUserId(),
                         Application.Origin.MARKETPLACE,
                         1736504583L,
                         113L,

@@ -69,7 +69,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var applications = applicationRepository.findAllByApplicantId(user.id());
+        final var applications = applicationRepository.findAllByApplicantId(user.githubUserId());
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
@@ -294,8 +294,8 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
-    public List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId) {
-        return applicationRepository.findAllByApplicantIdAndProjectIdAndIssueId(userId, projectId, issueId.value())
+    public List<Application> findApplications(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
+        return applicationRepository.findAllByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
                 .stream()
                 .map(ApplicationEntity::toDomain)
                 .toList();

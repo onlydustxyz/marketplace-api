@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public record Application(@NonNull Id id,
                           @NonNull UUID projectId,
-                          @NonNull UUID applicantId,
+                          @NonNull Long applicantId,
                           @NonNull Origin origin,
                           @NonNull ZonedDateTime appliedAt,
                           @NonNull GithubIssue.Id issueId,
@@ -33,7 +33,7 @@ public record Application(@NonNull Id id,
     }
 
     public static Application fromMarketplace(@NonNull UUID projectId,
-                                              @NonNull UUID applicantId,
+                                              @NonNull Long applicantId,
                                               @NonNull GithubIssue.Id issueId,
                                               @NonNull GithubComment.Id commentId,
                                               @NonNull String motivations,
@@ -44,7 +44,7 @@ public record Application(@NonNull Id id,
 
 
     public static Application fromGithub(@NonNull UUID projectId,
-                                         @NonNull UUID applicantId,
+                                         @NonNull Long applicantId,
                                          @NonNull ZonedDateTime appliedAt,
                                          @NonNull GithubIssue.Id issueId,
                                          @NonNull GithubComment.Id commentId,
