@@ -586,12 +586,7 @@ public class UserServiceTest {
     class ProjectApplication {
         final Long githubUserId = faker.number().randomNumber();
         final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
-        final GithubComment comment = new GithubComment(GithubComment.Id.random(),
-                issue.id(),
-                faker.number().randomNumber(),
-                faker.number().randomNumber(),
-                faker.date().past(1, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                faker.lorem().sentence());
+        final GithubComment.Id commentId = GithubComment.Id.random();
         final String motivation = faker.lorem().sentence();
         final String problemSolvingApproach = faker.lorem().sentence();
         final String personalAccessToken = faker.internet().password();
@@ -644,7 +639,7 @@ public class UserServiceTest {
         void should_reject_duplicate_applications() {
             // Given
             final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
-                    issue.id(), comment.id(), motivation, problemSolvingApproach);
+                    issue.id(), commentId, motivation, problemSolvingApproach);
             when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
 
             // When
@@ -667,7 +662,7 @@ public class UserServiceTest {
         @Test
         void should_apply_on_project() {
             // Given
-            when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(comment);
+            when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
 
             // When
             final var application = userService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach);
@@ -679,7 +674,7 @@ public class UserServiceTest {
             assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
             assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
             assertThat(application.issueId()).isEqualTo(issue.id());
-            assertThat(application.commentId()).isEqualTo(comment.id());
+            assertThat(application.commentId()).isEqualTo(commentId);
             assertThat(application.motivations()).isEqualTo(motivation);
             assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
 

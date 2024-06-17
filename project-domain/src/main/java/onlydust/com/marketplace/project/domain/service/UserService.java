@@ -178,11 +178,11 @@ public class UserService implements UserFacadePort {
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        final var comment = githubApiPort.createComment(personalAccessToken, issue, """
+        final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
                 """);
 
-        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, comment.id(), motivation, problemSolvingApproach);
+        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
         userStoragePort.save(application);
         projectObserverPort.onUserApplied(projectId, githubUserId, application.id());
