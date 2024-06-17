@@ -183,13 +183,27 @@ public class UserService implements UserFacadePort {
                 I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
                 """);
 
-        final var application = new Application(Application.Id.random(), projectId, userId, Application.Origin.MARKETPLACE,
-                ZonedDateTime.now(), issueId, comment.id(), motivation, problemSolvingApproach);
+        final var application = Application.fromMarketplace(projectId, userId, issueId, comment.id(), motivation, problemSolvingApproach);
 
         userStoragePort.save(application);
         projectObserverPort.onUserApplied(projectId, userId, application.id());
 
         return application;
+    }
+
+    @Override
+    public Application updateApplication(@NonNull Application.Id applicationId, @NonNull UUID userId, @NonNull String motivation,
+                                         String problemSolvingApproach) {
+        final var application = userStoragePort.find(applicationId)
+                .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
+
+        if (!application.applicantId().equals(userId))
+            throw forbidden("User is not authorized to update this application");
+
+        final var updated = application.update(motivation, problemSolvingApproach);
+        userStoragePort.save(updated);
+
+        return updated;
     }
 
     @Override

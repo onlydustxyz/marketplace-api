@@ -53,4 +53,6 @@ public interface UserStoragePort {
     void historizeUserRanks();
 
     List<Application> findApplications(UUID userId, UUID projectId, GithubIssue.Id issueId);
+
+    Optional<Application> find(Application.Id id);
 }

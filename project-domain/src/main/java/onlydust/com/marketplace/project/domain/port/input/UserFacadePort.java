@@ -36,6 +36,11 @@ public interface UserFacadePort {
                                @NonNull String motivation,
                                String problemSolvingApproach);
 
+    Application updateApplication(@NonNull Application.Id applicationId,
+                                  @NonNull UUID userId,
+                                  @NonNull String motivation,
+                                  String problemSolvingApproach);
+
     RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, List<UUID> companyAdminBillingProfileIds);
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,

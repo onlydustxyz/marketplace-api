@@ -224,7 +224,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         final var applicationId = client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -279,7 +279,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
@@ -289,6 +289,48 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .isBadRequest();
     }
 
+    @Test
+    void should_update_application() {
+        // Given
+        final var githubUserId = faker.number().numberBetween(100000, 2000000);
+        final var user = userAuthHelper.newFakeUser(UUID.randomUUID(), githubUserId, faker.name().username(), faker.internet().avatar(), false);
+        final var applicationId = UUID.randomUUID();
+
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                user.user().getId(),
+                Application.Origin.GITHUB,
+                1974137199L,
+                111L,
+                "My motivations",
+                null
+        ));
+
+        final var motivations = faker.lorem().paragraph();
+        final var problemSolvingApproach = faker.lorem().paragraph();
+
+        final var request = new ApplicationUpdateRequest()
+                .motivation(motivations)
+                .problemSolvingApproach(problemSolvingApproach);
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_APPLICATION.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        final var application = applicationRepository.findById(applicationId).orElseThrow();
+        assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+        assertThat(application.motivations()).isEqualTo(motivations);
+        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+    }
 
     @Test
     void should_not_be_able_to_apply_to_non_existing_project() {
@@ -312,7 +354,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.post()
-                .uri(getApiURI(ME_APPLY_TO_PROJECT))
+                .uri(getApiURI(ME_APPLICATIONS))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
