@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.bootstrap.it.bo;
 
+import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.UserSearchPage;
 import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagBO;
@@ -10,6 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +35,8 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             "ecosystem.name==Starknet"
     })
     void should_search_users_by_using_any_field_as_criteria(String query) {
-        searchUsers(query).getUsers();
+        searchUsers(query);
+        searchUsers(query, query.substring(0, query.indexOf("==")) + ",asc");
     }
 
     @ParameterizedTest
@@ -45,7 +48,8 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
     void should_search_users_by_using_any_stats_field_as_criteria(String field) {
         List.of("contributionCount", "rewardCount", "pendingRewardCount", "totalUsdAmount", "maxUsdAmount", "rank").forEach(stat -> {
             List.of("==", ">", "<", ">=", "<=").forEach(op -> {
-                searchUsers(field + "." + stat + op + "7").getUsers();
+                searchUsers(field + "." + stat + op + "7");
+                searchUsers(field + "." + stat + op + "7", field + "." + stat + ",desc");
             });
         });
     }
@@ -81,9 +85,56 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         });
     }
 
-    private UserSearchPage searchUsers(String query) {
+    @Test
+    void should_search_users_with_sorting() {
+        var users = searchUsers("global.rank<200", "login,desc", 10).getUsers();
+        assertThat(users).hasSize(10);
+        assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLogin().compareTo(u1.getLogin()));
+
+        var users2 = searchUsers("global.rank<200", "login,desc", 10, 2).getUsers();
+        users.addAll(users2);
+        assertThat(users).hasSize(20);
+        assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLogin().compareTo(u1.getLogin()));
+
+        users = searchUsers("global.rank<200", "global.rank", 10).getUsers();
+        assertThat(users).hasSize(10);
+        assertThat(users).isSortedAccordingTo((u1, u2) -> u1.getGlobal().getRank().compareTo(u2.getGlobal().getRank()));
+
+        users = searchUsers("language.name==Rust", "language.totalUsdAmount,desc", 10).getUsers();
+        assertThat(users).hasSize(10);
+        assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()
+                .compareTo(u1.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()));
+
+        users = searchUsers("global.rank<200", "global.rank;global.contributionCount,desc", 200).getUsers();
+        assertThat(users).hasSize(200);
+        assertThat(users).isSortedAccordingTo((u1, u2) -> {
+            final var rankCompare = u1.getGlobal().getRank().compareTo(u2.getGlobal().getRank());
+            if (rankCompare != 0) {
+                return rankCompare;
+            }
+            return u2.getGlobal().getContributionCount().compareTo(u1.getGlobal().getContributionCount());
+        });
+    }
+
+    private UserSearchPage searchUsers(@NonNull String query) {
+        return searchUsers(query, null, 5, 0);
+    }
+
+    private UserSearchPage searchUsers(@NonNull String query, String sort) {
+        return searchUsers(query, sort, 5, 0);
+    }
+
+    private UserSearchPage searchUsers(@NonNull String query, String sort, int pageSize) {
+        return searchUsers(query, sort, pageSize, 0);
+    }
+
+    private UserSearchPage searchUsers(@NonNull String query, String sort, int pageSize, int pageIndex) {
+        final var queryParams = new HashMap<>(Map.of("pageIndex", "" + pageIndex, "pageSize", "" + pageSize, "query", query));
+        if (sort != null) {
+            queryParams.put("sort", sort);
+        }
         final var response = client.get()
-                .uri(getApiURI(GET_SEARCH_USERS, Map.of("pageIndex", "0", "pageSize", "5", "query", query)))
+                .uri(getApiURI(GET_SEARCH_USERS, queryParams))
                 .header("Authorization", "Bearer " + mehdi.jwt())
                 .exchange()
                 .expectStatus()

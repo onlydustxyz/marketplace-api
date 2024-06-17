@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import static io.github.perplexhub.rsql.RSQLJPASupport.toSort;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
@@ -54,17 +55,19 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
                 ResponseEntity.ok(response);
     }
 
-    //(contributionLanguage:name==Rust and contributionLanguage:count>20) or (contribution-language:name==Java and contribution-language:count>100) and (rank-global:value<100 or (rank-language:name==Rust and rank-language:value<30) or (rank-language:name==Java and rank-language:value<10))
+    // global.rank<100 and (language.name==Rust and language.rank<20 or ecosystem.name==Starknet and ecosystem.rank<20)
     @SneakyThrows
     @Override
-    public ResponseEntity<UserSearchPage> searchUsers(Integer pageIndex, Integer pageSize, String query) {
+    public ResponseEntity<UserSearchPage> searchUsers(Integer pageIndex, Integer pageSize, String query, String sort) {
         final Map<String, String> propertyMapping = new HashMap<>();
         propertyMapping.put("language.id", "language.language.id");
         propertyMapping.put("language.name", "language.language.name");
         propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
         propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
 
-        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.toSpecification(query, propertyMapping), PageRequest.of(pageIndex, pageSize, Sort.by("login")));
+        final var page = allUserRSQLRepository.findAll(RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping)
+                        .and(toSort(sort, propertyMapping)),
+                PageRequest.of(pageIndex, pageSize));
 
         final var response = new UserSearchPage()
                 .users(page.getContent().stream().map(AllUserRSQLEntity::toBoPageItemResponse).toList())
