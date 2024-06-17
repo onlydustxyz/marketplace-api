@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
+import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -16,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +29,16 @@ class ApplicationsUpdaterTest {
     final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort);
 
     final Faker faker = new Faker();
+
+    final Project project1 = Project.builder()
+            .id(UUID.randomUUID())
+            .name(faker.app().name())
+            .build();
+
+    final Project project2 = Project.builder()
+            .id(UUID.randomUUID())
+            .name(faker.app().name())
+            .build();
 
     @BeforeEach
     void setup() {
@@ -44,16 +54,6 @@ class ApplicationsUpdaterTest {
                 .authorId(faker.number().randomNumber())
                 .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                 .body(faker.lorem().sentence())
-                .build();
-
-        final Project project1 = Project.builder()
-                .id(UUID.randomUUID())
-                .name(faker.app().name())
-                .build();
-
-        final Project project2 = Project.builder()
-                .id(UUID.randomUUID())
-                .name(faker.app().name())
                 .build();
 
         @BeforeEach

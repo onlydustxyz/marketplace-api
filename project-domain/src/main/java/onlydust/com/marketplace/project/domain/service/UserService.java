@@ -193,7 +193,7 @@ public class UserService implements UserFacadePort {
     @Override
     public Application updateApplication(@NonNull Application.Id applicationId, @NonNull Long githubUserId, @NonNull String motivation,
                                          String problemSolvingApproach) {
-        final var application = userStoragePort.find(applicationId)
+        final var application = userStoragePort.findApplication(applicationId)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
 
         if (!application.applicantId().equals(githubUserId))

@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
+import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -23,6 +24,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
     public void process(Event event) {
         if (event instanceof OnGithubCommentCreated onGithubCommentCreated)
             process(onGithubCommentCreated);
+        else if (event instanceof OnGithubCommentEdited onGithubCommentEdited)
+            process(onGithubCommentEdited);
         else
             LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
@@ -43,6 +46,10 @@ public class ApplicationsUpdater implements OutboxConsumer {
             // TODO: ask LLM if the comment expresses interest in the project
             userStoragePort.save(applications);
         }
+    }
+
+    private void process(OnGithubCommentEdited onGithubCommentEdited) {
+        final var commentId = GithubComment.Id.of(onGithubCommentEdited.id());
     }
 
     private static @NonNull Application newApplication(OnGithubCommentCreated onGithubCommentCreated, Project project) {
