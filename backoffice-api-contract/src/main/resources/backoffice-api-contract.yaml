@@ -1349,6 +1349,12 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            default: login
       responses:
         "200":
           description: 'User page'
