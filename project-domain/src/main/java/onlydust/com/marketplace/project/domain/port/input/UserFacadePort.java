@@ -54,4 +54,6 @@ public interface UserFacadePort {
     void refreshUserRanksAndStats();
 
     void historizeUserRanks();
+
+    void deleteApplication(Application.Id id, UUID userId, Long githubUserId);
 }

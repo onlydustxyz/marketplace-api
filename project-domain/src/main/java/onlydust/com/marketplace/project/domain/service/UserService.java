@@ -137,6 +137,20 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    public void deleteApplication(Application.Id id, UUID userId, Long githubUserId) {
+        final var application = userStoragePort.findApplication(id)
+                .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
+
+        if (!application.applicantId().equals(githubUserId)) {
+            final var isProjectLead = projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId);
+            if (!isProjectLead)
+                throw forbidden("User is not authorized to delete this application");
+        }
+
+        userStoragePort.deleteApplications(id);
+    }
+
+    @Override
     @Transactional
     public void markUserAsOnboarded(UUID userId) {
         userStoragePort.updateOnboardingWizardDisplayDate(userId, dateProvider.now());

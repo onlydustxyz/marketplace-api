@@ -440,6 +440,30 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/applications/{applicationId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Applications
+      summary: Delete application
+      operationId: deleteApplication
+      description: |
+        Delete application. Only the applicant or the project lead can delete an application.
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ApplicationId'
+      responses:
+        "204":
+          description: 'The application was deleted successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/rewards/{rewardId}:
     get:
       security:

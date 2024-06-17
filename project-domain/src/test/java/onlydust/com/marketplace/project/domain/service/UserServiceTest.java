@@ -585,6 +585,7 @@ public class UserServiceTest {
     @Nested
     class ProjectApplication {
         final Long githubUserId = faker.number().randomNumber();
+        final UUID userId = UUID.randomUUID();
         final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
         final GithubComment.Id commentId = GithubComment.Id.random();
         final String motivation = faker.lorem().sentence();
@@ -745,6 +746,86 @@ public class UserServiceTest {
             assertThat(updatedApplication.motivations()).isEqualTo(motivations);
             assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
             verify(userStoragePort).save(updatedApplication);
+        }
+
+        @Test
+        void should_prevent_delete_of_an_application_if_not_found() {
+            // Given
+            final var applicationId = Application.Id.random();
+
+            when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> userService.deleteApplication(applicationId, userId, githubUserId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Application %s not found".formatted(applicationId));
+        }
+
+        @Test
+        void should_prevent_delete_of_another_contributor_application() {
+            // Given
+            final var application = Application.fromMarketplace(
+                    projectId,
+                    faker.number().randomNumber(),
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+
+            // When
+            assertThatThrownBy(() -> userService.deleteApplication(application.id(), userId, githubUserId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User is not authorized to delete this application");
+        }
+
+        @Test
+        void should_delete_my_application() {
+            // Given
+            final var application = Application.fromMarketplace(
+                    projectId,
+                    githubUserId,
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+            // When
+            userService.deleteApplication(application.id(), userId, githubUserId);
+
+            // Then
+            verify(userStoragePort).deleteApplications(application.id());
+        }
+
+
+        @Test
+        void should_delete_application_as_project_lead() {
+            // Given
+            final var application = Application.fromMarketplace(
+                    projectId,
+                    faker.number().randomNumber(),
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
+
+            // When
+            userService.deleteApplication(application.id(), userId, githubUserId);
+
+            // Then
+            verify(userStoragePort).deleteApplications(application.id());
         }
     }
 }
