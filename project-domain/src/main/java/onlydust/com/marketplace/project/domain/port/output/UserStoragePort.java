@@ -61,4 +61,6 @@ public interface UserStoragePort {
     List<Application> findApplications(GithubComment.Id commentId);
 
     void deleteApplications(Application.Id... applicationIds);
+
+    void deleteApplicationsByIssueId(GithubIssue.Id issueId);
 }

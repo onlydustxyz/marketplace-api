@@ -7,9 +7,11 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentDeleted;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
+import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -31,6 +33,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
             process(onGithubCommentEdited);
         else if (event instanceof OnGithubCommentDeleted onGithubCommentDeleted)
             process(onGithubCommentDeleted);
+        else if (event instanceof OnGithubIssueDeleted onGithubIssueDeleted)
+            process(onGithubIssueDeleted);
         else
             LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
@@ -48,6 +52,11 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private void process(OnGithubCommentDeleted event) {
         final var commentId = GithubComment.Id.of(event.id());
         deleteObsoleteGithubApplications(commentId, Optional.empty());
+    }
+
+    private void process(OnGithubIssueDeleted event) {
+        final var issueId = GithubIssue.Id.of(event.id());
+        userStoragePort.deleteApplicationsByIssueId(issueId);
     }
 
     private void createMissingApplications(GithubComment comment) {
