@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
+import onlydust.com.marketplace.kernel.model.event.OnGithubCommentDeleted;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -11,6 +13,8 @@ import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.port.output.LLMPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+
+import java.util.Optional;
 
 @Slf4j
 @AllArgsConstructor
@@ -25,6 +29,8 @@ public class ApplicationsUpdater implements OutboxConsumer {
             process(onGithubCommentCreated);
         else if (event instanceof OnGithubCommentEdited onGithubCommentEdited)
             process(onGithubCommentEdited);
+        else if (event instanceof OnGithubCommentDeleted onGithubCommentDeleted)
+            process(onGithubCommentDeleted);
         else
             LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
@@ -36,7 +42,12 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private void process(OnGithubCommentEdited event) {
         final var comment = GithubComment.of(event);
         createMissingApplications(comment);
-        deleteObsoleteApplications(comment);
+        deleteObsoleteGithubApplications(comment.id(), Optional.of(comment.body()));
+    }
+
+    private void process(OnGithubCommentDeleted event) {
+        final var commentId = GithubComment.Id.of(event.id());
+        deleteObsoleteGithubApplications(commentId, Optional.empty());
     }
 
     private void createMissingApplications(GithubComment comment) {
@@ -53,13 +64,13 @@ public class ApplicationsUpdater implements OutboxConsumer {
             userStoragePort.save(applications);
     }
 
-    private void deleteObsoleteApplications(GithubComment comment) {
-        final var githubApplicationIds = userStoragePort.findApplications(comment.authorId(), comment.issueId()).stream()
+    private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {
+        final var githubApplicationIds = userStoragePort.findApplications(commentId).stream()
                 .filter(a -> a.origin() == Application.Origin.GITHUB)
                 .map(Application::id)
                 .toArray(Application.Id[]::new);
 
-        if (githubApplicationIds.length > 0 && !llmPort.isCommentShowingInterestToContribute(comment.body()))
+        if (githubApplicationIds.length > 0 && commentBody.map(body -> !llmPort.isCommentShowingInterestToContribute(body)).orElse(true))
             userStoragePort.deleteApplications(githubApplicationIds);
     }
 }

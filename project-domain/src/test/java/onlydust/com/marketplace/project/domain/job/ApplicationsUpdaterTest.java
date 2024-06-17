@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
+import onlydust.com.marketplace.kernel.model.event.OnGithubCommentDeleted;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentEdited;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -149,6 +150,7 @@ class ApplicationsUpdaterTest {
         @Test
         void should_delete_github_applications_if_new_comment_does_not_express_interest() {
             // Given
+            final var commentId = GithubComment.Id.of(event.id());
             final var existingApplications = List.of(
                     new Application(Application.Id.random(),
                             project1.getId(),
@@ -156,7 +158,7 @@ class ApplicationsUpdaterTest {
                             Application.Origin.MARKETPLACE,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             GithubIssue.Id.of(event.issueId()),
-                            GithubComment.Id.of(event.id()),
+                            commentId,
                             faker.lorem().sentence(),
                             faker.lorem().sentence()),
                     new Application(Application.Id.random(),
@@ -165,18 +167,20 @@ class ApplicationsUpdaterTest {
                             Application.Origin.GITHUB,
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             GithubIssue.Id.of(event.issueId()),
-                            GithubComment.Id.of(event.id()),
+                            commentId,
                             null,
                             null)
             );
 
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
+            when(userStoragePort.findApplications(commentId)).thenReturn(existingApplications);
             when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(false);
 
             // When
             applicationsUpdater.process(event);
 
             // Then
+            verify(userStoragePort).findApplications(commentId);
             verify(userStoragePort).deleteApplications(existingApplications.get(1).id());
         }
 
@@ -227,6 +231,50 @@ class ApplicationsUpdaterTest {
             verifyNoInteractions(llmPort);
             verify(userStoragePort, never()).deleteApplications(any(Application.Id[].class));
             verify(userStoragePort, never()).save(any(Application[].class));
+        }
+    }
+
+    @Nested
+    class OnGithubCommentDeletedProcessing {
+        final OnGithubCommentDeleted event = OnGithubCommentDeleted.builder()
+                .id(GithubComment.Id.random().value())
+                .build();
+
+        @Test
+        void should_delete_github_applications() {
+            // Given
+            final var authorId = faker.number().randomNumber();
+            final var issueId = GithubIssue.Id.random();
+
+            final var existingApplications = List.of(
+                    new Application(Application.Id.random(),
+                            project1.getId(),
+                            authorId,
+                            Application.Origin.MARKETPLACE,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issueId,
+                            GithubComment.Id.of(event.id()),
+                            faker.lorem().sentence(),
+                            faker.lorem().sentence()),
+                    new Application(Application.Id.random(),
+                            project2.getId(),
+                            authorId,
+                            Application.Origin.GITHUB,
+                            faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                            issueId,
+                            GithubComment.Id.of(event.id()),
+                            null,
+                            null)
+            );
+
+            when(userStoragePort.findApplications(GithubComment.Id.of(event.id()))).thenReturn(existingApplications);
+
+            // When
+            applicationsUpdater.process(event);
+
+            // Then
+            verifyNoInteractions(llmPort);
+            verify(userStoragePort).deleteApplications(existingApplications.get(1).id());
         }
     }
 }
