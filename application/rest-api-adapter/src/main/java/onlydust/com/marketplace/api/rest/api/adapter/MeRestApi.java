@@ -98,6 +98,16 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
+    public ResponseEntity<Void> updateApplication(UUID applicationId, ApplicationUpdateRequest applicationUpdateRequest) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        userFacadePort.updateApplication(Application.Id.of(applicationId),
+                authenticatedUser.getId(),
+                applicationUpdateRequest.getMotivation(),
+                applicationUpdateRequest.getProblemSolvingApproach());
+        return noContent().build();
+    }
+
+    @Override
     public ResponseEntity<PrivateUserProfileResponse> getMyProfile() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserProfileView userProfileView = userFacadePort.getProfileById(authenticatedUser.getId());

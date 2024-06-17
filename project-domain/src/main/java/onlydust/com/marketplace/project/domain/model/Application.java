@@ -32,5 +32,32 @@ public record Application(@NonNull Id id,
         }
     }
 
+    public static Application fromMarketplace(@NonNull UUID projectId,
+                                              @NonNull UUID applicantId,
+                                              @NonNull GithubIssue.Id issueId,
+                                              @NonNull GithubComment.Id commentId,
+                                              @NonNull String motivations,
+                                              String problemSolvingApproach) {
+        return new Application(Id.random(), projectId, applicantId, Origin.MARKETPLACE, ZonedDateTime.now(), issueId, commentId, motivations,
+                problemSolvingApproach);
+    }
+
+
+    public static Application fromGithub(@NonNull UUID projectId,
+                                         @NonNull UUID applicantId,
+                                         @NonNull ZonedDateTime appliedAt,
+                                         @NonNull GithubIssue.Id issueId,
+                                         @NonNull GithubComment.Id commentId,
+                                         @NonNull String motivations,
+                                         String problemSolvingApproach) {
+        return new Application(Id.random(), projectId, applicantId, Origin.GITHUB, appliedAt, issueId, commentId, motivations,
+                problemSolvingApproach);
+    }
+
+    public Application update(@NonNull String motivations,
+                              String problemSolvingApproach) {
+        return new Application(id, projectId, applicantId, Origin.MARKETPLACE, appliedAt, issueId, commentId, motivations, problemSolvingApproach);
+    }
+
     public enum Origin {GITHUB, MARKETPLACE}
 }

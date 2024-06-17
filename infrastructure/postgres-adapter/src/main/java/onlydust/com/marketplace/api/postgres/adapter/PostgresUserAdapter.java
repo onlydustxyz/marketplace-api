@@ -46,7 +46,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
     private final ApplicationRepository applicationRepository;
-    private final ProjectRepository projectRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
@@ -300,5 +299,11 @@ public class PostgresUserAdapter implements UserStoragePort {
                 .stream()
                 .map(ApplicationEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public Optional<Application> find(Application.Id id) {
+        return applicationRepository.findById(id.value())
+                .map(ApplicationEntity::toDomain);
     }
 }

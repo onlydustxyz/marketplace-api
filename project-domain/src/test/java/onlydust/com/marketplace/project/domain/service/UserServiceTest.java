@@ -19,8 +19,10 @@ import org.mockito.ArgumentCaptor;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -679,6 +681,72 @@ public class UserServiceTest {
 
             verify(userStoragePort).save(application);
             verify(projectObserverPort).onUserApplied(projectId, userId, application.id());
+        }
+
+        @Test
+        void should_prevent_update_of_non_existing_application() {
+            // Given
+            final var applicationId = Application.Id.random();
+
+            when(userStoragePort.find(applicationId)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> userService.updateApplication(applicationId, userId, faker.lorem().sentence(), faker.lorem().sentence()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class).hasMessage("Application %s not found".formatted(applicationId));
+        }
+
+        @Test
+        void should_prevent_update_of_another_contributor_application() {
+            // Given
+            final var application = Application.fromMarketplace(
+                    projectId,
+                    UUID.randomUUID(),
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+
+            when(userStoragePort.find(application.id())).thenReturn(Optional.of(application));
+
+            // When
+            final var newMotivation = faker.lorem().sentence();
+            final var newProblemSolvingApproach = faker.lorem().sentence();
+            assertThatThrownBy(() -> userService.updateApplication(application.id(), userId, newMotivation, newProblemSolvingApproach))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to update this application");
+        }
+
+        @Test
+        void should_update_application() {
+            // Given
+            final var application = Application.fromGithub(
+                    projectId,
+                    userId,
+                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+
+            when(userStoragePort.find(application.id())).thenReturn(Optional.of(application));
+
+            // When
+            final var newMotivation = faker.lorem().sentence();
+            final var newProblemSolvingApproach = faker.lorem().sentence();
+            final var updatedApplication = userService.updateApplication(application.id(), userId, newMotivation, newProblemSolvingApproach);
+
+            // Then
+            assertThat(updatedApplication.id()).isEqualTo(application.id());
+            assertThat(updatedApplication.projectId()).isEqualTo(application.projectId());
+            assertThat(updatedApplication.applicantId()).isEqualTo(application.applicantId());
+            assertThat(updatedApplication.appliedAt()).isEqualTo(application.appliedAt());
+            assertThat(updatedApplication.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+            assertThat(updatedApplication.motivations()).isEqualTo(newMotivation);
+            assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(newProblemSolvingApproach);
+            verify(userStoragePort).save(updatedApplication);
         }
     }
 }
