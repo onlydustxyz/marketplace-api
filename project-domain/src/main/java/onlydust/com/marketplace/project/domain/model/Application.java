@@ -12,6 +12,7 @@ import java.util.UUID;
 public record Application(@NonNull Id id,
                           @NonNull UUID projectId,
                           @NonNull UUID applicantId,
+                          @NonNull Origin origin,
                           @NonNull ZonedDateTime appliedAt,
                           @NonNull GithubIssue.Id issueId,
                           @NonNull GithubComment.Id commentId,
@@ -30,4 +31,6 @@ public record Application(@NonNull Id id,
             return Id.of(UUID.fromString(uuid));
         }
     }
+
+    public enum Origin {GITHUB, MARKETPLACE}
 }
