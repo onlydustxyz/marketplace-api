@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @Accessors(fluent = true)
 public class IndividualBillingProfile extends BillingProfile {
 
-    private static final PositiveAmount YEARLY_USD_PAYMENT_LIMIT = PositiveAmount.of(5000L);
+    private static final PositiveAmount YEARLY_USD_PAYMENT_LIMIT = PositiveAmount.of(5001L);
 
     @NonNull
     private final User owner;

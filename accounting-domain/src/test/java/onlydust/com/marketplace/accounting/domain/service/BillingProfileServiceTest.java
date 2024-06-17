@@ -939,7 +939,7 @@ class BillingProfileServiceTest {
             final var limit = billingProfile.currentYearPaymentLimit();
 
             // Then
-            assertThat(limit).isEqualTo(PositiveAmount.of(5000L));
+            assertThat(limit).isEqualTo(PositiveAmount.of(5001L));
         }
     }
 

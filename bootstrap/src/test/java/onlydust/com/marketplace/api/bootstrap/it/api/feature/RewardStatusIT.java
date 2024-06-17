@@ -2431,7 +2431,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.invoiceableRewardCount").isEqualTo(1)
-                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
@@ -3680,7 +3680,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.invoiceableRewardCount").isEqualTo(0)
-                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
     }
 
@@ -4060,7 +4060,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.invoiceableRewardCount").isEqualTo(0)
-                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
     }
 
