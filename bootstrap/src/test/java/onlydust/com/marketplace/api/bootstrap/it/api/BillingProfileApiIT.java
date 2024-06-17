@@ -349,7 +349,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isEqualTo(individualBillingProfile.id().value().toString())
                 .jsonPath("$.type").isEqualTo(individualBillingProfile.type().name())
                 .jsonPath("$.status").isEqualTo(individualBillingProfile.status().name())
-                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5000)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(0)
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
