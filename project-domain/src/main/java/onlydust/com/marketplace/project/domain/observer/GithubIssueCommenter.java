@@ -11,6 +11,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 @AllArgsConstructor
 @Slf4j
 public class GithubIssueCommenter implements ApplicationObserverPort {
+    private final UserStoragePort userStoragePort;
     private final ProjectStoragePort projectStoragePort;
     private final GithubStoragePort githubStoragePort;
     private final GithubAppService githubAppService;
@@ -27,15 +28,18 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
         final var project = projectStoragePort.getById(application.projectId())
                 .orElseThrow(() -> internalServerError("Project %s not found".formatted(application.projectId())));
 
+        final var applicant = userStoragePort.getUserByGithubId(application.applicantId())
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(application.applicantId())));
+
         githubAppService.getInstallationTokenFor(issue.repoId())
                 .filter(token -> githubAuthenticationInfoPort.getAuthorizedScopes(token).contains("issues"))
                 .ifPresentOrElse(
                         token -> githubApiPort.createComment(token, issue, """
-                                Hey @%d!
+                                Hey @%s!
                                 Thanks for showing interest.
                                 We've created an application for you to contribute to %s project.
                                 Go check it out on OnlyDust!
-                                """.formatted(application.applicantId(), project.getName())),
+                                """.formatted(applicant.getGithubLogin(), project.getName())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }

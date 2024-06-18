@@ -2,14 +2,8 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubComment;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationInfoPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -26,12 +20,17 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class GithubIssueCommenterTest {
+    final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final GithubAppService githubAppService = mock(GithubAppService.class);
     final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
-    final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(projectStoragePort, githubStoragePort, githubAppService,
+    final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(
+            userStoragePort,
+            projectStoragePort,
+            githubStoragePort,
+            githubAppService,
             githubAuthenticationInfoPort,
             githubApiPort);
 
@@ -39,7 +38,12 @@ class GithubIssueCommenterTest {
 
     @BeforeEach
     void setup() {
-        reset(projectStoragePort, githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
+        reset(userStoragePort,
+                projectStoragePort,
+                githubStoragePort,
+                githubAppService,
+                githubApiPort,
+                githubAuthenticationInfoPort);
     }
 
     @Nested
@@ -65,7 +69,12 @@ class GithubIssueCommenterTest {
                 githubIssueCommenter.onApplicationCreated(application);
 
                 // Then
-                verifyNoInteractions(projectStoragePort, githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
+                verifyNoInteractions(
+                        userStoragePort,
+                        projectStoragePort,
+                        githubStoragePort,
+                        githubAppService,
+                        githubApiPort, githubAuthenticationInfoPort);
             }
         }
     }
@@ -83,10 +92,15 @@ class GithubIssueCommenterTest {
                 .name(faker.lorem().word())
                 .build();
 
+        final User applicant = User.builder()
+                .githubUserId(faker.number().randomNumber(10, true))
+                .githubLogin(faker.internet().slug())
+                .build();
+
         final Application application = new Application(
                 Application.Id.random(),
                 project.getId(),
-                faker.number().randomNumber(10, true),
+                applicant.getGithubUserId(),
                 Application.Origin.GITHUB,
                 faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
                 issue.id(),
@@ -103,6 +117,7 @@ class GithubIssueCommenterTest {
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubAppToken));
             when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("issues", "public_repo"));
             when(projectStoragePort.getById(application.projectId())).thenReturn(Optional.of(project));
+            when(userStoragePort.getUserByGithubId(applicant.getGithubUserId())).thenReturn(Optional.of(applicant));
         }
 
         @Test
@@ -114,6 +129,20 @@ class GithubIssueCommenterTest {
             assertThatThrownBy(() -> githubIssueCommenter.onApplicationCreated(application))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Project %s not found".formatted(application.projectId()));
+
+            // Then
+            verifyNoInteractions(githubApiPort);
+        }
+
+        @Test
+        void should_throw_if_applicant_is_not_found() {
+            // Given
+            when(userStoragePort.getUserByGithubId(any())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> githubIssueCommenter.onApplicationCreated(application))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s not found".formatted(application.applicantId()));
 
             // Then
             verifyNoInteractions(githubApiPort);
