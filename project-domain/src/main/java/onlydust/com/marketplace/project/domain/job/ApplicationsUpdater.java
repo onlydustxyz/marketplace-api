@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.*;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -21,6 +22,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
     private final UserStoragePort userStoragePort;
     private final LLMPort llmPort;
+    private final IndexerPort indexerPort;
 
     @Override
     public void process(Event event) {
@@ -73,8 +75,10 @@ public class ApplicationsUpdater implements OutboxConsumer {
                 .map(projectId -> Application.fromGithubComment(comment, projectId))
                 .toArray(Application[]::new);
 
-        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(comment.body()))
+        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(comment.body())) {
+            indexerPort.indexUser(comment.authorId());
             userStoragePort.save(applications);
+        }
     }
 
     private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {

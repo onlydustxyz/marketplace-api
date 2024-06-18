@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.event.*;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -26,7 +27,8 @@ class ApplicationsUpdaterTest {
     final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final LLMPort llmPort = mock(LLMPort.class);
-    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, llmPort);
+    final IndexerPort indexerPort = mock(IndexerPort.class);
+    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, llmPort, indexerPort);
 
     final Faker faker = new Faker();
 
@@ -35,7 +37,7 @@ class ApplicationsUpdaterTest {
 
     @BeforeEach
     void setup() {
-        reset(userStoragePort, projectStoragePort, llmPort);
+        reset(userStoragePort, projectStoragePort, llmPort, indexerPort);
     }
 
     @Nested
@@ -89,6 +91,8 @@ class ApplicationsUpdaterTest {
             // Then
             verify(userStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(llmPort);
+            verifyNoInteractions(indexerPort);
+            verifyNoInteractions(indexerPort);
         }
 
         @Test
@@ -101,6 +105,7 @@ class ApplicationsUpdaterTest {
 
             // Then
             verify(userStoragePort, never()).save(any(Application[].class));
+            verifyNoInteractions(indexerPort);
         }
 
         @Test
@@ -123,6 +128,8 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.createdAt()));
+
+            verify(indexerPort).indexUser(event.authorId());
         }
     }
 
@@ -172,6 +179,7 @@ class ApplicationsUpdaterTest {
             // Then
             verify(userStoragePort).findApplications(commentId);
             verify(userStoragePort).deleteApplications(existingApplications.get(1).id());
+            verifyNoInteractions(indexerPort);
         }
 
         @Test
@@ -196,6 +204,8 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.updatedAt()));
+
+            verify(indexerPort).indexUser(event.authorId());
         }
 
         @Test
@@ -221,6 +231,7 @@ class ApplicationsUpdaterTest {
             verifyNoInteractions(llmPort);
             verify(userStoragePort, never()).deleteApplications(any(Application.Id[].class));
             verify(userStoragePort, never()).save(any(Application[].class));
+            verifyNoInteractions(indexerPort);
         }
     }
 
