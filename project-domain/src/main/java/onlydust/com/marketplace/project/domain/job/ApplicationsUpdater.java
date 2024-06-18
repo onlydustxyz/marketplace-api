@@ -11,9 +11,9 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.*;
-import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,9 +29,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;
     private final GithubStoragePort githubStoragePort;
-    private final GithubAppService githubAppService;
-    private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
-    private final GithubApiPort githubApiPort;
+    private final ApplicationObserverPort applicationObserverPort;
 
     @Override
     public void process(Event event) {
@@ -97,29 +95,17 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
         if (llmPort.isCommentShowingInterestToContribute(comment.body())) {
             indexerPort.indexUser(comment.authorId());
-            tryCommentIssue(issue, """
-                    Hey @%d!
-                    Thanks for showing interest.
-                    We've created an application for you to contribute to this project.
-                    Go check it out on OnlyDust!
-                    """.formatted(comment.authorId()));
             saveGithubApplications(comment, projectIds);
         }
     }
 
     private void saveGithubApplications(GithubComment comment, List<UUID> projectIds) {
-        userStoragePort.save(projectIds.stream()
+        final var applications = projectIds.stream()
                 .map(projectId -> Application.fromGithubComment(comment, projectId))
-                .toArray(Application[]::new));
-    }
+                .toArray(Application[]::new);
 
-    private void tryCommentIssue(@NonNull GithubIssue issue, @NonNull String commentBody) {
-        githubAppService.getInstallationTokenFor(issue.repoId())
-                .filter(token -> githubAuthenticationInfoPort.getAuthorizedScopes(token).contains("issues"))
-                .ifPresentOrElse(
-                        token -> githubApiPort.createComment(token, issue, commentBody),
-                        () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
-                );
+        userStoragePort.save(applications);
+        Arrays.stream(applications).forEach(applicationObserverPort::onApplicationCreated);
     }
 
     private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {

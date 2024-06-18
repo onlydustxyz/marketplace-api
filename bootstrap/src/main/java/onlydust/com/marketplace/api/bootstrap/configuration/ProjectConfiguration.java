@@ -26,6 +26,11 @@ import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
+import onlydust.com.marketplace.project.domain.job.ApplicationsUpdater;
+import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
+import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
+import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
+import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
@@ -203,19 +208,25 @@ public class ProjectConfiguration {
                                               final UserStoragePort userStoragePort,
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
-                                              final GithubAppService githubAppService,
-                                              final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
-                                              final GithubApiPort githubApiPort) {
+                                              final ApplicationObserverPort applicationObserver) {
         return new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         userStoragePort,
                         comment -> true,
                         indexerPort,
                         githubStoragePort,
-                        githubAppService,
-                        githubAuthenticationInfoPort,
-                        githubApiPort));
+                        applicationObserver));
+    }
 
+    @Bean
+    ApplicationObserverPort applicationObserver(final GithubStoragePort githubStoragePort,
+                                                final GithubAppService githubAppService,
+                                                final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
+                                                final GithubApiPort githubApiPort) {
+        return new GithubIssueCommenter(githubStoragePort,
+                githubAppService,
+                githubAuthenticationInfoPort,
+                githubApiPort);
     }
 
     @Bean
