@@ -3,10 +3,7 @@ package onlydust.com.marketplace.project.domain.observer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationInfoPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -14,6 +11,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 @AllArgsConstructor
 @Slf4j
 public class GithubIssueCommenter implements ApplicationObserverPort {
+    private final ProjectStoragePort projectStoragePort;
     private final GithubStoragePort githubStoragePort;
     private final GithubAppService githubAppService;
     private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
@@ -26,15 +24,18 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
         final var issue = githubStoragePort.findIssueById(application.issueId())
                 .orElseThrow(() -> internalServerError("Issue %s not found".formatted(application.issueId())));
 
+        final var project = projectStoragePort.getById(application.projectId())
+                .orElseThrow(() -> internalServerError("Project %s not found".formatted(application.projectId())));
+
         githubAppService.getInstallationTokenFor(issue.repoId())
                 .filter(token -> githubAuthenticationInfoPort.getAuthorizedScopes(token).contains("issues"))
                 .ifPresentOrElse(
                         token -> githubApiPort.createComment(token, issue, """
                                 Hey @%d!
                                 Thanks for showing interest.
-                                We've created an application for you to contribute to this project.
+                                We've created an application for you to contribute to %s project.
                                 Go check it out on OnlyDust!
-                                """.formatted(application.applicantId())),
+                                """.formatted(application.applicantId(), project.getName())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }

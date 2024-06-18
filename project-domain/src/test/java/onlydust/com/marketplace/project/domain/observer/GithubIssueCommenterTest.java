@@ -5,9 +5,11 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationInfoPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,18 +26,20 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class GithubIssueCommenterTest {
+    final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final GithubAppService githubAppService = mock(GithubAppService.class);
     final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
-    final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(githubStoragePort, githubAppService, githubAuthenticationInfoPort,
+    final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(projectStoragePort, githubStoragePort, githubAppService,
+            githubAuthenticationInfoPort,
             githubApiPort);
 
     final Faker faker = new Faker();
 
     @BeforeEach
     void setup() {
-        reset(githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
+        reset(projectStoragePort, githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
     }
 
     @Nested
@@ -61,7 +65,7 @@ class GithubIssueCommenterTest {
                 githubIssueCommenter.onApplicationCreated(application);
 
                 // Then
-                verifyNoInteractions(githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
+                verifyNoInteractions(projectStoragePort, githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
             }
         }
     }
@@ -74,9 +78,14 @@ class GithubIssueCommenterTest {
                 faker.number().randomNumber(),
                 0);
 
-        private final Application application = new Application(
+        final Project project = Project.builder()
+                .id(UUID.randomUUID())
+                .name(faker.lorem().word())
+                .build();
+
+        final Application application = new Application(
                 Application.Id.random(),
-                UUID.randomUUID(),
+                project.getId(),
                 faker.number().randomNumber(10, true),
                 Application.Origin.GITHUB,
                 faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
@@ -93,6 +102,21 @@ class GithubIssueCommenterTest {
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubAppToken));
             when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("issues", "public_repo"));
+            when(projectStoragePort.getById(application.projectId())).thenReturn(Optional.of(project));
+        }
+
+        @Test
+        void should_throw_if_project_is_not_found() {
+            // Given
+            when(projectStoragePort.getById(any())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> githubIssueCommenter.onApplicationCreated(application))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Project %s not found".formatted(application.projectId()));
+
+            // Then
+            verifyNoInteractions(githubApiPort);
         }
 
         @Test
