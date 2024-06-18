@@ -177,7 +177,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                                                   " %s and user %d", projectId, githubUserId)));
+                        " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
@@ -313,6 +313,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     }
 
     @Override
+    @Transactional
     public void deleteApplications(Application.Id... applicationIds) {
         applicationRepository.deleteAllById(Arrays.stream(applicationIds).map(UuidWrapper::value).toList());
     }
@@ -327,5 +328,11 @@ public class PostgresUserAdapter implements UserStoragePort {
     public Optional<Application> findApplication(Application.Id id) {
         return applicationRepository.findById(id.value())
                 .map(ApplicationEntity::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public void deleteObsoleteApplications() {
+        applicationRepository.deleteObsoleteApplications();
     }
 }

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -35,6 +36,7 @@ public class JobScheduler {
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
     private final OutboxConsumerJob projectMailOutboxJob;
     private final LanguageFacadePort languageFacadePort;
+    private final ApplicationsCleaner applicationsCleaner;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -126,6 +128,12 @@ public class JobScheduler {
     public void updateProjectLanguages() {
         LOGGER.info("Update projects languages");
         languageFacadePort.updateProjectsLanguages();
+    }
+
+    @Scheduled(fixedDelayString = "${application.cron.cleanup-obsolete-applications}")
+    public void cleanUpObsoleteApplications() {
+        LOGGER.info("Cleanup obsolete applications");
+        applicationsCleaner.cleanUp();
     }
 
 }

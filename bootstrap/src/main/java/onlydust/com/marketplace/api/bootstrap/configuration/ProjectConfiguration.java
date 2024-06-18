@@ -25,10 +25,7 @@ import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
-import onlydust.com.marketplace.project.domain.job.ApplicationsUpdater;
-import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
-import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
+import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
@@ -206,6 +203,11 @@ public class ProjectConfiguration {
                                               final UserStoragePort userStoragePort,
                                               final IndexerPort indexerPort) {
         return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort, comment -> true, indexerPort));
+    }
+
+    @Bean
+    public ApplicationsCleaner applicationsCleaner(final UserStoragePort userStoragePort) {
+        return new ApplicationsCleaner(userStoragePort);
     }
 
     @Bean
