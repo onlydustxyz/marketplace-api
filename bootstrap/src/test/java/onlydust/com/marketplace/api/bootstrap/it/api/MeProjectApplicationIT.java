@@ -11,6 +11,7 @@ import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -31,6 +32,11 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     IndexingEventRepository indexingEventRepository;
     @Autowired
     OutboxConsumerJob indexingEventsOutboxJob;
+
+    @BeforeEach
+    void setUp() {
+        indexerApiWireMockServer.resetAll();
+    }
 
     @Test
     void should_apply_to_project() {
@@ -253,6 +259,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.origin()).isEqualTo(Application.Origin.GITHUB);
         assertThat(application.motivations()).isNull();
         assertThat(application.problemSolvingApproach()).isNull();
+
+        indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
     }
 
     @Test
