@@ -5218,6 +5218,7 @@ components:
             - installed
             - canBeInstalled
             - isCurrentUserAdmin
+            - installationStatus
           properties:
             name:
               type: string
@@ -5232,7 +5233,8 @@ components:
                 $ref: '#/components/schemas/GithubRepoResponse'
             installed:
               type: boolean
-              description: False if this organization is not installed
+              description: Deprecated. Use installationStatus instead.
+              deprecated: true
             isCurrentUserAdmin:
               type: boolean
             isPersonal:
@@ -5240,6 +5242,15 @@ components:
             installationId:
               type: integer
               format: int64
+            installationStatus:
+              $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+
+    GithubOrganizationInstallationStatus:
+      type: string
+      enum:
+        - NOT_INSTALLED
+        - MISSING_PERMISSIONS
+        - COMPLETE
 
     ShortGithubRepoResponse:
       type: object
