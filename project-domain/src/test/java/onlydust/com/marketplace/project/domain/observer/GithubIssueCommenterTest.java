@@ -90,6 +90,7 @@ class GithubIssueCommenterTest {
         final Project project = Project.builder()
                 .id(UUID.randomUUID())
                 .name(faker.lorem().word())
+                .slug(faker.internet().slug())
                 .build();
 
         final User applicant = User.builder()

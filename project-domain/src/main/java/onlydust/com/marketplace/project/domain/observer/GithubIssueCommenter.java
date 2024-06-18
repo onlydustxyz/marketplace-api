@@ -38,8 +38,8 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                                 Hey @%s!
                                 Thanks for showing interest.
                                 We've created an application for you to contribute to %s project.
-                                Go check it out on OnlyDust!
-                                """.formatted(applicant.getGithubLogin(), project.getName())),
+                                Go check it out on [OnlyDust](https://app.onlydust.com/p/%s)!
+                                """.formatted(applicant.getGithubLogin(), project.getName(), project.getSlug())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }
