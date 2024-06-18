@@ -201,8 +201,21 @@ public class ProjectConfiguration {
     @Bean
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
                                               final UserStoragePort userStoragePort,
-                                              final IndexerPort indexerPort) {
-        return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort, comment -> true, indexerPort));
+                                              final IndexerPort indexerPort,
+                                              final GithubStoragePort githubStoragePort,
+                                              final GithubAppService githubAppService,
+                                              final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
+                                              final GithubApiPort githubApiPort) {
+        return new RetriedOutboxConsumer(
+                new ApplicationsUpdater(projectStoragePort,
+                        userStoragePort,
+                        comment -> true,
+                        indexerPort,
+                        githubStoragePort,
+                        githubAppService,
+                        githubAuthenticationInfoPort,
+                        githubApiPort));
+
     }
 
     @Bean

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubAccountMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
@@ -47,8 +48,15 @@ public class PostgresGithubAdapter implements GithubStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<GithubIssue> findIssueById(GithubIssue.Id issueId) {
         return githubIssueViewRepository.findById(issueId.value())
                 .map(GithubIssueViewEntity::toDomain);
+    }
+
+    @Override
+    public Optional<Long> findInstallationIdByRepoId(Long repoId) {
+        return githubAppInstallationRepository.findByRepoId(repoId)
+                .map(GithubAppInstallationViewEntity::getId);
     }
 }

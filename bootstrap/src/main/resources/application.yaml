@@ -108,6 +108,9 @@ infrastructure:
   dusty-bot:
     personal-access-token: ${DUSTY_BOT_GITHUB_PAT}
     base-uri: ${DUSTY_BOT_GITHUB_BASE_URL}
+  github-app:
+    app-id: ${GITHUB_APP_ID}
+    private-key: ${GITHUB_APP_PRIVATE_KEY}
   od:
     api:
       client:

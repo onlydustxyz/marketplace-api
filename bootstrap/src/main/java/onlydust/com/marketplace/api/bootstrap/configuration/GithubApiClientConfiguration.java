@@ -4,14 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
-import onlydust.com.marketplace.api.github_api.adapters.GithubApiAdapter;
-import onlydust.com.marketplace.api.github_api.adapters.GithubAuthenticationInfoAdapter;
-import onlydust.com.marketplace.api.github_api.adapters.GithubDustyBotAdapter;
-import onlydust.com.marketplace.api.github_api.adapters.GithubSearchApiAdapter;
+import onlydust.com.marketplace.api.github_api.adapters.*;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
-import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
-import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.kernel.infrastructure.github.GithubAppJwtBuilder;
+import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import onlydust.com.marketplace.project.domain.service.RetriedGithubInstallationFacade;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,6 +25,28 @@ public class GithubApiClientConfiguration {
         return new RetriedGithubInstallationFacade.Config();
     }
 
+    @Bean
+    @ConfigurationProperties("infrastructure.github-app")
+    GithubAppJwtBuilder.Config githubAppConfig() {
+        return new GithubAppJwtBuilder.Config();
+    }
+
+    @Bean
+    public GithubAppJwtBuilder githubAppJwtBuilder(final GithubAppJwtBuilder.Config githubAppConfig) {
+        return new GithubAppJwtBuilder(githubAppConfig);
+    }
+
+    @Bean
+    public GithubAppService githubAppService(final GithubStoragePort githubStoragePort,
+                                             final GithubAppApiPort githubAppApiPort) {
+        return new GithubAppService(githubStoragePort, githubAppApiPort);
+    }
+
+    @Bean
+    public GithubAppAdapter githubAppAdapter(final GithubHttpClient githubHttpClient,
+                                             final GithubAppJwtBuilder githubAppJwtBuilder) {
+        return new GithubAppAdapter(githubHttpClient, githubAppJwtBuilder);
+    }
 
     @Bean
     public ObjectMapper objectMapper() {

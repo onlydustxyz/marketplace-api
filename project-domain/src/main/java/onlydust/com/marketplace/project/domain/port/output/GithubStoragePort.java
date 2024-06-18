@@ -15,4 +15,6 @@ public interface GithubStoragePort {
     List<GithubAccount> findInstalledAccountsByIds(List<Long> userGithubAccountIds);
 
     Optional<GithubIssue> findIssueById(GithubIssue.Id issueId);
+
+    Optional<Long> findInstallationIdByRepoId(Long repoId);
 }

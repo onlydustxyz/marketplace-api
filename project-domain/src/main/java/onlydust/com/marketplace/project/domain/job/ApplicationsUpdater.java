@@ -11,6 +11,8 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.service.GithubAppService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,13 +22,14 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
     private final UserStoragePort userStoragePort;
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;
     private final GithubStoragePort githubStoragePort;
-    private final GithubAuthenticationPort githubAuthenticationPort;
+    private final GithubAppService githubAppService;
     private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
     private final GithubApiPort githubApiPort;
 
@@ -111,7 +114,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
     }
 
     private void tryCommentIssue(@NonNull GithubIssue issue, @NonNull String commentBody) {
-        githubAuthenticationPort.getInstallationTokenFor(issue.repoId())
+        githubAppService.getInstallationTokenFor(issue.repoId())
                 .filter(token -> githubAuthenticationInfoPort.getAuthorizedScopes(token).contains("issues"))
                 .ifPresentOrElse(
                         token -> githubApiPort.createComment(token, issue, commentBody),

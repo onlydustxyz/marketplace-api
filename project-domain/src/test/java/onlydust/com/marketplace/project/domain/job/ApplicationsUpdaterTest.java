@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,11 +28,11 @@ class ApplicationsUpdaterTest {
     final LLMPort llmPort = mock(LLMPort.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
-    final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
+    final GithubAppService githubAppService = mock(GithubAppService.class);
     final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
     final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, llmPort, indexerPort, githubStoragePort,
-            githubAuthenticationPort, githubAuthenticationInfoPort, githubApiPort);
+            githubAppService, githubAuthenticationInfoPort, githubApiPort);
 
     final Faker faker = new Faker();
 
@@ -45,7 +46,7 @@ class ApplicationsUpdaterTest {
 
     @BeforeEach
     void setup() {
-        reset(userStoragePort, projectStoragePort, llmPort, indexerPort, githubStoragePort, githubAuthenticationPort, githubApiPort, githubAuthenticationInfoPort);
+        reset(userStoragePort, projectStoragePort, llmPort, indexerPort, githubStoragePort, githubAppService, githubApiPort, githubAuthenticationInfoPort);
     }
 
     @Nested
@@ -64,7 +65,7 @@ class ApplicationsUpdaterTest {
             when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
             when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
-            when(githubAuthenticationPort.getInstallationTokenFor(event.repoId())).thenReturn(Optional.of(githubAppToken));
+            when(githubAppService.getInstallationTokenFor(event.repoId())).thenReturn(Optional.of(githubAppToken));
             when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("issues", "public_repo"));
         }
 
@@ -159,7 +160,7 @@ class ApplicationsUpdaterTest {
         @Test
         void should_not_comment_issue_without_github_app_token() {
             // Given
-            when(githubAuthenticationPort.getInstallationTokenFor(event.repoId())).thenReturn(Optional.empty());
+            when(githubAppService.getInstallationTokenFor(event.repoId())).thenReturn(Optional.empty());
 
             // When
             applicationsUpdater.process(event);
@@ -222,7 +223,7 @@ class ApplicationsUpdaterTest {
         @BeforeEach
         void setup() {
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
-            when(githubAuthenticationPort.getInstallationTokenFor(event.repoId())).thenReturn(Optional.of(githubAppToken));
+            when(githubAppService.getInstallationTokenFor(event.repoId())).thenReturn(Optional.of(githubAppToken));
             when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("issues", "public_repo"));
         }
 
