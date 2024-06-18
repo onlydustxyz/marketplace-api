@@ -1,0 +1,5 @@
+secret:
+  ignored-matches:
+  - match: 76a9cfa48e69b2d414b0ebd34e15e3763ea4570b194d4f0172d9c1199c636272
+    name: Generic High Entropy Secret - /Users/antho/Workspace/onlydust/marketplace-api/bootstrap/src/test/resources/application-it.yaml
+version: 2
