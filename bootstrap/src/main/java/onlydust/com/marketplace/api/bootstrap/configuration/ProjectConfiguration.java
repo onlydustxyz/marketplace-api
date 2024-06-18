@@ -26,10 +26,6 @@ import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
-import onlydust.com.marketplace.project.domain.job.ApplicationsUpdater;
-import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
-import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
-import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
@@ -123,7 +119,8 @@ public class ProjectConfiguration {
                                          final GithubUserPermissionsService githubUserPermissionsService,
                                          final GithubStoragePort githubStoragePort,
                                          final GithubApiPort githubApiPort,
-                                         final GithubAuthenticationPort githubAuthenticationPort
+                                         final GithubAuthenticationPort githubAuthenticationPort,
+                                         final GlobalConfig globalConfig
     ) {
         return new UserService(
                 userObservers,
@@ -136,7 +133,8 @@ public class ProjectConfiguration {
                 githubUserPermissionsService,
                 githubStoragePort,
                 githubApiPort,
-                githubAuthenticationPort);
+                githubAuthenticationPort,
+                globalConfig);
     }
 
     @Bean

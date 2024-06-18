@@ -43,6 +43,7 @@ public class UserService implements UserFacadePort {
     private final GithubStoragePort githubStoragePort;
     private final GithubApiPort githubApiPort;
     private final GithubAuthenticationPort githubAuthenticationPort;
+    private final GlobalConfig globalConfig;
 
     @Override
     @Transactional
@@ -193,8 +194,8 @@ public class UserService implements UserFacadePort {
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
         final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](https://app.onlydust.com).
-                """);
+                I am applying to this issue via [OnlyDust platform](%s).
+                """.formatted(globalConfig.appBaseUrl()));
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
