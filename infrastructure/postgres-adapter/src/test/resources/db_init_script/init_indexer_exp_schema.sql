@@ -305,7 +305,8 @@ create table indexer_exp.github_app_installations
         references indexer_exp.github_accounts,
     tech_created_at timestamp default now() not null,
     tech_updated_at timestamp default now() not null,
-    suspended_at    timestamp
+    suspended_at    timestamp,
+    permissions     text[]                  not null
 );
 
 create unique index github_app_installations_account_id_idx
