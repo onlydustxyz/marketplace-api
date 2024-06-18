@@ -911,9 +911,9 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                           {
                             "githubUserId": 98735558,
                             "login": "onlydustxyz",
-                            "htmlUrl": "https://github.com/onlydustxyz",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/98735558?v=4",
                             "name": "OnlyDust",
+                            "htmlUrl": "https://github.com/onlydustxyz",
                             "repos": [
                               {
                                 "id": 470103674,
@@ -1564,17 +1564,17 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                                 "isAuthorizedInGithubApp": true
                               }
                             ],
-                            "installed": true,
                             "isCurrentUserAdmin": false,
                             "isPersonal": false,
-                            "installationId": 44741576
+                            "installationId": 44741576,
+                            "installationStatus": "MISSING_PERMISSIONS"
                           },
                           {
                             "githubUserId": 105865802,
                             "login": "symeo-io",
-                            "htmlUrl": "https://github.com/symeo-io",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/105865802?v=4",
                             "name": "Symeo.io",
+                            "htmlUrl": "https://github.com/symeo-io",
                             "repos": [
                               {
                                 "id": 593536214,
@@ -1685,17 +1685,17 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                                 "isAuthorizedInGithubApp": true
                               }
                             ],
-                            "installed": true,
                             "isCurrentUserAdmin": true,
                             "isPersonal": false,
-                            "installationId": 44300041
+                            "installationId": 44300041,
+                            "installationStatus": "MISSING_PERMISSIONS"
                           },
                           {
                             "githubUserId": 16590657,
                             "login": "PierreOucif",
-                            "htmlUrl": "https://github.com/PierreOucif",
                             "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                             "name": "Ilysse",
+                            "htmlUrl": "https://github.com/PierreOucif",
                             "repos": [
                               {
                                 "id": 49207056,
@@ -1890,10 +1890,10 @@ public class MeGetGithubOrganizationsApiIT extends AbstractMarketplaceApiIT {
                                 "isAuthorizedInGithubApp": true
                               }
                             ],
-                            "installed": false,
                             "isCurrentUserAdmin": true,
                             "isPersonal": true,
-                            "installationId": 44300050
+                            "installationId": 44300050,
+                            "installationStatus": "SUSPENDED"
                           }
                         ]
                         """);
