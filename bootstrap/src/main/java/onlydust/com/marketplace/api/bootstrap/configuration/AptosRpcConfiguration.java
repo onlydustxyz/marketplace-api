@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AptosRpcConfiguration {
     @Bean
-    @ConfigurationProperties("infrastructure.aptos")
+    @ConfigurationProperties(value = "infrastructure.aptos", ignoreUnknownFields = false)
     public RpcClient.Properties aptosProperties() {
         return new RpcClient.Properties();
     }

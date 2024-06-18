@@ -21,7 +21,6 @@ application:
     update-projects-ranking: 7200000 # 2 hours
     indexer-sync-job-delay: 5000 # 5 seconds
     refresh-currency-quotes: 600000 # 10 minute
-    active-user-profiles-refresh-period-in-days: 30
     refresh-active-user-profiles: 86400000 # 1 day
     tracking-job-delay: 60000 # 1 minute
     indexing-event-job-delay: 5000 # 5 seconds
@@ -32,9 +31,9 @@ application:
     refresh-user-ranks: 300000 # 5 minutes
     historize-user-ranks-cron-expression: "0 0 0 * * *" # every day at midnight
     process-boosted-rewards-cron-expression: ${NODE_GUARDIANS_PROCESS_BOOSTED_REWARDS_CRON_EXPRESSION}
-    boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
     update-projects-languages: 300000 # 5 minutes
     cleanup-obsolete-applications: 86400000 # 1 day
+    boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -181,3 +180,4 @@ infrastructure:
 
 global:
   app-base-url: ${APP_BASE_URL}
+  active-user-profiles-refresh-period-in-days: 30

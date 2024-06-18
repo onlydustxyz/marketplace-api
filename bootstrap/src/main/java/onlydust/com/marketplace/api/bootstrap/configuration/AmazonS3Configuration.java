@@ -13,7 +13,7 @@ import static onlydust.com.marketplace.api.aws.s3.adapter.AmazonS3ClientFactory.
 public class AmazonS3Configuration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.aws")
+    @ConfigurationProperties(value = "infrastructure.aws", ignoreUnknownFields = false)
     public AmazonS3Properties amazonS3Properties() {
         return new AmazonS3Properties();
     }

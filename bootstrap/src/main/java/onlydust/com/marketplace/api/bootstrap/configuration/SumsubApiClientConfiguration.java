@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class SumsubApiClientConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.sumsub")
+    @ConfigurationProperties(value = "infrastructure.sumsub", ignoreUnknownFields = false)
     public SumsubClientProperties sumsubClientProperties() {
         return new SumsubClientProperties();
     }

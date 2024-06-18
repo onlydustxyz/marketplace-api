@@ -1,6 +1,5 @@
 package com.onlydust.marketplace.api.cron;
 
-import com.onlydust.marketplace.api.cron.properties.CronProperties;
 import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
+import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
@@ -27,7 +27,7 @@ public class JobScheduler {
     private final ProjectFacadePort projectFacadePort;
     private final CurrencyFacadePort currencyFacadePort;
     private final UserFacadePort userFacadePort;
-    private final CronProperties cronProperties;
+    private final GlobalConfig globalConfig;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final RewardStatusService rewardStatusService;
     private final OutboxConsumerJob accountingMailOutboxJob;
@@ -77,7 +77,7 @@ public class JobScheduler {
     @Scheduled(fixedDelayString = "${application.cron.refresh-active-user-profiles}")
     public void refreshActiveUserProfiles() {
         LOGGER.info("Refreshing active user profiles");
-        userFacadePort.refreshActiveUserProfiles(ZonedDateTime.now().minusDays(cronProperties.getActiveUserProfilesRefreshPeriodInDays()));
+        userFacadePort.refreshActiveUserProfiles(ZonedDateTime.now().minusDays(globalConfig.getActiveUserProfilesRefreshPeriodInDays()));
     }
 
     @Scheduled(fixedDelayString = "${application.cron.billing-profile-verification-job}")

@@ -237,7 +237,7 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("global")
+    @ConfigurationProperties(value = "global", ignoreUnknownFields = false)
     GlobalConfig globalConfig() {
         return new GlobalConfig();
     }

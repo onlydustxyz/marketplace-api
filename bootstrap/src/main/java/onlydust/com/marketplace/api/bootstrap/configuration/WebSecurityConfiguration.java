@@ -230,13 +230,13 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("application.web.cors")
+    @ConfigurationProperties(value = "application.web.cors", ignoreUnknownFields = false)
     public WebCorsProperties webCorsProperties() {
         return new WebCorsProperties();
     }
 
     @Bean
-    @ConfigurationProperties("application.web.auth0")
+    @ConfigurationProperties(value = "application.web.auth0", ignoreUnknownFields = false)
     public Auth0Properties auth0Properties() {
         return new Auth0Properties();
     }
@@ -247,19 +247,19 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("application.web.machine-to-machine")
+    @ConfigurationProperties(value = "application.web.machine-to-machine", ignoreUnknownFields = false)
     public ApiKeyAuthenticationService.Config indexerApiKeyAuthenticationConfig() {
         return new ApiKeyAuthenticationService.Config();
     }
 
     @Bean
-    @ConfigurationProperties("application.web.back-office")
+    @ConfigurationProperties(value = "application.web.back-office", ignoreUnknownFields = false)
     public ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig() {
         return new ApiKeyAuthenticationService.Config();
     }
 
     @Bean
-    @ConfigurationProperties("application.web.back-office-invoice-token")
+    @ConfigurationProperties(value = "application.web.back-office-invoice-token", ignoreUnknownFields = false)
     public QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig() {
         return new QueryParamTokenAuthenticationService.Config();
     }

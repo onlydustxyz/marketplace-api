@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 public class NodeGuardiansConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.node-guardians")
+    @ConfigurationProperties(value = "infrastructure.node-guardians", ignoreUnknownFields = false)
     public NodeGuardiansApiProperties nodeGuardiansApiProperties() {
         return new NodeGuardiansApiProperties();
     }
@@ -29,8 +29,8 @@ public class NodeGuardiansConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(value = "application.node-guardians")
-    public NodeGuardiansBoostProperties nodeGuardiansBoostProperties(){
+    @ConfigurationProperties(value = "application.node-guardians", ignoreUnknownFields = false)
+    public NodeGuardiansBoostProperties nodeGuardiansBoostProperties() {
         return new NodeGuardiansBoostProperties();
     }
 }

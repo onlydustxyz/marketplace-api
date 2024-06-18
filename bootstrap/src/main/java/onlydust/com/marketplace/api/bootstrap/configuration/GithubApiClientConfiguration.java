@@ -20,13 +20,13 @@ import java.net.http.HttpClient;
 public class GithubApiClientConfiguration {
 
     @Bean
-    @ConfigurationProperties("application.github.installation.retry")
+    @ConfigurationProperties(value = "application.github.installation.retry", ignoreUnknownFields = false)
     public RetriedGithubInstallationFacade.Config config() {
         return new RetriedGithubInstallationFacade.Config();
     }
 
     @Bean
-    @ConfigurationProperties("infrastructure.github-app")
+    @ConfigurationProperties(value = "infrastructure.github-app", ignoreUnknownFields = false)
     GithubAppJwtBuilder.Config githubAppConfig() {
         return new GithubAppJwtBuilder.Config();
     }
@@ -62,7 +62,7 @@ public class GithubApiClientConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("infrastructure.github")
+    @ConfigurationProperties(value = "infrastructure.github", ignoreUnknownFields = false)
     GithubHttpClient.Config githubConfig() {
         return new GithubHttpClient.Config();
     }
@@ -86,7 +86,7 @@ public class GithubApiClientConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("infrastructure.dusty-bot")
+    @ConfigurationProperties(value = "infrastructure.dusty-bot", ignoreUnknownFields = false)
     GithubHttpClient.Config githubDustyBotConfig() {
         return new GithubHttpClient.Config();
     }
