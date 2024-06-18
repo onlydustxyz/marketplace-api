@@ -5215,7 +5215,6 @@ components:
           required:
             - name
             - repos
-            - installed
             - canBeInstalled
             - isCurrentUserAdmin
             - installationStatus
@@ -5231,10 +5230,6 @@ components:
               description: Github repos linked to installed organization
               items:
                 $ref: '#/components/schemas/GithubRepoResponse'
-            installed:
-              type: boolean
-              description: Deprecated. Use installationStatus instead.
-              deprecated: true
             isCurrentUserAdmin:
               type: boolean
             isPersonal:
@@ -5249,6 +5244,7 @@ components:
       type: string
       enum:
         - NOT_INSTALLED
+        - SUSPENDED
         - MISSING_PERMISSIONS
         - COMPLETE
 

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubAppInstallationStatus;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.GithubInstallationFacadePort;
@@ -45,7 +46,7 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                 .avatarUrl(authenticatedUser.getGithubAvatarUrl())
                 .isPersonal(true)
                 .isCurrentUserAdmin(true)
-                .installed(false)
+                .installationStatus(GithubAppInstallationStatus.NOT_INSTALLED)
                 .build());
 
         final List<Long> userGithubAccountIds =
@@ -63,7 +64,7 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
                         .map(githubAccount -> githubAccount.toBuilder()
                                 .isPersonal(userGithubAccount.getIsPersonal())
                                 .isCurrentUserAdmin(userGithubAccount.getIsCurrentUserAdmin())
-                                .installed(githubAccount.getInstalled()).build())
+                                .installationStatus(githubAccount.getInstallationStatus()).build())
                         .orElse(userGithubAccount));
             }
             return updatedUserGithubAccounts;

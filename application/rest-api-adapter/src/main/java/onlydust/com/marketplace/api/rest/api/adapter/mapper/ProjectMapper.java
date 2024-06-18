@@ -6,14 +6,11 @@ import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationRepoView;
-import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.project.domain.view.UserLinkView;
 
-import java.net.URI;
 import java.util.Date;
 import java.util.UUID;
 
-import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
@@ -58,25 +55,6 @@ public interface ProjectMapper {
                 .ecosystemIds(updateProjectRequest.getEcosystemIds())
                 .categoryIds(updateProjectRequest.getCategoryIds())
                 .build();
-    }
-
-    static GithubOrganizationResponse mapOrganization(ProjectOrganizationView projectOrganizationView,
-                                                      final boolean includeAllAvailableRepos) {
-        final var organization = new GithubOrganizationResponse();
-        organization.setGithubUserId(projectOrganizationView.getId());
-        organization.setLogin(projectOrganizationView.getLogin());
-        organization.setAvatarUrl(projectOrganizationView.getAvatarUrl());
-        organization.setHtmlUrl(nonNull(projectOrganizationView.getHtmlUrl()) ?
-                URI.create(projectOrganizationView.getHtmlUrl()) : null);
-        organization.setName(projectOrganizationView.getName());
-        organization.setInstallationId(projectOrganizationView.getInstallationId());
-        organization.setInstalled(projectOrganizationView.getIsInstalled());
-        organization.setRepos(projectOrganizationView.getRepos().stream()
-                .filter(projectOrganizationRepoView -> includeAllAvailableRepos || projectOrganizationRepoView.getIsIncludedInProject())
-                .map(ProjectMapper::mapOrganizationRepo)
-                .sorted(comparing(GithubRepoResponse::getId))
-                .toList());
-        return organization;
     }
 
     static ProjectRewardSettings mapRewardSettings(onlydust.com.marketplace.project.domain.model.ProjectRewardSettings rewardSettings) {

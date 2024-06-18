@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.contract.model.GithubOrganizationInstallationStatus;
 import onlydust.com.marketplace.api.contract.model.GithubOrganizationResponse;
 import onlydust.com.marketplace.api.contract.model.GithubRepoResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
@@ -26,6 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 
@@ -133,7 +135,11 @@ public class ProjectReadEntity {
                 .htmlUrl(nonNull(entity.htmlUrl()) ? URI.create(entity.htmlUrl()) : null)
                 .name(entity.name())
                 .installationId(entity.installation() != null ? entity.installation().getId() : null)
-                .installed(nonNull(entity.installation()))
+                .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED : switch (entity.installation().getStatus()) {
+                    case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
+                    case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
+                    case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
+                })
                 .repos(entity.repos().stream()
                         .filter(GithubRepoViewEntity::isPublic)
                         .map(repo -> new GithubRepoResponse()
@@ -142,8 +148,8 @@ public class ProjectReadEntity {
                                 .name(repo.getName())
                                 .description(repo.getDescription())
                                 .htmlUrl(repo.getHtmlUrl())
-                                .stars(Math.toIntExact(repo.getStarsCount()))
-                                .forkCount(Math.toIntExact(repo.getForksCount()))
+                                .stars(isNull(repo.getStarsCount()) ? null : Math.toIntExact(repo.getStarsCount()))
+                                .forkCount(isNull(repo.getForksCount()) ? null : Math.toIntExact(repo.getForksCount()))
                                 .hasIssues(repo.getHasIssues())
                                 .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
                                 .isAuthorizedInGithubApp(entity.installation() != null &&

@@ -23,7 +23,7 @@ public class GithubAccount {
     @Builder.Default
     List<Long> authorizedRepoIds = new ArrayList<>();
     @Builder.Default
-    Boolean installed = false;
+    GithubAppInstallationStatus installationStatus = GithubAppInstallationStatus.NOT_INSTALLED;
     @Builder.Default
     Boolean isCurrentUserAdmin = false;
     @Builder.Default

@@ -17,7 +17,7 @@ public interface GithubAccountMapper {
                 .type(account.type())
                 .htmlUrl(account.htmlUrl())
                 .avatarUrl(account.avatarUrl())
-                .installed(installation.getSuspendedAt() == null)
+                .installationStatus(installation.getStatus().toDomain())
                 .installationId(installation.getId())
                 .repos(account.repos().stream().filter(GithubRepoViewEntity::isPublic)
                         .map(GithubRepoMapper::map)
