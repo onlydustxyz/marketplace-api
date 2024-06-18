@@ -219,11 +219,16 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    ApplicationObserverPort applicationObserver(final GithubStoragePort githubStoragePort,
+    ApplicationObserverPort applicationObserver(final UserStoragePort userStoragePort,
+                                                final ProjectStoragePort projectStoragePort,
+                                                final GithubStoragePort githubStoragePort,
                                                 final GithubAppService githubAppService,
                                                 final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
                                                 final GithubApiPort githubApiPort) {
-        return new GithubIssueCommenter(githubStoragePort,
+        return new GithubIssueCommenter(
+                userStoragePort,
+                projectStoragePort,
+                githubStoragePort,
                 githubAppService,
                 githubAuthenticationInfoPort,
                 githubApiPort);

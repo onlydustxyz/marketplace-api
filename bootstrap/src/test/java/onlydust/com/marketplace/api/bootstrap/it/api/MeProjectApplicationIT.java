@@ -265,12 +265,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 ));
 
         final var expectedComment = """
-                Hey @43467246!\\n\
+                Hey @AnthonyBuisset!\\n\
                 Thanks for showing interest.\\n\
-                We've created an application for you to contribute to this project.\\n\
-                Go check it out on OnlyDust!\\n\
+                We've created an application for you to contribute to Bretzel project.\\n\
+                Go check it out on [OnlyDust](https://app.onlydust.com/p/bretzel)!\\n\
                 """;
-        
+
         githubWireMockServer.stubFor(post(urlEqualTo("/repository/466482535/issues/7/comments"))
                 .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
                 .withRequestBody(equalToJson("""
