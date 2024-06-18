@@ -119,7 +119,7 @@ public class ProjectReadEntity {
     @Formula("(select count(pgfi.issue_id) from projects_good_first_issues pgfi where pgfi.project_id = id)")
     Integer goodFirstIssueCount;
 
-    public List<GithubOrganizationResponse> organizations() {
+    public List<GithubOrganizationResponse> organizations(final boolean includeAllAvailableRepos) {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
         getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
 
@@ -128,36 +128,41 @@ public class ProjectReadEntity {
                 .map(GithubRepoViewEntity::getId)
                 .collect(Collectors.toSet());
 
-        return organizationEntities.values().stream().map(entity -> new GithubOrganizationResponse()
-                .githubUserId(entity.id())
-                .login(entity.login())
-                .avatarUrl(entity.avatarUrl())
-                .htmlUrl(nonNull(entity.htmlUrl()) ? URI.create(entity.htmlUrl()) : null)
-                .name(entity.name())
-                .installationId(entity.installation() != null ? entity.installation().getId() : null)
-                .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED : switch (entity.installation().getStatus()) {
-                    case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
-                    case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
-                    case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
-                })
-                .repos(entity.repos().stream()
-                        .filter(GithubRepoViewEntity::isPublic)
-                        .map(repo -> new GithubRepoResponse()
-                                .id(repo.getId())
-                                .owner(repo.getOwner().login())
-                                .name(repo.getName())
-                                .description(repo.getDescription())
-                                .htmlUrl(repo.getHtmlUrl())
-                                .stars(isNull(repo.getStarsCount()) ? null : Math.toIntExact(repo.getStarsCount()))
-                                .forkCount(isNull(repo.getForksCount()) ? null : Math.toIntExact(repo.getForksCount()))
-                                .hasIssues(repo.getHasIssues())
-                                .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
-                                .isAuthorizedInGithubApp(entity.installation() != null &&
-                                        entity.installation().getAuthorizedRepos().stream()
-                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
-                        .sorted(comparing(GithubRepoResponse::getId))
-                        .toList())
-        ).toList();
+        return organizationEntities.values().stream()
+                .map(entity -> new GithubOrganizationResponse()
+                        .githubUserId(entity.id())
+                        .login(entity.login())
+                        .avatarUrl(entity.avatarUrl())
+                        .htmlUrl(nonNull(entity.htmlUrl()) ? URI.create(entity.htmlUrl()) : null)
+                        .name(entity.name())
+                        .installationId(entity.installation() != null ? entity.installation().getId() : null)
+                        .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED : switch (entity.installation().getStatus()) {
+                            case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
+                            case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
+                            case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
+                        })
+                        .repos(entity.repos().stream()
+                                .filter(GithubRepoViewEntity::isPublic)
+                                .filter(repo -> includeAllAvailableRepos || repoIdsIncludedInProject.contains(repo.getId()))
+                                .distinct()
+                                .map(repo -> new GithubRepoResponse()
+                                        .id(repo.getId())
+                                        .owner(repo.getOwner().login())
+                                        .name(repo.getName())
+                                        .description(repo.getDescription())
+                                        .htmlUrl(repo.getHtmlUrl())
+                                        .stars(isNull(repo.getStarsCount()) ? null : Math.toIntExact(repo.getStarsCount()))
+                                        .forkCount(isNull(repo.getForksCount()) ? null : Math.toIntExact(repo.getForksCount()))
+                                        .hasIssues(repo.getHasIssues())
+                                        .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
+                                        .isAuthorizedInGithubApp(entity.installation() != null &&
+                                                entity.installation().getAuthorizedRepos().stream()
+                                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
+                                .sorted(comparing(GithubRepoResponse::getId))
+                                .toList())
+                )
+                .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
+                .toList();
     }
 
     public ProjectLinkResponse toLinkResponse() {
