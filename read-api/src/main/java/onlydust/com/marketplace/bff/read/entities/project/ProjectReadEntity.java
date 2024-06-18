@@ -4,27 +4,28 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import onlydust.com.marketplace.api.contract.model.GithubOrganizationResponse;
+import onlydust.com.marketplace.api.contract.model.GithubRepoResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.isNull;
+import static java.util.Comparator.comparing;
 import static java.util.Objects.nonNull;
 
 
@@ -116,33 +117,41 @@ public class ProjectReadEntity {
     @Formula("(select count(pgfi.issue_id) from projects_good_first_issues pgfi where pgfi.project_id = id)")
     Integer goodFirstIssueCount;
 
-    public List<ProjectOrganizationView> organizations() {
+    public List<GithubOrganizationResponse> organizations() {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
         getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
 
-        final var repoIdsIncludedInProject =
-                getRepos().stream()
-                        .filter(GithubRepoViewEntity::isPublic)
-                        .map(GithubRepoViewEntity::getId).collect(Collectors.toSet());
+        final var repoIdsIncludedInProject = getRepos().stream()
+                .filter(GithubRepoViewEntity::isPublic)
+                .map(GithubRepoViewEntity::getId)
+                .collect(Collectors.toSet());
 
-        return organizationEntities.values().stream().map(entity -> ProjectOrganizationView.builder()
-                .id(entity.id())
+        return organizationEntities.values().stream().map(entity -> new GithubOrganizationResponse()
+                .githubUserId(entity.id())
                 .login(entity.login())
                 .avatarUrl(entity.avatarUrl())
-                .htmlUrl(entity.htmlUrl())
+                .htmlUrl(nonNull(entity.htmlUrl()) ? URI.create(entity.htmlUrl()) : null)
                 .name(entity.name())
-                .installationId(isNull(entity.installation()) ? null : entity.installation().getId())
-                .isInstalled(nonNull(entity.installation()))
+                .installationId(entity.installation() != null ? entity.installation().getId() : null)
+                .installed(nonNull(entity.installation()))
                 .repos(entity.repos().stream()
                         .filter(GithubRepoViewEntity::isPublic)
-                        .map(repo -> RepoMapper.mapToDomain(repo,
-                                repoIdsIncludedInProject.contains(repo.getId()),
-                                entity.installation() != null &&
+                        .map(repo -> new GithubRepoResponse()
+                                .id(repo.getId())
+                                .owner(repo.getOwner().login())
+                                .name(repo.getName())
+                                .description(repo.getDescription())
+                                .htmlUrl(repo.getHtmlUrl())
+                                .stars(Math.toIntExact(repo.getStarsCount()))
+                                .forkCount(Math.toIntExact(repo.getForksCount()))
+                                .hasIssues(repo.getHasIssues())
+                                .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
+                                .isAuthorizedInGithubApp(entity.installation() != null &&
                                         entity.installation().getAuthorizedRepos().stream()
-                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
-                        )
-                        .collect(Collectors.toSet()))
-                .build()).toList();
+                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
+                        .sorted(comparing(GithubRepoResponse::getId))
+                        .toList())
+        ).toList();
     }
 
     public ProjectLinkResponse toLinkResponse() {
