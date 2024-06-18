@@ -128,6 +128,8 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.createdAt()));
+            assertThat(applications).allMatch(application -> application.motivations().equals(event.body()));
+            assertThat(applications).allMatch(application -> application.problemSolvingApproach() == null);
 
             verify(indexerPort).indexUser(event.authorId());
         }
@@ -165,7 +167,7 @@ class ApplicationsUpdaterTest {
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             GithubIssue.Id.of(event.issueId()),
                             commentId,
-                            null,
+                            faker.lorem().sentence(),
                             null)
             );
 
@@ -204,6 +206,8 @@ class ApplicationsUpdaterTest {
             assertThat(applications).allMatch(application -> application.origin().equals(Application.Origin.GITHUB));
             assertThat(applications).allMatch(application -> application.commentId().value().equals(event.id()));
             assertThat(applications).allMatch(application -> application.appliedAt().equals(event.updatedAt()));
+            assertThat(applications).allMatch(application -> application.motivations().equals(event.body()));
+            assertThat(applications).allMatch(application -> application.problemSolvingApproach() == null);
 
             verify(indexerPort).indexUser(event.authorId());
         }
@@ -264,7 +268,7 @@ class ApplicationsUpdaterTest {
                             faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
                             issueId,
                             GithubComment.Id.of(event.id()),
-                            null,
+                            faker.lorem().sentence(),
                             null)
             );
 

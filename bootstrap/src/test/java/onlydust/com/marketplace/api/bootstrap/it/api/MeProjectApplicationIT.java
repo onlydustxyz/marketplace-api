@@ -197,7 +197,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(applicationRepository.findById(applicationId)).isEmpty();
     }
 
-
     @Test
     void should_delete_an_application_as_project_lead() {
         // Given
@@ -236,6 +235,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var issueId = 1930092330L;
         final var repoId = 466482535L;
         final var antho = userAuthHelper.authenticateAnthony();
+        final var commentBody = faker.lorem().sentence();
 
         indexingEventRepository.saveEvent(OnGithubCommentCreated.builder()
                 .id(commentId)
@@ -243,7 +243,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .repoId(repoId)
                 .authorId(antho.user().getGithubUserId())
                 .createdAt(ZonedDateTime.now().minusSeconds(2))
-                .body(faker.lorem().sentence())
+                .body(commentBody)
                 .build());
 
         // When
@@ -257,7 +257,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.issueId()).isEqualTo(issueId);
         assertThat(application.applicantId()).isEqualTo(antho.user().getGithubUserId());
         assertThat(application.origin()).isEqualTo(Application.Origin.GITHUB);
-        assertThat(application.motivations()).isNull();
+        assertThat(application.motivations()).isEqualTo(commentBody);
         assertThat(application.problemSolvingApproach()).isNull();
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
