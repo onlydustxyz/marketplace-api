@@ -369,3 +369,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000268_add_application_origin.sql
   - include:
       file: db/changelog/changelogs/00000269_use_github_user_id_in_applications.sql
+  - include:
+      file: db/changelog/changelogs/00000270_add_github_app_permissions_to_global_settings.sql

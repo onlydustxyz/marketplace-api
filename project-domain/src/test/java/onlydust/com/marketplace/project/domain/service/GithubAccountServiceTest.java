@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.project.domain.model.GithubAccount;
-import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.GithubRepo;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import org.junit.jupiter.api.Test;
@@ -53,7 +50,7 @@ public class GithubAccountServiceTest {
                         .build()
                 ),
                 List.of(123446L)
-                , true, false, false
+                , GithubAppInstallationStatus.COMPLETE, false, false
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))
@@ -89,7 +86,7 @@ public class GithubAccountServiceTest {
                         .build()
                 ),
                 List.of(123446L)
-                , true, false, false
+                , GithubAppInstallationStatus.COMPLETE, false, false
         );
 
         Mockito.when(githubStoragePort.findAccountByInstallationId(installationId))
@@ -170,13 +167,13 @@ public class GithubAccountServiceTest {
                 GithubAccount.builder()
                         .id(2L)
                         .login(githubAccounts.get(1).getLogin())
-                        .installed(true)
+                        .installationStatus(GithubAppInstallationStatus.COMPLETE)
                         .installationId(1L)
                         .build(),
                 GithubAccount.builder()
                         .id(user.getGithubUserId())
                         .login(user.getGithubLogin())
-                        .installed(true)
+                        .installationStatus(GithubAppInstallationStatus.COMPLETE)
                         .installationId(3L)
                         .build()
         ));
@@ -188,13 +185,13 @@ public class GithubAccountServiceTest {
                         githubAccounts.get(0).toBuilder().isCurrentUserAdmin(true).build(),
                         githubAccounts.get(1)
                                 .toBuilder()
-                                .installed(true)
+                                .installationStatus(GithubAppInstallationStatus.COMPLETE)
                                 .installationId(1L)
                                 .isCurrentUserAdmin(false)
                                 .isPersonal(false)
                                 .build(),
                         GithubAccount.builder()
-                                .installed(true)
+                                .installationStatus(GithubAppInstallationStatus.COMPLETE)
                                 .id(user.getGithubUserId())
                                 .login(user.getGithubLogin())
                                 .isPersonal(true)

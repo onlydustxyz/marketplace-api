@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.Comparator;
 
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.api.contract.model.GithubOrganizationInstallationStatus.*;
 
 public interface GithubMapper {
     static GithubOrganizationResponse mapToGithubOrganizationResponse(final GithubAccount githubAccount) {
@@ -17,7 +18,12 @@ public interface GithubMapper {
         organization.setAvatarUrl(githubAccount.getAvatarUrl());
         organization.setHtmlUrl(nonNull(githubAccount.getHtmlUrl()) ? URI.create(githubAccount.getHtmlUrl()) : null);
         organization.setName(githubAccount.getName());
-        organization.setInstalled(githubAccount.getInstalled());
+        organization.setInstallationStatus(switch (githubAccount.getInstallationStatus()) {
+            case NOT_INSTALLED -> NOT_INSTALLED;
+            case SUSPENDED -> SUSPENDED;
+            case MISSING_PERMISSIONS -> MISSING_PERMISSIONS;
+            case COMPLETE -> COMPLETE;
+        });
         organization.setInstallationId(githubAccount.getInstallationId());
         organization.setRepos(
                 githubAccount.getAuthorizedRepos().stream()

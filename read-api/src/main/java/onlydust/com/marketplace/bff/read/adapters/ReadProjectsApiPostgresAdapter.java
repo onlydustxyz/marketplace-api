@@ -44,7 +44,8 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapProjectVisibility;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.bff.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
@@ -309,10 +310,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(SponsorResponse::getName))
                         .toList())
-                .organizations(project.organizations().stream()
-                        .map(organizationView -> mapOrganization(organizationView, Boolean.TRUE.equals(includeAllAvailableRepos)))
-                        .sorted(comparing(GithubOrganizationResponse::getGithubUserId))
-                        .toList())
+                .organizations(project.organizations(Boolean.TRUE.equals(includeAllAvailableRepos)))
                 .languages(project.getLanguages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())
                 .indexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull))
                 .indexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null))

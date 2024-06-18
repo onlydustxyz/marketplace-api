@@ -5215,9 +5215,9 @@ components:
           required:
             - name
             - repos
-            - installed
             - canBeInstalled
             - isCurrentUserAdmin
+            - installationStatus
           properties:
             name:
               type: string
@@ -5230,9 +5230,6 @@ components:
               description: Github repos linked to installed organization
               items:
                 $ref: '#/components/schemas/GithubRepoResponse'
-            installed:
-              type: boolean
-              description: False if this organization is not installed
             isCurrentUserAdmin:
               type: boolean
             isPersonal:
@@ -5240,6 +5237,16 @@ components:
             installationId:
               type: integer
               format: int64
+            installationStatus:
+              $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+
+    GithubOrganizationInstallationStatus:
+      type: string
+      enum:
+        - NOT_INSTALLED
+        - SUSPENDED
+        - MISSING_PERMISSIONS
+        - COMPLETE
 
     ShortGithubRepoResponse:
       type: object
