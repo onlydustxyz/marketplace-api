@@ -56,7 +56,7 @@ public class PostgresGithubAdapter implements GithubStoragePort {
 
     @Override
     public Optional<Long> findInstallationIdByRepoId(Long repoId) {
-        return githubAppInstallationRepository.findByRepoId(repoId)
+        return githubAppInstallationRepository.findByAuthorizedReposIdRepoId(repoId)
                 .map(GithubAppInstallationViewEntity::getId);
     }
 }
