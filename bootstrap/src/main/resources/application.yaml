@@ -108,6 +108,9 @@ infrastructure:
   dusty-bot:
     personal-access-token: ${DUSTY_BOT_GITHUB_PAT}
     base-uri: ${DUSTY_BOT_GITHUB_BASE_URL}
+  github-app:
+    app-id: ${GITHUB_APP_ID}
+    private-key: ${GITHUB_APP_PRIVATE_KEY}
   od:
     api:
       client:
@@ -118,18 +121,6 @@ infrastructure:
       client:
         base-uri: ${INDEXER_API_BASE_URL}
         api-key: ${INDEXER_API_KEY}
-  linear:
-    base-uri: https://api.linear.app
-    api-key: ${LINEAR_API_KEY}
-    labels:
-      tech-stuff:
-        id: "08975455-9a1b-427d-9824-c4e172ada649"
-    teams:
-      engineering:
-        id: "fac4208d-473d-47c4-9356-c277878146a8"
-        states:
-          backlog:
-            id: "35c07f98-74f2-4b43-bfd1-d394addf337b"
   auth0:
     api:
       client:
@@ -187,3 +178,6 @@ infrastructure:
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
+
+global:
+  app-base-url: ${APP_BASE_URL}

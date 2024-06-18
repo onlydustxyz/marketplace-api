@@ -24,6 +24,10 @@
             <artifactId>project-domain</artifactId>
         </dependency>
         <dependency>
+            <groupId>onlydust.com.marketplace.kernel</groupId>
+            <artifactId>marketplace-kernel</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>

@@ -65,20 +65,34 @@ public class GithubHttpClient {
         return post(path, requestBody, config.personalAccessToken, responseClass);
     }
 
+
+    public <ResponseBody> Optional<ResponseBody> post(String path, @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+        return post(path, HttpRequest.BodyPublishers.noBody(), personalAccessToken, responseClass);
+    }
+
     public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody,
                                                                    @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+        try {
+            return post(path, HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)), personalAccessToken, responseClass);
+        } catch (JsonProcessingException e) {
+            throw internalServerError("Fail to serialize request", e);
+        }
+    }
+
+    public <ResponseBody> Optional<ResponseBody> post(String path, final HttpRequest.BodyPublisher bodyPublisher,
+                                                      @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {
             final HttpResponse<byte[]> httpResponse =
                     httpClient.send(HttpRequest.newBuilder().uri(buildURI(path))
                             .headers("Authorization", "Bearer " + personalAccessToken)
-                            .POST(HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)))
+                            .POST(bodyPublisher)
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
                 case 200, 201, 204, 206 -> Optional.of(decode(httpResponse.body(), responseClass));
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
-                    yield post(URI.create(location).getPath(), requestBody, personalAccessToken, responseClass);
+                    yield post(URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
                 }
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or
@@ -88,8 +102,6 @@ public class GithubHttpClient {
                 default -> throw internalServerError("Unable to fetch github API: " + path + " for " +
                                                      "error message " + deserializeErrorMessage(httpResponse), null);
             };
-        } catch (JsonProcessingException e) {
-            throw internalServerError("Fail to serialize request", e);
         } catch (IOException | InterruptedException e) {
             throw internalServerError("Fail send request", e);
         }

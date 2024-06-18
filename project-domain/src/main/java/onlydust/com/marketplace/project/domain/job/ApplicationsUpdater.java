@@ -10,19 +10,26 @@ import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.port.output.LLMPort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
+@Transactional
 public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
     private final UserStoragePort userStoragePort;
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;
+    private final GithubStoragePort githubStoragePort;
+    private final ApplicationObserverPort applicationObserverPort;
 
     @Override
     public void process(Event event) {
@@ -66,19 +73,39 @@ public class ApplicationsUpdater implements OutboxConsumer {
     }
 
     private void createMissingApplications(GithubComment comment) {
-        if (!userStoragePort.findApplications(comment.authorId(), comment.issueId()).isEmpty()) {
+        final var issue = githubStoragePort.findIssueById(comment.issueId())
+                .orElseThrow(() -> internalServerError("Issue %s not found".formatted(comment.issueId())));
+
+        if (issue.isAssigned()) {
+            LOGGER.debug("Skipping comment {} as issue is already assigned", comment.id());
+            return;
+        }
+
+        final var existingApplicationsForUser = userStoragePort.findApplications(comment.authorId(), comment.issueId());
+        if (!existingApplicationsForUser.isEmpty()) {
             LOGGER.debug("Skipping comment {} as user already applied to this issue", comment.id());
             return;
         }
 
-        final var applications = projectStoragePort.findProjectIdsByRepoId(comment.repoId()).stream()
+        final var projectIds = projectStoragePort.findProjectIdsByRepoId(comment.repoId());
+        if (projectIds.isEmpty()) {
+            LOGGER.debug("Skipping comment {} as not related to a project", comment.id());
+            return;
+        }
+
+        if (llmPort.isCommentShowingInterestToContribute(comment.body())) {
+            indexerPort.indexUser(comment.authorId());
+            saveGithubApplications(comment, projectIds);
+        }
+    }
+
+    private void saveGithubApplications(GithubComment comment, List<UUID> projectIds) {
+        final var applications = projectIds.stream()
                 .map(projectId -> Application.fromGithubComment(comment, projectId))
                 .toArray(Application[]::new);
 
-        if (applications.length > 0 && llmPort.isCommentShowingInterestToContribute(comment.body())) {
-            indexerPort.indexUser(comment.authorId());
-            userStoragePort.save(applications);
-        }
+        userStoragePort.save(applications);
+        Arrays.stream(applications).forEach(applicationObserverPort::onApplicationCreated);
     }
 
     private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {

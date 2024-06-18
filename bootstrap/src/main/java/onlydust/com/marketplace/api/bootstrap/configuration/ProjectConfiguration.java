@@ -26,12 +26,15 @@ import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
+import onlydust.com.marketplace.project.domain.model.GlobalConfig;
+import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -116,7 +119,8 @@ public class ProjectConfiguration {
                                          final GithubUserPermissionsService githubUserPermissionsService,
                                          final GithubStoragePort githubStoragePort,
                                          final GithubApiPort githubApiPort,
-                                         final GithubAuthenticationPort githubAuthenticationPort
+                                         final GithubAuthenticationPort githubAuthenticationPort,
+                                         final GlobalConfig globalConfig
     ) {
         return new UserService(
                 userObservers,
@@ -129,7 +133,8 @@ public class ProjectConfiguration {
                 githubUserPermissionsService,
                 githubStoragePort,
                 githubApiPort,
-                githubAuthenticationPort);
+                githubAuthenticationPort,
+                globalConfig);
     }
 
     @Bean
@@ -201,8 +206,40 @@ public class ProjectConfiguration {
     @Bean
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
                                               final UserStoragePort userStoragePort,
-                                              final IndexerPort indexerPort) {
-        return new RetriedOutboxConsumer(new ApplicationsUpdater(projectStoragePort, userStoragePort, comment -> true, indexerPort));
+                                              final IndexerPort indexerPort,
+                                              final GithubStoragePort githubStoragePort,
+                                              final ApplicationObserverPort applicationObserver) {
+        return new RetriedOutboxConsumer(
+                new ApplicationsUpdater(projectStoragePort,
+                        userStoragePort,
+                        comment -> true,
+                        indexerPort,
+                        githubStoragePort,
+                        applicationObserver));
+    }
+
+    @Bean
+    ApplicationObserverPort applicationObserver(final UserStoragePort userStoragePort,
+                                                final ProjectStoragePort projectStoragePort,
+                                                final GithubStoragePort githubStoragePort,
+                                                final GithubAppService githubAppService,
+                                                final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
+                                                final GithubApiPort githubApiPort,
+                                                final GlobalConfig globalConfig) {
+        return new GithubIssueCommenter(
+                userStoragePort,
+                projectStoragePort,
+                githubStoragePort,
+                githubAppService,
+                githubAuthenticationInfoPort,
+                githubApiPort,
+                globalConfig);
+    }
+
+    @Bean
+    @ConfigurationProperties("global")
+    GlobalConfig globalConfig() {
+        return new GlobalConfig();
     }
 
     @Bean

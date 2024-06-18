@@ -3,6 +3,9 @@ infrastructure:
     personal-access-token: "GITHUB_PAT"
   dusty-bot:
     personal-access-token: "DUSTY_BOT_PAT"
+  github-app:
+    app-id: 405926
+    private-key: MIIEugIBADANBgkqhkiG9w0BAQEFAASCBKQwggSgAgEAAoIBAQDre63wnVSxH1qq061xD938G+NTwAY34Pfby/mti3DiZxmELJBdMh/PtueAyqwv9yNBNR0o1imccUelMjuuK02kRG/mi5uOWZWNznEzEjhohX/h7qpdDZ69e8RVy+IVh4RO8tdf3pAiCbrUq5qddRYorhpDaV/FeRQ/z6meKuC+3lG+OiihLrWAOXBR7mSt0fh2vY8KYYvkgZ3Or/sq/+6SsTBGbO0cQREwtg3dj4+yiIMMQo3DCHZTer0YDc5JI3lx+VJFgwJGCw9x8x0Hg7eK3dq8yElB5WuHhRxoelMV/PkAiS7/mQc7jsvupzdl2Z44nAoXRDrquo5YldQgUR9vAgMBAAECggEARCePuExQ7tK8UyTg1hBZl1Ya/WpeYl3iXuMyaGArU9uzLuYXAmI3gs7VQhlmrJtCwOS2g9M4R+chbVaUn1w5JIoKORe+9fxHpLtTWAy19spssN96v2Ppxb3EnXBdBw4p5Q+z9jNcU/2s7VCdd2Uj/LInN8uPxH++tJlN5lFSqurvbJBIyE33tyuBBwjWSSgUIgX/l6uEn6/vixjtUQJEHLTKx/Oajn6n1SZ8iaw+m8f5+KBkJygIo3mf/DdAw3/PzXM80NMBVBRtxFj5scx77wnFHP9R2p2Nl2MwdAEmb/bKxVLU0ly/ssQIufLnE7e6YeYH+oH023TF1uf64j90wQKBgQD3anCTldy1S5GO7xDfmNAa5II9Fld3kgiCaDEUz2JG3LbzIYzMkGJssfOCZzF0ZPoHhhuhPVRl/eplyHoPaioyUIk9kAY9DtnuU8TRUgFThJMCAQcvFdVqnhyZ7WlIZiEmED0r1m9WcZWZxvxfhl40xfgRf5JXXm/pezFCmSV7BQKBgQDzp0DRgA3e4ZUXOshkxY/+Cs6SOklmjZRvJSqtNwTqIIhxqXxvjZS0bG1wypMd5Nfu7+6bOdnbReCgATNCjxEz8tx0GcuPdU5BtvosCTYxje9yZKtqXmKZTPJ/ytXyz2x3+KSgupQ6/7FZDUX79DqL+gftWzRvTD4aEm+qVNMC4wKBgEsP/OWZwuMx8RBHUXw01XZDO4wi+hhpsrE1wSZKIMvU7KBo3lm1uFa3ymQWwLdKZ1zfAAT0IWXsGjAVGYsRr4miS3DlAC+IEPAwc/b5hTN8dklWXIKZgi0dmRnOIHH5ojb1GEnzfcXhIf0MlMa6clxab3+Hj7N4EEXqvTAyXF+tAoGAJ25T0RO2KvG63Q2ITLakPOqmz4dbRZt4ABy1sV6MDw/AxRQ2rR7uh9xcQbqm4FmekG6H4NsV5KSEW6CWGRlqIUwWXTunc8n6JixkhCfhe1eK/qpIC2jG8CRBwmijAy6KUUgN7G0FfB7RJqY9Qy8dInYOPl1aOQDPtAxzwc8Ebx0CfyHlisBEOwaqdfV2xc2zqlfWTPhKY5DUS9avzVfC6cglrXk9gExZDfesA/5zMbGUw1j1WsYlVsxXIFIf4nqcHnBoWoGX6fmKGfbot2iLSh014By72FqeRXiV5rInBMd/vrc3+jx4IG/cQURiVl7xWaI3uCUidCwrY6ZtDjnVNXU=
   od:
     api:
       client:
@@ -22,8 +25,6 @@ infrastructure:
     api-key: fake-ph-api-key
     base-uri: http://ph.fake
     user-agent: od-it
-  linear:
-    api-key: "some-linear-api-key"
   ethereum:
     private-key: 0xcc6a05adc43ec626fd374dc325ed7d95bd13d35758997931a70cbdc26cc129fe
     api-key: INFURA_API_KEY
@@ -93,3 +94,6 @@ decorator:
       query:
         log-level: INFO
         enable-logging: false # Comment this line to enable SQL query logging
+
+global:
+  app-base-url: "https://local-app.onlydust.com"

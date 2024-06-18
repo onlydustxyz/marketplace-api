@@ -18,6 +18,6 @@ public class ContributionRefresher implements OutboxConsumer {
             contributionObserverPort.onContributionsChanged(onContributionChanged.repoId());
 
         else
-            LOGGER.warn("Event type {} not handled", event.getClass().getSimpleName());
+            LOGGER.debug("Event type {} not handled", event.getClass().getSimpleName());
     }
 }

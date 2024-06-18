@@ -90,6 +90,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Project> getById(UUID projectId) {
         return projectRepository.findById(projectId).map(ProjectEntity::toDomain);
     }

@@ -45,6 +45,7 @@ public class UserServiceTest {
     private GithubStoragePort githubStoragePort;
     private GithubApiPort githubApiPort;
     private GithubAuthenticationPort githubAuthenticationPort;
+    private GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.xyz");
 
     @BeforeEach
     void setUp() {
@@ -60,7 +61,7 @@ public class UserServiceTest {
         githubAuthenticationPort = mock(GithubAuthenticationPort.class);
 
         userService = new UserService(userObserverPort, userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort,
-                projectObserverPort, githubUserPermissionsService, githubStoragePort, githubApiPort, githubAuthenticationPort);
+                projectObserverPort, githubUserPermissionsService, githubStoragePort, githubApiPort, githubAuthenticationPort, globalConfig);
     }
 
     @Test
