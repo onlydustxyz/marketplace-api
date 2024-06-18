@@ -45,9 +45,7 @@ public class UserServiceTest {
     private GithubStoragePort githubStoragePort;
     private GithubApiPort githubApiPort;
     private GithubAuthenticationPort githubAuthenticationPort;
-    private GlobalConfig globalConfig = GlobalConfig.builder()
-            .appBaseUrl("https://local-app.onlydust.xyz")
-            .build();
+    private GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.xyz");
 
     @BeforeEach
     void setUp() {

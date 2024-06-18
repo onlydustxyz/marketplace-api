@@ -195,7 +195,7 @@ public class UserService implements UserFacadePort {
 
         final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](%s).
-                """.formatted(globalConfig.appBaseUrl()));
+                """.formatted(globalConfig.getAppBaseUrl()));
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 

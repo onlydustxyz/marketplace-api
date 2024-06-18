@@ -25,9 +25,7 @@ class GithubIssueCommenterTest {
     final GithubAppService githubAppService = mock(GithubAppService.class);
     final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
-    final GlobalConfig globalConfig = GlobalConfig.builder()
-            .appBaseUrl("https://local-app.onlydust.com")
-            .build();
+    final GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.com");
     final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(
             userStoragePort,
             projectStoragePort,
@@ -192,8 +190,6 @@ class GithubIssueCommenterTest {
 
         @Test
         void should_create_application() {
-            // Given
-
             // When
             githubIssueCommenter.onApplicationCreated(application);
 
@@ -203,7 +199,7 @@ class GithubIssueCommenterTest {
                     Thanks for showing interest.
                     We've created an application for you to contribute to %s.
                     Go check it out on [OnlyDust](%s/p/%s)!
-                    """.formatted(applicant.getGithubLogin(), project.getName(), globalConfig.appBaseUrl(), project.getSlug()));
+                    """.formatted(applicant.getGithubLogin(), project.getName(), globalConfig.getAppBaseUrl(), project.getSlug()));
         }
     }
 }
