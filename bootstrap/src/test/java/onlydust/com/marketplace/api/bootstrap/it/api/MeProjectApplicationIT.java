@@ -267,7 +267,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var expectedComment = """
                 Hey @AnthonyBuisset!\\n\
                 Thanks for showing interest.\\n\
-                We've created an application for you to contribute to Bretzel project.\\n\
+                We've created an application for you to contribute to Bretzel.\\n\
                 Go check it out on [OnlyDust](https://app.onlydust.com/p/bretzel)!\\n\
                 """;
 
