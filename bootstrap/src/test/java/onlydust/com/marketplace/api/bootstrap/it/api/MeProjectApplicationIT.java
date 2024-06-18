@@ -246,6 +246,47 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .body(commentBody)
                 .build());
 
+        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
+                .withHeader("Authorization", matching("Bearer .*"))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN"
+                                }
+                                """)
+                ));
+
+        githubWireMockServer.stubFor(get(urlEqualTo("/"))
+                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("x-oauth-scopes", "issues")
+                ));
+
+        final var expectedComment = """
+                Hey @43467246!\\n\
+                Thanks for showing interest.\\n\
+                We've created an application for you to contribute to this project.\\n\
+                Go check it out on OnlyDust!\\n\
+                """;
+        
+        githubWireMockServer.stubFor(post(urlEqualTo("/repository/466482535/issues/7/comments"))
+                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
+                .withRequestBody(equalToJson("""
+                        {
+                            "body": "%s"
+                        }
+                        """.formatted(expectedComment)))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)
+                ));
+
         // When
         indexingEventsOutboxJob.run();
 
@@ -261,6 +302,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.problemSolvingApproach()).isNull();
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
+        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repository/466482535/issues/7/comments")));
     }
 
     @Test
