@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class InfuraConfiguration {
     @Bean
-    @ConfigurationProperties("infrastructure.ethereum")
+    @ConfigurationProperties(value = "infrastructure.ethereum", ignoreUnknownFields = false)
     public InfuraClient.Properties ethereumProperties() {
         return new InfuraClient.Properties();
     }
@@ -35,7 +35,7 @@ public class InfuraConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("infrastructure.optimism")
+    @ConfigurationProperties(value = "infrastructure.optimism", ignoreUnknownFields = false)
     public InfuraClient.Properties optimismProperties() {
         return new InfuraClient.Properties();
     }
@@ -51,7 +51,7 @@ public class InfuraConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties("infrastructure.starknet")
+    @ConfigurationProperties(value = "infrastructure.starknet", ignoreUnknownFields = false)
     public InfuraClient.Properties starknetProperties() {
         return new InfuraClient.Properties();
     }

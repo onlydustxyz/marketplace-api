@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class IndexerApiClientConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.indexer.api.client")
+    @ConfigurationProperties(value = "infrastructure.indexer.api.client", ignoreUnknownFields = false)
     public IndexerApiHttpClient.Properties indexerApiHttpClientProperties() {
         return new IndexerApiHttpClient.Properties();
     }

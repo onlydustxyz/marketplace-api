@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class CoinmarketcapConfiguration {
     @Bean
-    @ConfigurationProperties("infrastructure.coinmarketcap")
+    @ConfigurationProperties(value = "infrastructure.coinmarketcap", ignoreUnknownFields = false)
     public CmcClient.Properties cmcClientProperties() {
         return new CmcClient.Properties();
     }

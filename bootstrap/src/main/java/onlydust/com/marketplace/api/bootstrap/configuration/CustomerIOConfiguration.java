@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class CustomerIOConfiguration {
 
     @Bean
-    @ConfigurationProperties(value = "infrastructure.customer-io")
+    @ConfigurationProperties(value = "infrastructure.customer-io", ignoreUnknownFields = false)
     public CustomerIOProperties customerIOProperties() {
         return new CustomerIOProperties();
     }

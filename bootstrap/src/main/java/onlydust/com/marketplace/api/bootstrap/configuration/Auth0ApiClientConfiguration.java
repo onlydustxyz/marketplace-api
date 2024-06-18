@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class Auth0ApiClientConfiguration {
     @Bean
-    @ConfigurationProperties(value = "infrastructure.auth0.api.client")
+    @ConfigurationProperties(value = "infrastructure.auth0.api.client", ignoreUnknownFields = false)
     public Auth0ApiClientProperties auth0ApiClientProperties() {
         return new Auth0ApiClientProperties();
     }

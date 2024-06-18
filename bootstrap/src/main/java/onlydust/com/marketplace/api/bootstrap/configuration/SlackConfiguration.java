@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class SlackConfiguration {
 
     @Bean
-    @ConfigurationProperties("infrastructure.slack")
+    @ConfigurationProperties(value = "infrastructure.slack", ignoreUnknownFields = false)
     public SlackProperties slackProperties() {
         return new SlackProperties();
     }

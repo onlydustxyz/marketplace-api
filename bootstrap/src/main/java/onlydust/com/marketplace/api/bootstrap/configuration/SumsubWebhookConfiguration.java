@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class SumsubWebhookConfiguration {
 
     @Bean
-    @ConfigurationProperties("application.sumsub.webhook")
+    @ConfigurationProperties(value = "application.sumsub.webhook", ignoreUnknownFields = false)
     public SumsubWebhookProperties sumsubProperties() {
         return new SumsubWebhookProperties();
     }
