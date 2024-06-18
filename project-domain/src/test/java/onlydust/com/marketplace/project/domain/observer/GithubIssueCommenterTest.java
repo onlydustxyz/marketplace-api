@@ -16,7 +16,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 class GithubIssueCommenterTest {
@@ -26,13 +25,17 @@ class GithubIssueCommenterTest {
     final GithubAppService githubAppService = mock(GithubAppService.class);
     final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
+    final GlobalConfig globalConfig = GlobalConfig.builder()
+            .appBaseUrl("https://local-app.onlydust.com")
+            .build();
     final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(
             userStoragePort,
             projectStoragePort,
             githubStoragePort,
             githubAppService,
             githubAuthenticationInfoPort,
-            githubApiPort);
+            githubApiPort,
+            globalConfig);
 
     final Faker faker = new Faker();
 
@@ -195,7 +198,12 @@ class GithubIssueCommenterTest {
             githubIssueCommenter.onApplicationCreated(application);
 
             // Then
-            verify(githubApiPort).createComment(eq(githubAppToken), eq(issue), any(String.class));
+            verify(githubApiPort).createComment(githubAppToken, issue, """
+                    Hey @%s!
+                    Thanks for showing interest.
+                    We've created an application for you to contribute to %s.
+                    Go check it out on [OnlyDust](%s/p/%s)!
+                    """.formatted(applicant.getGithubLogin(), project.getName(), globalConfig.appBaseUrl(), project.getSlug()));
         }
     }
 }

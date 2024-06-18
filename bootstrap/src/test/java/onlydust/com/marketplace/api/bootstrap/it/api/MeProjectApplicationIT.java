@@ -268,7 +268,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 Hey @AnthonyBuisset!\\n\
                 Thanks for showing interest.\\n\
                 We've created an application for you to contribute to Bretzel.\\n\
-                Go check it out on [OnlyDust](https://app.onlydust.com/p/bretzel)!\\n\
+                Go check it out on [OnlyDust](https://local-app.onlydust.com/p/bretzel)!\\n\
                 """;
 
         githubWireMockServer.stubFor(post(urlEqualTo("/repository/466482535/issues/7/comments"))

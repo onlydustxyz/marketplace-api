@@ -30,6 +30,7 @@ import onlydust.com.marketplace.project.domain.job.ApplicationsUpdater;
 import onlydust.com.marketplace.project.domain.job.ContributionRefresher;
 import onlydust.com.marketplace.project.domain.job.IndexerApiOutboxConsumer;
 import onlydust.com.marketplace.project.domain.job.TrackingEventPublisherOutboxConsumer;
+import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
@@ -37,6 +38,7 @@ import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
@@ -224,14 +226,22 @@ public class ProjectConfiguration {
                                                 final GithubStoragePort githubStoragePort,
                                                 final GithubAppService githubAppService,
                                                 final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
-                                                final GithubApiPort githubApiPort) {
+                                                final GithubApiPort githubApiPort,
+                                                final GlobalConfig globalConfig) {
         return new GithubIssueCommenter(
                 userStoragePort,
                 projectStoragePort,
                 githubStoragePort,
                 githubAppService,
                 githubAuthenticationInfoPort,
-                githubApiPort);
+                githubApiPort,
+                globalConfig);
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "global")
+    GlobalConfig globalConfig() {
+        return new GlobalConfig();
     }
 
     @Bean

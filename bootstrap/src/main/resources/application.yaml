@@ -178,3 +178,6 @@ infrastructure:
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
+
+global:
+  app-base-url: ${APP_BASE_URL}

@@ -94,3 +94,6 @@ decorator:
       query:
         log-level: INFO
         enable-logging: false # Comment this line to enable SQL query logging
+
+global:
+  app-base-url: "https://local-app.onlydust.com"

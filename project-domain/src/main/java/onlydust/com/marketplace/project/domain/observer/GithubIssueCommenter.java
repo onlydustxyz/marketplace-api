@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.observer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 
@@ -17,6 +18,7 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
     private final GithubAppService githubAppService;
     private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
     private final GithubApiPort githubApiPort;
+    private final GlobalConfig globalConfig;
 
     @Override
     public void onApplicationCreated(Application application) {
@@ -38,8 +40,8 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                                 Hey @%s!
                                 Thanks for showing interest.
                                 We've created an application for you to contribute to %s.
-                                Go check it out on [OnlyDust](https://app.onlydust.com/p/%s)!
-                                """.formatted(applicant.getGithubLogin(), project.getName(), project.getSlug())),
+                                Go check it out on [OnlyDust](%s/p/%s)!
+                                """.formatted(applicant.getGithubLogin(), project.getName(), globalConfig.appBaseUrl(), project.getSlug())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }
