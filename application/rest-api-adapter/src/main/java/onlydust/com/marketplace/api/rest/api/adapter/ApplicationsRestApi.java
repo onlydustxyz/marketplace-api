@@ -22,7 +22,7 @@ public class ApplicationsRestApi implements ApplicationsApi {
     private final ApplicationFacadePort applicationFacadePort;
 
     @Override
-    public ResponseEntity<Void> deleteApplication(UUID applicationId) {
+    public ResponseEntity<Void> deleteProjectApplication(UUID applicationId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         applicationFacadePort.deleteApplication(Application.Id.of(applicationId), authenticatedUser.getId(), authenticatedUser.getGithubUserId());
         return noContent().build();
