@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.contract.model.SponsorResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -27,4 +28,17 @@ public class SponsorReadEntity {
 
     @NonNull
     String name;
+
+    @NonNull
+    String url;
+
+    String logoUrl;
+
+    public SponsorResponse toDto() {
+        return new SponsorResponse()
+                .id(id)
+                .name(name)
+                .url(url)
+                .logoUrl(logoUrl);
+    }
 }

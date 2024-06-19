@@ -227,7 +227,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         userRepository.save(user);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
                 .profileWizardDisplayDate(new Date())
                 .build();

@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.GithubIssue;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @Table(schema = "indexer_exp", name = "github_issues")
 @Immutable
+@Accessors(fluent = true)
 public class GithubIssueReadEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -79,6 +81,15 @@ public class GithubIssueReadEntity {
     @NonNull
     List<GithubLabelReadEntity> labels;
 
+    @ManyToMany
+    @JoinTable(
+            schema = "indexer_exp",
+            name = "github_issues_assignees",
+            joinColumns = @JoinColumn(name = "issueId"),
+            inverseJoinColumns = @JoinColumn(name = "userId", referencedColumnName = "githubUserId")
+    )
+    @NonNull
+    List<AllUserReadEntity> assignees;
 
     @ManyToMany
     @JoinTable(

@@ -66,6 +66,7 @@ public class PostgresUserAdapter implements UserStoragePort {
         return userViewRepository.findById(userId).map(this::getUserDetails);
     }
 
+    // TODO remove
     private User getUserDetails(@NotNull UserViewEntity user) {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
@@ -150,7 +151,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .id(userId)
+                            .userId(userId)
                             .profileWizardDisplayDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
@@ -166,7 +167,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .id(userId)
+                            .userId(userId)
                             .termsAndConditionsAcceptanceDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);

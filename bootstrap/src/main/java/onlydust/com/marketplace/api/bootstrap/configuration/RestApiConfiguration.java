@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.service.GithubAccountService;
-import onlydust.com.marketplace.project.domain.service.GithubUserPermissionsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -54,11 +53,9 @@ public class RestApiConfiguration {
                                final BillingProfileFacadePort billingProfileFacadePort,
                                final PayoutPreferenceFacadePort payoutPreferenceFacadePort,
                                final HackathonFacadePort hackathonFacadePort,
-                               final CommitteeFacadePort committeeFacadePort,
-                               final GithubUserPermissionsService githubUserPermissionsService) {
+                               final CommitteeFacadePort committeeFacadePort) {
         return new MeRestApi(authenticatedAppUserService, userFacadePort, applicationFacadePort, contributorFacadePort,
-                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort, committeeFacadePort,
-                githubUserPermissionsService);
+                githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort, committeeFacadePort);
     }
 
     @Bean

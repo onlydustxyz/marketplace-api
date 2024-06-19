@@ -39,7 +39,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadMe
       summary: Get caller info
       operationId: getMe
       description: |
@@ -6103,11 +6103,11 @@ components:
             projectsLed:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLedShortResponse'
+                $ref: '#/components/schemas/ProjectLinkResponse'
             pendingProjectsLed:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLedShortResponse'
+                $ref: '#/components/schemas/ProjectLinkResponse'
             pendingApplications:
               type: array
               items:
@@ -6223,29 +6223,6 @@ components:
         individualLimitReached:
           type: boolean
           description: True if the (individual) billing profile has reached the yearly limit.
-    ProjectLedShortResponse:
-      type: object
-      required:
-        - id
-        - slug
-        - name
-        - contributorCount
-        - hasMissingGithubAppInstallation
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        logoUrl:
-          type: string
-        contributorCount:
-          type: integer
-          format: int64
-        hasMissingGithubAppInstallation:
-          type: boolean
 
     PatchMeContract:
       type: object

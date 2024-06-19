@@ -60,8 +60,8 @@ public class GithubIssueViewEntity {
     @JoinTable(
             name = "github_issues_assignees",
             schema = "indexer_exp",
-            joinColumns = @JoinColumn(name = "issue_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
+            joinColumns = @JoinColumn(name = "issueId"),
+            inverseJoinColumns = @JoinColumn(name = "userId"))
     @NonNull
     List<GithubAccountViewEntity> assignees;
 

@@ -80,7 +80,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
-        final OnboardingEntity onboarding = OnboardingEntity.builder().id(user.getId())
+        final OnboardingEntity onboarding = OnboardingEntity.builder().userId(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
                 .profileWizardDisplayDate(new Date())
                 .build();
@@ -142,7 +142,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Test
     void should_create_onboarding() {
         // Given
-        final OnboardingEntity expected = OnboardingEntity.builder().id(UUID.randomUUID())
+        final OnboardingEntity expected = OnboardingEntity.builder().userId(UUID.randomUUID())
                 .termsAndConditionsAcceptanceDate(new Date())
                 .profileWizardDisplayDate(new Date())
                 .build();

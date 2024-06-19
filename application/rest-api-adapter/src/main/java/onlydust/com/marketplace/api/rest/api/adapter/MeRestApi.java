@@ -39,7 +39,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileRequestToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileToPrivateResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -57,16 +58,6 @@ public class MeRestApi implements MeApi {
     private final PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     private final HackathonFacadePort hackathonFacadePort;
     private final CommitteeFacadePort committeeFacadePort;
-    private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
-
-    @Override
-    public ResponseEntity<GetMeResponse> getMe() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser,
-                githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(authenticatedUser.getGithubUserId())
-        );
-        return ResponseEntity.ok(getMeResponse);
-    }
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {

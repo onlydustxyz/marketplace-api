@@ -13,6 +13,10 @@ import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonRegistrationReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.bff.read.entities.sponsor.SponsorReadEntity;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -55,6 +59,40 @@ public class AllUserReadEntity {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     Set<ContactInformationReadEntity> contacts;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
+    UserProfileInfoReadEntity profile;
+
+    @ManyToMany
+    @JoinTable(
+            name = "project_leads",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "projectId")
+    )
+    Set<ProjectReadEntity> projectsLed;
+
+    @ManyToMany
+    @JoinTable(
+            name = "pending_project_leader_invitations",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId"),
+            inverseJoinColumns = @JoinColumn(name = "projectId")
+    )
+    Set<ProjectReadEntity> pendingProjectsLed;
+
+    @ManyToMany
+    @JoinTable(
+            name = "sponsors_users",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "sponsorId")
+    )
+    Set<SponsorReadEntity> sponsors;
+
+    @OneToMany(mappedBy = "applicant")
+    Set<ApplicationReadEntity> applications;
+
     @ManyToMany
     @JoinTable(
             name = "billing_profiles_users",
@@ -76,6 +114,19 @@ public class AllUserReadEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     JourneyCompletionEntity journeyCompletion;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
+    OnboardingReadEntity onboarding;
+
+    @Formula("""
+            exists(
+                select 1
+                from rewards r
+                join accounting.reward_statuses rs on r.id = rs.reward_id and rs.status = 'PENDING_BILLING_PROFILE'
+                where r.recipient_id = github_user_id)
+            """)
+    boolean hasMissingPayoutPreferences;
 
     public UserPageItemResponse toBoPageItemResponse() {
         return new UserPageItemResponse()

@@ -26,8 +26,6 @@ public class User {
     @Builder.Default
     List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
     @Builder.Default
-    List<Application> pendingApplications = new ArrayList<>();
-    @Builder.Default
     List<BillingProfileLinkView> billingProfiles = new ArrayList<>();
     boolean isMissingPayoutPreference;
     @Builder.Default
