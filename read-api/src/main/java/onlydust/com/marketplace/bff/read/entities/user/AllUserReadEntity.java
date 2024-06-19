@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.bff.read.entities.hackathon.HackathonRegistrationReadEntity;
@@ -117,5 +118,13 @@ public class AllUserReadEntity {
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl);
+    }
+
+    public ContributorResponse toContributorResponse() {
+        return new ContributorResponse()
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .isRegistered(registered != null);
     }
 }

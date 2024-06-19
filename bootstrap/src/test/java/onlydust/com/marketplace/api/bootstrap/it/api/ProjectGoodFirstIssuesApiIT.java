@@ -1,14 +1,79 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
+import onlydust.com.marketplace.api.bootstrap.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagProject;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.project.domain.model.Application;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 
 @TagProject
 public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
-    private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
+    private final static UUID CAL_DOT_COM = UUID.fromString("1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e");
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
+    private UserAuthHelper.AuthenticatedUser antho;
+
+    @BeforeEach
+    void setUp() {
+        antho = userAuthHelper.authenticateAnthony();
+        final var pierre = userAuthHelper.authenticatePierre();
+        final var ofux = userAuthHelper.authenticateOlivier();
+
+        applicationRepository.saveAll(List.of(
+                new ApplicationEntity(
+                        UUID.fromString("f3706f53-bd79-4991-8a76-7dd12aef81dd"),
+                        ZonedDateTime.of(2023, 11, 5, 9, 40, 41, 0, ZoneOffset.UTC),
+                        CAL_DOT_COM,
+                        pierre.user().getGithubUserId(),
+                        Application.Origin.MARKETPLACE,
+                        1980935024L,
+                        1111L,
+                        "I would like to work on this issue",
+                        "I would do this and that"),
+                new ApplicationEntity(
+                        UUID.fromString("609231c0-b38c-4d5c-b21d-6307595f520f"),
+                        ZonedDateTime.of(2023, 11, 7, 15, 26, 35, 0, ZoneOffset.UTC),
+                        CAL_DOT_COM,
+                        ofux.user().getGithubUserId(),
+                        Application.Origin.GITHUB,
+                        1980935024L,
+                        1112L,
+                        "I am very interested!",
+                        null),
+                new ApplicationEntity(
+                        UUID.fromString("bf6a909e-243d-4698-aa9f-5f40e3fb4826"),
+                        ZonedDateTime.of(2023, 11, 7, 20, 2, 11, 0, ZoneOffset.UTC),
+                        CAL_DOT_COM,
+                        antho.user().getGithubUserId(),
+                        Application.Origin.MARKETPLACE,
+                        1980935024L,
+                        1113L,
+                        "I could do it",
+                        "No idea yet ¯\\_(ツ)_/¯"),
+                new ApplicationEntity(
+                        UUID.fromString("536532eb-ed7b-4461-884d-20e54ba9bec6"),
+                        ZonedDateTime.of(2023, 11, 7, 20, 2, 11, 0, ZoneOffset.UTC),
+                        UUID.fromString("97f6b849-1545-4064-83f1-bc5ded33a8b3"),
+                        antho.user().getGithubUserId(),
+                        Application.Origin.GITHUB,
+                        1980935024L,
+                        1113L,
+                        "I could do it",
+                        null)
+        ));
+    }
 
     @Test
     void should_get_good_first_issues() {
@@ -66,7 +131,26 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "name": "✅ good first issue",
                                   "description": "Good for newcomers"
                                 }
-                              ]
+                              ],
+                              "applicants": [
+                                {
+                                  "githubUserId": 595505,
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                },
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                },
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                }
+                              ],
+                              "currentUserApplication": null,
+                              "languages": null
                             },
                             {
                               "id": 1980731400,
@@ -100,7 +184,10 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "name": "✅ good first issue",
                                   "description": "Good for newcomers"
                                 }
-                              ]
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null,
+                              "languages": null
                             },
                             {
                               "id": 1979376167,
@@ -138,7 +225,10 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "name": "✨ feature",
                                   "description": "New feature or request"
                                 }
-                              ]
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null,
+                              "languages": null
                             },
                             {
                               "id": 1975516187,
@@ -180,7 +270,10 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "name": "\\uD83D\\uDC1B bug",
                                   "description": "Something isn't working"
                                 }
-                              ]
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null,
+                              "languages": null
                             },
                             {
                               "id": 1943730312,
@@ -222,7 +315,76 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "name": "✨ feature",
                                   "description": "New feature or request"
                                 }
-                              ]
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null,
+                              "languages": null
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_good_first_issues_as_registered_user() {
+        // When
+        client.get()
+                .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5"
+                )))
+                .header("Authorization", "Bearer " + antho.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "issues": [
+                            {
+                              "id": 1980935024,
+                              "applicants": [
+                                {
+                                  "githubUserId": 595505,
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                },
+                                {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                },
+                                {
+                                  "githubUserId": 16590657,
+                                  "login": "PierreOucif",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                }
+                              ],
+                              "currentUserApplication": {
+                                "id": "bf6a909e-243d-4698-aa9f-5f40e3fb4826",
+                                "applicant": {
+                                  "githubUserId": 43467246,
+                                  "login": "AnthonyBuisset",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                  "isRegistered": true
+                                },
+                                "motivations": "I could do it",
+                                "problemSolvingApproach": "No idea yet ¯\\\\_(ツ)_/¯"
+                              }
+                            },
+                            {
+                              "id": 1980731400
+                            },
+                            {
+                              "id": 1979376167
+                            },
+                            {
+                              "id": 1975516187
+                            },
+                            {
+                              "id": 1943730312
                             }
                           ]
                         }
