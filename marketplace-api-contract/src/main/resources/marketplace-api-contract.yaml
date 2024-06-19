@@ -2380,7 +2380,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - ReadApplications
+        - ReadProjectApplications
       summary: Get applications of a project's issue or a user
       operationId: getProjectsApplications
       description: |
@@ -2445,7 +2445,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - ReadApplications
+        - ReadProjectApplications
       summary: Get application
       operationId: getProjectApplication
       description: |
@@ -2476,7 +2476,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Applications
+        - ProjectApplications
       summary: Delete application
       operationId: deleteProjectApplication
       description: |
