@@ -6089,6 +6089,7 @@ components:
             - hasAcceptedLatestTermsAndConditions
             - isAdmin
             - createdAt
+            - hasPendingApplications
           properties:
             hasSeenOnboardingWizard:
               type: boolean
@@ -6107,10 +6108,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectLedShortResponse'
-            projectsAppliedTo:
+            pendingApplications:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectId'
+                $ref: '#/components/schemas/ProjectApplicationShortResponse'
             isAdmin:
               type: boolean
               description: True if the user is an OnlyDust admin

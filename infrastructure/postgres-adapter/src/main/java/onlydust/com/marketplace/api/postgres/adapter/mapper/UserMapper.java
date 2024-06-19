@@ -51,7 +51,7 @@ public interface UserMapper {
 
     static User mapUserToDomain(UserViewEntity user, ZonedDateTime termsAndConditionsLatestVersionDate,
                                 List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
-                                List<ApplicationEntity> applications,
+                                List<ApplicationEntity> pendingApplications,
                                 List<BillingProfileLinkView> billingProfiles,
                                 boolean hasAnyRewardPendingBillingProfile) {
         return User.builder()
@@ -89,7 +89,7 @@ public interface UserMapper {
                                 .contributorCount(projectLedIdQueryEntity.getContributorCount())
                                 .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
                                 .build()).toList())
-                .projectsAppliedTo(applications.stream().map(ApplicationEntity::projectId).toList())
+                .pendingApplications(pendingApplications.stream().map(ApplicationEntity::toDomain).toList())
                 .createdAt(user.createdAt())
                 .billingProfiles(billingProfiles)
                 .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)

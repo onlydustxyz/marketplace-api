@@ -190,7 +190,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_projects_led_and_applications() {
+    void should_return_projects_led() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
@@ -200,9 +200,6 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed");
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                 projectIdWithoutRepo, pierre.user().getGithubUserId()));
-
-        final var projectAppliedTo1 = UUID.fromString("dcb3548a-977a-480e-8fb4-423d3f890c04");
-        final var projectAppliedTo2 = UUID.fromString("c66b929a-664d-40b9-96c4-90d3efd32a3c");
 
         // When
         client.get()

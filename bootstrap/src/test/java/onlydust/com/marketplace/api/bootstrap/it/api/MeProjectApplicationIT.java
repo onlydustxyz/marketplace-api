@@ -461,7 +461,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         ZonedDateTime.now(),
                         projectAppliedTo2,
                         pierre.user().getGithubUserId(),
-                        Application.Origin.MARKETPLACE,
+                        Application.Origin.GITHUB,
                         1736504583L,
                         113L,
                         "My motivations",
@@ -478,8 +478,21 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)
-                .jsonPath("$.projectsAppliedTo[0]").isEqualTo(projectAppliedTo1.toString())
-                .jsonPath("$.projectsAppliedTo[1]").isEqualTo(projectAppliedTo2.toString());
+                .json("""
+                        {
+                          "pendingApplications": [
+                            {
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "motivations": "My motivations",
+                              "problemSolvingApproach": null
+                            }
+                          ]
+                        }
+                        """);
     }
 }

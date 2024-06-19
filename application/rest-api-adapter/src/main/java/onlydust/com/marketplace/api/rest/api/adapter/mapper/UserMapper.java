@@ -155,7 +155,7 @@ public interface UserMapper {
                         .hasMissingGithubAppInstallation(projectLedView.getHasMissingGithubAppInstallation())
                 )
                 .toList());
-        getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
+        getMeResponse.setPendingApplications(authenticatedUser.getPendingApplications().stream().map(application -> map(authenticatedUser, application)).toList());
         getMeResponse.setIsAdmin(authenticatedUser.hasRole(AuthenticatedUser.Role.ADMIN));
         getMeResponse.setCreatedAt(toZoneDateTime(authenticatedUser.getCreatedAt()));
         getMeResponse.setEmail(authenticatedUser.getGithubEmail());
@@ -164,5 +164,21 @@ public interface UserMapper {
         getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
         getMeResponse.setSponsors(authenticatedUser.getSponsors().stream().map(SponsorMapper::map).toList());
         return getMeResponse;
+    }
+
+    static ProjectApplicationShortResponse map(final User authenticatedUser, final Application application) {
+        return new ProjectApplicationShortResponse()
+                .id(application.id().value())
+                .applicant(map(authenticatedUser))
+                .motivations(application.motivations())
+                .problemSolvingApproach(application.problemSolvingApproach());
+    }
+
+    static ContributorResponse map(User authenticatedUser) {
+        return new ContributorResponse()
+                .githubUserId(authenticatedUser.getGithubUserId())
+                .login(authenticatedUser.getGithubLogin())
+                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
+                .isRegistered(true);
     }
 }

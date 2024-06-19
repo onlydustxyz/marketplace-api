@@ -70,13 +70,14 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var applications = applicationRepository.findAllByApplicantId(user.githubUserId());
+        final var pendingApplications = applicationRepository.findAllByApplicantIdAndOriginAndIssueAssigneesIsEmpty(user.githubUserId(),
+                Application.Origin.GITHUB);
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
         final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.githubUserId());
         return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
+                projectLedIdsByUserId, pendingApplications, billingProfiles, hasAnyRewardPendingBillingProfile);
     }
 
     @Override
@@ -177,7 +178,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                        " %s and user %d", projectId, githubUserId)));
+                                                   " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));

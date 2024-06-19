@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.old;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
+import onlydust.com.marketplace.project.domain.model.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ApplicationRepository extends JpaRepository<ApplicationEntity, UUID> {
-    List<ApplicationEntity> findAllByApplicantId(Long applicantId);
+    List<ApplicationEntity> findAllByApplicantIdAndOriginAndIssueAssigneesIsEmpty(Long applicantId, Application.Origin origin);
 
     Optional<ApplicationEntity> findByApplicantIdAndProjectIdAndIssueId(Long applicantId, UUID projectId, Long value);
 

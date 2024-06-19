@@ -63,7 +63,8 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<GetMeResponse> getMe() {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final GetMeResponse getMeResponse = userToGetMeResponse(authenticatedUser,
-                githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(authenticatedUser.getGithubUserId()));
+                githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(authenticatedUser.getGithubUserId())
+        );
         return ResponseEntity.ok(getMeResponse);
     }
 
