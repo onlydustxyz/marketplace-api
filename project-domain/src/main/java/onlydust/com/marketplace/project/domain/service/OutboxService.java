@@ -2,7 +2,6 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
-import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
 import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
@@ -25,10 +24,6 @@ public class OutboxService implements ProjectObserverPort, UserObserverPort {
 
     @Override
     public void onRewardSettingsChanged(UUID projectId) {
-    }
-
-    @Override
-    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
     }
 
     @Override

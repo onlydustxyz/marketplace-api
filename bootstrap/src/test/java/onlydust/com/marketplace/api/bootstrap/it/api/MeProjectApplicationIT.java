@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.ApplicationUpdateRequest;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
@@ -23,6 +24,8 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
 @TagMe
 public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
@@ -32,6 +35,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     IndexingEventRepository indexingEventRepository;
     @Autowired
     OutboxConsumerJob indexingEventsOutboxJob;
+    @Autowired
+    SlackApiAdapter slackApiAdapter;
 
     @BeforeEach
     void setUp() {
@@ -308,6 +313,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
         githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repository/466482535/issues/7/comments")));
+        verify(slackApiAdapter).onApplicationCreated(any(Application.class));
     }
 
     @Test

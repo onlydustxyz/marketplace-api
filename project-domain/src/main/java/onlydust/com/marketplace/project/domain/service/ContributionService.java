@@ -2,7 +2,6 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
@@ -55,10 +54,6 @@ public class ContributionService implements ContributionFacadePort, Contribution
     @Override
     public void onRewardSettingsChanged(UUID projectId) {
         contributionStoragePort.refreshIgnoredContributions(projectId);
-    }
-
-    @Override
-    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
     }
 
     @Override

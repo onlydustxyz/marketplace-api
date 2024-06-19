@@ -7,7 +7,6 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +19,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 public class ApplicationService implements ApplicationFacadePort {
     private final UserStoragePort userStoragePort;
     private final ProjectStoragePort projectStoragePort;
-    private final ProjectObserverPort projectObserverPort;
+    private final ApplicationObserverPort applicationObserver;
     private final GithubUserPermissionsService githubUserPermissionsService;
     private final GithubStoragePort githubStoragePort;
     private final GithubApiPort githubApiPort;
@@ -72,7 +71,7 @@ public class ApplicationService implements ApplicationFacadePort {
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
         userStoragePort.save(application);
-        projectObserverPort.onUserApplied(projectId, githubUserId, application.id());
+        applicationObserver.onApplicationCreated(application);
 
         return application;
     }

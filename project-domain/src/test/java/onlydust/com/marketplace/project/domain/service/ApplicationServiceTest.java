@@ -6,7 +6,6 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
-import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ public class ApplicationServiceTest {
     private final Faker faker = new Faker();
     private final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     private final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
-    private final ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
+    private final ApplicationObserverPort applicationObserver = mock(ApplicationObserverPort.class);
     private final GithubUserPermissionsService githubUserPermissionsService = mock(GithubUserPermissionsService.class);
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final GithubApiPort githubApiPort = mock(GithubApiPort.class);
@@ -37,7 +36,7 @@ public class ApplicationServiceTest {
     private final ApplicationService applicationService = new ApplicationService(
             userStoragePort,
             projectStoragePort,
-            projectObserverPort,
+            applicationObserver,
             githubUserPermissionsService,
             githubStoragePort,
             githubApiPort,
@@ -55,7 +54,7 @@ public class ApplicationServiceTest {
 
     @BeforeEach
     void setUp() {
-        reset(userStoragePort, projectStoragePort, projectObserverPort, githubUserPermissionsService, githubStoragePort, githubApiPort,
+        reset(userStoragePort, projectStoragePort, applicationObserver, githubUserPermissionsService, githubStoragePort, githubApiPort,
                 githubAuthenticationPort);
 
         when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
@@ -143,7 +142,7 @@ public class ApplicationServiceTest {
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
 
         verify(userStoragePort).save(application);
-        verify(projectObserverPort).onUserApplied(projectId, githubUserId, application.id());
+        verify(applicationObserver).onApplicationCreated(application);
     }
 
     @Test
