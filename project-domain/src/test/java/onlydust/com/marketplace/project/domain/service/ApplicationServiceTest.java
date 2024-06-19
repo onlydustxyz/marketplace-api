@@ -43,9 +43,9 @@ public class ApplicationServiceTest {
             githubAuthenticationPort,
             globalConfig);
 
-    final Long githubUserId = faker.number().randomNumber();
+    final Long githubUserId = faker.number().randomNumber(10, true);
     final UUID userId = UUID.randomUUID();
-    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
+    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(10, true), faker.number().randomNumber(10, true), 0);
     final GithubComment.Id commentId = GithubComment.Id.random();
     final String motivation = faker.lorem().sentence();
     final String problemSolvingApproach = faker.lorem().sentence();
