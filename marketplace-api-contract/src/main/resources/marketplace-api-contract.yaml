@@ -397,14 +397,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationRequest'
+              $ref: '#/components/schemas/ProjectApplicationCreateRequest'
       responses:
         "200":
           description: 'The application was sent successfully.'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationResponse'
+                $ref: '#/components/schemas/ProjectApplicationCreateResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -416,8 +416,8 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Me
-      summary: Update application
-      operationId: updateApplication
+      summary: Update project application
+      operationId: updateProjectApplication
       description: |
         Update application. Only the applicant can update its application.
       parameters:
@@ -425,40 +425,16 @@ paths:
           name: applicationId
           required: true
           schema:
-            $ref: '#/components/schemas/ApplicationId'
+            $ref: '#/components/schemas/ProjectApplicationId'
       requestBody:
         description: 'Application'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationUpdateRequest'
+              $ref: '#/components/schemas/ProjectApplicationUpdateRequest'
       responses:
         "204":
           description: 'The application was updated successfully.'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/applications/{applicationId}:
-    delete:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - Applications
-      summary: Delete application
-      operationId: deleteApplication
-      description: |
-        Delete application. Only the applicant or the project lead can delete an application.
-      parameters:
-        - in: path
-          name: applicationId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ApplicationId'
-      responses:
-        "204":
-          description: 'The application was deleted successfully.'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -2399,6 +2375,126 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/applications:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjectApplications
+      summary: Get applications of a project's issue or a user
+      operationId: getProjectsApplications
+      description: |
+        Get the list of all applications in a project or by a user.
+        At least one of the parameters projectId or applicantId must be provided.
+        Only project leaders or applicants can access this information.
+      parameters:
+        - in: query
+          name: projectId
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: issueId
+          schema:
+            $ref: '#/components/schemas/IssueId'
+        - in: query
+          name: applicantId
+          schema:
+            $ref: '#/components/schemas/GithubUserId'
+        - in: query
+          name: isApplicantProjectMember
+          schema:
+            type: boolean
+        - in: query
+          name: applicantLoginSearch
+          schema:
+            type: string
+            example: 'John Doe'
+            description: 'Search by user login, user languages, or user ecosystems'
+        - in: query
+          name: sort
+          schema:
+            $ref: '#/components/schemas/ProjectApplicationPageSort'
+        - in: query
+          name: pageIndex
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: 'List of applications'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectApplicationPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/applications/{applicationId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjectApplications
+      summary: Get application
+      operationId: getProjectApplication
+      description: |
+        Get the details of an application. 
+        Only application's project's leaders or application's applicant can access this information.
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectApplicationId'
+      responses:
+        "200":
+          description: 'Application details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectApplicationResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ProjectApplications
+      summary: Delete application
+      operationId: deleteProjectApplication
+      description: |
+        Delete application. Only the applicant or the project lead can delete an application.
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectApplicationId'
+      responses:
+        "204":
+          description: 'The application was deleted successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/logos:
     post:
       security:
@@ -3518,7 +3614,7 @@ paths:
       tags:
         - ReadCommittees
       summary: Get committee application
-      operationId: getApplication
+      operationId: getCommitteeApplication
       description: |
         Get committee application
       parameters:
@@ -3843,7 +3939,7 @@ components:
       format: uuid
       description: OnlyDust project ID
 
-    ApplicationId:
+    ProjectApplicationId:
       type: string
       format: uuid
       description: Application ID
@@ -5593,11 +5689,38 @@ components:
           items:
             $ref: '#/components/schemas/GithubUserResponse'
         currentUserApplication:
-          $ref: '#/components/schemas/ApplicationShortResponse'
+          $ref: '#/components/schemas/ProjectApplicationShortResponse'
         languages:
           type: array
           items:
             $ref: '#/components/schemas/LanguageResponse'
+
+    GithubIssueLinkResponse:
+      type: object
+      description: Github issue link response
+      required:
+        - id
+        - number
+        - title
+        - status
+        - htmlUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/IssueId'
+        number:
+          type: integer
+          format: int64
+          description: Issue number
+          example: 6
+        title:
+          type: string
+          description: Issue or pull request title on Github
+        status:
+          $ref: '#/components/schemas/GithubIssueStatus'
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the issue.
 
     GithubLabel:
       type: object
@@ -6062,7 +6185,7 @@ components:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
 
-    ApplicationRequest:
+    ProjectApplicationCreateRequest:
       type: object
       required:
         - projectId
@@ -6080,7 +6203,7 @@ components:
           type: string
           description: The applicant's approach to solving the issue
 
-    ApplicationUpdateRequest:
+    ProjectApplicationUpdateRequest:
       type: object
       required:
         - motivation
@@ -6092,30 +6215,108 @@ components:
           type: string
           description: The applicant's approach to solving the issue
 
-    ApplicationResponse:
+    ProjectApplicationCreateResponse:
       type: object
       required:
         - id
       properties:
         id:
-          $ref: '#/components/schemas/ApplicationId'
+          $ref: '#/components/schemas/ProjectApplicationId'
 
-    ApplicationShortResponse:
+    ProjectApplicationPageSort:
+      type: string
+      default: RECOMMANDATION_SCORE
+      enum:
+        - RECOMMANDATION_SCORE
+        - LOGIN
+
+    ProjectApplicationPageResponse:
       allOf:
-        - $ref: '#/components/schemas/ApplicationResponse'
+        - $ref: '#/components/schemas/PageResponse'
         - type: object
           required:
-            - applicant
-            - motivations
+            - applications
           properties:
-            applicant:
-              $ref: '#/components/schemas/ContributorResponse'
-            motivations:
-              type: string
-              description: The applicant's motivation to work on the issue
-            problemSolvingApproach:
-              type: string
-              description: The applicant's approach to solving the issue
+            applications:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectApplicationPageItemResponse'
+
+    ProjectApplicationPageItemResponse:
+      type: object
+      required:
+        - id
+        - projectId
+        - issue
+        - applicant
+        - recommandationScore
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectApplicationId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        issue:
+          $ref: '#/components/schemas/GithubIssueLinkResponse'
+        applicant:
+          $ref: '#/components/schemas/ContributorResponse'
+        recommandationScore:
+          type: integer
+          minimum: 0
+          maximum: 20
+          description: The recommandation score of the applicant
+
+    ProjectApplicationResponse:
+      type: object
+      required:
+        - id
+        - projectId
+        - issue
+        - applicant
+        - recommandationScore
+        - motivation
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectApplicationId'
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+        issue:
+          $ref: '#/components/schemas/GithubIssueLinkResponse'
+        applicant:
+          $ref: '#/components/schemas/ContributorResponse'
+        availabilityScore:
+          type: integer
+          minimum: 0
+          maximum: 3
+          description: The availability score of the applicant
+        recommandationScore:
+          type: integer
+          minimum: 0
+          maximum: 20
+          description: The recommandation score of the applicant
+        motivation:
+          type: string
+          description: The applicant's motivation to work on the issue
+        problemSolvingApproach:
+          type: string
+          description: The applicant's approach to solving the issue
+
+    ProjectApplicationShortResponse:
+      type: object
+      required:
+        - id
+        - applicant
+        - motivations
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectApplicationId'
+        applicant:
+          $ref: '#/components/schemas/ContributorResponse'
+        motivations:
+          type: string
+          description: The applicant's motivation to work on the issue
+        problemSolvingApproach:
+          type: string
+          description: The applicant's approach to solving the issue
 
     CreateProjectRequest:
       type: object

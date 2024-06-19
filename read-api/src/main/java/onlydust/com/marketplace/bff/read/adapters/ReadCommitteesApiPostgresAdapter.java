@@ -65,7 +65,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     }
 
     @Override
-    public ResponseEntity<CommitteeApplicationResponse> getApplication(UUID committeeId, UUID projectId) {
+    public ResponseEntity<CommitteeApplicationResponse> getCommitteeApplication(UUID committeeId, UUID projectId) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var committee = committeeReadRepository.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));

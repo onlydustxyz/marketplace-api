@@ -6,7 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.contract.model.ApplicationShortResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -56,8 +56,8 @@ public class ApplicationReadEntity {
     @Enumerated(EnumType.STRING)
     Application.Origin origin;
 
-    public ApplicationShortResponse toShortResponse() {
-        return new ApplicationShortResponse()
+    public ProjectApplicationShortResponse toShortResponse() {
+        return new ProjectApplicationShortResponse()
                 .id(id)
                 .applicant(applicant.toContributorResponse())
                 .motivations(motivations)

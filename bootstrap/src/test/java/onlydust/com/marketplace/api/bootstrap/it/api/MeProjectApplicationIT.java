@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.bootstrap.it.api;
 
 import onlydust.com.marketplace.api.bootstrap.suites.tags.TagMe;
-import onlydust.com.marketplace.api.contract.model.ApplicationRequest;
-import onlydust.com.marketplace.api.contract.model.ApplicationResponse;
-import onlydust.com.marketplace.api.contract.model.ApplicationUpdateRequest;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
@@ -52,7 +52,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var problemSolvingApproach = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
-        final var request = new ApplicationRequest()
+        final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
                 .motivation(motivations)
@@ -82,7 +82,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody(ApplicationResponse.class)
+                .expectBody(ProjectApplicationCreateResponse.class)
                 .returnResult().getResponseBody().getId();
 
         final var application = applicationRepository.findById(applicationId).orElseThrow();
@@ -117,7 +117,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
 
-        final var request = new ApplicationRequest()
+        final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
                 .motivation(motivations)
@@ -156,7 +156,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
 
-        final var request = new ApplicationUpdateRequest()
+        final var request = new ProjectApplicationUpdateRequest()
                 .motivation(motivations)
                 .problemSolvingApproach(problemSolvingApproach);
 
@@ -361,7 +361,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
 
-        final var request = new ApplicationRequest()
+        final var request = new ProjectApplicationCreateRequest()
                 .projectId(projectId)
                 .issueId(issueId)
                 .motivation(motivations)
