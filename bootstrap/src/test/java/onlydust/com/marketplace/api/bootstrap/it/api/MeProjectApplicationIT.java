@@ -478,6 +478,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "pendingApplications": [
@@ -487,6 +488,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
+                              },
+                              "project": {
+                                "id": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
+                                "slug": "yolo-croute",
+                                "name": "Yolo croute",
+                                "logoUrl": "https://i.natgeofe.com/n/8271db90-5c35-46bc-9429-588a9529e44a/raccoon_thumb_3x4.JPG"
                               },
                               "motivations": "My motivations",
                               "problemSolvingApproach": null

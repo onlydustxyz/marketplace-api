@@ -62,6 +62,7 @@ public class ApplicationReadEntity {
                 .applicant(applicant.toContributorResponse())
                 .motivations(motivations)
                 .problemSolvingApproach(problemSolvingApproach)
+                .project(project.toLinkResponse())
                 ;
     }
 }

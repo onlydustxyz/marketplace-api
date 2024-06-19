@@ -6377,12 +6377,15 @@ components:
       required:
         - id
         - applicant
+        - project
         - motivations
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
         motivations:
           type: string
           description: The applicant's motivation to work on the issue
