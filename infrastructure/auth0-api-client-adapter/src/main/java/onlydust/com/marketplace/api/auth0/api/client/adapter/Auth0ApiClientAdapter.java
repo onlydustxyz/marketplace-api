@@ -35,6 +35,11 @@ public class Auth0ApiClientAdapter implements GithubAuthenticationPort {
         return newPat;
     }
 
+    @Override
+    public void logout(Long githubUserId) {
+        patCache.invalidate(githubUserId);
+    }
+
     private String fetchGithubPersonalToken(Long githubUserId) {
         final var userId = encode("github|%d".formatted(githubUserId), UTF_8);
         final var response = httpClient.send("/api/v2/users/%s".formatted(userId), HttpMethod.GET, null, Auth0UserResponse.class)

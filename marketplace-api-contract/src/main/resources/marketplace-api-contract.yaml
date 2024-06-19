@@ -78,6 +78,24 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/logout:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Logout
+      operationId: logoutMe
+      description: |
+        Evict data from caches and invalidate the tokens
+      responses:
+        "204":
+          description: 'Logout successful'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/profile:
     get:
       security:

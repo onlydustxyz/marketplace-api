@@ -152,6 +152,12 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
+    public ResponseEntity<Void> logoutMe() {
+        authenticatedAppUserService.logout();
+        return noContent().build();
+    }
+
+    @Override
     public ResponseEntity<ContributedReposResponse> getMyContributedRepos(List<UUID> projects) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 

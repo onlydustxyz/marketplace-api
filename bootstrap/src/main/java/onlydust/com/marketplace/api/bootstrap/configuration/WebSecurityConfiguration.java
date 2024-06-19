@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.A
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -190,8 +191,9 @@ public class WebSecurityConfiguration {
     }
 
     @Bean
-    public AuthenticatedAppUserService authenticatedAppUserService(final AuthenticationContext authenticationContext) {
-        return new AuthenticatedAppUserService(authenticationContext);
+    public AuthenticatedAppUserService authenticatedAppUserService(final AuthenticationContext authenticationContext,
+                                                                   final GithubAuthenticationPort githubAuthenticationPort) {
+        return new AuthenticatedAppUserService(authenticationContext, githubAuthenticationPort);
     }
 
     @Bean
