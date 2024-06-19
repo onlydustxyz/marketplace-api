@@ -36,4 +36,11 @@ public class GithubApiAdapter implements GithubApiPort {
                         new IssueAssigneesRequest(List.of(githubLogin)), personalAccessToken, IssueAssigneesResponse.class)
                 .orElseThrow(() -> internalServerError("Failed to assign user to issue"));
     }
+
+    @Override
+    public void unassign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin) {
+        client.delete("/repository/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
+                        new IssueAssigneesRequest(List.of(githubLogin)), personalAccessToken, IssueAssigneesResponse.class)
+                .orElseThrow(() -> internalServerError("Failed to assign user to issue"));
+    }
 }

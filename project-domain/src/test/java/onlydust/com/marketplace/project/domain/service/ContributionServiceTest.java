@@ -2,13 +2,19 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.ContributionStatus;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,8 +25,10 @@ class ContributionServiceTest {
 
     final ContributionStoragePort contributionStoragePort = mock(ContributionStoragePort.class);
     final PermissionService permissionService = mock(PermissionService.class);
+    final GithubAppService githubAppService = mock(GithubAppService.class);
+    final GithubApiPort githubApiPort = mock(GithubApiPort.class);
 
-    final ContributionService contributionService = new ContributionService(contributionStoragePort, permissionService);
+    final ContributionService contributionService = new ContributionService(contributionStoragePort, permissionService, githubAppService, githubApiPort);
 
     private final Faker faker = new Faker();
 
@@ -146,5 +154,103 @@ class ContributionServiceTest {
                 .hasMessage("Only project leaders can edit the list of ignored contributions");
         // Then
         verify(contributionStoragePort, never()).unignoreContributions(projectId, contributionIds);
+    }
+
+    @Nested
+    class UnassignContribution {
+        final UUID callerId = UUID.randomUUID();
+
+        final Project project = Project.builder()
+                .id(UUID.randomUUID())
+                .build();
+
+        final GithubRepo repo = GithubRepo.builder()
+                .id(faker.random().nextLong())
+                .build();
+
+        final ContributorLinkView contributor = ContributorLinkView.builder()
+                .login(faker.name().username())
+                .build();
+
+        final ContributionDetailsView contribution = ContributionDetailsView.builder()
+                .id(faker.random().hex(26))
+                .project(project)
+                .type(ContributionType.ISSUE)
+                .status(ContributionStatus.IN_PROGRESS)
+                .githubRepo(repo)
+                .contributor(contributor)
+                .build();
+
+        final String githubToken = faker.internet().password();
+
+        @BeforeEach
+        void setUp() {
+            reset(permissionService, contributionStoragePort);
+            when(permissionService.isUserProjectLead(project.getId(), callerId)).thenReturn(true);
+            when(contributionStoragePort.findContributionById(project.getId(), contribution.getId())).thenReturn(contribution);
+            when(githubAppService.getInstallationTokenFor(repo.getId())).thenReturn(Optional.of(githubToken));
+        }
+
+        @Test
+        void should_prevent_unassigning_contribution_when_caller_is_not_lead() {
+            // Given
+            when(permissionService.isUserProjectLead(project.getId(), callerId)).thenReturn(false);
+
+            // When
+            assertThatThrownBy(() -> contributionService.unassign(project.getId(), callerId, contribution.getId()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Only project leaders can unassign contributions");
+        }
+
+        @Test
+        void should_prevent_unassigning_contribution_if_not_an_issue() {
+            // Given
+            when(contributionStoragePort.findContributionById(project.getId(), contribution.getId())).thenReturn(contribution.toBuilder()
+                    .type(ContributionType.PULL_REQUEST)
+                    .build());
+
+            // When
+            assertThatThrownBy(() -> contributionService.unassign(project.getId(), callerId, contribution.getId()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Only issues can be unassigned");
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = ContributionStatus.class, names = {"IN_PROGRESS"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_prevent_unassigning_contribution_if_not_in_progress(ContributionStatus status) {
+            // Given
+            when(contributionStoragePort.findContributionById(project.getId(), contribution.getId())).thenReturn(contribution.toBuilder()
+                    .status(status)
+                    .build());
+
+            // When
+            assertThatThrownBy(() -> contributionService.unassign(project.getId(), callerId, contribution.getId()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Only in progress contributions can be unassigned");
+        }
+
+        @Test
+        void should_prevent_unassigning_contribution_if_github_app_not_installed() {
+            // Given
+            when(githubAppService.getInstallationTokenFor(repo.getId())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> contributionService.unassign(project.getId(), callerId, contribution.getId()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Could not to generate installation token for GitHub repo %d".formatted(repo.getId()));
+        }
+
+        @Test
+        void should_unassign_contribution() {
+            // When
+            contributionService.unassign(project.getId(), callerId, contribution.getId());
+
+            // Then
+            verify(githubApiPort).unassign(githubToken, repo.getId(), contribution.getGithubNumber(), contribution.getContributor().getLogin());
+        }
     }
 }

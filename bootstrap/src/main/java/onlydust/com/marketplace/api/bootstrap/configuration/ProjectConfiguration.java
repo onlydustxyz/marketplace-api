@@ -49,8 +49,10 @@ public class ProjectConfiguration {
 
     @Bean
     public ContributionService contributionService(final ContributionStoragePort contributionStoragePort,
-                                                   final PermissionService permissionService) {
-        return new ContributionService(contributionStoragePort, permissionService);
+                                                   final PermissionService permissionService,
+                                                   final GithubAppService githubAppService,
+                                                   final GithubApiPort githubApiPort) {
+        return new ContributionService(contributionStoragePort, permissionService, githubAppService, githubApiPort);
     }
 
     @Bean
