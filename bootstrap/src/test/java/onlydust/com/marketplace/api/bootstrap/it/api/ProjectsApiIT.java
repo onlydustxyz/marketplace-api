@@ -401,8 +401,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 "isMember": false,
                 "isContributor": false,
                 "isProjectLead": false,
-                "isInvitedAsProjectLead": false,
-                "hasApplied": false
+                "isInvitedAsProjectLead": false
               },
               "tags": [
                 "FAST_AND_FURIOUS",
@@ -611,8 +610,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead")
                 .isEqualTo(false)
-                .jsonPath("$.me.hasApplied")
-                .isEqualTo(false)
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
@@ -637,7 +634,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(BRETZEL_OVERVIEW_JSON);
     }
 
@@ -677,20 +673,33 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(true)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(true).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(true)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + userAuthHelper.authenticateHayden().jwt()).exchange()
                 // Then
-                .expectStatus().is2xxSuccessful().expectBody().jsonPath("$.me.isMember").isEqualTo(true).jsonPath("$.me.isContributor").isEqualTo(false).jsonPath("$.me.isProjectLead").isEqualTo(false).jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true).jsonPath("$.me.hasApplied").isEqualTo(false).json(B_CONSEIL_OVERVIEW_JSON);
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(true)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
+                .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
     @Test
@@ -716,7 +725,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(true)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
@@ -730,7 +738,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(true)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
@@ -744,7 +751,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
-                .jsonPath("$.me.hasApplied").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
@@ -754,7 +760,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String slug = "bretzel";
         final ProjectViewEntity bretzel = projectViewRepository.findBySlug(slug).orElseThrow();
-        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(), userAuthHelper.authenticatePierre().user().getGithubUserId()));
+        projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(), bretzel.getId(),
+                userAuthHelper.authenticatePierre().user().getGithubUserId()));
 
         projectTagRepository.saveAll(List.of(
                         ProjectTagEntity.builder()

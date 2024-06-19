@@ -220,7 +220,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .filter(Objects::nonNull)
                 .map(GithubRepoStatsViewEntity::getLastIndexedAt).toList();
 
-        record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor, Boolean hasApplied) {
+        record Me(Boolean isLeader, Boolean isInvitedAsProjectLead, Boolean isContributor) {
             public Boolean isMember() {
                 return isLeader || isInvitedAsProjectLead || isContributor;
             }
@@ -228,8 +228,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var me = isNull(caller) ? null : new Me(
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),
-                contributionViewEntityRepository.countBy(caller.getGithubUserId(), project.getId()) > 0,
-                applicationRepository.findByProjectIdAndApplicantId(project.getId(), caller.getGithubUserId()).isPresent()
+                contributionViewEntityRepository.countBy(caller.getGithubUserId(), project.getId()) > 0
         );
 
         return new ProjectResponse()
@@ -318,8 +317,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .isMember(me.isMember())
                         .isProjectLead(me.isLeader())
                         .isInvitedAsProjectLead(me.isInvitedAsProjectLead())
-                        .isContributor(me.isContributor())
-                        .hasApplied(me.hasApplied()))
+                        .isContributor(me.isContributor()))
                 .goodFirstIssueCount(project.getGoodFirstIssueCount());
     }
 
