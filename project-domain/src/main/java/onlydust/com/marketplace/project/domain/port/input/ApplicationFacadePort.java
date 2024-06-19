@@ -20,4 +20,6 @@ public interface ApplicationFacadePort {
                                   String problemSolvingApproach);
 
     void deleteApplication(Application.Id id, UUID userId, Long githubUserId);
+
+    void acceptApplication(Application.Id id, UUID userId);
 }

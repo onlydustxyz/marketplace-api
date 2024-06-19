@@ -24,6 +24,7 @@ public class ApplicationService implements ApplicationFacadePort {
     private final GithubStoragePort githubStoragePort;
     private final GithubApiPort githubApiPort;
     private final GithubAuthenticationPort githubAuthenticationPort;
+    private final GithubAppService githubAppService;
     private final GlobalConfig globalConfig;
 
     @Override
@@ -38,6 +39,26 @@ public class ApplicationService implements ApplicationFacadePort {
         }
 
         userStoragePort.deleteApplications(id);
+    }
+
+    @Override
+    public void acceptApplication(Application.Id id, UUID userId) {
+        final var application = userStoragePort.findApplication(id)
+                .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
+
+        if (!projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId))
+            throw forbidden("User is not authorized to accept this application");
+
+        final var issue = githubStoragePort.findIssueById(application.issueId())
+                .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+
+        final var applicant = userStoragePort.getUserByGithubId(application.applicantId())
+                .orElseThrow(() -> notFound("User %d not found".formatted(application.applicantId())));
+
+        final var githubAppToken = githubAppService.getInstallationTokenFor(issue.repoId())
+                .orElseThrow(() -> internalServerError("Could not generate GitHub App token for repository %d".formatted(issue.repoId())));
+
+        githubApiPort.assign(githubAppToken, issue.repoId(), issue.number(), applicant.getGithubLogin());
     }
 
     @Override

@@ -239,6 +239,64 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_approve_an_application_as_project_lead() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+        final var projectLead = userAuthHelper.authenticateGregoire();
+        final var applicationId = UUID.randomUUID();
+
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                user.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1974125983L,
+                111L,
+                "My motivations",
+                null
+        ));
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
+                .withHeader("Authorization", matching("Bearer .*"))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN"
+                                }
+                                """)
+                ));
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/repository/380954304/issues/6/assignees"))
+                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
+                .withRequestBody(equalToJson("""
+                        {
+                          "assignees" : [ "AnthonyBuisset" ]
+                        }
+                        """))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "id": 1974125983
+                                }
+                                """)
+                ));
+
+        // When
+        client.post()
+                .uri(getApiURI(APPLICATION_ACCEPT.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + projectLead.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repository/380954304/issues/6/assignees")));
+    }
+
+    @Test
     void should_detect_github_application() {
         // Given
         final var commentId = faker.number().randomNumber(10, true);
