@@ -5315,9 +5315,6 @@ components:
         isInvitedAsProjectLead:
           type: boolean
           description: Is the user invited as a project lead of the project?
-        hasApplied:
-          type: boolean
-          description: Has the user applied to the project?
 
     ProjectLinkResponse:
       type: object
