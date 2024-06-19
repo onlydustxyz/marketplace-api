@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.LanguageReadEntity;
-import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemFiltersQueryEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectPageItemQueryEntity;
@@ -200,9 +199,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<GoodFirstIssuesPageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
+        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = githubIssueReadRepository.findGoodFirstIssuesOf(projectId, PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
         return ok(new GoodFirstIssuesPageResponse()
-                .issues(page.stream().map(GithubIssueReadEntity::toDto).toList())
+                .issues(page.stream().map(i -> i.toDto(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

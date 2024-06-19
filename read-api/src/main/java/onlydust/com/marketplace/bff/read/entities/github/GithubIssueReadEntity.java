@@ -7,12 +7,15 @@ import lombok.NonNull;
 import lombok.Value;
 import onlydust.com.marketplace.api.contract.model.GithubIssue;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
+import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -27,7 +30,8 @@ public class GithubIssueReadEntity {
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NonNull GithubRepoReadEntity repo;
+    @NonNull
+    GithubRepoReadEntity repo;
 
     @NonNull
     Long number;
@@ -43,7 +47,8 @@ public class GithubIssueReadEntity {
     ZonedDateTime closedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @NonNull GithubAccountReadEntity author;
+    @NonNull
+    GithubAccountReadEntity author;
 
     @NonNull
     String htmlUrl;
@@ -71,6 +76,7 @@ public class GithubIssueReadEntity {
             inverseJoinColumns = @JoinColumn(name = "label_id")
     )
     @OrderBy("name")
+    @NonNull
     List<GithubLabelReadEntity> labels;
 
 
@@ -83,7 +89,19 @@ public class GithubIssueReadEntity {
     )
     Set<ProjectReadEntity> goodFirstIssueOf;
 
-    public GithubIssue toDto() {
+    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY)
+    @NonNull
+    Set<ApplicationReadEntity> applications;
+
+    public GithubIssue toDto(@NonNull UUID projectId, Long githubUserId) {
+        final var projectApplications = applications.stream()
+                .filter(application -> application.project().getId().equals(projectId))
+                .toList();
+
+        final var currentUserApplication = projectApplications.stream()
+                .filter(application -> application.applicant().githubUserId().equals(githubUserId))
+                .findFirst();
+
         return new GithubIssue()
                 .id(id)
                 .number(number)
@@ -97,6 +115,8 @@ public class GithubIssueReadEntity {
                 .author(author.toContributorResponse())
                 .commentCount(commentsCount)
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
+                .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
+                .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
                 ;
     }
 }

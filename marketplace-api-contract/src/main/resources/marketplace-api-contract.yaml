@@ -5547,6 +5547,7 @@ components:
         - repository
         - commentCount
         - labels
+        - applicants
       properties:
         id:
           $ref: '#/components/schemas/IssueId'
@@ -5586,6 +5587,17 @@ components:
           description: The list of labels assigned to this issue
           items:
             $ref: '#/components/schemas/GithubLabel'
+        applicants:
+          type: array
+          description: The list of applicants for this issue
+          items:
+            $ref: '#/components/schemas/GithubUserResponse'
+        currentUserApplication:
+          $ref: '#/components/schemas/ApplicationShortResponse'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
 
     GithubLabel:
       type: object
@@ -6087,6 +6099,23 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ApplicationId'
+
+    ApplicationShortResponse:
+      allOf:
+        - $ref: '#/components/schemas/ApplicationResponse'
+        - type: object
+          required:
+            - applicant
+            - motivations
+          properties:
+            applicant:
+              $ref: '#/components/schemas/ContributorResponse'
+            motivations:
+              type: string
+              description: The applicant's motivation to work on the issue
+            problemSolvingApproach:
+              type: string
+              description: The applicant's approach to solving the issue
 
     CreateProjectRequest:
       type: object
