@@ -1,0 +1,291 @@
+package onlydust.com.marketplace.project.domain.service;
+
+import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.GlobalConfig;
+import onlydust.com.marketplace.project.domain.port.output.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
+
+public class ApplicationServiceTest {
+    private final Faker faker = new Faker();
+    private final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+    private final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
+    private final ApplicationObserverPort applicationObserver = mock(ApplicationObserverPort.class);
+    private final GithubUserPermissionsService githubUserPermissionsService = mock(GithubUserPermissionsService.class);
+    private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
+    private final GithubApiPort githubApiPort = mock(GithubApiPort.class);
+    private final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
+    private final GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.xyz");
+
+    private final ApplicationService applicationService = new ApplicationService(
+            userStoragePort,
+            projectStoragePort,
+            applicationObserver,
+            githubUserPermissionsService,
+            githubStoragePort,
+            githubApiPort,
+            githubAuthenticationPort,
+            globalConfig);
+
+    final Long githubUserId = faker.number().randomNumber();
+    final UUID userId = UUID.randomUUID();
+    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(), faker.number().randomNumber(), 0);
+    final GithubComment.Id commentId = GithubComment.Id.random();
+    final String motivation = faker.lorem().sentence();
+    final String problemSolvingApproach = faker.lorem().sentence();
+    final String personalAccessToken = faker.internet().password();
+    final UUID projectId = UUID.randomUUID();
+
+    @BeforeEach
+    void setUp() {
+        reset(userStoragePort, projectStoragePort, applicationObserver, githubUserPermissionsService, githubStoragePort, githubApiPort,
+                githubAuthenticationPort);
+
+        when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
+        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
+        when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(personalAccessToken);
+        when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.empty());
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber(), issue.repoId()));
+    }
+
+    @Test
+    void should_reject_application_if_user_is_not_allowed_to_comment_on_issues() {
+        // Given
+        when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to apply on project");
+    }
+
+    @Test
+    void should_reject_application_if_issue_does_not_exists() {
+        // Given
+        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s not found".formatted(issue.id()));
+    }
+
+    @Test
+    void should_reject_application_if_issue_is_already_assigned() {
+        // Given
+        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(), faker.number().randomNumber(),
+                faker.number().randomNumber(), 1)));
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s is already assigned".formatted(issue.id()));
+    }
+
+    @Test
+    void should_reject_duplicate_applications() {
+        // Given
+        final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
+                issue.id(), commentId, motivation, problemSolvingApproach);
+        when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("User already applied to this issue");
+    }
+
+    @Test
+    void should_reject_applications_if_repo_does_not_belong_to_project() {
+        // Given
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("Issue %s does not belong to project %s".formatted(issue.id(), projectId));
+    }
+
+    @Test
+    void should_apply_on_project() {
+        // Given
+        when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
+
+        // When
+        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach);
+
+        // Then
+        assertThat(application.id()).isNotNull();
+        assertThat(application.projectId()).isEqualTo(projectId);
+        assertThat(application.applicantId()).isEqualTo(githubUserId);
+        assertThat(application.appliedAt()).isEqualToIgnoringSeconds(ZonedDateTime.now());
+        assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+        assertThat(application.issueId()).isEqualTo(issue.id());
+        assertThat(application.commentId()).isEqualTo(commentId);
+        assertThat(application.motivations()).isEqualTo(motivation);
+        assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+
+        verify(userStoragePort).save(application);
+        verify(applicationObserver).onApplicationCreated(application);
+    }
+
+    @Test
+    void should_prevent_update_of_non_existing_application() {
+        // Given
+        final var applicationId = Application.Id.random();
+
+        when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> applicationService.updateApplication(applicationId, githubUserId, faker.lorem().sentence(), faker.lorem().sentence()))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("Application %s not found".formatted(applicationId));
+    }
+
+    @Test
+    void should_prevent_update_of_another_contributor_application() {
+        // Given
+        final var application = Application.fromMarketplace(
+                projectId,
+                faker.number().randomNumber(),
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+        // When
+        final var newMotivation = faker.lorem().sentence();
+        final var newProblemSolvingApproach = faker.lorem().sentence();
+        assertThatThrownBy(() -> applicationService.updateApplication(application.id(), githubUserId, newMotivation, newProblemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("User is not authorized to update this application");
+    }
+
+    @Test
+    void should_update_application() {
+        // Given
+        final var application = Application.fromGithubComment(
+                new GithubComment(GithubComment.Id.random(), issue.id(),
+                        faker.number().randomNumber(),
+                        githubUserId,
+                        faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                        faker.lorem().sentence()),
+                projectId
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+        // When
+        final var motivations = faker.lorem().sentence();
+        final var problemSolvingApproach = faker.lorem().sentence();
+        final var updatedApplication = applicationService.updateApplication(application.id(), githubUserId, motivations, problemSolvingApproach);
+
+        // Then
+        assertThat(updatedApplication.id()).isEqualTo(application.id());
+        assertThat(updatedApplication.projectId()).isEqualTo(application.projectId());
+        assertThat(updatedApplication.applicantId()).isEqualTo(application.applicantId());
+        assertThat(updatedApplication.appliedAt()).isEqualTo(application.appliedAt());
+        assertThat(updatedApplication.origin()).isEqualTo(Application.Origin.MARKETPLACE);
+        assertThat(updatedApplication.motivations()).isEqualTo(motivations);
+        assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+        verify(userStoragePort).save(updatedApplication);
+    }
+
+    @Test
+    void should_prevent_delete_of_an_application_if_not_found() {
+        // Given
+        final var applicationId = Application.Id.random();
+
+        when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> applicationService.deleteApplication(applicationId, userId, githubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("Application %s not found".formatted(applicationId));
+    }
+
+    @Test
+    void should_prevent_delete_of_another_contributor_application() {
+        // Given
+        final var application = Application.fromMarketplace(
+                projectId,
+                faker.number().randomNumber(),
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+
+        // When
+        assertThatThrownBy(() -> applicationService.deleteApplication(application.id(), userId, githubUserId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User is not authorized to delete this application");
+    }
+
+    @Test
+    void should_delete_my_application() {
+        // Given
+        final var application = Application.fromMarketplace(
+                projectId,
+                githubUserId,
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+        // When
+        applicationService.deleteApplication(application.id(), userId, githubUserId);
+
+        // Then
+        verify(userStoragePort).deleteApplications(application.id());
+    }
+
+    @Test
+    void should_delete_application_as_project_lead() {
+        // Given
+        final var application = Application.fromMarketplace(
+                projectId,
+                faker.number().randomNumber(),
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
+
+        // When
+        applicationService.deleteApplication(application.id(), userId, githubUserId);
+
+        // Then
+        verify(userStoragePort).deleteApplications(application.id());
+    }
+}

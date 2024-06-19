@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -29,17 +30,6 @@ public interface UserFacadePort {
 
     void acceptInvitationToLeadProject(Long githubUserId, UUID projectId);
 
-    Application applyOnProject(@NonNull Long githubUserId,
-                               @NonNull UUID projectId,
-                               @NonNull GithubIssue.Id issueId,
-                               @NonNull String motivation,
-                               String problemSolvingApproach);
-
-    Application updateApplication(@NonNull Application.Id applicationId,
-                                  @NonNull Long githubUserId,
-                                  @NonNull String motivation,
-                                  String problemSolvingApproach);
-
     RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, List<UUID> companyAdminBillingProfileIds);
 
     Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
@@ -54,6 +44,4 @@ public interface UserFacadePort {
     void refreshUserRanksAndStats();
 
     void historizeUserRanks();
-
-    void deleteApplication(Application.Id id, UUID userId, Long githubUserId);
 }

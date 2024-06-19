@@ -1,17 +1,20 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
-import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
@@ -26,7 +29,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 @Slf4j
@@ -38,12 +42,6 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
-    private final ProjectObserverPort projectObserverPort;
-    private final GithubUserPermissionsService githubUserPermissionsService;
-    private final GithubStoragePort githubStoragePort;
-    private final GithubApiPort githubApiPort;
-    private final GithubAuthenticationPort githubAuthenticationPort;
-    private final GlobalConfig globalConfig;
 
     @Override
     @Transactional
@@ -138,20 +136,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public void deleteApplication(Application.Id id, UUID userId, Long githubUserId) {
-        final var application = userStoragePort.findApplication(id)
-                .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
-
-        if (!application.applicantId().equals(githubUserId)) {
-            final var isProjectLead = projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId);
-            if (!isProjectLead)
-                throw forbidden("User is not authorized to delete this application");
-        }
-
-        userStoragePort.deleteApplications(id);
-    }
-
-    @Override
     @Transactional
     public void markUserAsOnboarded(UUID userId) {
         userStoragePort.updateOnboardingWizardDisplayDate(userId, dateProvider.now());
@@ -167,57 +151,6 @@ public class UserService implements UserFacadePort {
     @Transactional
     public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
         userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
-    }
-
-    @Override
-    @Transactional
-    public Application applyOnProject(@NonNull Long githubUserId,
-                                      @NonNull UUID projectId,
-                                      @NonNull GithubIssue.Id issueId,
-                                      @NonNull String motivation,
-                                      String problemSolvingApproach) {
-        if (!githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId))
-            throw forbidden("User is not authorized to apply on project");
-
-        final var issue = githubStoragePort.findIssueById(issueId)
-                .orElseThrow(() -> notFound("Issue %s not found".formatted(issueId)));
-
-        if (issue.isAssigned())
-            throw forbidden("Issue %s is already assigned".formatted(issueId));
-
-        if (userStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
-            throw badRequest("User already applied to this issue");
-
-        if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))
-            throw badRequest("Issue %s does not belong to project %s".formatted(issueId, projectId));
-
-        final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
-
-        final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](%s).
-                """.formatted(globalConfig.getAppBaseUrl()));
-
-        final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
-
-        userStoragePort.save(application);
-        projectObserverPort.onUserApplied(projectId, githubUserId, application.id());
-
-        return application;
-    }
-
-    @Override
-    public Application updateApplication(@NonNull Application.Id applicationId, @NonNull Long githubUserId, @NonNull String motivation,
-                                         String problemSolvingApproach) {
-        final var application = userStoragePort.findApplication(applicationId)
-                .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
-
-        if (!application.applicantId().equals(githubUserId))
-            throw forbidden("User is not authorized to update this application");
-
-        final var updated = application.update(motivation, problemSolvingApproach);
-        userStoragePort.save(updated);
-
-        return updated;
     }
 
     @Override

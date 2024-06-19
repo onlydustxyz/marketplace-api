@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.project.domain.observer;
 
-import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 
 import java.util.List;
@@ -23,11 +22,6 @@ public class ProjectObserverComposite implements ProjectObserverPort {
     @Override
     public void onRewardSettingsChanged(UUID projectId) {
         observers.forEach(observer -> observer.onRewardSettingsChanged(projectId));
-    }
-
-    @Override
-    public void onUserApplied(UUID projectId, Long githubUserId, Application.Id applicationId) {
-        observers.forEach(observer -> observer.onUserApplied(projectId, githubUserId, applicationId));
     }
 
     @Override

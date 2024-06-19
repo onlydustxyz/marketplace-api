@@ -15,6 +15,7 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -26,7 +27,7 @@ import java.util.UUID;
 import static java.util.Objects.nonNull;
 
 @Slf4j
-public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort {
+public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort, ApplicationObserverPort {
 
     private final SlackProperties slackProperties;
     private final MethodsClient slackClient;
@@ -75,11 +76,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onUserApplied(UUID projectId, Long applicantId, Application.Id applicationId) {
-        final User user = userStoragePort.getUserByGithubId(applicantId)
-                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(applicantId)));
-        final var project = projectStoragePort.getById(projectId)
-                .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(projectId)));
+    public void onApplicationCreated(Application application) {
+        final User user = userStoragePort.getUserByGithubId(application.applicantId())
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(application.applicantId())));
+        final var project = projectStoragePort.getById(application.projectId())
+                .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(application.projectId())));
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project", UserAppliedOnProjectEventMapper.mapToSlackBlock(user,
                 project, slackProperties.getEnvironment()));
     }

@@ -27,10 +27,7 @@ import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
-import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
-import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
-import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
-import onlydust.com.marketplace.project.domain.observer.UserObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
@@ -114,22 +111,30 @@ public class ProjectConfiguration {
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort,
-                                         final ProjectObserverPort projectObservers,
-                                         final GithubUserPermissionsService githubUserPermissionsService,
-                                         final GithubStoragePort githubStoragePort,
-                                         final GithubApiPort githubApiPort,
-                                         final GithubAuthenticationPort githubAuthenticationPort,
-                                         final GlobalConfig globalConfig
-    ) {
+                                         final ImageStoragePort imageStoragePort) {
         return new UserService(
                 userObservers,
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort,
-                projectObservers,
+                imageStoragePort);
+    }
+
+    @Bean
+    public ApplicationFacadePort applicationFacadePort(final PostgresUserAdapter postgresUserAdapter,
+                                                       final ProjectStoragePort projectStoragePort,
+                                                       final ApplicationObserverPort applicationObservers,
+                                                       final GithubUserPermissionsService githubUserPermissionsService,
+                                                       final GithubStoragePort githubStoragePort,
+                                                       final GithubApiPort githubApiPort,
+                                                       final GithubAuthenticationPort githubAuthenticationPort,
+                                                       final GlobalConfig globalConfig
+    ) {
+        return new ApplicationService(
+                postgresUserAdapter,
+                projectStoragePort,
+                applicationObservers,
                 githubUserPermissionsService,
                 githubStoragePort,
                 githubApiPort,
@@ -208,24 +213,24 @@ public class ProjectConfiguration {
                                               final UserStoragePort userStoragePort,
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
-                                              final ApplicationObserverPort applicationObserver) {
+                                              final ApplicationObserverPort applicationObservers) {
         return new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         userStoragePort,
                         comment -> true,
                         indexerPort,
                         githubStoragePort,
-                        applicationObserver));
+                        applicationObservers));
     }
 
     @Bean
-    ApplicationObserverPort applicationObserver(final UserStoragePort userStoragePort,
-                                                final ProjectStoragePort projectStoragePort,
-                                                final GithubStoragePort githubStoragePort,
-                                                final GithubAppService githubAppService,
-                                                final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
-                                                final GithubApiPort githubApiPort,
-                                                final GlobalConfig globalConfig) {
+    GithubIssueCommenter githubIssueCommenter(final UserStoragePort userStoragePort,
+                                              final ProjectStoragePort projectStoragePort,
+                                              final GithubStoragePort githubStoragePort,
+                                              final GithubAppService githubAppService,
+                                              final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
+                                              final GithubApiPort githubApiPort,
+                                              final GlobalConfig globalConfig) {
         return new GithubIssueCommenter(
                 userStoragePort,
                 projectStoragePort,
@@ -275,6 +280,12 @@ public class ProjectConfiguration {
                                                 final SlackApiAdapter slackApiAdapter,
                                                 final ContributionService contributionService) {
         return new ProjectObserverComposite(outboxService, contributionService, slackApiAdapter);
+    }
+
+    @Bean
+    public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
+                                                        final GithubIssueCommenter githubIssueCommenter) {
+        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter);
     }
 
     @Bean
