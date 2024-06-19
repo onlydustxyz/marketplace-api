@@ -14,6 +14,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import java.util.UUID;
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForEmptyJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Java6Assertions.assertThatThrownBy;
 
 @TagUser
 public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
@@ -137,10 +139,30 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         indexerApiWireMockServer.verify(0, putRequestedFor(anyUrl()));
 
         // ===============================================
+        // When we call it again after a logout
+        client.post()
+                .uri(getApiURI(ME_LOGOUT))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .exchange()
+                .expectStatus().isNoContent();
+
+        client.get()
+                .uri(getApiURI(ME_GET))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .exchange()
+                .expectStatus()
+                .is5xxServerError();
+
+        assertThatThrownBy(() -> auth0ApiClientStub.getGithubPersonalToken(githubUserId))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("No Github personal token for user %d in Auth0ApiClientStub".formatted(githubUserId));
+
+        // ===============================================
         // When we call it again (already signed-up) with a new email
         indexerApiWireMockServer.resetRequests();
         Thread.sleep(600); // make sure user claims won't be in cache anymore
         token = ((JwtVerifierStub) jwtVerifier).tokenFor(githubUserId);
+        auth0ApiClientStub.withPat(githubUserId, token);
 
         userAuthHelper.mockAuth0UserInfo(githubUserId, login, login, avatarUrl, faker.internet().emailAddress());
 

@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDust
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
@@ -15,15 +16,15 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class AuthenticatedAppUserServiceTest {
 
     private static final Faker faker = new Faker();
 
     final AuthenticationContext authenticationContext = mock(AuthenticationContext.class);
-    final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext);
+    final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
+    final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext, githubAuthenticationPort);
 
     final UUID userId = UUID.randomUUID();
     final long githubUserId = faker.number().randomNumber();
@@ -87,5 +88,22 @@ public class AuthenticatedAppUserServiceTest {
         assertNotNull(onlydustException);
         assertEquals(401, onlydustException.getStatus());
         assertEquals("Unauthorized non-authenticated user", onlydustException.getMessage());
+    }
+
+    @Test
+    void should_logout_from_github() {
+        // Given
+        when(authenticationContext.getAuthenticationFromContext())
+                .thenReturn(Auth0OnlyDustAppAuthentication.builder()
+                        .isAuthenticated(true)
+                        .user(user)
+                        .authorities(List.of(new OnlyDustAppGrantedAuthority(AuthenticatedUser.Role.USER)))
+                        .build());
+
+        // When
+        authenticatedAppUserService.logout();
+
+        // Then
+        verify(githubAuthenticationPort).logout(githubUserId);
     }
 }

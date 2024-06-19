@@ -20,6 +20,11 @@ public class Auth0ApiClientStub implements GithubAuthenticationPort {
         return pat;
     }
 
+    @Override
+    public void logout(Long githubUserId) {
+        pats.remove(githubUserId);
+    }
+
     public void withPat(Long githubUserId, String pat) {
         pats.put(githubUserId, pat);
     }
