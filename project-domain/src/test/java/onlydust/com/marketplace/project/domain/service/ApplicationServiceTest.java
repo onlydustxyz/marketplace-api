@@ -2,12 +2,10 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubComment;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.GlobalConfig;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
@@ -31,6 +29,7 @@ public class ApplicationServiceTest {
     private final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     private final GithubApiPort githubApiPort = mock(GithubApiPort.class);
     private final GithubAuthenticationPort githubAuthenticationPort = mock(GithubAuthenticationPort.class);
+    private final GithubAppService githubAppService = mock(GithubAppService.class);
     private final GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.xyz");
 
     private final ApplicationService applicationService = new ApplicationService(
@@ -41,6 +40,7 @@ public class ApplicationServiceTest {
             githubStoragePort,
             githubApiPort,
             githubAuthenticationPort,
+            githubAppService,
             globalConfig);
 
     final Long githubUserId = faker.number().randomNumber(10, true);
@@ -55,7 +55,7 @@ public class ApplicationServiceTest {
     @BeforeEach
     void setUp() {
         reset(userStoragePort, projectStoragePort, applicationObserver, githubUserPermissionsService, githubStoragePort, githubApiPort,
-                githubAuthenticationPort);
+                githubAppService, githubAuthenticationPort);
 
         when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
         when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
@@ -287,5 +287,102 @@ public class ApplicationServiceTest {
 
         // Then
         verify(userStoragePort).deleteApplications(application.id());
+    }
+
+    @Nested
+    class AcceptApplication {
+        final User applicant = User.builder()
+                .githubUserId(githubUserId)
+                .githubLogin(faker.name().username())
+                .build();
+
+        final Application application = Application.fromMarketplace(
+                projectId,
+                githubUserId,
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        final String githubToken = faker.internet().password();
+
+        @BeforeEach
+        void setUp() {
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
+            when(userStoragePort.getUserByGithubId(application.applicantId())).thenReturn(Optional.of(applicant));
+            when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubToken));
+        }
+
+        @Test
+        void should_prevent_accepting_application_if_not_found() {
+            // Given
+            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Application %s not found".formatted(application.id()));
+        }
+
+        @Test
+        void should_prevent_accepting_application_if_not_project_lead() {
+            // Given
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+
+            // When
+            assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User is not authorized to accept this application");
+        }
+
+        @Test
+        void should_prevent_accepting_application_if_issue_not_found() {
+            // Given
+            when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Issue %s not found".formatted(issue.id()));
+        }
+
+        @Test
+        void should_prevent_accepting_application_if_applicant_not_found() {
+            // Given
+            when(userStoragePort.getUserByGithubId(application.applicantId())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %d not found".formatted(application.applicantId()));
+        }
+
+        @Test
+        void should_prevent_accepting_application_if_github_app_not_installed() {
+            // Given
+            when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Could not generate GitHub App token for repository %s".formatted(issue.repoId()));
+        }
+
+        @Test
+        void should_accepting_application() {
+            // When
+            applicationService.acceptApplication(application.id(), userId);
+
+            // Then
+            verify(githubApiPort).assign(githubToken, issue.repoId(), issue.number(), applicant.getGithubLogin());
+        }
     }
 }

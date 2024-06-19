@@ -2495,6 +2495,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/applications/{applicationId}/accept:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ProjectApplications
+      summary: Accept an application
+      operationId: acceptProjectApplication
+      description: |
+        Accept an application. Only the project lead can accept an application.
+        The issue will be assigned to the applicant on GitHub.
+      parameters:
+        - in: path
+          name: applicationId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectApplicationId'
+      responses:
+        "204":
+          description: 'The application was approved successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/logos:
     post:
       security:

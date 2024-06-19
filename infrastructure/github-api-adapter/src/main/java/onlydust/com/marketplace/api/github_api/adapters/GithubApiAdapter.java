@@ -6,9 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.CommentRequest;
 import onlydust.com.marketplace.api.github_api.dto.CommentResponse;
+import onlydust.com.marketplace.api.github_api.dto.IssueAssigneesRequest;
+import onlydust.com.marketplace.api.github_api.dto.IssueAssigneesResponse;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
+
+import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
@@ -24,5 +28,12 @@ public class GithubApiAdapter implements GithubApiPort {
                 .map(CommentResponse::id)
                 .map(GithubComment.Id::of)
                 .orElseThrow(() -> internalServerError("Failed to create comment"));
+    }
+
+    @Override
+    public void assign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin) {
+        client.post("/repository/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
+                        new IssueAssigneesRequest(List.of(githubLogin)), personalAccessToken, IssueAssigneesResponse.class)
+                .orElseThrow(() -> internalServerError("Failed to assign user to issue"));
     }
 }

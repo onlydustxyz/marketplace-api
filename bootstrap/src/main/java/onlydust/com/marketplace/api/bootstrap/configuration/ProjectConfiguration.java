@@ -129,6 +129,7 @@ public class ProjectConfiguration {
                                                        final GithubStoragePort githubStoragePort,
                                                        final GithubApiPort githubApiPort,
                                                        final GithubAuthenticationPort githubAuthenticationPort,
+                                                       final GithubAppService githubAppService,
                                                        final GlobalConfig globalConfig
     ) {
         return new ApplicationService(
@@ -139,6 +140,7 @@ public class ProjectConfiguration {
                 githubStoragePort,
                 githubApiPort,
                 githubAuthenticationPort,
+                githubAppService,
                 globalConfig);
     }
 
