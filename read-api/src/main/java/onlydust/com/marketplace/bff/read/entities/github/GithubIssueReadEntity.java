@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.GithubIssue;
+import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
@@ -129,5 +130,14 @@ public class GithubIssueReadEntity {
                 .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
                 ;
+    }
+
+    public GithubIssueLinkResponse toLinkDto() {
+        return new GithubIssueLinkResponse()
+                .id(id)
+                .number(number)
+                .title(title)
+                .status(status)
+                .htmlUrl(htmlUrl);
     }
 }

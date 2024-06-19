@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
@@ -56,6 +57,9 @@ public class ApplicationReadEntity {
     @Enumerated(EnumType.STRING)
     Application.Origin origin;
 
+    @OneToOne
+    ApplicationRankingReadEntity ranking;
+
     public ProjectApplicationShortResponse toShortResponse() {
         return new ProjectApplicationShortResponse()
                 .id(id)
@@ -63,6 +67,16 @@ public class ApplicationReadEntity {
                 .motivations(motivations)
                 .problemSolvingApproach(problemSolvingApproach)
                 .project(project.toLinkResponse())
+                ;
+    }
+
+    public ProjectApplicationPageItemResponse toPageItemDto() {
+        return new ProjectApplicationPageItemResponse()
+                .id(id)
+                .projectId(project.getId())
+                .issue(issue.toLinkDto())
+                .applicant(applicant.toContributorResponse())
+                .recommandationScore(ranking.recommandationScore())
                 ;
     }
 }

@@ -46,6 +46,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
             REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_language_per_user;
             REFRESH MATERIALIZED VIEW CONCURRENTLY received_rewards_stats_per_project_per_user;
             REFRESH MATERIALIZED VIEW CONCURRENTLY global_users_ranks;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY application_rankings;
             """, nativeQuery = true)
     void refreshUsersRanksAndStats();
 
