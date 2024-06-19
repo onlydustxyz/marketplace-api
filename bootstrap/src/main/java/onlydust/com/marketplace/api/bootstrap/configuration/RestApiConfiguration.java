@@ -48,6 +48,7 @@ public class RestApiConfiguration {
     @Bean
     public MeRestApi meRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
                                final UserFacadePort userFacadePort,
+                               final ApplicationFacadePort applicationFacadePort,
                                final ContributorFacadePort contributorFacadePort,
                                final GithubAccountService githubAccountService,
                                final BillingProfileFacadePort billingProfileFacadePort,
@@ -55,15 +56,15 @@ public class RestApiConfiguration {
                                final HackathonFacadePort hackathonFacadePort,
                                final CommitteeFacadePort committeeFacadePort,
                                final GithubUserPermissionsService githubUserPermissionsService) {
-        return new MeRestApi(authenticatedAppUserService, userFacadePort, contributorFacadePort,
+        return new MeRestApi(authenticatedAppUserService, userFacadePort, applicationFacadePort, contributorFacadePort,
                 githubAccountService, billingProfileFacadePort, payoutPreferenceFacadePort, hackathonFacadePort, committeeFacadePort,
                 githubUserPermissionsService);
     }
 
     @Bean
     public ApplicationsRestApi applicationsRestApi(final AuthenticatedAppUserService authenticatedAppUserService,
-                                                   final UserFacadePort userFacadePort) {
-        return new ApplicationsRestApi(authenticatedAppUserService, userFacadePort);
+                                                   final ApplicationFacadePort applicationFacadePort) {
+        return new ApplicationsRestApi(authenticatedAppUserService, applicationFacadePort);
     }
 
     @Bean

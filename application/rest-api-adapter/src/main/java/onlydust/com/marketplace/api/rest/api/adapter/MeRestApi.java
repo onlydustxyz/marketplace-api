@@ -50,6 +50,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class MeRestApi implements MeApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final UserFacadePort userFacadePort;
+    private final ApplicationFacadePort applicationFacadePort;
     private final ContributorFacadePort contributorFacadePort;
     private final GithubOrganizationFacadePort githubOrganizationFacadePort;
     private final BillingProfileFacadePort billingProfileFacadePort;
@@ -88,7 +89,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<ApplicationResponse> applyOnProject(ApplicationRequest applicationRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var application = userFacadePort.applyOnProject(authenticatedUser.getGithubUserId(),
+        final var application = applicationFacadePort.applyOnProject(authenticatedUser.getGithubUserId(),
                 applicationRequest.getProjectId(),
                 GithubIssue.Id.of(applicationRequest.getIssueId()),
                 applicationRequest.getMotivation(),
@@ -99,7 +100,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> updateApplication(UUID applicationId, ApplicationUpdateRequest applicationUpdateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.updateApplication(Application.Id.of(applicationId),
+        applicationFacadePort.updateApplication(Application.Id.of(applicationId),
                 authenticatedUser.getGithubUserId(),
                 applicationUpdateRequest.getMotivation(),
                 applicationUpdateRequest.getProblemSolvingApproach());

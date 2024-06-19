@@ -114,21 +114,29 @@ public class ProjectConfiguration {
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort,
-                                         final ProjectObserverPort projectObservers,
-                                         final GithubUserPermissionsService githubUserPermissionsService,
-                                         final GithubStoragePort githubStoragePort,
-                                         final GithubApiPort githubApiPort,
-                                         final GithubAuthenticationPort githubAuthenticationPort,
-                                         final GlobalConfig globalConfig
-    ) {
+                                         final ImageStoragePort imageStoragePort) {
         return new UserService(
                 userObservers,
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort,
+                imageStoragePort);
+    }
+
+    @Bean
+    public ApplicationFacadePort applicationFacadePort(final PostgresUserAdapter postgresUserAdapter,
+                                                       final ProjectStoragePort projectStoragePort,
+                                                       final ProjectObserverPort projectObservers,
+                                                       final GithubUserPermissionsService githubUserPermissionsService,
+                                                       final GithubStoragePort githubStoragePort,
+                                                       final GithubApiPort githubApiPort,
+                                                       final GithubAuthenticationPort githubAuthenticationPort,
+                                                       final GlobalConfig globalConfig
+    ) {
+        return new ApplicationService(
+                postgresUserAdapter,
+                projectStoragePort,
                 projectObservers,
                 githubUserPermissionsService,
                 githubStoragePort,
