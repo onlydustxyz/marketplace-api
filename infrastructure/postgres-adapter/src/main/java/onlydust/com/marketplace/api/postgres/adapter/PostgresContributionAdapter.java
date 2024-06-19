@@ -33,7 +33,7 @@ import static java.util.Objects.isNull;
 public class PostgresContributionAdapter implements ContributionStoragePort {
 
     public static final long UNEXISTING_GITHUB_USER_ID = -1L;
-    
+
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final ShortProjectViewEntityRepository shortProjectViewEntityRepository;
     private final GithubRepoViewEntityRepository githubRepoViewEntityRepository;
@@ -95,8 +95,8 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
             case GITHUB_NUMBER_TITLE -> Sort.by(direction, "github_number", "github_title");
             case CONTRIBUTOR_LOGIN -> Sort.by(direction, "contributor_login");
             case LINKS_COUNT -> JpaSort.unsafe(direction, "COALESCE(jsonb_array_length(COALESCE(closing_issues.links," +
-                    "closing_pull_requests.links, reviewed_pull_requests.links)" +
-                    "), 0)");
+                                                          "closing_pull_requests.links, reviewed_pull_requests.links)" +
+                                                          "), 0)");
         };
     }
 

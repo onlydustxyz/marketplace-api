@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.github_api;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
@@ -73,26 +74,37 @@ public class GithubHttpClient {
     public <ResponseBody, RequestBody> Optional<ResponseBody> post(String path, final RequestBody requestBody,
                                                                    @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {
-            return post(path, HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)), personalAccessToken, responseClass);
+            return fetch(HttpMethod.POST, path, HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)), personalAccessToken,
+                    responseClass);
         } catch (JsonProcessingException e) {
             throw internalServerError("Fail to serialize request", e);
         }
     }
 
-    public <ResponseBody> Optional<ResponseBody> post(String path, final HttpRequest.BodyPublisher bodyPublisher,
-                                                      @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+    public <ResponseBody, RequestBody> Optional<ResponseBody> delete(String path, final RequestBody requestBody,
+                                                                     @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+        try {
+            return fetch(HttpMethod.DELETE, path, HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)), personalAccessToken,
+                    responseClass);
+        } catch (JsonProcessingException e) {
+            throw internalServerError("Fail to serialize request", e);
+        }
+    }
+
+    public <ResponseBody> Optional<ResponseBody> fetch(HttpMethod method, String path, final HttpRequest.BodyPublisher bodyPublisher,
+                                                       @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {
             final HttpResponse<byte[]> httpResponse =
                     httpClient.send(HttpRequest.newBuilder().uri(buildURI(path))
                             .headers("Authorization", "Bearer " + personalAccessToken)
-                            .POST(bodyPublisher)
+                            .method(method.name(), bodyPublisher)
                             .build(), HttpResponse.BodyHandlers.ofByteArray());
             return switch (httpResponse.statusCode()) {
                 case 200, 201, 204, 206 -> Optional.of(decode(httpResponse.body(), responseClass));
                 case 301, 302, 307, 308 -> {
                     final var location = httpResponse.headers().firstValue("Location")
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
-                    yield post(URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
+                    yield fetch(method, URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
                 }
                 case 403, 404 ->
                     // Should be considered as an internal server error because it happens due to wrong github PAT or
