@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.observer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubAppAccessToken;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
@@ -16,7 +17,6 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubStoragePort githubStoragePort;
     private final GithubAppService githubAppService;
-    private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
     private final GithubApiPort githubApiPort;
     private final GlobalConfig globalConfig;
 
@@ -34,9 +34,9 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(application.applicantId())));
 
         githubAppService.getInstallationTokenFor(issue.repoId())
-                .filter(token -> githubAuthenticationInfoPort.getAuthorizedScopes(token).contains("issues"))
+                .filter(GithubAppAccessToken::canWriteIssues)
                 .ifPresentOrElse(
-                        token -> githubApiPort.createComment(token, issue, """
+                        token -> githubApiPort.createComment(token.token(), issue, """
                                 Hey @%s!
                                 Thanks for showing interest.
                                 We've created an application for you to contribute to %s.

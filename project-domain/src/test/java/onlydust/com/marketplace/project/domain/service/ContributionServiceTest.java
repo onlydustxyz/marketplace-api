@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -181,7 +182,7 @@ class ContributionServiceTest {
                 .contributor(contributor)
                 .build();
 
-        final String githubToken = faker.internet().password();
+        final GithubAppAccessToken githubToken = new GithubAppAccessToken(faker.internet().password(), Map.of("issues", "write"));
 
         @BeforeEach
         void setUp() {
@@ -250,7 +251,7 @@ class ContributionServiceTest {
             contributionService.unassign(project.getId(), callerId, contribution.getId());
 
             // Then
-            verify(githubApiPort).unassign(githubToken, repo.getId(), contribution.getGithubNumber(), contribution.getContributor().getLogin());
+            verify(githubApiPort).unassign(githubToken.token(), repo.getId(), contribution.getGithubNumber(), contribution.getContributor().getLogin());
         }
     }
 }

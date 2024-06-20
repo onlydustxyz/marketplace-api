@@ -232,7 +232,6 @@ public class ProjectConfiguration {
                                               final ProjectStoragePort projectStoragePort,
                                               final GithubStoragePort githubStoragePort,
                                               final GithubAppService githubAppService,
-                                              final GithubAuthenticationInfoPort githubAuthenticationInfoPort,
                                               final GithubApiPort githubApiPort,
                                               final GlobalConfig globalConfig) {
         return new GithubIssueCommenter(
@@ -240,7 +239,6 @@ public class ProjectConfiguration {
                 projectStoragePort,
                 githubStoragePort,
                 githubAppService,
-                githubAuthenticationInfoPort,
                 githubApiPort,
                 globalConfig);
     }

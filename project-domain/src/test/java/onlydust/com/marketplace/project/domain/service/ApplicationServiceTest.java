@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -305,7 +302,7 @@ public class ApplicationServiceTest {
                 faker.lorem().sentence()
         );
 
-        final String githubToken = faker.internet().password();
+        final GithubAppAccessToken githubToken = new GithubAppAccessToken(faker.internet().password(), Map.of("issues", "write"));
 
         @BeforeEach
         void setUp() {
@@ -382,7 +379,7 @@ public class ApplicationServiceTest {
             applicationService.acceptApplication(application.id(), userId);
 
             // Then
-            verify(githubApiPort).assign(githubToken, issue.repoId(), issue.number(), applicant.getGithubLogin());
+            verify(githubApiPort).assign(githubToken.token(), issue.repoId(), issue.number(), applicant.getGithubLogin());
         }
     }
 }
