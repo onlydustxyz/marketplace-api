@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.project.domain.model.GithubAppAccessToken;
 import onlydust.com.marketplace.project.domain.port.output.GithubAppApiPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 
@@ -11,7 +12,7 @@ public class GithubAppService {
     private final GithubStoragePort githubStoragePort;
     private final GithubAppApiPort githubAppApiPort;
 
-    public Optional<String> getInstallationTokenFor(Long repoId) {
+    public Optional<GithubAppAccessToken> getInstallationTokenFor(Long repoId) {
         return githubStoragePort.findInstallationIdByRepoId(repoId)
                 .flatMap(githubAppApiPort::getInstallationToken);
     }

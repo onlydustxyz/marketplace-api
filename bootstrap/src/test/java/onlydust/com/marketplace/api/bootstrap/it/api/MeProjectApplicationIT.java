@@ -263,7 +263,10 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         .withStatus(201)
                         .withBody("""
                                 {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN"
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
+                                    "permissions": {
+                                        "issues": "write"
+                                    }
                                 }
                                 """)
                 ));
@@ -320,16 +323,12 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         .withStatus(201)
                         .withBody("""
                                 {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN"
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
+                                    "permissions": {
+                                        "issues": "write"
+                                    }
                                 }
                                 """)
-                ));
-
-        githubWireMockServer.stubFor(get(urlEqualTo("/"))
-                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
-                .willReturn(aResponse()
-                        .withStatus(200)
-                        .withHeader("x-oauth-scopes", "issues")
                 ));
 
         final var expectedComment = """

@@ -62,7 +62,10 @@ public class ContributionService implements ContributionFacadePort, Contribution
         final var githubToken = githubAppService.getInstallationTokenFor(contribution.getGithubRepo().getId())
                 .orElseThrow(() -> internalServerError("Could not to generate installation token for GitHub repo %d".formatted(contribution.getGithubRepo().getId())));
 
-        githubApiPort.unassign(githubToken, contribution.getGithubRepo().getId(), contribution.getGithubNumber(), contribution.getContributor().getLogin());
+        githubApiPort.unassign(githubToken.token(),
+                contribution.getGithubRepo().getId(),
+                contribution.getGithubNumber(),
+                contribution.getContributor().getLogin());
     }
 
     @Override

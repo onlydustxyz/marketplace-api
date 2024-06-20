@@ -3,15 +3,18 @@ package onlydust.com.marketplace.project.domain.observer;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
+import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -23,7 +26,6 @@ class GithubIssueCommenterTest {
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final GithubAppService githubAppService = mock(GithubAppService.class);
-    final GithubAuthenticationInfoPort githubAuthenticationInfoPort = mock(GithubAuthenticationInfoPort.class);
     final GithubApiPort githubApiPort = mock(GithubApiPort.class);
     final GlobalConfig globalConfig = new GlobalConfig().setAppBaseUrl("https://local-app.onlydust.com");
     final GithubIssueCommenter githubIssueCommenter = new GithubIssueCommenter(
@@ -31,7 +33,6 @@ class GithubIssueCommenterTest {
             projectStoragePort,
             githubStoragePort,
             githubAppService,
-            githubAuthenticationInfoPort,
             githubApiPort,
             globalConfig);
 
@@ -43,8 +44,7 @@ class GithubIssueCommenterTest {
                 projectStoragePort,
                 githubStoragePort,
                 githubAppService,
-                githubApiPort,
-                githubAuthenticationInfoPort);
+                githubApiPort);
     }
 
     @Nested
@@ -75,7 +75,7 @@ class GithubIssueCommenterTest {
                         projectStoragePort,
                         githubStoragePort,
                         githubAppService,
-                        githubApiPort, githubAuthenticationInfoPort);
+                        githubApiPort);
             }
         }
     }
@@ -111,13 +111,12 @@ class GithubIssueCommenterTest {
                 null
         );
 
-        private final String githubAppToken = faker.lorem().word();
+        private final GithubAppAccessToken githubAppToken = new GithubAppAccessToken(faker.lorem().word(), Map.of("issues", "write"));
 
         @BeforeEach
         void setup() {
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubAppToken));
-            when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("issues", "public_repo"));
             when(projectStoragePort.getById(application.projectId())).thenReturn(Optional.of(project));
             when(userStoragePort.getUserByGithubId(applicant.getGithubUserId())).thenReturn(Optional.of(applicant));
         }
@@ -179,7 +178,8 @@ class GithubIssueCommenterTest {
         @Test
         void should_not_comment_issue_without_proper_permissions() {
             // Given
-            when(githubAuthenticationInfoPort.getAuthorizedScopes(githubAppToken)).thenReturn(Set.of("public_repo"));
+            when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(new GithubAppAccessToken(faker.lorem().word(), Map.of(
+                    "issues", "read"))));
 
             // When
             githubIssueCommenter.onApplicationCreated(application);
@@ -194,7 +194,7 @@ class GithubIssueCommenterTest {
             githubIssueCommenter.onApplicationCreated(application);
 
             // Then
-            verify(githubApiPort).createComment(githubAppToken, issue, """
+            verify(githubApiPort).createComment(githubAppToken.token(), issue, """
                     Hey @%s!
                     Thanks for showing interest.
                     We've created an application for you to contribute to %s.

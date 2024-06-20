@@ -29,7 +29,10 @@ public class ProjectUnassignContributionsIT extends AbstractMarketplaceApiIT {
                         .withStatus(201)
                         .withBody("""
                                 {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN"
+                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
+                                    "permissions": {
+                                        "issues": "write"
+                                    }
                                 }
                                 """)
                 ));
