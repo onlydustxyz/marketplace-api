@@ -3,10 +3,7 @@ package onlydust.com.marketplace.bff.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadUsersApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.bff.read.entities.user.UserProfileEcosystemPageItemEntity;
-import onlydust.com.marketplace.bff.read.entities.user.UserProfileLanguagePageItemEntity;
-import onlydust.com.marketplace.bff.read.entities.user.UserProfileProjectEarningsEntity;
-import onlydust.com.marketplace.bff.read.entities.user.UserWeeklyStatsEntity;
+import onlydust.com.marketplace.bff.read.entities.user.*;
 import onlydust.com.marketplace.bff.read.repositories.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,10 +39,8 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem) {
 
         final var workDistribution = ecosystem != null ?
-                userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem)
-                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId))) :
-                userWorkDistributionEntityRepository.findByContributorId(githubId)
-                        .orElseThrow(() -> notFound("User %d not found".formatted(githubId)));
+                userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem) :
+                userWorkDistributionEntityRepository.findByContributorId(githubId);
 
         final var userWeeklyStats = ecosystem != null ?
                 userWeeklyStatsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem) :
@@ -58,7 +53,8 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
                         .totalEarnedUsd(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::totalEarnedUsd).reduce(BigDecimal.ZERO,
                                 BigDecimal::add))
                         .perProject(perProjectsStats.stream().map(UserProfileProjectEarningsEntity::toDto).toList()))
-                .workDistribution(workDistribution.toDto())
+                .workDistribution(workDistribution.map(UserWorkDistributionEntity::toDto)
+                        .orElse(new UserWorkDistribution().codeReviewCount(0).issueCount(0).pullRequestCount(0)))
                 .activity(userWeeklyStats.stream().map(UserWeeklyStatsEntity::toDto).toList())
         );
     }

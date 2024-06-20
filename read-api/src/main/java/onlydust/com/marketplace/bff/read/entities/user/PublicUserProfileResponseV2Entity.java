@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.AllUserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
@@ -37,10 +36,23 @@ public class PublicUserProfileResponseV2Entity {
     @NonNull
     Long githubUserId;
 
-    @OneToOne
-    @JoinColumn(name = "githubUserId", referencedColumnName = "userId", insertable = false, updatable = false)
+    UUID userId;
+    @NonNull String login;
+    @NonNull String avatarUrl;
+    String email;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    UserViewEntity registered;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     @NonNull
-    AllUserViewEntity user;
+    GithubAccountViewEntity github;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
+    UserProfileInfoViewEntity profile;
 
     @NonNull Integer rank;
     @NonNull BigDecimal rankPercentile;
@@ -58,25 +70,25 @@ public class PublicUserProfileResponseV2Entity {
     public PublicUserProfileResponseV2 toDto() {
         return new PublicUserProfileResponseV2()
                 .githubUserId(githubUserId)
-                .login(user().login())
-                .avatarUrl(user().avatarUrl())
-                .id(user.userId())
-                .htmlUrl(URI.create(user.github().htmlUrl()))
-                .location(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::location).orElse(user.github().location()))
-                .bio(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::bio).orElse(user.github().bio()))
-                .website(Optional.ofNullable(user.profile()).map(UserProfileInfoViewEntity::website).orElse(user.github().website()))
-                .signedUpOnGithubAt(user.github().createdAt())
-                .signedUpAt(Optional.ofNullable(user.registered()).map(UserViewEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
-                .lastSeenAt(Optional.ofNullable(user.registered()).map(UserViewEntity::lastSeenAt).orElse(null))
-                .contacts(Optional.ofNullable(user.profile()).flatMap(UserProfileInfoViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(contactsOf(user.github())))
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .id(userId)
+                .htmlUrl(isNull(github) ? null : URI.create(github.htmlUrl()))
+                .location(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::location).orElse(isNull(github) ? null : github.location()))
+                .bio(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::bio).orElse(isNull(github) ? null : github.bio()))
+                .website(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::website).orElse(isNull(github) ? null : github.website()))
+                .signedUpOnGithubAt(isNull(github) ? null : github.createdAt())
+                .signedUpAt(Optional.ofNullable(registered).map(UserViewEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
+                .lastSeenAt(Optional.ofNullable(registered).map(UserViewEntity::lastSeenAt).orElse(null))
+                .contacts(Optional.ofNullable(profile).flatMap(UserProfileInfoViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(isNull(github) ? List.of() : contactsOf(github)))
                 .statsSummary(new UserProfileStatsSummary()
-                        .rank(rank)
-                        .rankPercentile(prettyRankPercentile(rankPercentile))
-                        .rankCategory(rankCategory)
-                        .contributedProjectCount(contributedProjectCount)
-                        .leadedProjectCount(leadedProjectCount)
-                        .contributionCount(contributionCount)
-                        .rewardCount(rewardCount))
+                        .rank(Optional.ofNullable(rank).orElse(0))
+                        .rankPercentile(prettyRankPercentile(Optional.ofNullable(rankPercentile).orElse(BigDecimal.ONE)))
+                        .rankCategory(Optional.ofNullable(rankCategory).orElse(UserRankCategory.F))
+                        .contributedProjectCount(Optional.ofNullable(contributedProjectCount).orElse(0))
+                        .leadedProjectCount(Optional.ofNullable(leadedProjectCount).orElse(0))
+                        .contributionCount(Optional.ofNullable(contributionCount).orElse(0))
+                        .rewardCount(Optional.ofNullable(rewardCount).orElse(0)))
                 .ecosystems(isNull(ecosystems) ? List.of() : ecosystems.stream()
                         .map(ecosystem -> new EcosystemResponse()
                                 .id(ecosystem.id())
