@@ -34,6 +34,10 @@ public class ApplicationReadEntity {
     @NonNull
     ZonedDateTime receivedAt;
 
+    @NonNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "projectId", insertable = false, updatable = false)
+    ProjectReadEntity project;
     UUID projectId;
 
     @NonNull
