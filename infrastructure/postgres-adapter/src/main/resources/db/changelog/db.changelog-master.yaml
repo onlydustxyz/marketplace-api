@@ -373,3 +373,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000270_add_github_app_permissions_to_global_settings.sql
   - include:
       file: db/changelog/changelogs/00000271_update_application_constraints.sql
+  - include:
+      file: db/changelog/changelogs/00000272_remove_application_issue_fk.sql
