@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.bff.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.bff.read.entities.user.AllUserReadEntity;
@@ -33,13 +34,10 @@ public class ApplicationReadEntity {
     @NonNull
     ZonedDateTime receivedAt;
 
-    @NonNull
-    @ManyToOne
-    @JoinColumn(name = "projectId")
-    ProjectReadEntity project;
+    UUID projectId;
 
     @NonNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "issueId")
     GithubIssueReadEntity issue;
 
@@ -57,7 +55,7 @@ public class ApplicationReadEntity {
     @Enumerated(EnumType.STRING)
     Application.Origin origin;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "applicationId")
     ApplicationRankingReadEntity ranking;
 
@@ -74,10 +72,28 @@ public class ApplicationReadEntity {
     public ProjectApplicationPageItemResponse toPageItemDto() {
         return new ProjectApplicationPageItemResponse()
                 .id(id)
-                .projectId(project.getId())
+                .projectId(projectId)
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
                 .recommandationScore(ranking.recommandationScore())
+                ;
+    }
+
+    public ProjectApplicationResponse toDto() {
+        return new ProjectApplicationResponse()
+                .id(id)
+                .projectId(projectId)
+                .issue(issue.toLinkDto())
+                .applicant(applicant.toContributorResponse())
+                .recommandationScore(ranking.recommandationScore())
+                .availabilityScore(ranking.availabilityScore())
+                .languageScore(ranking.mainRepoLanguageUserScore())
+                .fidelityScore(ranking.projectFidelityScore())
+                .appliedDistinctProjectCount(ranking.appliedProjectCount())
+                .pendingApplicationCountOnThisProject(ranking.pendingApplicationCountOnThisProject())
+                .pendingApplicationCountOnOtherProjects(ranking.pendingApplicationCountOnOtherProjects())
+                .motivation(motivations)
+                .problemSolvingApproach(problemSolvingApproach)
                 ;
     }
 }

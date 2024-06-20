@@ -324,4 +324,76 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                           """);
     }
 
+    @Test
+    @Order(10)
+    void should_return_not_found_when_application_by_id_does_not_exist() {
+        // Given
+        final var pierre = userAuthHelper.authenticatePierre();
+
+        // When (no application for this issue on project 1)
+        client.get()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(UUID.randomUUID().toString())))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    @Order(10)
+    void should_return_application_by_id() {
+        // Given
+        final var pierre = userAuthHelper.authenticatePierre();
+        final UUID applicationId = UUID.randomUUID();
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                projectAppliedTo1,
+                pierre.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1736504583L,
+                112L,
+                "Highly motivated",
+                "Do the math"
+        ));
+
+        // When (no application for this issue on project 1)
+        client.get()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                          "issue": {
+                            "id": 1736504583,
+                            "number": 1112,
+                            "title": "Monthly contracting subscription",
+                            "status": "OPEN",
+                            "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112"
+                          },
+                          "applicant": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": true
+                          },
+                          "recommandationScore": 25,
+                          "languageScore": 0,
+                          "availabilityScore": 0,
+                          "fidelityScore": 100,
+                          "appliedDistinctProjectCount": 2,
+                          "pendingApplicationCountOnOtherProjects": 2,
+                          "pendingApplicationCountOnThisProject": 2,
+                          "motivation": "Highly motivated",
+                          "problemSolvingApproach": "Do the math"
+                        }
+                        """);
+    }
+
 }

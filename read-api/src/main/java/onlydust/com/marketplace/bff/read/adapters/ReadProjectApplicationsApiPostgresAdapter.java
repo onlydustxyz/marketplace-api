@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectApplicationsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageSort;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.bff.read.repositories.ApplicationReadRepository;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -61,5 +63,11 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
                 .hasMore(page.hasNext())
                 .applications(page.getContent().stream().map(ApplicationReadEntity::toPageItemDto).toList())
         );
+    }
+
+    @Override
+    public ResponseEntity<ProjectApplicationResponse> getProjectApplication(UUID applicationId) {
+        final var application = applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
+        return ok(application.toDto());
     }
 }

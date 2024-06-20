@@ -29,14 +29,15 @@ public class ApplicationRankingReadEntity {
     @EqualsAndHashCode.Include
     UUID applicationId;
 
-    @NonNull
     double availabilityPercentile;
-    @NonNull
     double bestProjectsSimilarityPercentile;
-    @NonNull
     double mainRepoLanguageUserPercentile;
-    @NonNull
     double projectFidelityPercentile;
+
+    int appliedProjectCount;
+    int pendingApplicationCountOnThisProject;
+    int pendingApplicationCountOnOtherProjects;
+    int contribution_in_progress_count;
 
     public int availabilityScore() {
         return percentileToScorePercentage(availabilityPercentile);

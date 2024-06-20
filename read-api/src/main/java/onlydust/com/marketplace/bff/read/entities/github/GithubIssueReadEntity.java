@@ -107,7 +107,7 @@ public class GithubIssueReadEntity {
 
     public GithubIssue toDto(@NonNull UUID projectId, Long githubUserId) {
         final var projectApplications = applications.stream()
-                .filter(application -> application.project().getId().equals(projectId))
+                .filter(application -> application.projectId().equals(projectId))
                 .toList();
 
         final var currentUserApplication = projectApplications.stream()
