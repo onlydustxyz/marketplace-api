@@ -58,7 +58,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .motivation(motivations)
                 .problemSolvingApproach(problemSolvingApproach);
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repository/380954304/issues/7/comments"))
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
                 .withRequestBody(equalToJson("""
                         {
                             "body": "I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.com).\\n"
@@ -271,7 +271,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 """)
                 ));
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repository/380954304/issues/6/assignees"))
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/6/assignees"))
                 .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
                 .withRequestBody(equalToJson("""
                         {
@@ -296,7 +296,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repository/380954304/issues/6/assignees")));
+        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/380954304/issues/6/assignees")));
     }
 
     @Test
@@ -338,7 +338,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 Go check it out on [OnlyDust](https://local-app.onlydust.com/p/bretzel)!\\n\
                 """;
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/repository/466482535/issues/7/comments"))
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/466482535/issues/7/comments"))
                 .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
                 .withRequestBody(equalToJson("""
                         {
@@ -369,7 +369,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.problemSolvingApproach()).isNull();
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
-        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repository/466482535/issues/7/comments")));
+        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/466482535/issues/7/comments")));
         verify(slackApiAdapter).onApplicationCreated(any(Application.class));
     }
 

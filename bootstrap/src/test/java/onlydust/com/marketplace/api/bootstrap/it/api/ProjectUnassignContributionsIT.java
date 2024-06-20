@@ -37,7 +37,7 @@ public class ProjectUnassignContributionsIT extends AbstractMarketplaceApiIT {
                                 """)
                 ));
 
-        githubWireMockServer.stubFor(delete(urlEqualTo("/repository/663102799/issues/4/assignees"))
+        githubWireMockServer.stubFor(delete(urlEqualTo("/repositories/663102799/issues/4/assignees"))
                 .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
                 .withRequestBody(equalToJson("""
                         {
@@ -62,6 +62,6 @@ public class ProjectUnassignContributionsIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        githubWireMockServer.verify(deleteRequestedFor(urlEqualTo("/repository/663102799/issues/4/assignees")));
+        githubWireMockServer.verify(deleteRequestedFor(urlEqualTo("/repositories/663102799/issues/4/assignees")));
     }
 }

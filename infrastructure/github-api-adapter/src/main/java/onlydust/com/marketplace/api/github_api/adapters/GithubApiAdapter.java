@@ -24,7 +24,7 @@ public class GithubApiAdapter implements GithubApiPort {
     @Override
     public GithubComment.Id createComment(@NonNull String personalAccessToken, @NonNull GithubIssue issue, @NonNull String body) {
         final var request = new CommentRequest(body);
-        return client.post("/repository/%d/issues/%d/comments".formatted(issue.repoId(), issue.number()), request, personalAccessToken, CommentResponse.class)
+        return client.post("/repositories/%d/issues/%d/comments".formatted(issue.repoId(), issue.number()), request, personalAccessToken, CommentResponse.class)
                 .map(CommentResponse::id)
                 .map(GithubComment.Id::of)
                 .orElseThrow(() -> internalServerError("Failed to create comment"));
@@ -32,14 +32,14 @@ public class GithubApiAdapter implements GithubApiPort {
 
     @Override
     public void assign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin) {
-        client.post("/repository/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
+        client.post("/repositories/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
                         new IssueAssigneesRequest(List.of(githubLogin)), personalAccessToken, IssueAssigneesResponse.class)
                 .orElseThrow(() -> internalServerError("Failed to assign user to issue"));
     }
 
     @Override
     public void unassign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin) {
-        client.delete("/repository/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
+        client.delete("/repositories/%d/issues/%d/assignees".formatted(repoId, githubIssueNumber),
                         new IssueAssigneesRequest(List.of(githubLogin)), personalAccessToken, IssueAssigneesResponse.class)
                 .orElseThrow(() -> internalServerError("Failed to assign user to issue"));
     }
