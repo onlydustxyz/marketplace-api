@@ -81,30 +81,32 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_CONTRIBUTIONS = "/api/v1/projects/%s/contributions";
     protected static final String PROJECT_GOOD_FIRST_ISSUES = "/api/v1/projects/%s/good-first-issues";
     protected static final String PROJECTS_INSIGHTS_STALED_CONTRIBUTIONS = "/api/v1/projects/%s/insights" +
-                                                                           "/contributions/staled";
+            "/contributions/staled";
     protected static final String PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors" +
-                                                                           "/churned";
+            "/churned";
     protected static final String PROJECTS_INSIGHTS_NEWCOMERS = "/api/v1/projects/%s/insights/contributors/newcomers";
     protected static final String PROJECTS_INSIGHTS_MOST_ACTIVE_CONTRIBUTORS = "/api/v1/projects/%s/insights" +
-                                                                               "/contributors/most-actives";
+            "/contributors/most-actives";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String PROJECTS_REWARD = "/api/v1/projects/%s/rewards/%s";
     protected static final String PROJECTS_GET_REWARD_ITEMS = "/api/v1/projects/%s/rewards/%s/reward-items";
     protected static final String PROJECTS_GET_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items";
     protected static final String PROJECTS_GET_ALL_COMPLETED_REWARDABLE_ITEMS = "/api/v1/projects/%s/rewardable-items" +
-                                                                                "/all-completed";
+            "/all-completed";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_WORK = "/api/v1/projects/%s/rewardable-items/other" +
-                                                                        "-works";
+            "-works";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_ISSUE = "/api/v1/projects/%s/rewardable-items/other" +
-                                                                         "-issues";
+            "-issues";
     protected static final String PROJECTS_POST_REWARDABLE_OTHER_PR = "/api/v1/projects/%s/rewardable-items/other" +
-                                                                      "-pull-requests";
+            "-pull-requests";
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String PROJECTS_IGNORED_CONTRIBUTIONS_PUT = "/api/v1/projects/%s/ignored-contributions";
     protected static final String PROJECT_CONTRIBUTION_UNASSIGN = "/api/v1/projects/%s/contributions/%s/unassign";
     protected static final String PROJECTS_CATEGORIES_SUGGEST = "/api/v1/projects/categories/suggest";
+    protected static final String APPLICATIONS = "/api/v1/applications";
+    protected static final String APPLICATIONS_BY_ID = "/api/v1/applications/%s";
     protected static final String ME_GET = "/api/v1/me";
     protected static final String ME_LOGOUT = "/api/v1/me/logout";
     protected static final String ME_PATCH = "/api/v1/me";

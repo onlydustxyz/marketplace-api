@@ -316,6 +316,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .createdAt(ZonedDateTime.now().minusSeconds(2))
                 .body(commentBody)
                 .build());
+        indexingEventRepository.flush();
 
         githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
                 .withHeader("Authorization", matching("Bearer .*"))
@@ -395,6 +396,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         indexingEventRepository.saveEvent(OnGithubIssueDeleted.builder()
                 .id(issueId)
                 .build());
+        indexingEventRepository.flush();
 
         // When
         indexingEventsOutboxJob.run();

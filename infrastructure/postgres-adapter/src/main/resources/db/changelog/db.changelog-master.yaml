@@ -375,3 +375,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000271_update_application_constraints.sql
   - include:
       file: db/changelog/changelogs/00000272_remove_application_issue_fk.sql
+  - include:
+      file: db/changelog/changelogs/00000272_create_views_for_applications.sql

@@ -126,4 +126,11 @@ public class ReadMarketplaceApiConfiguration {
                                                                              final HackathonDetailsReadRepository hackathonDetailsReadRepository) {
         return new ReadHackathonsApiPostgresAdapter(authenticatedAppUserService, hackathonShortReadRepository, hackathonDetailsReadRepository);
     }
+
+    @Bean
+    public ReadProjectApplicationsApiPostgresAdapter readProjectApplicationsApiPostgresAdapter(final AuthenticatedAppUserService authenticatedAppUserService,
+                                                                                               final PermissionService permissionService,
+                                                                                               final ApplicationReadRepository applicationReadRepository) {
+        return new ReadProjectApplicationsApiPostgresAdapter(authenticatedAppUserService, permissionService, applicationReadRepository);
+    }
 }

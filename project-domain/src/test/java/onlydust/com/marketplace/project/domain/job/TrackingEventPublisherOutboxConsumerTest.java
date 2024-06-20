@@ -194,7 +194,7 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_detect_good_first_issues(String goodFirstIssueLabel) {
             // Given
             final var event = OnGithubIssueAssigned.builder()
-                    .id(faker.number().randomNumber())
+                    .id(faker.random().nextLong())
                     .repoId(githubRepoId)
                     .assigneeId(githubUserId)
                     .labels(Set.of(faker.lorem().word(), faker.lorem().word(), goodFirstIssueLabel, faker.lorem().word()))

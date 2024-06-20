@@ -6291,6 +6291,12 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectApplicationPageItemResponse'
 
+    ScorePercentage:
+      type: integer
+      minimum: 0
+      maximum: 100
+      description: A score between 0 and 100. The higher, the better.
+
     ProjectApplicationPageItemResponse:
       type: object
       required:
@@ -6309,10 +6315,7 @@ components:
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
         recommandationScore:
-          type: integer
-          minimum: 0
-          maximum: 20
-          description: The recommandation score of the applicant
+          $ref: '#/components/schemas/ScorePercentage'
 
     ProjectApplicationResponse:
       type: object
@@ -6322,6 +6325,10 @@ components:
         - issue
         - applicant
         - recommandationScore
+        - availabilityScore
+        - appliedDistinctProjectCount
+        - pendingApplicationCountOnOtherProjects
+        - pendingApplicationCountOnThisProject
         - motivation
       properties:
         id:
@@ -6332,16 +6339,23 @@ components:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
-        availabilityScore:
-          type: integer
-          minimum: 0
-          maximum: 3
-          description: The availability score of the applicant
         recommandationScore:
+          $ref: '#/components/schemas/ScorePercentage'
+        availabilityScore:
+          $ref: '#/components/schemas/ScorePercentage'
+        languageScore:
+          $ref: '#/components/schemas/ScorePercentage'
+        fidelityScore:
+          $ref: '#/components/schemas/ScorePercentage'
+        appliedDistinctProjectCount:
           type: integer
-          minimum: 0
-          maximum: 20
-          description: The recommandation score of the applicant
+          description: Number of distinct projects the applicant has applied to.
+        pendingApplicationCountOnOtherProjects:
+          type: integer
+          description: Number of pending applications the applicant has on other projects.
+        pendingApplicationCountOnThisProject:
+          type: integer
+          description: Number of pending applications the applicant has on this project.
         motivation:
           type: string
           description: The applicant's motivation to work on the issue
