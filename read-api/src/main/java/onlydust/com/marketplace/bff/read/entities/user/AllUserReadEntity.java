@@ -157,7 +157,7 @@ public class AllUserReadEntity {
                 .email(email)
                 .lastSeenAt(registered == null ? null : registered.lastSeenAt())
                 .signedUpAt(registered == null ? null : toZoneDateTime(registered.createdAt()))
-                .contacts(Optional.ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toDto).toList())
+                .contacts(Optional.ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toBODto).toList())
                 .leadedProjectCount(globalUsersRanks == null ? 0 : globalUsersRanks.leadedProjectCount().intValue())
                 .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
                 .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())

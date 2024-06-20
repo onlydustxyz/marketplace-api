@@ -13,7 +13,11 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
     @Language("PostgreSQL")
     String SELECT = """
             select
-                gur.github_user_id                                                                              as github_user_id,
+                u.github_user_id                                                                                as github_user_id,
+                u.user_id                                                                                       as user_id,
+                u.login                                                                                         as login,
+                u.avatar_url                                                                                    as avatar_url,
+                u.email                                                                                         as email,
                 gur.rank                                                                                        as rank,
                 gur.rank_percentile                                                                             as rank_percentile,
                 case
@@ -29,8 +33,8 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                 gur.contributed_project_count                                                                   as contributed_project_count,
                 gur.leaded_project_count                                                                        as leaded_project_count,
                 gur.reward_count                                                                                as reward_count
-            from
-                global_users_ranks gur
+            from iam.all_users u
+                left join global_users_ranks gur on gur.github_user_id = u.github_user_id
                 left join lateral (select jsonb_agg(distinct jsonb_build_object(
                                         'id', e.id,
                                         'name', e.name,
@@ -53,14 +57,13 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
     @Language("PostgreSQL")
     String WHERE_GITHUB_ID = """
             where
-                gur.github_user_id = :githubUserId
+                u.github_user_id = :githubUserId
             """;
 
     @Language("PostgreSQL")
     String WHERE_GITHUB_LOGIN = """
-                join indexer_exp.github_accounts ga on ga.id = gur.github_user_id
             where
-                ga.login = :githubUserLogin
+                u.login = :githubUserLogin
             """;
 
     @Query(value = SELECT + WHERE_GITHUB_ID, nativeQuery = true)

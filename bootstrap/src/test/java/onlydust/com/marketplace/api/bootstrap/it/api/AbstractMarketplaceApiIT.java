@@ -167,6 +167,8 @@ public class AbstractMarketplaceApiIT {
     protected static final String USER_LANGUAGES = "/api/v1/users/%d/languages";
     protected static final String USER_ECOSYSTEMS = "/api/v1/users/%d/ecosystems";
     protected static final String USER_STATS = "/api/v1/users/%d/stats";
+    protected static final String USER_BY_ID = "/api/v1/users/%d";
+    protected static final String USER_BY_LOGIN = "/api/v1/users/login/%s";
     protected static final String PUT_COMMITTEES_APPLICATIONS = "/api/v1/committees/%s/projects/%s/applications";
     protected static final String COMMITTEES_APPLICATIONS = "/api/v1/committees/%s/projects/applications";
     protected static final String COMMITTEES_BY_ID = "/api/v1/committees/%s";
