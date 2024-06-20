@@ -44,8 +44,8 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
             throw OnlyDustException.badRequest("At least one of projectId and applicantId must be provided");
         }
 
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        if (caller.isEmpty() || (!caller.get().getGithubUserId().equals(applicantId) && !permissionService.isUserProjectLead(projectId, caller.get().getId()))) {
+        final var caller = authenticatedAppUserService.getAuthenticatedUser();
+        if (!caller.getGithubUserId().equals(applicantId) && !permissionService.isUserProjectLead(projectId, caller.getId())) {
             throw forbidden("Only project leads can get project applications");
         }
 
@@ -67,7 +67,12 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
 
     @Override
     public ResponseEntity<ProjectApplicationResponse> getProjectApplication(UUID applicationId) {
+        final var caller = authenticatedAppUserService.getAuthenticatedUser();
         final var application = applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
+        if (!caller.getGithubUserId().equals(application.applicant().githubUserId()) &&
+                !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
+            throw forbidden("Only project leads and applicant can get application details");
+        }
         return ok(application.toDto());
     }
 }

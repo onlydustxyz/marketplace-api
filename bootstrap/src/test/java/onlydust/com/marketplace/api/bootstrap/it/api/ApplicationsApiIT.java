@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -75,7 +74,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_return_forbidden_status_when_caller_is_not_lead() {
         // Given
-        final String jwt = userAuthHelper.authenticateCamille().jwt();
+        final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
         client.get()
@@ -87,7 +86,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .exchange()
                 .expectStatus()
-                .isEqualTo(HttpStatus.FORBIDDEN);
+                .isForbidden();
     }
 
     @Test
@@ -342,15 +341,43 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(10)
-    void should_return_application_by_id() {
+    void should_return_forbidden_when_caller_is_not_applicant_not_leader() {
         // Given
-        final var pierre = userAuthHelper.authenticatePierre();
+        final var camille = userAuthHelper.authenticateHayden();
         final UUID applicationId = UUID.randomUUID();
         applicationRepository.save(new ApplicationEntity(
                 applicationId,
                 ZonedDateTime.now(),
                 projectAppliedTo1,
-                pierre.user().getGithubUserId(),
+                userAuthHelper.authenticatePierre().user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1736504583L,
+                112L,
+                "Highly motivated",
+                "Do the math"
+        ));
+
+        // When (no application for this issue on project 1)
+        client.get()
+                .uri(getApiURI(APPLICATIONS_BY_ID.formatted(applicationId.toString())))
+                .header("Authorization", BEARER_PREFIX + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+    }
+
+    @Test
+    @Order(10)
+    void should_return_application_by_id() {
+        // Given
+        final var olivier = userAuthHelper.authenticateOlivier();
+        final UUID applicationId = UUID.randomUUID();
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                projectAppliedTo1,
+                olivier.user().getGithubUserId(),
                 Application.Origin.GITHUB,
                 1736504583L,
                 112L,
@@ -361,7 +388,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         // When (no application for this issue on project 1)
         client.get()
                 .uri(getApiURI(APPLICATIONS_BY_ID.formatted(applicationId)))
-                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .header("Authorization", BEARER_PREFIX + olivier.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -378,16 +405,16 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112"
                           },
                           "applicant": {
-                            "githubUserId": 16590657,
-                            "login": "PierreOucif",
-                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "githubUserId": 595505,
+                            "login": "ofux",
+                            "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                             "isRegistered": true
                           },
-                          "recommandationScore": 25,
-                          "languageScore": 0,
+                          "recommandationScore": 0,
                           "availabilityScore": 0,
-                          "fidelityScore": 100,
-                          "appliedDistinctProjectCount": 2,
+                          "languageScore": 0,
+                          "fidelityScore": 0,
+                          "appliedDistinctProjectCount": 3,
                           "pendingApplicationCountOnOtherProjects": 2,
                           "pendingApplicationCountOnThisProject": 2,
                           "motivation": "Highly motivated",
