@@ -88,9 +88,9 @@ from applications a
          left join projects_contributors pc on pc.project_id != a.project_id and pc.github_user_id = a.applicant_id
          left join project_similarities ps on ps.project1_id = a.project_id and ps.project2_id = pc.project_id
 
-         join indexer_exp.contributions in_progress_contribs
-              on in_progress_contribs.contributor_id = a.applicant_id and
-                 in_progress_contribs.status = 'IN_PROGRESS'
+         left join indexer_exp.contributions in_progress_contribs
+                   on in_progress_contribs.contributor_id = a.applicant_id and
+                      in_progress_contribs.status = 'IN_PROGRESS'
          left join lateral (select count(distinct a2.project_id)                                        as project_count,
                                    count(distinct a2.id) filter ( where a2.project_id = a.project_id )  as pending_application_count_on_this_project,
                                    count(distinct a2.id) filter ( where a2.project_id != a.project_id ) as pending_application_count_on_other_projects
