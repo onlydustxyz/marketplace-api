@@ -80,8 +80,6 @@ class Auth0JwtServiceTest {
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
                 .roles(List.of(AuthenticatedUser.Role.USER))
-                .hasSeenOnboardingWizard(true)
-                .hasAcceptedLatestTermsAndConditions(true)
                 .build());
 
 
@@ -98,8 +96,6 @@ class Auth0JwtServiceTest {
         assertThat(user.getGithubLogin()).isEqualTo("pixelfact");
         assertThat(user.getGithubUserId()).isEqualTo(143011364L);
         assertThat(user.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
-        assertThat(user.hasSeenOnboardingWizard()).isTrue();
-        assertThat(user.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
 
     @Test
@@ -172,8 +168,6 @@ class Auth0JwtServiceTest {
                 .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
                 .roles(List.of(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN))
-                .hasSeenOnboardingWizard(true)
-                .hasAcceptedLatestTermsAndConditions(true)
                 .build());
 
         final String impersonationHeader = """

@@ -2,9 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
@@ -14,11 +14,8 @@ import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
-import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
-import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -26,34 +23,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 public interface UserMapper {
 
-    static ContributorLinkView mapToContributorLinkView(ContributorQueryEntity user) {
-        return ContributorLinkView.builder()
-                .githubUserId(user.getGithubUserId())
-                .login(user.getLogin())
-                .avatarUrl(user.getAvatarUrl())
-                .isRegistered(user.getIsRegistered())
-                .build();
-    }
-
-    static ProjectLeaderLinkView mapToProjectLeaderLinkView(ProjectLeadQueryEntity user) {
-        return ProjectLeaderLinkView.builder()
-                .id(user.getId())
-                .githubUserId(user.getGithubId())
-                .login(user.getLogin())
-                .avatarUrl(user.getAvatarUrl())
-                .url(user.getHtmlUrl())
-                .build();
-    }
-
-    static User mapUserToDomain(UserViewEntity user, ZonedDateTime termsAndConditionsLatestVersionDate,
-                                List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
-                                List<ApplicationEntity> pendingApplications,
-                                List<BillingProfileLinkView> billingProfiles,
-                                boolean hasAnyRewardPendingBillingProfile) {
+    static User mapUserToDomain(UserViewEntity user, List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
+                                List<BillingProfileLinkView> billingProfiles) {
         return User.builder()
                 .id(user.id())
                 .githubUserId(user.githubUserId())
@@ -61,14 +35,7 @@ public interface UserMapper {
                 .githubEmail(user.githubEmail())
                 .githubAvatarUrl(user.profile() != null && user.profile().avatarUrl() != null ?
                         user.profile().avatarUrl() : user.avatarUrl())
-                .firstName(nonNull(user.profile()) ? user.profile().firstName() : null)
-                .lastName(nonNull(user.profile()) ? user.profile().lastName() : null)
                 .roles(Arrays.stream(user.roles()).toList())
-                .hasAcceptedLatestTermsAndConditions(nonNull(user.onboarding())
-                                                     && nonNull(user.onboarding().getTermsAndConditionsAcceptanceDate())
-                                                     && user.onboarding().getTermsAndConditionsAcceptanceDate().isAfter(termsAndConditionsLatestVersionDate))
-                .hasSeenOnboardingWizard(nonNull(user.onboarding())
-                                         && nonNull(user.onboarding().getProfileWizardDisplayDate()))
                 .projectsLed(projectLedIdViewEntities.stream()
                         .filter(projectLedIdQueryEntity -> !projectLedIdQueryEntity.getPending())
                         .map(projectLedIdQueryEntity -> ProjectLedView.builder()
@@ -79,20 +46,7 @@ public interface UserMapper {
                                 .contributorCount(projectLedIdQueryEntity.getContributorCount())
                                 .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
                                 .build()).toList())
-                .pendingProjectsLed(projectLedIdViewEntities.stream()
-                        .filter(ProjectLedIdQueryEntity::getPending)
-                        .map(projectLedIdQueryEntity -> ProjectLedView.builder()
-                                .name(projectLedIdQueryEntity.getName())
-                                .logoUrl(projectLedIdQueryEntity.getLogoUrl())
-                                .slug(projectLedIdQueryEntity.getProjectSlug())
-                                .id(projectLedIdQueryEntity.getId().getProjectId())
-                                .contributorCount(projectLedIdQueryEntity.getContributorCount())
-                                .hasMissingGithubAppInstallation(projectLedIdQueryEntity.getIsMissingGithubAppInstallation())
-                                .build()).toList())
-                .createdAt(user.createdAt())
                 .billingProfiles(billingProfiles)
-                .isMissingPayoutPreference(hasAnyRewardPendingBillingProfile)
-                .sponsors(user.sponsors().stream().map(SponsorViewEntity::toDomain).toList())
                 .build();
     }
 
@@ -104,7 +58,6 @@ public interface UserMapper {
                 .githubEmail(userEntity.getGithubEmail())
                 .githubAvatarUrl(userEntity.getGithubAvatarUrl())
                 .roles(Arrays.stream(userEntity.getRoles()).toList())
-                .createdAt(userEntity.getCreatedAt())
                 .build();
 
     }

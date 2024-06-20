@@ -42,7 +42,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
-    private final GlobalSettingsRepository globalSettingsRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
@@ -66,19 +65,14 @@ public class PostgresUserAdapter implements UserStoragePort {
         return userViewRepository.findById(userId).map(this::getUserDetails);
     }
 
-    // TODO remove
     private User getUserDetails(@NotNull UserViewEntity user) {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var pendingApplications = applicationRepository.findAllByApplicantIdAndOriginAndIssueAssigneesIsEmpty(user.githubUserId(),
-                Application.Origin.GITHUB);
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
-        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.githubUserId());
-        return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                projectLedIdsByUserId, pendingApplications, billingProfiles, hasAnyRewardPendingBillingProfile);
+        return mapUserToDomain(user, projectLedIdsByUserId, billingProfiles);
     }
 
     @Override

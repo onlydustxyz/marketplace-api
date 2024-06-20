@@ -57,7 +57,7 @@ public class UserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -76,7 +76,7 @@ public class UserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -94,7 +94,7 @@ public class UserServiceTest {
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
         final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).hasAcceptedLatestTermsAndConditions(true).hasSeenOnboardingWizard(true).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).build();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -111,17 +111,16 @@ public class UserServiceTest {
         // Given
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).build();
-        final Date createdAt = new Date();
 
         // When
         when(userStoragePort.getUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.createUser(any())).thenReturn(User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).hasAcceptedLatestTermsAndConditions(false).hasSeenOnboardingWizard(false).createdAt(createdAt).build());
+        when(userStoragePort.createUser(any())).thenReturn(User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).build());
         final User userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
         assertThat(userByGithubIdentity.getId()).isNotNull();
-        assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).hasAcceptedLatestTermsAndConditions(false).createdAt(createdAt).hasSeenOnboardingWizard(false).build(), userByGithubIdentity);
+        assertEquals(User.builder().id(userByGithubIdentity.getId()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).roles(List.of(AuthenticatedUser.Role.USER)).build(), userByGithubIdentity);
     }
 
     @Test

@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.project.domain.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.ToString;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,32 +25,7 @@ public class User {
     @Builder.Default
     List<ProjectLedView> projectsLed = new ArrayList<>();
     @Builder.Default
-    List<ProjectLedView> pendingProjectsLed = new ArrayList<>();
-    @Builder.Default
     List<BillingProfileLinkView> billingProfiles = new ArrayList<>();
-    boolean isMissingPayoutPreference;
-    @Builder.Default
-    List<Sponsor> sponsors = new ArrayList<>();
-
-    @Getter(AccessLevel.NONE)
-    boolean hasAcceptedLatestTermsAndConditions;
-    @Getter(AccessLevel.NONE)
-    boolean hasSeenOnboardingWizard;
-    Date createdAt;
-    String firstName;
-    String lastName;
-
-    public boolean hasAcceptedLatestTermsAndConditions() {
-        return hasAcceptedLatestTermsAndConditions;
-    }
-
-    public boolean hasSeenOnboardingWizard() {
-        return hasSeenOnboardingWizard;
-    }
-
-    public boolean hasRole(AuthenticatedUser.Role role) {
-        return roles.contains(role);
-    }
 
     public List<UUID> getAdministratedBillingProfiles() {
         return this.billingProfiles.stream()

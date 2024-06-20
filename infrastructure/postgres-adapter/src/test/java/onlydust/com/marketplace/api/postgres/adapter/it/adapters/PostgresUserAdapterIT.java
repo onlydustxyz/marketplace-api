@@ -69,8 +69,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
 
     @Test
@@ -103,8 +101,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -130,8 +126,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isFalse();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
