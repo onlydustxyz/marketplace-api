@@ -95,3 +95,8 @@ decorator:
 
 global:
   app-base-url: "https://local-app.onlydust.com"
+
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: OPENAI_API_KEY

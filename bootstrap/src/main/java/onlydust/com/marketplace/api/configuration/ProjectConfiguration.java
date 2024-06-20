@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.service.BlockchainService;
 import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infrastructure.langchain.adapters.LangchainLLMAdapter;
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
@@ -217,11 +218,12 @@ public class ProjectConfiguration {
                                               final UserStoragePort userStoragePort,
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
-                                              final ApplicationObserverPort applicationObservers) {
+                                              final ApplicationObserverPort applicationObservers,
+                                              final LangchainLLMAdapter langchainLLMAdapter) {
         return new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         userStoragePort,
-                        comment -> true,
+                        langchainLLMAdapter,
                         indexerPort,
                         githubStoragePort,
                         applicationObservers));

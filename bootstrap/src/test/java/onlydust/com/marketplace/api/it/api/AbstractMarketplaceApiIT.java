@@ -62,7 +62,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "posthog", property = "infrastructure.posthog.base-uri"),
         @ConfigureWireMock(name = "sumsub", property = "infrastructure.sumsub.base-uri"),
         @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri"),
-        @ConfigureWireMock(name = "node-guardians", property = "infrastructure.node-guardians.base-uri")
+        @ConfigureWireMock(name = "node-guardians", property = "infrastructure.node-guardians.base-uri"),
+        @ConfigureWireMock(name = "langchain", property = "langchain4j.open-ai.chat-model.base-url")
 })
 public class AbstractMarketplaceApiIT {
 
@@ -134,7 +135,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String USERS_GET_CONTRIBUTIONS = "/api/v2/users/%s/contributions";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
-    protected static final String SUGGEST_NEW_TECHNOLOGY = "/api/v1/technologies";
     protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
     protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";
     protected static final String GET_ECOSYSTEM_CONTRIBUTORS = "/api/v1/ecosystems/%s/contributors";
@@ -191,8 +191,6 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("dustyBot")
     protected WireMockServer dustyBotApiWireMockServer;
-    @InjectWireMock("linear")
-    protected WireMockServer linearWireMockServer;
     @InjectWireMock("auth0")
     protected WireMockServer auth0WireMockServer;
     @InjectWireMock("posthog")
@@ -207,7 +205,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer customerIOWireMockServer;
     @InjectWireMock("node-guardians")
     protected WireMockServer nodeGuardiansWireMockServer;
-
+    @InjectWireMock("langchain")
+    protected WireMockServer langchainWireMockServer;
 
     @LocalServerPort
     int port;
