@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
-import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,14 +21,11 @@ import java.util.UUID;
 @IdClass(ProjectLeadEntity.PrimaryKey.class)
 public class ProjectLeadEntity {
     @Id
-    @Column(name = "project_id", nullable = false, updatable = false)
     UUID projectId;
     @Id
-    @Column(name = "user_id", nullable = false, updatable = false)
     UUID userId;
 
     @CreationTimestamp
-    @Column(name = "assigned_at", nullable = false, updatable = false)
     private Date assignedAt;
 
     public ProjectLeadEntity(UUID projectId, UUID userId) {

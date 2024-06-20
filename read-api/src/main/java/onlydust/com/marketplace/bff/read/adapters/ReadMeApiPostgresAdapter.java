@@ -5,19 +5,27 @@ import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.entities.billing_profile.AllBillingProfileUserReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.bff.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.bff.read.entities.project.PublicProjectReadEntity;
+import onlydust.com.marketplace.bff.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.bff.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.bff.read.repositories.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
@@ -33,6 +41,36 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final UserRewardStatsReadRepository userRewardStatsReadRepository;
     private final PublicProjectReadRepository publicProjectReadRepository;
     private final UserReadRepository userReadRepository;
+    private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
+
+    @Override
+    public ResponseEntity<GetMeResponse> getMe() {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var user = userReadRepository.findByUserId(authenticatedUser.getId())
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
+        final var userAuthorizedToApplyOnGithubIssues = githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(user.githubUserId());
+
+        final var response = new GetMeResponse()
+                .id(user.registered().id())
+                .githubUserId(user.githubUserId())
+                .avatarUrl(user.avatarUrl())
+                .login(user.login())
+                .hasSeenOnboardingWizard(user.onboarding() != null && user.onboarding().getProfileWizardDisplayDate() != null)
+                .hasAcceptedLatestTermsAndConditions(user.onboarding() != null && user.onboarding().isHasAcceptedTermsAndConditions())
+                .isAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues)
+                .projectsLed(user.projectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
+                .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
+                .pendingApplications(user.applications().stream().filter(a -> a.origin() == Application.Origin.GITHUB && a.issue().assignees().isEmpty()).map(ApplicationReadEntity::toShortResponse).toList())
+                .isAdmin(Arrays.stream(user.registered().roles()).anyMatch(r -> r == AuthenticatedUser.Role.ADMIN))
+                .createdAt(toZoneDateTime(user.registered().createdAt()))
+                .email(user.email())
+                .firstName(user.profile() == null ? null : user.profile().firstName())
+                .lastName(user.profile() == null ? null : user.profile().lastName())
+                .missingPayoutPreference(user.hasMissingPayoutPreferences())
+                .sponsors(user.sponsors().stream().map(SponsorReadEntity::toDto).toList());
+
+        return ok(response);
+    }
 
     @Override
     public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
@@ -93,6 +131,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
 
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
-                ResponseEntity.ok(myRewardsPageResponse);
+                ok(myRewardsPageResponse);
     }
 }

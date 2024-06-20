@@ -10,9 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ApplicationRepository extends JpaRepository<ApplicationEntity, UUID> {
-    List<ApplicationEntity> findAllByApplicantId(Long applicantId);
-
-    Optional<ApplicationEntity> findByApplicantIdAndProjectIdAndIssueId(Long applicantId, UUID projectId, Long value);
+    Optional<ApplicationEntity> findByApplicantIdAndProjectIdAndIssueId(Long applicantId, UUID projectId, Long issueId);
 
     List<ApplicationEntity> findAllByApplicantIdAndIssueId(Long applicantId, Long issueId);
 

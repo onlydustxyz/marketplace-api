@@ -42,7 +42,6 @@ public class PostgresUserAdapter implements UserStoragePort {
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
-    private final GlobalSettingsRepository globalSettingsRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
@@ -70,13 +69,10 @@ public class PostgresUserAdapter implements UserStoragePort {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var applications = applicationRepository.findAllByApplicantId(user.githubUserId());
         final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
                 .map(BillingProfileUserEntity::toBillingProfileLinkView)
                 .toList();
-        final var hasAnyRewardPendingBillingProfile = rewardViewRepository.existsPendingBillingProfileByRecipientId(user.githubUserId());
-        return mapUserToDomain(user, globalSettingsRepository.get().getTermsAndConditionsLatestVersionDate(),
-                projectLedIdsByUserId, applications, billingProfiles, hasAnyRewardPendingBillingProfile);
+        return mapUserToDomain(user, projectLedIdsByUserId, billingProfiles);
     }
 
     @Override
@@ -149,7 +145,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .id(userId)
+                            .userId(userId)
                             .profileWizardDisplayDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
@@ -165,7 +161,7 @@ public class PostgresUserAdapter implements UserStoragePort {
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .id(userId)
+                            .userId(userId)
                             .termsAndConditionsAcceptanceDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
@@ -177,7 +173,7 @@ public class PostgresUserAdapter implements UserStoragePort {
     public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
         final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
-                        " %s and user %d", projectId, githubUserId)));
+                                                   " %s and user %d", projectId, githubUserId)));
 
         final var user = getUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));

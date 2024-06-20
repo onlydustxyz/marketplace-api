@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.TotalsEarned;
@@ -13,7 +12,6 @@ import java.util.Set;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
 public interface UserMapper {
 
@@ -126,43 +124,19 @@ public interface UserMapper {
         };
     }
 
-    static GetMeResponse userToGetMeResponse(final User authenticatedUser, boolean userAuthorizedToApplyOnGithubIssues) {
-        final GetMeResponse getMeResponse = new GetMeResponse();
-        getMeResponse.setId(authenticatedUser.getId());
-        getMeResponse.setGithubUserId(authenticatedUser.getGithubUserId());
-        getMeResponse.setAvatarUrl(authenticatedUser.getGithubAvatarUrl());
-        getMeResponse.setLogin(authenticatedUser.getGithubLogin());
-        getMeResponse.setHasSeenOnboardingWizard(authenticatedUser.hasSeenOnboardingWizard());
-        getMeResponse.setHasAcceptedLatestTermsAndConditions(authenticatedUser.hasAcceptedLatestTermsAndConditions());
-        getMeResponse.setIsAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues);
-        getMeResponse.setProjectsLed(authenticatedUser.getProjectsLed()
-                .stream().map(projectLedView -> new ProjectLedShortResponse()
-                        .id(projectLedView.getId())
-                        .slug(projectLedView.getSlug())
-                        .name(projectLedView.getName())
-                        .logoUrl(projectLedView.getLogoUrl())
-                        .contributorCount(projectLedView.getContributorCount())
-                        .hasMissingGithubAppInstallation(projectLedView.getHasMissingGithubAppInstallation())
-                )
-                .toList());
-        getMeResponse.setPendingProjectsLed(authenticatedUser.getPendingProjectsLed()
-                .stream().map(projectLedView -> new ProjectLedShortResponse()
-                        .id(projectLedView.getId())
-                        .slug(projectLedView.getSlug())
-                        .name(projectLedView.getName())
-                        .logoUrl(projectLedView.getLogoUrl())
-                        .contributorCount(projectLedView.getContributorCount())
-                        .hasMissingGithubAppInstallation(projectLedView.getHasMissingGithubAppInstallation())
-                )
-                .toList());
-        getMeResponse.setProjectsAppliedTo(authenticatedUser.getProjectsAppliedTo());
-        getMeResponse.setIsAdmin(authenticatedUser.hasRole(AuthenticatedUser.Role.ADMIN));
-        getMeResponse.setCreatedAt(toZoneDateTime(authenticatedUser.getCreatedAt()));
-        getMeResponse.setEmail(authenticatedUser.getGithubEmail());
-        getMeResponse.setFirstName(authenticatedUser.getFirstName());
-        getMeResponse.setLastName(authenticatedUser.getLastName());
-        getMeResponse.setMissingPayoutPreference(authenticatedUser.isMissingPayoutPreference());
-        getMeResponse.setSponsors(authenticatedUser.getSponsors().stream().map(SponsorMapper::map).toList());
-        return getMeResponse;
+    static ProjectApplicationShortResponse map(final User authenticatedUser, final Application application) {
+        return new ProjectApplicationShortResponse()
+                .id(application.id().value())
+                .applicant(map(authenticatedUser))
+                .motivations(application.motivations())
+                .problemSolvingApproach(application.problemSolvingApproach());
+    }
+
+    static ContributorResponse map(User authenticatedUser) {
+        return new ContributorResponse()
+                .githubUserId(authenticatedUser.getGithubUserId())
+                .login(authenticatedUser.getGithubLogin())
+                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
+                .isRegistered(true);
     }
 }

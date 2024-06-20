@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -37,10 +38,30 @@ public class ApplicationEntity {
     Application.Origin origin;
     @NonNull
     Long issueId;
+
+    @ManyToOne
+    @JoinColumn(name = "issueId", insertable = false, updatable = false)
+    GithubIssueViewEntity issue;
+
     @NonNull
     Long commentId;
+    @NonNull
     String motivations;
     String problemSolvingApproach;
+
+    public ApplicationEntity(@NonNull UUID id, @NonNull ZonedDateTime receivedAt, @NonNull UUID projectId, @NonNull Long applicantId,
+                             @NonNull Application.Origin origin, @NonNull Long issueId, @NonNull Long commentId,
+                             @NonNull String motivations, String problemSolvingApproach) {
+        this.id = id;
+        this.receivedAt = receivedAt;
+        this.projectId = projectId;
+        this.applicantId = applicantId;
+        this.origin = origin;
+        this.issueId = issueId;
+        this.commentId = commentId;
+        this.motivations = motivations;
+        this.problemSolvingApproach = problemSolvingApproach;
+    }
 
     public static ApplicationEntity fromDomain(Application application) {
         return ApplicationEntity.builder()

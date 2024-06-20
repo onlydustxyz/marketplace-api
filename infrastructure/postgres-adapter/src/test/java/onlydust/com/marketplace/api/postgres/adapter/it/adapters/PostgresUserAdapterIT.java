@@ -54,7 +54,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         userRepository.save(user);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
                 .profileWizardDisplayDate(new Date())
                 .build();
@@ -69,8 +69,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isTrue();
     }
 
     @Test
@@ -88,7 +86,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         userRepository.save(user);
 
         final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(user.getId())
+                .userId(user.getId())
                 .termsAndConditionsAcceptanceDate(faker.date().birthday())
                 .profileWizardDisplayDate(new Date())
                 .build();
@@ -103,8 +101,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isTrue();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -130,8 +126,6 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
         assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
         assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
-        assertThat(result.hasSeenOnboardingWizard()).isFalse();
-        assertThat(result.hasAcceptedLatestTermsAndConditions()).isFalse();
     }
 
     @Test
@@ -140,7 +134,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final var userId = UUID.randomUUID();
         final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(userId)
+                .userId(userId)
                 .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
                 .profileWizardDisplayDate(faker.date().birthday(0, 3))
                 .build();
@@ -163,7 +157,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Given
         final var userId = UUID.randomUUID();
         final OnboardingEntity onboarding = OnboardingEntity.builder()
-                .id(userId)
+                .userId(userId)
                 .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
                 .profileWizardDisplayDate(faker.date().birthday(0, 3))
                 .build();

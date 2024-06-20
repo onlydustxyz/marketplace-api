@@ -39,7 +39,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadMe
       summary: Get caller info
       operationId: getMe
       description: |
@@ -6089,6 +6089,7 @@ components:
             - hasAcceptedLatestTermsAndConditions
             - isAdmin
             - createdAt
+            - hasPendingApplications
           properties:
             hasSeenOnboardingWizard:
               type: boolean
@@ -6102,15 +6103,15 @@ components:
             projectsLed:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLedShortResponse'
+                $ref: '#/components/schemas/ProjectLinkResponse'
             pendingProjectsLed:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLedShortResponse'
-            projectsAppliedTo:
+                $ref: '#/components/schemas/ProjectLinkResponse'
+            pendingApplications:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectId'
+                $ref: '#/components/schemas/ProjectApplicationShortResponse'
             isAdmin:
               type: boolean
               description: True if the user is an OnlyDust admin
@@ -6222,29 +6223,6 @@ components:
         individualLimitReached:
           type: boolean
           description: True if the (individual) billing profile has reached the yearly limit.
-    ProjectLedShortResponse:
-      type: object
-      required:
-        - id
-        - slug
-        - name
-        - contributorCount
-        - hasMissingGithubAppInstallation
-      properties:
-        id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        logoUrl:
-          type: string
-        contributorCount:
-          type: integer
-          format: int64
-        hasMissingGithubAppInstallation:
-          type: boolean
 
     PatchMeContract:
       type: object
@@ -6376,12 +6354,15 @@ components:
       required:
         - id
         - applicant
+        - project
         - motivations
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
         motivations:
           type: string
           description: The applicant's motivation to work on the issue

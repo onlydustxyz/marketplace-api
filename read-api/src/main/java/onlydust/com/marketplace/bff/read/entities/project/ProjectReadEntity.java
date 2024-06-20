@@ -111,8 +111,8 @@ public class ProjectReadEntity {
     @JoinTable(
             schema = "public",
             name = "project_leads",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId")
+            joinColumns = @JoinColumn(name = "projectId"),
+            inverseJoinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId")
     )
     Set<AllUserReadEntity> leads;
 
@@ -136,11 +136,12 @@ public class ProjectReadEntity {
                         .htmlUrl(nonNull(entity.htmlUrl()) ? URI.create(entity.htmlUrl()) : null)
                         .name(entity.name())
                         .installationId(entity.installation() != null ? entity.installation().getId() : null)
-                        .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED : switch (entity.installation().getStatus()) {
-                            case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
-                            case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
-                            case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
-                        })
+                        .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED :
+                                switch (entity.installation().getStatus()) {
+                                    case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
+                                    case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
+                                    case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
+                                })
                         .repos(entity.repos().stream()
                                 .filter(GithubRepoViewEntity::isPublic)
                                 .filter(repo -> includeAllAvailableRepos || repoIdsIncludedInProject.contains(repo.getId()))
@@ -156,8 +157,8 @@ public class ProjectReadEntity {
                                         .hasIssues(repo.getHasIssues())
                                         .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
                                         .isAuthorizedInGithubApp(entity.installation() != null &&
-                                                entity.installation().getAuthorizedRepos().stream()
-                                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
+                                                                 entity.installation().getAuthorizedRepos().stream()
+                                                                         .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
                                 .sorted(comparing(GithubRepoResponse::getId))
                                 .toList())
                 )

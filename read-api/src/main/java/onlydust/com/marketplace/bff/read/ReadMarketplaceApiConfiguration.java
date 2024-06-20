@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationR
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.bff.read.adapters.*;
 import onlydust.com.marketplace.bff.read.repositories.*;
+import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -108,9 +109,10 @@ public class ReadMarketplaceApiConfiguration {
                                                              final RewardDetailsReadRepository rewardDetailsReadRepository,
                                                              final UserRewardStatsReadRepository userRewardStatsReadRepository,
                                                              final PublicProjectReadRepository publicProjectReadRepository,
-                                                             final UserReadRepository userReadRepository) {
+                                                             final UserReadRepository userReadRepository,
+                                                             final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort) {
         return new ReadMeApiPostgresAdapter(authenticatedAppUserService, allBillingProfileUserReadRepository, rewardDetailsReadRepository,
-                userRewardStatsReadRepository, publicProjectReadRepository, userReadRepository);
+                userRewardStatsReadRepository, publicProjectReadRepository, userReadRepository, githubUserPermissionsFacadePort);
     }
 
     @Bean

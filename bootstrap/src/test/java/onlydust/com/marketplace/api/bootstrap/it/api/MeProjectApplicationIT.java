@@ -461,7 +461,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         ZonedDateTime.now(),
                         projectAppliedTo2,
                         pierre.user().getGithubUserId(),
-                        Application.Origin.MARKETPLACE,
+                        Application.Origin.GITHUB,
                         1736504583L,
                         113L,
                         "My motivations",
@@ -478,8 +478,28 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.projectsAppliedTo.length()").isEqualTo(2)
-                .jsonPath("$.projectsAppliedTo[0]").isEqualTo(projectAppliedTo1.toString())
-                .jsonPath("$.projectsAppliedTo[1]").isEqualTo(projectAppliedTo2.toString());
+                .consumeWith(System.out::println)
+                .json("""
+                        {
+                          "pendingApplications": [
+                            {
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "project": {
+                                "id": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
+                                "slug": "yolo-croute",
+                                "name": "Yolo croute",
+                                "logoUrl": "https://i.natgeofe.com/n/8271db90-5c35-46bc-9429-588a9529e44a/raccoon_thumb_3x4.JPG"
+                              },
+                              "motivations": "My motivations",
+                              "problemSolvingApproach": null
+                            }
+                          ]
+                        }
+                        """);
     }
 }

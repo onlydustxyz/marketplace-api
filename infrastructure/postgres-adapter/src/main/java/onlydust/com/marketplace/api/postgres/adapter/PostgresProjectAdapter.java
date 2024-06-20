@@ -194,13 +194,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             }
         }
 
-        final var projectLeaders = project.getProjectLeaders();
-        if (!isNull(projectLeadersToKeep)) {
-            projectLeaders.clear();
-            projectLeaders.addAll(projectLeadersToKeep.stream()
-                    .map(userId -> new ProjectLeadEntity(projectId, userId))
-                    .collect(Collectors.toUnmodifiableSet()));
-        }
+        if (!isNull(projectLeadersToKeep))
+            project.getProjectLeaders().removeIf(lead -> !projectLeadersToKeep.contains(lead.getUserId()));
 
         if (!isNull(githubRepoIds)) {
             if (nonNull(project.getRepos())) {

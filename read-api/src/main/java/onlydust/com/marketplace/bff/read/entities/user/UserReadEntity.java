@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.bff.read.entities.user;
 
 
+import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
+import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,7 +12,10 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.Type;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -27,10 +32,23 @@ import java.util.UUID;
 public class UserReadEntity implements Serializable {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
+    @NonNull
+    UUID id;
 
-    @NonNull ZonedDateTime lastSeenAt;
-    
+    @NonNull
+    ZonedDateTime lastSeenAt;
+
     @Column(name = "created_at")
-    @NonNull Date createdAt;
+    @NonNull
+    Date createdAt;
+
+    @Type(
+            value = EnumArrayType.class,
+            parameters = @Parameter(
+                    name = AbstractArrayType.SQL_ARRAY_TYPE,
+                    value = "iam.user_role"
+            )
+    )
+    @Column(nullable = false, columnDefinition = "iam.user_role[]")
+    AuthenticatedUser.Role[] roles;
 }
