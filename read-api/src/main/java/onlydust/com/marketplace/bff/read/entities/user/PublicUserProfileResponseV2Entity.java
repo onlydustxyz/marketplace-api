@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserProfileInfoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
-import onlydust.com.marketplace.bff.read.mapper.ContactMapper;
+import onlydust.com.marketplace.bff.read.entities.github.GithubAccountReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -43,16 +40,16 @@ public class PublicUserProfileResponseV2Entity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
-    UserViewEntity registered;
+    UserReadEntity registered;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     @NonNull
-    GithubAccountViewEntity github;
+    GithubAccountReadEntity github;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
-    UserProfileInfoViewEntity profile;
+    UserProfileInfoReadEntity profile;
 
     @NonNull Integer rank;
     @NonNull BigDecimal rankPercentile;
@@ -74,13 +71,15 @@ public class PublicUserProfileResponseV2Entity {
                 .avatarUrl(avatarUrl)
                 .id(userId)
                 .htmlUrl(isNull(github) ? null : URI.create(github.htmlUrl()))
-                .location(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::location).orElse(isNull(github) ? null : github.location()))
-                .bio(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::bio).orElse(isNull(github) ? null : github.bio()))
-                .website(Optional.ofNullable(profile).map(UserProfileInfoViewEntity::website).orElse(isNull(github) ? null : github.website()))
+                .location(Optional.ofNullable(profile).map(UserProfileInfoReadEntity::location).orElse(isNull(github) ? null : github.location()))
+                .bio(Optional.ofNullable(profile).map(UserProfileInfoReadEntity::bio).orElse(isNull(github) ? null : github.bio()))
+                .website(Optional.ofNullable(profile).map(UserProfileInfoReadEntity::website).orElse(isNull(github) ? null : github.website()))
                 .signedUpOnGithubAt(isNull(github) ? null : github.createdAt())
-                .signedUpAt(Optional.ofNullable(registered).map(UserViewEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
-                .lastSeenAt(Optional.ofNullable(registered).map(UserViewEntity::lastSeenAt).orElse(null))
-                .contacts(Optional.ofNullable(profile).flatMap(UserProfileInfoViewEntity::publicContacts).map(l -> l.stream().map(ContactMapper::map).toList()).orElse(isNull(github) ? List.of() : contactsOf(github)))
+                .signedUpAt(Optional.ofNullable(registered).map(UserReadEntity::createdAt).map(d -> d.toInstant().atZone(ZoneOffset.UTC)).orElse(null))
+                .lastSeenAt(Optional.ofNullable(registered).map(UserReadEntity::lastSeenAt).orElse(null))
+                .contacts(Optional.ofNullable(profile).flatMap(UserProfileInfoReadEntity::publicContacts)
+                        .map(l -> l.stream().map(ContactInformationReadEntity::toDto).toList())
+                        .orElse(isNull(github) ? List.of() : contactsOf(github)))
                 .statsSummary(new UserProfileStatsSummary()
                         .rank(Optional.ofNullable(rank).orElse(0))
                         .rankPercentile(prettyRankPercentile(Optional.ofNullable(rankPercentile).orElse(BigDecimal.ONE)))
@@ -109,7 +108,7 @@ public class PublicUserProfileResponseV2Entity {
                 .orElse(BigDecimal.valueOf(100));
     }
 
-    private static List<ContactInformation> contactsOf(GithubAccountViewEntity account) {
+    private static List<ContactInformation> contactsOf(GithubAccountReadEntity account) {
         return Stream.of(
                         account.twitter() == null ? null :
                                 new ContactInformation().channel(ContactInformationChannel.TWITTER).contact(account.twitter()).visibility(ContactInformation.VisibilityEnum.PUBLIC),

@@ -23,27 +23,39 @@ public class ContactInformationReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @Column(name = "user_id")
-    @NonNull UUID userId;
+    @NonNull
+    UUID userId;
 
     @Id
     @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
-    @NonNull ContactChanelEnumEntity channel;
+    @NonNull
+    ContactChanelEnumEntity channel;
 
     @NonNull String contact;
 
     @Column(name = "public")
-    @NonNull Boolean isPublic;
+    @NonNull
+    Boolean isPublic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "userId", insertable = false, updatable = false)
     AllUserReadEntity user;
 
-    public ContactInformation toDto() {
+    public ContactInformation toBODto() {
         return new ContactInformation()
                 .channel(ContactInformationChannel.valueOf(channel.name().toUpperCase()))
                 .contact(contact)
                 .visibility(isPublic ? ContactInformation.VisibilityEnum.PUBLIC : ContactInformation.VisibilityEnum.PRIVATE);
+    }
+
+    public onlydust.com.marketplace.api.contract.model.ContactInformation toDto() {
+        return new onlydust.com.marketplace.api.contract.model.ContactInformation()
+                .channel(onlydust.com.marketplace.api.contract.model.ContactInformationChannel.valueOf(channel.name().toUpperCase()))
+                .contact(contact)
+                .visibility(isPublic ?
+                        onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC :
+                        onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PRIVATE);
     }
 
     @EqualsAndHashCode
