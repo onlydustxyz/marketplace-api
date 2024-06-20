@@ -58,6 +58,7 @@ public class ApplicationReadEntity {
     Application.Origin origin;
 
     @OneToOne
+    @JoinColumn(name = "id", referencedColumnName = "applicationId")
     ApplicationRankingReadEntity ranking;
 
     public ProjectApplicationShortResponse toShortResponse() {

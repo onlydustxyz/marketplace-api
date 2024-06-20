@@ -66,7 +66,7 @@ REFRESH MATERIALIZED VIEW repo_languages;
 
 
 
-CREATE MATERIALIZED VIEW application_rankings AS
+CREATE VIEW application_rankings AS
 select a.id                                                                      as application_id,
 
        coalesce(min(ps.rank_percentile), 1)                                      as best_projects_similarity_percentile,
@@ -103,6 +103,3 @@ group by a.id,
          applied_on.project_count,
          applied_on.pending_application_count_on_this_project,
          applied_on.pending_application_count_on_other_projects;
-
-CREATE UNIQUE INDEX application_rankings_pk ON application_rankings (id);
-REFRESH MATERIALIZED VIEW application_rankings;
