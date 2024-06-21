@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.contract.model.GithubIssue;
 import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageItemResponse;
+import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
@@ -130,6 +131,7 @@ public class GithubIssueReadEntity {
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
                 .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
+                .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList())
                 ;
     }
 

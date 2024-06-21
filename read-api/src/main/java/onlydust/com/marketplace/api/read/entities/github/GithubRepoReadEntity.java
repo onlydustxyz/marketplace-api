@@ -1,14 +1,18 @@
 package onlydust.com.marketplace.api.read.entities.github;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
+import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.SQLOrder;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
@@ -16,10 +20,12 @@ import java.util.List;
 import java.util.Set;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Value
+@NoArgsConstructor(force = true)
 @Entity
 @Table(schema = "indexer_exp", name = "github_repos")
 @Immutable
+@Accessors(fluent = true)
 public class GithubRepoReadEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -34,8 +40,15 @@ public class GithubRepoReadEntity {
     Long forksCount;
     Boolean hasIssues;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "repoId")
-    List<GithubRepoLanguageViewEntity> languages;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "repo_languages",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "repoId"),
+            inverseJoinColumns = @JoinColumn(name = "languageId"))
+    @NonNull
+    @SQLOrder("rank desc")
+    List<LanguageReadEntity> languages;
 
     @ManyToOne(fetch = FetchType.LAZY)
     GithubRepoReadEntity parent;
