@@ -181,3 +181,8 @@ infrastructure:
 global:
   app-base-url: ${APP_BASE_URL}
   active-user-profiles-refresh-period-in-days: 30
+
+langchain4j:
+  open-ai:
+    chat-model:
+      api-key: ${OPENAI_API_KEY}

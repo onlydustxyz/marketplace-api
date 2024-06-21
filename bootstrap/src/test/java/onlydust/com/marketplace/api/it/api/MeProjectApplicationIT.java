@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
@@ -8,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.Applicatio
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
@@ -317,6 +317,35 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .body(commentBody)
                 .build());
         indexingEventRepository.flush();
+
+        langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
+                .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
+                .withRequestBody(matchingJsonPath("model", equalTo("gpt-3.5-turbo")))
+                .withRequestBody(matchingJsonPath("messages[0].role", equalTo("user")))
+                .withRequestBody(matchingJsonPath("messages[0].content", containing(commentBody)))
+                .withRequestBody(matchingJsonPath("temperature", equalTo("0.7")))
+                .willReturn(okJson("""
+                        {
+                          "id": "chatcmpl-9cUTl59knClLSGpf1HmnnP3hyUeYp",
+                          "created": 1718960653,
+                          "model": "gpt-3.5-turbo-0125",
+                          "choices": [
+                            {
+                              "index": 0,
+                              "message": {
+                                "role": "assistant",
+                                "content": "true"
+                              },
+                              "finish_reason": "stop"
+                            }
+                          ],
+                          "usage": {
+                            "prompt_tokens": 56,
+                            "completion_tokens": 1,
+                            "total_tokens": 57
+                          }
+                        }
+                        """)));
 
         githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
                 .withHeader("Authorization", matching("Bearer .*"))

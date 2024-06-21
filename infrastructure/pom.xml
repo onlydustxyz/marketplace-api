@@ -29,6 +29,7 @@
         <module>slack-adapter</module>
         <module>customer-io-adapter</module>
         <module>node-guardians-api-client-adapter</module>
+        <module>langchain</module>
     </modules>
 
     <properties>
