@@ -23,7 +23,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectMailEve
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.jobs.RetriedOutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
@@ -220,13 +219,13 @@ public class ProjectConfiguration {
                                               final GithubStoragePort githubStoragePort,
                                               final ApplicationObserverPort applicationObservers,
                                               final LangchainLLMAdapter langchainLLMAdapter) {
-        return new RetriedOutboxConsumer(
+        return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         userStoragePort,
                         langchainLLMAdapter,
                         indexerPort,
                         githubStoragePort,
-                        applicationObservers));
+                        applicationObservers)));
     }
 
     @Bean
