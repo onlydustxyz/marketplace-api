@@ -287,8 +287,9 @@ public class ProjectConfiguration {
 
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
-                                                        final GithubIssueCommenter githubIssueCommenter) {
-        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter);
+                                                        final GithubIssueCommenter githubIssueCommenter,
+                                                        final OutboxService outboxService) {
+        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxService);
     }
 
     @Bean

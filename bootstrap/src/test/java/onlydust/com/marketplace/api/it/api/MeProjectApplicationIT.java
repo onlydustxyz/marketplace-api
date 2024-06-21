@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateReque
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
@@ -37,6 +38,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     OutboxConsumerJob indexingEventsOutboxJob;
     @Autowired
     SlackApiAdapter slackApiAdapter;
+    @Autowired
+    PosthogProperties posthogProperties;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +50,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_apply_to_project() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
-        final var issueId = 1974127467L;
+        final Long issueId = 1974127467L;
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
@@ -93,6 +96,26 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.commentId()).isEqualTo(123456789L);
         assertThat(application.motivations()).isEqualTo(motivations);
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+
+        trackingOutboxJob.run();
+
+        posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
+                .withRequestBody(matchingJsonPath("$.event", equalTo("application_created")))
+                .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(user.user().getGithubUserId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))
+                .withRequestBody(matchingJsonPath("$.properties['application_id']", equalTo(applicationId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['project_id']", equalTo(projectId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(user.user().getGithubUserId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("MARKETPLACE")))
+                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("0")))
+                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("75")))
+        );
     }
 
     @Test
@@ -303,7 +326,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_detect_github_application() {
         // Given
         final var commentId = faker.number().randomNumber(10, true);
-        final var issueId = 1930092330L;
+        final Long issueId = 1930092330L;
         final var repoId = 466482535L;
         final var antho = userAuthHelper.authenticateAnthony();
         final var commentBody = faker.lorem().sentence();
@@ -401,6 +424,26 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
         githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/466482535/issues/7/comments")));
         verify(slackApiAdapter).onApplicationCreated(any(Application.class));
+
+        trackingOutboxJob.run();
+
+        posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
+                .withRequestBody(matchingJsonPath("$.event", equalTo("application_created")))
+                .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(antho.user().getGithubUserId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))
+                .withRequestBody(matchingJsonPath("$.properties['application_id']", equalTo(application.id().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['project_id']", equalTo(application.projectId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
+                .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(antho.user().getGithubUserId().toString())))
+                .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("GITHUB")))
+                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("0")))
+                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("75")))
+        );
     }
 
     @Test

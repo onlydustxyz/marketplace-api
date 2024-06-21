@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.posthog.dto.EventDTO;
 import onlydust.com.marketplace.api.posthog.processors.*;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreatedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
@@ -40,6 +41,9 @@ public class PosthogApiClientAdapter implements TrackingEventPublisher {
 
         else if (event instanceof OnPullRequestMergedTrackingEvent onPullRequestMerged)
             publish(new PullRequestMergedEventReader(), onPullRequestMerged);
+
+        else if (event instanceof OnApplicationCreatedTrackingEvent onApplicationCreated)
+            publish(new ApplicationCreatedEventReader(), onApplicationCreated);
 
         else
             LOGGER.debug("Event type {} not handle by Posthog event tracking consumer", event.getClass());

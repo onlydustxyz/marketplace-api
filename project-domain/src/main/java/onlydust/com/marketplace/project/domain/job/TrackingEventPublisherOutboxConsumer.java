@@ -9,14 +9,14 @@ import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ScoredApplication;
-import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
-import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
-import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.*;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
 import java.util.Comparator;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
@@ -49,6 +49,10 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
             if (projectStoragePort.isLinkedToAProject(onPullRequestMerged.repoId()))
                 userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
+        } else if (event instanceof OnApplicationCreated onApplicationCreated) {
+            final var scoredApplication = userStoragePort.findScoredApplication(onApplicationCreated.applicationId())
+                    .orElseThrow(() -> internalServerError("Scored application %s not found".formatted(onApplicationCreated.applicationId())));
+            trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication));
         } else {
             trackingEventPublisher.publish(event);
         }

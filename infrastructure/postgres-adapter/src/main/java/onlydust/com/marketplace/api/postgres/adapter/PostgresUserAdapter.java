@@ -337,4 +337,10 @@ public class PostgresUserAdapter implements UserStoragePort {
         return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
                 .map(ApplicationEntity::toScoredDomain).toList();
     }
+
+    @Override
+    public Optional<ScoredApplication> findScoredApplication(Application.Id id) {
+        return applicationRepository.findById(id.value())
+                .map(ApplicationEntity::toScoredDomain);
+    }
 }
