@@ -160,8 +160,8 @@ infrastructure:
   slack:
     environment: ${ENV}
     token: ${SLACK_TOKEN}
-    kyc-kyb-channel: '#kyc-kyb'
-    dev-rel-channel: '#dev-rel'
+    kyc-kyb-channel: ${SLACK_KYC_KYB_CHANNEL}
+    dev-rel-channel: ${SLACK_DEV_REL_CHANNEL}
     tag-all-channel: ${SLACK_PING_ALL_CHANNEL_FOR_CLOSED_BILLING_PROFILE}
   customer-io:
     base-uri: https://api-eu.customer.io/v1
