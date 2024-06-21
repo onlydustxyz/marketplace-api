@@ -23,8 +23,6 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
-    private static boolean setup = false;
-
     @Autowired
     private ApplicationRepository applicationRepository;
 
@@ -34,9 +32,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(0)
     void setupOnce() {
-        if (setup) return;
-        setup = true;
-
         final var pierre = userAuthHelper.authenticatePierre();
         final var antho = userAuthHelper.authenticateAnthony();
         final var olivier = userAuthHelper.authenticateOlivier();
@@ -53,10 +48,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         ));
     }
 
-    private static ApplicationEntity fakeApplication(UUID projectId,
-                                                     UserAuthHelper.AuthenticatedUser user,
-                                                     long issueId,
-                                                     long commentId) {
+    public static ApplicationEntity fakeApplication(UUID projectId,
+                                                    UserAuthHelper.AuthenticatedUser user,
+                                                    long issueId,
+                                                    long commentId) {
         return new ApplicationEntity(
                 UUID.randomUUID(),
                 ZonedDateTime.now(),

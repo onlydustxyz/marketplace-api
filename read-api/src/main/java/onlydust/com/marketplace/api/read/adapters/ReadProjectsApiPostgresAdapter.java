@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ContributionView
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributorRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectPageItemFiltersQueryEntity;
@@ -67,7 +66,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
     private final ProjectLeadViewRepository projectLeadViewRepository;
-    private final ApplicationRepository applicationRepository;
     private final ContributionViewEntityRepository contributionViewEntityRepository;
     private final ProjectsPageRepository projectsPageRepository;
     private final ProjectsPageFiltersRepository projectsPageFiltersRepository;
@@ -394,5 +392,32 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<ProjectIssuesPageResponse> getProjectIssues(UUID projectId,
+                                                                      ProjectIssuesSort sort,
+                                                                      SortDirection direction,
+                                                                      Integer pageIndex,
+                                                                      Integer pageSize,
+                                                                      Boolean isAssigned,
+                                                                      Boolean isApplied) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId())) {
+            throw forbidden("Only project leads can read issues on their projects");
+        }
+
+        final var page = githubIssueReadRepository.findAllOf(projectId, isAssigned, isApplied,
+                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, switch (sort) {
+                    case CREATED_AT -> "createdAt";
+                    case CLOSED_AT -> "closedAt";
+                })));
+
+        return ok(new ProjectIssuesPageResponse()
+                .issues(page.stream().map(i -> i.toProjectIssueDto(projectId)).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 }
