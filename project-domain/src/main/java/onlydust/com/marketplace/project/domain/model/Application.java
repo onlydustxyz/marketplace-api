@@ -1,23 +1,34 @@
 package onlydust.com.marketplace.project.domain.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-public record Application(@NonNull Id id,
-                          @NonNull UUID projectId,
-                          @NonNull Long applicantId,
-                          @NonNull Origin origin,
-                          @NonNull ZonedDateTime appliedAt,
-                          @NonNull GithubIssue.Id issueId,
-                          @NonNull GithubComment.Id commentId,
-                          @NonNull String motivations,
-                          String problemSolvingApproach) {
+@Getter
+@Accessors(fluent = true)
+@AllArgsConstructor
+public class Application {
+    @NonNull
+    private final Id id;
+    @NonNull
+    private final UUID projectId;
+    @NonNull
+    private final Long applicantId;
+    @NonNull
+    private final Origin origin;
+    @NonNull
+    private final ZonedDateTime appliedAt;
+    @NonNull
+    private final GithubIssue.Id issueId;
+    @NonNull
+    private final GithubComment.Id commentId;
+    @NonNull
+    private final String motivations;
+    private final String problemSolvingApproach;
 
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
@@ -72,6 +83,10 @@ public record Application(@NonNull Id id,
                 commentId,
                 motivations,
                 problemSolvingApproach);
+    }
+
+    public ScoredApplication scored(int score) {
+        return ScoredApplication.of(this, score);
     }
 
     public enum Origin {GITHUB, MARKETPLACE}

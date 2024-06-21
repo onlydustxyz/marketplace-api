@@ -25,8 +25,9 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
+    Integer applicationScore;
 
-    public static OnGithubIssueAssignedTrackingEvent of(OnGithubIssueAssigned onGithubIssueAssigned, User user) {
+    public static OnGithubIssueAssignedTrackingEvent of(OnGithubIssueAssigned onGithubIssueAssigned, User user, Integer applicationScore) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
@@ -34,6 +35,7 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
+                .applicationScore(applicationScore)
                 .build();
     }
 

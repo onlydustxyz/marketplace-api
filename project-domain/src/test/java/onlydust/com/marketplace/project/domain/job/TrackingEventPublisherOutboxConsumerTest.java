@@ -7,6 +7,9 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestCreated;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubComment;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
@@ -22,10 +25,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -134,6 +135,7 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_publish_github_issue_assigned_events() {
             // Given
             final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
+            when(userStoragePort.findScoredApplications(user.getGithubUserId(), GithubIssue.Id.of(event.id()))).thenReturn(List.of());
 
             // When
             trackingEventPublisherOutboxConsumer.process(event);
@@ -148,8 +150,48 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
+            assertThat(capturedTrackingEvent.applicationScore()).isNull();
         }
 
+        @Test
+        void should_include_application_Score_in_github_issue_assigned_events() {
+            // Given
+            final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
+            final var issueId = GithubIssue.Id.of(event.id());
+
+            when(userStoragePort.findScoredApplications(user.getGithubUserId(), issueId))
+                    .thenReturn(List.of(
+                            new Application(Application.Id.random(),
+                                    UUID.randomUUID(),
+                                    user.getGithubUserId(),
+                                    Application.Origin.MARKETPLACE,
+                                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                                    issueId,
+                                    GithubComment.Id.random(),
+                                    faker.lorem().sentence(),
+                                    faker.lorem().sentence())
+                                    .scored(60),
+                            new Application(Application.Id.random(),
+                                    UUID.randomUUID(),
+                                    user.getGithubUserId(),
+                                    Application.Origin.GITHUB,
+                                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                                    issueId,
+                                    GithubComment.Id.random(),
+                                    faker.lorem().sentence(),
+                                    null)
+                                    .scored(10)
+                    ));
+
+            // When
+            trackingEventPublisherOutboxConsumer.process(event);
+
+            // Then
+            final var trackingEventCaptor = ArgumentCaptor.forClass(OnGithubIssueAssignedTrackingEvent.class);
+            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
+            final var capturedTrackingEvent = trackingEventCaptor.getValue();
+            assertThat(capturedTrackingEvent.applicationScore()).isEqualTo(60);
+        }
 
         @Test
         void should_publish_pull_request_created_events() {
@@ -168,7 +210,6 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.authorUserId()).isEqualTo(user.getId());
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
         }
-
 
         @Test
         void should_publish_pull_request_merged_events() {
