@@ -97,6 +97,12 @@ public class ApplicationEntity {
     }
 
     public ScoredApplication toScoredDomain() {
-        return toDomain().scored(ranking.recommandationScore());
+        return toDomain().scored(
+                ranking.availabilityScore(),
+                ranking.bestProjectsSimilarityScore(),
+                ranking.mainRepoLanguageUserScore(),
+                ranking.projectFidelityScore(),
+                ranking.recommendationScore()
+        );
     }
 }

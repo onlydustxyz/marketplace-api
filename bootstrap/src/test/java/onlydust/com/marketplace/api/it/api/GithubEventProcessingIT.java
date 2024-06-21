@@ -1,18 +1,23 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestCreated;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
+import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
@@ -24,10 +29,13 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     PosthogProperties posthogProperties;
     @Autowired
     OutboxConsumerJob indexingEventsOutboxJob;
+    @Autowired
+    ApplicationRepository applicationRepository;
 
     final Faker faker = new Faker();
 
     private static final Long kaaperRepoId = 493591124L;
+    private static final UUID kaaperProjectId = UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
     @Test
     void should_publish_github_issue_assigned_event() {
@@ -35,7 +43,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
         final var antho = userAuthHelper.authenticateAnthony();
         final var createdAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final var assignedAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
-        final Long issueId = faker.number().randomNumber();
+        final Long issueId = 1587664960L;
 
         indexingEventRepository.saveEvent(OnGithubIssueAssigned.builder()
                 .id(issueId)
@@ -45,6 +53,17 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
                 .assignedAt(assignedAt)
                 .labels(Set.of("documentation", "good first issue"))
                 .build());
+
+        applicationRepository.save(new ApplicationEntity(
+                UUID.randomUUID(),
+                ZonedDateTime.now(),
+                kaaperProjectId,
+                antho.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                issueId,
+                111L,
+                "My motivations",
+                null));
 
         // When
         indexingEventsOutboxJob.run();
@@ -61,6 +80,11 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['assignee_github_id']", equalTo(antho.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['assignee_user_id']", equalTo(antho.user().getId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['is_good_first_issue']", equalTo("true")))
+                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("40")))
+                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("99")))
+                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
+                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("85")))
         );
     }
 

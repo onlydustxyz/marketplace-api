@@ -9,12 +9,14 @@ import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ScoredApplication;
-import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
-import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
-import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
+import onlydust.com.marketplace.project.domain.model.event.*;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+
+import java.util.Comparator;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
 @AllArgsConstructor
@@ -29,13 +31,15 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
             if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId()))
                 userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId())
                         .ifPresent(user -> {
-                            final var applicationScore = userStoragePort.findScoredApplications(
+                            final var scoredApplication = userStoragePort.findScoredApplications(
                                             onGithubIssueAssigned.assigneeId(),
                                             GithubIssue.Id.of(onGithubIssueAssigned.id()))
                                     .stream()
-                                    .map(ScoredApplication::score)
-                                    .max(Integer::compareTo);
-                            trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user, applicationScore.orElse(null)));
+                                    // We should only have 1 result
+                                    // except for the edge case of multiple project with same repo applications,
+                                    // hence taking the max should be enough
+                                    .max(Comparator.comparing(ScoredApplication::recommendationScore));
+                            trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user, scoredApplication.orElse(null)));
                         });
         } else if (event instanceof OnPullRequestCreated onPullRequestCreated) {
             if (projectStoragePort.isLinkedToAProject(onPullRequestCreated.repoId()))
@@ -45,6 +49,10 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
             if (projectStoragePort.isLinkedToAProject(onPullRequestMerged.repoId()))
                 userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
+        } else if (event instanceof OnApplicationCreated onApplicationCreated) {
+            final var scoredApplication = userStoragePort.findScoredApplication(onApplicationCreated.applicationId())
+                    .orElseThrow(() -> internalServerError("Scored application %s not found".formatted(onApplicationCreated.applicationId())));
+            trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication));
         } else {
             trackingEventPublisher.publish(event);
         }

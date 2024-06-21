@@ -85,8 +85,16 @@ public class Application {
                 problemSolvingApproach);
     }
 
-    public ScoredApplication scored(int score) {
-        return ScoredApplication.of(this, score);
+    public ScoredApplication scored(final int availabilityScore,
+                                    final int bestProjectsSimilarityScore,
+                                    final int mainRepoLanguageUserScore,
+                                    final int projectFidelityScore,
+                                    final int recommendationScore) {
+        return ScoredApplication.of(this, availabilityScore,
+                bestProjectsSimilarityScore,
+                mainRepoLanguageUserScore,
+                projectFidelityScore,
+                recommendationScore);
     }
 
     public enum Origin {GITHUB, MARKETPLACE}
