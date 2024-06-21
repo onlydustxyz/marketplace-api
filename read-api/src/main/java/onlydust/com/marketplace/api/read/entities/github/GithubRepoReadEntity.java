@@ -13,6 +13,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -39,13 +40,14 @@ public class GithubRepoReadEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     GithubRepoReadEntity parent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_github_repos",
             schema = "public",
             joinColumns = @JoinColumn(name = "github_repo_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
-    ProjectViewEntity project;
+    Set<ProjectViewEntity> projects;
+
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "github_repo_visibility")

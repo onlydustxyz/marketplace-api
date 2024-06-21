@@ -13,7 +13,20 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
             SELECT i
             FROM GithubIssueReadEntity i
             JOIN i.goodFirstIssueOf p
-            WHERE p.id = :id
+            WHERE p.id = :projectId
             """)
-    Page<GithubIssueReadEntity> findGoodFirstIssuesOf(UUID id, Pageable pageable);
+    Page<GithubIssueReadEntity> findGoodFirstIssuesOf(UUID projectId, Pageable pageable);
+
+    @Query("""
+            SELECT i
+            FROM GithubIssueReadEntity i
+            JOIN i.repo.projects p
+            WHERE p.id = :projectId AND
+            (:isAssigned IS NULL OR (:isAssigned = TRUE AND size(i.assignees) > 0) OR (:isAssigned = FALSE AND size(i.assignees) = 0)) AND
+            (:isApplied IS NULL OR (:isApplied = TRUE AND size(i.applications) > 0) OR (:isApplied = FALSE AND size(i.applications) = 0))
+            """)
+    Page<GithubIssueReadEntity> findAllOf(UUID projectId,
+                                          Boolean isAssigned,
+                                          Boolean isApplied,
+                                          Pageable pageable);
 }

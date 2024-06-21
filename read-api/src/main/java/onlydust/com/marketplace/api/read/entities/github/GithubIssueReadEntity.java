@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.GithubIssue;
 import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
+import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageItemResponse;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
@@ -139,5 +140,25 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl);
+    }
+
+    public ProjectIssuesPageItemResponse toProjectIssueDto(@NonNull UUID projectId) {
+        final var projectApplications = applications.stream()
+                .filter(application -> application.projectId().equals(projectId))
+                .toList();
+
+        return new ProjectIssuesPageItemResponse()
+                .id(id)
+                .number(number)
+                .repository(repo.toShortResponse())
+                .createdAt(createdAt)
+                .closedAt(closedAt)
+                .title(title)
+                .htmlUrl(htmlUrl)
+                .status(status)
+                .author(author.toContributorResponse())
+                .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
+                .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
+                ;
     }
 }
