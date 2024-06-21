@@ -10,6 +10,7 @@ import onlydust.com.backoffice.api.contract.model.UpdateHackathonRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.HackathonMapper;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RestController
 @Tags(@Tag(name = "BackofficeHackathonManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeHackathonRestApi implements BackofficeHackathonManagementApi {
 
     private final HackathonFacadePort hackathonFacadePort;

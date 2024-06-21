@@ -12,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.InvoiceFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @RestController
 @Tags(@Tag(name = "BackofficeInvoicingManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeInvoicingManagementRestApi implements BackofficeInvoicingManagementApi {
     private final InvoiceFacadePort invoiceFacadePort;
     private final QueryParamTokenAuthenticationService.Config queryParamTokenAuthenticationConfig;

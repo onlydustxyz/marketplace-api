@@ -17,6 +17,7 @@ import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,7 @@ import static org.springframework.http.ResponseEntity.noContent;
 @Tags(@Tag(name = "Projects"))
 @AllArgsConstructor
 @Slf4j
+@Profile("api")
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;

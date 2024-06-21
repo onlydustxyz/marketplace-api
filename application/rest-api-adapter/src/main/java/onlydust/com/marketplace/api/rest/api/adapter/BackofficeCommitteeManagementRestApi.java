@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.project.domain.view.commitee.CommitteeLinkView;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,7 @@ import static org.springframework.http.ResponseEntity.*;
 @RestController
 @Tags(@Tag(name = "BackofficeCommitteeManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeCommitteeManagementRestApi implements BackOfficeCommitteeManagementApi {
 
     private final CommitteeFacadePort committeeFacadePort;

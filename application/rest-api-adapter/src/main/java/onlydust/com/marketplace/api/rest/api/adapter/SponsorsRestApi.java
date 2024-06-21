@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +34,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @Tags(@Tag(name = "Sponsors"))
 @AllArgsConstructor
 @Slf4j
+@Profile("api")
 public class SponsorsRestApi implements SponsorsApi {
     private final SponsorFacadePort sponsorFacadePort;
     private final AccountingFacadePort accountingFacadePort;

@@ -24,6 +24,7 @@ import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @Tags(@Tag(name = "Me"))
 @AllArgsConstructor
+@Profile("api")
 public class MeRestApi implements MeApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final UserFacadePort userFacadePort;

@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.CommitteeMapper;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @RestController
 @Tags(@Tag(name = "Committees"))
 @AllArgsConstructor
+@Profile("api")
 public class CommitteeRestApi implements CommitteesApi {
 
     private final AuthenticatedAppUserService authenticatedAppUserService;

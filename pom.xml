@@ -49,7 +49,7 @@
         <skipUTs>${skipTests}</skipUTs>
         <java.version>17</java.version>
         <spring-boot.version>3.2.5</spring-boot.version>
-        <start-class>onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication</start-class>
+        <start-class>onlydust.com.marketplace.api.MarketplaceApiApplication</start-class>
         <jackson.version>2.15.4</jackson.version>
         <aws-java-sdk-s3.version>1.12.701</aws-java-sdk-s3.version>
         <liquibase-core.version>4.24.0</liquibase-core.version>

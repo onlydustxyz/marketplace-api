@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 @RestController
 @Tags(@Tag(name = "BackofficeCurrencyManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyManagementApi {
     private final CurrencyFacadePort currencyFacadePort;
 

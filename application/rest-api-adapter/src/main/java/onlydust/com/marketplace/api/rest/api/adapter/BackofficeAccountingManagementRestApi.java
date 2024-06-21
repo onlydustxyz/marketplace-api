@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeAccountingManagementRestApi implements BackofficeAccountingManagementApi {
     private final AccountingFacadePort accountingFacadePort;
     private final AccountingRewardPort accountingRewardPort;

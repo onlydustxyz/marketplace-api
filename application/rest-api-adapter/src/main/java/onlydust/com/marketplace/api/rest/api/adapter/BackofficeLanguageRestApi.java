@@ -7,6 +7,7 @@ import onlydust.com.backoffice.api.contract.BackofficeLanguageManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,6 +25,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badReq
 @RestController
 @Tags(@Tag(name = "BackofficeLanguageManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeLanguageRestApi implements BackofficeLanguageManagementApi {
     private final LanguageFacadePort languageFacadePort;
 

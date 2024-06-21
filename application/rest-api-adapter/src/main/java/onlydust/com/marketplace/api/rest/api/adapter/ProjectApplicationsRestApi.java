@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.ProjectApplicationsApi;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,7 @@ import static org.springframework.http.ResponseEntity.noContent;
 @RestController
 @Tags(@Tag(name = "Applications"))
 @AllArgsConstructor
+@Profile("api")
 public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ApplicationFacadePort applicationFacadePort;

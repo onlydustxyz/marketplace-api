@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +33,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @RestController
 @Tags(@Tag(name = "BackofficeSponsorManagement"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeSponsorManagementRestApi implements BackofficeSponsorManagementApi {
 
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
