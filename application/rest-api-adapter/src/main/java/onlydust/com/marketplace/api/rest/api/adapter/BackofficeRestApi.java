@@ -4,10 +4,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeApi;
-import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.backoffice.api.contract.model.EcosystemPage;
+import onlydust.com.backoffice.api.contract.model.EcosystemRequest;
+import onlydust.com.backoffice.api.contract.model.EcosystemResponse;
+import onlydust.com.backoffice.api.contract.model.ProjectPage;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +27,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @RestController
 @Tags(@Tag(name = "Backoffice"))
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeRestApi implements BackofficeApi {
     private final BackofficeFacadePort backofficeFacadePort;
     final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;

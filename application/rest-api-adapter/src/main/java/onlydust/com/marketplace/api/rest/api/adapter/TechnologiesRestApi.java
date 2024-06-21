@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.TechnologiesApi;
 import onlydust.com.marketplace.api.contract.model.AllTechnologiesResponse;
 import onlydust.com.marketplace.project.domain.port.input.TechnologiesPort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tags(@Tag(name = "Technologies"))
 @AllArgsConstructor
+@Profile("api")
 public class TechnologiesRestApi implements TechnologiesApi {
     private final TechnologiesPort technologiesPort;
 

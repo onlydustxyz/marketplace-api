@@ -2,7 +2,7 @@
   <configuration default="false" name="Marketplace" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="local,api" />
     <module name="bootstrap" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="onlydust.com.marketplace.api.bootstrap.MarketplaceApiApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="onlydust.com.marketplace.api.MarketplaceApiApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="false" />

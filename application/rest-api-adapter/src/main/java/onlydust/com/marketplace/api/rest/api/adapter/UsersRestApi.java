@@ -13,6 +13,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,6 +31,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 @RestController
 @Tags(@Tag(name = "Users"))
 @AllArgsConstructor
+@Profile("api")
 public class UsersRestApi implements UsersApi {
 
     private final static int DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_TRIGGER_EXTERNAL_SEARCH = 5;

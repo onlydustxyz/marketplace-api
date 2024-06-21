@@ -23,6 +23,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.PayoutInfoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.User;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -47,6 +48,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @RestController
 @Tags(@Tag(name = "BillingProfiles"))
 @AllArgsConstructor
+@Profile("api")
 public class BillingProfileRestApi implements BillingProfilesApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BillingProfileFacadePort billingProfileFacadePort;

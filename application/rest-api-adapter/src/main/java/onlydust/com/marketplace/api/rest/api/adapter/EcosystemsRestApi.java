@@ -5,11 +5,12 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.EcosystemsApi;
 import onlydust.com.marketplace.api.contract.model.EcosystemPage;
-import onlydust.com.marketplace.project.domain.model.Ecosystem;
-import onlydust.com.marketplace.project.domain.port.input.EcosystemFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.EcosystemMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
+import onlydust.com.marketplace.project.domain.model.Ecosystem;
+import onlydust.com.marketplace.project.domain.port.input.EcosystemFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tags(@Tag(name = "Ecosystems"))
 @AllArgsConstructor
+@Profile("api")
 public class EcosystemsRestApi implements EcosystemsApi {
     private final EcosystemFacadePort ecosystemFacadePort;
 

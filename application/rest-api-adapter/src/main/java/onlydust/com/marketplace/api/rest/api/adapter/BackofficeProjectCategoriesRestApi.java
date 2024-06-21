@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.ProjectCategoryUpdateRequest;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 import onlydust.com.marketplace.project.domain.port.input.ProjectCategoryFacadePort;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,6 +20,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @AllArgsConstructor
+@Profile("bo")
 public class BackofficeProjectCategoriesRestApi implements BackofficeProjectCategoriesApi {
     private final ProjectCategoryFacadePort projectCategoryFacadePort;
 
