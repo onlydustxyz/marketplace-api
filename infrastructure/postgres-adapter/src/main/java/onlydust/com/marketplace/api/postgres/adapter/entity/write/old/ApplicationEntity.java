@@ -3,10 +3,12 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationRankingViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.ScoredApplication;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -49,6 +51,10 @@ public class ApplicationEntity {
     String motivations;
     String problemSolvingApproach;
 
+    @OneToOne
+    @JoinColumn(name = "id", insertable = false, updatable = false)
+    ApplicationRankingViewEntity ranking;
+
     public ApplicationEntity(@NonNull UUID id, @NonNull ZonedDateTime receivedAt, @NonNull UUID projectId, @NonNull Long applicantId,
                              @NonNull Application.Origin origin, @NonNull Long issueId, @NonNull Long commentId,
                              @NonNull String motivations, String problemSolvingApproach) {
@@ -88,5 +94,9 @@ public class ApplicationEntity {
                 GithubComment.Id.of(commentId),
                 motivations,
                 problemSolvingApproach);
+    }
+
+    public ScoredApplication toScoredDomain() {
+        return toDomain().scored(ranking.recommandationScore());
     }
 }

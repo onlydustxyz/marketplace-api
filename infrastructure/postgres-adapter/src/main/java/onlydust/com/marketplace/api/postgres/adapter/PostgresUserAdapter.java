@@ -331,4 +331,10 @@ public class PostgresUserAdapter implements UserStoragePort {
     public void deleteObsoleteApplications() {
         applicationRepository.deleteObsoleteApplications();
     }
+
+    @Override
+    public List<ScoredApplication> findScoredApplications(Long applicantId, GithubIssue.Id issueId) {
+        return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
+                .map(ApplicationEntity::toScoredDomain).toList();
+    }
 }
