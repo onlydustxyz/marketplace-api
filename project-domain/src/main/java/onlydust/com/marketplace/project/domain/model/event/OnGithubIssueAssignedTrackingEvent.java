@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
+import onlydust.com.marketplace.project.domain.model.ScoredApplication;
 import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
@@ -25,9 +26,13 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
-    Integer applicationScore;
+    Integer availabilityScore;
+    Integer bestProjectsSimilarityScore;
+    Integer mainRepoLanguageUserScore;
+    Integer projectFidelityScore;
+    Integer recommendationScore;
 
-    public static OnGithubIssueAssignedTrackingEvent of(OnGithubIssueAssigned onGithubIssueAssigned, User user, Integer applicationScore) {
+    public static OnGithubIssueAssignedTrackingEvent of(OnGithubIssueAssigned onGithubIssueAssigned, User user, ScoredApplication scoredApplication) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
@@ -35,7 +40,11 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
-                .applicationScore(applicationScore)
+                .availabilityScore(scoredApplication == null ? null : scoredApplication.availabilityScore())
+                .bestProjectsSimilarityScore(scoredApplication == null ? null : scoredApplication.bestProjectsSimilarityScore())
+                .mainRepoLanguageUserScore(scoredApplication == null ? null : scoredApplication.mainRepoLanguageUserScore())
+                .projectFidelityScore(scoredApplication == null ? null : scoredApplication.projectFidelityScore())
+                .recommendationScore(scoredApplication == null ? null : scoredApplication.recommendationScore())
                 .build();
     }
 

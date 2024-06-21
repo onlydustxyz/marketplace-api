@@ -79,7 +79,7 @@ public class ApplicationReadEntity {
                 .projectId(projectId)
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
-                .recommandationScore(ranking.recommandationScore())
+                .recommandationScore(ranking.recommendationScore())
                 ;
     }
 
@@ -89,7 +89,7 @@ public class ApplicationReadEntity {
                 .projectId(projectId)
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
-                .recommandationScore(ranking.recommandationScore())
+                .recommandationScore(ranking.recommendationScore())
                 .availabilityScore(ranking.availabilityScore())
                 .languageScore(ranking.mainRepoLanguageUserScore())
                 .fidelityScore(ranking.projectFidelityScore())

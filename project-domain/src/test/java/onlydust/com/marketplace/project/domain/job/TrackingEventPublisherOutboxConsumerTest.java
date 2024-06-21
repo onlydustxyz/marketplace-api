@@ -150,7 +150,11 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
-            assertThat(capturedTrackingEvent.applicationScore()).isNull();
+            assertThat(capturedTrackingEvent.availabilityScore()).isNull();
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isNull();
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isNull();
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isNull();
+            assertThat(capturedTrackingEvent.recommendationScore()).isNull();
         }
 
         @Test
@@ -170,7 +174,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                                     GithubComment.Id.random(),
                                     faker.lorem().sentence(),
                                     faker.lorem().sentence())
-                                    .scored(60),
+                                    .scored(70, 12, 34, 56, 89),
                             new Application(Application.Id.random(),
                                     UUID.randomUUID(),
                                     user.getGithubUserId(),
@@ -180,7 +184,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                                     GithubComment.Id.random(),
                                     faker.lorem().sentence(),
                                     null)
-                                    .scored(10)
+                                    .scored(60, 23, 45, 67, 78)
                     ));
 
             // When
@@ -190,7 +194,11 @@ class TrackingEventPublisherOutboxConsumerTest {
             final var trackingEventCaptor = ArgumentCaptor.forClass(OnGithubIssueAssignedTrackingEvent.class);
             verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
             final var capturedTrackingEvent = trackingEventCaptor.getValue();
-            assertThat(capturedTrackingEvent.applicationScore()).isEqualTo(60);
+            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(70);
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(12);
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(34);
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(56);
+            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(89);
         }
 
         @Test
