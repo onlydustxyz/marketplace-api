@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -145,7 +145,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 43
                             },
                             {
                               "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -162,7 +162,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 41
                             },
                             {
                               "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -179,7 +179,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 0
+                              "recommandationScore": 33
                             }
                           ]
                         }
@@ -219,7 +219,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 35
                             },
                             {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -236,7 +236,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 35
                             }
                           ]
                         }
@@ -268,23 +268,6 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 0,
                           "applications": [
                             {
-                              "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                              "issue": {
-                                "id": 1736474921,
-                                "number": 1111,
-                                "title": "Documentation by AnthonyBuisset",
-                                "status": "OPEN",
-                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111"
-                              },
-                              "applicant": {
-                                "githubUserId": 16590657,
-                                "login": "PierreOucif",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommandationScore": 25
-                            },
-                            {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
                               "issue": {
                                 "id": 1736474921,
@@ -299,7 +282,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 35
                             },
                             {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -316,11 +299,28 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 25
+                              "recommandationScore": 35
+                            },
+                            {
+                              "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                              "issue": {
+                                "id": 1736474921,
+                                "number": 1111,
+                                "title": "Documentation by AnthonyBuisset",
+                                "status": "OPEN",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "recommandationScore": 41
                             }
                           ]
                         }
-                          """);
+                        """);
     }
 
     @Test
@@ -410,10 +410,10 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                             "isRegistered": true
                           },
-                          "recommandationScore": 0,
-                          "availabilityScore": 0,
+                          "recommandationScore": 36,
+                          "availabilityScore": 71,
                           "languageScore": 0,
-                          "fidelityScore": 0,
+                          "fidelityScore": 43,
                           "appliedDistinctProjectCount": 3,
                           "pendingApplicationCountOnOtherProjects": 2,
                           "pendingApplicationCountOnThisProject": 2,
