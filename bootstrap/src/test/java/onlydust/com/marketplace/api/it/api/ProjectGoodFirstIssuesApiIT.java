@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -150,7 +150,36 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "currentUserApplication": null,
-                              "languages": null
+                              "languages": [
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                                  "slug": "go",
+                                  "name": "Go",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ]
                             },
                             {
                               "id": 1980731400,
@@ -187,7 +216,36 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null,
-                              "languages": null
+                              "languages": [
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                                  "slug": "go",
+                                  "name": "Go",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ]
                             },
                             {
                               "id": 1979376167,
@@ -228,7 +286,36 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null,
-                              "languages": null
+                              "languages": [
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                                  "slug": "go",
+                                  "name": "Go",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ]
                             },
                             {
                               "id": 1975516187,
@@ -273,7 +360,36 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null,
-                              "languages": null
+                              "languages": [
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                                  "slug": "go",
+                                  "name": "Go",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ]
                             },
                             {
                               "id": 1943730312,
@@ -318,7 +434,36 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null,
-                              "languages": null
+                              "languages": [
+                                {
+                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                                  "slug": "python",
+                                  "name": "Python",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                                },
+                                {
+                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                                  "slug": "go",
+                                  "name": "Go",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
+                                },
+                                {
+                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                                  "slug": "javascript",
+                                  "name": "Javascript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                                },
+                                {
+                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                                  "slug": "typescript",
+                                  "name": "Typescript",
+                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                                }
+                              ]
                             }
                           ]
                         }
@@ -339,7 +484,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "issues": [
