@@ -11,6 +11,7 @@ public interface LanguageRepository extends JpaRepository<LanguageEntity, UUID> 
 
     @Modifying
     @Query(nativeQuery = true, value = """
+            REFRESH MATERIALIZED VIEW CONCURRENTLY repo_languages;
             REFRESH MATERIALIZED VIEW CONCURRENTLY project_languages;
             """)
     void updateProjectLanguages();
