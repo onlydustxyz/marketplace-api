@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 
 @Data
 @Builder(toBuilder = true)

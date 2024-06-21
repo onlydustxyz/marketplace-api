@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -25,6 +26,7 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +38,7 @@ import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
-public class PostgresUserAdapter implements UserStoragePort {
+public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort {
 
     private final CustomUserRepository customUserRepository;
     private final CustomContributorRepository customContributorRepository;
@@ -330,6 +332,18 @@ public class PostgresUserAdapter implements UserStoragePort {
     @Transactional
     public void deleteObsoleteApplications() {
         applicationRepository.deleteObsoleteApplications();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> getGithubUserId(UUID userId) {
+        return userRepository.findById(userId).map(UserEntity::getGithubUserId);
+    }
+
+    @Override
+    @Transactional
+    public void replaceUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
+        userRepository.replaceUserByGithubUser(userId, currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
     }
 
     @Override

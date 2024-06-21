@@ -1514,7 +1514,6 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
   /bo/v1/search/users:
     get:
       security:
@@ -2364,7 +2363,26 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-
+  /bo/v1/debug/reset-and-replace-user:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeDebug
+      summary: Reset and replace user
+      operationId: resetAndReplaceUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplaceAndResetUserRequest"
+      responses:
+        "204":
+          description: "User was successfully deleted"
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   /bo/v1/committees:
     get:
       security:
@@ -5266,6 +5284,25 @@ components:
       enum:
         - PENDING
         - APPROVED
+
+    ReplaceAndResetUserRequest:
+      type: object
+      required:
+        - userId
+        - newGithubLogin
+        - githubOAuthAppId
+        - githubOAuthAppSecret
+      properties:
+        userId:
+          type: string
+          format: uuid
+        newGithubLogin:
+          type: string
+        githubOAuthAppId:
+          type: string
+        githubOAuthAppSecret:
+          type: string
+
 
     PageResponse:
       type: object

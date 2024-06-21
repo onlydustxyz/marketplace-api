@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0JwtClaims;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.AuthenticationService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import org.springframework.security.core.Authentication;

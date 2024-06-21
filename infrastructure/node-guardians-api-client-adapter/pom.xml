@@ -26,5 +26,9 @@
             <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>project-domain</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec-http</artifactId>
+        </dependency>
     </dependencies>
 </project>

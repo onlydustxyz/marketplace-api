@@ -6,11 +6,12 @@ import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.*;
 import onlydust.com.marketplace.api.github_api.properties.GithubPaginationProperties;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
+import onlydust.com.marketplace.user.domain.port.output.GithubUserStoragePort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ import static java.util.Objects.nonNull;
 
 @AllArgsConstructor
 @Slf4j
-public class GithubSearchApiAdapter implements GithubSearchPort {
+public class GithubSearchApiAdapter implements GithubSearchPort, GithubUserStoragePort {
     private final GithubHttpClient client;
     private final GithubPaginationProperties githubPaginationProperties;
     private final GithubAuthenticationPort githubAuthenticationPort;
@@ -34,6 +35,10 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
 
     @Override
     public List<GithubUserIdentity> searchUsersByLogin(final String login) {
+        return searchGithubUsersByLogin(login);
+    }
+
+    private List<GithubUserIdentity> searchGithubUsersByLogin(String login) {
         final var encodedLogin = encode(login.trim(), UTF_8);
         return client.get("/search/users?per_page=5&q=" + encodedLogin, GithubUserSearchResponse.class)
                 .map(GithubUserSearchResponse::getItems)
@@ -45,6 +50,12 @@ public class GithubSearchApiAdapter implements GithubSearchPort {
                                 .githubAvatarUrl(githubUser.getAvatarUrl())
                                 .build()
                 ).toList();
+    }
+
+
+    @Override
+    public List<GithubUserIdentity> searchUsers(String login) {
+        return searchGithubUsersByLogin(login);
     }
 
     @Override

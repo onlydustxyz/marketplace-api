@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import org.hibernate.annotations.Immutable;
