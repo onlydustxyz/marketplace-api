@@ -3,13 +3,20 @@ package onlydust.com.marketplace.api.it.api;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.Map;
 
 @TagProject
 public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
+
+    @AfterAll
+    static void tearDown() throws IOException, InterruptedException {
+        restoreIndexerDump();
+    }
 
     @Test
     void should_return_all_ecosystem_given_an_authenticated_user() {
