@@ -16,8 +16,6 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
 import java.util.Comparator;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-
 @Slf4j
 @AllArgsConstructor
 public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
@@ -50,9 +48,9 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
                 userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
         } else if (event instanceof OnApplicationCreated onApplicationCreated) {
-            final var scoredApplication = userStoragePort.findScoredApplication(onApplicationCreated.applicationId())
-                    .orElseThrow(() -> internalServerError("Scored application %s not found".formatted(onApplicationCreated.applicationId())));
-            trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication));
+            userStoragePort.findScoredApplication(onApplicationCreated.applicationId())
+                    .ifPresent(scoredApplication -> trackingEventPublisher.publish(
+                            OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication)));
         } else {
             trackingEventPublisher.publish(event);
         }
