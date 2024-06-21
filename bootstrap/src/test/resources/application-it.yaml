@@ -45,6 +45,8 @@ infrastructure:
     environment: develop
     token: fake-slack-token
     tag-all-channel: false
+    kyc-kyb-channel: '#kyc-kyb'
+    dev-rel-channel: '#dev-rel'
   node-guardians:
     base-uri: http://fake-url
     api-key: fake-api-key
