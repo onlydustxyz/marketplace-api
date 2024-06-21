@@ -97,6 +97,6 @@ public class ApplicationEntity {
     }
 
     public ScoredApplication toScoredDomain() {
-        return toDomain().scored(ranking.recommandationScore());
+        return toDomain().scored(ranking.recommendationScore());
     }
 }
