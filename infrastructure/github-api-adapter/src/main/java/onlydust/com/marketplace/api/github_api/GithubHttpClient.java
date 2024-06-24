@@ -18,6 +18,7 @@ import java.net.http.HttpResponse;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
@@ -106,13 +107,11 @@ public class GithubHttpClient {
                             .orElseThrow(() -> internalServerError("%d status received without Location header".formatted(httpResponse.statusCode())));
                     yield fetch(method, URI.create(location).getPath(), bodyPublisher, personalAccessToken, responseClass);
                 }
-                case 403, 404 ->
-                    // Should be considered as an internal server error because it happens due to wrong github PAT or
-                    // rate limiting exceeded,
-                    // but never due to a user action
-                        throw internalServerError(deserializeErrorMessage(httpResponse));
-                default -> throw internalServerError("Unable to fetch github API: " + path + " for " +
-                                                     "error message " + deserializeErrorMessage(httpResponse), null);
+                case 404 -> Optional.empty();
+                case 401, 403 ->
+                        throw forbidden("Unauthorized access to Github API: %s for error message %s".formatted(path, deserializeErrorMessage(httpResponse)));
+                default ->
+                        throw internalServerError("Unable to fetch github API: %s for error message %s".formatted(path, deserializeErrorMessage(httpResponse)));
             };
         } catch (IOException | InterruptedException e) {
             throw internalServerError("Fail send request", e);
