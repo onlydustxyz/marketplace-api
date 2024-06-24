@@ -119,6 +119,38 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_reject_as_forbidden_upon_unauthorized_application() {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier();
+        final Long issueId = 1974127467L;
+        final var motivations = faker.lorem().paragraph();
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+
+        final var request = new ProjectApplicationCreateRequest()
+                .projectId(projectId)
+                .issueId(issueId)
+                .motivation(motivations);
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
+                .willReturn(unauthorized()));
+
+        final var existingApplicationCount = applicationRepository.count();
+
+        // When
+        client.post()
+                .uri(getApiURI(ME_APPLICATIONS))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isForbidden();
+
+        assertThat(applicationRepository.count()).isEqualTo(existingApplicationCount);
+    }
+
+    @Test
     void should_not_be_able_to_apply_twice() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
