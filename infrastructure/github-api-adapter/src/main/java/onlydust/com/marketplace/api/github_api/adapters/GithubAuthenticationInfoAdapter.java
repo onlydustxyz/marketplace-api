@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-
 @AllArgsConstructor
 public class GithubAuthenticationInfoAdapter implements GithubAuthenticationInfoPort {
 
@@ -26,6 +24,6 @@ public class GithubAuthenticationInfoAdapter implements GithubAuthenticationInfo
         return response.headers()
                 .firstValue("x-oauth-scopes")
                 .map(scopes -> Set.of(scopes.split(", ")))
-                .orElseThrow(() -> internalServerError("Failed to fetch authorized scopes"));
+                .orElse(Set.of());
     }
 }
