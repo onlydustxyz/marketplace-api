@@ -376,8 +376,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
                 .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
                 .withRequestBody(matchingJsonPath("model", equalTo("gpt-3.5-turbo")))
-                .withRequestBody(matchingJsonPath("messages[0].role", equalTo("user")))
-                .withRequestBody(matchingJsonPath("messages[0].content", containing(commentBody)))
+                .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
                 .withRequestBody(matchingJsonPath("temperature", equalTo("0.7")))
                 .willReturn(okJson("""
                         {
