@@ -34,14 +34,13 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
     private final ApplicationReadRepository applicationReadRepository;
 
     @Override
-    public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplications(UUID projectId,
+    public ResponseEntity<ProjectApplicationPageResponse> getProjectsApplications(Integer pageIndex,
+                                                                                  Integer pageSize, UUID projectId,
                                                                                   Long issueId,
                                                                                   Long applicantId,
                                                                                   Boolean isApplicantProjectMember,
                                                                                   String applicantLoginSearch,
-                                                                                  ProjectApplicationPageSort sort,
-                                                                                  Integer pageIndex,
-                                                                                  Integer pageSize) {
+                                                                                  ProjectApplicationPageSort sort) {
         if (projectId == null && applicantId == null) {
             throw OnlyDustException.badRequest("At least one of projectId and applicantId must be provided");
         }
@@ -73,7 +72,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
         if (!caller.getGithubUserId().equals(application.applicant().githubUserId()) &&
-            !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
+                !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
             throw forbidden("Only project leads and applicant can get application details");
         }
         return ok(application.toDto());
