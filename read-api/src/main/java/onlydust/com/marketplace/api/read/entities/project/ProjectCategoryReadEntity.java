@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.read.entities.project;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
 import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -17,7 +15,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Immutable
 @Table(name = "project_categories", schema = "public")

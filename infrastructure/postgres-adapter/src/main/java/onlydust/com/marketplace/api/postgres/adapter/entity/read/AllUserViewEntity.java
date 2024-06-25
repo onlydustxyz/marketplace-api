@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
@@ -18,7 +16,8 @@ import java.util.UUID;
 import static java.util.Objects.isNull;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "all_users", schema = "iam")
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)

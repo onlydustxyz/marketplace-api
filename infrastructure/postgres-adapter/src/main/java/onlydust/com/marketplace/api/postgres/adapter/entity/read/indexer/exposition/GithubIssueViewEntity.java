@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import org.hibernate.annotations.Immutable;
 
@@ -12,7 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true)
 @Entity
 @Table(schema = "indexer_exp", name = "github_issues")

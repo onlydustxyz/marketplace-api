@@ -5,11 +5,9 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.hibernate.annotations.Parameter;
@@ -25,7 +23,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "users", schema = "iam")
 @EntityListeners(AuditingEntityListener.class)
 @Accessors(fluent = true)
@@ -73,7 +72,8 @@ public class UserViewEntity implements Serializable {
     )
     List<SponsorViewEntity> sponsors;
 
-    @NonNull ZonedDateTime lastSeenAt;
+    @NonNull
+    ZonedDateTime lastSeenAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

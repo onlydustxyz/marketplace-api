@@ -2,11 +2,9 @@ package onlydust.com.marketplace.api.read.entities.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.UserWeeklyStats;
 import org.hibernate.annotations.Immutable;
 
@@ -14,7 +12,8 @@ import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

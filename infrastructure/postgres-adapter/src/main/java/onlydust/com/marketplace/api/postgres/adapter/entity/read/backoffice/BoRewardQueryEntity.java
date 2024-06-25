@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
@@ -29,7 +30,8 @@ import static java.util.Objects.isNull;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 public class BoRewardQueryEntity {
     @Id

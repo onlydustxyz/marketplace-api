@@ -12,7 +12,6 @@ import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -48,7 +47,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var user = userReadRepository.findByUserId(authenticatedUser.getId())
+        final var user = userReadRepository.findMe(authenticatedUser.getId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
         final var userAuthorizedToApplyOnGithubIssues = githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(user.githubUserId());
 
@@ -62,7 +61,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .isAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues)
                 .projectsLed(user.projectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
                 .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
-                .pendingApplications(user.applications().stream().filter(a -> a.origin() == Application.Origin.GITHUB && a.issue().assignees().isEmpty()).map(ApplicationReadEntity::toShortResponse).toList())
+                .pendingApplications(user.pendingApplications().stream().map(ApplicationReadEntity::toShortResponse).toList())
                 .isAdmin(Arrays.stream(user.registered().roles()).anyMatch(r -> r == AuthenticatedUser.Role.ADMIN))
                 .createdAt(toZoneDateTime(user.registered().createdAt()))
                 .email(user.email())
@@ -77,7 +76,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var journeyCompletion = userReadRepository.findByUserId(authenticatedUser.getId())
+        final var journeyCompletion = userReadRepository.findMeJourney(authenticatedUser.getId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
 
         return ok(journeyCompletion.journeyCompletion().toResponse());

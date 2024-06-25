@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.entities.user;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.UserRankCategory;
 import org.hibernate.annotations.Immutable;
 
@@ -11,7 +12,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -29,18 +31,26 @@ public class EcosystemContributorPageItemEntity {
     @NonNull
     Long contributorId;
 
-    @NonNull String login;
-    @NonNull String avatarUrl;
+    @NonNull
+    String login;
+    @NonNull
+    String avatarUrl;
 
-    @NonNull Integer rank;
+    @NonNull
+    Integer rank;
     @Enumerated(EnumType.STRING)
     @NonNull
     UserRankCategory rankCategory;
-    @NonNull Integer contributionCount;
-    @NonNull Integer contributionCountRank;
-    @NonNull Integer rewardCount;
-    @NonNull BigDecimal totalEarnedUsd;
-    @NonNull Integer totalEarnedUsdRank;
+    @NonNull
+    Integer contributionCount;
+    @NonNull
+    Integer contributionCountRank;
+    @NonNull
+    Integer rewardCount;
+    @NonNull
+    BigDecimal totalEarnedUsd;
+    @NonNull
+    Integer totalEarnedUsdRank;
 
     @Embeddable
     @Builder

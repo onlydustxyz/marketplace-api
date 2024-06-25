@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
@@ -15,7 +16,8 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Builder(access = AccessLevel.PRIVATE)
 @Table(name = "sponsor_account_transactions", schema = "accounting")
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

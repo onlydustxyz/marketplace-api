@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
+import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -17,22 +16,28 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Table(name = "billing_profiles", schema = "accounting")
+@Immutable
 public class BillingProfileReadEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
+    @NonNull
+    UUID id;
 
-    @NonNull String name;
+    @NonNull
+    String name;
     @Enumerated(EnumType.STRING)
-    @NonNull BillingProfileType type;
+    @NonNull
+    BillingProfileType type;
 
     ZonedDateTime invoiceMandateAcceptedAt;
 
     @Enumerated(EnumType.STRING)
-    @NonNull VerificationStatus verificationStatus;
+    @NonNull
+    VerificationStatus verificationStatus;
 
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     KycReadEntity kyc;

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -12,7 +13,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "contact_informations", schema = "public")
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -28,12 +30,15 @@ public class ContactInformationViewEntity {
     @Id
     @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
-    @NonNull Channel channel;
+    @NonNull
+    Channel channel;
 
-    @NonNull String contact;
+    @NonNull
+    String contact;
 
     @Column(name = "public")
-    @NonNull Boolean isPublic;
+    @NonNull
+    Boolean isPublic;
 
     @EqualsAndHashCode
     static class PrimaryKey implements Serializable {

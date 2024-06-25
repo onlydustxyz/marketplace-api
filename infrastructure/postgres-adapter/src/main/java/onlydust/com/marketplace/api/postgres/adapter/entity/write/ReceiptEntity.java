@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Receipt;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
@@ -16,7 +17,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "receipts", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor

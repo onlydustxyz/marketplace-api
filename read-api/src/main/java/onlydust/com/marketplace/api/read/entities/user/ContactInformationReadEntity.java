@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.user;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ContactInformation;
 import onlydust.com.backoffice.api.contract.model.ContactInformationChannel;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
@@ -17,7 +15,8 @@ import java.util.UUID;
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "contact_informations", schema = "public")
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 public class ContactInformationReadEntity {
     @Id
@@ -32,7 +31,8 @@ public class ContactInformationReadEntity {
     @NonNull
     ContactChanelEnumEntity channel;
 
-    @NonNull String contact;
+    @NonNull
+    String contact;
 
     @Column(name = "public")
     @NonNull
@@ -60,7 +60,9 @@ public class ContactInformationReadEntity {
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
-        @NonNull UUID userId;
-        @NonNull ContactChanelEnumEntity channel;
+        @NonNull
+        UUID userId;
+        @NonNull
+        ContactChanelEnumEntity channel;
     }
 }

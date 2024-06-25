@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -16,7 +14,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "languages", schema = "public")
 @Immutable
 @Accessors(fluent = true)
@@ -27,7 +26,9 @@ public class LanguageRSQLEntity {
     @NonNull
     UUID id;
 
-    @NonNull String name;
-    @NonNull String slug;
+    @NonNull
+    String name;
+    @NonNull
+    String slug;
     String logoUrl;
 }
