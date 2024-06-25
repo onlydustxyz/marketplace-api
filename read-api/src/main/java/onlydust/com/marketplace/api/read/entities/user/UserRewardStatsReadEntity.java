@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.user;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CurrencyViewEntity;
 import onlydust.com.marketplace.project.domain.view.Money;
 import org.hibernate.annotations.Immutable;
@@ -15,7 +14,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @EqualsAndHashCode
 @NoArgsConstructor(force = true)
 @Immutable

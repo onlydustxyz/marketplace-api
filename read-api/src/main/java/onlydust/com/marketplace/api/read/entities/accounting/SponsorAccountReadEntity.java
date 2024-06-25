@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.read.entities.accounting;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
@@ -19,7 +17,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "sponsor_accounts", schema = "accounting")
 @Immutable
 @Accessors(fluent = true)

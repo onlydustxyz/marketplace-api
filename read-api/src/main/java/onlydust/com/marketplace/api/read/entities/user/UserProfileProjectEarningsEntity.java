@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.UserProfileProjectEarnings;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
 import org.hibernate.annotations.Immutable;
@@ -14,7 +15,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -23,13 +25,16 @@ import java.util.UUID;
 public class UserProfileProjectEarningsEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID projectId;
+    @NonNull
+    UUID projectId;
 
     @ManyToOne
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    @NonNull ProjectLinkViewEntity project;
+    @NonNull
+    ProjectLinkViewEntity project;
 
-    @NonNull BigDecimal totalEarnedUsd;
+    @NonNull
+    BigDecimal totalEarnedUsd;
 
     public UserProfileProjectEarnings toDto() {
         return new UserProfileProjectEarnings()

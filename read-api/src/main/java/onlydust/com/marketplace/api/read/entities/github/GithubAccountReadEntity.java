@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.entities.github;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
@@ -14,7 +15,8 @@ import java.util.Set;
 
 @Entity
 @Table(name = "github_accounts", schema = "indexer_exp")
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -35,7 +37,8 @@ public class GithubAccountReadEntity {
     String twitter;
     String linkedin;
     String telegram;
-    @NonNull ZonedDateTime createdAt;
+    @NonNull
+    ZonedDateTime createdAt;
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     Set<GithubRepoViewEntity> repos;

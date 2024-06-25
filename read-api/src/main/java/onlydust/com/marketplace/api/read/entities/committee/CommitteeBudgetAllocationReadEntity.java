@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.entities.committee;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationLinkResponse;
 import onlydust.com.backoffice.api.contract.model.MoneyResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
@@ -18,7 +19,8 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.read.mapper.CommitteeMapper.roundScore;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

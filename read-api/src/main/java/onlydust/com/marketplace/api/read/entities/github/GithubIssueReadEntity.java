@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.read.entities.github;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.GithubIssue;
 import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
@@ -23,7 +21,8 @@ import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true)
 @Table(schema = "indexer_exp", name = "github_issues")
 @Immutable

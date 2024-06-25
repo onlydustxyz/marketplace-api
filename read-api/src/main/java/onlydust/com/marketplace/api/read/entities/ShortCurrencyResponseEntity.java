@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ShortCurrencyResponse;
 import org.hibernate.annotations.Immutable;
 
@@ -12,7 +13,8 @@ import java.net.URI;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

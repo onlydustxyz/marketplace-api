@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.project.domain.model.Reward;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -11,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "reward_items", schema = "public")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor

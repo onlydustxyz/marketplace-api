@@ -6,6 +6,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.UserProfileContributingStatus;
 import onlydust.com.marketplace.api.contract.model.UserProfileLanguagePageItem;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLinkViewEntity;
@@ -20,7 +21,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -29,13 +31,19 @@ import java.util.UUID;
 public class UserProfileLanguagePageItemEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID language_id;
+    @NonNull
+    UUID language_id;
 
-    @NonNull Integer rank;
-    @NonNull String contributingStatus;
-    @NonNull Integer contributionCount;
-    @NonNull Integer rewardCount;
-    @NonNull BigDecimal totalEarnedUsd;
+    @NonNull
+    Integer rank;
+    @NonNull
+    String contributingStatus;
+    @NonNull
+    Integer contributionCount;
+    @NonNull
+    Integer rewardCount;
+    @NonNull
+    BigDecimal totalEarnedUsd;
 
     @ManyToOne
     @JoinColumn(insertable = false, updatable = false)
@@ -43,7 +51,8 @@ public class UserProfileLanguagePageItemEntity {
     LanguageReadEntity language;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @NonNull List<ProjectLinkViewEntity> projects;
+    @NonNull
+    List<ProjectLinkViewEntity> projects;
 
     public UserProfileLanguagePageItem toDto() {
         return new UserProfileLanguagePageItem()

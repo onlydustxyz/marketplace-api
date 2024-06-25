@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Immutable;
 
 import java.util.List;
@@ -14,7 +15,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "user_profile_info", schema = "public")
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.entities;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
@@ -18,7 +19,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "recent_public_activity", schema = "public")
 @Immutable
 @Accessors(fluent = true)

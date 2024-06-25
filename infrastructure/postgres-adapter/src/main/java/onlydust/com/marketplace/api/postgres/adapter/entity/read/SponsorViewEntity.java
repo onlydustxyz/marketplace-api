@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
@@ -19,7 +18,8 @@ import static java.util.stream.Collectors.toSet;
 
 @Entity
 @NoArgsConstructor(force = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "sponsors", schema = "public")
 @Immutable
 public class SponsorViewEntity {

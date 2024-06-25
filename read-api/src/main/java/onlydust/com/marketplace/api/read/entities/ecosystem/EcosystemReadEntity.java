@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.read.entities.ecosystem;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.EcosystemDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.EcosystemShortResponseBanners;
@@ -22,7 +20,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "ecosystems", schema = "public")
 @Immutable
 @Accessors(fluent = true)

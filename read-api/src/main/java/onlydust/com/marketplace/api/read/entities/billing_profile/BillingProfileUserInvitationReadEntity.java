@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 
 import java.io.Serializable;
@@ -12,7 +10,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "billing_profiles_user_invitations", schema = "accounting")

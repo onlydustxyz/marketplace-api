@@ -5,6 +5,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryPageItemResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectCategorySuggestionStatus;
 import org.hibernate.annotations.Immutable;
@@ -15,7 +16,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 public class ProjectCategoryPageItemReadEntity {
     @Id

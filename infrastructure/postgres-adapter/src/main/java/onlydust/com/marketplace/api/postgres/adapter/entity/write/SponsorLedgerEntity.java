@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
 import jakarta.persistence.*;
@@ -13,7 +11,8 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "sponsor_ledgers", schema = "accounting")
 public class SponsorLedgerEntity {
     @Id

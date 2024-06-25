@@ -4,11 +4,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.UserWorkDistribution;
 import org.hibernate.annotations.Immutable;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -17,11 +19,15 @@ import org.hibernate.annotations.Immutable;
 public class UserWorkDistributionEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull Long contributorId;
+    @NonNull
+    Long contributorId;
 
-    @NonNull Integer codeReviewCount;
-    @NonNull Integer issueCount;
-    @NonNull Integer pullRequestCount;
+    @NonNull
+    Integer codeReviewCount;
+    @NonNull
+    Integer issueCount;
+    @NonNull
+    Integer pullRequestCount;
 
     public UserWorkDistribution toDto() {
         return new UserWorkDistribution()

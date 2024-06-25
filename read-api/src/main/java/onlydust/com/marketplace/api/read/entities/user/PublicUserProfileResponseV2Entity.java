@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.entities.user;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.github.GithubAccountReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -21,7 +22,8 @@ import java.util.stream.Stream;
 import static java.util.Objects.isNull;
 
 @Entity
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)

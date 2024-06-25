@@ -1,11 +1,9 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.KycResponse;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
@@ -16,18 +14,22 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Table(name = "kyc", schema = "accounting")
 public class KycReadEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull UUID billingProfileId;
+    @NonNull
+    UUID id;
+    @NonNull
+    UUID billingProfileId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
-    @NonNull BillingProfileReadEntity billingProfile;
+    @NonNull
+    BillingProfileReadEntity billingProfile;
 
     UUID ownerId;
     @Enumerated(EnumType.STRING)

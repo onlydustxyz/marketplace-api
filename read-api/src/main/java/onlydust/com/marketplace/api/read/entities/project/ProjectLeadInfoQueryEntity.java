@@ -3,8 +3,11 @@ package onlydust.com.marketplace.api.read.entities.project;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Value;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
@@ -14,7 +17,8 @@ import java.util.UUID;
 @Entity
 @Immutable
 @Table(name = "projects", schema = "public")
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true)
 public class ProjectLeadInfoQueryEntity {
     @Id

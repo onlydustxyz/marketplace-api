@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.reward;
 
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.Money;
 import onlydust.com.marketplace.api.contract.model.RewardStatusContract;
@@ -24,7 +22,8 @@ import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
-@Value
+@Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
