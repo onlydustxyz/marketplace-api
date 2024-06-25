@@ -6,9 +6,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
-public interface GithubIssueReadRepository extends Repository<GithubIssueReadEntity, UUID> {
+public interface GithubIssueReadRepository extends Repository<GithubIssueReadEntity, Long> {
+
+    Optional<GithubIssueReadEntity> findById(Long issueId);
+
     @Query("""
             SELECT i
             FROM GithubIssueReadEntity i

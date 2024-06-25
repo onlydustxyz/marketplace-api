@@ -1772,6 +1772,35 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /api/v1/issues/{issueId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadIssues
+      summary: Get issue
+      operationId: getIssue
+      description: |
+        Get an issue by id.
+      parameters:
+        - in: path
+          name: issueId
+          required: true
+          schema:
+            $ref: '#/components/schemas/IssueId'
+      responses:
+        "200":
+          description: 'Issue'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GithubIssueLinkResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/projects/{projectId}/rewards:
     get:
