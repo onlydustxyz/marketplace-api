@@ -16,14 +16,15 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.math.BigDecimal.ZERO;
 import static java.util.Optional.ofNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 
@@ -59,7 +60,7 @@ public class AllUserReadEntity {
     Set<ContactInformationReadEntity> contacts;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
     UserProfileInfoReadEntity profile;
 
     @ManyToMany
@@ -69,6 +70,7 @@ public class AllUserReadEntity {
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
+    @NonNull
     Set<ProjectReadEntity> projectsLed;
 
     @ManyToMany
@@ -78,6 +80,7 @@ public class AllUserReadEntity {
             joinColumns = @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId"),
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
+    @NonNull
     Set<ProjectReadEntity> pendingProjectsLed;
 
     @ManyToMany
@@ -87,10 +90,17 @@ public class AllUserReadEntity {
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
             inverseJoinColumns = @JoinColumn(name = "sponsorId")
     )
+    @NonNull
     Set<SponsorReadEntity> sponsors;
 
     @OneToMany(mappedBy = "applicant")
+    @NonNull
     Set<ApplicationReadEntity> applications;
+
+    @OneToMany(mappedBy = "applicant")
+    @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
+    @NonNull
+    Set<ApplicationReadEntity> pendingApplications;
 
     @ManyToMany
     @JoinTable(
@@ -100,22 +110,35 @@ public class AllUserReadEntity {
             inverseJoinColumns = @JoinColumn(name = "billing_profile_id")
     )
     @OrderBy("name")
+    @NonNull
     List<BillingProfileReadEntity> billingProfiles;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToMany
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    GlobalUsersRanksReadEntity globalUsersRanks;
+    @NonNull
+    @Getter(AccessLevel.NONE)
+    Set<GlobalUsersRanksReadEntity> globalUsersRanks;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    public Optional<GlobalUsersRanksReadEntity> globalUsersRanks() {
+        return globalUsersRanks.stream().findFirst();
+    }
+
+    @OneToMany
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    ReceivedRewardStatsPerUserReadEntity receivedRewardStats;
+    @NonNull
+    @Getter(AccessLevel.NONE)
+    Set<ReceivedRewardStatsPerUserReadEntity> receivedRewardStats;
+
+    public Optional<ReceivedRewardStatsPerUserReadEntity> receivedRewardStats() {
+        return receivedRewardStats.stream().findFirst();
+    }
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     JourneyCompletionEntity journeyCompletion;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "userId", insertable = false, updatable = false)
     OnboardingReadEntity onboarding;
 
     @Formula("""
@@ -157,8 +180,8 @@ public class AllUserReadEntity {
                 .lastSeenAt(registered == null ? null : registered.lastSeenAt())
                 .signedUpAt(registered == null ? null : toZoneDateTime(registered.createdAt()))
                 .contacts(Optional.ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toBODto).toList())
-                .leadedProjectCount(globalUsersRanks == null ? 0 : globalUsersRanks.leadedProjectCount().intValue())
-                .totalEarnedUsd(receivedRewardStats == null ? BigDecimal.ZERO : receivedRewardStats.usdTotal())
+                .leadedProjectCount(globalUsersRanks().map(GlobalUsersRanksReadEntity::leadedProjectCount).orElse(0L).intValue())
+                .totalEarnedUsd(receivedRewardStats().map(ReceivedRewardStatsPerUserReadEntity::usdTotal).orElse(ZERO))
                 .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
                 ;
     }

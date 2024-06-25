@@ -5,13 +5,13 @@ import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserReadRepository extends JpaRepository<AllUserReadEntity, UUID> {
+public interface UserReadRepository extends Repository<AllUserReadEntity, UUID> {
     @Query(value = """
             SELECT u
             FROM AllUserReadEntity u
@@ -44,5 +44,24 @@ public interface UserReadRepository extends JpaRepository<AllUserReadEntity, UUI
             LEFT JOIN FETCH bp.kyb
             WHERE u.userId = :userId
             """)
-    Optional<AllUserReadEntity> findByUserId(UUID userId);
+    Optional<AllUserReadEntity> findBoUser(UUID userId);
+
+    @Query(value = """
+            SELECT u
+            FROM AllUserReadEntity u
+            JOIN FETCH u.registered
+            LEFT JOIN FETCH u.onboarding
+            LEFT JOIN FETCH u.profile
+            WHERE u.userId = :userId
+            """)
+    Optional<AllUserReadEntity> findMe(UUID userId);
+
+
+    @Query(value = """
+            SELECT u
+            FROM AllUserReadEntity u
+            JOIN FETCH u.journeyCompletion
+            WHERE u.userId = :userId
+            """)
+    Optional<AllUserReadEntity> findMeJourney(UUID userId);
 }

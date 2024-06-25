@@ -583,7 +583,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .json("""
                         {
                           "pendingApplications": [

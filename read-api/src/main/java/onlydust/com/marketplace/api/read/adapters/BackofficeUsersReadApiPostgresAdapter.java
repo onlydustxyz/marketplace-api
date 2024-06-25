@@ -8,10 +8,10 @@ import onlydust.com.backoffice.api.contract.BackofficeUsersReadApi;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
 import onlydust.com.backoffice.api.contract.model.UserSearchPage;
-import onlydust.com.marketplace.api.read.mapper.UserMapper;
-import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
 import onlydust.com.marketplace.api.read.entities.user.rsql.AllUserRSQLEntity;
+import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.repositories.AllUserRSQLRepository;
+import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +41,7 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
 
     @Override
     public ResponseEntity<UserDetailsResponse> getUserById(UUID userId) {
-        final var user = userReadRepository.findByUserId(userId)
+        final var user = userReadRepository.findBoUser(userId)
                 .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
 
         return ResponseEntity.ok(user.toUserDetailsResponse());

@@ -102,7 +102,7 @@ public class GithubIssueReadEntity {
     )
     Set<ProjectReadEntity> goodFirstIssueOf;
 
-    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "issue")
     @NonNull
     Set<ApplicationReadEntity> applications;
 

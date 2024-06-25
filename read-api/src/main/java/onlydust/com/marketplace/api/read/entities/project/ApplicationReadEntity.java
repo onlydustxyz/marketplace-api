@@ -35,18 +35,18 @@ public class ApplicationReadEntity {
     ZonedDateTime receivedAt;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
     ProjectReadEntity project;
     UUID projectId;
 
     @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "issueId")
     GithubIssueReadEntity issue;
 
     @NonNull
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId")
     AllUserReadEntity applicant;
 
@@ -59,7 +59,7 @@ public class ApplicationReadEntity {
     @Enumerated(EnumType.STRING)
     Application.Origin origin;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id", referencedColumnName = "applicationId")
     ApplicationRankingReadEntity ranking;
 
