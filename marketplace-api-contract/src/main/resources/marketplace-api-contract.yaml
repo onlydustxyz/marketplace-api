@@ -2534,11 +2534,13 @@ paths:
             $ref: '#/components/schemas/ProjectApplicationPageSort'
         - in: query
           name: pageIndex
+          required: true
           schema:
             type: integer
             default: 0
         - in: query
           name: pageSize
+          required: true
           schema:
             type: integer
             default: 10

@@ -75,7 +75,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736474921"
+                        "issueId", "1736474921",
+                        "pageIndex", "0",
+                        "pageSize", "10"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -94,7 +96,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736504583"
+                        "issueId", "1736504583",
+                        "pageIndex", "0",
+                        "pageSize", "10"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -110,7 +114,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo1.toString(),
-                        "issueId", "1736474921"
+                        "issueId", "1736474921",
+                        "pageIndex", "0",
+                        "pageSize", "10"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -184,7 +190,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
                         "projectId", projectAppliedTo2.toString(),
-                        "issueId", "1736504583"
+                        "issueId", "1736504583",
+                        "pageIndex", "0",
+                        "pageSize", "10"
                 )))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
@@ -240,6 +248,101 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(1)
+    void should_return_applications_for_project_and_issue_and_is_project_member() {
+        // Given
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(APPLICATIONS, Map.of(
+                        "projectId", projectAppliedTo2.toString(),
+                        "issueId", "1736504583",
+                        "isApplicantProjectMember", "true",
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {"totalPageNumber":0,"totalItemNumber":0,"hasMore":false,"nextPageIndex":0,"applications":[]}
+                        """);
+
+    }
+
+    @Test
+    @Order(1)
+    void should_return_applications_for_project_and_issue_and_is_not_project_member() {
+        // Given
+        final String jwt = userAuthHelper.authenticateGregoire().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(APPLICATIONS, Map.of(
+                        "projectId", projectAppliedTo2.toString(),
+                        "issueId", "1736504583",
+                        "isApplicantProjectMember", "false",
+                        "pageIndex", "0",
+                        "pageSize", "10"
+                )))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "applications": [
+                            {
+                              "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
+                              "issue": {
+                                "id": 1736504583,
+                                "number": 1112,
+                                "title": "Monthly contracting subscription",
+                                "status": "OPEN",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112"
+                              },
+                              "applicant": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                "isRegistered": true
+                              },
+                              "recommandationScore": 35
+                            },
+                            {
+                              "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
+                              "issue": {
+                                "id": 1736504583,
+                                "number": 1112,
+                                "title": "Monthly contracting subscription",
+                                "status": "OPEN",
+                                "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1112"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "recommandationScore": 35
+                            }
+                          ]
+                        }
+                        """);
+
+    }
+
+    @Test
+    @Order(1)
     void should_return_applications_for_applicant() {
         // Given
         final var pierre = userAuthHelper.authenticatePierre();
@@ -247,7 +350,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
         // When (no application for this issue on project 1)
         client.get()
                 .uri(getApiURI(APPLICATIONS, Map.of(
-                        "applicantId", pierre.user().getGithubUserId().toString()
+                        "applicantId", pierre.user().getGithubUserId().toString(),
+                        "pageIndex", "0",
+                        "pageSize", "10"
                 )))
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then

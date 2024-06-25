@@ -28,9 +28,12 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             JOIN FETCH a.applicant u
             JOIN FETCH a.ranking
             WHERE   (:projectId IS NULL OR a.projectId = :projectId) AND
-                    (:issueId IS NULL OR a.issue.id = :issueId) AND
-                    (:applicantId IS NULL OR a.applicant.id = :applicantId) AND
-                    (:isApplicantProjectMember IS NULL OR a.applicant.id = :isApplicantProjectMember) AND
+                    (:issueId IS NULL OR i.id = :issueId) AND
+                    (:applicantId IS NULL OR u.id = :applicantId) AND
+                    (:isApplicantProjectMember IS NULL OR 
+                        (:isApplicantProjectMember = TRUE AND exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = u.githubUserId)) OR 
+                        (:isApplicantProjectMember = FALSE AND NOT exists (select 1 from ProjectMemberReadEntity m where m.projectId = a.projectId and m.githubUserId = u.githubUserId))
+                    ) AND
                     (:applicantLoginSearch IS NULL OR u.login ILIKE %:applicantLoginSearch%)
             """)
     Page<ApplicationReadEntity> findAll(UUID projectId,

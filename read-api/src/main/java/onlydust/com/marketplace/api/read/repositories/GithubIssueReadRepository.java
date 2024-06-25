@@ -12,7 +12,9 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
     @Query("""
             SELECT i
             FROM GithubIssueReadEntity i
-            JOIN i.goodFirstIssueOf p
+            JOIN FETCH i.goodFirstIssueOf p
+            JOIN FETCH i.author
+            JOIN FETCH i.repo
             WHERE p.id = :projectId
             """)
     Page<GithubIssueReadEntity> findGoodFirstIssuesOf(UUID projectId, Pageable pageable);

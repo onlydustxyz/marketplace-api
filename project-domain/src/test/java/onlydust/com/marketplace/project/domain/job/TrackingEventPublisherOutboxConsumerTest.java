@@ -244,7 +244,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     .id(faker.random().nextLong())
                     .repoId(githubRepoId)
                     .assigneeId(githubUserId)
-                    .labels(Set.of(faker.lorem().word(), faker.lorem().word(), goodFirstIssueLabel, faker.lorem().word()))
+                    .labels(Set.of("foo", "bar", goodFirstIssueLabel, "baz"))
                     .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .assignedAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .build();
