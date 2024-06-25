@@ -114,7 +114,7 @@ public class AllUserReadEntity {
     List<BillingProfileReadEntity> billingProfiles;
 
     @OneToMany
-    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
+    @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     @Getter(AccessLevel.NONE)
     Set<GlobalUsersRanksReadEntity> globalUsersRanks;
@@ -124,7 +124,7 @@ public class AllUserReadEntity {
     }
 
     @OneToMany
-    @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
+    @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     @Getter(AccessLevel.NONE)
     Set<ReceivedRewardStatsPerUserReadEntity> receivedRewardStats;

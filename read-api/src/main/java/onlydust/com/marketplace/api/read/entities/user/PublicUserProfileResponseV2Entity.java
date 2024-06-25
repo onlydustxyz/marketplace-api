@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.github.GithubAccountReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
@@ -44,15 +46,16 @@ public class PublicUserProfileResponseV2Entity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     UserReadEntity registered;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
-    @NonNull
     GithubAccountReadEntity github;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
     UserProfileInfoReadEntity profile;
 
     @NonNull
