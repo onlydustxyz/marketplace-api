@@ -48,8 +48,10 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
         } else if (event instanceof OnApplicationCreated onApplicationCreated) {
             userStoragePort.findScoredApplication(onApplicationCreated.applicationId())
-                    .ifPresent(scoredApplication -> trackingEventPublisher.publish(
-                            OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication)));
+                    .ifPresent(scoredApplication -> {
+                        final var user = userStoragePort.getUserByGithubId(onApplicationCreated.applicantId());
+                        trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, scoredApplication, user));
+                    });
         } else {
             trackingEventPublisher.publish(event);
         }
