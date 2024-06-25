@@ -15,6 +15,11 @@ public class GithubAuthenticationInfoAdapter implements GithubAuthenticationInfo
     private final Map<String, Set<String>> scopesByToken = new HashMap<>();
 
     @Override
+    public void logout(String accessToken) {
+        scopesByToken.remove(accessToken);
+    }
+
+    @Override
     public Set<String> getAuthorizedScopes(String accessToken) {
         return scopesByToken.computeIfAbsent(accessToken, this::fetchAuthorizedScopes);
     }

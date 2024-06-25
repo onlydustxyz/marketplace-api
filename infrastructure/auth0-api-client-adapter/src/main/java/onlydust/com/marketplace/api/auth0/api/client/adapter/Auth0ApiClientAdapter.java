@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import io.netty.handler.codec.http.HttpMethod;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static java.net.URLEncoder.encode;
@@ -29,8 +30,8 @@ public class Auth0ApiClientAdapter implements GithubAuthenticationPort {
     }
 
     @Override
-    public void logout(Long githubUserId) {
-        patCache.invalidate(githubUserId);
+    public Optional<String> logout(Long githubUserId) {
+        return Optional.ofNullable(patCache.asMap().remove(githubUserId));
     }
 
     private String fetchGithubPersonalToken(Long githubUserId) {

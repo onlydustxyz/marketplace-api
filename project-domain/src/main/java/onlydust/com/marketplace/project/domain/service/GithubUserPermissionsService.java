@@ -11,6 +11,12 @@ public class GithubUserPermissionsService implements GithubUserPermissionsFacade
     private final GithubAuthenticationInfoPort githubAuthenticationInfoPort;
 
     @Override
+    public void logout(Long githubUserId) {
+        githubAuthenticationPort.logout(githubUserId)
+                .ifPresent(accessToken -> githubAuthenticationInfoPort.logout(accessToken));
+    }
+
+    @Override
     public boolean isUserAuthorizedToApplyOnProject(Long githubUserId) {
         final var accessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
         final var authorizedScopes = githubAuthenticationInfoPort.getAuthorizedScopes(accessToken);
