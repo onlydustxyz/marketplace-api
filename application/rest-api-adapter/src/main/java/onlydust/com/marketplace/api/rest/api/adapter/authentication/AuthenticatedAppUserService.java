@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 
@@ -19,7 +19,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauth
 public class AuthenticatedAppUserService {
 
     private final AuthenticationContext authenticationContext;
-    private final GithubAuthenticationPort githubAuthenticationPort;
+    private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
 
     /**
      * @return the authenticated user
@@ -57,6 +57,6 @@ public class AuthenticatedAppUserService {
     }
 
     public void logout() {
-        githubAuthenticationPort.logout(getAuthenticatedUser().getGithubUserId());
+        githubUserPermissionsFacadePort.logout(getAuthenticatedUser().getGithubUserId());
     }
 }
