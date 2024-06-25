@@ -26,19 +26,18 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
     @Override
     public void process(Event event) {
         if (event instanceof OnGithubIssueAssigned onGithubIssueAssigned) {
-            if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId()))
-                userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId())
-                        .ifPresent(user -> {
-                            final var scoredApplication = userStoragePort.findScoredApplications(
-                                            onGithubIssueAssigned.assigneeId(),
-                                            GithubIssue.Id.of(onGithubIssueAssigned.id()))
-                                    .stream()
-                                    // We should only have 1 result
-                                    // except for the edge case of multiple project with same repo applications,
-                                    // hence taking the max should be enough
-                                    .max(Comparator.comparing(ScoredApplication::recommendationScore));
-                            trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user, scoredApplication.orElse(null)));
-                        });
+            if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId())) {
+                final var user = userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId());
+                final var scoredApplication = userStoragePort.findScoredApplications(
+                                onGithubIssueAssigned.assigneeId(),
+                                GithubIssue.Id.of(onGithubIssueAssigned.id()))
+                        .stream()
+                        // We should only have 1 result
+                        // except for the edge case of multiple project with same repo applications,
+                        // hence taking the max should be enough
+                        .max(Comparator.comparing(ScoredApplication::recommendationScore));
+                trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user, scoredApplication));
+            }
         } else if (event instanceof OnPullRequestCreated onPullRequestCreated) {
             if (projectStoragePort.isLinkedToAProject(onPullRequestCreated.repoId()))
                 userStoragePort.getUserByGithubId(onPullRequestCreated.authorId())

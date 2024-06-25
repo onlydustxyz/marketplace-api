@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.model.ScoredApplication;
 import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Value
@@ -19,7 +20,6 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     Long issueId;
     @NonNull
     Long assigneeGithubId;
-    @NonNull
     UUID assigneeUserId;
     @NonNull
     ZonedDateTime createdAt;
@@ -32,19 +32,21 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     Integer projectFidelityScore;
     Integer recommendationScore;
 
-    public static OnGithubIssueAssignedTrackingEvent of(OnGithubIssueAssigned onGithubIssueAssigned, User user, ScoredApplication scoredApplication) {
+    public static OnGithubIssueAssignedTrackingEvent of(@NonNull OnGithubIssueAssigned onGithubIssueAssigned,
+                                                        @NonNull Optional<User> user,
+                                                        @NonNull Optional<ScoredApplication> scoredApplication) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
-                .assigneeUserId(user.getId())
+                .assigneeUserId(user.map(User::getId).orElse(null))
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
-                .availabilityScore(scoredApplication == null ? null : scoredApplication.availabilityScore())
-                .bestProjectsSimilarityScore(scoredApplication == null ? null : scoredApplication.bestProjectsSimilarityScore())
-                .mainRepoLanguageUserScore(scoredApplication == null ? null : scoredApplication.mainRepoLanguageUserScore())
-                .projectFidelityScore(scoredApplication == null ? null : scoredApplication.projectFidelityScore())
-                .recommendationScore(scoredApplication == null ? null : scoredApplication.recommendationScore())
+                .availabilityScore(scoredApplication.map(ScoredApplication::availabilityScore).orElse(null))
+                .bestProjectsSimilarityScore(scoredApplication.map(ScoredApplication::bestProjectsSimilarityScore).orElse(null))
+                .mainRepoLanguageUserScore(scoredApplication.map(ScoredApplication::mainRepoLanguageUserScore).orElse(null))
+                .projectFidelityScore(scoredApplication.map(ScoredApplication::projectFidelityScore).orElse(null))
+                .recommendationScore(scoredApplication.map(ScoredApplication::recommendationScore).orElse(null))
                 .build();
     }
 

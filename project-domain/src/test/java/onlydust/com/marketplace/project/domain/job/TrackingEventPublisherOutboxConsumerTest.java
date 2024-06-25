@@ -86,11 +86,11 @@ class TrackingEventPublisherOutboxConsumerTest {
         @BeforeEach
         void setUp() {
             when(userStoragePort.getUserByGithubId(githubUserId)).thenReturn(Optional.empty());
-            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(false);
+            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(true);
         }
 
         @ParameterizedTest
-        @ValueSource(classes = {OnGithubIssueAssigned.class, OnPullRequestCreated.class, OnPullRequestMerged.class})
+        @ValueSource(classes = {OnPullRequestCreated.class, OnPullRequestMerged.class})
         void should_not_publish_github_events(Class<? extends Event> eventClass) {
             // Given
             final var event = fakeEvent(eventClass);
@@ -99,7 +99,33 @@ class TrackingEventPublisherOutboxConsumerTest {
             trackingEventPublisherOutboxConsumer.process(event);
 
             // Then
-            verify(trackingEventPublisher, never()).publish(any());
+            verifyNoInteractions(trackingEventPublisher);
+        }
+
+        @Test
+        void should_publish_github_issue_assigned_events() {
+            // Given
+            final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
+            when(userStoragePort.findScoredApplications(githubUserId, GithubIssue.Id.of(event.id()))).thenReturn(List.of());
+
+            // When
+            trackingEventPublisherOutboxConsumer.process(event);
+
+            // Then
+            final var trackingEventCaptor = ArgumentCaptor.forClass(OnGithubIssueAssignedTrackingEvent.class);
+            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
+            final var capturedTrackingEvent = trackingEventCaptor.getValue();
+            assertThat(capturedTrackingEvent.issueId()).isEqualTo(event.id());
+            assertThat(capturedTrackingEvent.assigneeGithubId()).isEqualTo(event.assigneeId());
+            assertThat(capturedTrackingEvent.assigneeUserId()).isNull();
+            assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
+            assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
+            assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
+            assertThat(capturedTrackingEvent.availabilityScore()).isNull();
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isNull();
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isNull();
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isNull();
+            assertThat(capturedTrackingEvent.recommendationScore()).isNull();
         }
 
 
