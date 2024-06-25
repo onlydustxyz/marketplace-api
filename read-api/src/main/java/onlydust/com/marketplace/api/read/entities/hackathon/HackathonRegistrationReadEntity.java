@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
+import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @Table(name = "hackathon_registrations", schema = "public")
 @IdClass(HackathonRegistrationReadEntity.PrimaryKey.class)
+@Immutable
 public class HackathonRegistrationReadEntity {
     @Id
     @EqualsAndHashCode.Include

@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.KybResponse;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Table(name = "kyb", schema = "accounting")
+@Immutable
 public class KybReadEntity {
     @Id
     @EqualsAndHashCode.Include

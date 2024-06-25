@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Table(name = "billing_profile_stats", schema = "accounting")
+@Immutable
 public class BillingProfileStatsReadEntity {
     @Id
     @EqualsAndHashCode.Include

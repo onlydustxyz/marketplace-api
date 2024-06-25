@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
+import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
 @Table(name = "billing_profiles", schema = "accounting")
+@Immutable
 public class BillingProfileReadEntity {
     @Id
     @EqualsAndHashCode.Include

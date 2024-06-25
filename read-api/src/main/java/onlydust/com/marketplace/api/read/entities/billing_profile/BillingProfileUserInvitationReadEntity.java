@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
+import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Table(name = "billing_profiles_user_invitations", schema = "accounting")
 @IdClass(BillingProfileUserInvitationReadEntity.PrimaryKey.class)
+@Immutable
 public class BillingProfileUserInvitationReadEntity {
     @Id
     @EqualsAndHashCode.Include
