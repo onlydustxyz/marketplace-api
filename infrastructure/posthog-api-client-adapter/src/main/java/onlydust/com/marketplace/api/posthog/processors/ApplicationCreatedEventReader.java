@@ -21,7 +21,7 @@ public class ApplicationCreatedEventReader implements EventReader<OnApplicationC
 
     @Override
     public String eventType(OnApplicationCreatedTrackingEvent event) {
-        return "application_created";
+        return "issue_applied";
     }
 
     @Override
