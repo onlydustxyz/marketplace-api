@@ -64,7 +64,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/7/comments"))
                 .withRequestBody(equalToJson("""
                         {
-                            "body": "I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.com).\\n"
+                            "body": "I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.com/p/bretzel).\\n"
                         }
                         """))
                 .willReturn(aResponse()
