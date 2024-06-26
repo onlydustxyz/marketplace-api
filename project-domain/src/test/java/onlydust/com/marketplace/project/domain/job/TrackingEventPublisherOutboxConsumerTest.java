@@ -86,11 +86,11 @@ class TrackingEventPublisherOutboxConsumerTest {
         @BeforeEach
         void setUp() {
             when(userStoragePort.getUserByGithubId(githubUserId)).thenReturn(Optional.empty());
-            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(false);
+            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(true);
         }
 
         @ParameterizedTest
-        @ValueSource(classes = {OnGithubIssueAssigned.class, OnPullRequestCreated.class, OnPullRequestMerged.class})
+        @ValueSource(classes = {OnPullRequestCreated.class, OnPullRequestMerged.class})
         void should_not_publish_github_events(Class<? extends Event> eventClass) {
             // Given
             final var event = fakeEvent(eventClass);
@@ -99,9 +99,71 @@ class TrackingEventPublisherOutboxConsumerTest {
             trackingEventPublisherOutboxConsumer.process(event);
 
             // Then
-            verify(trackingEventPublisher, never()).publish(any());
+            verifyNoInteractions(trackingEventPublisher);
         }
 
+        @Test
+        void should_publish_github_issue_assigned_events() {
+            // Given
+            final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
+            when(userStoragePort.findScoredApplications(githubUserId, GithubIssue.Id.of(event.id()))).thenReturn(List.of());
+
+            // When
+            trackingEventPublisherOutboxConsumer.process(event);
+
+            // Then
+            final var trackingEventCaptor = ArgumentCaptor.forClass(OnGithubIssueAssignedTrackingEvent.class);
+            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
+            final var capturedTrackingEvent = trackingEventCaptor.getValue();
+            assertThat(capturedTrackingEvent.issueId()).isEqualTo(event.id());
+            assertThat(capturedTrackingEvent.assigneeGithubId()).isEqualTo(event.assigneeId());
+            assertThat(capturedTrackingEvent.assigneeUserId()).isNull();
+            assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
+            assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
+            assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
+            assertThat(capturedTrackingEvent.availabilityScore()).isNull();
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isNull();
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isNull();
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isNull();
+            assertThat(capturedTrackingEvent.recommendationScore()).isNull();
+        }
+
+        @Test
+        void should_publish_on_application_created() {
+            // Given
+            final var application = new Application(Application.Id.random(),
+                    UUID.randomUUID(),
+                    githubUserId,
+                    Application.Origin.MARKETPLACE,
+                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                    GithubIssue.Id.random(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence())
+                    .scored(70, 12, 34, 56, 89);
+
+            when(userStoragePort.findScoredApplication(application.id())).thenReturn(Optional.of(application));
+
+            // When
+            trackingEventPublisherOutboxConsumer.process(OnApplicationCreated.of(application));
+
+            // Then
+            final var trackingEventCaptor = ArgumentCaptor.forClass(OnApplicationCreatedTrackingEvent.class);
+            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
+            final var capturedTrackingEvent = trackingEventCaptor.getValue();
+            assertThat(capturedTrackingEvent.applicationId()).isEqualTo(application.id());
+            assertThat(capturedTrackingEvent.projectId()).isEqualTo(application.projectId());
+            assertThat(capturedTrackingEvent.applicantGithubId()).isEqualTo(application.applicantId());
+            assertThat(capturedTrackingEvent.applicantUserId()).isNull();
+            assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
+            assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
+            assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());
+            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(application.availabilityScore());
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(application.bestProjectsSimilarityScore());
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(application.mainRepoLanguageUserScore());
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(application.projectFidelityScore());
+            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(application.recommendationScore());
+        }
 
         @Test
         void should_forward_unknown_events() {
@@ -258,42 +320,43 @@ class TrackingEventPublisherOutboxConsumerTest {
             final var capturedTrackingEvent = trackingEventCaptor.getValue();
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isTrue();
         }
-    }
 
-    @Test
-    void should_publish_on_application_created() {
-        // Given
-        final var application = new Application(Application.Id.random(),
-                UUID.randomUUID(),
-                githubUserId,
-                Application.Origin.MARKETPLACE,
-                faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                GithubIssue.Id.random(),
-                GithubComment.Id.random(),
-                faker.lorem().sentence(),
-                faker.lorem().sentence())
-                .scored(70, 12, 34, 56, 89);
+        @Test
+        void should_publish_on_application_created() {
+            // Given
+            final var application = new Application(Application.Id.random(),
+                    UUID.randomUUID(),
+                    githubUserId,
+                    Application.Origin.MARKETPLACE,
+                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                    GithubIssue.Id.random(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence())
+                    .scored(70, 12, 34, 56, 89);
 
-        when(userStoragePort.findScoredApplication(application.id())).thenReturn(Optional.of(application));
+            when(userStoragePort.findScoredApplication(application.id())).thenReturn(Optional.of(application));
 
-        // When
-        trackingEventPublisherOutboxConsumer.process(OnApplicationCreated.of(application));
+            // When
+            trackingEventPublisherOutboxConsumer.process(OnApplicationCreated.of(application));
 
-        // Then
-        final var trackingEventCaptor = ArgumentCaptor.forClass(OnApplicationCreatedTrackingEvent.class);
-        verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
-        final var capturedTrackingEvent = trackingEventCaptor.getValue();
-        assertThat(capturedTrackingEvent.applicationId()).isEqualTo(application.id());
-        assertThat(capturedTrackingEvent.projectId()).isEqualTo(application.projectId());
-        assertThat(capturedTrackingEvent.applicantGithubId()).isEqualTo(application.applicantId());
-        assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
-        assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
-        assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());
-        assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(application.availabilityScore());
-        assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(application.bestProjectsSimilarityScore());
-        assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(application.mainRepoLanguageUserScore());
-        assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(application.projectFidelityScore());
-        assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(application.recommendationScore());
+            // Then
+            final var trackingEventCaptor = ArgumentCaptor.forClass(OnApplicationCreatedTrackingEvent.class);
+            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
+            final var capturedTrackingEvent = trackingEventCaptor.getValue();
+            assertThat(capturedTrackingEvent.applicationId()).isEqualTo(application.id());
+            assertThat(capturedTrackingEvent.projectId()).isEqualTo(application.projectId());
+            assertThat(capturedTrackingEvent.applicantGithubId()).isEqualTo(application.applicantId());
+            assertThat(capturedTrackingEvent.applicantUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
+            assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
+            assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());
+            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(application.availabilityScore());
+            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(application.bestProjectsSimilarityScore());
+            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(application.mainRepoLanguageUserScore());
+            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(application.projectFidelityScore());
+            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(application.recommendationScore());
+        }
     }
 
     @NoArgsConstructor

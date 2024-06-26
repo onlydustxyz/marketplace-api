@@ -9,6 +9,7 @@ public class ApplicationCreatedEventReader implements EventReader<OnApplicationC
         properties.put("application_id", event.applicationId().toString());
         properties.put("project_id", event.projectId().toString());
         properties.put("issue_id", event.issueId().toString());
+        properties.put("applicant_user_id", event.applicantUserId() == null ? null : event.applicantUserId().toString());
         properties.put("applicant_github_id", event.applicantGithubId());
         properties.put("origin", event.origin().toString());
         properties.put("availability_score", event.availabilityScore());
@@ -25,7 +26,7 @@ public class ApplicationCreatedEventReader implements EventReader<OnApplicationC
 
     @Override
     public Object distinctId(OnApplicationCreatedTrackingEvent event) {
-        return event.applicantGithubId();
+        return event.applicantUserId() == null ? event.applicationId() : event.applicantUserId();
     }
 
     @Override

@@ -6,8 +6,10 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.ScoredApplication;
+import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @Value
@@ -21,6 +23,7 @@ public class OnApplicationCreatedTrackingEvent extends Event {
     UUID projectId;
     @NonNull
     Long applicantGithubId;
+    UUID applicantUserId;
     @NonNull
     Application.Origin origin;
     @NonNull
@@ -33,11 +36,14 @@ public class OnApplicationCreatedTrackingEvent extends Event {
     Integer projectFidelityScore;
     Integer recommendationScore;
 
-    public static Event of(OnApplicationCreated onApplicationCreated, ScoredApplication scoredApplication) {
+    public static Event of(@NonNull OnApplicationCreated onApplicationCreated,
+                           @NonNull ScoredApplication scoredApplication,
+                           @NonNull Optional<User> applicant) {
         return OnApplicationCreatedTrackingEvent.builder()
                 .applicationId(onApplicationCreated.applicationId())
                 .projectId(onApplicationCreated.projectId())
                 .applicantGithubId(onApplicationCreated.applicantId())
+                .applicantUserId(applicant.map(User::getId).orElse(null))
                 .origin(onApplicationCreated.origin())
                 .appliedAt(onApplicationCreated.appliedAt())
                 .issueId(onApplicationCreated.issueId())
