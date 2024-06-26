@@ -71,7 +71,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
         posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
-                .withRequestBody(matchingJsonPath("$.event", equalTo("github_issue_assigned")))
+                .withRequestBody(matchingJsonPath("$.event", equalTo("issue_assigned")))
                 .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(antho.user().getId().toString())))
                 .withRequestBody(matchingJsonPath("$.timestamp", equalTo(assignedAt.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))

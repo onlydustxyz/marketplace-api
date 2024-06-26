@@ -20,7 +20,7 @@ public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssue
 
     @Override
     public String eventType(OnGithubIssueAssignedTrackingEvent event) {
-        return "github_issue_assigned";
+        return "issue_assigned";
     }
 
     @Override
