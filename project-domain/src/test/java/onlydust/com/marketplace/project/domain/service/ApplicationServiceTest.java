@@ -48,6 +48,10 @@ public class ApplicationServiceTest {
     final String problemSolvingApproach = faker.lorem().sentence();
     final String personalAccessToken = faker.internet().password();
     final UUID projectId = UUID.randomUUID();
+    final Project project = Project.builder()
+            .id(projectId)
+            .slug(faker.lorem().word())
+            .build();
 
     @BeforeEach
     void setUp() {
@@ -59,6 +63,7 @@ public class ApplicationServiceTest {
         when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(personalAccessToken);
         when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.empty());
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber(), issue.repoId()));
+        when(projectStoragePort.getById(projectId)).thenReturn(Optional.of(project));
     }
 
     @Test
@@ -109,6 +114,17 @@ public class ApplicationServiceTest {
     }
 
     @Test
+    void should_reject_applications_if_project_does_not_exists() {
+        // Given
+        when(projectStoragePort.getById(projectId)).thenReturn(Optional.empty());
+
+        // When
+        assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class).hasMessage("Project %s not found".formatted(projectId));
+    }
+
+    @Test
     void should_reject_applications_if_repo_does_not_belong_to_project() {
         // Given
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber()));
@@ -140,6 +156,9 @@ public class ApplicationServiceTest {
 
         verify(userStoragePort).save(application);
         verify(applicationObserver).onApplicationCreated(application);
+        verify(githubApiPort).createComment(personalAccessToken, issue, """
+                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
+                """.formatted(project.getSlug()));
     }
 
     @Test

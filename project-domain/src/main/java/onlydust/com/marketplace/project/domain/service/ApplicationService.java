@@ -80,14 +80,17 @@ public class ApplicationService implements ApplicationFacadePort {
         if (userStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
             throw badRequest("User already applied to this issue");
 
+        final var project = projectStoragePort.getById(projectId)
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+
         if (!projectStoragePort.getProjectRepoIds(projectId).contains(issue.repoId()))
             throw badRequest("Issue %s does not belong to project %s".formatted(issueId, projectId));
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
         final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](%s).
-                """.formatted(globalConfig.getAppBaseUrl()));
+                I am applying to this issue via [OnlyDust platform](%s/p/%s).
+                """.formatted(globalConfig.getAppBaseUrl(), project.getSlug()));
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
