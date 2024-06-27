@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -116,8 +115,8 @@ public class ProjectReadEntity {
     )
     Set<AllUserReadEntity> leads;
 
-    @Formula("(select count(pgfi.issue_id) from projects_good_first_issues pgfi where pgfi.project_id = id)")
-    Integer goodFirstIssueCount;
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    Set<ProjectsGoodFirstIssuesReadEntity> goodFirstIssues;
 
     public List<GithubOrganizationResponse> organizations(final boolean includeAllAvailableRepos) {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
@@ -139,7 +138,8 @@ public class ProjectReadEntity {
                         .installationStatus(entity.installation() == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED :
                                 switch (entity.installation().getStatus()) {
                                     case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
-                                    case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
+                                    case MISSING_PERMISSIONS ->
+                                            GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
                                     case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
                                 })
                         .repos(entity.repos().stream()
@@ -157,8 +157,8 @@ public class ProjectReadEntity {
                                         .hasIssues(repo.getHasIssues())
                                         .isIncludedInProject(repoIdsIncludedInProject.contains(repo.getId()))
                                         .isAuthorizedInGithubApp(entity.installation() != null &&
-                                                                 entity.installation().getAuthorizedRepos().stream()
-                                                                         .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
+                                                entity.installation().getAuthorizedRepos().stream()
+                                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId()))))
                                 .sorted(comparing(GithubRepoResponse::getId))
                                 .toList())
                 )

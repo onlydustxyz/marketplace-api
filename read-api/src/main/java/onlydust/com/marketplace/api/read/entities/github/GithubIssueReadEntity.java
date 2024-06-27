@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageItemResponse;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectsGoodFirstIssuesReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
@@ -93,14 +93,8 @@ public class GithubIssueReadEntity {
     @NonNull
     List<AllUserReadEntity> assignees;
 
-    @ManyToMany
-    @JoinTable(
-            schema = "public",
-            name = "projects_good_first_issues",
-            joinColumns = @JoinColumn(name = "issue_id"),
-            inverseJoinColumns = @JoinColumn(name = "project_id")
-    )
-    Set<ProjectReadEntity> goodFirstIssueOf;
+    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY)
+    Set<ProjectsGoodFirstIssuesReadEntity> goodFirstIssueOf;
 
     @OneToMany(mappedBy = "issue")
     @NonNull
