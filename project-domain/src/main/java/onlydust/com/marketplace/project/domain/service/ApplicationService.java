@@ -32,13 +32,29 @@ public class ApplicationService implements ApplicationFacadePort {
         final var application = userStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
-        if (!application.applicantId().equals(githubUserId)) {
+        final var deleteSelfApplication = application.applicantId().equals(githubUserId);
+
+        if (!deleteSelfApplication) {
             final var isProjectLead = projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId);
             if (!isProjectLead)
                 throw forbidden("User is not authorized to delete this application");
         }
 
         userStoragePort.deleteApplications(id);
+
+        if (deleteSelfApplication && application.origin() == Application.Origin.MARKETPLACE)
+            tryDeleteGithubComment(application);
+    }
+
+    private void tryDeleteGithubComment(Application application) {
+        try {
+            final var issue = githubStoragePort.findIssueById(application.issueId())
+                    .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+            final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(application.applicantId());
+            githubApiPort.deleteComment(personalAccessToken, issue.repoId(), application.commentId());
+        } catch (Exception e) {
+            LOGGER.info("Could not delete GitHub comment for application %s".formatted(application.id()), e);
+        }
     }
 
     @Override

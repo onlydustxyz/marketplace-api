@@ -92,6 +92,11 @@ public class GithubHttpClient {
         }
     }
 
+
+    public <ResponseBody> Optional<ResponseBody> delete(String path, @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+        return fetch(HttpMethod.DELETE, path, HttpRequest.BodyPublishers.noBody(), personalAccessToken, responseClass);
+    }
+
     public <ResponseBody> Optional<ResponseBody> fetch(HttpMethod method, String path, final HttpRequest.BodyPublisher bodyPublisher,
                                                        @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {

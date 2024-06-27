@@ -10,4 +10,6 @@ public interface GithubApiPort {
     void assign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin);
 
     void unassign(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull Long githubIssueNumber, @NonNull String githubLogin);
+
+    void deleteComment(@NonNull String personalAccessToken, @NonNull Long repoId, @NonNull GithubComment.Id id);
 }
