@@ -38,6 +38,13 @@ public class BackofficeBannersRestApi implements BackofficeBannersApi {
     }
 
     @Override
+    public ResponseEntity<Void> deleteBanner(UUID bannerId) {
+        bannerFacadePort.deleteBanner(Banner.Id.of(bannerId));
+
+        return noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> updateBanner(UUID bannerId, BannerUpdateRequest bannerUpdateRequest) {
         bannerFacadePort.updateBanner(
                 Banner.Id.of(bannerId),

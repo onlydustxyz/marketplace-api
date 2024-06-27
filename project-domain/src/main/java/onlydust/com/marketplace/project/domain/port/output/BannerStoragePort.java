@@ -9,4 +9,6 @@ public interface BannerStoragePort {
     void save(Banner banner);
 
     Optional<Banner> findById(Banner.Id id);
+
+    void delete(Banner.Id id);
 }

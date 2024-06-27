@@ -21,4 +21,9 @@ public class PostgresBannersAdapter implements BannerStoragePort {
     public Optional<Banner> findById(Banner.Id id) {
         return bannerRepository.findById(id.value()).map(BannerEntity::toDomain);
     }
+
+    @Override
+    public void delete(Banner.Id id) {
+        bannerRepository.deleteById(id.value());
+    }
 }

@@ -33,4 +33,12 @@ public class BannerService implements BannerFacadePort {
                 .buttonLinkUrl(buttonLinkUrl)
                 .updatedAt(ZonedDateTime.now()));
     }
+
+    @Override
+    public void deleteBanner(Banner.Id id) {
+        final var banner = bannerStoragePort.findById(id)
+                .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
+
+        bannerStoragePort.delete(banner.id());
+    }
 }

@@ -57,6 +57,14 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 // Then
                 .expectStatus()
                 .isUnauthorized();
+
+        // When
+        client.delete()
+                .uri(getApiURI(BANNER.formatted(UUID.randomUUID())))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isUnauthorized();
     }
 
     @Test
@@ -86,12 +94,22 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .isUnauthorized();
 
+        // When
         client.put()
                 .uri(getApiURI(BANNER.formatted(UUID.randomUUID())))
                 .header("Authorization", "Bearer " + user.jwt())
                 .bodyValue(new BannerUpdateRequest()
                         .text(faker.lorem().sentence())
                 )
+                .exchange()
+                // Then
+                .expectStatus()
+                .isUnauthorized();
+
+        // When
+        client.delete()
+                .uri(getApiURI(BANNER.formatted(UUID.randomUUID())))
+                .header("Authorization", "Bearer " + user.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -117,6 +135,15 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .bodyValue(new BannerUpdateRequest()
                         .text(faker.lorem().sentence())
                 )
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNotFound();
+
+        // When
+        client.delete()
+                .uri(getApiURI(BANNER.formatted(UUID.randomUUID())))
+                .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -218,6 +245,23 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .jsonPath("$.buttonText").isEqualTo(newButtonText)
                 .jsonPath("$.buttonLinkUrl").isEqualTo(newButtonLinkUrl.toString())
         ;
+
+
+        client.delete()
+                .uri(getApiURI(BANNER.formatted(bannerId)))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        client.get()
+                .uri(getApiURI(BANNER.formatted(bannerId)))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNotFound();
     }
 
     @Test
