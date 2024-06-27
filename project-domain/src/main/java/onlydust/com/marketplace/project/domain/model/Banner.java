@@ -9,11 +9,12 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-@Getter
+@Data
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class Banner {
     @NonNull
+    @Setter(AccessLevel.NONE)
     private final Id id;
 
     @NonNull

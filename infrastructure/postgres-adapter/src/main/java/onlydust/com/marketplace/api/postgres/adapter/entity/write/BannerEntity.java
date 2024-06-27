@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -44,5 +45,16 @@ public class BannerEntity {
                 .visible(banner.visible())
                 .updatedAt(banner.updatedAt())
                 .build();
+    }
+
+    public Banner toDomain() {
+        return new Banner(
+                Banner.Id.of(id),
+                text,
+                buttonText,
+                buttonIconSlug,
+                buttonLinkUrl == null ? null : URI.create(buttonLinkUrl),
+                visible,
+                updatedAt);
     }
 }

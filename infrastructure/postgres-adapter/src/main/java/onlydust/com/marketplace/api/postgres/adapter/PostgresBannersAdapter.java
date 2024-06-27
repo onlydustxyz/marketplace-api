@@ -6,6 +6,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.BannerRepository
 import onlydust.com.marketplace.project.domain.model.Banner;
 import onlydust.com.marketplace.project.domain.port.output.BannerStoragePort;
 
+import java.util.Optional;
+
 @AllArgsConstructor
 public class PostgresBannersAdapter implements BannerStoragePort {
     private final BannerRepository bannerRepository;
@@ -13,5 +15,10 @@ public class PostgresBannersAdapter implements BannerStoragePort {
     @Override
     public void save(Banner banner) {
         bannerRepository.save(BannerEntity.of(banner));
+    }
+
+    @Override
+    public Optional<Banner> findById(Banner.Id id) {
+        return bannerRepository.findById(id.value()).map(BannerEntity::toDomain);
     }
 }
