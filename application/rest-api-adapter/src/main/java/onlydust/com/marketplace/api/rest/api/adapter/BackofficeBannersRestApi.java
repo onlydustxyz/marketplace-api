@@ -45,6 +45,20 @@ public class BackofficeBannersRestApi implements BackofficeBannersApi {
     }
 
     @Override
+    public ResponseEntity<Void> hideBanner(UUID bannerId) {
+        bannerFacadePort.hideBanner(Banner.Id.of(bannerId));
+
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> showBanner(UUID bannerId) {
+        bannerFacadePort.showBanner(Banner.Id.of(bannerId));
+
+        return noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> updateBanner(UUID bannerId, BannerUpdateRequest bannerUpdateRequest) {
         bannerFacadePort.updateBanner(
                 Banner.Id.of(bannerId),

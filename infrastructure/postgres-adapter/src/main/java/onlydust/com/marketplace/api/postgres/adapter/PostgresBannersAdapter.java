@@ -26,4 +26,9 @@ public class PostgresBannersAdapter implements BannerStoragePort {
     public void delete(Banner.Id id) {
         bannerRepository.deleteById(id.value());
     }
+
+    @Override
+    public void hideAll() {
+        bannerRepository.findAll().forEach(banner -> banner.visible(false));
+    }
 }

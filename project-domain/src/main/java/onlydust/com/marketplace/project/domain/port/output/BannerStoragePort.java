@@ -11,4 +11,6 @@ public interface BannerStoragePort {
     Optional<Banner> findById(Banner.Id id);
 
     void delete(Banner.Id id);
+
+    void hideAll();
 }

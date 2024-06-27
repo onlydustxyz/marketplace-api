@@ -10,4 +10,8 @@ public interface BannerFacadePort {
     void updateBanner(Banner.Id id, String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl);
 
     void deleteBanner(Banner.Id id);
+
+    void hideBanner(Banner.Id id);
+
+    void showBanner(Banner.Id id);
 }

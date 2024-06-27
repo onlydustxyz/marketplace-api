@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.project.domain.model.Banner;
 import onlydust.com.marketplace.project.domain.port.input.BannerFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BannerStoragePort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -40,5 +41,23 @@ public class BannerService implements BannerFacadePort {
                 .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
 
         bannerStoragePort.delete(banner.id());
+    }
+
+    @Override
+    public void hideBanner(Banner.Id id) {
+        final var banner = bannerStoragePort.findById(id)
+                .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
+
+        bannerStoragePort.save(banner.visible(false));
+    }
+
+    @Override
+    @Transactional
+    public void showBanner(Banner.Id id) {
+        bannerStoragePort.hideAll();
+        final var banner = bannerStoragePort.findById(id)
+                .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
+
+        bannerStoragePort.save(banner.visible(true));
     }
 }
