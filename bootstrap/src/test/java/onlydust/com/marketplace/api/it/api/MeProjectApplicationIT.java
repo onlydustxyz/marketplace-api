@@ -233,7 +233,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_delete_my_application() {
+    void should_delete_my_github_application() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
         final var applicationId = UUID.randomUUID();
@@ -260,6 +260,38 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .isNoContent();
 
         assertThat(applicationRepository.findById(applicationId)).isEmpty();
+        githubWireMockServer.verify(0, deleteRequestedFor(anyUrl()));
+    }
+
+    @Test
+    void should_delete_my_marketplace_application() {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier();
+        final var applicationId = UUID.randomUUID();
+
+        applicationRepository.save(new ApplicationEntity(
+                applicationId,
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                user.user().getGithubUserId(),
+                Application.Origin.MARKETPLACE,
+                1952203217L,
+                111L,
+                "My motivations",
+                null
+        ));
+
+        // When
+        client.delete()
+                .uri(getApiURI(APPLICATION.formatted(applicationId)))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        assertThat(applicationRepository.findById(applicationId)).isEmpty();
+        githubWireMockServer.verify(deleteRequestedFor(urlEqualTo("/repositories/380954304/issues/comments/111")));
     }
 
     @Test
@@ -291,6 +323,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .isNoContent();
 
         assertThat(applicationRepository.findById(applicationId)).isEmpty();
+        githubWireMockServer.verify(0, deleteRequestedFor(anyUrl()));
     }
 
     @Test

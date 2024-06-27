@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -281,6 +282,55 @@ public class ApplicationServiceTest {
 
         // Then
         verify(userStoragePort).deleteApplications(application.id());
+        verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
+    }
+
+    @Test
+    void should_delete_my_github_application() {
+        // Given
+        final var application = Application.fromGithubComment(new GithubComment(
+                        GithubComment.Id.random(),
+                        issue.id(),
+                        issue.repoId(),
+                        githubUserId,
+                        ZonedDateTime.now().minusDays(1),
+                        faker.lorem().sentence()
+                ),
+                projectId
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+        // When
+        applicationService.deleteApplication(application.id(), userId, githubUserId);
+
+        // Then
+        verify(userStoragePort).deleteApplications(application.id());
+        verifyNoInteractions(githubApiPort);
+    }
+
+
+    @Test
+    void should_not_delete_github_comment_if_not_authorized() {
+        // Given
+        final var application = Application.fromMarketplace(
+                projectId,
+                githubUserId,
+                issue.id(),
+                GithubComment.Id.random(),
+                faker.lorem().sentence(),
+                faker.lorem().sentence()
+        );
+
+        doThrow(forbidden("User is not authorized to delete this application")).when(githubApiPort).deleteComment(any(), any(), any());
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+
+        // When
+        applicationService.deleteApplication(application.id(), userId, githubUserId);
+
+        // Then
+        verify(userStoragePort).deleteApplications(application.id());
+        verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
     @Test
@@ -303,6 +353,7 @@ public class ApplicationServiceTest {
 
         // Then
         verify(userStoragePort).deleteApplications(application.id());
+        verifyNoInteractions(githubApiPort);
     }
 
     @Nested
