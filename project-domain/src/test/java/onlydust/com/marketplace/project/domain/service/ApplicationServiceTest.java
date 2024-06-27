@@ -158,7 +158,33 @@ public class ApplicationServiceTest {
         verify(applicationObserver).onApplicationCreated(application);
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-                """.formatted(project.getSlug()));
+
+                # My background and how it can be leveraged
+                %s
+
+                # How I plan on tackling this issue
+                %s
+                """.formatted(project.getSlug(), motivation, problemSolvingApproach));
+    }
+
+
+    @Test
+    void should_apply_on_project_without_problem_solving_approach() {
+        // Given
+        when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
+
+        // When
+        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, null);
+
+        // Then
+        assertThat(application.problemSolvingApproach()).isNull();
+
+        verify(githubApiPort).createComment(personalAccessToken, issue, """
+                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
+
+                # My background and how it can be leveraged
+                %s
+                """.formatted(project.getSlug(), motivation));
     }
 
     @Test
