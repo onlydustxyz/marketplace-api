@@ -17,7 +17,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
@@ -93,7 +95,13 @@ public class ApplicationsUpdater implements OutboxConsumer {
             return;
         }
 
-        if (llmPort.isCommentShowingInterestToContribute(comment.body())) {
+        final var pattern = Pattern.compile("\\R");
+        final var cleanComment = pattern.splitAsStream(comment.body())
+                .filter(s -> !s.startsWith(">"))
+                .filter(s -> !s.isEmpty())
+                .collect(joining("\n"));
+
+        if (llmPort.isCommentShowingInterestToContribute(cleanComment)) {
             indexerPort.indexUser(comment.authorId());
             saveGithubApplications(comment, projectIds);
         }

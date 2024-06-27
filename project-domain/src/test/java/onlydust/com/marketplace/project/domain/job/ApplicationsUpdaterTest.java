@@ -180,6 +180,29 @@ class ApplicationsUpdaterTest {
             verify(indexerPort).indexUser(event.authorId());
             Arrays.stream(applications).forEach(application -> verify(applicationObserverPort).onApplicationCreated(application));
         }
+
+        @Test
+        void should_remove_quotes_when_analyzing_comments() {
+            // Given
+            when(llmPort.isCommentShowingInterestToContribute(any())).thenReturn(false);
+
+            // When
+            applicationsUpdater.process(OnGithubCommentCreated.builder()
+                    .id(GithubComment.Id.random().value())
+                    .repoId(issue.repoId())
+                    .issueId(issue.id().value())
+                    .authorId(faker.number().randomNumber())
+                    .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
+                    .body("""
+                            > Can I work on this ?
+
+                            Yeah sure!
+                            """)
+                    .build());
+
+            // Then
+            verify(llmPort).isCommentShowingInterestToContribute("Yeah sure!");
+        }
     }
 
     @Nested
