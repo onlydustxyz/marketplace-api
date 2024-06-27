@@ -160,10 +160,10 @@ public class ApplicationServiceTest {
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
 
-                # My background and how it can be leveraged
+                ### My background and how it can be leveraged
                 %s
 
-                # How I plan on tackling this issue
+                ### How I plan on tackling this issue
                 %s
                 """.formatted(project.getSlug(), motivation, problemSolvingApproach));
     }
@@ -174,15 +174,15 @@ public class ApplicationServiceTest {
         when(githubApiPort.createComment(eq(personalAccessToken), eq(issue), any())).thenReturn(commentId);
 
         // When
-        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, null);
+        final var application = applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, " ");
 
         // Then
-        assertThat(application.problemSolvingApproach()).isNull();
+        assertThat(application.problemSolvingApproach()).isEqualTo(" ");
 
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
 
-                # My background and how it can be leveraged
+                ### My background and how it can be leveraged
                 %s
                 """.formatted(project.getSlug(), motivation));
     }
@@ -277,10 +277,10 @@ public class ApplicationServiceTest {
         verify(githubApiPort).updateComment(personalAccessToken, issue.repoId(), commentId, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
 
-                # My background and how it can be leveraged
+                ### My background and how it can be leveraged
                 %s
 
-                # How I plan on tackling this issue
+                ### How I plan on tackling this issue
                 %s
                 """.formatted(project.getSlug(), updatedApplication.motivations(), updatedApplication.problemSolvingApproach()));
     }

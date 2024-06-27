@@ -124,13 +124,13 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var motivationsSection = """
 
-                # My background and how it can be leveraged
+                ### My background and how it can be leveraged
                 %s
                 """.formatted(motivations);
 
-        final var problemSolvingApproachSection = problemSolvingApproach == null ? "" : """
+        final var problemSolvingApproachSection = (problemSolvingApproach == null || problemSolvingApproach.isBlank()) ? "" : """
 
-                # How I plan on tackling this issue
+                ### How I plan on tackling this issue
                 %s
                 """.formatted(problemSolvingApproach);
 
