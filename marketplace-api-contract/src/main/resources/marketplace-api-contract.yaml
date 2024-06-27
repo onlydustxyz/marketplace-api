@@ -34,6 +34,22 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/banner:
+    get:
+      tags:
+        - ReadBanner
+      summary: Get currently visible banner
+      operationId: getBanner
+      responses:
+        "200":
+          description: 'Banner'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BannerResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me:
     get:
       security:
@@ -8409,3 +8425,25 @@ components:
           description: The list of assignees for this issue
           items:
             $ref: '#/components/schemas/GithubUserResponse'
+
+    BannerResponse:
+      type: object
+      required:
+        - id
+        - text
+      properties:
+        id:
+          $ref: '#/components/schemas/BannerId'
+        text:
+          type: string
+        buttonIconSlug:
+          type: string
+        buttonText:
+          type: string
+        buttonLinkUrl:
+          type: string
+          format: uri
+
+    BannerId:
+      type: string
+      format: uuid

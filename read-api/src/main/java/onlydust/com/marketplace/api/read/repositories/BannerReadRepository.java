@@ -12,4 +12,6 @@ public interface BannerReadRepository extends Repository<BannerReadEntity, UUID>
     Page<BannerReadEntity> findAll(Pageable pageable);
 
     Optional<BannerReadEntity> findById(UUID bannerId);
+
+    Optional<BannerReadEntity> findFirstByVisibleTrue();
 }

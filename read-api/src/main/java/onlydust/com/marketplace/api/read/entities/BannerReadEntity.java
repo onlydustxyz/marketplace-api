@@ -56,4 +56,13 @@ public class BannerReadEntity {
                 .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl))
                 .visible(visible);
     }
+
+    public onlydust.com.marketplace.api.contract.model.BannerResponse toResponse() {
+        return new onlydust.com.marketplace.api.contract.model.BannerResponse()
+                .id(id)
+                .text(text)
+                .buttonText(buttonText)
+                .buttonIconSlug(buttonIconSlug)
+                .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl));
+    }
 }
