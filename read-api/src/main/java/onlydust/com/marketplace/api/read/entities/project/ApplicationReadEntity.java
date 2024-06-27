@@ -42,13 +42,15 @@ public class ApplicationReadEntity {
 
     @NonNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "issueId")
+    @JoinColumn(name = "issueId", insertable = false, updatable = false)
     GithubIssueReadEntity issue;
+    Long issueId;
 
     @NonNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId")
+    @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     AllUserReadEntity applicant;
+    Long applicantId;
 
     @NonNull
     String motivations;

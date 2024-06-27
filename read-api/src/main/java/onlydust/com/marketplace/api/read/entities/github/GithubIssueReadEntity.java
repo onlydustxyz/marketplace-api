@@ -106,13 +106,13 @@ public class GithubIssueReadEntity {
                 .toList();
 
         final var currentUserApplication = projectApplications.stream()
-                .filter(application -> application.applicant().githubUserId().equals(githubUserId))
+                .filter(application -> application.applicantId().equals(githubUserId))
                 .findFirst();
 
         return new GithubIssue()
                 .id(id)
                 .number(number)
-                .repository(repo.toShortResponse())
+                .repository(repo.toLinkResponse())
                 .createdAt(createdAt)
                 .closedAt(closedAt)
                 .title(title)
