@@ -45,6 +45,12 @@ public class GithubApiAdapter implements GithubApiPort {
     }
 
     @Override
+    public void updateComment(@NonNull String githubPersonalToken, @NonNull Long repoId, GithubComment.@NonNull Id id, @NonNull String body) {
+        client.patch("/repositories/%d/issues/comments/%d".formatted(repoId, id.value()), new CommentRequest(body), githubPersonalToken, CommentResponse.class)
+                .orElseThrow(() -> internalServerError("Failed to update comment"));
+    }
+
+    @Override
     public void deleteComment(@NonNull String personalAccessToken, @NonNull Long repoId, GithubComment.@NonNull Id id) {
         client.delete("/repositories/%d/issues/comments/%d".formatted(repoId, id.value()), personalAccessToken, Void.class);
     }

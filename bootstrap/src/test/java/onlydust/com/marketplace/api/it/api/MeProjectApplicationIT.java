@@ -209,6 +209,18 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
 
+        githubWireMockServer.stubFor(patch(urlEqualTo("/repositories/380954304/issues/comments/111"))
+                .withRequestBody(containing("https://local-app.onlydust.com/p/bretzel")
+                        .and(containing(motivations))
+                        .and(containing(problemSolvingApproach)))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withBody("""
+                                {
+                                    "id": 111
+                                }
+                                """)));
+
         final var request = new ProjectApplicationUpdateRequest()
                 .motivation(motivations)
                 .problemSolvingApproach(problemSolvingApproach);
@@ -228,6 +240,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(application.motivations()).isEqualTo(motivations);
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
+
+        githubWireMockServer.verify(patchRequestedFor(urlEqualTo("/repositories/380954304/issues/comments/111")));
     }
 
     @Test

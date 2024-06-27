@@ -168,7 +168,6 @@ public class ApplicationServiceTest {
                 """.formatted(project.getSlug(), motivation, problemSolvingApproach));
     }
 
-
     @Test
     void should_apply_on_project_without_problem_solving_approach() {
         // Given
@@ -224,10 +223,33 @@ public class ApplicationServiceTest {
     }
 
     @Test
-    void should_update_application() {
+    void should_prevent_application_update_if_no_github_permissions() {
         // Given
         final var application = Application.fromGithubComment(
                 new GithubComment(GithubComment.Id.random(), issue.id(),
+                        faker.number().randomNumber(),
+                        githubUserId,
+                        faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
+                        faker.lorem().sentence()),
+                projectId
+        );
+
+        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
+
+        // When
+        assertThatThrownBy(() -> applicationService.updateApplication(application.id(), githubUserId, motivation, problemSolvingApproach))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User is not authorized to update this application");
+    }
+
+    @Test
+    void should_update_application() {
+        // Given
+        final var application = Application.fromGithubComment(
+                new GithubComment(commentId,
+                        issue.id(),
                         faker.number().randomNumber(),
                         githubUserId,
                         faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -251,6 +273,16 @@ public class ApplicationServiceTest {
         assertThat(updatedApplication.motivations()).isEqualTo(motivations);
         assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
         verify(userStoragePort).save(updatedApplication);
+
+        verify(githubApiPort).updateComment(personalAccessToken, issue.repoId(), commentId, """
+                I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
+
+                # My background and how it can be leveraged
+                %s
+
+                # How I plan on tackling this issue
+                %s
+                """.formatted(project.getSlug(), updatedApplication.motivations(), updatedApplication.problemSolvingApproach()));
     }
 
     @Test

@@ -82,6 +82,16 @@ public class GithubHttpClient {
         }
     }
 
+    public <ResponseBody, RequestBody> Optional<ResponseBody> patch(String path, final RequestBody requestBody,
+                                                                    @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
+        try {
+            return fetch(HttpMethod.PATCH, path, HttpRequest.BodyPublishers.ofByteArray(objectMapper.writeValueAsBytes(requestBody)), personalAccessToken,
+                    responseClass);
+        } catch (JsonProcessingException e) {
+            throw internalServerError("Fail to serialize request", e);
+        }
+    }
+
     public <ResponseBody, RequestBody> Optional<ResponseBody> delete(String path, final RequestBody requestBody,
                                                                      @NonNull String personalAccessToken, Class<ResponseBody> responseClass) {
         try {

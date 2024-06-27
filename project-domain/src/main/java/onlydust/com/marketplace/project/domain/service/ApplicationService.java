@@ -138,6 +138,7 @@ public class ApplicationService implements ApplicationFacadePort {
     }
 
     @Override
+    @Transactional
     public Application updateApplication(@NonNull Application.Id applicationId, @NonNull Long githubUserId, @NonNull String motivation,
                                          String problemSolvingApproach) {
         final var application = userStoragePort.findApplication(applicationId)
@@ -146,8 +147,21 @@ public class ApplicationService implements ApplicationFacadePort {
         if (!application.applicantId().equals(githubUserId))
             throw forbidden("User is not authorized to update this application");
 
+        if (!githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId))
+            throw forbidden("User is not authorized to update this application");
+
+        final var issue = githubStoragePort.findIssueById(application.issueId())
+                .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+
+        final var project = projectStoragePort.getById(application.projectId())
+                .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));
+
+        final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
+
         final var updated = application.update(motivation, problemSolvingApproach);
         userStoragePort.save(updated);
+
+        githubApiPort.updateComment(personalAccessToken, issue.repoId(), application.commentId(), formatComment(project, motivation, problemSolvingApproach));
 
         return updated;
     }
