@@ -381,3 +381,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000273_add_recommendation_score_in_view.sql
   - include:
       file: db/changelog/changelogs/00000274_add_project_member_view.sql
+  - include:
+      file: db/changelog/changelogs/00000275_optimize_issues_perf.sql

@@ -318,7 +318,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .isProjectLead(me.isLeader())
                         .isInvitedAsProjectLead(me.isInvitedAsProjectLead())
                         .isContributor(me.isContributor()))
-                .goodFirstIssueCount(project.getGoodFirstIssueCount());
+                .goodFirstIssueCount(project.getGoodFirstIssues().size());
     }
 
     @Override

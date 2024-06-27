@@ -112,7 +112,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "repository": {
                                 "id": 350360184,
-                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -198,7 +197,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "repository": {
                                 "id": 350360184,
-                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -264,7 +262,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "repository": {
                                 "id": 350360184,
-                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -334,7 +331,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "repository": {
                                 "id": 350360184,
-                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -408,7 +404,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               },
                               "repository": {
                                 "id": 350360184,
-                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"

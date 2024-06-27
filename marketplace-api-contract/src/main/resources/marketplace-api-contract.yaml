@@ -5515,6 +5515,30 @@ components:
         - MISSING_PERMISSIONS
         - COMPLETE
 
+    GithubRepoLinkResponse:
+      type: object
+      required:
+        - id
+        - owner
+        - name
+        - htmlUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/GithubRepoId'
+        name:
+          type: string
+          description: Repo name on Github
+          example: marketplace-backend
+        description:
+          type: string
+          description: Repo description on Github
+          example: Awesome repo
+        htmlUrl:
+          type: string
+          format: url
+          description: The public Github URL of the repo
+          example: https://github.com/onlydustxyz/marketplace-backend
+
     ShortGithubRepoResponse:
       type: object
       required:
@@ -5846,7 +5870,7 @@ components:
         author:
           $ref: '#/components/schemas/ContributorResponse'
         repository:
-          $ref: '#/components/schemas/ShortGithubRepoResponse'
+          $ref: '#/components/schemas/GithubRepoLinkResponse'
         commentCount:
           type: integer
         labels:
