@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
+import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,9 +105,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
-        final var commentId = githubApiPort.createComment(personalAccessToken, issue, """
-                I am applying to this issue via [OnlyDust platform](%s/p/%s).
-                """.formatted(globalConfig.getAppBaseUrl(), project.getSlug()));
+        final var commentId = githubApiPort.createComment(personalAccessToken, issue, formatComment(project, motivation, problemSolvingApproach));
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
@@ -114,6 +113,28 @@ public class ApplicationService implements ApplicationFacadePort {
         applicationObserver.onApplicationCreated(application);
 
         return application;
+    }
+
+    private @NonNull String formatComment(final @NonNull Project project,
+                                          final @NonNull String motivations,
+                                          final String problemSolvingApproach) {
+        final var header = """
+                I am applying to this issue via [OnlyDust platform](%s/p/%s).
+                """.formatted(globalConfig.getAppBaseUrl(), project.getSlug());
+
+        final var motivationsSection = """
+
+                # My background and how it can be leveraged
+                %s
+                """.formatted(motivations);
+
+        final var problemSolvingApproachSection = problemSolvingApproach == null ? "" : """
+
+                # How I plan on tackling this issue
+                %s
+                """.formatted(problemSolvingApproach);
+
+        return header + motivationsSection + problemSolvingApproachSection;
     }
 
     @Override
