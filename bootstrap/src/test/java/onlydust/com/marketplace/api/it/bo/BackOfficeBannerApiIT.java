@@ -223,7 +223,45 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(2)
+    void should_get_banners() {
+        // Given
+        final var texts = new String[]{faker.lorem().sentence(), faker.lorem().sentence(), faker.lorem().sentence(), faker.lorem().sentence()};
 
+        final var banners = new UUID[]{
+                createBanner(texts[0]),
+                createBanner(texts[1]),
+                createBanner(texts[2]),
+                createBanner(texts[3])
+        };
+
+        // When
+        client.get()
+                .uri(getApiURI(BANNERS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.totalPageNumber").isEqualTo(1)
+                .jsonPath("$.totalItemNumber").isEqualTo(4)
+                .jsonPath("$.hasMore").isEqualTo(false)
+                .jsonPath("$.nextPageIndex").isEqualTo(0)
+                .jsonPath("$.banners.length()").isEqualTo(4)
+                .jsonPath("$.banners[0].id").isEqualTo(banners[3].toString())
+                .jsonPath("$.banners[0].text").isEqualTo(texts[3])
+                .jsonPath("$.banners[0].visible").isEqualTo(false)
+                .jsonPath("$.banners[1].id").isEqualTo(banners[2].toString())
+                .jsonPath("$.banners[1].text").isEqualTo(texts[2])
+                .jsonPath("$.banners[1].visible").isEqualTo(false)
+                .jsonPath("$.banners[2].id").isEqualTo(banners[1].toString())
+                .jsonPath("$.banners[2].text").isEqualTo(texts[1])
+                .jsonPath("$.banners[2].visible").isEqualTo(false)
+                .jsonPath("$.banners[3].id").isEqualTo(banners[0].toString())
+                .jsonPath("$.banners[3].text").isEqualTo(texts[0])
+                .jsonPath("$.banners[3].visible").isEqualTo(false)
+        ;
+    }
 
     @Test
     @Order(3)
