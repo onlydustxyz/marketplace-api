@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeBannersReadApi;
 import onlydust.com.backoffice.api.contract.model.BannerPageResponse;
+import onlydust.com.backoffice.api.contract.model.BannerResponse;
 import onlydust.com.marketplace.api.read.entities.BannerReadEntity;
 import onlydust.com.marketplace.api.read.repositories.BannerReadRepository;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
@@ -24,6 +28,14 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("bo")
 public class BackofficeBannersReadApiPostgresAdapter implements BackofficeBannersReadApi {
     private final BannerReadRepository bannerReadRepository;
+
+    @Override
+    public ResponseEntity<BannerResponse> getBanner(UUID bannerId) {
+        final var banner = bannerReadRepository.findById(bannerId)
+                .orElseThrow(() -> notFound("Banner not found"));
+
+        return ok(banner.toBoResponse());
+    }
 
     @Override
     public ResponseEntity<BannerPageResponse> getBannerPage(Integer pageIndex, Integer pageSize) {

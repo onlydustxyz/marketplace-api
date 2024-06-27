@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -76,6 +77,19 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Test
     @Order(1)
+    void should_raise_not_found() {
+        // When
+        client.get()
+                .uri(getApiURI(BANNER.formatted(UUID.randomUUID())))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
+    @Order(1)
     void should_get_no_banners() {
         // When
         client.get()
@@ -118,6 +132,22 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody().getId();
 
         assertThat(bannerId).isNotNull();
+
+        client.get()
+                .uri(getApiURI(BANNER.formatted(bannerId)))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(bannerId.toString())
+                .jsonPath("$.text").isEqualTo(text)
+                .jsonPath("$.visible").isEqualTo(false)
+                .jsonPath("$.buttonIconSlug").isEqualTo(buttonIconSlug)
+                .jsonPath("$.buttonText").isEqualTo(buttonText)
+                .jsonPath("$.buttonLinkUrl").isEqualTo(buttonLinkUrl.toString())
+        ;
     }
 
     @Test
@@ -141,5 +171,21 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody().getId();
 
         assertThat(bannerId).isNotNull();
+
+        client.get()
+                .uri(getApiURI(BANNER.formatted(bannerId)))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(bannerId.toString())
+                .jsonPath("$.text").isEqualTo(text)
+                .jsonPath("$.visible").isEqualTo(false)
+                .jsonPath("$.buttonIconSlug").doesNotExist()
+                .jsonPath("$.buttonText").doesNotExist()
+                .jsonPath("$.buttonLinkUrl").doesNotExist()
+        ;
     }
 }
