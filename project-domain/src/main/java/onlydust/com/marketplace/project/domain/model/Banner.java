@@ -25,6 +25,12 @@ public class Banner {
 
     @NonNull
     ZonedDateTime updatedAt;
+
+    public Banner(@NonNull String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl
+    ) {
+        this(Id.random(), text, buttonText, buttonIconSlug, buttonLinkUrl, false, ZonedDateTime.now());
+    }
+
     @NoArgsConstructor(staticName = "random")
     @EqualsAndHashCode(callSuper = true)
     @SuperBuilder

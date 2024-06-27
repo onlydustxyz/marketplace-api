@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -32,4 +33,16 @@ public class BannerEntity {
 
     @NonNull
     ZonedDateTime updatedAt;
+
+    public static BannerEntity of(Banner banner) {
+        return BannerEntity.builder()
+                .id(banner.id().value())
+                .text(banner.text())
+                .buttonText(banner.buttonText())
+                .buttonIconSlug(banner.buttonIconSlug())
+                .buttonLinkUrl(banner.buttonLinkUrl() == null ? null : banner.buttonLinkUrl().toString())
+                .visible(banner.visible())
+                .updatedAt(banner.updatedAt())
+                .build();
+    }
 }

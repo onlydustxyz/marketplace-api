@@ -401,4 +401,9 @@ public class PostgresConfiguration {
                 committeeJuryVoteRepository,
                 committeeBudgetAllocationRepository);
     }
+
+    @Bean
+    PostgresBannersAdapter postgresBannersAdapter(final BannerRepository bannerRepository) {
+        return new PostgresBannersAdapter(bannerRepository);
+    }
 }
