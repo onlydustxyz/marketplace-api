@@ -1,15 +1,16 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.toSet;
 
 @Entity
 @AllArgsConstructor
@@ -35,6 +36,9 @@ public class BannerEntity {
     @NonNull
     ZonedDateTime updatedAt;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "bannerId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<BannerClosedByEntity> closedBy;
+
     public static BannerEntity of(Banner banner) {
         return BannerEntity.builder()
                 .id(banner.id().value())
@@ -44,6 +48,7 @@ public class BannerEntity {
                 .buttonLinkUrl(banner.buttonLinkUrl() == null ? null : banner.buttonLinkUrl().toString())
                 .visible(banner.visible())
                 .updatedAt(banner.updatedAt())
+                .closedBy(banner.closedBy().stream().map(userId -> new BannerClosedByEntity(banner.id().value(), userId)).collect(toSet()))
                 .build();
     }
 
@@ -55,6 +60,7 @@ public class BannerEntity {
                 buttonIconSlug,
                 buttonLinkUrl == null ? null : URI.create(buttonLinkUrl),
                 visible,
-                updatedAt);
+                updatedAt,
+                closedBy.stream().map(BannerClosedByEntity::userId).collect(toSet()));
     }
 }

@@ -69,6 +69,7 @@ public class AbstractMarketplaceApiIT {
 
     protected static final Faker faker = new Faker();
     protected static final String BANNER = "/api/v1/banner";
+    protected static final String ME_BANNER = "/api/v1/me/banners/%s";
     protected static final String BILLING_PROFILE_INVOICE_PREVIEW = "/api/v1/billing-profiles/%s/invoice-preview";
     protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String BILLING_PROFILE_INVOICE = "/api/v1/billing-profiles/%s/invoices/%s";

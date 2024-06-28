@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.port.input;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.net.URI;
+import java.util.UUID;
 
 public interface BannerFacadePort {
     Banner createBanner(String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl);
@@ -14,4 +15,6 @@ public interface BannerFacadePort {
     void hideBanner(Banner.Id id);
 
     void showBanner(Banner.Id id);
+
+    void closeBanner(Banner.Id id, UUID userId);
 }

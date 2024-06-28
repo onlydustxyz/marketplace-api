@@ -385,3 +385,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000275_optimize_issues_perf.sql
   - include:
       file: db/changelog/changelogs/00000276_create_banners.sql
+  - include:
+      file: db/changelog/changelogs/00000277_create_banners_closed_by.sql

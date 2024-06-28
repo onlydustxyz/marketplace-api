@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneOffset;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +51,32 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_nothing_if_no_visible_banner() {
+        // Given
+        final var user = userAuthHelper.authenticateAnthony();
+        bannerRepository.save(banners.get(1).visible(true));
+
+        // When
+        client.delete()
+                .uri(getApiURI(ME_BANNER.formatted(banners.get(1).id())))
+                .header("Authorization", "Bearer " + user.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(BANNER))
+                .header("Authorization", "Bearer " + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+    }
+
+
+    @Test
+    void should_return_nothing_if_no_banner_is_closed() {
         // When
         client.get()
                 .uri(getApiURI(BANNER))
@@ -66,6 +93,7 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
                 faker.internet().slug(),
                 faker.internet().url(),
                 false,
-                faker.date().birthday().toInstant().atZone(ZoneOffset.UTC));
+                faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
+                new HashSet<>());
     }
 }
