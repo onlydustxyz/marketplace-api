@@ -7828,6 +7828,7 @@ components:
         - location
         - startDate
         - endDate
+        - projects
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -7843,6 +7844,10 @@ components:
         endDate:
           type: string
           format: date-time
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
 
     HackathonsListResponse:
       type: object

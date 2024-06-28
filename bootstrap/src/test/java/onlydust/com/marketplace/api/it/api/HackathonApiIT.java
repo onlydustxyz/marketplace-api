@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
@@ -294,14 +294,41 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "title": "Hackathon 1",
                               "location": null,
                               "startDate": "2024-04-19T00:00:00Z",
-                              "endDate": "2024-04-20T00:00:00Z"
+                              "endDate": "2024-04-20T00:00:00Z",
+                              "projects": [
+                                {
+                                  "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                                  "slug": "cairo-foundry",
+                                  "name": "Cairo foundry",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                                  "slug": "cairo-streams",
+                                  "name": "Cairo streams",
+                                  "logoUrl": null
+                                },
+                                {
+                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
+                                  "slug": "red-bull",
+                                  "name": "Red bull",
+                                  "logoUrl": "https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A"
+                                },
+                                {
+                                  "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                                  "slug": "cairo-foundry",
+                                  "name": "Cairo foundry",
+                                  "logoUrl": null
+                                }
+                              ]
                             },
                             {
                               "slug": "hackathon-3",
                               "title": "Hackathon 3",
                               "location": "Location 3",
                               "startDate": "2024-04-19T00:00:00Z",
-                              "endDate": "2024-04-20T00:00:00Z"
+                              "endDate": "2024-04-20T00:00:00Z",
+                              "projects": []
                             }
                           ]
                         }
