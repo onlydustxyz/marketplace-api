@@ -1,13 +1,12 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 
 public class IssuesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_issue_by_id() {
-        final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
+        final var olivier = userAuthHelper.authenticateOlivier();
 
         // When
         client.get()
@@ -25,7 +24,35 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "title": "Documentation by AnthonyBuisset",
                           "status": "OPEN",
                           "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
-                          "githubAppInstallationStatus": "NOT_INSTALLED"
+                          "githubAppInstallationStatus": null,
+                          "githubAppInstallationPermissionsUpdateUrl": null
+                        }
+                        """);
+    }
+
+
+    @Test
+    void should_return_issue_by_id_as_project_lead() {
+        final var olivier = userAuthHelper.authenticateOlivier();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ISSUES_BY_ID, "1835403768")))
+                .header("Authorization", "Bearer " + olivier.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": 1835403768,
+                          "number": 6,
+                          "title": "Test #2",
+                          "status": "OPEN",
+                          "htmlUrl": "https://github.com/onlydustxyz/od-rust-template/issues/6",
+                          "githubAppInstallationStatus": "MISSING_PERMISSIONS",
+                          "githubAppInstallationPermissionsUpdateUrl": "https://github.com/organizations/onlydustxyz/settings/installations/44741576/permissions/update"
                         }
                         """);
     }

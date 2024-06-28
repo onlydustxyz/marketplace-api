@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectsGoodFirstIssue
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
@@ -155,15 +156,24 @@ public class GithubIssueReadEntity {
                 ;
     }
 
-    public GithubIssueResponse toDto() {
-        return new GithubIssueResponse()
+    public GithubIssueResponse toDto(boolean asProjectLead) {
+        final var response = new GithubIssueResponse()
                 .id(id)
                 .number(number)
                 .title(title)
                 .status(status)
-                .htmlUrl(htmlUrl)
-                .githubAppInstallationStatus(map(repo.owner().installation() == null ? null : repo.owner().installation().getStatus()))
-                ;
+                .htmlUrl(htmlUrl);
+
+        if (asProjectLead) {
+            final var installationStatus = map(repo.owner().installation() == null ? null : repo.owner().installation().getStatus());
+            response.setGithubAppInstallationStatus(installationStatus);
+            if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS)
+                response.setGithubAppInstallationPermissionsUpdateUrl(
+                        URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
+                                .formatted(repoOwnerLogin, repo.owner().installation().getId())));
+        }
+
+        return response;
     }
 
     private GithubOrganizationInstallationStatus map(GithubAppInstallationViewEntity.Status status) {
