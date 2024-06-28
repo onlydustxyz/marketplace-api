@@ -1256,6 +1256,198 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  # BackofficeBannerManagement ===============================================================
+  /bo/v1/banners:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBannersRead
+      summary: Get banners page
+      operationId: getBannerPage
+      description: |
+        Get banners page
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Banner page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BannerPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBanners
+      summary: Create banner
+      operationId: createBanner
+      description: |
+        Create banner. A banner is hidden by default.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BannerCreateRequest'
+      responses:
+        "201":
+          description: 'Banner created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BannerCreateResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+  /bo/v1/banners/{bannerId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBannersRead
+      summary: Get banner
+      operationId: getBanner
+      description: |
+        Get banner
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      responses:
+        "200":
+          description: 'Banner'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BannerResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBanners
+      summary: Update banner
+      operationId: updateBanner
+      description: |
+        Update banner
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BannerUpdateRequest'
+      responses:
+        "204":
+          description: 'Banner updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBanners
+      summary: Delete banner
+      operationId: deleteBanner
+      description: |
+        Delete banner
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      responses:
+        "204":
+          description: 'Banner deleted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/banners/{bannerId}/visible:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBanners
+      summary: Show banner
+      operationId: showBanner
+      description: |
+        Show banner. All other banners will be hidden
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      responses:
+        "204":
+          description: 'Banner is now visible'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeBanners
+      summary: Hide banner
+      operationId: hideBanner
+      description: |
+        Hide banner
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      responses:
+        "204":
+          description: 'Banner is now hidden'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # Backoffice ===============================================================
   /bo/v1/users:
     get:
@@ -5074,3 +5266,103 @@ components:
       enum:
         - PENDING
         - APPROVED
+
+    PageResponse:
+      type: object
+      required:
+        - totalPageNumber
+        - totalItemNumber
+        - nextPageIndex
+        - hasMore
+      properties:
+        totalPageNumber:
+          type: integer
+        totalItemNumber:
+          type: integer
+        hasMore:
+          type: boolean
+        nextPageIndex:
+          description: if there is no next page, it will be equals to the last page
+          type: integer
+
+    BannerCreateRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+        buttonIconSlug:
+          type: string
+        buttonText:
+          type: string
+        buttonLinkUrl:
+          type: string
+          format: uri
+
+    BannerUpdateRequest:
+      allOf:
+        - $ref: '#/components/schemas/BannerCreateRequest'
+
+    BannerId:
+      type: string
+      format: uuid
+
+    BannerCreateResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/BannerId'
+
+    BannerUpdateResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/BannerId'
+
+    BannerShortResponse:
+      type: object
+      required:
+        - id
+        - text
+        - visible
+      properties:
+        id:
+          $ref: '#/components/schemas/BannerId'
+        text:
+          type: string
+        visible:
+          type: boolean
+
+    BannerPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/BannerShortResponse'
+
+    BannerPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - banners
+          properties:
+            banners:
+              type: array
+              items:
+                $ref: '#/components/schemas/BannerPageItemResponse'
+
+    BannerResponse:
+      allOf:
+        - $ref: '#/components/schemas/BannerShortResponse'
+        - type: object
+          properties:
+            buttonIconSlug:
+              type: string
+            buttonText:
+              type: string
+            buttonLinkUrl:
+              type: string
+              format: uri

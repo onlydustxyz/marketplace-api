@@ -409,4 +409,9 @@ public class ProjectConfiguration {
                                                                      final GithubAuthenticationInfoPort githubAuthenticationInfoPort) {
         return new GithubUserPermissionsService(githubAuthenticationPort, githubAuthenticationInfoPort);
     }
+
+    @Bean
+    public BannerFacadePort bannerFacadePort(final BannerStoragePort bannerStoragePort) {
+        return new BannerService(bannerStoragePort);
+    }
 }

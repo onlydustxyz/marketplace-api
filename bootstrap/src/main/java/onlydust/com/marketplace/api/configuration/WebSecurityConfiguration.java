@@ -70,6 +70,11 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/hackathons/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
 
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/banners/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/banners/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/banners/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/banners/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
+
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/committees/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/committees/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/committees/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
@@ -135,6 +140,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/actuator/health")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/version")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/banner")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/sumsub/webhook")).permitAll()
                                 .anyRequest().authenticated())
 
