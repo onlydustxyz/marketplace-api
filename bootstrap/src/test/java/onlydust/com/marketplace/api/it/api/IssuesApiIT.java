@@ -24,7 +24,8 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "number": 1111,
                           "title": "Documentation by AnthonyBuisset",
                           "status": "OPEN",
-                          "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111"
+                          "htmlUrl": "https://github.com/od-mocks/cool.repo.B/issues/1111",
+                          "githubAppInstallationStatus": "NOT_INSTALLED"
                         }
                         """);
     }

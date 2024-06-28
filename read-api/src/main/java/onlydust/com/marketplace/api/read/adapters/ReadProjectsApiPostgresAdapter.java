@@ -202,7 +202,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = githubIssueReadRepository.findGoodFirstIssuesOf(projectId, PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
         return ok(new GoodFirstIssuesPageResponse()
-                .issues(page.stream().map(i -> i.toDto(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
+                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

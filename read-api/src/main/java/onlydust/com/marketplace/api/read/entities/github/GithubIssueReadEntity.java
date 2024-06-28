@@ -4,10 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.GithubIssue;
-import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
-import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
-import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectsGoodFirstIssuesReadEntity;
@@ -100,7 +98,7 @@ public class GithubIssueReadEntity {
     @NonNull
     Set<ApplicationReadEntity> applications;
 
-    public GithubIssue toDto(@NonNull UUID projectId, Long githubUserId) {
+    public GithubIssuePageItemResponse toPageItemResponse(@NonNull UUID projectId, Long githubUserId) {
         final var projectApplications = applications.stream()
                 .filter(application -> application.projectId().equals(projectId))
                 .toList();
@@ -109,7 +107,7 @@ public class GithubIssueReadEntity {
                 .filter(application -> application.applicantId().equals(githubUserId))
                 .findFirst();
 
-        return new GithubIssue()
+        return new GithubIssuePageItemResponse()
                 .id(id)
                 .number(number)
                 .repository(repo.toLinkResponse())
@@ -155,5 +153,24 @@ public class GithubIssueReadEntity {
                 .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
                 ;
+    }
+
+    public GithubIssueResponse toDto() {
+        return new GithubIssueResponse()
+                .id(id)
+                .number(number)
+                .title(title)
+                .status(status)
+                .htmlUrl(htmlUrl)
+                .githubAppInstallationStatus(map(repo.owner().installation() == null ? null : repo.owner().installation().getStatus()))
+                ;
+    }
+
+    private GithubOrganizationInstallationStatus map(GithubAppInstallationViewEntity.Status status) {
+        return status == null ? GithubOrganizationInstallationStatus.NOT_INSTALLED : switch (status) {
+            case SUSPENDED -> GithubOrganizationInstallationStatus.SUSPENDED;
+            case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
+            case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
+        };
     }
 }
