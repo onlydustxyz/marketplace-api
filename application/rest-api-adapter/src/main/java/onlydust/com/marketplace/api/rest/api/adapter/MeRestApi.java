@@ -60,6 +60,7 @@ public class MeRestApi implements MeApi {
     private final PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     private final HackathonFacadePort hackathonFacadePort;
     private final CommitteeFacadePort committeeFacadePort;
+    private final BannerFacadePort bannerFacadePort;
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
@@ -220,6 +221,13 @@ public class MeRestApi implements MeApi {
         userFacadePort.claimProjectForAuthenticatedUser(
                 projectId, authenticatedUser
         );
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> closeBanner(UUID bannerId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        bannerFacadePort.closeBanner(Banner.Id.of(bannerId), authenticatedUser.getId());
         return noContent().build();
     }
 

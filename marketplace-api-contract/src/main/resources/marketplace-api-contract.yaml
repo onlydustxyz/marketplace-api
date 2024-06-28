@@ -94,6 +94,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/banners/{bannerId}:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Close a banner
+      operationId: closeBanner
+      description: |
+        Close a banner for the caller. Will mark the banner as closed for the caller.
+        The banner won't be displayed anymore.
+      parameters:
+        - in: path
+          name: bannerId
+          required: true
+          schema:
+            $ref: '#/components/schemas/BannerId'
+      responses:
+        "204":
+          description: 'Banner closed'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/logout:
     post:
       security:

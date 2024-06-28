@@ -6,12 +6,16 @@ import onlydust.com.backoffice.api.contract.model.BannerCreateRequest;
 import onlydust.com.backoffice.api.contract.model.BannerCreateResponse;
 import onlydust.com.backoffice.api.contract.model.BannerUpdateRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.BannerClosedByEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.BannerRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +25,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
     private UserAuthHelper.AuthenticatedBackofficeUser emilie;
     private final Faker faker = new Faker();
+
+    @Autowired
+    BannerRepository bannerRepository;
 
     @BeforeEach
     void login() {
@@ -290,6 +297,16 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody().getId();
 
         assertThat(bannerId).isNotNull();
+
+        // Add some closedBy rows
+        final var banner = bannerRepository.findById(bannerId).orElseThrow();
+        banner.closedBy().addAll(Set.of(
+                new BannerClosedByEntity(bannerId, userAuthHelper.authenticateAnthony().user().getId()),
+                new BannerClosedByEntity(bannerId, userAuthHelper.authenticatePierre().user().getId()),
+                new BannerClosedByEntity(bannerId, userAuthHelper.authenticateOlivier().user().getId()),
+                new BannerClosedByEntity(bannerId, userAuthHelper.authenticateHayden().user().getId())
+        ));
+        bannerRepository.save(banner);
 
         client.get()
                 .uri(getApiURI(BANNER.formatted(bannerId)))

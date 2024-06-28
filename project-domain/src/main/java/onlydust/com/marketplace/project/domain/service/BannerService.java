@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -59,5 +60,14 @@ public class BannerService implements BannerFacadePort {
                 .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
 
         bannerStoragePort.save(banner.visible(true));
+    }
+
+    @Override
+    public void closeBanner(Banner.Id id, UUID userId) {
+        final var banner = bannerStoragePort.findById(id)
+                .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
+
+        banner.close(userId);
+        bannerStoragePort.save(banner);
     }
 }

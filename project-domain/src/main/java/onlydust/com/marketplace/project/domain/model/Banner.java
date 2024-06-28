@@ -7,6 +7,8 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -27,9 +29,16 @@ public class Banner {
     @NonNull
     ZonedDateTime updatedAt;
 
-    public Banner(@NonNull String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl
+    @NonNull
+    Set<UUID> closedBy;
+
+    public Banner(final @NonNull String text, final String buttonText, final String buttonIconSlug, final URI buttonLinkUrl
     ) {
-        this(Id.random(), text, buttonText, buttonIconSlug, buttonLinkUrl, false, ZonedDateTime.now());
+        this(Id.random(), text, buttonText, buttonIconSlug, buttonLinkUrl, false, ZonedDateTime.now(), new HashSet<>());
+    }
+
+    public void close(final @NonNull UUID userId) {
+        closedBy.add(userId);
     }
 
     @NoArgsConstructor(staticName = "random")

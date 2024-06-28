@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.BannerEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BannerRepository;
 import onlydust.com.marketplace.project.domain.model.Banner;
 import onlydust.com.marketplace.project.domain.port.output.BannerStoragePort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -18,6 +19,7 @@ public class PostgresBannersAdapter implements BannerStoragePort {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Banner> findById(Banner.Id id) {
         return bannerRepository.findById(id.value()).map(BannerEntity::toDomain);
     }
