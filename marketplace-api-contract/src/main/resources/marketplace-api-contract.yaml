@@ -5869,9 +5869,14 @@ components:
       allOf:
         - $ref: '#/components/schemas/GithubIssueLinkResponse'
         - type: object
+          description: |
+            Only the project lead can see the GitHub App installation details
           properties:
             githubAppInstallationStatus:
               $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+            githubAppInstallationPermissionsUpdateUrl:
+              type: string
+              format: uri
 
     GithubIssuePageItemResponse:
       type: object
