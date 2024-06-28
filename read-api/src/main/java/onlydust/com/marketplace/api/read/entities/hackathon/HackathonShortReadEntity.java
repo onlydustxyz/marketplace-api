@@ -11,12 +11,15 @@ import onlydust.com.marketplace.api.contract.model.HackathonsListItemResponse;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -49,6 +52,8 @@ public class HackathonShortReadEntity {
     @NonNull
     Date endDate;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<HackathonDetailsReadEntity.Project> projects;
 
     public HackathonsListItemResponse toHackathonsListItemResponse() {
         return new HackathonsListItemResponse()
@@ -58,6 +63,9 @@ public class HackathonShortReadEntity {
                 .location(location)
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
+                .projects(projects == null ? List.of() : projects.stream()
+                        .map(HackathonDetailsReadEntity.Project::toLinkResponse)
+                        .toList())
                 ;
     }
 

@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -78,6 +77,13 @@ public class HackathonDetailsReadEntity {
                           @NonNull String shortDescription,
                           @NonNull ProjectVisibility visibility
     ) {
+        public ProjectLinkResponse toLinkResponse() {
+            return new ProjectLinkResponse()
+                    .id(this.id)
+                    .slug(this.slug)
+                    .name(this.name)
+                    .logoUrl(this.logoUrl);
+        }
     }
 
     public record Track(@NonNull String name,
