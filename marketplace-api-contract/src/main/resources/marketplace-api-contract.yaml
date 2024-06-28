@@ -1835,7 +1835,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GithubIssueLinkResponse'
+                $ref: '#/components/schemas/GithubIssueResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "404":
@@ -4998,7 +4998,7 @@ components:
             issues:
               type: array
               items:
-                $ref: '#/components/schemas/GithubIssue'
+                $ref: '#/components/schemas/GithubIssuePageItemResponse'
 
     SponsorResponse:
       type: object
@@ -5865,7 +5865,15 @@ components:
           type: integer
           format: int64
 
-    GithubIssue:
+    GithubIssueResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubIssueLinkResponse'
+        - type: object
+          properties:
+            githubAppInstallationStatus:
+              $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+
+    GithubIssuePageItemResponse:
       type: object
       description: Github issue
       required:
