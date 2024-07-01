@@ -133,7 +133,10 @@ public class GithubIssueReadEntity {
                 .number(number)
                 .title(title)
                 .status(status)
-                .htmlUrl(htmlUrl);
+                .htmlUrl(htmlUrl)
+                .repo(repo.toLinkResponse())
+                .author(author.toGithubUserResponse())
+                ;
     }
 
     public ProjectIssuesPageItemResponse toProjectIssueDto(@NonNull UUID projectId) {

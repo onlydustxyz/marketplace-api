@@ -25,6 +25,9 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             SELECT a
             FROM ApplicationReadEntity a
             JOIN FETCH a.issue i
+            JOIN FETCH i.repo
+            JOIN FETCH i.author
+            JOIN FETCH a.project
             JOIN FETCH a.applicant u
             JOIN FETCH a.ranking
             WHERE   (:projectId IS NULL OR a.projectId = :projectId) AND

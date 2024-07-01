@@ -78,10 +78,11 @@ public class ApplicationReadEntity {
     public ProjectApplicationPageItemResponse toPageItemDto() {
         return new ProjectApplicationPageItemResponse()
                 .id(id)
-                .projectId(projectId)
+                .project(project.toLinkResponse())
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
-                .recommandationScore(ranking.recommendationScore())
+                .receivedAt(receivedAt)
+                .recommendationScore(ranking.recommendationScore())
                 ;
     }
 
