@@ -5960,6 +5960,8 @@ components:
         - title
         - status
         - htmlUrl
+        - repo
+        - author
       properties:
         id:
           $ref: '#/components/schemas/IssueId'
@@ -5977,6 +5979,10 @@ components:
           type: string
           format: url
           description: The public Github URL of the issue.
+        repo:
+          $ref: '#/components/schemas/GithubRepoLinkResponse'
+        author:
+          $ref: '#/components/schemas/GithubUserResponse'
 
     GithubLabel:
       type: object
@@ -6486,19 +6492,24 @@ components:
       type: object
       required:
         - id
-        - projectId
+        - project
         - issue
         - applicant
+        - receivedAt
         - recommendationScore
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
-        projectId:
-          $ref: '#/components/schemas/ProjectId'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
+        receivedAt:
+          type: string
+          format: date-time
+          description: When the application was created
         recommendationScore:
           $ref: '#/components/schemas/ScorePercentage'
 
