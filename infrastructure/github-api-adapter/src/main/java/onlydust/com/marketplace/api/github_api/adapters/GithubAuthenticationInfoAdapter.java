@@ -4,15 +4,15 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationInfoPort;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 @AllArgsConstructor
 public class GithubAuthenticationInfoAdapter implements GithubAuthenticationInfoPort {
 
     private final GithubHttpClient httpClient;
-    private final Map<String, Set<String>> scopesByToken = new HashMap<>();
+    private final Map<String, Set<String>> scopesByToken = new ConcurrentHashMap<>();
 
     @Override
     public void logout(String accessToken) {
