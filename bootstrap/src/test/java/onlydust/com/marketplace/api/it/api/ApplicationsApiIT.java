@@ -510,7 +510,8 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                             "isRegistered": true
                           },
-                          "recommandationScore": 36,
+                          "origin": "GITHUB",
+                          "recommendationScore": 36,
                           "availabilityScore": 71,
                           "languageScore": 0,
                           "fidelityScore": 43,

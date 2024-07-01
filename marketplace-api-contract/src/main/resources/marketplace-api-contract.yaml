@@ -4159,6 +4159,13 @@ components:
       format: uuid
       description: Application ID
 
+    ProjectApplicationOrigin:
+      type: string
+      description: Application origin
+      enum:
+        - GITHUB
+        - MARKETPLACE
+
     TransactionId:
       type: string
       format: uuid
@@ -6502,6 +6509,7 @@ components:
         - projectId
         - issue
         - applicant
+        - origin
         - recommandationScore
         - availabilityScore
         - appliedDistinctProjectCount
@@ -6517,7 +6525,9 @@ components:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
-        recommandationScore:
+        origin:
+          $ref: '#/components/schemas/ProjectApplicationOrigin'
+        recommendationScore:
           $ref: '#/components/schemas/ScorePercentage'
         availabilityScore:
           $ref: '#/components/schemas/ScorePercentage'

@@ -6,12 +6,12 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.api.contract.model.ProjectApplicationOrigin;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationShortResponse;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
-import onlydust.com.marketplace.project.domain.model.Application;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
@@ -59,7 +59,7 @@ public class ApplicationReadEntity {
 
     @NonNull
     @Enumerated(EnumType.STRING)
-    Application.Origin origin;
+    ProjectApplicationOrigin origin;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id", referencedColumnName = "applicationId")
@@ -91,7 +91,8 @@ public class ApplicationReadEntity {
                 .projectId(projectId)
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
-                .recommandationScore(ranking.recommendationScore())
+                .origin(origin)
+                .recommendationScore(ranking.recommendationScore())
                 .availabilityScore(ranking.availabilityScore())
                 .languageScore(ranking.mainRepoLanguageUserScore())
                 .fidelityScore(ranking.projectFidelityScore())
