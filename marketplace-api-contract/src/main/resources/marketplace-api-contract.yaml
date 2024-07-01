@@ -6489,7 +6489,7 @@ components:
         - projectId
         - issue
         - applicant
-        - recommandationScore
+        - recommendationScore
       properties:
         id:
           $ref: '#/components/schemas/ProjectApplicationId'
@@ -6499,7 +6499,7 @@ components:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
           $ref: '#/components/schemas/ContributorResponse'
-        recommandationScore:
+        recommendationScore:
           $ref: '#/components/schemas/ScorePercentage'
 
     ProjectApplicationResponse:
@@ -6510,7 +6510,7 @@ components:
         - issue
         - applicant
         - origin
-        - recommandationScore
+        - recommendationScore
         - availabilityScore
         - appliedDistinctProjectCount
         - pendingApplicationCountOnOtherProjects

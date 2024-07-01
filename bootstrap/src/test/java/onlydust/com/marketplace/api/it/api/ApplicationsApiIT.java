@@ -146,7 +146,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 43
+                              "recommendationScore": 43
                             },
                             {
                               "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -163,7 +163,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 41
+                              "recommendationScore": 41
                             },
                             {
                               "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -180,7 +180,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 33
+                              "recommendationScore": 33
                             }
                           ]
                         }
@@ -222,7 +222,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             },
                             {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -239,7 +239,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             }
                           ]
                         }
@@ -316,7 +316,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             },
                             {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -333,7 +333,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             }
                           ]
                         }
@@ -382,7 +382,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             },
                             {
                               "projectId": "6239cb20-eece-466a-80a0-742c1071dd3c",
@@ -399,7 +399,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 35
+                              "recommendationScore": 35
                             },
                             {
                               "projectId": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
@@ -416,7 +416,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                                 "isRegistered": true
                               },
-                              "recommandationScore": 41
+                              "recommendationScore": 41
                             }
                           ]
                         }
