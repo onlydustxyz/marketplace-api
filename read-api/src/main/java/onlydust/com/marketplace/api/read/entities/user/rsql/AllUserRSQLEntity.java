@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserSearchPageItemResponse;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.UserReadEntity;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZoneId;
@@ -35,6 +36,9 @@ public class AllUserRSQLEntity {
     String avatarUrl;
     String email;
 
+    @Formula("(select ci.contact from contact_informations ci where ci.user_id = user_id and ci.channel = 'telegram')")
+    String telegram;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     UserReadEntity registered;
@@ -58,7 +62,6 @@ public class AllUserRSQLEntity {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem;
-
 
     public UserSearchPageItemResponse toBoPageItemResponse() {
         return new UserSearchPageItemResponse()
