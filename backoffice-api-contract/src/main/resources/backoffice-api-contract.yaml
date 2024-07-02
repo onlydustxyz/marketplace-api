@@ -5259,6 +5259,8 @@ components:
           $ref: '#/components/schemas/ProjectCategorySlug'
         name:
           type: string
+        description:
+          type: string
         status:
           $ref: '#/components/schemas/ProjectCategorySuggestionStatus'
         iconSlug:
@@ -5270,9 +5272,12 @@ components:
       type: object
       required:
         - name
+        - description
         - iconSlug
       properties:
         name:
+          type: string
+        description:
           type: string
         iconSlug:
           type: string
@@ -5288,6 +5293,7 @@ components:
       required:
         - id
         - name
+        - description
         - iconSlug
       properties:
         id:
@@ -5295,6 +5301,8 @@ components:
         slug:
           $ref: '#/components/schemas/ProjectCategorySlug'
         name:
+          type: string
+        description:
           type: string
         iconSlug:
           type: string

@@ -469,6 +469,7 @@ public interface BackOfficeMapper {
         return new ProjectCategoryResponse()
                 .id(projectCategory.id().value())
                 .name(projectCategory.name())
+                .description(projectCategory.description())
                 .iconSlug(projectCategory.iconSlug());
     }
 

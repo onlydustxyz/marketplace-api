@@ -15,8 +15,8 @@ public class ProjectCategoriesApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_create_project_category() {
         // Given
-        projectCategoryStoragePort.save(ProjectCategory.of("Game", "game"));
-        projectCategoryStoragePort.save(ProjectCategory.of("Tutorial", "tuto"));
+        projectCategoryStoragePort.save(ProjectCategory.of("Game", "Games are fun", "game"));
+        projectCategoryStoragePort.save(ProjectCategory.of("Tutorial", "I love learning", "tuto"));
 
         // When
         client.get()
@@ -31,11 +31,13 @@ public class ProjectCategoriesApiIT extends AbstractMarketplaceApiIT {
                           "categories": [
                             {
                               "name": "Game",
+                              "description": "Games are fun",
                               "slug": "game",
                               "iconSlug": "game"
                             },
                             {
                               "name": "Tutorial",
+                              "description": "I love learning",
                               "slug": "tutorial",
                               "iconSlug": "tuto"
                             }

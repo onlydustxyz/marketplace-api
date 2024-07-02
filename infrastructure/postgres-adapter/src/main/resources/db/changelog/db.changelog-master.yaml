@@ -387,3 +387,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000276_create_banners.sql
   - include:
       file: db/changelog/changelogs/00000277_create_banners_closed_by.sql
+  - include:
+      file: db/changelog/changelogs/00000278_add_project_categories_description.sql

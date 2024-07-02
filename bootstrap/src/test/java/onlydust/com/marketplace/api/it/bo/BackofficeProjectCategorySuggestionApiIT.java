@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,10 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                 new ProjectCategorySuggestionEntity(UUID.fromString("d3af3bfc-5689-412a-8191-1466aa269830"), "DeFi", projectId),
                 new ProjectCategorySuggestionEntity(UUID.fromString("d3df4dbf-850e-42a5-af16-ca8a0278489c"), "Art", projectId)
         ));
-        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "brain", Set.of());
+        final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "AI is cool", "brain", Set.of());
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "lock", Set.of()),
-                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "nft", "NFT", "paint", Set.of()),
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is important", "lock", Set.of()),
+                new ProjectCategoryEntity(UUID.fromString("b1d059b7-f70e-4a9c-b522-28076bc59938"), "nft", "NFT", "NFT are non-fungible", "paint", Set.of()),
                 categoryAI
         ));
         final var project = projectRepository.findById(projectId).get();
@@ -71,6 +71,7 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                               "id": "d3df4dbf-850e-42a5-af16-ca8a0278489c",
                               "slug": null,
                               "name": "Art",
+                              "description": null,
                               "status": "PENDING",
                               "iconSlug": null,
                               "projectCount": null
@@ -79,6 +80,7 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                               "id": "d3af3bfc-5689-412a-8191-1466aa269830",
                               "slug": null,
                               "name": "DeFi",
+                              "description": null,
                               "status": "PENDING",
                               "iconSlug": null,
                               "projectCount": null
@@ -87,6 +89,7 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                               "id": "fbb36293-1a5b-49c5-9cd0-6e33922d22ba",
                               "slug": null,
                               "name": "Gaming",
+                              "description": null,
                               "status": "PENDING",
                               "iconSlug": null,
                               "projectCount": null
@@ -95,6 +98,7 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                               "id": "b151c7e4-1493-4927-bb0f-8647ec98a9c5",
                               "slug": "ai",
                               "name": "AI",
+                              "description": "AI is cool",
                               "status": "APPROVED",
                               "iconSlug": "brain",
                               "projectCount": 1
@@ -103,6 +107,7 @@ public class BackofficeProjectCategorySuggestionApiIT extends AbstractMarketplac
                               "id": "b1d059b7-f70e-4a9c-b522-28076bc59938",
                               "slug": "nft",
                               "name": "NFT",
+                              "description": "NFT are non-fungible",
                               "status": "APPROVED",
                               "iconSlug": "paint",
                               "projectCount": 0

@@ -4,9 +4,9 @@ import onlydust.com.backoffice.api.contract.model.ProjectCategoryCreateRequest;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryResponse;
 import onlydust.com.backoffice.api.contract.model.ProjectCategoryUpdateRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -42,6 +42,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .bodyValue("""
                         {
                           "name": "Security",
+                          "description": "Security is import",
                           "iconSlug": "lock"
                         }
                         """)
@@ -58,6 +59,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .bodyValue("""
                         {
                           "name": "Security",
+                          "description": "Security is import",
                           "iconSlug": "lock"
                         }
                         """)
@@ -89,6 +91,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .bodyValue("""
                         {
                           "name": "Security",
+                          "description": "Security is import",
                           "iconSlug": "lock"
                         }
                         """)
@@ -115,6 +118,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .json("""
                         {
                           "name": "Security",
+                          "description": "Security is import",
                           "iconSlug": "lock"
                         }
                         """);
@@ -137,6 +141,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new ProjectCategoryCreateRequest()
                         .name("AI")
+                        .description("AI is cool")
                         .iconSlug("brain")
                         .suggestionId(suggestionId))
                 // Then
@@ -162,6 +167,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .json("""
                         {
                           "name": "AI",
+                          "description": "AI is cool",
                           "iconSlug": "brain"
                         }
                         """);
@@ -176,6 +182,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .isOk()
                 .expectBody()
                 .jsonPath("$.categories[?(@.name == 'AI')].projectCount").isEqualTo(1)
+                .jsonPath("$.categories[?(@.name == 'AI')].description").isEqualTo("AI is cool")
                 .jsonPath("$.categories[?(@.status == 'PENDING')]").doesNotExist();
     }
 
@@ -190,6 +197,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .bodyValue("""
                         {
                           "name": "Another name",
+                          "description": "Another description",
                           "iconSlug": "something-else"
                         }
                         """)
@@ -202,6 +210,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .json("""
                         {
                           "name": "Another name",
+                          "description": "Another description",
                           "iconSlug": "something-else"
                         }
                         """);
@@ -219,6 +228,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .json("""
                         {
                           "name": "Another name",
+                          "description": "Another description",
                           "iconSlug": "something-else"
                         }
                         """);
@@ -241,6 +251,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new ProjectCategoryUpdateRequest()
                         .name("AI")
+                        .description("AI is cool")
                         .iconSlug("brain")
                         .suggestionId(suggestionId))
                 // Then
@@ -264,6 +275,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .json("""
                         {
                           "name": "AI",
+                          "description": "AI is cool",
                           "iconSlug": "brain"
                         }
                         """);
@@ -278,6 +290,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .isOk()
                 .expectBody()
                 .jsonPath("$.categories[?(@.name == 'AI')].projectCount").isEqualTo(2)
+                .jsonPath("$.categories[?(@.name == 'AI')].description").isEqualTo("AI is cool")
                 .jsonPath("$.categories[?(@.status == 'PENDING')]").doesNotExist();
     }
 
