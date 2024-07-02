@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -36,10 +37,12 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final var olivier = userAuthHelper.authenticateOlivier();
 
         applicationRepository.saveAll(List.of(
+                // 1652216316L has 2 applicants on project 2
+                // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
                 fakeApplication(projectAppliedTo1, pierre, 1651834617L, 112L),
                 fakeApplication(projectAppliedTo2, pierre, 1652216316L, 113L),
 
-                fakeApplication(projectAppliedTo1, antho, 1652216316L, 112L),
+                fakeApplication(projectAppliedTo2, antho, 1652216316L, 112L),
                 fakeApplication(projectAppliedTo2, antho, 1651834617L, 113L),
 
                 fakeApplication(projectAppliedTo1, olivier, 1651834617L, 112L)
@@ -202,6 +205,29 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getAssignees()).isEmpty());
+    }
+
+    @Test
+    @Order(1)
+    void should_return_unassigned_open_project_issues() {
+        // Given
+        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+        final var issues = client.get()
+                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "30",
+                        "isAssigned", "false",
+                        "status", "OPEN")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+
+        assertThat(issues).isNotEmpty();
+        assertThat(issues).allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
     }
 
     @Test

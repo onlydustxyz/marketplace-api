@@ -400,6 +400,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                       SortDirection direction,
                                                                       Integer pageIndex,
                                                                       Integer pageSize,
+                                                                      GithubIssueStatus status,
                                                                       Boolean isAssigned,
                                                                       Boolean isApplied) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
@@ -407,7 +408,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
             throw forbidden("Only project leads can read issues on their projects");
         }
 
-        final var page = githubIssueReadRepository.findAllOf(projectId, isAssigned, isApplied,
+        final var page = githubIssueReadRepository.findAllOf(projectId, status, isAssigned, isApplied,
                 PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, switch (sort) {
                     case CREATED_AT -> "createdAt";
                     case CLOSED_AT -> "closedAt";

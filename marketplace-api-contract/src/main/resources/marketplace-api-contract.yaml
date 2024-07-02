@@ -1762,6 +1762,10 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/GithubIssueStatus'
+        - in: query
           name: isAssigned
           description: |
             When true, only issues that have been assigned are returned.

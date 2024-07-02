@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +40,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository;
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
+    private final RewardReadRepository rewardReadRepository;
     private final UserRewardStatsReadRepository userRewardStatsReadRepository;
     private final PublicProjectReadRepository publicProjectReadRepository;
     private final UserReadRepository userReadRepository;
@@ -50,6 +52,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final var user = userReadRepository.findMe(authenticatedUser.getId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
         final var userAuthorizedToApplyOnGithubIssues = githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(user.githubUserId());
+        final var hasMissingPayoutPreferences = rewardReadRepository.existsByRecipientIdAndStatus_Status(authenticatedUser.getGithubUserId(),
+                RewardStatus.Input.PENDING_BILLING_PROFILE);
 
         final var response = new GetMeResponse()
                 .id(user.registered().id())
@@ -67,7 +71,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .email(user.email())
                 .firstName(user.profile() == null ? null : user.profile().firstName())
                 .lastName(user.profile() == null ? null : user.profile().lastName())
-                .missingPayoutPreference(user.hasMissingPayoutPreferences())
+                .missingPayoutPreference(hasMissingPayoutPreferences)
                 .sponsors(user.sponsors().stream().map(SponsorReadEntity::toDto).toList());
 
         return ok(response);

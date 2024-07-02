@@ -11,6 +11,8 @@ import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectsGoodFirstIssuesReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
@@ -42,6 +44,8 @@ public class GithubIssueReadEntity {
     String title;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "indexer_exp.github_issue_status")
     @NonNull
     GithubIssueStatus status;
 
