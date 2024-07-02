@@ -110,7 +110,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
                                 "isRegistered": false
                               },
-                              "repository": {
+                              "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
@@ -195,7 +195,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
                                 "isRegistered": false
                               },
-                              "repository": {
+                              "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
@@ -260,7 +260,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/467258?v=4",
                                 "isRegistered": false
                               },
-                              "repository": {
+                              "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
@@ -329,7 +329,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16177678?v=4",
                                 "isRegistered": false
                               },
-                              "repository": {
+                              "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
@@ -402,7 +402,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/10899980?v=4",
                                 "isRegistered": false
                               },
-                              "repository": {
+                              "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",

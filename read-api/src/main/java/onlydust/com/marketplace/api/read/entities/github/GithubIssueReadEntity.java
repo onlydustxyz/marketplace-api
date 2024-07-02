@@ -111,7 +111,7 @@ public class GithubIssueReadEntity {
         return new GithubIssuePageItemResponse()
                 .id(id)
                 .number(number)
-                .repository(repo.toLinkResponse())
+                .repo(repo.toLinkResponse())
                 .createdAt(createdAt)
                 .closedAt(closedAt)
                 .title(title)

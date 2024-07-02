@@ -5896,7 +5896,7 @@ components:
         - createdAt
         - htmlUrl
         - author
-        - repository
+        - repo
         - commentCount
         - labels
         - applicants
@@ -5930,7 +5930,7 @@ components:
           description: The body of the issue.
         author:
           $ref: '#/components/schemas/ContributorResponse'
-        repository:
+        repo:
           $ref: '#/components/schemas/GithubRepoLinkResponse'
         commentCount:
           type: integer
