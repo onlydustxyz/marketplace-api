@@ -5,12 +5,14 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -42,17 +44,23 @@ public class GithubAccountReadEntity {
 
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
     Set<GithubRepoViewEntity> repos;
-    @OneToOne(mappedBy = "account", fetch = FetchType.LAZY)
-    GithubAppInstallationViewEntity installation;
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    @Getter(AccessLevel.NONE)
+    @NonNull
+    List<GithubAppInstallationViewEntity> installation;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "githubUser")
-    UserViewEntity user;
+    Optional<GithubAppInstallationViewEntity> installation() {
+        return installation.stream().findFirst();
+    }
+
+    @Formula("exists(select 1 from iam.users u where u.github_user_id = id)")
+    boolean isRegistered;
 
     public ContributorResponse toContributorResponse() {
         return new ContributorResponse()
                 .githubUserId(id)
                 .login(login)
                 .avatarUrl(avatarUrl)
-                .isRegistered(user != null);
+                .isRegistered(isRegistered);
     }
 }

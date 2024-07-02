@@ -39,6 +39,7 @@ public class GithubRepoReadEntity {
     Long starsCount;
     Long forksCount;
     Boolean hasIssues;
+    String ownerLogin;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -66,7 +67,7 @@ public class GithubRepoReadEntity {
     @Column(columnDefinition = "github_repo_visibility")
     Visibility visibility;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id", referencedColumnName = "id")
     GithubRepoStatsViewEntity stats;
 
@@ -75,7 +76,7 @@ public class GithubRepoReadEntity {
                 .id(id)
                 .name(name)
                 .description(description)
-                .owner(owner.login())
+                .owner(ownerLogin)
                 .htmlUrl(htmlUrl);
     }
 

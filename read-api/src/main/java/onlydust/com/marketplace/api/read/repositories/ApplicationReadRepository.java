@@ -14,7 +14,9 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
     @Query("""
             SELECT a
             FROM ApplicationReadEntity a
-            JOIN FETCH a.issue
+            JOIN FETCH a.issue i
+            JOIN FETCH i.repo
+            JOIN FETCH i.author
             JOIN FETCH a.applicant
             JOIN FETCH a.ranking
             WHERE a.id = :id

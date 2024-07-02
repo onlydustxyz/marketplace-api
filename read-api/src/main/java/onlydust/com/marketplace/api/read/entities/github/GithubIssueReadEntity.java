@@ -174,12 +174,12 @@ public class GithubIssueReadEntity {
                 .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList());
 
         if (asProjectLead) {
-            final var installationStatus = map(repo.owner().installation() == null ? null : repo.owner().installation().getStatus());
+            final var installationStatus = map(repo.owner().installation().map(GithubAppInstallationViewEntity::getStatus).orElse(null));
             response.setGithubAppInstallationStatus(installationStatus);
             if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS)
                 response.setGithubAppInstallationPermissionsUpdateUrl(
                         URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
-                                .formatted(repoOwnerLogin, repo.owner().installation().getId())));
+                                .formatted(repoOwnerLogin, repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
         }
 
         return response;

@@ -11,6 +11,15 @@ import java.util.UUID;
 
 public interface GithubIssueReadRepository extends Repository<GithubIssueReadEntity, Long> {
 
+    @Query("""
+            SELECT i
+            FROM GithubIssueReadEntity i
+            JOIN FETCH i.author
+            JOIN FETCH i.repo r
+            JOIN FETCH r.owner
+            LEFT JOIN FETCH i.applications
+            WHERE i.id = :issueId
+            """)
     Optional<GithubIssueReadEntity> findById(Long issueId);
 
     @Query("""
