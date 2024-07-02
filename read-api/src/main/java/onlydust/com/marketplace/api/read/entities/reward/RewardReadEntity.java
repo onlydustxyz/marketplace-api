@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.read.entities.reward;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
@@ -35,9 +38,11 @@ public class RewardReadEntity {
     AllUserReadEntity requestor;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId")
+    @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     AllUserReadEntity recipient;
+
+    Long recipientId;
 
     UUID billingProfileId;
 
@@ -50,4 +55,9 @@ public class RewardReadEntity {
     @JoinColumn(name = "projectId")
     @NonNull
     ProjectReadEntity project;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull
+    RewardStatusReadEntity status;
 }

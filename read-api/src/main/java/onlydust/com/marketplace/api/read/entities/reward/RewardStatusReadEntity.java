@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.UUID;
 
@@ -24,6 +26,8 @@ public class RewardStatusReadEntity {
     UUID rewardId;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "accounting.reward_status")
     @NonNull
     RewardStatus.Input status;
 }

@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistratio
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -140,15 +139,6 @@ public class AllUserReadEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     OnboardingReadEntity onboarding;
-
-    @Formula("""
-            exists(
-                select 1
-                from rewards r
-                join accounting.reward_statuses rs on r.id = rs.reward_id and rs.status = 'PENDING_BILLING_PROFILE'
-                where r.recipient_id = github_user_id)
-            """)
-    boolean hasMissingPayoutPreferences;
 
     public UserPageItemResponse toBoPageItemResponse() {
         return new UserPageItemResponse()
