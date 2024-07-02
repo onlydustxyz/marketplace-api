@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.read.repositories;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,10 +38,12 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
             FROM GithubIssueReadEntity i
             JOIN i.repo.projects p
             WHERE p.id = :projectId AND
+            (coalesce(:status, null) IS NULL OR i.status = :status) AND
             (:isAssigned IS NULL OR (:isAssigned = TRUE AND size(i.assignees) > 0) OR (:isAssigned = FALSE AND size(i.assignees) = 0)) AND
             (:isApplied IS NULL OR (:isApplied = TRUE AND size(i.applications) > 0) OR (:isApplied = FALSE AND size(i.applications) = 0))
             """)
     Page<GithubIssueReadEntity> findAllOf(UUID projectId,
+                                          GithubIssueStatus status,
                                           Boolean isAssigned,
                                           Boolean isApplied,
                                           Pageable pageable);

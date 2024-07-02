@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -202,6 +203,29 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getAssignees()).isEmpty());
+    }
+
+    @Test
+    @Order(1)
+    void should_return_unassigned_open_project_issues() {
+        // Given
+        final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+        final var issues = client.get()
+                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "30",
+                        "isAssigned", "false",
+                        "status", "OPEN")))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+
+        assertThat(issues).isNotEmpty();
+        assertThat(issues).allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
     }
 
     @Test
