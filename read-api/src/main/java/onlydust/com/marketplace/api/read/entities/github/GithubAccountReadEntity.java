@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
-import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
@@ -55,12 +54,5 @@ public class GithubAccountReadEntity {
                 .login(login)
                 .avatarUrl(avatarUrl)
                 .isRegistered(user != null);
-    }
-
-    public GithubUserResponse toGithubUserResponse() {
-        return new GithubUserResponse()
-                .githubUserId(id)
-                .login(login)
-                .avatarUrl(avatarUrl);
     }
 }

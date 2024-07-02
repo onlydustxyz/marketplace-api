@@ -101,7 +101,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               "title": "[CAL-2679] Nice find. Unit testable (could be follow up)?",
                               "status": "OPEN",
                               "createdAt": "2023-11-07T09:40:41Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12255",
                               "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
                               "author": {
@@ -116,7 +115,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "commentCount": 1,
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -148,37 +146,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                                 }
                               ],
-                              "currentUserApplication": null,
-                              "languages": [
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
-                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
-                                  "slug": "go",
-                                  "name": "Go",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
-                                },
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "slug": "typescript",
-                                  "name": "Typescript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1980731400,
@@ -186,7 +154,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               "title": "[CAL-2678] No loader on clicking install button from apps listing page.",
                               "status": "OPEN",
                               "createdAt": "2023-11-07T07:36:17Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12253",
                               "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
                               "author": {
@@ -201,7 +168,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "commentCount": 5,
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -213,37 +179,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null,
-                              "languages": [
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
-                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
-                                  "slug": "go",
-                                  "name": "Go",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
-                                },
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "slug": "typescript",
-                                  "name": "Typescript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1979376167,
@@ -251,7 +187,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               "title": "Read skippable events to calculate realistic availability",
                               "status": "OPEN",
                               "createdAt": "2023-11-06T15:01:09Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12244",
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
                               "author": {
@@ -266,7 +201,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "commentCount": 6,
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -282,37 +216,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null,
-                              "languages": [
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
-                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
-                                  "slug": "go",
-                                  "name": "Go",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
-                                },
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "slug": "typescript",
-                                  "name": "Typescript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1975516187,
@@ -320,7 +224,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               "title": "[CAL-2671] Individual Insights Page has Team Insights",
                               "status": "OPEN",
                               "createdAt": "2023-11-03T06:12:34Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12215",
                               "body": "Individual insights page has insights from from \\"most booked\\" and \\"least booked\\" members. It should just be data that pretains to them:\\n\\n![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/e74bdb02-5e26-41e8-87be-8dda7e382fd4/f48ddf61-24ba-4a09-b94c-ed1aa2b50df4?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy9lNzRiZGIwMi01ZTI2LTQxZTgtODdiZS04ZGRhN2UzODJmZDQvZjQ4ZGRmNjEtMjRiYS00YTA5LWI5NGMtZWQxYWEyYjUwZGY0IiwiaWF0IjoxNjk4OTkxOTYyLCJleHAiOjE2OTkwNzgzNjJ9.dSRqQBHSC2TupIr9T7wnYSh8Vm3x1KlTsSEo1NIejwI)\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2671](https://linear.app/calcom/issue/CAL-2671/individual-insights-page-has-team-insights)</sub>",
                               "author": {
@@ -335,7 +238,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "commentCount": 5,
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -355,37 +257,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null,
-                              "languages": [
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
-                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
-                                  "slug": "go",
-                                  "name": "Go",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
-                                },
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "slug": "typescript",
-                                  "name": "Typescript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1943730312,
@@ -393,7 +265,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                               "title": "Conditional Questions on Event Types",
                               "status": "OPEN",
                               "createdAt": "2023-10-15T05:42:44Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
                               "author": {
@@ -408,7 +279,6 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "commentCount": 9,
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -428,37 +298,7 @@ public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null,
-                              "languages": [
-                                {
-                                  "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
-                                  "slug": "python",
-                                  "name": "Python",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                                },
-                                {
-                                  "id": "c83881b3-5aef-4819-9596-fdbbbedf2b0b",
-                                  "slug": "go",
-                                  "name": "Go",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-go.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-go.png"
-                                },
-                                {
-                                  "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                  "slug": "javascript",
-                                  "name": "Javascript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                },
-                                {
-                                  "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
-                                  "slug": "typescript",
-                                  "name": "Typescript",
-                                  "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
-                                  "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
-                                }
-                              ]
+                              "currentUserApplication": null
                             }
                           ]
                         }

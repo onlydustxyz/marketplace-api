@@ -5872,85 +5872,6 @@ components:
           type: integer
           format: int64
 
-    GithubIssueResponse:
-      allOf:
-        - $ref: '#/components/schemas/GithubIssueLinkResponse'
-        - type: object
-          description: |
-            Only the project lead can see the GitHub App installation details
-          properties:
-            githubAppInstallationStatus:
-              $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
-            githubAppInstallationPermissionsUpdateUrl:
-              type: string
-              format: uri
-
-    GithubIssuePageItemResponse:
-      type: object
-      description: Github issue
-      required:
-        - id
-        - number
-        - title
-        - status
-        - createdAt
-        - htmlUrl
-        - author
-        - repo
-        - commentCount
-        - labels
-        - applicants
-      properties:
-        id:
-          $ref: '#/components/schemas/IssueId'
-        number:
-          type: integer
-          format: int64
-          description: Issue number
-          example: 6
-        title:
-          type: string
-          description: Issue or pull request title on Github
-        status:
-          $ref: '#/components/schemas/GithubIssueStatus'
-        createdAt:
-          type: string
-          format: date-time
-          description: When the issue was created.
-        closedAt:
-          type: string
-          format: date-time
-          description: When the issue was cancelled or closed.
-        htmlUrl:
-          type: string
-          format: url
-          description: The public Github URL of the issue.
-        body:
-          type: string
-          description: The body of the issue.
-        author:
-          $ref: '#/components/schemas/ContributorResponse'
-        repo:
-          $ref: '#/components/schemas/GithubRepoLinkResponse'
-        commentCount:
-          type: integer
-        labels:
-          type: array
-          description: The list of labels assigned to this issue
-          items:
-            $ref: '#/components/schemas/GithubLabel'
-        applicants:
-          type: array
-          description: The list of applicants for this issue
-          items:
-            $ref: '#/components/schemas/GithubUserResponse'
-        currentUserApplication:
-          $ref: '#/components/schemas/ProjectApplicationShortResponse'
-        languages:
-          type: array
-          items:
-            $ref: '#/components/schemas/LanguageResponse'
-
     GithubIssueLinkResponse:
       type: object
       description: Github issue link response
@@ -5982,7 +5903,83 @@ components:
         repo:
           $ref: '#/components/schemas/GithubRepoLinkResponse'
         author:
-          $ref: '#/components/schemas/GithubUserResponse'
+          $ref: '#/components/schemas/ContributorResponse'
+
+    GithubIssueResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubIssueLinkResponse'
+        - type: object
+          description: |
+            Only the project lead can see the GitHub App installation details
+          required:
+            - createdAt
+            - commentCount
+            - labels
+            - applicants
+            - languages
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: When the issue was created.
+            closedAt:
+              type: string
+              format: date-time
+              description: When the issue was cancelled or closed.
+            body:
+              type: string
+              description: The body of the issue.
+            commentCount:
+              type: integer
+            labels:
+              type: array
+              description: The list of labels assigned to this issue
+              items:
+                $ref: '#/components/schemas/GithubLabel'
+            applicants:
+              type: array
+              description: The list of applicants for this issue
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
+            githubAppInstallationStatus:
+              $ref: '#/components/schemas/GithubOrganizationInstallationStatus'
+            githubAppInstallationPermissionsUpdateUrl:
+              type: string
+              format: uri
+
+    GithubIssuePageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/GithubIssueLinkResponse'
+        - type: object
+          description: Github issue
+          required:
+            - createdAt
+            - labels
+            - applicants
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: When the issue was created.
+            body:
+              type: string
+              description: The body of the issue.
+            labels:
+              type: array
+              description: The list of labels assigned to this issue
+              items:
+                $ref: '#/components/schemas/GithubLabel'
+            applicants:
+              type: array
+              description: The list of applicants for this issue
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
+            currentUserApplication:
+              $ref: '#/components/schemas/ProjectApplicationShortResponse'
 
     GithubLabel:
       type: object
