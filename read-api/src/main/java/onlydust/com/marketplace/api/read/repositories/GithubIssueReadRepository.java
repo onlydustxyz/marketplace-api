@@ -36,7 +36,9 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
     @Query("""
             SELECT i
             FROM GithubIssueReadEntity i
-            JOIN i.repo.projects p
+            JOIN FETCH i.repo r
+            JOIN FETCH i.author
+            JOIN r.projects p
             WHERE p.id = :projectId AND
             (coalesce(:status, null) IS NULL OR i.status = :status) AND
             (:isAssigned IS NULL OR (:isAssigned = TRUE AND size(i.assignees) > 0) OR (:isAssigned = FALSE AND size(i.assignees) = 0)) AND
