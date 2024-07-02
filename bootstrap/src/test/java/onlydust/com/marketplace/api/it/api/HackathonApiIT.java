@@ -109,6 +109,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "slug": "hackathon-1",
+                          "index": 1,
                           "title": "Hackathon 1",
                           "subtitle": "Subtitle 1",
                           "description": "Description 1",
@@ -230,6 +231,57 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
+    void should_generate_unique_index_for_hackathons() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(hackathonId1.value().toString())
+                .json("""
+                        {
+                          "slug": "hackathon-1",
+                          "index": 1
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-2")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(hackathonId2.value().toString())
+                .json("""
+                        {
+                          "slug": "hackathon-2",
+                          "index": 2
+                        }
+                        """);
+
+
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-3")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(hackathonId3.value().toString())
+                .json("""
+                        {
+                          "slug": "hackathon-3",
+                          "index": 3
+                        }
+                        """);
+    }
+
+    @Test
     @Order(10)
     void should_register_to_hackathon() {
         // When
@@ -291,6 +343,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           "hackathons": [
                             {
                               "slug": "hackathon-1",
+                              "index": 1,
                               "title": "Hackathon 1",
                               "location": null,
                               "startDate": "2024-04-19T00:00:00Z",
@@ -324,6 +377,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "slug": "hackathon-3",
+                              "index": 3,
                               "title": "Hackathon 3",
                               "location": "Location 3",
                               "startDate": "2024-04-19T00:00:00Z",
