@@ -23,6 +23,10 @@
         </dependency>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>user-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>rest-api-adapter</artifactId>
         </dependency>
         <dependency>

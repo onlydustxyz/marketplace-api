@@ -5,6 +5,7 @@ import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiClientPrope
 import onlydust.com.marketplace.api.auth0.api.client.adapter.Auth0ApiHttpClient;
 import onlydust.com.marketplace.api.auth0.api.client.adapter.authentication.Auth0ApiAuthenticator;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.port.output.IdentityProviderPort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,12 @@ public class Auth0ApiClientConfiguration {
     @Bean
     public GithubAuthenticationPort githubAuthenticationPort(final Auth0ApiClientProperties properties,
                                                              final Auth0ApiHttpClient auth0ApiHttpClient) {
+        return new Auth0ApiClientAdapter(properties, auth0ApiHttpClient);
+    }
+
+    @Bean
+    public IdentityProviderPort identityProviderPort(final Auth0ApiClientProperties properties,
+                                                     final Auth0ApiHttpClient auth0ApiHttpClient) {
         return new Auth0ApiClientAdapter(properties, auth0ApiHttpClient);
     }
 }

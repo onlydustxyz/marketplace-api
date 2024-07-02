@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 
 import java.util.List;
 import java.util.Optional;

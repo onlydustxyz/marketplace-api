@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.project.domain.mocks;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
 
 public class ContributorFaker {
     final Faker faker = new Faker();

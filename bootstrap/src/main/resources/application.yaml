@@ -11,6 +11,8 @@ application:
     back-office-invoice-token:
       token: ${BACKOFFICE_INVOICE_DOWNLOAD_TOKEN}
       base-url: ${BACKOFFICE_API_BASE_URL}
+    debug:
+      environment: ${ENV}
   github:
     installation:
       retry:

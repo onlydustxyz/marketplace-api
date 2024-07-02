@@ -10,6 +10,8 @@ import onlydust.com.marketplace.kernel.infrastructure.github.GithubAppJwtBuilder
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 import onlydust.com.marketplace.project.domain.service.RetriedGithubInstallationFacade;
+import onlydust.com.marketplace.user.domain.port.output.GithubOAuthAppPort;
+import onlydust.com.marketplace.user.domain.port.output.GithubUserStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -105,5 +107,16 @@ public class GithubApiClientConfiguration {
     @Bean
     public GithubAuthenticationInfoAdapter githubAuthenticationInfoAdapter(final GithubHttpClient githubHttpClient) {
         return new GithubAuthenticationInfoAdapter(githubHttpClient);
+    }
+
+    @Bean
+    public GithubUserStoragePort githubUserStoragePort(final GithubHttpClient githubHttpClient,
+                                                       final GithubAuthenticationPort githubAuthenticationPort) {
+        return new GithubSearchApiAdapter(githubHttpClient, GithubPaginationProperties.builder().build(), githubAuthenticationPort);
+    }
+
+    @Bean
+    public GithubOAuthAppPort githubOAuthAppPort(final GithubHttpClient.Config githubConfig) {
+        return new GithubOAuthAppAdapter(githubConfig);
     }
 }

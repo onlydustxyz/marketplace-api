@@ -3,7 +3,7 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.Value;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.project.domain.model.GithubUserIdentity;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 
 import java.util.Date;
 import java.util.UUID;
