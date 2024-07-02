@@ -40,7 +40,7 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
             WHERE p.id = :projectId AND
             (coalesce(:status, null) IS NULL OR i.status = :status) AND
             (:isAssigned IS NULL OR (:isAssigned = TRUE AND size(i.assignees) > 0) OR (:isAssigned = FALSE AND size(i.assignees) = 0)) AND
-            (:isApplied IS NULL OR (:isApplied = TRUE AND size(i.applications) > 0) OR (:isApplied = FALSE AND size(i.applications) = 0))
+            (:isApplied IS NULL OR (:isApplied = TRUE AND exists(from ApplicationReadEntity a where a.issueId = i.id and a.projectId = p.id)) OR (:isApplied = FALSE AND not exists(from ApplicationReadEntity a where a.issueId = i.id and a.projectId = p.id)))
             """)
     Page<GithubIssueReadEntity> findAllOf(UUID projectId,
                                           GithubIssueStatus status,

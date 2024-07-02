@@ -37,10 +37,12 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final var olivier = userAuthHelper.authenticateOlivier();
 
         applicationRepository.saveAll(List.of(
+                // 1652216316L has 2 applicants on project 2
+                // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
                 fakeApplication(projectAppliedTo1, pierre, 1651834617L, 112L),
                 fakeApplication(projectAppliedTo2, pierre, 1652216316L, 113L),
 
-                fakeApplication(projectAppliedTo1, antho, 1652216316L, 112L),
+                fakeApplication(projectAppliedTo2, antho, 1652216316L, 112L),
                 fakeApplication(projectAppliedTo2, antho, 1651834617L, 113L),
 
                 fakeApplication(projectAppliedTo1, olivier, 1651834617L, 112L)
