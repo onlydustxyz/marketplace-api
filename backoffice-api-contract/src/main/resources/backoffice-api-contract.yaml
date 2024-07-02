@@ -1559,6 +1559,51 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/search/users/csv:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeUsersRead
+      summary: Search users and export results to CSV
+      operationId: searchUsersCSV
+      description: |
+        Search users
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: query
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: sort
+          required: false
+          schema:
+            type: string
+            default: login
+      responses:
+        "200":
+          description: 'Users CSV'
+          content:
+            text/csv:
+              schema:
+                type: string
+                description: login,email,telegram
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/earnings:
     get:
       security:

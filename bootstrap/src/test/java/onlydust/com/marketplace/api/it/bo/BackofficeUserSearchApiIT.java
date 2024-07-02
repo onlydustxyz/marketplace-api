@@ -129,6 +129,22 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         assertThat(error.getMessage()).isEqualTo("Invalid query: 'login==ofux' and/or sort: 'foo' (UnknownProperty error)");
     }
 
+    @Test
+    void should_search_users_and_export_to_csv() {
+        var csv = searchUsersCSV("global.rank<=8", null, 1000, 0);
+        assertThat(csv).isEqualToIgnoringWhitespace("""
+                Login,Email,Telegram
+                AnthonyBuisset,abuisset@gmail.com,https://t.me/abuisset
+                Bernardstanislas,bernardstanislas@gmail.com,
+                ClementWalter,,
+                PierreOucif,pierre.oucif@gadz.org,
+                danilowhk,,
+                gregcha,gcm.charles@gmail.com,https://t.me/gregoirecharles
+                ofux,olivier.fuxet@gmail.com,
+                oscarwroche,oscar.w.roche@gmail.com,
+                """);
+    }
+
     private UserSearchPage searchUsers(@NonNull String query) {
         return searchUsers(query, null, 5, 0);
     }
@@ -153,6 +169,21 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody(UserSearchPage.class).returnResult().getResponseBody();
+        return response;
+    }
+
+    private String searchUsersCSV(@NonNull String query, String sort, int pageSize, int pageIndex) {
+        final var queryParams = new HashMap<>(Map.of("pageIndex", "" + pageIndex, "pageSize", "" + pageSize, "query", query));
+        if (sort != null) {
+            queryParams.put("sort", sort);
+        }
+        final var response = client.get()
+                .uri(getApiURI(GET_SEARCH_USERS_CSV, queryParams))
+                .header("Authorization", "Bearer " + mehdi.jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(String.class).returnResult().getResponseBody();
         return response;
     }
 

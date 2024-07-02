@@ -12,6 +12,9 @@ import onlydust.com.marketplace.api.read.entities.user.rsql.AllUserRSQLEntity;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.repositories.AllUserRSQLRepository;
 import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,13 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import static io.github.perplexhub.rsql.RSQLJPASupport.toSort;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
 @RestController
@@ -64,21 +67,7 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
     @SneakyThrows
     @Override
     public ResponseEntity<UserSearchPage> searchUsers(Integer pageIndex, Integer pageSize, String query, String sort) {
-        final Map<String, String> propertyMapping = new HashMap<>();
-        propertyMapping.put("language.id", "language.language.id");
-        propertyMapping.put("language.name", "language.language.name");
-        propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
-        propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
-
-        Page<AllUserRSQLEntity> page;
-        try {
-            page = allUserRSQLRepository.findAll(
-                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping).and(toSort(sort, propertyMapping)),
-                    PageRequest.of(pageIndex, pageSize));
-        } catch (RSQLException e) {
-            throw badRequest("Invalid query: '%s' and/or sort: '%s' (%s error)"
-                    .formatted(query, sort, e.getClass().getSimpleName().replaceAll("Exception", "")));
-        }
+        final var page = searchUsersWithRSQL(pageIndex, pageSize, query, sort);
 
         final var response = new UserSearchPage()
                 .users(page.getContent().stream().map(AllUserRSQLEntity::toBoPageItemResponse).toList())
@@ -90,4 +79,49 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<String> searchUsersCSV(Integer pageIndex, Integer pageSize, String query, String sort) {
+        final var page = searchUsersWithRSQL(pageIndex, pageSize, query, sort);
+
+        final CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setHeader(new String[]{
+                "Login",
+                "Email",
+                "Telegram",
+        }).build();
+
+        final StringWriter sw = new StringWriter();
+        try (final var csvPrinter = new CSVPrinter(sw, csvFormat)) {
+            for (final var user : page.getContent()) {
+                csvPrinter.printRecord(
+                        user.login(),
+                        user.email(),
+                        user.telegram()
+                );
+            }
+        } catch (final Exception e) {
+            throw internalServerError("Error while exporting users to CSV", e);
+        }
+
+        return ResponseEntity.ok(sw.toString());
+    }
+
+    private @NotNull Page<AllUserRSQLEntity> searchUsersWithRSQL(Integer pageIndex, Integer pageSize, String query, String sort) {
+        final Map<String, String> propertyMapping = new HashMap<>();
+        propertyMapping.put("language.id", "language.language.id");
+        propertyMapping.put("language.name", "language.language.name");
+        propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
+        propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
+
+        try {
+            return allUserRSQLRepository.findAll(
+                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping).and(toSort(sort, propertyMapping)),
+                    PageRequest.of(pageIndex, pageSize));
+        } catch (RSQLException e) {
+            throw badRequest("Invalid query: '%s' and/or sort: '%s' (%s error)"
+                    .formatted(query, sort, e.getClass().getSimpleName().replaceAll("Exception", "")));
+        }
+    }
+
+
 }
