@@ -111,19 +111,16 @@ public class GithubIssueReadEntity {
         return new GithubIssuePageItemResponse()
                 .id(id)
                 .number(number)
-                .repository(repo.toLinkResponse())
-                .createdAt(createdAt)
-                .closedAt(closedAt)
                 .title(title)
-                .body(body)
-                .htmlUrl(htmlUrl)
                 .status(status)
+                .htmlUrl(htmlUrl)
+                .repo(repo.toLinkResponse())
                 .author(author.toContributorResponse())
-                .commentCount(commentsCount)
+                .createdAt(createdAt)
+                .body(body)
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
                 .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
                 .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
-                .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList())
                 ;
     }
 
@@ -135,7 +132,7 @@ public class GithubIssueReadEntity {
                 .status(status)
                 .htmlUrl(htmlUrl)
                 .repo(repo.toLinkResponse())
-                .author(author.toGithubUserResponse())
+                .author(author.toContributorResponse())
                 ;
     }
 
@@ -165,15 +162,24 @@ public class GithubIssueReadEntity {
                 .number(number)
                 .title(title)
                 .status(status)
-                .htmlUrl(htmlUrl);
+                .htmlUrl(htmlUrl)
+                .repo(repo.toLinkResponse())
+                .author(author.toContributorResponse())
+                .createdAt(createdAt)
+                .closedAt(closedAt)
+                .body(body)
+                .commentCount(commentsCount)
+                .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
+                .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
+                .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList());
 
         if (asProjectLead) {
-            final var installationStatus = map(repo.owner().installation() == null ? null : repo.owner().installation().getStatus());
+            final var installationStatus = map(repo.owner().installation().map(GithubAppInstallationViewEntity::getStatus).orElse(null));
             response.setGithubAppInstallationStatus(installationStatus);
             if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS)
                 response.setGithubAppInstallationPermissionsUpdateUrl(
                         URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
-                                .formatted(repoOwnerLogin, repo.owner().installation().getId())));
+                                .formatted(repoOwnerLogin, repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
         }
 
         return response;
