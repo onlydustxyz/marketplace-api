@@ -6728,6 +6728,7 @@ components:
         - id
         - slug
         - name
+        - description
         - iconSlug
       properties:
         id:
@@ -6735,6 +6736,8 @@ components:
         slug:
           $ref: '#/components/schemas/ProjectCategorySlug'
         name:
+          type: string
+        description:
           type: string
         iconSlug:
           type: string

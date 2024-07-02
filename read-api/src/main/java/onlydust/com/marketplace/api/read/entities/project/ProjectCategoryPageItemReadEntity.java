@@ -25,6 +25,7 @@ public class ProjectCategoryPageItemReadEntity {
     private @NonNull UUID id;
     private String slug;
     private @NonNull String name;
+    private String description;
     private String iconSlug;
     @Enumerated(EnumType.STRING)
     private ProjectCategorySuggestionStatus status;
@@ -35,6 +36,7 @@ public class ProjectCategoryPageItemReadEntity {
                 .id(id)
                 .slug(slug)
                 .name(name)
+                .description(description)
                 .iconSlug(iconSlug)
                 .status(status)
                 .projectCount(projectCount)

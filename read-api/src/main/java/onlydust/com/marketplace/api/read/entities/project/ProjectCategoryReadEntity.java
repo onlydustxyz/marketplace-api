@@ -27,6 +27,7 @@ public class ProjectCategoryReadEntity {
     private @NonNull UUID id;
     private @NonNull String slug;
     private @NonNull String name;
+    private @NonNull String description;
     private @NonNull String iconSlug;
 
     @ManyToMany
@@ -40,6 +41,7 @@ public class ProjectCategoryReadEntity {
                 .id(id)
                 .slug(slug)
                 .name(name)
+                .description(description)
                 .iconSlug(iconSlug)
                 ;
     }
@@ -49,6 +51,7 @@ public class ProjectCategoryReadEntity {
                 .id(id)
                 .slug(slug)
                 .name(name)
+                .description(description)
                 .iconSlug(iconSlug)
                 ;
     }

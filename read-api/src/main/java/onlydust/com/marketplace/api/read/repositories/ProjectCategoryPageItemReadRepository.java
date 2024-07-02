@@ -14,6 +14,7 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
                 pcs.id      as id,
                 null        as slug,
                 pcs.name    as name,
+                null        as description,
                 null        as icon_slug,
                 'PENDING'   as status,
                 null        as project_count
@@ -24,6 +25,7 @@ public interface ProjectCategoryPageItemReadRepository extends Repository<Projec
                 pc.id                           as id,
                 pc.slug                         as slug,
                 pc.name                         as name,
+                pc.description                  as description,
                 pc.icon_slug                    as icon_slug,
                 'APPROVED'                      as status,
                 count(distinct ppc.project_id)  as project_count

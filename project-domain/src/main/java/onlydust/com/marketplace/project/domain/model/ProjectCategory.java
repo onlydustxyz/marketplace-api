@@ -17,11 +17,12 @@ import java.util.UUID;
 public class ProjectCategory {
     private final @NonNull Id id;
     private @NonNull String name;
+    private @NonNull String description;
     private @NonNull String iconSlug;
     private @NonNull Set<UUID> projects;
 
-    public static ProjectCategory of(@NonNull final String name, @NonNull final String iconSlug) {
-        return new ProjectCategory(Id.random(), name, iconSlug, new HashSet<>());
+    public static ProjectCategory of(@NonNull final String name, @NonNull final String description, @NonNull final String iconSlug) {
+        return new ProjectCategory(Id.random(), name, description, iconSlug, new HashSet<>());
     }
 
     public String slug() {

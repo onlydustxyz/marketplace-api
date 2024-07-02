@@ -21,6 +21,7 @@ public class ProjectCategoryEntity {
     private @NonNull UUID id;
     private @NonNull String slug;
     private @NonNull String name;
+    private @NonNull String description;
     private @NonNull String iconSlug;
 
     @OneToMany(mappedBy = "projectCategoryId", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -31,6 +32,7 @@ public class ProjectCategoryEntity {
                 .id(projectCategory.id().value())
                 .slug(projectCategory.slug())
                 .name(projectCategory.name())
+                .description(projectCategory.description())
                 .iconSlug(projectCategory.iconSlug())
                 .projectCategories(projectCategory.projects().stream()
                         .map(projectId -> new ProjectProjectCategoryEntity(projectId, projectCategory.id().value()))
@@ -42,6 +44,7 @@ public class ProjectCategoryEntity {
         return new ProjectCategory(
                 ProjectCategory.Id.of(id),
                 name,
+                description,
                 iconSlug,
                 projectCategories.stream().map(ProjectProjectCategoryEntity::getProjectId).collect(toSet()));
     }
