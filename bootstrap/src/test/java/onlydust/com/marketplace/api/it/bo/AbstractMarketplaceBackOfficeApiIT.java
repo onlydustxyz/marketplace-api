@@ -53,6 +53,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @ContextConfiguration(initializers = WireMockInitializer.class)
 @EnableWireMock({
         @ConfigureWireMock(name = "auth0", property = "application.web.auth0.user-info-url"),
+        @ConfigureWireMock(name = "auth0-m2m", property = "infrastructure.auth0.api.client.domain-base-uri"),
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
         @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
@@ -83,6 +84,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")
     protected WireMockServer auth0WireMockServer;
+    @InjectWireMock("auth0-m2m")
+    protected WireMockServer authM2M0WireMockServer;
     @InjectWireMock("github")
     protected WireMockServer githubWireMockServer;
     @InjectWireMock("indexer-api")

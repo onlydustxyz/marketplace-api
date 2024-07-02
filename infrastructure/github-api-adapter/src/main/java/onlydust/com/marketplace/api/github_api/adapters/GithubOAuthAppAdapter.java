@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.github_api.adapters;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.github_api.dto.ApplicantGrantDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.user.domain.port.output.GithubOAuthAppPort;
@@ -17,12 +18,14 @@ import java.util.Base64;
 @AllArgsConstructor
 public class GithubOAuthAppAdapter implements GithubOAuthAppPort {
 
+    private final GithubHttpClient.Config config;
+
     @Override
     public void deleteGithubOAuthApp(String githubOAuthAppId, String githubOAuthAppSecret, String personalAccessToken) {
         try {
             final HttpClient httpClient = HttpClient.newHttpClient();
             final HttpRequest httpRequest;
-            httpRequest = HttpRequest.newBuilder().uri(URI.create("https://api.github.com/applications/%s/grant".formatted(githubOAuthAppId)))
+            httpRequest = HttpRequest.newBuilder().uri(URI.create("%s/applications/%s/grant".formatted(config.getBaseUri(), githubOAuthAppId)))
                     .header("Authorization", getBasicAuthenticationHeader(githubOAuthAppId, githubOAuthAppSecret))
                     .method(HttpMethod.DELETE.name(),
                             HttpRequest.BodyPublishers.ofByteArray(new ObjectMapper().writeValueAsBytes(ApplicantGrantDTO.builder().accessToken(personalAccessToken).build())))

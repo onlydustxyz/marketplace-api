@@ -50,6 +50,13 @@ infrastructure:
   node-guardians:
     base-uri: http://fake-url
     api-key: fake-api-key
+  auth0:
+    api:
+      client:
+        domain-base-uri: https://fake-auth0
+        client-id: fake-m2m-client-id
+        client-secret: fake-m2m-client-secret
+        pat-cache-ttl-in-seconds: 3600
 application:
   web:
     machine-to-machine:
@@ -59,6 +66,8 @@ application:
     back-office-invoice-token:
       base-url: "https://local-bo-api.onlydust.com"
       token: "BO_TOKEN"
+    debug:
+      environment: develop
   cron:
     notification-job-delay: 500
     indexer-sync-job-delay: 500

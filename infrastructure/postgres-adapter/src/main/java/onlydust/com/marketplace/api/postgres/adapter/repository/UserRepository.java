@@ -58,13 +58,13 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
 
     @Modifying
     @Query(nativeQuery = true, value = """
-            update accounting.billing_profiles_user_invitations set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId;
-            update hidden_contributors set contributor_github_user_id = :newGithubUserId where contributor_github_user_id = :currentGithubUserId;
-            update pending_project_leader_invitations set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId;
-            update historical_user_ranks set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId;
-            update rewards set recipient_id = :newGithubUser where github_user_id = :currentGithubUserId;
-            update iam.users set github_user_id = :newGithubUserId, github_login = :githubLogin, github_avatar_url = :githubAvatarUrl where github_user_id =:currentGithubUserId and id = :userId;
-            delete from indexer_exp.github_accounts where id = :currentGithubUserId;
+            update accounting.billing_profiles_user_invitations set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId ;
+            update hidden_contributors set contributor_github_user_id = :newGithubUserId where contributor_github_user_id = :currentGithubUserId ;
+            update pending_project_leader_invitations set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId ;
+            update historical_user_ranks set github_user_id = :newGithubUserId where github_user_id = :currentGithubUserId ;
+            update rewards set recipient_id = :newGithubUserId where recipient_id = :currentGithubUserId ;
+            update iam.users set github_user_id = :newGithubUserId, github_login = :githubLogin, github_avatar_url = :githubAvatarUrl where github_user_id =:currentGithubUserId and id = :userId ;
+            delete from indexer_exp.github_accounts where id = :currentGithubUserId ;
             """)
     void replaceUserByGithubUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl);
 

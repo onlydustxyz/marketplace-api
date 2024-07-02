@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.configuration;
 
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.output.*;
@@ -18,9 +19,10 @@ public class UserDomainConfiguration {
 
     @Bean
     public AppUserFacadePort appUserFacadePort(final AppUserStoragePort appUserStoragePort,
-                                            final GithubOAuthAppPort githubOAuthAppPort,
-                                            final IdentityProviderPort identityProviderPort,
-                                            final GithubUserStoragePort githubUserStoragePort) {
-        return new AppUserService(appUserStoragePort, githubOAuthAppPort, identityProviderPort, githubUserStoragePort);
+                                               final GithubOAuthAppPort githubOAuthAppPort,
+                                               final IdentityProviderPort identityProviderPort,
+                                               final GithubUserStoragePort githubUserStoragePort,
+                                               final IndexerPort indexerPort) {
+        return new AppUserService(appUserStoragePort, githubOAuthAppPort, identityProviderPort, githubUserStoragePort, indexerPort);
     }
 }

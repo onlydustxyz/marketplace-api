@@ -8,10 +8,12 @@ import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStora
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
+import onlydust.com.marketplace.api.rest.api.adapter.BackofficeDebugRestApi;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.service.BackofficeService;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,6 +40,12 @@ public class BackofficeConfiguration {
                                         final BlockchainFacadePort blockchainFacadePort) {
         return new PaymentService(accountingRewardStoragePort, invoiceStoragePort,
                 accountingFacadePort, blockchainFacadePort);
+    }
+
+    @Bean
+    @ConfigurationProperties(value = "application.web.debug")
+    public BackofficeDebugRestApi.DebugProperties debugProperties() {
+        return new BackofficeDebugRestApi.DebugProperties();
     }
 }
 

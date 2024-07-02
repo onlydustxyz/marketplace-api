@@ -116,7 +116,7 @@ public class GithubApiClientConfiguration {
     }
 
     @Bean
-    public GithubOAuthAppPort githubOAuthAppPort() {
-        return new GithubOAuthAppAdapter();
+    public GithubOAuthAppPort githubOAuthAppPort(final GithubHttpClient.Config githubConfig) {
+        return new GithubOAuthAppAdapter(githubConfig);
     }
 }
