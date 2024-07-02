@@ -17,6 +17,7 @@ public interface HackathonDetailsReadRepository extends JpaRepository<HackathonD
             SELECT
                 h.id,
                 h.slug,
+                h.index,
                 h.status,
                 h.title,
                 h.subtitle,

@@ -37,6 +37,8 @@ public class HackathonShortReadEntity {
     UUID id;
     @NonNull
     String slug;
+    @NonNull
+    Integer index;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -59,6 +61,7 @@ public class HackathonShortReadEntity {
         return new HackathonsListItemResponse()
                 .id(id)
                 .slug(slug)
+                .index(index)
                 .title(title)
                 .location(location)
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))

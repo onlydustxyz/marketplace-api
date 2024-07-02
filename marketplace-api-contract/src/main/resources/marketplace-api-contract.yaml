@@ -7892,6 +7892,7 @@ components:
         - startDate
         - endDate
         - projects
+        - index
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -7911,6 +7912,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectLinkResponse'
+        index:
+          type: integer
+          description: unique auto-incremented index of the hackathon
 
     HackathonsListResponse:
       type: object
@@ -7961,6 +7965,7 @@ components:
         - sponsors
         - projects
         - tracks
+        - index
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -8005,6 +8010,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/HackathonsTrackResponse'
+        index:
+          type: integer
+          description: unique auto-incremented index of the hackathon
+
+
     SuggestProjectCategoryRequest:
       type: object
       required:

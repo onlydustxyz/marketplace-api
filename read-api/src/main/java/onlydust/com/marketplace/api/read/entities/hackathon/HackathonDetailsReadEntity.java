@@ -37,7 +37,9 @@ public class HackathonDetailsReadEntity {
     UUID id;
     @NonNull
     String slug;
-
+    @NonNull
+    Integer index;
+    
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "hackathon_status")
@@ -97,6 +99,7 @@ public class HackathonDetailsReadEntity {
         return new HackathonsDetailsResponse()
                 .id(this.id)
                 .slug(this.slug)
+                .index(this.index)
                 .me(Optional.ofNullable(isRegistered).map(value -> new HackathonsDetailsResponseMe().hasRegistered(value)).orElse(null))
                 .title(this.title)
                 .subtitle(this.subtitle)

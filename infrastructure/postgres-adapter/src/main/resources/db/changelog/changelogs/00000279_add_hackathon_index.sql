@@ -1,0 +1,2 @@
+ALTER TABLE hackathons
+    ADD COLUMN INDEX SERIAL;

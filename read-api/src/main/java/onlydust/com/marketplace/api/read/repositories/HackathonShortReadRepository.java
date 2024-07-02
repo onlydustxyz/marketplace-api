@@ -15,6 +15,7 @@ public interface HackathonShortReadRepository extends Repository<HackathonShortR
             SELECT
                 h.id,
                 h.slug,
+                h.index,
                 h.status,
                 h.title,
                 h.location,
