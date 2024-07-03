@@ -157,16 +157,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 43
+                                "isRegistered": true,
+                                "globalRank": 1,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -190,16 +192,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 41
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -223,16 +227,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 595505,
                                 "login": "ofux",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 33
+                                "isRegistered": true,
+                                "globalRank": 4,
+                                "globalRankCategory": "A"
+                              }
                             }
                           ]
                         }
@@ -285,16 +291,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 1,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -318,16 +326,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             }
                           ]
                         }
@@ -415,16 +425,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
                                 "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 1,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -448,16 +460,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             }
                           ]
                         }
@@ -517,16 +531,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -550,16 +566,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 35
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             },
                             {
                               "project": {
@@ -583,16 +601,18 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                 "author": {
                                   "githubUserId": 112474158,
                                   "login": "onlydust-contributor",
-                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4"
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/112474158?v=4",
+                                  "isRegistered": true
                                 }
                               },
                               "applicant": {
                                 "githubUserId": 16590657,
                                 "login": "PierreOucif",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
-                                "isRegistered": true
-                              },
-                              "recommendationScore": 41
+                                "isRegistered": true,
+                                "globalRank": 5,
+                                "globalRankCategory": "A"
+                              }
                             }
                           ]
                         }
@@ -687,17 +707,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                             "isRegistered": true
                           },
                           "origin": "GITHUB",
-                          "recommendationScore": 36,
-                          "availabilityScore": 71,
-                          "languageScore": 0,
-                          "fidelityScore": 43,
-                          "appliedDistinctProjectCount": 3,
-                          "pendingApplicationCountOnOtherProjects": 2,
-                          "pendingApplicationCountOnThisProject": 2,
                           "motivation": "Highly motivated",
                           "problemSolvingApproach": "Do the math"
                         }
                         """);
     }
-
 }

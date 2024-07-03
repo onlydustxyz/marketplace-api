@@ -9,6 +9,7 @@ import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ContributorResponse;
 import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
+import onlydust.com.marketplace.api.contract.model.RankedContributorResponse;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
@@ -189,5 +190,16 @@ public class AllUserReadEntity {
                 .login(login)
                 .avatarUrl(avatarUrl)
                 .isRegistered(registered != null);
+    }
+
+    public RankedContributorResponse toRankedContributorResponse() {
+        return new RankedContributorResponse()
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .isRegistered(registered != null)
+                .globalRank(globalUsersRanks().map(GlobalUsersRanksReadEntity::rank).orElse(0L).intValue())
+                .globalRankCategory(globalUsersRanks().map(GlobalUsersRanksReadEntity::rankCategory).orElse(null))
+                ;
     }
 }

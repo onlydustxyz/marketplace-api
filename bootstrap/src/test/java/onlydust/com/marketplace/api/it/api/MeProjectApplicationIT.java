@@ -108,11 +108,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(user.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("MARKETPLACE")))
-                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("0")))
-                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("75")))
         );
     }
 
@@ -514,11 +509,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(antho.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("GITHUB")))
-                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("0")))
-                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("75")))
         );
     }
 

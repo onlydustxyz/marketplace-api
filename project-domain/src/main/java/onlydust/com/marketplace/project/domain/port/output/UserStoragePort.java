@@ -65,8 +65,4 @@ public interface UserStoragePort {
     void deleteApplicationsByIssueId(GithubIssue.Id issueId);
 
     void deleteObsoleteApplications();
-
-    List<ScoredApplication> findScoredApplications(Long applicantId, GithubIssue.Id issueId);
-
-    Optional<ScoredApplication> findScoredApplication(Application.Id id);
 }

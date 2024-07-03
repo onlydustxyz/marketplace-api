@@ -12,11 +12,6 @@ public class ApplicationCreatedEventReader implements EventReader<OnApplicationC
         properties.put("applicant_user_id", event.applicantUserId() == null ? null : event.applicantUserId().toString());
         properties.put("applicant_github_id", event.applicantGithubId());
         properties.put("origin", event.origin().toString());
-        properties.put("availability_score", event.availabilityScore());
-        properties.put("best_projects_similarity_score", event.bestProjectsSimilarityScore());
-        properties.put("main_repo_language_user_score", event.mainRepoLanguageUserScore());
-        properties.put("project_fidelity_score", event.projectFidelityScore());
-        properties.put("recommendation_score", event.recommendationScore());
     }
 
     @Override

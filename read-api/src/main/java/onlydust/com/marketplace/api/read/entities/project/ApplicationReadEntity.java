@@ -61,10 +61,6 @@ public class ApplicationReadEntity {
     @Enumerated(EnumType.STRING)
     ProjectApplicationOrigin origin;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id", referencedColumnName = "applicationId")
-    ApplicationRankingReadEntity ranking;
-
     public ProjectApplicationShortResponse toShortResponse() {
         return new ProjectApplicationShortResponse()
                 .id(id)
@@ -80,9 +76,8 @@ public class ApplicationReadEntity {
                 .id(id)
                 .project(project.toLinkResponse())
                 .issue(issue.toLinkDto())
-                .applicant(applicant.toContributorResponse())
+                .applicant(applicant.toRankedContributorResponse())
                 .receivedAt(receivedAt)
-                .recommendationScore(ranking.recommendationScore())
                 ;
     }
 
@@ -93,13 +88,6 @@ public class ApplicationReadEntity {
                 .issue(issue.toLinkDto())
                 .applicant(applicant.toContributorResponse())
                 .origin(origin)
-                .recommendationScore(ranking.recommendationScore())
-                .availabilityScore(ranking.availabilityScore())
-                .languageScore(ranking.mainRepoLanguageUserScore())
-                .fidelityScore(ranking.projectFidelityScore())
-                .appliedDistinctProjectCount(ranking.appliedProjectCount())
-                .pendingApplicationCountOnThisProject(ranking.pendingApplicationCountOnThisProject())
-                .pendingApplicationCountOnOtherProjects(ranking.pendingApplicationCountOnOtherProjects())
                 .motivation(motivations)
                 .problemSolvingApproach(problemSolvingApproach)
                 ;

@@ -18,7 +18,6 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             JOIN FETCH i.repo
             JOIN FETCH i.author
             JOIN FETCH a.applicant
-            JOIN FETCH a.ranking
             WHERE a.id = :id
             """)
     Optional<ApplicationReadEntity> findById(UUID id);
@@ -31,7 +30,6 @@ public interface ApplicationReadRepository extends Repository<ApplicationReadEnt
             JOIN FETCH i.author
             JOIN FETCH a.project
             JOIN FETCH a.applicant u
-            JOIN FETCH a.ranking
             WHERE   (:projectId IS NULL OR a.projectId = :projectId) AND
                     (:issueId IS NULL OR i.id = :issueId) AND
                     (:applicantId IS NULL OR u.id = :applicantId) AND

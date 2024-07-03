@@ -23,7 +23,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -106,7 +109,6 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_publish_github_issue_assigned_events() {
             // Given
             final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
-            when(userStoragePort.findScoredApplications(githubUserId, GithubIssue.Id.of(event.id()))).thenReturn(List.of());
 
             // When
             trackingEventPublisherOutboxConsumer.process(event);
@@ -121,11 +123,6 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
-            assertThat(capturedTrackingEvent.availabilityScore()).isNull();
-            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isNull();
-            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isNull();
-            assertThat(capturedTrackingEvent.projectFidelityScore()).isNull();
-            assertThat(capturedTrackingEvent.recommendationScore()).isNull();
         }
 
         @Test
@@ -139,10 +136,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     GithubIssue.Id.random(),
                     GithubComment.Id.random(),
                     faker.lorem().sentence(),
-                    faker.lorem().sentence())
-                    .scored(70, 12, 34, 56, 89);
-
-            when(userStoragePort.findScoredApplication(application.id())).thenReturn(Optional.of(application));
+                    faker.lorem().sentence());
 
             // When
             trackingEventPublisherOutboxConsumer.process(OnApplicationCreated.of(application));
@@ -158,11 +152,6 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
             assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
             assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());
-            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(application.availabilityScore());
-            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(application.bestProjectsSimilarityScore());
-            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(application.mainRepoLanguageUserScore());
-            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(application.projectFidelityScore());
-            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(application.recommendationScore());
         }
 
         @Test
@@ -195,7 +184,6 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_publish_github_issue_assigned_events() {
             // Given
             final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
-            when(userStoragePort.findScoredApplications(user.getGithubUserId(), GithubIssue.Id.of(event.id()))).thenReturn(List.of());
 
             // When
             trackingEventPublisherOutboxConsumer.process(event);
@@ -210,55 +198,6 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
-            assertThat(capturedTrackingEvent.availabilityScore()).isNull();
-            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isNull();
-            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isNull();
-            assertThat(capturedTrackingEvent.projectFidelityScore()).isNull();
-            assertThat(capturedTrackingEvent.recommendationScore()).isNull();
-        }
-
-        @Test
-        void should_include_application_Score_in_github_issue_assigned_events() {
-            // Given
-            final var event = (OnGithubIssueAssigned) fakeEvent(OnGithubIssueAssigned.class);
-            final var issueId = GithubIssue.Id.of(event.id());
-
-            when(userStoragePort.findScoredApplications(user.getGithubUserId(), issueId))
-                    .thenReturn(List.of(
-                            new Application(Application.Id.random(),
-                                    UUID.randomUUID(),
-                                    user.getGithubUserId(),
-                                    Application.Origin.MARKETPLACE,
-                                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                                    issueId,
-                                    GithubComment.Id.random(),
-                                    faker.lorem().sentence(),
-                                    faker.lorem().sentence())
-                                    .scored(70, 12, 34, 56, 89),
-                            new Application(Application.Id.random(),
-                                    UUID.randomUUID(),
-                                    user.getGithubUserId(),
-                                    Application.Origin.GITHUB,
-                                    faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
-                                    issueId,
-                                    GithubComment.Id.random(),
-                                    faker.lorem().sentence(),
-                                    null)
-                                    .scored(60, 23, 45, 67, 78)
-                    ));
-
-            // When
-            trackingEventPublisherOutboxConsumer.process(event);
-
-            // Then
-            final var trackingEventCaptor = ArgumentCaptor.forClass(OnGithubIssueAssignedTrackingEvent.class);
-            verify(trackingEventPublisher).publish(trackingEventCaptor.capture());
-            final var capturedTrackingEvent = trackingEventCaptor.getValue();
-            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(70);
-            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(12);
-            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(34);
-            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(56);
-            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(89);
         }
 
         @Test
@@ -332,10 +271,7 @@ class TrackingEventPublisherOutboxConsumerTest {
                     GithubIssue.Id.random(),
                     GithubComment.Id.random(),
                     faker.lorem().sentence(),
-                    faker.lorem().sentence())
-                    .scored(70, 12, 34, 56, 89);
-
-            when(userStoragePort.findScoredApplication(application.id())).thenReturn(Optional.of(application));
+                    faker.lorem().sentence());
 
             // When
             trackingEventPublisherOutboxConsumer.process(OnApplicationCreated.of(application));
@@ -351,11 +287,6 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
             assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
             assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());
-            assertThat(capturedTrackingEvent.availabilityScore()).isEqualTo(application.availabilityScore());
-            assertThat(capturedTrackingEvent.bestProjectsSimilarityScore()).isEqualTo(application.bestProjectsSimilarityScore());
-            assertThat(capturedTrackingEvent.mainRepoLanguageUserScore()).isEqualTo(application.mainRepoLanguageUserScore());
-            assertThat(capturedTrackingEvent.projectFidelityScore()).isEqualTo(application.projectFidelityScore());
-            assertThat(capturedTrackingEvent.recommendationScore()).isEqualTo(application.recommendationScore());
         }
     }
 
