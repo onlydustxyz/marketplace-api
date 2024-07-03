@@ -128,6 +128,9 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.applications[?(@.id)]").isNotEmpty()
                 .jsonPath("$.applications[?(!@.receivedAt)]").isEmpty()
                 .jsonPath("$.applications[?(@.receivedAt)]").isNotEmpty()
+                .jsonPath("$.applications[0].applicant.globalRank").isEqualTo(1)
+                .jsonPath("$.applications[1].applicant.globalRank").isEqualTo(4)
+                .jsonPath("$.applications[2].applicant.globalRank").isEqualTo(5)
                 .json("""
                         {
                           "totalPageNumber": 1,

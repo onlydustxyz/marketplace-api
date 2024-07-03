@@ -12,7 +12,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,7 +55,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
                 applicantId,
                 isApplicantProjectMember,
                 applicantLoginSearch,
-                PageRequest.of(pageIndex, pageSize, Sort.by("applicant.login")));
+                PageRequest.of(pageIndex, pageSize, JpaSort.unsafe("element(applicant.globalUsersRanks).rank")));
 
         return ok(new ProjectApplicationPageResponse()
                 .totalItemNumber((int) page.getTotalElements())
@@ -72,7 +72,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
         if (!caller.getGithubUserId().equals(application.applicant().githubUserId()) &&
-                !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
+            !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
             throw forbidden("Only project leads and applicant can get application details");
         }
         return ok(application.toDto());
