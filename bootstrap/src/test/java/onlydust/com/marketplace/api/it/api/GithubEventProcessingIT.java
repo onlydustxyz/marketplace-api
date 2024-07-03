@@ -80,11 +80,6 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['assignee_github_id']", equalTo(antho.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['assignee_user_id']", equalTo(antho.user().getId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['is_good_first_issue']", equalTo("true")))
-                .withRequestBody(matchingJsonPath("$.properties['availability_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['best_projects_similarity_score']", equalTo("40")))
-                .withRequestBody(matchingJsonPath("$.properties['main_repo_language_user_score']", equalTo("99")))
-                .withRequestBody(matchingJsonPath("$.properties['project_fidelity_score']", equalTo("100")))
-                .withRequestBody(matchingJsonPath("$.properties['recommendation_score']", equalTo("85")))
         );
     }
 

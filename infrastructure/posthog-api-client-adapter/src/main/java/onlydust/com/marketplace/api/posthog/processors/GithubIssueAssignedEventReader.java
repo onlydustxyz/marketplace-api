@@ -13,11 +13,6 @@ public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssue
         properties.put("assignee_github_id", event.assigneeGithubId());
         properties.put("assignee_user_id", event.assigneeUserId() == null ? null : event.assigneeUserId().toString());
         properties.put("is_good_first_issue", event.isGoodFirstIssue());
-        properties.put("availability_score", event.availabilityScore());
-        properties.put("best_projects_similarity_score", event.bestProjectsSimilarityScore());
-        properties.put("main_repo_language_user_score", event.mainRepoLanguageUserScore());
-        properties.put("project_fidelity_score", event.projectFidelityScore());
-        properties.put("recommendation_score", event.recommendationScore());
     }
 
     @Override

@@ -5,7 +5,6 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.ScoredApplication;
 import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
@@ -30,14 +29,8 @@ public class OnApplicationCreatedTrackingEvent extends Event {
     ZonedDateTime appliedAt;
     @NonNull
     GithubIssue.Id issueId;
-    Integer availabilityScore;
-    Integer bestProjectsSimilarityScore;
-    Integer mainRepoLanguageUserScore;
-    Integer projectFidelityScore;
-    Integer recommendationScore;
 
     public static Event of(@NonNull OnApplicationCreated onApplicationCreated,
-                           @NonNull ScoredApplication scoredApplication,
                            @NonNull Optional<User> applicant) {
         return OnApplicationCreatedTrackingEvent.builder()
                 .applicationId(onApplicationCreated.applicationId())
@@ -47,11 +40,6 @@ public class OnApplicationCreatedTrackingEvent extends Event {
                 .origin(onApplicationCreated.origin())
                 .appliedAt(onApplicationCreated.appliedAt())
                 .issueId(onApplicationCreated.issueId())
-                .availabilityScore(scoredApplication.availabilityScore())
-                .bestProjectsSimilarityScore(scoredApplication.bestProjectsSimilarityScore())
-                .mainRepoLanguageUserScore(scoredApplication.mainRepoLanguageUserScore())
-                .projectFidelityScore(scoredApplication.projectFidelityScore())
-                .recommendationScore(scoredApplication.recommendationScore())
                 .build();
     }
 }

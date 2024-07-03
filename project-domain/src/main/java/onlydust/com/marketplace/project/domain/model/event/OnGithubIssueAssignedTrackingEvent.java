@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
-import onlydust.com.marketplace.project.domain.model.ScoredApplication;
 import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
@@ -26,15 +25,9 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
-    Integer availabilityScore;
-    Integer bestProjectsSimilarityScore;
-    Integer mainRepoLanguageUserScore;
-    Integer projectFidelityScore;
-    Integer recommendationScore;
 
     public static OnGithubIssueAssignedTrackingEvent of(@NonNull OnGithubIssueAssigned onGithubIssueAssigned,
-                                                        @NonNull Optional<User> user,
-                                                        @NonNull Optional<ScoredApplication> scoredApplication) {
+                                                        @NonNull Optional<User> user) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
@@ -42,11 +35,6 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
-                .availabilityScore(scoredApplication.map(ScoredApplication::availabilityScore).orElse(null))
-                .bestProjectsSimilarityScore(scoredApplication.map(ScoredApplication::bestProjectsSimilarityScore).orElse(null))
-                .mainRepoLanguageUserScore(scoredApplication.map(ScoredApplication::mainRepoLanguageUserScore).orElse(null))
-                .projectFidelityScore(scoredApplication.map(ScoredApplication::projectFidelityScore).orElse(null))
-                .recommendationScore(scoredApplication.map(ScoredApplication::recommendationScore).orElse(null))
                 .build();
     }
 

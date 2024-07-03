@@ -345,16 +345,4 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     public void replaceUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
         userRepository.replaceUserByGithubUser(userId, currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
     }
-
-    @Override
-    public List<ScoredApplication> findScoredApplications(Long applicantId, GithubIssue.Id issueId) {
-        return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
-                .map(ApplicationEntity::toScoredDomain).toList();
-    }
-
-    @Override
-    public Optional<ScoredApplication> findScoredApplication(Application.Id id) {
-        return applicationRepository.findById(id.value())
-                .map(ApplicationEntity::toScoredDomain);
-    }
 }

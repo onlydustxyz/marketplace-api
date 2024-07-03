@@ -4937,6 +4937,21 @@ components:
               type: boolean
               description: True if the user is registered on OnlyDust
 
+    RankedContributorResponse:
+      allOf:
+        - $ref: '#/components/schemas/ContributorResponse'
+        - type: object
+          required:
+            - globalRank
+            - globalRankCategory
+          properties:
+            globalRank:
+              type: integer
+              description: User rank on OnlyDust (the lower, the better)
+              example: 42
+            globalRankCategory:
+              $ref: '#/components/schemas/UserRankCategory'
+
     ContributorsPageSortBy:
       type: string
       enum:
@@ -6506,13 +6521,11 @@ components:
         issue:
           $ref: '#/components/schemas/GithubIssueLinkResponse'
         applicant:
-          $ref: '#/components/schemas/ContributorResponse'
+          $ref: '#/components/schemas/RankedContributorResponse'
         receivedAt:
           type: string
           format: date-time
           description: When the application was created
-        recommendationScore:
-          $ref: '#/components/schemas/ScorePercentage'
 
     ProjectApplicationResponse:
       type: object
@@ -6522,11 +6535,6 @@ components:
         - issue
         - applicant
         - origin
-        - recommendationScore
-        - availabilityScore
-        - appliedDistinctProjectCount
-        - pendingApplicationCountOnOtherProjects
-        - pendingApplicationCountOnThisProject
         - motivation
       properties:
         id:
@@ -6539,23 +6547,6 @@ components:
           $ref: '#/components/schemas/ContributorResponse'
         origin:
           $ref: '#/components/schemas/ProjectApplicationOrigin'
-        recommendationScore:
-          $ref: '#/components/schemas/ScorePercentage'
-        availabilityScore:
-          $ref: '#/components/schemas/ScorePercentage'
-        languageScore:
-          $ref: '#/components/schemas/ScorePercentage'
-        fidelityScore:
-          $ref: '#/components/schemas/ScorePercentage'
-        appliedDistinctProjectCount:
-          type: integer
-          description: Number of distinct projects the applicant has applied to.
-        pendingApplicationCountOnOtherProjects:
-          type: integer
-          description: Number of pending applications the applicant has on other projects.
-        pendingApplicationCountOnThisProject:
-          type: integer
-          description: Number of pending applications the applicant has on this project.
         motivation:
           type: string
           description: The applicant's motivation to work on the issue

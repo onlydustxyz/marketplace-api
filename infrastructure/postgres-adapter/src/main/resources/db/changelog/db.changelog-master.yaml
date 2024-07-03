@@ -393,3 +393,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000279_add_hackathon_index.sql
   - include:
       file: db/changelog/changelogs/00000279_improve_user_rsql_views.sql
+  - include:
+      file: db/changelog/changelogs/00000280_remove_application_rankings.sql
