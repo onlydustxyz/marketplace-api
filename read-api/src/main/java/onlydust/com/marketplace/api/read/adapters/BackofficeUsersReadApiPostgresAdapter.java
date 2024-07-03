@@ -107,7 +107,7 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
     private @NotNull Page<AllUserRSQLEntity> searchUsersWithRSQL(Integer pageIndex, Integer pageSize, String query, String sort) {
         try {
             return allUserRSQLRepository.findAll(
-                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query).and(toSort(sort)),
+                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, true).and(toSort(sort)),
                     PageRequest.of(pageIndex, pageSize));
         } catch (RSQLException e) {
             throw badRequest("Invalid query: '%s' and/or sort: '%s' (%s error)"
