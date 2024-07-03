@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserSearchPageItemResponseEcosystemInner;
-import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -29,8 +28,12 @@ public class UnitedStatsPerEcosystemPerUserRSQLEntity {
     @Id
     @NonNull
     @EqualsAndHashCode.Include
-    UUID ecosystemId;
+    @Column(name = "ecosystemId")
+    UUID id;
 
+    @NonNull
+    @Column(name = "ecosystemName")
+    String name;
     @NonNull
     Integer contributionCount;
     @NonNull
@@ -52,14 +55,10 @@ public class UnitedStatsPerEcosystemPerUserRSQLEntity {
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     AllUserRSQLEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ecosystemId", referencedColumnName = "id", insertable = false, updatable = false)
-    EcosystemReadEntity ecosystem;
-
     public UserSearchPageItemResponseEcosystemInner toDto() {
         return new UserSearchPageItemResponseEcosystemInner()
-                .id(ecosystemId)
-                .name(ecosystem.name())
+                .id(id)
+                .name(name)
                 .contributionCount(contributionCount)
                 .rewardCount(rewardCount)
                 .pendingRewardCount(pendingRewardCount)
@@ -72,6 +71,6 @@ public class UnitedStatsPerEcosystemPerUserRSQLEntity {
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         Long githubUserId;
-        UUID ecosystemId;
+        UUID id;
     }
 }

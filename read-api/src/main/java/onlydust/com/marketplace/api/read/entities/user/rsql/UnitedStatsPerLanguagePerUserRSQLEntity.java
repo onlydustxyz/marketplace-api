@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserSearchPageItemResponseLanguageInner;
-import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -29,8 +28,12 @@ public class UnitedStatsPerLanguagePerUserRSQLEntity {
     @Id
     @NonNull
     @EqualsAndHashCode.Include
-    UUID languageId;
+    @Column(name = "languageId")
+    UUID id;
 
+    @NonNull
+    @Column(name = "languageName")
+    String name;
     @NonNull
     Integer contributionCount;
     @NonNull
@@ -52,14 +55,10 @@ public class UnitedStatsPerLanguagePerUserRSQLEntity {
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     AllUserRSQLEntity user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "languageId", referencedColumnName = "id", insertable = false, updatable = false)
-    LanguageReadEntity language;
-
     public UserSearchPageItemResponseLanguageInner toDto() {
         return new UserSearchPageItemResponseLanguageInner()
-                .id(languageId)
-                .name(language.name())
+                .id(id)
+                .name(name)
                 .contributionCount(contributionCount)
                 .rewardCount(rewardCount)
                 .pendingRewardCount(pendingRewardCount)
@@ -72,6 +71,6 @@ public class UnitedStatsPerLanguagePerUserRSQLEntity {
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         Long githubUserId;
-        UUID languageId;
+        UUID id;
     }
 }
