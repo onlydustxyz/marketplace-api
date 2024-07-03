@@ -105,6 +105,9 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
     }
 
     private @NotNull Page<AllUserRSQLEntity> searchUsersWithRSQL(Integer pageIndex, Integer pageSize, String query, String sort) {
+        if (sort != null && (sort.contains("global") || sort.contains("language") || sort.contains("ecosystem"))) {
+            throw badRequest("Invalid sort: '%s' (global, language and ecosystem are not allowed)".formatted(sort));
+        }
         try {
             return allUserRSQLRepository.findAll(
                     RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, true).and(toSort(sort)),
