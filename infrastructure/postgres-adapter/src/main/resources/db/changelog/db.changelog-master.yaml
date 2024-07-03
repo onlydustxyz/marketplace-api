@@ -391,3 +391,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000278_add_project_categories_description.sql
   - include:
       file: db/changelog/changelogs/00000279_add_hackathon_index.sql
+  - include:
+      file: db/changelog/changelogs/00000279_improve_user_rsql_views.sql

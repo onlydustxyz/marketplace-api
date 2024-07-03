@@ -25,8 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static io.github.perplexhub.rsql.RSQLJPASupport.toSort;
@@ -107,15 +105,9 @@ public class BackofficeUsersReadApiPostgresAdapter implements BackofficeUsersRea
     }
 
     private @NotNull Page<AllUserRSQLEntity> searchUsersWithRSQL(Integer pageIndex, Integer pageSize, String query, String sort) {
-        final Map<String, String> propertyMapping = new HashMap<>();
-        propertyMapping.put("language.id", "language.language.id");
-        propertyMapping.put("language.name", "language.language.name");
-        propertyMapping.put("ecosystem.id", "ecosystem.ecosystem.id");
-        propertyMapping.put("ecosystem.name", "ecosystem.ecosystem.name");
-
         try {
             return allUserRSQLRepository.findAll(
-                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query, propertyMapping).and(toSort(sort, propertyMapping)),
+                    RSQLJPASupport.<AllUserRSQLEntity>toSpecification(query).and(toSort(sort)),
                     PageRequest.of(pageIndex, pageSize));
         } catch (RSQLException e) {
             throw badRequest("Invalid query: '%s' and/or sort: '%s' (%s error)"

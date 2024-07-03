@@ -32,8 +32,10 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             "login==ofux",
             "email==*gmail.com",
             "githubUserId==595505",
-            "language.name==Rust",
-            "ecosystem.name==Starknet"
+            "language1.name==Rust",
+            "ecosystem1.name==Starknet",
+            "language2.name==Java",
+            "ecosystem2.name==Zama"
     })
     void should_search_users_by_using_any_field_as_criteria(String query) {
         searchUsers(query);
@@ -43,8 +45,12 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
     @ParameterizedTest
     @ValueSource(strings = {
             "global",
-            "language",
-            "ecosystem"
+            "language1",
+            "language2",
+            "language3",
+            "ecosystem1",
+            "ecosystem2",
+            "ecosystem3"
     })
     void should_search_users_by_using_any_stats_field_as_criteria(String field) {
         List.of("contributionCount", "rewardCount", "pendingRewardCount", "totalUsdAmount", "maxUsdAmount", "rank").forEach(stat -> {
@@ -69,7 +75,7 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             assertThat(user.getGlobal().getRank()).isLessThan(100);
         });
 
-        users = searchUsers("language.name==Rust and language.totalUsdAmount>1000").getUsers();
+        users = searchUsers("language1.name==Rust and language1.totalUsdAmount>1000").getUsers();
         assertThat(users).isNotEmpty();
         users.forEach(user -> {
             final var rust = user.getLanguage().stream().filter(l -> l.getName().equals("Rust")).toList();
@@ -77,12 +83,34 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             rust.forEach(r -> assertThat(r.getTotalUsdAmount()).isGreaterThan(BigDecimal.valueOf(1000)));
         });
 
-        users = searchUsers("ecosystem.name==Starknet and ecosystem.contributionCount>50").getUsers();
+        users = searchUsers("language1.name==Rust and language1.totalUsdAmount>1000 and language2.name==Cairo and language2.rank<100").getUsers();
+        assertThat(users).isNotEmpty();
+        users.forEach(user -> {
+            final var rust = user.getLanguage().stream().filter(l -> l.getName().equals("Rust")).toList();
+            assertThat(rust).hasSize(1);
+            rust.forEach(r -> assertThat(r.getTotalUsdAmount()).isGreaterThan(BigDecimal.valueOf(1000)));
+            final var cairo = user.getLanguage().stream().filter(l -> l.getName().equals("Cairo")).toList();
+            assertThat(cairo).hasSize(1);
+            cairo.forEach(r -> assertThat(r.getRank()).isLessThan(100));
+        });
+
+        users = searchUsers("ecosystem1.name==Starknet and ecosystem1.contributionCount>50").getUsers();
         assertThat(users).isNotEmpty();
         users.forEach(user -> {
             final var starknet = user.getEcosystem().stream().filter(l -> l.getName().equals("Starknet")).toList();
             assertThat(starknet).hasSize(1);
             starknet.forEach(r -> assertThat(r.getContributionCount()).isGreaterThan(50));
+        });
+
+        users = searchUsers("ecosystem1.name==Starknet and ecosystem1.contributionCount>50 and ecosystem5.name=ilike=aztec and ecosystem5.rank<200").getUsers();
+        assertThat(users).isNotEmpty();
+        users.forEach(user -> {
+            final var starknet = user.getEcosystem().stream().filter(l -> l.getName().equals("Starknet")).toList();
+            assertThat(starknet).hasSize(1);
+            starknet.forEach(r -> assertThat(r.getContributionCount()).isGreaterThan(50));
+            final var aztec = user.getEcosystem().stream().filter(l -> l.getName().equals("Aztec")).toList();
+            assertThat(aztec).hasSize(1);
+            aztec.forEach(r -> assertThat(r.getRank()).isLessThan(200));
         });
     }
 
@@ -101,7 +129,7 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         assertThat(users).hasSize(10);
         assertThat(users).isSortedAccordingTo((u1, u2) -> u1.getGlobal().getRank().compareTo(u2.getGlobal().getRank()));
 
-        users = searchUsers("language.name==Rust", "language.totalUsdAmount,desc", 10).getUsers();
+        users = searchUsers("language1.name==Rust", "language1.totalUsdAmount,desc", 10).getUsers();
         assertThat(users).hasSize(10);
         assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()
                 .compareTo(u1.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()));

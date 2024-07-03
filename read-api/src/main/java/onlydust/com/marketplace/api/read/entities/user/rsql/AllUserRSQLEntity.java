@@ -39,7 +39,7 @@ public class AllUserRSQLEntity {
     @Formula("(select ci.contact from contact_informations ci where ci.user_id = user_id and ci.channel = 'telegram')")
     String telegram;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
     UserReadEntity registered;
 
@@ -53,15 +53,47 @@ public class AllUserRSQLEntity {
     Set<ProjectReadEntity> contributedProjects;
 
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
     UnitedStatsPerUserRSQLEntity global;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language1;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language;
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language2;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language3;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language4;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language5;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language6;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language7;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language8;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerLanguagePerUserRSQLEntity> language9;
 
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem1;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem;
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem2;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem3;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem4;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem5;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem6;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem7;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem8;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    Set<UnitedStatsPerEcosystemPerUserRSQLEntity> ecosystem9;
 
     public UserSearchPageItemResponse toBoPageItemResponse() {
         return new UserSearchPageItemResponse()
@@ -73,8 +105,8 @@ public class AllUserRSQLEntity {
                 .lastSeenAt(ofNullable(registered).map(u -> u.lastSeenAt().toInstant().atZone(ZoneId.systemDefault())).orElse(null))
                 .signedUpAt(ofNullable(registered).map(u -> u.createdAt().toInstant().atZone(ZoneId.systemDefault())).orElse(null))
                 .global(ofNullable(global).map(UnitedStatsPerUserRSQLEntity::toDto).orElse(null))
-                .language(language.stream().map(UnitedStatsPerLanguagePerUserRSQLEntity::toDto).toList())
-                .ecosystem(ecosystem.stream().map(UnitedStatsPerEcosystemPerUserRSQLEntity::toDto).toList())
+                .language(language1.stream().map(UnitedStatsPerLanguagePerUserRSQLEntity::toDto).toList())
+                .ecosystem(ecosystem1.stream().map(UnitedStatsPerEcosystemPerUserRSQLEntity::toDto).toList())
                 ;
     }
 }
