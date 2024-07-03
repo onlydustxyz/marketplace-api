@@ -9,6 +9,7 @@ import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
@@ -28,18 +29,19 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {
-            "login==ofux",
-            "email==*gmail.com",
-            "githubUserId==595505",
-            "language1.name==Rust",
-            "ecosystem1.name==Starknet",
-            "language2.name==Java",
-            "ecosystem2.name==Zama"
+    @CsvSource({
+            "login==ofux,true",
+            "email==*gmail.com,true",
+            "githubUserId==595505,true",
+            "language1.name==Rust,false",
+            "ecosystem1.name==Starknet,false",
+            "language2.name==Java,false",
+            "ecosystem2.name==Zama,false"
     })
-    void should_search_users_by_using_any_field_as_criteria(String query) {
+    void should_search_users_by_using_any_field_as_criteria(String query, boolean sortable) {
         searchUsers(query);
-        searchUsers(query, query.substring(0, query.indexOf("==")) + ",asc");
+        if (sortable)
+            searchUsers(query, query.substring(0, query.indexOf("==")) + ",asc");
     }
 
     @ParameterizedTest
@@ -56,13 +58,17 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         List.of("contributionCount", "rewardCount", "pendingRewardCount", "totalUsdAmount", "maxUsdAmount", "rank").forEach(stat -> {
             List.of("==", ">", "<", ">=", "<=").forEach(op -> {
                 searchUsers(field + "." + stat + op + "7");
-                searchUsers(field + "." + stat + op + "7", field + "." + stat + ",desc");
             });
         });
     }
 
     @Test
     void should_search_users_with_criteria() {
+        final var rustAndCairoCount = searchUsers("((language1.name==Rust);(language2.name==Cairo))").getTotalItemNumber();
+        assertThat(rustAndCairoCount).isEqualTo(16);
+        final var rustOrCairoCount = searchUsers("((language1.name==Rust),(language2.name==Cairo))").getTotalItemNumber();
+        assertThat(rustOrCairoCount).isEqualTo(214);
+
         var users = searchUsers("login==ofux").getUsers();
         assertThat(users).hasSize(1);
         users.forEach(user -> {
@@ -124,25 +130,6 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
         users.addAll(users2);
         assertThat(users).hasSize(20);
         assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLogin().compareTo(u1.getLogin()));
-
-        users = searchUsers("global.rank<200", "global.rank", 10).getUsers();
-        assertThat(users).hasSize(10);
-        assertThat(users).isSortedAccordingTo((u1, u2) -> u1.getGlobal().getRank().compareTo(u2.getGlobal().getRank()));
-
-        users = searchUsers("language1.name==Rust", "language1.totalUsdAmount,desc", 10).getUsers();
-        assertThat(users).hasSize(10);
-        assertThat(users).isSortedAccordingTo((u1, u2) -> u2.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()
-                .compareTo(u1.getLanguage().stream().filter(l -> l.getName().equals("Rust")).findFirst().orElseThrow().getTotalUsdAmount()));
-
-        users = searchUsers("global.rank<200", "global.rank;global.contributionCount,desc", 200).getUsers();
-        assertThat(users).hasSize(200);
-        assertThat(users).isSortedAccordingTo((u1, u2) -> {
-            final var rankCompare = u1.getGlobal().getRank().compareTo(u2.getGlobal().getRank());
-            if (rankCompare != 0) {
-                return rankCompare;
-            }
-            return u2.getGlobal().getContributionCount().compareTo(u1.getGlobal().getContributionCount());
-        });
     }
 
     @Test
@@ -155,6 +142,15 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
 
         error = searchUsersWithWrongQuery("login==ofux", "foo");
         assertThat(error.getMessage()).isEqualTo("Invalid query: 'login==ofux' and/or sort: 'foo' (UnknownProperty error)");
+
+        error = searchUsersWithWrongQuery("login==ofux", "language1.rank");
+        assertThat(error.getMessage()).isEqualTo("Invalid sort: 'language1.rank' (global, language and ecosystem are not allowed)");
+
+        error = searchUsersWithWrongQuery("login==ofux", "ecosystem3.rank");
+        assertThat(error.getMessage()).isEqualTo("Invalid sort: 'ecosystem3.rank' (global, language and ecosystem are not allowed)");
+
+        error = searchUsersWithWrongQuery("login==ofux", "global.contributionCount");
+        assertThat(error.getMessage()).isEqualTo("Invalid sort: 'global.contributionCount' (global, language and ecosystem are not allowed)");
     }
 
     @Test
