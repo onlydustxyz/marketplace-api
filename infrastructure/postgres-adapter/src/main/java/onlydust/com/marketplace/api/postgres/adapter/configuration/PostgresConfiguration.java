@@ -147,7 +147,6 @@ public class PostgresConfiguration {
                                                    final OnboardingRepository onboardingRepository,
                                                    final ProjectLeaderInvitationRepository projectLeaderInvitationRepository,
                                                    final ProjectLeadRepository projectLeadRepository,
-                                                   final ApplicationRepository applicationRepository,
                                                    final UserProfileInfoRepository userProfileInfoRepository,
                                                    final CustomRewardRepository customRewardRepository,
                                                    final ProjectLedIdRepository projectLedIdRepository,
@@ -163,13 +162,17 @@ public class PostgresConfiguration {
                 onboardingRepository,
                 projectLeaderInvitationRepository,
                 projectLeadRepository,
-                applicationRepository,
                 userProfileInfoRepository,
                 customRewardRepository,
                 projectLedIdRepository,
                 rewardViewRepository,
                 currencyRepository,
                 billingProfileUserRepository);
+    }
+
+    @Bean
+    public PostgresProjectApplicationAdapter postgresProjectApplicationAdapter(final ApplicationRepository applicationRepository) {
+        return new PostgresProjectApplicationAdapter(applicationRepository);
     }
 
     @Bean
