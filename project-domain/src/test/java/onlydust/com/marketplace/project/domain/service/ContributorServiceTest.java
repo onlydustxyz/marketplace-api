@@ -52,7 +52,7 @@ public class ContributorServiceTest {
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
-        verify(userStoragePort, never()).getUserByGithubId(anyLong());
+        verify(userStoragePort, never()).getRegisteredUserByGithubId(anyLong());
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
@@ -81,7 +81,7 @@ public class ContributorServiceTest {
         when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
-                contributor -> when(userStoragePort.getUserByGithubId(contributor.getId().getGithubUserId()))
+                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().getGithubUserId()))
                         .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
                                 .githubUserId(contributor.getId().getGithubUserId())
                                 .githubLogin(contributor.getId().getGithubLogin())
@@ -116,7 +116,7 @@ public class ContributorServiceTest {
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
-        verify(userStoragePort, never()).getUserByGithubId(anyLong());
+        verify(userStoragePort, never()).getRegisteredUserByGithubId(anyLong());
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
@@ -141,7 +141,7 @@ public class ContributorServiceTest {
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
-        verify(userStoragePort, never()).getUserByGithubId(anyLong());
+        verify(userStoragePort, never()).getRegisteredUserByGithubId(anyLong());
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
@@ -164,7 +164,7 @@ public class ContributorServiceTest {
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
-        verify(userStoragePort, never()).getUserByGithubId(anyLong());
+        verify(userStoragePort, never()).getRegisteredUserByGithubId(anyLong());
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
         assertThat(contributors.getRight()).isEmpty();
     }
@@ -184,7 +184,7 @@ public class ContributorServiceTest {
         // When
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
-                contributor -> when(userStoragePort.getUserByGithubId(contributor.getId().getGithubUserId()))
+                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().getGithubUserId()))
                         .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
                                 .githubUserId(contributor.getId().getGithubUserId())
                                 .githubLogin(contributor.getId().getGithubLogin())

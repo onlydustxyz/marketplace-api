@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
@@ -16,9 +17,11 @@ public interface UserStoragePort {
 
     void saveProfile(UUID userId, UserProfile userProfile);
 
-    Optional<User> getUserByGithubId(Long githubId);
+    Optional<User> getRegisteredUserByGithubId(Long githubId);
 
-    Optional<User> getUserById(UUID userId);
+    Optional<GithubUserIdentity> getIndexedUserByGithubId(Long githubId);
+
+    Optional<User> getRegisteredUserById(UUID userId);
 
     User createUser(User user);
 

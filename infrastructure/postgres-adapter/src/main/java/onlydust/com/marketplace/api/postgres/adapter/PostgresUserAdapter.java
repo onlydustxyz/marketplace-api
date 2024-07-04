@@ -2,10 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ContributorQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectStatsForUserQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -44,6 +41,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
+    private final AllUserViewRepository allUserViewRepository;
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
@@ -57,13 +55,19 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserByGithubId(Long githubId) {
+    public Optional<User> getRegisteredUserByGithubId(Long githubId) {
         return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getUserById(UUID userId) {
+    public Optional<GithubUserIdentity> getIndexedUserByGithubId(Long githubId) {
+        return allUserViewRepository.findByGithubUserId(githubId).map(AllUserViewEntity::toGithubIdentity);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<User> getRegisteredUserById(UUID userId) {
         return userViewRepository.findById(userId).map(this::getUserDetails);
     }
 
@@ -177,7 +181,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
                                                    " %s and user %d", projectId, githubUserId)));
 
-        final var user = getUserByGithubId(githubUserId)
+        final var user = getRegisteredUserByGithubId(githubUserId)
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
 
         projectLeaderInvitationRepository.delete(invitation);

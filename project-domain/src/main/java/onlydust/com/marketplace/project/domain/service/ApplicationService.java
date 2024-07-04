@@ -69,7 +69,7 @@ public class ApplicationService implements ApplicationFacadePort {
         final var issue = githubStoragePort.findIssueById(application.issueId())
                 .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
 
-        final var applicant = userStoragePort.getUserByGithubId(application.applicantId())
+        final var applicant = userStoragePort.getIndexedUserByGithubId(application.applicantId())
                 .orElseThrow(() -> notFound("User %d not found".formatted(application.applicantId())));
 
         final var githubAppToken = githubAppService.getInstallationTokenFor(issue.repoId())

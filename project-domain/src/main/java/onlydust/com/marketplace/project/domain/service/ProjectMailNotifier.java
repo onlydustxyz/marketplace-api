@@ -27,7 +27,8 @@ public class ProjectMailNotifier implements CommitteeObserverPort {
     public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull UUID projectId, @NonNull UUID userId) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("Committee %s not found".formatted(committeeId.value())));
-        final User user = userStoragePort.getUserById(userId).orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
+        final User user =
+                userStoragePort.getRegisteredUserById(userId).orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);
         projectMailOutboxPort.push(new NewCommitteeApplication(projectInfos.name(), projectId, user.getGithubEmail(), user.getGithubLogin(), userId,
                 committee.name(), committeeId.value(), committee.applicationEndDate()));

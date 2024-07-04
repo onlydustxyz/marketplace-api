@@ -23,19 +23,19 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
     public void process(Event event) {
         if (event instanceof OnGithubIssueAssigned onGithubIssueAssigned) {
             if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId())) {
-                final var user = userStoragePort.getUserByGithubId(onGithubIssueAssigned.assigneeId());
+                final var user = userStoragePort.getRegisteredUserByGithubId(onGithubIssueAssigned.assigneeId());
                 trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user));
             }
         } else if (event instanceof OnPullRequestCreated onPullRequestCreated) {
             if (projectStoragePort.isLinkedToAProject(onPullRequestCreated.repoId()))
-                userStoragePort.getUserByGithubId(onPullRequestCreated.authorId())
+                userStoragePort.getRegisteredUserByGithubId(onPullRequestCreated.authorId())
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestCreatedTrackingEvent.of(onPullRequestCreated, user)));
         } else if (event instanceof OnPullRequestMerged onPullRequestMerged) {
             if (projectStoragePort.isLinkedToAProject(onPullRequestMerged.repoId()))
-                userStoragePort.getUserByGithubId(onPullRequestMerged.authorId())
+                userStoragePort.getRegisteredUserByGithubId(onPullRequestMerged.authorId())
                         .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user)));
         } else if (event instanceof OnApplicationCreated onApplicationCreated) {
-            final var user = userStoragePort.getUserByGithubId(onApplicationCreated.applicantId());
+            final var user = userStoragePort.getRegisteredUserByGithubId(onApplicationCreated.applicantId());
             trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, user));
         } else {
             trackingEventPublisher.publish(event);

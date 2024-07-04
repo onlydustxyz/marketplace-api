@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -416,7 +417,7 @@ public class ApplicationServiceTest {
 
     @Nested
     class AcceptApplication {
-        final User applicant = User.builder()
+        final GithubUserIdentity applicant = GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
                 .githubLogin(faker.name().username())
                 .build();
@@ -437,7 +438,7 @@ public class ApplicationServiceTest {
             when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
             when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
-            when(userStoragePort.getUserByGithubId(application.applicantId())).thenReturn(Optional.of(applicant));
+            when(userStoragePort.getIndexedUserByGithubId(application.applicantId())).thenReturn(Optional.of(applicant));
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubToken));
         }
 
@@ -480,7 +481,7 @@ public class ApplicationServiceTest {
         @Test
         void should_prevent_accepting_application_if_applicant_not_found() {
             // Given
-            when(userStoragePort.getUserByGithubId(application.applicantId())).thenReturn(Optional.empty());
+            when(userStoragePort.getIndexedUserByGithubId(application.applicantId())).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
