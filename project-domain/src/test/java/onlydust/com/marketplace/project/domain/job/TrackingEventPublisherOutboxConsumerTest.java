@@ -88,7 +88,7 @@ class TrackingEventPublisherOutboxConsumerTest {
     class GivenNonRegisteredUser {
         @BeforeEach
         void setUp() {
-            when(userStoragePort.getUserByGithubId(githubUserId)).thenReturn(Optional.empty());
+            when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.empty());
             when(projectStoragePort.isLinkedToAProject(any())).thenReturn(true);
         }
 
@@ -176,7 +176,7 @@ class TrackingEventPublisherOutboxConsumerTest {
 
         @BeforeEach
         void setUp() {
-            when(userStoragePort.getUserByGithubId(githubUserId)).thenReturn(Optional.of(user));
+            when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.of(user));
             when(projectStoragePort.isLinkedToAProject(githubRepoId)).thenReturn(true);
         }
 

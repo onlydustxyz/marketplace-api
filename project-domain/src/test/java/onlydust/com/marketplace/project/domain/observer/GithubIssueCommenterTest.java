@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
@@ -94,7 +95,7 @@ class GithubIssueCommenterTest {
                 .slug(faker.internet().slug())
                 .build();
 
-        final User applicant = User.builder()
+        final GithubUserIdentity applicant = GithubUserIdentity.builder()
                 .githubUserId(faker.number().randomNumber(10, true))
                 .githubLogin(faker.internet().slug())
                 .build();
@@ -118,7 +119,7 @@ class GithubIssueCommenterTest {
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubAppToken));
             when(projectStoragePort.getById(application.projectId())).thenReturn(Optional.of(project));
-            when(userStoragePort.getUserByGithubId(applicant.getGithubUserId())).thenReturn(Optional.of(applicant));
+            when(userStoragePort.getIndexedUserByGithubId(applicant.getGithubUserId())).thenReturn(Optional.of(applicant));
         }
 
         @Test
@@ -138,7 +139,7 @@ class GithubIssueCommenterTest {
         @Test
         void should_throw_if_applicant_is_not_found() {
             // Given
-            when(userStoragePort.getUserByGithubId(any())).thenReturn(Optional.empty());
+            when(userStoragePort.getIndexedUserByGithubId(any())).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> githubIssueCommenter.onApplicationCreated(application))

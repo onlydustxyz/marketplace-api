@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -56,5 +57,14 @@ public class AllUserViewEntity {
 
     public ShortContributorView toDomain() {
         return new ShortContributorView(GithubUserId.of(githubUserId), login, avatarUrl, isNull(userId) ? null : UserId.of(userId), email);
+    }
+
+    public GithubUserIdentity toGithubIdentity() {
+        return GithubUserIdentity.builder()
+                .githubUserId(githubUserId)
+                .githubLogin(login)
+                .githubAvatarUrl(avatarUrl)
+                .email(email)
+                .build();
     }
 }

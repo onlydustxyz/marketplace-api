@@ -47,7 +47,7 @@ public class UserService implements UserFacadePort {
     @Transactional
     public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
         return userStoragePort
-                .getUserByGithubId(githubUserIdentity.getGithubUserId())
+                .getRegisteredUserByGithubId(githubUserIdentity.getGithubUserId())
                 .map(user -> {
                     if (!readOnly)
                         userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());

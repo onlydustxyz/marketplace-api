@@ -88,7 +88,7 @@ public class ContributorService implements ContributorFacadePort {
     private List<Contributor> getExternalContributors(String login) {
         return githubSearchPort.searchUsersByLogin(login).stream().map(
                 identity -> {
-                    final var user = userStoragePort.getUserByGithubId(identity.getGithubUserId()).map(User::toGithubIdentity);
+                    final var user = userStoragePort.getRegisteredUserByGithubId(identity.getGithubUserId()).map(User::toGithubIdentity);
                     return Contributor.builder()
                             .id(user.orElse(identity))
                             .isRegistered(user.isPresent())

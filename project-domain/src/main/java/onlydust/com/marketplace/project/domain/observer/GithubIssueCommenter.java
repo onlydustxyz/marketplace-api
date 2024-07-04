@@ -30,7 +30,7 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
         final var project = projectStoragePort.getById(application.projectId())
                 .orElseThrow(() -> internalServerError("Project %s not found".formatted(application.projectId())));
 
-        final var applicant = userStoragePort.getUserByGithubId(application.applicantId())
+        final var applicant = userStoragePort.getIndexedUserByGithubId(application.applicantId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(application.applicantId())));
 
         githubAppService.getInstallationTokenFor(issue.repoId())

@@ -40,7 +40,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
 
 
     @Test
-    void getUserByGithubId_should_map_onboarding_data() {
+    void getRegisteredUserByGithubId_should_map_onboarding_data() {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
@@ -61,7 +61,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         onboardingRepository.save(onboarding);
 
         // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
         assertThat(result.getId()).isEqualTo(user.getId());
@@ -72,7 +72,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
-    void getUserByGithubId_should_map_outdated_terms_and_conditions_acceptance() {
+    void getRegisteredUserByGithubId_should_map_outdated_terms_and_conditions_acceptance() {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
@@ -93,7 +93,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         onboardingRepository.save(onboarding);
 
         // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
         assertThat(result.getId()).isEqualTo(user.getId());
@@ -104,7 +104,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
-    void getUserByGithubId_without_onboarding_data() {
+    void getRegisteredUserByGithubId_without_onboarding_data() {
         // Given
         final UserEntity user = UserEntity.builder()
                 .id(UUID.randomUUID())
@@ -118,7 +118,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         userRepository.save(user);
 
         // When
-        final User result = postgresUserAdapter.getUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
         assertThat(result.getId()).isEqualTo(user.getId());
