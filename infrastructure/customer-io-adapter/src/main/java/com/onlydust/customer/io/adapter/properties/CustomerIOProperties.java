@@ -27,4 +27,6 @@ public class CustomerIOProperties {
     Integer verificationFailedEmailId;
     @NonNull
     Integer newCommitteeApplicationEmailId;
+    @NonNull
+    Integer projectApplicationsToReviewByUserEmailId;
 }

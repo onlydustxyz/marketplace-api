@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.job.ApplicationMailNotifier;
 import onlydust.com.marketplace.project.domain.model.Application;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 
@@ -714,5 +718,112 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                           "problemSolvingApproach": "Do the math"
                         }
                         """);
+    }
+
+    @Autowired
+    ApplicationMailNotifier applicationMailNotifier;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
+    @Autowired
+    OutboxConsumerJob projectMailOutboxJob;
+
+    @Test
+    @Order(100)
+    void should_send_daily_reports_to_leads_by_email() {
+        // Given
+        final var gregoire = userAuthHelper.authenticateGregoire();
+
+        // When
+        applicationMailNotifier.notifyProjectApplicationsToReview();
+        projectMailOutboxJob.run();
+
+        // Then
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getProjectApplicationsToReviewByUserEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(gregoire.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                {
+                                  "username": "gregcha",
+                                  "projects": [
+                                    {
+                                      "slug": "taco-tuesday",
+                                      "name": "Taco Tuesday",
+                                      "issues": [
+                                        {
+                                          "id": 1736474921,
+                                          "title": "Documentation by AnthonyBuisset",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 3
+                                        },{
+                                          "id": 1736504583,
+                                          "title": "Monthly contracting subscription",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 2
+                                        }
+                                      ]
+                                    },{
+                                      "slug": "starklings",
+                                      "name": "Starklings",
+                                      "issues": [
+                                        {
+                                          "id": 1736474921,
+                                          "title": "Documentation by AnthonyBuisset",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 1
+                                        },{
+                                          "id": 1736504583,
+                                          "title": "Monthly contracting subscription",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 2
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                                """, true, false)))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(gregoire.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Applications to review daily report")))
+        );
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getProjectApplicationsToReviewByUserEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo("46fec596-7a91-422e-8532-5f479e790217")))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                {
+                                  "username": "Blumebee",
+                                  "projects": [
+                                    {
+                                      "slug": "taco-tuesday",
+                                      "name": "Taco Tuesday",
+                                      "issues": [
+                                        {
+                                          "id": 1736474921,
+                                          "title": "Documentation by AnthonyBuisset",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 3
+                                        },{
+                                          "id": 1736504583,
+                                          "title": "Monthly contracting subscription",
+                                          "repoName": "cool.repo.B",
+                                          "applicantCount": 2
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                                """, true, false)))
+                        .withRequestBody(matchingJsonPath("$.to", containing("emilie.blum")))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Applications to review daily report")))
+        );
     }
 }

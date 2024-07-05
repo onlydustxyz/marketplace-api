@@ -19,6 +19,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 @Slf4j
 public class ApplicationService implements ApplicationFacadePort {
     private final UserStoragePort userStoragePort;
+    private final ProjectApplicationStoragePort projectApplicationStoragePort;
     private final ProjectStoragePort projectStoragePort;
     private final ApplicationObserverPort applicationObserver;
     private final GithubUserPermissionsService githubUserPermissionsService;
@@ -30,7 +31,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
     @Override
     public void deleteApplication(Application.Id id, UUID userId, Long githubUserId) {
-        final var application = userStoragePort.findApplication(id)
+        final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
         final var deleteSelfApplication = application.applicantId().equals(githubUserId);
@@ -41,7 +42,7 @@ public class ApplicationService implements ApplicationFacadePort {
                 throw forbidden("User is not authorized to delete this application");
         }
 
-        userStoragePort.deleteApplications(id);
+        projectApplicationStoragePort.deleteApplications(id);
 
         if (deleteSelfApplication && application.origin() == Application.Origin.MARKETPLACE)
             tryDeleteGithubComment(application);
@@ -60,7 +61,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
     @Override
     public void acceptApplication(Application.Id id, UUID userId) {
-        final var application = userStoragePort.findApplication(id)
+        final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
         if (!projectStoragePort.getProjectLeadIds(application.projectId()).contains(userId))
@@ -94,7 +95,7 @@ public class ApplicationService implements ApplicationFacadePort {
         if (issue.isAssigned())
             throw forbidden("Issue %s is already assigned".formatted(issueId));
 
-        if (userStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
+        if (projectApplicationStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
             throw badRequest("User already applied to this issue");
 
         final var project = projectStoragePort.getById(projectId)
@@ -109,7 +110,7 @@ public class ApplicationService implements ApplicationFacadePort {
 
         final var application = Application.fromMarketplace(projectId, githubUserId, issueId, commentId, motivation, problemSolvingApproach);
 
-        userStoragePort.save(application);
+        projectApplicationStoragePort.save(application);
         applicationObserver.onApplicationCreated(application);
 
         return application;
@@ -141,7 +142,7 @@ public class ApplicationService implements ApplicationFacadePort {
     @Transactional
     public Application updateApplication(@NonNull Application.Id applicationId, @NonNull Long githubUserId, @NonNull String motivation,
                                          String problemSolvingApproach) {
-        final var application = userStoragePort.findApplication(applicationId)
+        final var application = projectApplicationStoragePort.findApplication(applicationId)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
 
         if (!application.applicantId().equals(githubUserId))
@@ -159,7 +160,7 @@ public class ApplicationService implements ApplicationFacadePort {
         final var personalAccessToken = githubAuthenticationPort.getGithubPersonalToken(githubUserId);
 
         final var updated = application.update(motivation, problemSolvingApproach);
-        userStoragePort.save(updated);
+        projectApplicationStoragePort.save(updated);
 
         githubApiPort.updateComment(personalAccessToken, issue.repoId(), application.commentId(), formatComment(project, motivation, problemSolvingApproach));
 

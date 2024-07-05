@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
 import jakarta.persistence.EntityManagerFactory;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectApplicationAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -37,6 +38,8 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     ApplicationRepository applicationRepository;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    PostgresProjectApplicationAdapter postgresProjectApplicationAdapter;
 
 
     @Test
@@ -280,7 +283,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         em.close();
 
         // When
-        postgresUserAdapter.deleteObsoleteApplications();
+        postgresProjectApplicationAdapter.deleteObsoleteApplications();
 
         // Then
         assertThat(applicationRepository.existsById(UUID.fromString("10e0ca81-7633-4357-a88b-168278facfab"))).isFalse();

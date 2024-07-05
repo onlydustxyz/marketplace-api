@@ -14,10 +14,7 @@ import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransa
 import onlydust.com.marketplace.api.infrastructure.langchain.adapters.LangchainLLMAdapter;
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresGithubAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresRewardAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectMailEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
@@ -125,6 +122,7 @@ public class ProjectConfiguration {
 
     @Bean
     public ApplicationFacadePort applicationFacadePort(final PostgresUserAdapter postgresUserAdapter,
+                                                       final PostgresProjectApplicationAdapter postgresProjectApplicationAdapter,
                                                        final ProjectStoragePort projectStoragePort,
                                                        final ApplicationObserverPort applicationObservers,
                                                        final GithubUserPermissionsService githubUserPermissionsService,
@@ -136,6 +134,7 @@ public class ProjectConfiguration {
     ) {
         return new ApplicationService(
                 postgresUserAdapter,
+                postgresProjectApplicationAdapter,
                 projectStoragePort,
                 applicationObservers,
                 githubUserPermissionsService,
@@ -215,6 +214,7 @@ public class ProjectConfiguration {
     @Bean
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
                                               final UserStoragePort userStoragePort,
+                                              final ProjectApplicationStoragePort projectApplicationStoragePort,
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
                                               final ApplicationObserverPort applicationObservers,
@@ -222,6 +222,7 @@ public class ProjectConfiguration {
         return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         userStoragePort,
+                        projectApplicationStoragePort,
                         langchainLLMAdapter,
                         indexerPort,
                         githubStoragePort,
@@ -251,8 +252,14 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public ApplicationsCleaner applicationsCleaner(final UserStoragePort userStoragePort) {
-        return new ApplicationsCleaner(userStoragePort);
+    public ApplicationsCleaner applicationsCleaner(final ProjectApplicationStoragePort projectApplicationStoragePort) {
+        return new ApplicationsCleaner(projectApplicationStoragePort);
+    }
+
+    @Bean
+    public ApplicationMailNotifier applicationMailNotifier(final OutboxPort projectMailOutbox,
+                                                           final ProjectApplicationStoragePort projectApplicationStoragePort) {
+        return new ApplicationMailNotifier(projectMailOutbox, projectApplicationStoragePort);
     }
 
     @Bean
@@ -383,8 +390,10 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox, final ProjectStoragePort projectStoragePort,
-                                                       final UserStoragePort userStoragePort, final CommitteeStoragePort committeeStoragePort) {
+    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox,
+                                                       final ProjectStoragePort projectStoragePort,
+                                                       final UserStoragePort userStoragePort,
+                                                       final CommitteeStoragePort committeeStoragePort) {
         return new ProjectMailNotifier(projectMailOutbox, projectStoragePort, userStoragePort, committeeStoragePort);
     }
 

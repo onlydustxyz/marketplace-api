@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
+import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 
 @AllArgsConstructor
 @Slf4j
@@ -33,6 +34,8 @@ public class CustomerIOAdapter implements OutboxConsumer {
             sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
         } else if (event instanceof NewCommitteeApplication newCommitteeApplication) {
             sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, newCommitteeApplication));
+        } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
+            sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else {
             LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
         }

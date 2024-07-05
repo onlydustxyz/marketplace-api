@@ -26,12 +26,14 @@ import static org.mockito.Mockito.*;
 
 class ApplicationsUpdaterTest {
     final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+    final ProjectApplicationStoragePort projectApplicationStoragePort = mock(ProjectApplicationStoragePort.class);
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final LLMPort llmPort = mock(LLMPort.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final ApplicationObserverPort applicationObserverPort = mock(ApplicationObserverPort.class);
-    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, llmPort, indexerPort, githubStoragePort,
+    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, projectApplicationStoragePort, llmPort,
+            indexerPort, githubStoragePort,
             applicationObserverPort);
 
     final Faker faker = new Faker();
@@ -62,7 +64,7 @@ class ApplicationsUpdaterTest {
         @BeforeEach
         void setup() {
             when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
-            when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
+            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
         }
 
@@ -75,7 +77,7 @@ class ApplicationsUpdaterTest {
             applicationsUpdater.process(event);
 
             // Then
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(llmPort);
             verifyNoInteractions(applicationObserverPort);
         }
@@ -93,13 +95,13 @@ class ApplicationsUpdaterTest {
                     faker.lorem().sentence(),
                     faker.lorem().sentence());
 
-            when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of(existingApplication));
+            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of(existingApplication));
 
             // When
             applicationsUpdater.process(event);
 
             // Then
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(llmPort);
             verifyNoInteractions(applicationObserverPort);
             verifyNoInteractions(indexerPort);
@@ -114,7 +116,7 @@ class ApplicationsUpdaterTest {
             applicationsUpdater.process(event);
 
             // Then
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(indexerPort);
             verifyNoInteractions(applicationObserverPort);
         }
@@ -130,7 +132,7 @@ class ApplicationsUpdaterTest {
                     .hasMessage("Issue %s not found".formatted(event.issueId()));
 
             // Then
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(applicationObserverPort);
             verifyNoInteractions(indexerPort);
             verifyNoInteractions(llmPort);
@@ -148,7 +150,7 @@ class ApplicationsUpdaterTest {
             applicationsUpdater.process(event);
 
             // Then
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(applicationObserverPort);
             verifyNoInteractions(indexerPort);
             verifyNoInteractions(llmPort);
@@ -164,7 +166,7 @@ class ApplicationsUpdaterTest {
 
             // Then
             final var applicationsCaptor = ArgumentCaptor.forClass(Application[].class);
-            verify(userStoragePort).save(applicationsCaptor.capture());
+            verify(projectApplicationStoragePort).save(applicationsCaptor.capture());
             final var applications = applicationsCaptor.getValue();
             assertThat(applications).hasSize(2);
 
@@ -246,23 +248,23 @@ class ApplicationsUpdaterTest {
                             null)
             );
 
-            when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
-            when(userStoragePort.findApplications(commentId)).thenReturn(existingApplications);
+            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
+            when(projectApplicationStoragePort.findApplications(commentId)).thenReturn(existingApplications);
             when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(false);
 
             // When
             applicationsUpdater.process(event);
 
             // Then
-            verify(userStoragePort).findApplications(commentId);
-            verify(userStoragePort).deleteApplications(existingApplications.get(1).id());
+            verify(projectApplicationStoragePort).findApplications(commentId);
+            verify(projectApplicationStoragePort).deleteApplications(existingApplications.get(1).id());
             verifyNoInteractions(indexerPort);
         }
 
         @Test
         void should_create_applications_if_none_yet_and_new_comment_expresses_interest() {
             // Given
-            when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
+            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
             when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
             when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
 
@@ -271,7 +273,7 @@ class ApplicationsUpdaterTest {
 
             // Then
             final var applicationsCaptor = ArgumentCaptor.forClass(Application[].class);
-            verify(userStoragePort).save(applicationsCaptor.capture());
+            verify(projectApplicationStoragePort).save(applicationsCaptor.capture());
             final var applications = applicationsCaptor.getValue();
             assertThat(applications).hasSize(2);
 
@@ -303,15 +305,15 @@ class ApplicationsUpdaterTest {
                             faker.lorem().sentence(),
                             faker.lorem().sentence())
             );
-            when(userStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
+            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(existingApplications);
 
             // When
             applicationsUpdater.process(event);
 
             // Then
             verifyNoInteractions(llmPort);
-            verify(userStoragePort, never()).deleteApplications(any(Application.Id[].class));
-            verify(userStoragePort, never()).save(any(Application[].class));
+            verify(projectApplicationStoragePort, never()).deleteApplications(any(Application.Id[].class));
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
             verifyNoInteractions(indexerPort);
         }
     }
@@ -349,14 +351,14 @@ class ApplicationsUpdaterTest {
                             null)
             );
 
-            when(userStoragePort.findApplications(GithubComment.Id.of(event.id()))).thenReturn(existingApplications);
+            when(projectApplicationStoragePort.findApplications(GithubComment.Id.of(event.id()))).thenReturn(existingApplications);
 
             // When
             applicationsUpdater.process(event);
 
             // Then
             verifyNoInteractions(llmPort);
-            verify(userStoragePort).deleteApplications(existingApplications.get(1).id());
+            verify(projectApplicationStoragePort).deleteApplications(existingApplications.get(1).id());
         }
     }
 
@@ -373,7 +375,7 @@ class ApplicationsUpdaterTest {
 
             // Then
             verifyNoInteractions(llmPort);
-            verify(userStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
+            verify(projectApplicationStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
         }
     }
 
@@ -390,7 +392,7 @@ class ApplicationsUpdaterTest {
 
             // Then
             verifyNoInteractions(llmPort);
-            verify(userStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
+            verify(projectApplicationStoragePort).deleteApplicationsByIssueId(GithubIssue.Id.of(event.id()));
         }
     }
 }
