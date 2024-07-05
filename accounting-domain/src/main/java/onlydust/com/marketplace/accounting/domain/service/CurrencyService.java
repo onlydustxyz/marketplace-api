@@ -99,7 +99,7 @@ public class CurrencyService implements CurrencyFacadePort {
     }
 
     @Override
-    public Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals) {
+    public Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals, List<String> countryRestrictions) {
         var currency = currencyStorage.get(id).orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
 
         if (name != null)
@@ -112,6 +112,8 @@ public class CurrencyService implements CurrencyFacadePort {
         }
         if (decimals != null)
             currency = currency.withDecimals(decimals);
+        if (countryRestrictions != null)
+            currency = currency.withCountryRestrictions(countryRestrictions);
 
         currencyStorage.save(currency);
 
