@@ -22,7 +22,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Immutable
-public class ApplicationsToReviewEntity {
+public class ApplicationsToReviewQueryEntity {
     @Id
     @NonNull
     @EqualsAndHashCode.Include

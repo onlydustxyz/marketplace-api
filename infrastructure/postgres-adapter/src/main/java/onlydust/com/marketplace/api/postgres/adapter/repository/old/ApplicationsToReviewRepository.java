@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository.old;
 
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationsToReviewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationsToReviewQueryEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ApplicationsToReviewRepository extends Repository<ApplicationsToReviewEntity, UUID> {
+public interface ApplicationsToReviewRepository extends Repository<ApplicationsToReviewQueryEntity, UUID> {
 
     @Query(value = """
             select applications_grouped_by_project.lead_id                                          as user_id,
@@ -57,5 +57,5 @@ public interface ApplicationsToReviewRepository extends Repository<ApplicationsT
                      applications_grouped_by_project.lead_github_login,
                      applications_grouped_by_project.lead_email;
             """, nativeQuery = true)
-    List<ApplicationsToReviewEntity> findAllProjectApplicationsToReview();
+    List<ApplicationsToReviewQueryEntity> findAllProjectApplicationsToReview();
 }

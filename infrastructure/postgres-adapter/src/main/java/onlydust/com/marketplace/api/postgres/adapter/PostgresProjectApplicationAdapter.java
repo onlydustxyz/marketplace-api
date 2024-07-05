@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationsToReviewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationsToReviewQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationsToReviewRepository;
@@ -75,7 +75,7 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
 
     @Override
     public List<ProjectApplicationsToReviewByUser> findProjectApplicationsToReview() {
-        return applicationsToReviewRepository.findAllProjectApplicationsToReview().stream().map(ApplicationsToReviewEntity::toDomain).toList();
+        return applicationsToReviewRepository.findAllProjectApplicationsToReview().stream().map(ApplicationsToReviewQueryEntity::toDomain).toList();
     }
 
 }
