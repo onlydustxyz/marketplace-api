@@ -17,6 +17,7 @@ import java.util.UUID;
 @Table(name = "project_category_suggestions", schema = "public")
 public class ProjectCategorySuggestionEntity {
     @Id
+    @EqualsAndHashCode.Include
     private @NonNull UUID id;
     private @NonNull String name;
     private @NonNull UUID projectId;

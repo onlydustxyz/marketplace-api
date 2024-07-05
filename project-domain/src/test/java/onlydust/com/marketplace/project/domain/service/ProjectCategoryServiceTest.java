@@ -4,7 +4,6 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
-import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,54 +19,12 @@ import static org.mockito.Mockito.*;
 class ProjectCategoryServiceTest {
     Faker faker = new Faker();
     ProjectCategoryService projectCategoryService;
-    ProjectObserverPort projectObserverPort = mock(ProjectObserverPort.class);
-    PermissionService permissionService = mock(PermissionService.class);
     ProjectCategoryStoragePort projectCategoryStoragePort = mock(ProjectCategoryStoragePort.class);
 
     @BeforeEach
     void setUp() {
-        reset(projectObserverPort, projectCategoryStoragePort, permissionService);
-        projectCategoryService = new ProjectCategoryService(projectObserverPort, projectCategoryStoragePort, permissionService);
-    }
-
-    @Test
-    void cannot_suggest_project_category_if_not_project_lead() {
-        // Given
-        final var userId = UUID.randomUUID();
-        final var projectId = UUID.randomUUID();
-        final var name = faker.rickAndMorty().character();
-
-        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
-
-        // When
-        assertThatThrownBy(() -> projectCategoryService.suggest(name, userId, projectId))
-                // Then
-                .isInstanceOf(OnlyDustException.class)
-                .hasMessage("Only project leads can suggest project categories");
-    }
-
-    @Test
-    void should_suggest_project_category() {
-        // Given
-        final var userId = UUID.randomUUID();
-        final var projectId = UUID.randomUUID();
-        final var name = faker.rickAndMorty().character();
-
-        when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
-
-        // When
-        projectCategoryService.suggest(name, userId, projectId);
-
-        // Then
-        final var suggestionCaptor = ArgumentCaptor.forClass(ProjectCategorySuggestion.class);
-        verify(projectCategoryStoragePort).save(suggestionCaptor.capture());
-        final var projectCategorySuggestion = suggestionCaptor.getValue();
-
-        assertThat(suggestionCaptor.getValue().id()).isNotNull();
-        assertThat(projectCategorySuggestion.name()).isEqualTo(name);
-        assertThat(projectCategorySuggestion.projectId()).isEqualTo(projectId);
-
-        verify(projectObserverPort).onProjectCategorySuggested(name, userId);
+        reset(projectCategoryStoragePort);
+        projectCategoryService = new ProjectCategoryService(projectCategoryStoragePort);
     }
 
     @Test

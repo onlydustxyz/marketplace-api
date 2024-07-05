@@ -401,13 +401,6 @@ public class ProjectsRestApi implements ProjectsApi {
     }
 
     @Override
-    public ResponseEntity<Void> suggestProjectCategory(SuggestProjectCategoryRequest request) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectCategoryFacadePort.suggest(request.getName(), authenticatedUser.getId(), request.getProjectId());
-        return noContent().build();
-    }
-
-    @Override
     public ResponseEntity<Void> unassignContribution(UUID projectId, String contributionId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         contributionsFacadePort.unassign(projectId, authenticatedUser.getId(), contributionId);

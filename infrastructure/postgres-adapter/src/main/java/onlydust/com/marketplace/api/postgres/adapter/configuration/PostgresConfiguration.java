@@ -57,7 +57,8 @@ public class PostgresConfiguration {
                                                  final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                  final HiddenContributorRepository hiddenContributorRepository,
                                                  final ProjectTagRepository projectTagRepository,
-                                                 final ProjectInfosViewRepository projectInfosViewRepository) {
+                                                 final ProjectInfosViewRepository projectInfosViewRepository,
+                                                 final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -72,7 +73,8 @@ public class PostgresConfiguration {
                 contributorActivityViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectInfosViewRepository
+                projectInfosViewRepository,
+                projectCategorySuggestionRepository
         );
     }
 
@@ -96,7 +98,8 @@ public class PostgresConfiguration {
                                                            final ContributorActivityViewEntityRepository contributorActivityViewEntityRepository,
                                                            final HiddenContributorRepository hiddenContributorRepository,
                                                            final ProjectTagRepository projectTagRepository,
-                                                           final ProjectInfosViewRepository projectInfosViewRepository) {
+                                                           final ProjectInfosViewRepository projectInfosViewRepository,
+                                                           final ProjectCategorySuggestionRepository projectCategorySuggestionRepository) {
         return new PostgresProjectAdapter(
                 projectRepository,
                 projectViewRepository,
@@ -111,7 +114,8 @@ public class PostgresConfiguration {
                 contributorActivityViewEntityRepository,
                 hiddenContributorRepository,
                 projectTagRepository,
-                projectInfosViewRepository
+                projectInfosViewRepository,
+                projectCategorySuggestionRepository
         );
     }
 

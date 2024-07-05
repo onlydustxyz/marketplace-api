@@ -76,10 +76,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public ProjectCategoryFacadePort projectCategoryFacadePort(final ProjectObserverPort projectObservers,
-                                                               final ProjectCategoryStoragePort projectCategoryStoragePort,
-                                                               final PermissionService permissionService) {
-        return new ProjectCategoryService(projectObservers, projectCategoryStoragePort, permissionService);
+    public ProjectCategoryFacadePort projectCategoryFacadePort(final ProjectCategoryStoragePort projectCategoryStoragePort) {
+        return new ProjectCategoryService(projectCategoryStoragePort);
     }
 
     @Bean

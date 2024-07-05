@@ -15,12 +15,13 @@ public interface ProjectStoragePort {
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                        ProjectVisibility visibility
-            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds);
+            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions);
 
     void updateProject(UUID id, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds);
+                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds,
+                       List<UUID> categoryIds, List<String> categorySuggestions);
 
     List<UUID> getProjectLeadIds(UUID projectId);
 
@@ -73,4 +74,6 @@ public interface ProjectStoragePort {
     List<UUID> getProjectContributedOnIdsForUser(UUID userId);
 
     List<UUID> findProjectIdsByRepoId(Long repoId);
+
+    List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId);
 }
