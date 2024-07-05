@@ -171,8 +171,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresProjectApplicationAdapter postgresProjectApplicationAdapter(final ApplicationRepository applicationRepository) {
-        return new PostgresProjectApplicationAdapter(applicationRepository);
+    public PostgresProjectApplicationAdapter postgresProjectApplicationAdapter(final ApplicationRepository applicationRepository,
+                                                                               final ApplicationsToReviewRepository applicationsToReviewRepository) {
+        return new PostgresProjectApplicationAdapter(applicationRepository, applicationsToReviewRepository);
     }
 
     @Bean

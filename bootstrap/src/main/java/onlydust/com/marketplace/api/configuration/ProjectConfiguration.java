@@ -257,6 +257,12 @@ public class ProjectConfiguration {
     }
 
     @Bean
+    public ApplicationMailNotifier applicationMailNotifier(final OutboxPort projectMailOutbox,
+                                                           final ProjectApplicationStoragePort projectApplicationStoragePort) {
+        return new ApplicationMailNotifier(projectMailOutbox, projectApplicationStoragePort);
+    }
+
+    @Bean
     public OutboxConsumer indexingEventsOutboxConsumer(final OutboxConsumer contributionRefresher,
                                                        final OutboxConsumer applicationsUpdater,
                                                        final OutboxConsumer trackingOutboxConsumer) {
@@ -384,8 +390,10 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox, final ProjectStoragePort projectStoragePort,
-                                                       final UserStoragePort userStoragePort, final CommitteeStoragePort committeeStoragePort) {
+    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox,
+                                                       final ProjectStoragePort projectStoragePort,
+                                                       final UserStoragePort userStoragePort,
+                                                       final CommitteeStoragePort committeeStoragePort) {
         return new ProjectMailNotifier(projectMailOutbox, projectStoragePort, userStoragePort, committeeStoragePort);
     }
 

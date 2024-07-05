@@ -4,6 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,4 +27,6 @@ public interface ProjectApplicationStoragePort {
     void deleteApplicationsByIssueId(GithubIssue.Id issueId);
 
     void deleteObsoleteApplications();
+
+    List<ProjectApplicationsToReviewByUser> findProjectApplicationsToReview();
 }

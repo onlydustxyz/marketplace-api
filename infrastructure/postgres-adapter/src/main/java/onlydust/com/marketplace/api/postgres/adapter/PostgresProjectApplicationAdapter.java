@@ -2,12 +2,15 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ApplicationsToReviewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationsToReviewRepository;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.port.output.ProjectApplicationStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,7 @@ import java.util.UUID;
 public class PostgresProjectApplicationAdapter implements ProjectApplicationStoragePort {
 
     private final ApplicationRepository applicationRepository;
+    private final ApplicationsToReviewRepository applicationsToReviewRepository;
 
     @Override
     @Transactional
@@ -67,6 +71,11 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
     @Transactional
     public void deleteObsoleteApplications() {
         applicationRepository.deleteObsoleteApplications();
+    }
+
+    @Override
+    public List<ProjectApplicationsToReviewByUser> findProjectApplicationsToReview() {
+        return applicationsToReviewRepository.findAllProjectApplicationsToReview().stream().map(ApplicationsToReviewEntity::toDomain).toList();
     }
 
 }
