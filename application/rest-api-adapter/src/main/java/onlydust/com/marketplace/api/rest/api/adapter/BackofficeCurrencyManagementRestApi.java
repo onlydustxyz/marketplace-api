@@ -91,7 +91,8 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                 request.getName(),
                 request.getDescription(),
                 request.getLogoUrl(),
-                request.getDecimals()
+                request.getDecimals(),
+                request.getCountryRestrictions()
         );
 
         return ResponseEntity.ok(mapCurrencyResponse(currency));

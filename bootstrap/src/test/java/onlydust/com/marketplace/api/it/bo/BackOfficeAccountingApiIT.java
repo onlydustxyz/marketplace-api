@@ -14,13 +14,13 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
@@ -847,7 +847,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
