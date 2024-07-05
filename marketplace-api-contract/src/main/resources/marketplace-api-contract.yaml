@@ -2755,7 +2755,7 @@ paths:
   /api/v1/projects/categories/suggest:
     post:
       security:
-        - apiKey: [ ]
+        - bearerAuth: [ ]
       tags:
         - Projects
       summary: Suggest project category
