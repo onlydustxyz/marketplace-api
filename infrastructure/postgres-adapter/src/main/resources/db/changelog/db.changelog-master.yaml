@@ -399,3 +399,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000281_update_project_similarities_view_with_categories.sql
   - include:
       file: db/changelog/changelogs/00000282_add_currency_country_restrictions.sql
+  - include:
+      file: db/changelog/changelogs/00000283_patch_invoice_currency_country_restrictions.sql
