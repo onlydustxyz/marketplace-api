@@ -48,4 +48,8 @@ public class OutboxService implements ProjectObserverPort, UserObserverPort, App
     public void onApplicationCreated(Application application) {
         trackingOutbox.push(OnApplicationCreated.of(application));
     }
+
+    @Override
+    public void onApplicationAccepted(Application application) {
+    }
 }

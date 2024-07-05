@@ -5,6 +5,10 @@ import lombok.NonNull;
 public record GithubIssue(@NonNull Id id,
                           @NonNull Long repoId,
                           @NonNull Long number,
+                          @NonNull String title,
+                          String description,
+                          @NonNull String htmlUrl,
+                          @NonNull String repoName,
                           int assigneeCount) {
     public boolean isAssigned() {
         return assigneeCount > 0;

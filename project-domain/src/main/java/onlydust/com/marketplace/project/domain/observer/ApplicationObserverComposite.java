@@ -16,4 +16,9 @@ public class ApplicationObserverComposite implements ApplicationObserverPort {
     public void onApplicationCreated(Application application) {
         observers.forEach(observer -> observer.onApplicationCreated(application));
     }
+
+    @Override
+    public void onApplicationAccepted(Application application) {
+        observers.forEach(observer -> observer.onApplicationAccepted(application));
+    }
 }

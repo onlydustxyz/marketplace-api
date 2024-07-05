@@ -46,7 +46,14 @@ public class ApplicationServiceTest {
 
     final Long githubUserId = faker.number().randomNumber(10, true);
     final UUID userId = UUID.randomUUID();
-    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(10, true), faker.number().randomNumber(10, true), 0);
+    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
+            faker.number().randomNumber(10, true),
+            faker.number().randomNumber(10, true),
+            faker.rickAndMorty().character(),
+            faker.rickAndMorty().quote(),
+            faker.internet().url(),
+            faker.rickAndMorty().character(),
+            0);
     final GithubComment.Id commentId = GithubComment.Id.random();
     final String motivation = faker.lorem().sentence();
     final String problemSolvingApproach = faker.lorem().sentence();
@@ -95,8 +102,14 @@ public class ApplicationServiceTest {
     @Test
     void should_reject_application_if_issue_is_already_assigned() {
         // Given
-        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(), faker.number().randomNumber(),
-                faker.number().randomNumber(), 1)));
+        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(GithubIssue.Id.random(),
+                faker.number().randomNumber(10, true),
+                faker.number().randomNumber(10, true),
+                faker.rickAndMorty().character(),
+                faker.rickAndMorty().quote(),
+                faker.internet().url(),
+                faker.rickAndMorty().character(),
+                1)));
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))

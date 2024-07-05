@@ -29,4 +29,6 @@ public class CustomerIOProperties {
     Integer newCommitteeApplicationEmailId;
     @NonNull
     Integer projectApplicationsToReviewByUserEmailId;
+    @NonNull
+    Integer projectApplicationAcceptedEmailId;
 }

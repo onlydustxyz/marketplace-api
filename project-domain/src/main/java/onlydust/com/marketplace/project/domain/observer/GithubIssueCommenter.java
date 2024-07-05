@@ -45,4 +45,8 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }
+
+    @Override
+    public void onApplicationAccepted(Application application) {
+    }
 }

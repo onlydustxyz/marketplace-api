@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
@@ -40,6 +41,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     SlackApiAdapter slackApiAdapter;
     @Autowired
     PosthogProperties posthogProperties;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @BeforeEach
     void setUp() {
@@ -392,6 +395,30 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .isNoContent();
 
         githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/380954304/issues/6/assignees")));
+
+        projectMailOutboxJob.run();
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getProjectApplicationAcceptedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(user.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                {
+                                  "username" : "AnthonyBuisset",
+                                  "projectName" : "Bretzel",
+                                  "issueId" : 1974125983,
+                                  "issueUrl" : "https://github.com/gregcha/bretzel-app/issues/6",
+                                  "repoName" : "bretzel-app",
+                                  "issueTitle" : "Test #7",
+                                  "issueDescription" : "test"
+                                }
+                                """, true, false)))
+                        .withRequestBody(matchingJsonPath("$.to", containing("abuisset")))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application has been accepted!")))
+        );
     }
 
     @Test
