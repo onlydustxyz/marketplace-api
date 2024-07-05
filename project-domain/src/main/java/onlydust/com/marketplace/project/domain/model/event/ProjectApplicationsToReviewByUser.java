@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@EventType("NewProjectApplications")
+@EventType("ProjectApplicationsToReviewByUser")
 @Builder
 public class ProjectApplicationsToReviewByUser extends Event {
     @NonNull
