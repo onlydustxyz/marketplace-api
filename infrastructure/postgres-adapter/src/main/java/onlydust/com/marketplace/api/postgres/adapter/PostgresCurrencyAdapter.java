@@ -5,13 +5,15 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.project.domain.port.output.ProjectCurrencyStoragePort;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
-public class PostgresCurrencyAdapter implements CurrencyStorage {
+public class PostgresCurrencyAdapter implements CurrencyStorage, ProjectCurrencyStoragePort {
     private final CurrencyRepository repository;
 
     @Override
@@ -37,5 +39,10 @@ public class PostgresCurrencyAdapter implements CurrencyStorage {
     @Override
     public Boolean exists(Currency.Code code) {
         return repository.existsByCode(code.toString());
+    }
+
+    @Override
+    public Optional<UUID> findCurrencyIdByCode(String code) {
+        return repository.findByCode(code).map(CurrencyEntity::id);
     }
 }

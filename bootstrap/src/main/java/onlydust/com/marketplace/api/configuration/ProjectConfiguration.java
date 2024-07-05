@@ -414,4 +414,11 @@ public class ProjectConfiguration {
     public BannerFacadePort bannerFacadePort(final BannerStoragePort bannerStoragePort) {
         return new BannerService(bannerStoragePort);
     }
+
+    @Bean
+    public AutomatedRewardFacadePort automatedRewardFacadePort(final GithubSearchPort githubSearchPort, final ProjectFacadePort projectFacadePort,
+                                                               final RewardFacadePort rewardFacadePort, final ProjectStoragePort projectStoragePort,
+                                                               final ProjectCurrencyStoragePort projectCurrencyStoragePort) {
+        return new AutomatedRewardService(githubSearchPort, projectFacadePort, rewardFacadePort, projectStoragePort, projectCurrencyStoragePort);
+    }
 }

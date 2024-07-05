@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeDebugRestApi;
+import onlydust.com.marketplace.api.rest.api.adapter.BackofficeProjectRestApi;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
@@ -46,6 +47,12 @@ public class BackofficeConfiguration {
     @ConfigurationProperties(value = "application.web.debug")
     public BackofficeDebugRestApi.DebugProperties debugProperties() {
         return new BackofficeDebugRestApi.DebugProperties();
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "application.automated-rewards")
+    public BackofficeProjectRestApi.OnlydustBotProperties onlydustBotProperties() {
+        return new BackofficeProjectRestApi.OnlydustBotProperties();
     }
 }
 

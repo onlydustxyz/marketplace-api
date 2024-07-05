@@ -7,7 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeProjec
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
-import onlydust.com.marketplace.api.read.entities.CommitteeJuryVoteViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
