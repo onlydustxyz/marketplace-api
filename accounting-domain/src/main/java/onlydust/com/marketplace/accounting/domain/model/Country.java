@@ -22,6 +22,10 @@ public class Country {
 
     private final @NonNull String iso3Code;
 
+    public static Optional<Country> tryFromIso3(String iso3Code) {
+        return COUNTRY_NAME_MAPPED_TO_ISO3_CODE.containsKey(iso3Code) ? Optional.of(Country.fromIso3(iso3Code)) : Optional.empty();
+    }
+
     public Optional<String> display() {
         return Optional.ofNullable(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(iso3Code));
     }
