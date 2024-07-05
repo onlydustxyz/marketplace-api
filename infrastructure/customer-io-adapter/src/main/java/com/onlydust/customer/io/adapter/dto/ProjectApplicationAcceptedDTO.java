@@ -9,7 +9,7 @@ public record ProjectApplicationAcceptedDTO(@NonNull String username,
                                             @NonNull String issueUrl,
                                             @NonNull String repoName,
                                             @NonNull String issueTitle,
-                                            @NonNull String issueDescription) {
+                                            String issueDescription) {
 
     public static ProjectApplicationAcceptedDTO fromEvent(final ProjectApplicationAccepted event) {
         return new ProjectApplicationAcceptedDTO(

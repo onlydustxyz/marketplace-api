@@ -33,6 +33,6 @@ public class ProjectApplicationAccepted extends Event {
                         @NonNull String htmlUrl,
                         @NonNull String title,
                         @NonNull String repoName,
-                        @NonNull String description) {
+                        String description) {
     }
 }
