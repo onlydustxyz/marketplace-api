@@ -500,6 +500,19 @@ public class CurrencyServiceTest {
         verify(currencyStorage, times(1)).save(currency);
     }
 
+    @Test
+    void should_forbid_update_of_invalid_country_restrictions() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        assertThatThrownBy(() -> currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("FR")))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("FR is not a valid ISO3 country code");
+    }
+
     @SneakyThrows
     @Test
     void should_upload_currency_logo() {

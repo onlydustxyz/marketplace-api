@@ -202,7 +202,11 @@ public class Currency implements Cloneable {
     }
 
     public Currency withCountryRestrictions(List<String> countryRestrictions) {
-        return toBuilder().countryRestrictions(countryRestrictions.stream().map(Country::fromIso3).collect(toSet())).build();
+        return toBuilder()
+                .countryRestrictions(countryRestrictions.stream()
+                        .map(code -> Country.tryFromIso3(code).orElseThrow(() -> badRequest("%s is not a valid ISO3 country code".formatted(code))))
+                        .collect(toSet()))
+                .build();
     }
 
     @NoArgsConstructor(staticName = "random")
