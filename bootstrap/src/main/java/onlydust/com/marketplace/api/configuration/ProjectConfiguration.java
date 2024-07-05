@@ -258,8 +258,15 @@ public class ProjectConfiguration {
 
     @Bean
     public ApplicationMailNotifier applicationMailNotifier(final OutboxPort projectMailOutbox,
-                                                           final ProjectApplicationStoragePort projectApplicationStoragePort) {
-        return new ApplicationMailNotifier(projectMailOutbox, projectApplicationStoragePort);
+                                                           final ProjectApplicationStoragePort projectApplicationStoragePort,
+                                                           final ProjectStoragePort projectStoragePort,
+                                                           final GithubStoragePort githubStoragePort,
+                                                           final UserStoragePort userStoragePort) {
+        return new ApplicationMailNotifier(projectMailOutbox,
+                projectApplicationStoragePort,
+                projectStoragePort,
+                githubStoragePort,
+                userStoragePort);
     }
 
     @Bean
@@ -295,8 +302,9 @@ public class ProjectConfiguration {
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
                                                         final GithubIssueCommenter githubIssueCommenter,
-                                                        final OutboxService outboxService) {
-        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxService);
+                                                        final OutboxService outboxService,
+                                                        final ApplicationMailNotifier applicationMailNotifier) {
+        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxService, applicationMailNotifier);
     }
 
     @Bean

@@ -7,6 +7,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
+import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 
 import java.math.RoundingMode;
@@ -90,6 +91,16 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 projectApplicationsToReviewByUser.getEmail(),
                 "Applications to review daily report",
                 ProjectApplicationsToReviewByUserDTO.fromEvent(projectApplicationsToReviewByUser));
+    }
+
+    public static MailDTO<ProjectApplicationAcceptedDTO> fromProjectApplicationAccepted(@NonNull CustomerIOProperties customerIOProperties,
+                                                                                        @NonNull ProjectApplicationAccepted projectApplicationAccepted) {
+        return new MailDTO<>(customerIOProperties.getProjectApplicationAcceptedEmailId().toString(),
+                mapIdentifiers(projectApplicationAccepted.getEmail(), projectApplicationAccepted.getUserId()),
+                customerIOProperties.getOnlyDustMarketingEmail(),
+                projectApplicationAccepted.getEmail(),
+                "Your application has been accepted!",
+                ProjectApplicationAcceptedDTO.fromEvent(projectApplicationAccepted));
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {

@@ -43,6 +43,10 @@ class ApplicationsUpdaterTest {
     final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
             faker.number().randomNumber(),
             faker.number().randomNumber(),
+            faker.rickAndMorty().character(),
+            faker.rickAndMorty().quote(),
+            faker.internet().url(),
+            faker.rickAndMorty().character(),
             0);
 
     @BeforeEach
@@ -144,6 +148,10 @@ class ApplicationsUpdaterTest {
             when(githubStoragePort.findIssueById(any())).thenReturn(Optional.of(new GithubIssue(GithubIssue.Id.random(),
                     faker.number().randomNumber(),
                     faker.number().randomNumber(),
+                    faker.rickAndMorty().character(),
+                    faker.rickAndMorty().quote(),
+                    faker.internet().url(),
+                    faker.rickAndMorty().character(),
                     1)));
 
             // When

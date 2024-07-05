@@ -78,6 +78,13 @@ public class GithubIssueViewEntity {
     }
 
     public GithubIssue toDomain() {
-        return new GithubIssue(GithubIssue.Id.of(id), repo.id, number, assignees.size());
+        return new GithubIssue(GithubIssue.Id.of(id),
+                repo.id,
+                number,
+                title,
+                body,
+                htmlUrl,
+                repoName,
+                assignees.size());
     }
 }
