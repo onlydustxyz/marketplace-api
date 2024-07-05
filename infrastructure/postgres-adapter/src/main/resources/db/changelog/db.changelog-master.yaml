@@ -395,3 +395,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000279_improve_user_rsql_views.sql
   - include:
       file: db/changelog/changelogs/00000280_remove_application_rankings.sql
+  - include:
+      file: db/changelog/changelogs/00000281_update_project_similarities_view_with_categories.sql
