@@ -77,11 +77,10 @@ public class AutomatedRewardService implements AutomatedRewardFacadePort {
         if (recipientResults.isEmpty()) {
             throw OnlyDustException.internalServerError("Github user %s not found".formatted(recipientResults));
         }
-        if (recipientResults.size() > 1) {
-            throw OnlyDustException.internalServerError("Multiple user found for github logins %s".formatted(recipientResults));
-        }
-        final GithubUserIdentity recipient = recipientResults.get(0);
-        return recipient;
+        return recipientResults.stream()
+                .filter(githubUserIdentity -> githubUserIdentity.getGithubLogin().equals(recipientLogin))
+                .findFirst()
+                .orElseThrow(() -> OnlyDustException.internalServerError("Github user %s not found in github search response".formatted(recipientLogin)));
     }
 
 }
