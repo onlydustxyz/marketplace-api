@@ -33,6 +33,7 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             "login==ofux,true",
             "email==*gmail.com,true",
             "githubUserId==595505,true",
+            "billingProfile.name==pixelfact,false",
             "language1.name==Rust,false",
             "ecosystem1.name==Starknet,false",
             "language2.name==Java,false",

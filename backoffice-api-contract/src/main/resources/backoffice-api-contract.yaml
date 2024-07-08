@@ -3443,6 +3443,10 @@ components:
             allOf:
               - $ref: '#/components/schemas/UserSearchEcosystem'
               - $ref: '#/components/schemas/UserSearchStats'
+        billingProfile:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSearchBillingProfile'
 
     UserSearchLanguage:
       type: object
@@ -3467,6 +3471,22 @@ components:
         name:
           type: string
           description: Ecosystem name
+
+    UserSearchBillingProfile:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+        name:
+          type: string
+          description: Billing profile name
+        type:
+          $ref: '#/components/schemas/BillingProfileType'
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
 
     UserSearchStats:
       type: object

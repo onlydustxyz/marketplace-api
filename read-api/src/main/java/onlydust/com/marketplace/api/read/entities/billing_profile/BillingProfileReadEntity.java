@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
+import onlydust.com.backoffice.api.contract.model.UserSearchBillingProfile;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import org.hibernate.annotations.Immutable;
 
@@ -65,6 +66,15 @@ public class BillingProfileReadEntity {
                 .verificationStatus(verificationStatus)
                 .kyb(kyb == null ? null : kyb.toDto())
                 .kyc(kyc == null ? null : kyc.toDto())
+                ;
+    }
+
+    public UserSearchBillingProfile toUserSearch() {
+        return new UserSearchBillingProfile()
+                .id(id)
+                .name(name)
+                .type(type)
+                .status(verificationStatus)
                 ;
     }
 }

@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserSearchPageItemResponse;
+import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.UserReadEntity;
 import org.hibernate.annotations.Formula;
@@ -52,6 +53,14 @@ public class AllUserRSQLEntity {
     )
     Set<ProjectReadEntity> contributedProjects;
 
+    @ManyToMany
+    @JoinTable(
+            name = "billing_profiles_users",
+            schema = "accounting",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "billing_profile_id", referencedColumnName = "id")
+    )
+    Set<BillingProfileReadEntity> billingProfile;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "githubUserId", insertable = false, updatable = false)
@@ -107,6 +116,7 @@ public class AllUserRSQLEntity {
                 .global(ofNullable(global).map(UnitedStatsPerUserRSQLEntity::toDto).orElse(null))
                 .language(language1.stream().map(UnitedStatsPerLanguagePerUserRSQLEntity::toDto).toList())
                 .ecosystem(ecosystem1.stream().map(UnitedStatsPerEcosystemPerUserRSQLEntity::toDto).toList())
+                .billingProfile(ofNullable(billingProfile).orElse(Set.of()).stream().map(BillingProfileReadEntity::toUserSearch).toList())
                 ;
     }
 }
