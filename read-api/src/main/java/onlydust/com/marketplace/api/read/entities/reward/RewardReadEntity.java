@@ -72,6 +72,10 @@ public class RewardReadEntity {
     @NonNull
     RewardStatusDataReadEntity statusData;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "invoiceId")
+    InvoiceReadEntity invoice;
+
     public BigDecimal usdEquivalent() {
         return statusData.amountUsdEquivalent();
     }
