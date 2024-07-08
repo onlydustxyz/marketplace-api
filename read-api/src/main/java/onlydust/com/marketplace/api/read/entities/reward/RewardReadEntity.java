@@ -35,12 +35,12 @@ public class RewardReadEntity {
     @NonNull
     Date requestedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "requestorId", referencedColumnName = "userId")
     @NonNull
     AllUserReadEntity requestor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     AllUserReadEntity recipient;
