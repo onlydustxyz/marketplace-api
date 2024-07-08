@@ -113,6 +113,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/bo/v1/project-categories/**")).hasAnyAuthority(BO_READER.name())
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/project-categories/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/project-categories/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/project-categories/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/project-categories/**")).hasAnyAuthority(BO_MARKETING_ADMIN.name())
 
                                 .requestMatchers(antMatcher("/api/v1/me/**")).hasAuthority(USER.name())

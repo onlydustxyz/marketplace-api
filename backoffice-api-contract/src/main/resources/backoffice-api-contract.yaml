@@ -1810,7 +1810,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-    put:
+    patch:
       security:
         - apiKey: [ ]
         - bearerAuth: [ ]
@@ -1818,7 +1818,7 @@ paths:
         - BackofficeProjectCategories
       summary: Update project category
       operationId: updateProjectCategory
-      description: Update project category
+      description: Update project category. Only specified fields will be updated.
       parameters:
         - in: path
           name: id

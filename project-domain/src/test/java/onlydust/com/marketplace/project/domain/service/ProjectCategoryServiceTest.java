@@ -148,6 +148,101 @@ class ProjectCategoryServiceTest {
     }
 
     @Test
+    void should_partial_update_project_category_name() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
+        final var newName = faker.rickAndMorty().character();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), newName, null, null, null);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(newName);
+        assertThat(projectCategory.description()).isEqualTo(existing.description());
+        assertThat(projectCategory.iconSlug()).isEqualTo(existing.iconSlug());
+    }
+
+    @Test
+    void should_partial_update_project_category_description() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
+        final var newDescription = faker.rickAndMorty().quote();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), null, newDescription, null, null);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(existing.name());
+        assertThat(projectCategory.description()).isEqualTo(newDescription);
+        assertThat(projectCategory.iconSlug()).isEqualTo(existing.iconSlug());
+    }
+
+    @Test
+    void should_partial_update_project_category_icon_slug() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
+        final var newIconSlug = faker.rickAndMorty().location();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), null, null, newIconSlug, null);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(existing.name());
+        assertThat(projectCategory.description()).isEqualTo(existing.description());
+        assertThat(projectCategory.iconSlug()).isEqualTo(newIconSlug);
+    }
+
+    @Test
+    void should_link_project_category_to_suggestion() {
+        // Given
+        final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
+        existing.projects().add(UUID.randomUUID());
+        final var suggestionId = ProjectCategorySuggestion.Id.random();
+        final var projectId = UUID.randomUUID();
+
+        when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
+        when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(faker.rickAndMorty().character(), projectId)));
+
+        // When
+        projectCategoryService.updateCategory(existing.id(), null, null, null, suggestionId);
+
+        // Then
+        final var projectCategoryCaptor = ArgumentCaptor.forClass(ProjectCategory.class);
+        verify(projectCategoryStoragePort).save(projectCategoryCaptor.capture());
+        final var projectCategory = projectCategoryCaptor.getValue();
+
+        assertThat(projectCategory.id()).isEqualTo(existing.id());
+        assertThat(projectCategory.name()).isEqualTo(existing.name());
+        assertThat(projectCategory.description()).isEqualTo(existing.description());
+        assertThat(projectCategory.iconSlug()).isEqualTo(existing.iconSlug());
+        assertThat(projectCategory.projects()).hasSize(2);
+        assertThat(projectCategory.projects()).contains(projectId);
+
+        verify(projectCategoryStoragePort).delete(suggestionId);
+    }
+
+    @Test
     void should_update_project_category_from_a_suggestion() {
         // Given
         final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
