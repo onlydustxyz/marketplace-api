@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.KycIdDocumentType;
 import onlydust.com.backoffice.api.contract.model.KycResponse;
+import onlydust.com.backoffice.api.contract.model.UserSearchKyc;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import org.hibernate.annotations.Immutable;
@@ -43,7 +45,7 @@ public class KycReadEntity {
     String country;
     Boolean consideredUsPersonQuestionnaire;
     @Enumerated(EnumType.STRING)
-    KycResponse.IdDocumentTypeEnum idDocumentType;
+    KycIdDocumentType idDocumentType;
     String idDocumentNumber;
     String idDocumentCountryCode;
     ZonedDateTime validUntil;
@@ -69,6 +71,18 @@ public class KycReadEntity {
                 .validUntil(validUntil)
                 .usCitizen(usCitizen)
                 .sumsubUrl(applicantId == null ? null : "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(applicantId))
+                ;
+    }
+
+    public UserSearchKyc toUserSearch() {
+        return new UserSearchKyc()
+                .firstName(firstName)
+                .lastName(lastName)
+                .countryCode(country)
+                .idDocumentType(idDocumentType)
+                .idDocumentNumber(idDocumentNumber)
+                .usCitizen(usCitizen)
+                .idDocumentCountryCode(idDocumentCountryCode)
                 ;
     }
 }
