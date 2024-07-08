@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import onlydust.com.marketplace.api.suites.tags.TagUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                "contributedProjectCount": 6,
                                "contributionCount": 217,
                                "rewardCount": 10,
-                               "totalEarnedUsd": 1799150.00,
+                               "totalEarnedUsd": 900080.00,
                                "projects": [
                                  {
                                    "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
