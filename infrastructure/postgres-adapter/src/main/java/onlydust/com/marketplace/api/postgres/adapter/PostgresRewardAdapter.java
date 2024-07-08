@@ -90,21 +90,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
-        if (statuses == null || statuses.isEmpty()) {
-            statuses = EnumSet.allOf(Payment.Status.class);
-        }
-        final var page = paymentShortViewRepository.findByStatuses(statuses.stream().map(Enum::name).collect(Collectors.toSet()),
-                PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
-        return Page.<BatchPaymentShortView>builder()
-                .content(page.getContent().stream().map(PaymentShortQueryEntity::toDomain).toList())
-                .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements())
-                .build();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds) {
         return paymentShortViewRepository.findByIds(paymentIds.stream().map(UuidWrapper::value).collect(Collectors.toSet()))
                 .stream().map(PaymentShortQueryEntity::toDomain).toList();

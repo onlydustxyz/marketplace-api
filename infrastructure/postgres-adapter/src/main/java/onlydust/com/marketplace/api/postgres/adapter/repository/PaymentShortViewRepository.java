@@ -2,8 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortQueryEntity;
 import org.intellij.lang.annotations.Language;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -57,11 +55,6 @@ public interface PaymentShortViewRepository extends JpaRepository<PaymentShortQu
     String GROUP_BY = """
             GROUP BY bp.id, bp.tech_created_at, bp.status, bp.network
             """;
-
-    @Query(value = SELECT + """
-            WHERE coalesce(:statuses) IS NULL OR cast(bp.status as text) IN (:statuses)
-            """ + GROUP_BY, nativeQuery = true)
-    Page<PaymentShortQueryEntity> findByStatuses(Set<String> statuses, Pageable pageable);
 
     @Query(value = SELECT + """
             WHERE coalesce(:ids) IS NULL OR bp.id IN (:ids)

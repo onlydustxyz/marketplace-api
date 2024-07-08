@@ -25,8 +25,6 @@ public interface AccountingRewardStoragePort {
 
     void savePayment(Payment updatedPayment);
 
-    Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses);
-
     List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds);
 
     Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,

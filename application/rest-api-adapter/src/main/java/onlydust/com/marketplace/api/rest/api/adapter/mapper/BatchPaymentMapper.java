@@ -1,16 +1,16 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentResponse;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentStatus;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentsResponse;
+import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
-import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapNetwork;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BatchPaymentMapper {
 
@@ -18,15 +18,6 @@ public interface BatchPaymentMapper {
         final BatchPaymentsResponse batchPaymentsResponse = new BatchPaymentsResponse();
         batchPayments.stream().map(BatchPaymentMapper::domainToResponse).forEach(batchPaymentsResponse::addBatchPaymentsItem);
         return batchPaymentsResponse;
-    }
-
-    static BatchPaymentPageResponse pageToResponse(final Page<BatchPaymentShortView> page, final int pageIndex) {
-        return new BatchPaymentPageResponse()
-                .batchPayments(page.getContent().stream().map(BatchPaymentMapper::domainToResponse).toList())
-                .totalPageNumber(page.getTotalPageNumber())
-                .totalItemNumber(page.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
     }
 
     static BatchPaymentResponse domainToResponse(final BatchPaymentShortView bp) {

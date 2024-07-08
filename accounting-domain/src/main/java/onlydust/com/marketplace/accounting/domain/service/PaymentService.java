@@ -13,7 +13,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -58,11 +57,6 @@ public class PaymentService implements PaymentPort {
 
         accountingFacadePort.confirm(updatedPayment);
         accountingRewardStoragePort.savePayment(updatedPayment);
-    }
-
-    @Override
-    public Page<BatchPaymentShortView> findPayments(int pageIndex, int pageSize, Set<Payment.Status> statuses) {
-        return accountingRewardStoragePort.findPayments(pageIndex, pageSize, statuses);
     }
 
     @Override

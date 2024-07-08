@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentDetailsResponse;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentResponse;
 import onlydust.com.backoffice.api.contract.model.BatchPaymentStatus;
 import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
@@ -19,6 +21,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.*;
+import static onlydust.com.marketplace.api.read.mapper.NetworkMapper.map;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -39,6 +42,7 @@ public class BatchPaymentReadEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "network")
+    @NonNull
     NetworkEnumEntity network;
 
     @Enumerated(EnumType.STRING)
@@ -78,5 +82,30 @@ public class BatchPaymentReadEntity {
         return rewards.stream()
                 .map(RewardReadEntity::usdEquivalent)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BatchPaymentResponse toResponse() {
+        return new BatchPaymentResponse()
+                .id(id)
+                .createdAt(createdAt)
+                .status(status)
+                .network(map(network))
+                .rewardCount((long) rewards.size())
+                .totalsPerCurrency(totalsPerCurrency())
+                .totalUsdEquivalent(totalUsdEquivalent());
+    }
+
+    public BatchPaymentDetailsResponse toDetailsResponse() {
+        return new BatchPaymentDetailsResponse()
+                .id(id)
+                .createdAt(createdAt)
+                .status(status)
+                .csv(csv)
+                .network(map(network))
+                .transactionHash(transactionHash)
+                .rewardCount((long) rewards.size())
+                .rewards(rewards.stream().map(RewardReadEntity::toShortResponse).toList())
+                .totalsPerCurrency(totalsPerCurrency())
+                .totalUsdEquivalent(totalUsdEquivalent());
     }
 }

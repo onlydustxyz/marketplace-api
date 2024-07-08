@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -238,19 +237,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<Void> deleteBatchPayment(UUID batchPaymentId) {
         paymentPort.deletePaymentById(Payment.Id.of(batchPaymentId));
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize, List<BatchPaymentStatus> statuses) {
-        final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
-                paymentPort.findPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
-                        statuses.stream().map(BatchPaymentMapper::map).collect(Collectors.toSet())),
-                pageIndex);
-        return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
-                ResponseEntity.ok(batchPaymentPageResponse);
     }
 
     @Override
