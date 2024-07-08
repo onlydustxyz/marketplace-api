@@ -6,8 +6,6 @@ import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 import java.util.Optional;
 
 public interface ProjectCategoryStoragePort {
-    void save(ProjectCategorySuggestion suggestion);
-
     void delete(ProjectCategorySuggestion.Id id);
 
     void save(ProjectCategory projectCategory);

@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.kernel.Utils.CurrencyConversion.optimimumScale;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
@@ -32,6 +33,8 @@ public class Currency implements Cloneable {
     private BigDecimal latestUsdQuote;
     @Builder.Default
     private final Set<ERC20> erc20 = Set.of();
+    @Builder.Default
+    private final Set<Country> countryRestrictions = Set.of();
 
     public static Currency of(final @NonNull ERC20 token) {
         return Currency.builder()
@@ -110,6 +113,10 @@ public class Currency implements Cloneable {
 
     public Optional<BigDecimal> latestUsdQuote() {
         return Optional.ofNullable(latestUsdQuote);
+    }
+
+    public Set<Country> countryRestrictions() {
+        return countryRestrictions;
     }
 
     public List<Network> supportedNetworks() {
@@ -192,6 +199,14 @@ public class Currency implements Cloneable {
 
     public int precision() {
         return optimimumScale(latestUsdQuote, decimals);
+    }
+
+    public Currency withCountryRestrictions(List<String> countryRestrictions) {
+        return toBuilder()
+                .countryRestrictions(countryRestrictions.stream()
+                        .map(code -> Country.tryFromIso3(code).orElseThrow(() -> badRequest("%s is not a valid ISO3 country code".formatted(code))))
+                        .collect(toSet()))
+                .build();
     }
 
     @NoArgsConstructor(staticName = "random")

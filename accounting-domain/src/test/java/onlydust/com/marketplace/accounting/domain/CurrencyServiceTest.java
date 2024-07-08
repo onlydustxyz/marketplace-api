@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain;
 
 import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -350,7 +351,7 @@ public class CurrencyServiceTest {
         when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", logoUrl, 3);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", logoUrl, 3, List.of("USA", "FRA"));
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -361,6 +362,7 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.countryRestrictions()).containsExactlyInAnyOrder(Country.fromIso3("USA"), Country.fromIso3("FRA"));
 
         verify(currencyStorage, times(1)).save(currency);
     }
@@ -372,7 +374,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(any())).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> currencyService.updateCurrency(currencyId, "Some name", "Some descritpion", URI.create("https://usd.io"), 3))
+        assertThatThrownBy(() -> currencyService.updateCurrency(currencyId, "Some name", "Some descritpion", URI.create("https://usd.io"), 3, null))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
@@ -387,7 +389,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", null, null, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", null, null, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -410,7 +412,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, "US currency", null, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, "US currency", null, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -436,7 +438,7 @@ public class CurrencyServiceTest {
         when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, logoUrl, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, logoUrl, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -459,7 +461,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, 3);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, 3, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -472,6 +474,43 @@ public class CurrencyServiceTest {
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
 
         verify(currencyStorage, times(1)).save(currency);
+    }
+
+
+    @Test
+    void should_allow_partial_update_of_country_restrictions() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("USA", "FRA"));
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo(initialCurrency.name());
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).isEqualTo(initialCurrency.description());
+        assertThat(currency.logoUri()).isEqualTo(initialCurrency.logoUri());
+        assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.countryRestrictions()).containsExactlyInAnyOrder(Country.fromIso3("USA"), Country.fromIso3("FRA"));
+
+        verify(currencyStorage, times(1)).save(currency);
+    }
+
+    @Test
+    void should_forbid_update_of_invalid_country_restrictions() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        assertThatThrownBy(() -> currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("FR")))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("FR is not a valid ISO3 country code");
     }
 
     @SneakyThrows

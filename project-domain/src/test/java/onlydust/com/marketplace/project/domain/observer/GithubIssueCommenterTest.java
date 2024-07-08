@@ -83,10 +83,13 @@ class GithubIssueCommenterTest {
 
     @Nested
     class GivenAnExternalApplication {
-        final GithubIssue issue = new GithubIssue(
-                GithubIssue.Id.random(),
-                faker.number().randomNumber(),
-                faker.number().randomNumber(),
+        final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
+                faker.number().randomNumber(10, true),
+                faker.number().randomNumber(10, true),
+                faker.rickAndMorty().character(),
+                faker.rickAndMorty().quote(),
+                faker.internet().url(),
+                faker.rickAndMorty().character(),
                 0);
 
         final Project project = Project.builder()

@@ -6,8 +6,8 @@ import onlydust.com.backoffice.api.contract.model.CurrencyType;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +89,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_add_erc20_support_on_ethereum() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -120,7 +120,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_add_erc20_support_on_optimism() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -151,7 +151,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_reject_erc20_support_from_invalid_contract() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -173,7 +173,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_add_erc20_support_on_starknet() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -204,7 +204,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_add_coin_support_on_aptos() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -234,7 +234,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_add_native_cryptocurrency_support() {
         client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -272,7 +272,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
         final var response = client
                 .post()
-                .uri(getApiURI(POST_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -301,8 +301,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         final var currencyId = response.getId();
 
         client
-                .put()
-                .uri(getApiURI(PUT_CURRENCIES.formatted(currencyId)))
+                .patch()
+                .uri(getApiURI(CURRENCY.formatted(currencyId)))
                 .contentType(APPLICATION_JSON)
                 .header("Authorization", "Bearer " + camille.jwt())
                 .bodyValue("""
@@ -324,6 +324,24 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.logoUrl").isEqualTo("https://s3.upload.wikimedia.org/Flag_of_Europe.svg.png")
                 .jsonPath("$.decimals").isEqualTo(3)
                 .jsonPath("$.description").isEqualTo("Euro is the official currency of the European Union")
+        ;
+
+        client
+                .patch()
+                .uri(getApiURI(CURRENCY.formatted(currencyId)))
+                .contentType(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + camille.jwt())
+                .bodyValue("""
+                        {
+                            "countryRestrictions": ["USA", "BRA"]
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.countryRestrictions[0]").isEqualTo("BRA")
+                .jsonPath("$.countryRestrictions[1]").isEqualTo("USA")
         ;
     }
 
@@ -357,7 +375,7 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     void should_list_all_supported_currencies() {
         client
                 .get()
-                .uri(getApiURI(GET_CURRENCIES))
+                .uri(getApiURI(CURRENCIES))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
@@ -377,7 +395,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "supportedOn": [
                                 "ETHEREUM"
                               ],
-                              "description": "Ethereum (ETH) is a cryptocurrency"
+                              "description": "Ethereum (ETH) is a cryptocurrency",
+                              "countryRestrictions": []
                             },
                             {
                               "code": "EUR",
@@ -389,7 +408,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                               "supportedOn": [
                                 "SEPA"
                               ],
-                              "description": "Euro is the official currency of the European Union"
+                              "description": "Euro is the official currency of the European Union",
+                              "countryRestrictions": ["BRA", "USA"]
                             },
                             {
                               "code": "USDC",
@@ -433,7 +453,8 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 "OPTIMISM",
                                 "ETHEREUM"
                               ],
-                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform."
+                              "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
+                              "countryRestrictions": []
                             }
                           ]
                         }

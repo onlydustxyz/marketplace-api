@@ -174,9 +174,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_PROJECTS = "/bo/v1/projects";
     protected static final String PROJECTS_REWARDS = "/api/v1/projects/%s/rewards";
     protected static final String GET_PROJECT_LEAD_INVITATIONS = "/bo/v1/project-lead-invitations";
-    protected static final String POST_CURRENCIES = "/bo/v1/currencies";
-    protected static final String PUT_CURRENCIES = "/bo/v1/currencies/%s";
-    protected static final String GET_CURRENCIES = "/bo/v1/currencies";
+    protected static final String CURRENCIES = "/bo/v1/currencies";
+    protected static final String CURRENCY = "/bo/v1/currencies/%s";
     protected static final String INVOICES = "/bo/v1/invoices";
     protected static final String V2_INVOICES = "/bo/v2/invoices";
     protected static final String INVOICE = "/bo/v1/invoices/%s";

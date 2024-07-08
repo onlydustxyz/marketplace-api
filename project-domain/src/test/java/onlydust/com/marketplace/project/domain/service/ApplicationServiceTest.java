@@ -22,6 +22,7 @@ import static org.mockito.Mockito.*;
 public class ApplicationServiceTest {
     private final Faker faker = new Faker();
     private final UserStoragePort userStoragePort = mock(UserStoragePort.class);
+    private final ProjectApplicationStoragePort projectApplicationStoragePort = mock(ProjectApplicationStoragePort.class);
     private final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     private final ApplicationObserverPort applicationObserver = mock(ApplicationObserverPort.class);
     private final GithubUserPermissionsService githubUserPermissionsService = mock(GithubUserPermissionsService.class);
@@ -33,6 +34,7 @@ public class ApplicationServiceTest {
 
     private final ApplicationService applicationService = new ApplicationService(
             userStoragePort,
+            projectApplicationStoragePort,
             projectStoragePort,
             applicationObserver,
             githubUserPermissionsService,
@@ -44,7 +46,14 @@ public class ApplicationServiceTest {
 
     final Long githubUserId = faker.number().randomNumber(10, true);
     final UUID userId = UUID.randomUUID();
-    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(), faker.number().randomNumber(10, true), faker.number().randomNumber(10, true), 0);
+    final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
+            faker.number().randomNumber(10, true),
+            faker.number().randomNumber(10, true),
+            faker.rickAndMorty().character(),
+            faker.rickAndMorty().quote(),
+            faker.internet().url(),
+            faker.rickAndMorty().character(),
+            0);
     final GithubComment.Id commentId = GithubComment.Id.random();
     final String motivation = faker.lorem().sentence();
     final String problemSolvingApproach = faker.lorem().sentence();
@@ -63,7 +72,7 @@ public class ApplicationServiceTest {
         when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(true);
         when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
         when(githubAuthenticationPort.getGithubPersonalToken(githubUserId)).thenReturn(personalAccessToken);
-        when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.empty());
+        when(projectApplicationStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.empty());
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(Set.of(faker.number().randomNumber(), issue.repoId()));
         when(projectStoragePort.getById(projectId)).thenReturn(Optional.of(project));
     }
@@ -93,8 +102,14 @@ public class ApplicationServiceTest {
     @Test
     void should_reject_application_if_issue_is_already_assigned() {
         // Given
-        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(issue.id(), faker.number().randomNumber(),
-                faker.number().randomNumber(), 1)));
+        when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(new GithubIssue(GithubIssue.Id.random(),
+                faker.number().randomNumber(10, true),
+                faker.number().randomNumber(10, true),
+                faker.rickAndMorty().character(),
+                faker.rickAndMorty().quote(),
+                faker.internet().url(),
+                faker.rickAndMorty().character(),
+                1)));
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
@@ -107,7 +122,7 @@ public class ApplicationServiceTest {
         // Given
         final var application = new Application(Application.Id.random(), projectId, githubUserId, Application.Origin.MARKETPLACE, ZonedDateTime.now(),
                 issue.id(), commentId, motivation, problemSolvingApproach);
-        when(userStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(githubUserId, projectId, issue.id())).thenReturn(Optional.of(application));
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))
@@ -156,7 +171,7 @@ public class ApplicationServiceTest {
         assertThat(application.motivations()).isEqualTo(motivation);
         assertThat(application.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
 
-        verify(userStoragePort).save(application);
+        verify(projectApplicationStoragePort).save(application);
         verify(applicationObserver).onApplicationCreated(application);
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
@@ -193,7 +208,7 @@ public class ApplicationServiceTest {
         // Given
         final var applicationId = Application.Id.random();
 
-        when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
+        when(projectApplicationStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> applicationService.updateApplication(applicationId, githubUserId, faker.lorem().sentence(), faker.lorem().sentence()))
@@ -213,7 +228,7 @@ public class ApplicationServiceTest {
                 faker.lorem().sentence()
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
         final var newMotivation = faker.lorem().sentence();
@@ -235,7 +250,7 @@ public class ApplicationServiceTest {
                 projectId
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
         when(githubUserPermissionsService.isUserAuthorizedToApplyOnProject(githubUserId)).thenReturn(false);
 
         // When
@@ -258,7 +273,7 @@ public class ApplicationServiceTest {
                 projectId
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
         final var motivations = faker.lorem().sentence();
@@ -273,7 +288,7 @@ public class ApplicationServiceTest {
         assertThat(updatedApplication.origin()).isEqualTo(Application.Origin.MARKETPLACE);
         assertThat(updatedApplication.motivations()).isEqualTo(motivations);
         assertThat(updatedApplication.problemSolvingApproach()).isEqualTo(problemSolvingApproach);
-        verify(userStoragePort).save(updatedApplication);
+        verify(projectApplicationStoragePort).save(updatedApplication);
 
         verify(githubApiPort).updateComment(personalAccessToken, issue.repoId(), commentId, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
@@ -291,7 +306,7 @@ public class ApplicationServiceTest {
         // Given
         final var applicationId = Application.Id.random();
 
-        when(userStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
+        when(projectApplicationStoragePort.findApplication(applicationId)).thenReturn(Optional.empty());
 
         // When
         assertThatThrownBy(() -> applicationService.deleteApplication(applicationId, userId, githubUserId))
@@ -312,7 +327,7 @@ public class ApplicationServiceTest {
                 faker.lorem().sentence()
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
 
         // When
@@ -334,13 +349,13 @@ public class ApplicationServiceTest {
                 faker.lorem().sentence()
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
         applicationService.deleteApplication(application.id(), userId, githubUserId);
 
         // Then
-        verify(userStoragePort).deleteApplications(application.id());
+        verify(projectApplicationStoragePort).deleteApplications(application.id());
         verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
@@ -358,13 +373,13 @@ public class ApplicationServiceTest {
                 projectId
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
         applicationService.deleteApplication(application.id(), userId, githubUserId);
 
         // Then
-        verify(userStoragePort).deleteApplications(application.id());
+        verify(projectApplicationStoragePort).deleteApplications(application.id());
         verifyNoInteractions(githubApiPort);
     }
 
@@ -382,13 +397,13 @@ public class ApplicationServiceTest {
         );
 
         doThrow(forbidden("User is not authorized to delete this application")).when(githubApiPort).deleteComment(any(), any(), any());
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
 
         // When
         applicationService.deleteApplication(application.id(), userId, githubUserId);
 
         // Then
-        verify(userStoragePort).deleteApplications(application.id());
+        verify(projectApplicationStoragePort).deleteApplications(application.id());
         verify(githubApiPort).deleteComment(personalAccessToken, issue.repoId(), application.commentId());
     }
 
@@ -404,14 +419,14 @@ public class ApplicationServiceTest {
                 faker.lorem().sentence()
         );
 
-        when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+        when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
 
         // When
         applicationService.deleteApplication(application.id(), userId, githubUserId);
 
         // Then
-        verify(userStoragePort).deleteApplications(application.id());
+        verify(projectApplicationStoragePort).deleteApplications(application.id());
         verifyNoInteractions(githubApiPort);
     }
 
@@ -435,7 +450,7 @@ public class ApplicationServiceTest {
 
         @BeforeEach
         void setUp() {
-            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
+            when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
             when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(userId));
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(userStoragePort.getIndexedUserByGithubId(application.applicantId())).thenReturn(Optional.of(applicant));
@@ -445,7 +460,7 @@ public class ApplicationServiceTest {
         @Test
         void should_prevent_accepting_application_if_not_found() {
             // Given
-            when(userStoragePort.findApplication(application.id())).thenReturn(Optional.empty());
+            when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.empty());
 
             // When
             assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))

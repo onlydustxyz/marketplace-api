@@ -2752,31 +2752,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/projects/categories/suggest:
-    post:
-      security:
-        - apiKey: [ ]
-      tags:
-        - Projects
-      summary: Suggest project category
-      operationId: suggestProjectCategory
-      description: |
-        Project lead can suggest a new project category.
-      requestBody:
-        description: 'Project category'
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SuggestProjectCategoryRequest'
-
-      responses:
-        "204":
-          description: 'Category suggested'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/billing-profiles:
     post:
       security:
@@ -5437,6 +5412,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectCategoryResponse'
+        categorySuggestions:
+          type: array
+          items:
+            type: string
         sponsors:
           type: array
           items:
@@ -6618,6 +6597,10 @@ components:
           description: List of categories to link the project on.
           items:
             $ref: '#/components/schemas/ProjectCategoryId'
+        categorySuggestions:
+          type: array
+          items:
+            type: string
 
     UpdateProjectIgnoredContributionsRequest:
       type: object
@@ -6703,6 +6686,14 @@ components:
             It is allowed to link a new category directly through this list.
           items:
             $ref: '#/components/schemas/ProjectCategoryId'
+        categorySuggestions:
+          type: array
+          description: List of category suggestions to link the project on.
+            All other category suggestions will be unlinked from the project.
+            If empty, all category suggestions will be unlinked from the project.
+            If null, no change will be made.
+          items:
+            type: string
 
     ProjectCategoriesResponse:
       type: object
@@ -8004,18 +7995,6 @@ components:
         index:
           type: integer
           description: unique auto-incremented index of the hackathon
-
-
-    SuggestProjectCategoryRequest:
-      type: object
-      required:
-        - name
-        - projectId
-      properties:
-        name:
-          type: string
-        projectId:
-          $ref: '#/components/schemas/ProjectId'
 
     CommitteeResponse:
       type: object

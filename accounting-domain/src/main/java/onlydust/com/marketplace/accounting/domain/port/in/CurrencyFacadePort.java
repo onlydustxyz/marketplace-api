@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 
 public interface CurrencyFacadePort {
     Currency addERC20Support(final @NonNull Blockchain blockchain, final @NonNull Hash tokenAddress);
@@ -20,7 +21,7 @@ public interface CurrencyFacadePort {
 
     void refreshQuotes();
 
-    Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals);
+    Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals, List<String> countryRestrictions);
 
     URL uploadLogo(InputStream imageInputStream);
 

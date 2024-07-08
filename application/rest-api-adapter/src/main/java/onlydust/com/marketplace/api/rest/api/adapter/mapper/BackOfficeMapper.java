@@ -661,6 +661,7 @@ public interface BackOfficeMapper {
                 .description(currency.description().orElse(null))
                 .tokens(currency.erc20().stream().map(BackOfficeMapper::mapToken).toList())
                 .supportedOn(currency.supportedNetworks().stream().map(BackOfficeMapper::mapNetwork).toList())
+                .countryRestrictions(currency.countryRestrictions().stream().map(Country::iso3Code).sorted().toList())
                 ;
     }
 

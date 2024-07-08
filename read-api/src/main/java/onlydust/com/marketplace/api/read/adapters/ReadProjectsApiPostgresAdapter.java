@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
@@ -12,10 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributo
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectPageItemFiltersQueryEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
@@ -298,9 +296,13 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(ProjectCategoryResponse::getName))
                         .toList())
+                .categorySuggestions(project.getCategorySuggestions().stream()
+                        .map(ProjectCategorySuggestionReadEntity::name)
+                        .sorted()
+                        .toList())
                 .sponsors(project.getSponsors().stream()
-                        .filter(s -> SponsorMapper.isActive(s))
-                        .map(s -> s.sponsor())
+                        .filter(SponsorMapper::isActive)
+                        .map(ProjectSponsorViewEntity::sponsor)
                         .map(s -> new SponsorResponse()
                                 .id(s.getId())
                                 .name(s.getName())

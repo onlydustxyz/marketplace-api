@@ -83,7 +83,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
                 .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(application.projectId())));
         sendNotification(slackProperties.getDevRelChannel(), "New user application on project",
                 UserAppliedOnProjectEventMapper.mapToSlackBlock(user.getGithubLogin(),
-                project, slackProperties.getEnvironment()));
+                        project, slackProperties.getEnvironment()));
+    }
+
+    @Override
+    public void onApplicationAccepted(Application application) {
     }
 
     @Override

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(staticName = "fromIso3")
 @Getter
 @Accessors(fluent = true)
+@EqualsAndHashCode
 public class Country {
     private static final Map<String, String> COUNTRY_NAME_MAPPED_TO_ISO3_CODE = Arrays.stream(Locale.getISOCountries()).map(isoCountry -> new Locale("",
             isoCountry)).collect(Collectors.toMap(Locale::getISO3Country, locale -> locale.getDisplayCountry(Locale.ENGLISH)));
@@ -19,6 +21,10 @@ public class Country {
             "ITA", "LVA", "LTU", "LUX", "MLT", "NLD", "POL", "PRT", "ROU", "SVK", "SVN", "ESP", "SWE", "GBR");
 
     private final @NonNull String iso3Code;
+
+    public static Optional<Country> tryFromIso3(String iso3Code) {
+        return COUNTRY_NAME_MAPPED_TO_ISO3_CODE.containsKey(iso3Code) ? Optional.of(Country.fromIso3(iso3Code)) : Optional.empty();
+    }
 
     public Optional<String> display() {
         return Optional.ofNullable(COUNTRY_NAME_MAPPED_TO_ISO3_CODE.get(iso3Code));

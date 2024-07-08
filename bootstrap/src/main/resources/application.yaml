@@ -36,6 +36,7 @@ application:
     update-projects-languages: 300000 # 5 minutes
     cleanup-obsolete-applications: 86400000 # 1 day
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
+    send-application-mail-cron-expression: "0 0 12 * * ?" # every day at noon
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -178,6 +179,8 @@ infrastructure:
     invoice-rejected-email-id: 10
     verification-failed-email-id: 15
     new-committee-application-email-id: 14
+    project-applications-to-review-by-user-email-id: 16
+    project-application-accepted-email-id: 17
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}

@@ -28,6 +28,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
     private final UserStoragePort userStoragePort;
+    private final ProjectApplicationStoragePort projectApplicationStoragePort;
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;
     private final GithubStoragePort githubStoragePort;
@@ -66,12 +67,12 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
     private void process(OnGithubIssueDeleted event) {
         final var issueId = GithubIssue.Id.of(event.id());
-        userStoragePort.deleteApplicationsByIssueId(issueId);
+        projectApplicationStoragePort.deleteApplicationsByIssueId(issueId);
     }
 
     private void process(OnGithubIssueTransferred event) {
         final var issueId = GithubIssue.Id.of(event.id());
-        userStoragePort.deleteApplicationsByIssueId(issueId);
+        projectApplicationStoragePort.deleteApplicationsByIssueId(issueId);
     }
 
     private void createMissingApplications(GithubComment comment) {
@@ -83,7 +84,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
             return;
         }
 
-        final var existingApplicationsForUser = userStoragePort.findApplications(comment.authorId(), comment.issueId());
+        final var existingApplicationsForUser = projectApplicationStoragePort.findApplications(comment.authorId(), comment.issueId());
         if (!existingApplicationsForUser.isEmpty()) {
             LOGGER.debug("Skipping comment {} as user already applied to this issue", comment.id());
             return;
@@ -112,17 +113,17 @@ public class ApplicationsUpdater implements OutboxConsumer {
                 .map(projectId -> Application.fromGithubComment(comment, projectId))
                 .toArray(Application[]::new);
 
-        userStoragePort.save(applications);
+        projectApplicationStoragePort.save(applications);
         Arrays.stream(applications).forEach(applicationObserverPort::onApplicationCreated);
     }
 
     private void deleteObsoleteGithubApplications(@NonNull GithubComment.Id commentId, @NonNull Optional<String> commentBody) {
-        final var githubApplicationIds = userStoragePort.findApplications(commentId).stream()
+        final var githubApplicationIds = projectApplicationStoragePort.findApplications(commentId).stream()
                 .filter(a -> a.origin() == Application.Origin.GITHUB)
                 .map(Application::id)
                 .toArray(Application.Id[]::new);
 
         if (githubApplicationIds.length > 0 && commentBody.map(body -> !llmPort.isCommentShowingInterestToContribute(body)).orElse(true))
-            userStoragePort.deleteApplications(githubApplicationIds);
+            projectApplicationStoragePort.deleteApplications(githubApplicationIds);
     }
 }

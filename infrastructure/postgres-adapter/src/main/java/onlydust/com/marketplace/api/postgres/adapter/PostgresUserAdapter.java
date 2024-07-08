@@ -1,24 +1,27 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
-import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contributor;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
@@ -45,7 +48,6 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     private final OnboardingRepository onboardingRepository;
     private final ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     private final ProjectLeadRepository projectLeadRepository;
-    private final ApplicationRepository applicationRepository;
     private final UserProfileInfoRepository userProfileInfoRepository;
     private final CustomRewardRepository customRewardRepository;
     private final ProjectLedIdRepository projectLedIdRepository;
@@ -190,12 +192,6 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    @Transactional
-    public void save(@NonNull Application... applications) {
-        applicationRepository.saveAll(Arrays.stream(applications).map(ApplicationEntity::fromDomain).toList());
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public RewardDetailsView findRewardById(UUID rewardId) {
         return rewardViewRepository.findById(rewardId)
@@ -294,48 +290,6 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Transactional
     public void historizeUserRanks() {
         userRepository.historizeGlobalUsersRanks(new Date());
-    }
-
-    @Override
-    public Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
-        return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
-                .map(ApplicationEntity::toDomain);
-    }
-
-    @Override
-    public List<Application> findApplications(Long applicantId, GithubIssue.Id issueId) {
-        return applicationRepository.findAllByApplicantIdAndIssueId(applicantId, issueId.value()).stream()
-                .map(ApplicationEntity::toDomain).toList();
-    }
-
-    @Override
-    public List<Application> findApplications(GithubComment.Id commentId) {
-        return applicationRepository.findAllByCommentId(commentId.value()).stream()
-                .map(ApplicationEntity::toDomain).toList();
-    }
-
-    @Override
-    @Transactional
-    public void deleteApplications(Application.Id... applicationIds) {
-        applicationRepository.deleteAllById(Arrays.stream(applicationIds).map(UuidWrapper::value).toList());
-    }
-
-    @Override
-    @Transactional
-    public void deleteApplicationsByIssueId(GithubIssue.Id issueId) {
-        applicationRepository.deleteAllByIssueId(issueId.value());
-    }
-
-    @Override
-    public Optional<Application> findApplication(Application.Id id) {
-        return applicationRepository.findById(id.value())
-                .map(ApplicationEntity::toDomain);
-    }
-
-    @Override
-    @Transactional
-    public void deleteObsoleteApplications() {
-        applicationRepository.deleteObsoleteApplications();
     }
 
     @Override

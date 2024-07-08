@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HiddenContributorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
@@ -27,11 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper.moreInfosToEntities;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -53,6 +54,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final HiddenContributorRepository hiddenContributorRepository;
     private final ProjectTagRepository projectTagRepository;
     private final ProjectInfosViewRepository projectInfosViewRepository;
+    private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
 
     @Override
     public Optional<UUID> getProjectIdBySlug(String slug) {
@@ -102,7 +104,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubRepoIds, UUID firstProjectLeaderId,
                               List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings,
-                              List<UUID> ecosystemIds, List<UUID> categoryIds) {
+                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -119,18 +121,22 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
                         .repos(githubRepoIds == null ? null : githubRepoIds.stream()
                                 .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                                .collect(Collectors.toSet()))
+                                .collect(toSet()))
                         .moreInfos(moreInfos == null ? null : moreInfosToEntities(moreInfos, projectId))
                         .projectLeaders(Set.of(new ProjectLeadEntity(projectId, firstProjectLeaderId)))
                         .projectLeaderInvitations(githubUserIdsAsProjectLeads == null ? null :
                                 githubUserIdsAsProjectLeads.stream()
                                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                                                 projectId, githubUserId))
-                                        .collect(Collectors.toSet()))
+                                        .collect(toSet()))
                         .ecosystems(ecosystemIds == null ? null :
-                                ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId)).collect(Collectors.toSet()))
+                                ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId)).collect(toSet()))
                         .categories(categoryIds == null ? null :
-                                categoryIds.stream().map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId)).collect(Collectors.toSet()))
+                                categoryIds.stream().map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId)).collect(toSet()))
+                        .categorySuggestions(categorySuggestions == null ? Set.of() :
+                                categorySuggestions.stream().map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(),
+                                        categorySuggestion, projectId)).collect(toSet())
+                        )
                         .rank(0)
                         .build();
 
@@ -145,7 +151,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
                               List<UUID> projectLeadersToKeep, String imageUrl,
                               ProjectRewardSettings rewardSettings,
-                              List<UUID> ecosystemIds, List<UUID> categoryIds) {
+                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions) {
         final var project = this.projectRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
         project.setSlug(slug);
@@ -190,7 +196,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 project.setProjectLeaderInvitations(githubUserIdsAsProjectLeadersToInvite.stream()
                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
                                 githubUserId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             }
         }
 
@@ -202,11 +208,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 project.getRepos().clear();
                 project.getRepos().addAll(githubRepoIds.stream()
                         .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             } else {
                 project.setRepos(githubRepoIds.stream()
                         .map(repoId -> new ProjectRepoEntity(projectId, repoId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             }
         }
 
@@ -215,11 +221,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 project.getEcosystems().clear();
                 project.getEcosystems().addAll(ecosystemIds.stream()
                         .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             } else {
                 project.setEcosystems(ecosystemIds.stream()
                         .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             }
         }
 
@@ -228,12 +234,21 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 project.getCategories().clear();
                 project.getCategories().addAll(categoryIds.stream()
                         .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             } else {
                 project.setCategories(categoryIds.stream()
                         .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
-                        .collect(Collectors.toSet()));
+                        .collect(toSet()));
             }
+        }
+
+        if (nonNull(categorySuggestions)) {
+            project.getCategorySuggestions().removeIf(categorySuggestion -> !categorySuggestions.contains(categorySuggestion.getName()));
+            project.getCategorySuggestions().addAll(categorySuggestions.stream()
+                    .filter(categorySuggestion -> project.getCategorySuggestions().stream()
+                            .noneMatch(suggestion -> suggestion.getName().equals(categorySuggestion)))
+                    .map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(), categorySuggestion, projectId))
+                    .collect(toSet()));
         }
 
         this.projectRepository.saveAndFlush(project);
@@ -253,7 +268,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         return projectLeaderInvitationRepository.findAllByProjectId(projectId)
                 .stream()
                 .map(ProjectLeaderInvitationEntity::getGithubUserId)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     @Override
@@ -295,7 +310,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
                 .map(ProjectRepoEntity::getRepoId)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
     @Override
@@ -416,6 +431,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         return projectRepoRepository.findAllByRepoId(repoId)
                 .stream()
                 .map(ProjectRepoEntity::getProjectId)
+                .toList();
+    }
+
+    @Override
+    public List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId) {
+        return projectCategorySuggestionRepository.findAllByProjectId(projectId)
+                .stream()
+                .map(ProjectCategorySuggestionEntity::toDomain)
                 .toList();
     }
 }

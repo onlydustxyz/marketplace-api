@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresProjectAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.BeforeEach;
@@ -581,7 +581,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",
                 new ProjectRewardSettings(false, false, false, null),
-                List.of(), List.of());
+                List.of(), List.of(), List.of());
         return projectId;
     }
 

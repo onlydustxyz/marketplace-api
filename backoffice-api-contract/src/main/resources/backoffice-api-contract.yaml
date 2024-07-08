@@ -2137,7 +2137,7 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/currencies/{currencyId}:
-    put:
+    patch:
       security:
         - bearerAuth: [ ]
       tags:
@@ -4185,6 +4185,11 @@ components:
           type: integer
         description:
           type: string
+        countryRestrictions:
+          type: array
+          items:
+            type: string
+            format: iso-country-code
 
     CurrencyListResponse:
       type: object
@@ -4201,6 +4206,7 @@ components:
           required:
             - type
             - decimals
+            - countryRestrictions
           properties:
             type:
               $ref: '#/components/schemas/CurrencyType'
@@ -4216,6 +4222,11 @@ components:
               type: integer
             description:
               type: string
+            countryRestrictions:
+              type: array
+              items:
+                type: string
+                format: iso-country-code
 
     Token:
       type: object

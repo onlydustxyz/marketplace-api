@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCurrencyStoragePort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
@@ -27,6 +28,7 @@ public class PostgresCurrencyAdapter implements CurrencyStorage, ProjectCurrency
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Currency> findByCode(Currency.Code code) {
         return repository.findByCode(code.toString()).map(CurrencyEntity::toDomain);
     }

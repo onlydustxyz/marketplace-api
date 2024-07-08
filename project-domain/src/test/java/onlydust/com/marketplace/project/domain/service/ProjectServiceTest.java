@@ -59,6 +59,7 @@ public class ProjectServiceTest {
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final List<UUID> ecosystemIds = List.of(UUID.randomUUID());
+        final var categorySuggestions = List.of(faker.lorem().word(), faker.internet().slug());
         final CreateProjectCommand command = CreateProjectCommand.builder()
                 .name(faker.pokemon().name())
                 .shortDescription(faker.lorem().sentence())
@@ -70,6 +71,7 @@ public class ProjectServiceTest {
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
                 .ecosystemIds(ecosystemIds)
+                .categorySuggestions(categorySuggestions)
                 .build();
         final UUID expectedProjectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
@@ -87,6 +89,8 @@ public class ProjectServiceTest {
         verify(projectObserverPort).onProjectCreated(uuidArgumentCaptor.capture(), uuidArgumentCaptor.capture());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
+        verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(0), projectLeadId);
+        verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(1), projectLeadId);
         assertEquals(expectedProjectId, uuidArgumentCaptor.getAllValues().get(0));
         assertEquals(projectLeadId, uuidArgumentCaptor.getAllValues().get(1));
     }
@@ -99,6 +103,7 @@ public class ProjectServiceTest {
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
         final UUID projectId = UUID.randomUUID();
         final UUID projectLeadId = UUID.randomUUID();
+        final var categorySuggestions = List.of(faker.lorem().word(), faker.internet().slug());
         final UpdateProjectCommand command = UpdateProjectCommand.builder()
                 .id(projectId)
                 .name(faker.pokemon().name())
@@ -117,12 +122,17 @@ public class ProjectServiceTest {
                                 false,
                                 faker.date().birthday()
                         ))
+                .categorySuggestions(categorySuggestions)
                 .build();
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(projectLeadId));
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(new HashSet<>(Arrays.asList(1L, 2L, 3L)));
+        when(projectStoragePort.getProjectCategorySuggestions(projectId)).thenReturn(List.of(
+                new ProjectCategorySuggestion(ProjectCategorySuggestion.Id.random(), categorySuggestions.get(0), projectId),
+                new ProjectCategorySuggestion(ProjectCategorySuggestion.Id.random(), faker.lordOfTheRings().character(), projectId)));
+
         projectService.updateProject(projectLeadId, command);
 
         // Then
@@ -138,11 +148,13 @@ public class ProjectServiceTest {
                 imageUrl,
                 command.getRewardSettings(),
                 command.getEcosystemIds(),
-                command.getCategoryIds()
-        );
+                command.getCategoryIds(),
+                categorySuggestions);
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
         verify(projectObserverPort).onRewardSettingsChanged(projectId);
+        verify(projectObserverPort, never()).onProjectCategorySuggested(categorySuggestions.get(0), projectId);
+        verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(1), projectLeadId);
     }
 
     @Test

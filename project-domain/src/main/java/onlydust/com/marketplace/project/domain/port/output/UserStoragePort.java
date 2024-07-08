@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
-import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contributor;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -33,8 +34,6 @@ public interface UserStoragePort {
 
     UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
 
-    void save(@NonNull Application... applications);
-
     RewardDetailsView findRewardById(UUID rewardId);
 
     Page<RewardItemView> findRewardItemsPageById(UUID rewardId, int pageIndex, int pageSize);
@@ -54,18 +53,4 @@ public interface UserStoragePort {
     void refreshUserRanksAndStats();
 
     void historizeUserRanks();
-
-    Optional<Application> findApplication(Application.Id id);
-
-    Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId);
-
-    List<Application> findApplications(Long applicantId, GithubIssue.Id issueId);
-
-    List<Application> findApplications(GithubComment.Id commentId);
-
-    void deleteApplications(Application.Id... applicationIds);
-
-    void deleteApplicationsByIssueId(GithubIssue.Id issueId);
-
-    void deleteObsoleteApplications();
 }
