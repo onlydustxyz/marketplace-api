@@ -52,7 +52,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
                 .isUnauthorized();
 
         // When
-        client.put()
+        client.patch()
                 .uri(PROJECT_CATEGORY.formatted(UUID.randomUUID()))
                 .header("Authorization", "Bearer " + notAnAdmin.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -190,7 +190,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
     @Order(2)
     void should_update_project_category() {
         // When
-        client.put()
+        client.patch()
                 .uri(PROJECT_CATEGORY.formatted(projectCategoryId))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
@@ -245,7 +245,7 @@ public class BackofficeProjectCategoryApiIT extends AbstractMarketplaceBackOffic
         projectCategorySuggestionRepository.save(new ProjectCategorySuggestionEntity(suggestionId, "ai", projectId));
 
         // When
-        final var response = client.put()
+        client.patch()
                 .uri(PROJECT_CATEGORY.formatted(projectCategoryFromSuggestionId))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 .contentType(MediaType.APPLICATION_JSON)

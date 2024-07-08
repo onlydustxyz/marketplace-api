@@ -14,7 +14,7 @@ public class ProjectCategoryService implements ProjectCategoryFacadePort {
     private final ProjectCategoryStoragePort projectCategoryStoragePort;
 
     @Override
-    public void deleteCategorySuggestion(ProjectCategorySuggestion.Id id) {
+    public void deleteCategorySuggestion(@NonNull ProjectCategorySuggestion.Id id) {
         projectCategoryStoragePort.delete(id);
     }
 
@@ -31,18 +31,25 @@ public class ProjectCategoryService implements ProjectCategoryFacadePort {
     }
 
     @Override
-    public ProjectCategory updateCategory(ProjectCategory.@NonNull Id id, @NonNull String name, @NonNull String description, @NonNull String iconSlug,
+    public ProjectCategory updateCategory(@NonNull ProjectCategory.Id id, final String name, final String description, final String iconSlug,
                                           final ProjectCategorySuggestion.Id suggestionId) {
         final var projectCategory = projectCategoryStoragePort.get(id)
                 .orElseThrow(() -> notFound("Project category %s not found".formatted(id)));
 
+        if (name != null)
+            projectCategory.name(name);
+
+        if (description != null)
+            projectCategory.description(description);
+
+        if (iconSlug != null)
+            projectCategory.iconSlug(iconSlug);
+
         if (suggestionId != null)
             link(suggestionId, projectCategory);
 
-        projectCategoryStoragePort.save(projectCategory
-                .name(name)
-                .description(description)
-                .iconSlug(iconSlug));
+        projectCategoryStoragePort.save(projectCategory);
+        
         return projectCategory;
     }
 
