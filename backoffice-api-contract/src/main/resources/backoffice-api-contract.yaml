@@ -3487,6 +3487,46 @@ components:
           $ref: '#/components/schemas/BillingProfileType'
         status:
           $ref: '#/components/schemas/VerificationStatus'
+        kyc:
+          $ref: '#/components/schemas/UserSearchKyc'
+        kyb:
+          $ref: '#/components/schemas/UserSearchKyb'
+
+    UserSearchKyc:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        countryCode:
+          type: string
+          format: iso-country-code
+        usCitizen:
+          type: boolean
+        idDocumentType:
+          $ref: '#/components/schemas/KycIdDocumentType'
+        idDocumentNumber:
+          type: string
+        idDocumentCountryCode:
+          type: string
+
+    UserSearchKyb:
+      type: object
+      properties:
+        name:
+          type: string
+        registrationNumber:
+          type: string
+        countryCode:
+          type: string
+          format: iso-country-code
+        usEntity:
+          type: boolean
+        subjectToEuropeVAT:
+          type: boolean
+        euVATNumber:
+          type: string
 
     UserSearchStats:
       type: object
@@ -3757,12 +3797,7 @@ components:
         usCitizen:
           type: boolean
         idDocumentType:
-          type: string
-          enum:
-            - PASSPORT
-            - ID_CARD
-            - RESIDENCE_PERMIT
-            - DRIVER_LICENSE
+          $ref: '#/components/schemas/KycIdDocumentType'
         idDocumentNumber:
           type: string
         validUntil:
@@ -3772,6 +3807,14 @@ components:
           type: string
         sumsubUrl:
           type: string
+
+    KycIdDocumentType:
+      type: string
+      enum:
+        - PASSPORT
+        - ID_CARD
+        - RESIDENCE_PERMIT
+        - DRIVER_LICENSE
 
     KybResponse:
       type: object

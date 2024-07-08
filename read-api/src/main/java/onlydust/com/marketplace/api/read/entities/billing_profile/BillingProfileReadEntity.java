@@ -9,6 +9,8 @@ import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.UserSearchBillingProfile;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
@@ -31,12 +33,16 @@ public class BillingProfileReadEntity {
     @NonNull
     String name;
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "accounting.billing_profile_type")
     @NonNull
     BillingProfileType type;
 
     ZonedDateTime invoiceMandateAcceptedAt;
 
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "accounting.verification_status")
     @NonNull
     VerificationStatus verificationStatus;
 
@@ -75,6 +81,8 @@ public class BillingProfileReadEntity {
                 .name(name)
                 .type(type)
                 .status(verificationStatus)
+                .kyb(kyb == null ? null : kyb.toUserSearch())
+                .kyc(kyc == null ? null : kyc.toUserSearch())
                 ;
     }
 }

@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.it.bo;
 
 import lombok.NonNull;
+import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.OnlyDustError;
 import onlydust.com.backoffice.api.contract.model.UserSearchPage;
+import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -34,6 +36,8 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             "email==*gmail.com,true",
             "githubUserId==595505,true",
             "billingProfile.name==pixelfact,false",
+            "billingProfile.kyc.lastName==Oucif,false",
+            "billingProfile.kyb.name==pixelfact,false",
             "language1.name==Rust,false",
             "ecosystem1.name==Starknet,false",
             "language2.name==Java,false",
@@ -119,6 +123,14 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
             assertThat(aztec).hasSize(1);
             aztec.forEach(r -> assertThat(r.getRank()).isLessThan(200));
         });
+
+        users = searchUsers("billingProfile.verificationStatus==NOT_STARTED and billingProfile.type==SELF_EMPLOYED").getUsers();
+        assertThat(users).isNotEmpty();
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getStatus() == VerificationStatus.NOT_STARTED && bp.getType() == BillingProfileType.SELF_EMPLOYED));
+
+        users = searchUsers("billingProfile.kyb.country==FRA").getUsers();
+        assertThat(users).isNotEmpty();
+        assertThat(users).allMatch(user -> user.getBillingProfile().stream().anyMatch(bp -> bp.getKyb() != null && bp.getKyb().getCountryCode().equals("FRA")));
     }
 
     @Test
