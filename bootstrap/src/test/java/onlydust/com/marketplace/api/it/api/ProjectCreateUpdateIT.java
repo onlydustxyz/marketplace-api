@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectCategoryFacadePort;
@@ -19,6 +20,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 
 @TagProject
@@ -33,6 +35,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     private ProjectCategoryFacadePort projectCategoryFacadePort;
+
+    @Autowired
+    private SlackApiAdapter slackApiAdapter;
 
     @BeforeEach
     public void setup() {
@@ -83,12 +88,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """, true, false))
                 .willReturn(WireMock.noContent()));
+        final var user = userAuthHelper.authenticatePierre();
 
         // When
-
         final var response = client.post()
                 .uri(getApiURI(PROJECTS_POST))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -110,7 +115,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                           ],
                           "logoUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
                           "ecosystemIds" : ["b599313c-a074-440f-af04-a466529ab2e7","99b6c284-f9bb-4f89-8ce7-03771465ef8e"],
-                          "categoryIds": ["%s", "%s"]
+                          "categoryIds": ["%s", "%s"],
+                          "categorySuggestions": ["finance"]
                         }
                         """.formatted(gameCategory.id(), tutorialCategory.id()))
                 .exchange()
@@ -158,7 +164,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.organizations[0].repos.length()").isEqualTo(1)
                 .jsonPath("$.organizations[0].repos[0].name").isEqualTo("marketplace-frontend")
                 .jsonPath("$.organizations[0].repos[0].description").isEqualTo("Contributions marketplace backend " +
-                        "services")
+                                                                               "services")
                 .jsonPath("$.organizations[1].login").isEqualTo("od-mocks")
                 .jsonPath("$.organizations[1].installationId").isEqualTo(null)
                 .jsonPath("$.organizations[1].repos.length()").isEqualTo(1)
@@ -172,7 +178,10 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.ecosystems[0].name").isEqualTo("Starknet")
                 .jsonPath("$.ecosystems[1].name").isEqualTo("Zama")
                 .jsonPath("$.categories[0].name").isEqualTo("Game")
-                .jsonPath("$.categories[1].name").isEqualTo("Tutorial");
+                .jsonPath("$.categories[1].name").isEqualTo("Tutorial")
+                .jsonPath("$.categorySuggestions[0]").isEqualTo("finance");
+
+        verify(slackApiAdapter).onProjectCategorySuggested("finance", user.user().getId());
     }
 
     @SneakyThrows
@@ -246,11 +255,12 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+        final var user = userAuthHelper.authenticatePierre();
 
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticatePierre().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + user.jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -285,7 +295,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                             "ignoreContributionsBefore": "2021-01-01T00:00:00Z"
                           },
                           "ecosystemIds": ["99b6c284-f9bb-4f89-8ce7-03771465ef8e","6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"],
-                          "categoryIds": ["%s"]
+                          "categoryIds": ["%s"],
+                          "categorySuggestions": ["defi"]
                         }
                         """.formatted(cryptoCategory.id()))
                 .exchange()
@@ -315,6 +326,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """))
         );
+        verify(slackApiAdapter).onProjectCategorySuggested("defi", user.user().getId());
     }
 
     private void runJobs() {
@@ -521,7 +533,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
         assertThat(response.getMessage()).contains("Project leaders to keep must be a subset of current project " +
-                "leaders");
+                                                   "leaders");
     }
 
     @Test
@@ -814,7 +826,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.slug").isEqualTo("updated-project")
                 .jsonPath("$.shortDescription").isEqualTo("This is a super updated project")
                 .jsonPath("$.longDescription").isEqualTo("This is a super awesome updated project with a nice " +
-                        "description")
+                                                         "description")
                 .jsonPath("$.logoUrl").isEqualTo("https://avatars.githubusercontent.com/u/yyyyyyyyyyyy")
                 .jsonPath("$.hiring").isEqualTo(false)
                 .jsonPath("$.moreInfos.length()").isEqualTo(2)
@@ -846,6 +858,8 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.ecosystems[0].name").isEqualTo("Ethereum")
                 .jsonPath("$.ecosystems[1].name").isEqualTo("Starknet")
 
-                .jsonPath("$.categories[0].name").isEqualTo("Crypto");
+                .jsonPath("$.categories[0].name").isEqualTo("Crypto")
+                .jsonPath("$.categorySuggestions[0]").isEqualTo("defi")
+        ;
     }
 }

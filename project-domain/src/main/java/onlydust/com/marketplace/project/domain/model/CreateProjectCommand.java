@@ -20,4 +20,5 @@ public class CreateProjectCommand {
     String imageUrl;
     List<UUID> ecosystemIds;
     List<UUID> categoryIds;
+    List<String> categorySuggestions;
 }

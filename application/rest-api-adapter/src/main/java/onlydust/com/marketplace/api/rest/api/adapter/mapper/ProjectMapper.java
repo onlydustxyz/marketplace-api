@@ -32,6 +32,7 @@ public interface ProjectMapper {
                 .imageUrl(createProjectRequest.getLogoUrl())
                 .ecosystemIds(createProjectRequest.getEcosystemIds())
                 .categoryIds(createProjectRequest.getCategoryIds())
+                .categorySuggestions(createProjectRequest.getCategorySuggestions())
                 .build();
     }
 
@@ -54,6 +55,7 @@ public interface ProjectMapper {
                 .imageUrl(updateProjectRequest.getLogoUrl())
                 .ecosystemIds(updateProjectRequest.getEcosystemIds())
                 .categoryIds(updateProjectRequest.getCategoryIds())
+                .categorySuggestions(updateProjectRequest.getCategorySuggestions())
                 .build();
     }
 

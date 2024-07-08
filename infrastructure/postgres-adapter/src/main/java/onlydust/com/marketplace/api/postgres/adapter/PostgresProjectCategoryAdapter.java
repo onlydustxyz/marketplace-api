@@ -19,11 +19,6 @@ public class PostgresProjectCategoryAdapter implements ProjectCategoryStoragePor
     private final ProjectCategoryRepository projectCategoryRepository;
 
     @Override
-    public void save(ProjectCategorySuggestion suggestion) {
-        projectCategorySuggestionRepository.save(ProjectCategorySuggestionEntity.fromDomain(suggestion));
-    }
-
-    @Override
     public void delete(ProjectCategory.Id id) {
         projectCategoryRepository.deleteById(id.value());
     }

@@ -22,4 +22,5 @@ public class UpdateProjectCommand {
     ProjectRewardSettings rewardSettings;
     List<UUID> ecosystemIds;
     List<UUID> categoryIds;
+    List<String> categorySuggestions;
 }

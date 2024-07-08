@@ -108,7 +108,6 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
     protected static final String PROJECTS_IGNORED_CONTRIBUTIONS_PUT = "/api/v1/projects/%s/ignored-contributions";
     protected static final String PROJECT_CONTRIBUTION_UNASSIGN = "/api/v1/projects/%s/contributions/%s/unassign";
-    protected static final String PROJECTS_CATEGORIES_SUGGEST = "/api/v1/projects/categories/suggest";
     protected static final String APPLICATIONS = "/api/v1/applications";
     protected static final String APPLICATIONS_BY_ID = "/api/v1/applications/%s";
     protected static final String ME_GET = "/api/v1/me";
