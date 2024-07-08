@@ -816,12 +816,12 @@ public interface BackOfficeMapper {
                 ;
     }
 
-    static KycResponse.IdDocumentTypeEnum map(Kyc.IdDocumentTypeEnum idDocumentType) {
+    static KycIdDocumentType map(Kyc.IdDocumentTypeEnum idDocumentType) {
         return switch (idDocumentType) {
-            case PASSPORT -> KycResponse.IdDocumentTypeEnum.PASSPORT;
-            case ID_CARD -> KycResponse.IdDocumentTypeEnum.ID_CARD;
-            case RESIDENCE_PERMIT -> KycResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-            case DRIVER_LICENSE -> KycResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
+            case PASSPORT -> KycIdDocumentType.PASSPORT;
+            case ID_CARD -> KycIdDocumentType.ID_CARD;
+            case RESIDENCE_PERMIT -> KycIdDocumentType.RESIDENCE_PERMIT;
+            case DRIVER_LICENSE -> KycIdDocumentType.DRIVER_LICENSE;
         };
     }
 

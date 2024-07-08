@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.KybResponse;
+import onlydust.com.backoffice.api.contract.model.UserSearchKyb;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import org.hibernate.annotations.Immutable;
@@ -66,6 +67,17 @@ public class KybReadEntity {
                 .subjectToEuropeVAT(subjectToEuVAT)
                 .euVATNumber(euVATNumber)
                 .sumsubUrl(applicantId == null ? null : "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(applicantId))
+                ;
+    }
+
+    public UserSearchKyb toUserSearch() {
+        return new UserSearchKyb()
+                .name(name)
+                .registrationNumber(registrationNumber)
+                .countryCode(country)
+                .usEntity(usEntity)
+                .subjectToEuropeVAT(subjectToEuVAT)
+                .euVATNumber(euVATNumber)
                 ;
     }
 }
