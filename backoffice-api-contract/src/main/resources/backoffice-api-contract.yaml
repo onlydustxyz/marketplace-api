@@ -5343,8 +5343,16 @@ components:
           $ref: '#/components/schemas/ProjectCategoryId'
 
     ProjectCategoryUpdateRequest:
-      allOf:
-        - $ref: '#/components/schemas/ProjectCategoryCreateRequest'
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        iconSlug:
+          type: string
+        suggestionId:
+          $ref: '#/components/schemas/ProjectCategoryId'
 
     ProjectCategoryResponse:
       type: object
