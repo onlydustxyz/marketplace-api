@@ -6,7 +6,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Value;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Immutable;
@@ -30,5 +29,6 @@ public class BillingProfileStatsViewEntity {
     Boolean missingVerification;
     Boolean individualLimitReached;
     BigDecimal currentYearPaymentAmount;
+    BigDecimal currentYearPaymentLimit;
     Boolean mandateAcceptanceOutdated;
 }
