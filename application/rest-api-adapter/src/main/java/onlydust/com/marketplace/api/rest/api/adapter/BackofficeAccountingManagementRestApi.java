@@ -235,12 +235,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId)), authenticatedUser));
-    }
-
-    @Override
     public ResponseEntity<Void> deleteBatchPayment(UUID batchPaymentId) {
         paymentPort.deletePaymentById(Payment.Id.of(batchPaymentId));
         return ResponseEntity.noContent().build();

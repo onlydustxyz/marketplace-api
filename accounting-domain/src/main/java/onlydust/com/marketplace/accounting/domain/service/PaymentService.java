@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,12 +68,6 @@ public class PaymentService implements PaymentPort {
     @Override
     public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> ids) {
         return accountingRewardStoragePort.findPaymentsByIds(ids);
-    }
-
-    @Override
-    public BatchPaymentDetailsView findPaymentById(Payment.Id paymentId) {
-        return accountingRewardStoragePort.findPaymentDetailsById(paymentId)
-                .orElseThrow(() -> notFound("Batch payment details %s not found".formatted(paymentId.value())));
     }
 
     @Override

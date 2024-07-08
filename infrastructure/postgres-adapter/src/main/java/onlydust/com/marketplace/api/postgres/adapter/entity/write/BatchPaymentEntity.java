@@ -21,12 +21,13 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Table(name = "batch_payments", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 public class BatchPaymentEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     String csv;
     String transactionHash;

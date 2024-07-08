@@ -177,4 +177,12 @@ public class ProjectReadEntity {
                 .logoUrl(logoUrl)
                 .slug(slug);
     }
+
+    public onlydust.com.backoffice.api.contract.model.ProjectLinkResponse toBoLinkResponse() {
+        return new onlydust.com.backoffice.api.contract.model.ProjectLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .slug(slug);
+    }
 }

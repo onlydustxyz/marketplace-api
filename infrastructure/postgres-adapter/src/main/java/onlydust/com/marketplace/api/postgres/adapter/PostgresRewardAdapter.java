@@ -9,13 +9,15 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
+import onlydust.com.marketplace.accounting.domain.view.EarningsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BatchPaymentRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NodeGuardianBoostRewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
@@ -106,22 +108,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds) {
         return paymentShortViewRepository.findByIds(paymentIds.stream().map(UuidWrapper::value).collect(Collectors.toSet()))
                 .stream().map(PaymentShortQueryEntity::toDomain).toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<BatchPaymentDetailsView> findPaymentDetailsById(Payment.Id batchPaymentId) {
-        return batchPaymentRepository.findById(batchPaymentId.value()).map(this::getBatchPaymentDetailsView);
-    }
-
-    private BatchPaymentDetailsView getBatchPaymentDetailsView(BatchPaymentEntity batchPayment) {
-        return BatchPaymentDetailsView.builder()
-                .payment(batchPayment.toDomain())
-                .rewardViews(
-                        backofficeRewardViewRepository.findAllByRewardIds(batchPayment.getRewards().stream().map(BatchPaymentRewardEntity::rewardId).toList()).stream()
-                                .map(BoRewardQueryEntity::toDomain)
-                                .toList())
-                .build();
     }
 
     @Override
@@ -233,7 +219,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     public Optional<Integer> getBoostedRewardsCountByRecipientId(Long recipientId) {
         return shortRewardViewRepository.countNumberOfBoostByRecipientId(recipientId);
     }
-
 
     @Override
     @Transactional

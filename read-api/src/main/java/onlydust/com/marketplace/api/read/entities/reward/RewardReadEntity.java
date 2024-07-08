@@ -7,6 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.MoneyWithUsdEquivalentResponse;
+import onlydust.com.backoffice.api.contract.model.ShortRewardResponse;
+import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
@@ -42,6 +45,7 @@ public class RewardReadEntity {
     @NonNull
     AllUserReadEntity recipient;
 
+    @NonNull
     Long recipientId;
 
     UUID billingProfileId;
@@ -60,4 +64,33 @@ public class RewardReadEntity {
     @JoinColumn(name = "id", referencedColumnName = "reward_id")
     @NonNull
     RewardStatusReadEntity status;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id", referencedColumnName = "reward_id")
+    @NonNull
+    RewardStatusDataReadEntity statusData;
+
+    public BigDecimal usdEquivalent() {
+        return statusData.amountUsdEquivalent();
+    }
+
+    public ShortRewardResponse toShortResponse() {
+        return new ShortRewardResponse()
+                .id(id)
+                .status(status.toBoContract())
+                .project(project.toBoLinkResponse())
+                .money(new MoneyWithUsdEquivalentResponse()
+                        .amount(amount)
+                        .currency(currency.toBoShortResponse())
+                        .conversionRate(statusData.usdConversionRate())
+                        .dollarsEquivalent(statusData.amountUsdEquivalent())
+                );
+    }
+
+    public TotalMoneyWithUsdEquivalentResponse toTotalMoneyWithUsdEquivalentResponse() {
+        return new TotalMoneyWithUsdEquivalentResponse()
+                .amount(amount)
+                .currency(currency.toBoShortResponse())
+                .dollarsEquivalent(statusData.amountUsdEquivalent());
+    }
 }

@@ -837,7 +837,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get batch payment details
       operationId: getBatchPayment
       description: |

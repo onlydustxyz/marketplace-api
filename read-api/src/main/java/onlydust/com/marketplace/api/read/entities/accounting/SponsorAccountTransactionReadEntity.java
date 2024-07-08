@@ -4,10 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.backoffice.api.contract.model.TransactionReceipt;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import onlydust.com.marketplace.api.read.mapper.NetworkMapper;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -60,19 +60,10 @@ public class SponsorAccountTransactionReadEntity {
         return new TransactionReceipt()
                 .id(id)
                 .reference(reference)
-                .network(map(network))
+                .network(NetworkMapper.map(network))
                 .amount(type.isDebit() ? amount.negate() : amount)
                 .thirdPartyName(thirdPartyName)
                 .thirdPartyAccountNumber(thirdPartyAccountNumber);
     }
 
-    private TransactionNetwork map(NetworkEnumEntity network) {
-        return switch (network) {
-            case sepa -> TransactionNetwork.SEPA;
-            case ethereum -> TransactionNetwork.ETHEREUM;
-            case aptos -> TransactionNetwork.APTOS;
-            case starknet -> TransactionNetwork.STARKNET;
-            case optimism -> TransactionNetwork.OPTIMISM;
-        };
-    }
 }
