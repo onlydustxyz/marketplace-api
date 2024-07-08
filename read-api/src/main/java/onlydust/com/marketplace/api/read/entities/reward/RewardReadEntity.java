@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+
 @Entity
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -91,6 +93,6 @@ public class RewardReadEntity {
         return new TotalMoneyWithUsdEquivalentResponse()
                 .amount(amount)
                 .currency(currency.toBoShortResponse())
-                .dollarsEquivalent(statusData.amountUsdEquivalent());
+                .dollarsEquivalent(prettyUsd(statusData.amountUsdEquivalent()));
     }
 }
