@@ -56,7 +56,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "auth0-m2m", property = "infrastructure.auth0.api.client.domain-base-uri"),
         @ConfigureWireMock(name = "github", stubLocation = "", property = "infrastructure.github.baseUri"),
         @ConfigureWireMock(name = "indexer-api", property = "infrastructure.indexer.api.client.baseUri"),
-        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri")
+        @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri"),
+        @ConfigureWireMock(name = "dustyBot", stubLocation = "", property = "infrastructure.dustyBot.baseUri")
 })
 public class AbstractMarketplaceBackOfficeApiIT {
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
@@ -92,6 +93,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer indexerApiWireMockServer;
     @InjectWireMock("customer-io")
     protected WireMockServer customerIOWireMockServer;
+    @InjectWireMock("dustyBot")
+    protected WireMockServer dustyBotApiWireMockServer;
     @Autowired
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
     @Autowired
@@ -205,6 +208,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String PROJECT_CATEGORIES = "/bo/v1/project-categories";
     protected static final String PROJECT_CATEGORY = "/bo/v1/project-categories/%s";
     protected static final String PROJECT_CATEGORY_SUGGESTION = "/bo/v1/project-category-suggestions/%s";
+    protected static final String PROJECT_REWARDS = "/bo/v1/projects/%s/rewards";
 
     protected URI getApiURI(final String path) {
         return UriComponentsBuilder.newInstance()

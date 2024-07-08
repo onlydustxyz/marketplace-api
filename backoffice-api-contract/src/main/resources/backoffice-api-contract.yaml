@@ -1890,6 +1890,35 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/projects/{projectSlug}/rewards:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeProject
+      summary: Reward a contributor on project
+      operationId: rewardContributor
+      description: |
+        Reward a contributor on project
+      parameters:
+        - in: path
+          name: projectSlug
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewardContributorRequest'
+      responses:
+        "204":
+          description: 'Contributor was rewarded'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeLanguageManagement ===============================================================
 
   /bo/v1/languages:
@@ -5467,3 +5496,22 @@ components:
             buttonLinkUrl:
               type: string
               format: uri
+
+    RewardContributorRequest:
+      required:
+        - amount
+        - currencyCode
+        - repositoryName
+        - reason
+        - recipientGithubLogin
+      properties:
+        amount:
+          type: number
+        currencyCode:
+          type: string
+        repositoryName:
+          type: string
+        reason:
+          type: string
+        recipientGithubLogin:
+          type: string

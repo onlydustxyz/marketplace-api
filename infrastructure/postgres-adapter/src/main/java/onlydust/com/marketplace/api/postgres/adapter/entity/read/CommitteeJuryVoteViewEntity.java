@@ -1,9 +1,8 @@
-package onlydust.com.marketplace.api.read.entities;
+package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectShortViewEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;

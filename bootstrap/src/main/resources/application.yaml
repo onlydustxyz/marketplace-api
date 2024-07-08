@@ -43,9 +43,11 @@ application:
       od-api-header: ${SUMSUB_WEBHOOK_HEADER}
   node-guardians:
     project-id: ${NODE_GUARDIANS_BOOST_PROJECT_ID}
-    project-lead-id: ${NODE_GUARDIANS_BOOST_PROJECT_LEAD_ID}
+    project-lead-id: ${OD_BOT_PROJECT_LEAD_ID}
     github-repo-id: ${NODE_GUARDIANS_BOOST_GITHUB_REPO_ID}
     ecosystem-id: ${NODE_GUARDIANS_BOOST_ECOSYSTEM_ID}
+  automated-rewards:
+    project-lead-id: ${OD_BOT_PROJECT_LEAD_ID}
 
 spring:
   autoconfigure:
