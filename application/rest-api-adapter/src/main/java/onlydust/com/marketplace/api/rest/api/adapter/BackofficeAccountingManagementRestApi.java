@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
@@ -27,13 +26,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Tags(@Tag(name = "BackofficeAccountingManagement"))
@@ -65,7 +64,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, currencyId, lockedUntil, allowance) :
                 accountingFacadePort.createSponsorAccountWithInitialBalance(sponsorId, currencyId, lockedUntil, transaction);
 
-        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+        return ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
@@ -87,7 +86,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
 
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ResponseEntity.ok(response);
+                ok(response);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var sponsorAccountStatement = accountingFacadePort.fund(SponsorAccount.Id.of(accountId), mapReceiptToTransaction(receipt));
         final var addedReceipt = sponsorAccountStatement.account().getTransactions().stream()
                 .filter(t -> t.reference().equals(receipt.getReference())).findFirst().orElseThrow();
-        return ResponseEntity.ok(mapTransactionToReceipt(sponsorAccountStatement.account(), addedReceipt));
+        return ok(mapTransactionToReceipt(sponsorAccountStatement.account(), addedReceipt));
     }
 
     @Override
@@ -104,20 +103,20 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
         final var sponsorAccountStatement = accountingFacadePort.delete(
                 SponsorAccount.Id.of(accountId),
                 SponsorAccount.Transaction.Id.of(receiptId));
-        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+        return ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
     public ResponseEntity<AccountResponse> updateAccountAllowance(UUID accountId, UpdateAccountAllowanceRequest updateAccountAllowanceRequest) {
         final var sponsorAccountStatement = accountingFacadePort.increaseAllowance(SponsorAccount.Id.of(accountId),
                 Amount.of(updateAccountAllowanceRequest.getAllowance()));
-        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+        return ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
     public ResponseEntity<AccountResponse> updateAccountAttributes(UUID accountId, UpdateAccountRequest updateAccountRequest) {
         final var sponsorAccountStatement = accountingFacadePort.updateSponsorAccount(SponsorAccount.Id.of(accountId), updateAccountRequest.getLockedUntil());
-        return ResponseEntity.ok(mapAccountToResponse(sponsorAccountStatement));
+        return ok(mapAccountToResponse(sponsorAccountStatement));
     }
 
     @Override
@@ -187,7 +186,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 DateMapper.parseNullable(fromProcessedAt),
                 DateMapper.parseNullable(toProcessedAt)
         );
-        return ResponseEntity.ok(rewardPageToResponse(sanitizedPageIndex, rewards, authenticatedUser));
+        return ok(rewardPageToResponse(sanitizedPageIndex, rewards, authenticatedUser));
     }
 
     @Override
@@ -208,24 +207,20 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 DateMapper.parseNullable(fromProcessedAt),
                 DateMapper.parseNullable(toProcessedAt)
         );
-        return ResponseEntity.ok(csv);
+        return ok(csv);
     }
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getReward(UUID rewardId) {
         final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
         final var reward = accountingRewardPort.getReward(RewardId.of(rewardId));
-        return ResponseEntity.ok(map(reward, authenticatedUser));
+        return ok(map(reward, authenticatedUser));
     }
 
     @Override
     public ResponseEntity<BatchPaymentsResponse> createBatchPayments(PostBatchPaymentRequest postBatchPaymentRequest) {
-        final var batchPayments =
-                paymentPort.createPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
-
-        return ResponseEntity.ok(BatchPaymentMapper.domainToResponse(
-                paymentPort.findPaymentsByIds(batchPayments.stream().map(Payment::id).collect(Collectors.toSet()))
-        ));
+        final var batchPayments = paymentPort.createPaymentsForInvoices(postBatchPaymentRequest.getInvoiceIds().stream().map(Invoice.Id::of).toList());
+        return ok(BatchPaymentMapper.map(batchPayments));
     }
 
     @Override
@@ -235,39 +230,20 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
-        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
-        return ResponseEntity.ok(BatchPaymentMapper.domainToDetailedResponse(paymentPort.findPaymentById(Payment.Id.of(batchPaymentId)), authenticatedUser));
-    }
-
-    @Override
     public ResponseEntity<Void> deleteBatchPayment(UUID batchPaymentId) {
         paymentPort.deletePaymentById(Payment.Id.of(batchPaymentId));
         return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize, List<BatchPaymentStatus> statuses) {
-        final int sanitizePageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final int sanitizedPageSize = PaginationHelper.sanitizePageSize(pageSize);
-        final BatchPaymentPageResponse batchPaymentPageResponse = BatchPaymentMapper.pageToResponse(
-                paymentPort.findPayments(sanitizePageIndex, sanitizedPageSize, statuses == null ? null :
-                        statuses.stream().map(BatchPaymentMapper::map).collect(Collectors.toSet())),
-                pageIndex);
-        return batchPaymentPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(batchPaymentPageResponse) :
-                ResponseEntity.ok(batchPaymentPageResponse);
-    }
-
-    @Override
     public ResponseEntity<Void> notifyRewardsPaid() {
         accountingRewardPort.notifyAllNewPaidRewards();
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @Override
     public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
-        return ResponseEntity.ok(map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
+        return ok(map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
     }
 
     @Override
@@ -289,7 +265,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 DateMapper.parseNullable(fromProcessedAt),
                 DateMapper.parseNullable(toProcessedAt)
         );
-        return ResponseEntity.ok(new EarningsResponse()
+        return ok(new EarningsResponse()
                 .totalUsdAmount(prettyUsd(earnings.totalUsdAmount()))
                 .amountsPerCurrency(earnings.earningsPerCurrencies().stream()
                         .sorted(Comparator.comparing(a -> a.money().currency().code()))

@@ -201,7 +201,6 @@ public class PostgresConfiguration {
                                                        final BatchPaymentRepository batchPaymentRepository,
                                                        final BackofficeRewardViewRepository backofficeRewardViewRepository,
                                                        final RewardRepository rewardRepository,
-                                                       final PaymentShortViewRepository paymentShortViewRepository,
                                                        final ShortRewardViewRepository shortRewardViewRepository,
                                                        final BackofficeEarningsViewRepository backofficeEarningsViewRepository,
                                                        final NodeGuardianBoostRewardRepository nodeGuardianBoostRewardRepository) {
@@ -209,7 +208,6 @@ public class PostgresConfiguration {
                 batchPaymentRepository,
                 backofficeRewardViewRepository,
                 rewardRepository,
-                paymentShortViewRepository,
                 shortRewardViewRepository,
                 backofficeEarningsViewRepository,
                 nodeGuardianBoostRewardRepository);

@@ -3,24 +3,22 @@ package onlydust.com.marketplace.api.it.bo;
 import com.github.javafaker.Faker;
 import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
+import onlydust.com.backoffice.api.contract.model.PostBatchPaymentRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -35,6 +33,7 @@ import java.util.*;
 
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -59,11 +58,14 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
     UserId anthony;
     UserId olivier;
+    UserId pierre;
     CompanyBillingProfile olivierBillingProfile;
     ShortBillingProfileView anthonyBillingProfile;
+    SelfEmployedBillingProfile pierreBillingProfile;
 
     static final List<Invoice.Id> anthonyInvoiceIds = new ArrayList<>();
     static final List<Invoice.Id> olivierInvoiceIds = new ArrayList<>();
+    static final List<Invoice.Id> pierreInvoiceIds = new ArrayList<>();
     static Payment.Id sepaBatchPaymentId;
     static Payment.Id ethBatchPaymentId;
 
@@ -76,6 +78,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         // Given
         this.anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
         this.olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
+        this.pierre = UserId.of(userAuthHelper.authenticatePierre().user().getId());
 
         olivierBillingProfile = billingProfileService.createCompanyBillingProfile(this.olivier, "Olive Company", null);
         billingProfileService.updatePayoutInfo(olivierBillingProfile.id(), this.olivier,
@@ -87,6 +90,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         billingProfileService.updatePayoutInfo(anthonyBillingProfile.getId(), this.anthony,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.anthony + ".eth"))).build());
         accountingHelper.patchBillingProfile(anthonyBillingProfile.getId().value(), null, VerificationStatus.VERIFIED);
+
+        pierreBillingProfile = billingProfileService.createSelfEmployedBillingProfile(this.pierre, "Pierre", null);
+        billingProfileService.acceptInvoiceMandate(this.pierre, pierreBillingProfile.id());
+        billingProfileService.updatePayoutInfo(pierreBillingProfile.id(), this.pierre,
+                PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.pierre + ".eth"))).build());
+        accountingHelper.patchBillingProfile(pierreBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
         kybRepository.findByBillingProfileId(olivierBillingProfile.id().value())
                 .map(kyb -> kybRepository.saveAndFlush(kyb.toBuilder()
@@ -111,38 +120,54 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .usCitizen(false)
                         .verificationStatus(VerificationStatus.VERIFIED).build()))
                 .orElseThrow();
+        kybRepository.findByBillingProfileId(pierreBillingProfile.id().value())
+                .map(kyb -> kybRepository.saveAndFlush(kyb.toBuilder()
+                        .country("FRA")
+                        .address("1 Infinite Loop, Cupertino, CA 95014, United States")
+                        .euVATNumber("FR12345678901")
+                        .name("Pierre Inc.")
+                        .registrationDate(faker.date().birthday())
+                        .registrationNumber("123456789")
+                        .usEntity(false)
+                        .subjectToEuVAT(true)
+                        .verificationStatus(VerificationStatus.VERIFIED).build()))
+                .orElseThrow();
 
         updatePayoutPreferences(595505L, olivierBillingProfile.id(), UUID.fromString("e41f44a2-464c-4c96-817f-81acb06b2523"));
         updatePayoutPreferences(43467246L, anthonyBillingProfile.getId(), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
+        updatePayoutPreferences(16590657L, pierreBillingProfile.id(), UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"));
 
         // Given
-        newOlivierInvoiceToReview(List.of(
+        olivierInvoiceIds.add(newInvoiceToReview(olivier, olivierBillingProfile.id(), List.of(
                 RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4"),
-                RewardId.of("1fad9f3b-67ab-4499-a320-d719a986d933")));
+                RewardId.of("1fad9f3b-67ab-4499-a320-d719a986d933"))));
 
-        newAnthonyApprovedInvoice(List.of(
-                RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028")));
+        anthonyInvoiceIds.add(newApprovedInvoice(anthony, anthonyBillingProfile.getId(), List.of(
+                RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"))));
+
+        pierreInvoiceIds.add(newApprovedInvoice(pierre, pierreBillingProfile.id(), List.of(
+                RewardId.of("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))));
 
         // Already paid invoice
         final var paidRewardId = RewardId.of("79209029-c488-4284-aa3f-bce8870d3a66");
-        newAnthonyApprovedInvoice(List.of(paidRewardId));
+        anthonyInvoiceIds.add(newApprovedInvoice(anthony, anthonyBillingProfile.getId(), List.of(paidRewardId)));
         backofficeAccountingManagementRestApi.payReward(paidRewardId.value(),
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference(
                         "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
     }
 
-    private void newOlivierInvoiceToReview(List<RewardId> rewardIds) throws IOException {
-        final Invoice.Id invoiceId = billingProfileService.previewInvoice(olivier, olivierBillingProfile.id(), rewardIds).id();
-        billingProfileService.uploadExternalInvoice(olivier, olivierBillingProfile.id(), invoiceId, "foo.pdf",
+    private Invoice.Id newInvoiceToReview(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) throws IOException {
+        final Invoice.Id invoiceId = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds).id();
+        billingProfileService.uploadExternalInvoice(userId, billingProfileId, invoiceId, "foo.pdf",
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
-        olivierInvoiceIds.add(invoiceId);
+        return invoiceId;
     }
 
-    private void newAnthonyApprovedInvoice(List<RewardId> rewardIds) throws IOException {
-        final Invoice.Id invoiceId = billingProfileService.previewInvoice(anthony, anthonyBillingProfile.getId(), rewardIds).id();
-        billingProfileService.uploadGeneratedInvoice(anthony, anthonyBillingProfile.getId(), invoiceId,
+    private Invoice.Id newApprovedInvoice(UserId userId, BillingProfile.Id billingProfileId, List<RewardId> rewardIds) throws IOException {
+        final Invoice.Id invoiceId = billingProfileService.previewInvoice(userId, billingProfileId, rewardIds).id();
+        billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoiceId,
                 new FileSystemResource(Objects.requireNonNull(getClass().getResource("/invoices/invoice-sample.pdf")).getFile()).getInputStream());
-        anthonyInvoiceIds.add(invoiceId);
+        return invoiceId;
     }
 
     private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
@@ -217,13 +242,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
         client.post()
                 .uri(getApiURI(POST_REWARDS_BATCH_PAYMENTS))
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                            {
-                            "invoiceIds": ["%s","%s"]
-                            }
-                        """.formatted(
-                        olivierInvoiceIds.get(0),
-                        anthonyInvoiceIds.get(0)))
+                .bodyValue(new PostBatchPaymentRequest()
+                        .invoiceIds(List.of(
+                                olivierInvoiceIds.get(0).value(),
+                                anthonyInvoiceIds.get(0).value(),
+                                pierreInvoiceIds.get(0).value())
+                        ))
                 .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
@@ -241,40 +265,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "TO_PAY",
                               "network": "ETHEREUM",
-                              "rewardCount": 1,
-                              "totalUsdEquivalent": 1010.00,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 1000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 1010.00
-                                }
-                              ]
+                              "rewardCount": 2
                             },
                             {
                               "status": "TO_PAY",
                               "network": "SEPA",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2750,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 2750,
-                                  "currency": {
-                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                    "code": "USD",
-                                    "name": "US Dollar",
-                                    "logoUrl": null,
-                                    "decimals": 2
-                                  },
-                                  "dollarsEquivalent": 2750
-                                }
-                              ]
+                              "rewardCount": 2
                             }
                           ]
                         }
@@ -303,11 +299,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         {
                           "status": "TO_PAY",
                           "network": "ETHEREUM",
-                          "rewardCount": 1,
-                          "totalUsdEquivalent": 1010.00,
+                          "rewardCount": 2,
+                          "totalUsdEquivalent": 2222.00,
                           "totalsPerCurrency": [
                             {
-                              "amount": 1000,
+                              "amount": 2000,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -315,16 +311,39 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "dollarsEquivalent": 1010.00
+                              "dollarsEquivalent": 2020.00
                             }
                           ],
-                          "csv": "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,\\r\\n",
                           "transactionHash": null,
                           "rewards": [
                             {
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
                               "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
                                 "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "status": "PROCESSING",
+                              "money": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": 1.0100000000000000
+                              }
+                            },
+                            {
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0",
+                              "project": {
+                                "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                "slug": "qa-new-contributions",
+                                "name": "QA new contributions",
                                 "logoUrl": null
                               },
                               "status": "PROCESSING",
@@ -344,6 +363,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           ]
                         }
                         """);
+
+        assertThat(csv.getValue().split("\\R")).containsExactlyInAnyOrder(
+                "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,fc92397c-3431-4a84-8054-845376b630a0.eth,1200.0,",
+                "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,"
+        );
     }
 
     @Test
@@ -367,11 +391,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "TO_PAY",
                               "network": "ETHEREUM",
-                              "rewardCount": 1,
-                              "totalUsdEquivalent": 1010.00,
+                              "rewardCount": 2,
+                              "totalUsdEquivalent": 2020.00,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 1000,
+                                  "amount": 2000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -379,7 +403,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 1010.00
+                                  "dollarsEquivalent": 2020.00
                                 }
                               ]
                             },
@@ -455,8 +479,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         {
                           "network": "ETHEREUM",
                           "status": "PAID",
-                          "rewardCount": 1,
-                          "totalUsdEquivalent": 1010.00,
+                          "rewardCount": 2,
+                          "totalUsdEquivalent": 2222.00,
                           "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
                         }
                         """);
@@ -479,11 +503,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "PAID",
                               "network": "ETHEREUM",
-                              "rewardCount": 1,
-                              "totalUsdEquivalent": 1010.00,
+                              "rewardCount": 2,
+                              "totalUsdEquivalent": 2020.00,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 1000,
+                                  "amount": 2000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -491,7 +515,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 1010.00
+                                  "dollarsEquivalent": 2020.00
                                 }
                               ]
                             }

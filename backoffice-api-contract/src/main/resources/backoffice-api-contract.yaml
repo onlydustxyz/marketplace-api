@@ -796,7 +796,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get batch payments
       operationId: getBatchPayments
       description: |
@@ -837,7 +837,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get batch payment details
       operationId: getBatchPayment
       description: |
@@ -4662,14 +4662,13 @@ components:
         batchPayments:
           type: array
           items:
-            $ref: '#/components/schemas/BatchPaymentResponse'
+            $ref: '#/components/schemas/BatchPaymentShortResponse'
 
-    BatchPaymentResponse:
+    BatchPaymentShortResponse:
       type: object
       required:
         - id
         - rewardCount
-        - totalAmounts
         - network
       properties:
         id:
@@ -4684,12 +4683,21 @@ components:
         rewardCount:
           type: integer
           format: int64
-        totalUsdEquivalent:
-          type: number
-        totalsPerCurrency:
-          type: array
-          items:
-            $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
+
+    BatchPaymentResponse:
+      allOf:
+        - $ref: '#/components/schemas/BatchPaymentShortResponse'
+        - type: object
+          required:
+            - totalUsdEquivalent
+            - totalsPerCurrency
+          properties:
+            totalUsdEquivalent:
+              type: number
+            totalsPerCurrency:
+              type: array
+              items:
+                $ref: '#/components/schemas/TotalMoneyWithUsdEquivalentResponse'
 
     BatchPaymentStatus:
       type: string

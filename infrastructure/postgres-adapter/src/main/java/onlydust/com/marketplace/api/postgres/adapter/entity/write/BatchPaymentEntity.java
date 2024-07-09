@@ -21,12 +21,13 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Table(name = "batch_payments", schema = "accounting")
 @EntityListeners(AuditingEntityListener.class)
 public class BatchPaymentEntity {
     @Id
+    @EqualsAndHashCode.Include
     UUID id;
     String csv;
     String transactionHash;
@@ -43,11 +44,9 @@ public class BatchPaymentEntity {
 
     @CreationTimestamp
     @Column(name = "tech_created_at", nullable = false, updatable = false)
-    @EqualsAndHashCode.Exclude
     private Date createdAt;
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
-    @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
     public static BatchPaymentEntity fromDomain(final Payment payment) {
