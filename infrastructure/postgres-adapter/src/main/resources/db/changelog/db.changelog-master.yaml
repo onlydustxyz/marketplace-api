@@ -407,3 +407,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000285_payment_limit_per_country.sql
   - include:
       file: db/changelog/changelogs/00000285_fix_project_similarities.sql
+  - include:
+      file: db/changelog/changelogs/00000286_fix_payment_limit_per_country.sql
