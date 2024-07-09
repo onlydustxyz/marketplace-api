@@ -45,10 +45,12 @@ public class SponsorAccountTransactionViewEntity {
     HistoricalTransaction.Type type;
 
     @ManyToOne
+    @JoinColumn(name = "sponsorAccountId")
     @NonNull
     SponsorAccountViewEntity sponsorAccount;
 
     @ManyToOne
+    @JoinColumn(name = "projectId")
     ProjectViewEntity project;
 
     @NonNull
