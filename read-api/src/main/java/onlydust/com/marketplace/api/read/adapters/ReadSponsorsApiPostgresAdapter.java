@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.read.entities.accounting.SponsorAccountAllow
 import onlydust.com.marketplace.api.read.repositories.SponsorAccountAllowanceTransactionReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -33,6 +34,8 @@ import static org.springframework.http.ResponseEntity.status;
 @Transactional(readOnly = true)
 @Profile("api")
 public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
+    private final AuthenticatedAppUserService authenticatedAppUserService;
+    private final PermissionService permissionService;
     private final SponsorAccountAllowanceTransactionReadRepository sponsorAccountAllowanceTransactionReadRepository;
 
     @Override
@@ -46,6 +49,10 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                                                        List<SponsorAccountTransactionType> types,
                                                                                        SponsorAccountTransactionSort sort,
                                                                                        SortDirection direction) {
+
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserSponsorAdmin(authenticatedUser.getId(), sponsorId))
+            throw OnlyDustException.forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.getId(), sponsorId));
 
         final var sortBy = switch (Optional.ofNullable(sort).orElse(SponsorAccountTransactionSort.DATE)) {
             case DATE -> "timestamp";
