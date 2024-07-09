@@ -403,3 +403,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000283_patch_invoice_currency_country_restrictions.sql
   - include:
       file: db/changelog/changelogs/00000284_fix_stat_views.sql
+  - include:
+      file: db/changelog/changelogs/00000285_fix_project_similarities.sql
