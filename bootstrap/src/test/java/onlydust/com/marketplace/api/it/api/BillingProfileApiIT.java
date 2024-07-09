@@ -12,12 +12,13 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
-import onlydust.com.marketplace.api.helper.CurrencyHelper;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
+import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -43,6 +44,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     PayoutPreferenceFacadePort payoutPreferenceFacadePort;
+    @Autowired
+    KycRepository kycRepository;
 
     @Test
     @Order(10)
@@ -349,12 +352,43 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isEqualTo(individualBillingProfile.id().value().toString())
                 .jsonPath("$.type").isEqualTo(individualBillingProfile.type().name())
                 .jsonPath("$.status").isEqualTo(individualBillingProfile.status().name())
-                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(null)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(0)
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
                 .jsonPath("$.me.invitation").isEmpty();
+
+        // When
+        final var kyc = kycRepository.findByBillingProfileId(individualBillingProfile.id().value()).orElseThrow();
+        kyc.setCountry("FRA");
+        kycRepository.saveAndFlush(kyc);
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(individualBillingProfile.id().value().toString())
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(0);
+
+        // When
+        kyc.setCountry("IND");
+        kycRepository.saveAndFlush(kyc);
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(individualBillingProfile.id().value().toString())
+                .jsonPath("$.currentYearPaymentLimit").isEqualTo(20001)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(0);
 
         client.put()
                 .uri(BILLING_PROFILES_TYPE_BY_ID.formatted(individualBillingProfile.id().value().toString()))
