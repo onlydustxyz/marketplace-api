@@ -25,7 +25,6 @@ public interface CurrencyFacadePort {
 
     URL uploadLogo(InputStream imageInputStream);
 
-    // TODO: move to read-api
     Collection<Currency> listCurrencies();
 
     BigDecimal latestQuote(Currency.Code usd, Currency.Code eur);
