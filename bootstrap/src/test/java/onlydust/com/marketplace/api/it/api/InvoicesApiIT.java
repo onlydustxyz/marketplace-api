@@ -15,13 +15,13 @@ import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacade
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
+import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
@@ -155,7 +155,6 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "networks": ["ETHEREUM"]
                             },
                             {
-                             
                               "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
                               "networks": ["ETHEREUM"]
                             },
@@ -193,20 +192,34 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Anthony BUISSET",
                               "rewardCount": 9,
                               "invoiceableRewardCount": 0,
-                              "invoiceMandateAccepted": true,
+                              "requestableRewardCount": 0,
+                              "invoiceMandateAccepted": false,
                               "enabled": true,
                               "pendingInvitationResponse": false,
-                              "role": "ADMIN"
+                              "role": "ADMIN",
+                              "missingPayoutInfo": false,
+                              "missingVerification": false,
+                              "verificationBlocked": false,
+                              "currentYearPaymentLimit": 5001,
+                              "currentYearPaymentAmount": 0,
+                              "individualLimitReached": false
                             },
                             {
                               "type": "COMPANY",
                               "name": "My billing profile",
                               "rewardCount": 12,
                               "invoiceableRewardCount": 12,
+                              "requestableRewardCount": 12,
                               "invoiceMandateAccepted": false,
                               "enabled": true,
                               "pendingInvitationResponse": false,
-                              "role": "ADMIN"
+                              "role": "ADMIN",
+                              "missingPayoutInfo": false,
+                              "missingVerification": false,
+                              "verificationBlocked": false,
+                              "currentYearPaymentLimit": null,
+                              "currentYearPaymentAmount": 0,
+                              "individualLimitReached": false
                             }
                           ]
                         }
@@ -400,7 +413,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Anthony BUISSET",
                               "rewardCount": 9,
                               "invoiceableRewardCount": 0,
-                              "invoiceMandateAccepted": true,
+                              "invoiceMandateAccepted": false,
                               "enabled": true,
                               "pendingInvitationResponse": false,
                               "role": "ADMIN"
@@ -668,7 +681,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Anthony BUISSET",
                               "rewardCount": 9,
                               "invoiceableRewardCount": 0,
-                              "invoiceMandateAccepted": true,
+                              "invoiceMandateAccepted": false,
                               "enabled": true,
                               "pendingInvitationResponse": false,
                               "role": "ADMIN"
