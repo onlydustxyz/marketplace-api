@@ -211,7 +211,6 @@ public class ProjectConfiguration {
 
     @Bean
     public OutboxConsumer applicationsUpdater(final ProjectStoragePort projectStoragePort,
-                                              final UserStoragePort userStoragePort,
                                               final ProjectApplicationStoragePort projectApplicationStoragePort,
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
@@ -219,7 +218,6 @@ public class ProjectConfiguration {
                                               final LangchainLLMAdapter langchainLLMAdapter) {
         return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
-                        userStoragePort,
                         projectApplicationStoragePort,
                         langchainLLMAdapter,
                         indexerPort,

@@ -19,7 +19,6 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -27,7 +26,6 @@ import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
-import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -279,23 +277,6 @@ public interface BackOfficeMapper {
                 .decimals(currency.decimals());
     }
 
-    static UserPage mapUserPageToContract(final Page<UserShortView> userPage, int pageIndex) {
-        return new UserPage()
-                .users(userPage.getContent().stream().map(user -> new UserPageItemResponse()
-                        .id(user.id())
-                        .githubUserId(user.githubUserId())
-                        .login(user.login())
-                        .avatarUrl(user.avatarUrl())
-                        .email(user.email())
-                        .lastSeenAt(user.lastSeenAt())
-                        .signedUpAt(user.signedUpAt())
-                ).toList())
-                .totalPageNumber(userPage.getTotalPageNumber())
-                .totalItemNumber(userPage.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, userPage.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, userPage.getTotalPageNumber()));
-    }
-
     static InvoicePage mapInvoicePageToContract(final Page<Invoice> page, final int pageIndex, final String baseUri, final String token) {
         return new InvoicePage()
                 .invoices(page.getContent().stream().map(i -> mapInvoice(i, baseUri, token)).toList())
@@ -371,28 +352,6 @@ public interface BackOfficeMapper {
                 .usCitizen(kycSnapshot.usCitizen());
     }
 
-    static KybResponse mapKyb(Kyb kybSnapshot) {
-        return new KybResponse()
-                .name(kybSnapshot.getName())
-                .registrationNumber(kybSnapshot.getRegistrationNumber())
-                .address(kybSnapshot.getAddress())
-                .country(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().display().orElse(null))
-                .countryCode(isNull(kybSnapshot.getCountry()) ? null : kybSnapshot.getCountry().iso3Code())
-                .usEntity(kybSnapshot.getUsEntity())
-                .subjectToEuropeVAT(kybSnapshot.getSubjectToEuropeVAT())
-                .euVATNumber(kybSnapshot.getEuVATNumber());
-    }
-
-    static KycResponse mapKyc(Kyc kycSnapshot) {
-        return new KycResponse()
-                .firstName(kycSnapshot.getFirstName())
-                .lastName(kycSnapshot.getLastName())
-                .address(kycSnapshot.getAddress())
-                .country(kycSnapshot.getCountry().flatMap(Country::display).orElse(null))
-                .countryCode(kycSnapshot.getCountry().map(Country::iso3Code).orElse(null))
-                .usCitizen(kycSnapshot.isUsCitizen());
-    }
-
     @SneakyThrows
     static InvoiceDetailsResponse mapInvoiceToContract(final InvoiceView invoice, AuthenticatedUser authenticatedUser) {
         return new InvoiceDetailsResponse()
@@ -423,18 +382,6 @@ public interface BackOfficeMapper {
                 .money(moneyViewToResponse(reward.money()));
     }
 
-    static ShortRewardResponse mapToShortResponse(RewardDetailsView reward, AuthenticatedUser authenticatedUser) {
-        return new ShortRewardResponse()
-                .id(reward.id().value())
-                .status(map(reward.status().as(authenticatedUser)))
-                .project(new ProjectLinkResponse()
-                        .id(reward.project().id().value())
-                        .slug(reward.project().slug())
-                        .name(reward.project().name())
-                        .logoUrl(reward.project().logoUrl()))
-                .money(moneyViewToResponse(reward.money()));
-    }
-
     static BillingProfileShortResponse mapToShortResponse(Invoice.BillingProfileSnapshot billingProfileSnapshot) {
         return new BillingProfileShortResponse()
                 .id(billingProfileSnapshot.id().value())
@@ -443,16 +390,6 @@ public interface BackOfficeMapper {
                 .verificationStatus(VerificationStatus.VERIFIED)
                 .kyc(billingProfileSnapshot.kyc().map(BackOfficeMapper::mapKyc).orElse(null))
                 .kyb(billingProfileSnapshot.kyb().map(BackOfficeMapper::mapKyb).orElse(null));
-    }
-
-    static BillingProfileShortResponse mapToShortResponse(BillingProfileView billingProfileView) {
-        return new BillingProfileShortResponse()
-                .id(billingProfileView.getId().value())
-                .type(map(billingProfileView.getType()))
-                .subject(billingProfileView.subject())
-                .verificationStatus(map(billingProfileView.getVerificationStatus()))
-                .kyc(isNull(billingProfileView.getKyc()) ? null : mapKyc(billingProfileView.getKyc()))
-                .kyb(isNull(billingProfileView.getKyb()) ? null : mapKyb(billingProfileView.getKyb()));
     }
 
     static UserResponse map(onlydust.com.marketplace.accounting.domain.view.UserView userView) {
@@ -630,7 +567,6 @@ public interface BackOfficeMapper {
                 .hasMore(hasMore(pageIndex, projectViewPage.getTotalPageNumber()))
                 .nextPageIndex(nextPageIndex(pageIndex, projectViewPage.getTotalPageNumber()));
     }
-
 
     static Blockchain mapBlockchain(BlockchainContract blockchain) {
         return switch (blockchain) {
@@ -865,27 +801,6 @@ public interface BackOfficeMapper {
             case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
             case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED;
         };
-    }
-
-    static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {
-        return contacts.stream()
-                .map(contactInformation -> {
-                    final ContactInformation response = new ContactInformation();
-                    response.setContact(contactInformation.getContact());
-                    response.setChannel(switch (contactInformation.getChannel()) {
-                        case EMAIL -> ContactInformationChannel.EMAIL;
-                        case LINKEDIN -> ContactInformationChannel.LINKEDIN;
-                        case TWITTER -> ContactInformationChannel.TWITTER;
-                        case TELEGRAM -> ContactInformationChannel.TELEGRAM;
-                        case DISCORD -> ContactInformationChannel.DISCORD;
-                        case WHATSAPP -> ContactInformationChannel.WHATSAPP;
-                    });
-                    response.setVisibility(switch (contactInformation.getVisibility()) {
-                        case PUBLIC -> ContactInformation.VisibilityEnum.PUBLIC;
-                        case PRIVATE -> ContactInformation.VisibilityEnum.PRIVATE;
-                    });
-                    return response;
-                }).toList();
     }
 
     static LanguageResponse mapLanguageResponse(Language language) {

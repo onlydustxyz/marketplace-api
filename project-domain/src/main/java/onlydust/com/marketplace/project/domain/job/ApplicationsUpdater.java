@@ -27,7 +27,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 @Transactional
 public class ApplicationsUpdater implements OutboxConsumer {
     private final ProjectStoragePort projectStoragePort;
-    private final UserStoragePort userStoragePort;
     private final ProjectApplicationStoragePort projectApplicationStoragePort;
     private final LLMPort llmPort;
     private final IndexerPort indexerPort;

@@ -36,7 +36,6 @@ public interface PayoutPreferenceMapper {
                 .type(BillingProfileMapper.map(view.getType()));
     }
 
-
     private static ProjectShortResponse projectToResponse(final ProjectShortView view) {
         return new ProjectShortResponse()
                 .id(view.id().value())

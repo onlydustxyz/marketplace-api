@@ -10,7 +10,6 @@ import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.view.RegisteredContributorLinkView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -498,7 +497,7 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(1)
-                    .juryIds(List.of(userStub().getId()))
+                    .juryIds(List.of(UUID.randomUUID()))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
                     .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
                             UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
@@ -525,7 +524,7 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(2)
-                    .juryIds(List.of(userStub().getId()))
+                    .juryIds(List.of(UUID.randomUUID()))
                     .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
@@ -541,7 +540,7 @@ public class CommitteeServiceTest {
         @Test
         void given_no_application() {
             final Committee.Id committeeId = Committee.Id.random();
-            final var jury1 = userStub();
+            final var jury1 = UUID.randomUUID();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -549,14 +548,14 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .votePerJury(2)
-                    .juryIds(List.of(jury1.getId()))
+                    .juryIds(List.of(jury1))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
                     .build();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
-            when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of());
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of());
+            when(projectStoragePort.getProjectLedIdsForUser(jury1)).thenReturn(List.of());
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1)).thenReturn(List.of());
             assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Committee %s must have some project applications to assign juries to them".formatted(committeeId));
@@ -565,7 +564,7 @@ public class CommitteeServiceTest {
         @Test
         void given_1_jury_with_2_votes_for_2_projects() {
             final Committee.Id committeeId = Committee.Id.random();
-            final var jury1 = userStub();
+            final var jury1 = UUID.randomUUID();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -573,15 +572,15 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_APPLICATIONS)
                     .votePerJury(2)
-                    .juryIds(List.of(jury1.getId()))
+                    .juryIds(List.of(jury1))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
                     .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
                     .build();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
-            when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of());
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of());
+            when(projectStoragePort.getProjectLedIdsForUser(jury1)).thenReturn(List.of());
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1)).thenReturn(List.of());
             committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
 
             // Then
@@ -593,8 +592,8 @@ public class CommitteeServiceTest {
         void given_juries_as_project_lead_and_contributor() {
             final Committee.Id committeeId = Committee.Id.random();
             final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
-            final var jury1 = userStub();
-            final var jury2 = userStub();
+            final var jury1 = UUID.randomUUID();
+            final var jury2 = UUID.randomUUID();
 
             final var committee = Committee.builder()
                     .id(committeeId)
@@ -603,7 +602,7 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(5)
-                    .juryIds(List.of(jury1.getId(), jury2.getId()))
+                    .juryIds(List.of(jury1, jury2))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
                     .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UUID.randomUUID(), p, List.of()))))
                     .build();
@@ -611,11 +610,11 @@ public class CommitteeServiceTest {
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
-            when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(0)));
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
+            when(projectStoragePort.getProjectLedIdsForUser(jury1)).thenReturn(List.of(projectIds.get(0)));
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1)).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
 
-            when(projectStoragePort.getProjectLedIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(3)));
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(4), projectIds.get(0)));
+            when(projectStoragePort.getProjectLedIdsForUser(jury2)).thenReturn(List.of(projectIds.get(3)));
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2)).thenReturn(List.of(projectIds.get(4), projectIds.get(0)));
 
             // Then
             assertThatThrownBy(() -> committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES))
@@ -630,10 +629,10 @@ public class CommitteeServiceTest {
             final var committeeId = Committee.Id.random();
             final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
             final int votePerJury = 5;
-            final var jury1 = userStub();
-            final var jury2 = userStub();
-            final var jury3 = userStub();
-            final var juries = List.of(jury1.getId(), jury2.getId(), jury3.getId());
+            final var jury1 = UUID.randomUUID();
+            final var jury2 = UUID.randomUUID();
+            final var jury3 = UUID.randomUUID();
+            final var juries = List.of(jury1, jury2, jury3);
             final var juryCriteria = List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name()));
 
             final var committee = Committee.builder()
@@ -651,14 +650,14 @@ public class CommitteeServiceTest {
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(committee));
 
-            when(projectStoragePort.getProjectLedIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(0)));
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1.getId())).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
+            when(projectStoragePort.getProjectLedIdsForUser(jury1)).thenReturn(List.of(projectIds.get(0)));
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury1)).thenReturn(List.of(projectIds.get(1), projectIds.get(2)));
 
-            when(projectStoragePort.getProjectLedIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(3)));
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(4), projectIds.get(0)));
+            when(projectStoragePort.getProjectLedIdsForUser(jury2)).thenReturn(List.of(projectIds.get(3)));
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2)).thenReturn(List.of(projectIds.get(4), projectIds.get(0)));
 
-            when(projectStoragePort.getProjectLedIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(5)));
-            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2.getId())).thenReturn(List.of(projectIds.get(6), projectIds.get(7)));
+            when(projectStoragePort.getProjectLedIdsForUser(jury2)).thenReturn(List.of(projectIds.get(5)));
+            when(projectStoragePort.getProjectContributedOnIdsForUser(jury2)).thenReturn(List.of(projectIds.get(6), projectIds.get(7)));
             committeeService.updateStatus(committeeId, Committee.Status.OPEN_TO_VOTES);
 
             // Then
@@ -666,15 +665,6 @@ public class CommitteeServiceTest {
             verify(committeeStoragePort).saveJuryAssignments(listArgumentCaptor.capture());
             final List<JuryAssignment> assignments = listArgumentCaptor.getValue();
             assertEquals(votePerJury * juries.size() * juryCriteria.size(), assignments.size());
-        }
-
-        private RegisteredContributorLinkView userStub() {
-            return RegisteredContributorLinkView.builder()
-                    .id(UUID.randomUUID())
-                    .login(faker.rickAndMorty().character())
-                    .avatarUrl(faker.internet().url())
-                    .githubUserId(faker.number().randomNumber())
-                    .build();
         }
     }
 

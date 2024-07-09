@@ -8,7 +8,6 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
-import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.view.ContributionRewardView;
 import onlydust.com.marketplace.project.domain.view.ReceiptView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
@@ -172,7 +171,6 @@ public interface RewardMapper {
                 .authorLogin(view.getAuthorLogin())
                 .githubBody(view.getGithubBody());
     }
-
 
     static ShortCurrencyResponse mapCurrency(CurrencyView currency) {
         if (currency == null) return null;
