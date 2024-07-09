@@ -143,7 +143,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                     .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
             return switch (billingProfileEntity.getType()) {
                 case INDIVIDUAL -> {
-                    final var individualBillingProfile = (IndividualBillingProfile) billingProfileEntity.toDomain();
                     BillingProfileView billingProfileView = BillingProfileView.builder()
                             .enabled(billingProfileEntity.getEnabled())
                             .type(BillingProfile.Type.INDIVIDUAL)
@@ -158,7 +157,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceableRewardCount(billingProfileCustomData.getStats().invoiceableRewardCount())
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                            .currentYearPaymentLimit(individualBillingProfile.currentYearPaymentLimit())
+                            .currentYearPaymentLimit(PositiveAmount.of(billingProfileCustomData.getStats().currentYearPaymentLimit()))
                             .currentYearPaymentAmount(PositiveAmount.of(billingProfileCustomData.getStats().currentYearPaymentAmount()))
                             .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
                                     .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))

@@ -923,27 +923,6 @@ class BillingProfileServiceTest {
     }
 
     @Nested
-    class GivenIndividualBillingProfile {
-
-        final UserId userId = UserId.random();
-        IndividualBillingProfile billingProfile;
-
-        @BeforeEach
-        void setUp() {
-            billingProfile = billingProfileService.createIndividualBillingProfile(userId, "my profile", null);
-        }
-
-        @Test
-        void should_return_current_year_payment_limit() {
-            // When
-            final var limit = billingProfile.currentYearPaymentLimit();
-
-            // Then
-            assertThat(limit).isEqualTo(PositiveAmount.of(5001L));
-        }
-    }
-
-    @Nested
     class GivenSelfEmployedBillingProfile {
 
         final UserId userId = UserId.random();

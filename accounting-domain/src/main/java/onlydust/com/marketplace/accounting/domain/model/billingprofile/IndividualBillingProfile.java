@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 
 import java.time.ZonedDateTime;
@@ -13,8 +12,6 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @Accessors(fluent = true)
 public class IndividualBillingProfile extends BillingProfile {
-
-    private static final PositiveAmount YEARLY_USD_PAYMENT_LIMIT = PositiveAmount.of(5001L);
 
     @NonNull
     private final User owner;
@@ -55,9 +52,5 @@ public class IndividualBillingProfile extends BillingProfile {
     @Override
     public boolean isSwitchableToCompany() {
         return false;
-    }
-
-    public PositiveAmount currentYearPaymentLimit() {
-        return YEARLY_USD_PAYMENT_LIMIT;
     }
 }
