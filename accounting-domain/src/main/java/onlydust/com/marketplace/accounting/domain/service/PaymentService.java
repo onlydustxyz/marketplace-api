@@ -12,13 +12,11 @@ import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -57,11 +55,6 @@ public class PaymentService implements PaymentPort {
 
         accountingFacadePort.confirm(updatedPayment);
         accountingRewardStoragePort.savePayment(updatedPayment);
-    }
-
-    @Override
-    public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> ids) {
-        return accountingRewardStoragePort.findPaymentsByIds(ids);
     }
 
     @Override

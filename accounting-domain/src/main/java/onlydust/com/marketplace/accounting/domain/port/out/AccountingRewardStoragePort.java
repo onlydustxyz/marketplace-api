@@ -7,7 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
@@ -24,8 +23,6 @@ public interface AccountingRewardStoragePort {
     Optional<Payment> findPayment(Payment.Id batchPaymentId);
 
     void savePayment(Payment updatedPayment);
-
-    List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds);
 
     Page<RewardDetailsView> findRewards(int pageIndex, int pageSize,
                                         @NonNull Set<RewardStatus.Input> statuses,

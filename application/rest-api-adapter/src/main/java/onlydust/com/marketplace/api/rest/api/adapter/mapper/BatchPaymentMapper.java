@@ -1,37 +1,29 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import onlydust.com.backoffice.api.contract.model.BatchPaymentResponse;
+import onlydust.com.backoffice.api.contract.model.BatchPaymentShortResponse;
 import onlydust.com.backoffice.api.contract.model.BatchPaymentStatus;
 import onlydust.com.backoffice.api.contract.model.BatchPaymentsResponse;
-import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 
-import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapNetwork;
 
 public interface BatchPaymentMapper {
 
-    static BatchPaymentsResponse domainToResponse(final List<BatchPaymentShortView> batchPayments) {
-        final BatchPaymentsResponse batchPaymentsResponse = new BatchPaymentsResponse();
-        batchPayments.stream().map(BatchPaymentMapper::domainToResponse).forEach(batchPaymentsResponse::addBatchPaymentsItem);
-        return batchPaymentsResponse;
+    static BatchPaymentsResponse map(final List<Payment> batchPayments) {
+        return new BatchPaymentsResponse()
+                .batchPayments(batchPayments.stream().map(BatchPaymentMapper::map).toList());
     }
 
-    static BatchPaymentResponse domainToResponse(final BatchPaymentShortView bp) {
-        final var totalsPerCurrency = bp.totalsPerCurrency().stream().map(BackOfficeMapper::totalMoneyViewToResponse).toList();
-        return new BatchPaymentResponse()
+    static BatchPaymentShortResponse map(final Payment bp) {
+        return new BatchPaymentShortResponse()
                 .id(bp.id().value())
-                .createdAt(bp.createdAt())
+                .createdAt(bp.createdAt().toInstant().atZone(ZoneOffset.UTC))
                 .status(map(bp.status()))
-                .rewardCount(bp.rewardCount())
-                .network(mapNetwork(bp.network()))
-                .totalUsdEquivalent(totalsPerCurrency.stream()
-                        .map(TotalMoneyWithUsdEquivalentResponse::getDollarsEquivalent)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .totalsPerCurrency(totalsPerCurrency);
+                .rewardCount((long) bp.rewards().size())
+                .network(mapNetwork(bp.network()));
     }
 
     static Payment.Status map(final BatchPaymentStatus status) {

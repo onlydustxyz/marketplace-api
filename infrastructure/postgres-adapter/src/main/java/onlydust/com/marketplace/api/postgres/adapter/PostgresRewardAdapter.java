@@ -9,11 +9,9 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.BatchPaymentShortView;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PaymentShortQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoRewardQueryEntity;
@@ -36,7 +34,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewardStoragePort, BoostedRewardStoragePort {
@@ -44,7 +41,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     private final BatchPaymentRepository batchPaymentRepository;
     private final BackofficeRewardViewRepository backofficeRewardViewRepository;
     private final RewardRepository rewardRepository;
-    private final PaymentShortViewRepository paymentShortViewRepository;
     private final ShortRewardViewRepository shortRewardViewRepository;
     private final BackofficeEarningsViewRepository backofficeEarningsViewRepository;
     private final NodeGuardianBoostRewardRepository nodeGuardianBoostRewardRepository;
@@ -86,13 +82,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional
     public void savePayment(Payment payment) {
         batchPaymentRepository.saveAndFlush(BatchPaymentEntity.fromDomain(payment));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<BatchPaymentShortView> findPaymentsByIds(Set<Payment.Id> paymentIds) {
-        return paymentShortViewRepository.findByIds(paymentIds.stream().map(UuidWrapper::value).collect(Collectors.toSet()))
-                .stream().map(PaymentShortQueryEntity::toDomain).toList();
     }
 
     @Override

@@ -265,40 +265,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "TO_PAY",
                               "network": "ETHEREUM",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2020.00,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 2000,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "dollarsEquivalent": 2020.00
-                                }
-                              ]
+                              "rewardCount": 2
                             },
                             {
                               "status": "TO_PAY",
                               "network": "SEPA",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2750,
-                              "totalsPerCurrency": [
-                                {
-                                  "amount": 2750,
-                                  "currency": {
-                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                    "code": "USD",
-                                    "name": "US Dollar",
-                                    "logoUrl": null,
-                                    "decimals": 2
-                                  },
-                                  "dollarsEquivalent": 2750
-                                }
-                              ]
+                              "rewardCount": 2
                             }
                           ]
                         }
