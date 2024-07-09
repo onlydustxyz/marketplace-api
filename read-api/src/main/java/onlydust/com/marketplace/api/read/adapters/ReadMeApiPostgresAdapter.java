@@ -45,6 +45,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final PublicProjectReadRepository publicProjectReadRepository;
     private final UserReadRepository userReadRepository;
     private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
+    private final PayoutPreferenceReadRepository payoutPreferenceReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -137,5 +138,14 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ok(myRewardsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var payoutPreferences = payoutPreferenceReadRepository.findAllForUser(authenticatedUser.getId());
+        return ResponseEntity.ok(payoutPreferences.stream()
+                .map(p -> p.toDto(authenticatedUser.getGithubUserId()))
+                .toList());
     }
 }

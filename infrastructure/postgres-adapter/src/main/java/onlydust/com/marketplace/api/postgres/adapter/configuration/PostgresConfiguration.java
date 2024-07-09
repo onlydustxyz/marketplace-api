@@ -364,11 +364,8 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresPayoutPreferenceAdapter postgresPayoutPreferenceAdapter(final PayoutPreferenceRepository payoutPreferenceRepository,
-                                                                           final PayoutPreferenceViewRepository payoutPreferenceViewRepository,
-                                                                           final RewardRepository rewardRepository,
-                                                                           final ShortBillingProfileViewRepository shortBillingProfileViewRepository) {
-        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, payoutPreferenceViewRepository, rewardRepository,
-                shortBillingProfileViewRepository);
+                                                                           final RewardRepository rewardRepository) {
+        return new PostgresPayoutPreferenceAdapter(payoutPreferenceRepository, rewardRepository);
     }
 
     @Bean

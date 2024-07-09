@@ -9,15 +9,16 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
-import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
 import onlydust.com.marketplace.api.contract.MeApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubRepoMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -39,7 +40,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
-import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileRequestToDomain;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileToPrivateResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
@@ -251,16 +251,6 @@ public class MeRestApi implements MeApi {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.updateGithubProfile(authenticatedUser);
         return ResponseEntity.ok().build();
-    }
-
-    @Override
-    public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final List<PayoutPreferenceView> payoutPreferences = payoutPreferenceFacadePort.getPayoutPreferences(UserId.of(authenticatedUser.getId()));
-        final List<PayoutPreferencesItemResponse> response = isNull(payoutPreferences) ? List.of() : payoutPreferences.stream()
-                .map(PayoutPreferenceMapper::mapToResponse)
-                .toList();
-        return ResponseEntity.ok(response);
     }
 
     @Override
