@@ -684,7 +684,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadMe
       summary: Get my payout preferences
       operationId: getMyPayoutPreferences
       description: |
@@ -6406,6 +6406,12 @@ components:
         verificationBlocked:
           type: boolean
           description: True if the billing profile verification process is blocked.
+        currentYearPaymentLimit:
+          type: number
+          description: The payment limit for the current year (typically, $5000 for individuals)
+        currentYearPaymentAmount:
+          type: number
+          description: The total payments amount for the current year so far.
         individualLimitReached:
           type: boolean
           description: True if the (individual) billing profile has reached the yearly limit.

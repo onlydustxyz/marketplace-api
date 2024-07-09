@@ -41,5 +41,7 @@ public class BillingProfileStatsReadEntity {
     @NonNull
     BigDecimal currentYearPaymentAmount;
     @NonNull
+    BigDecimal currentYearPaymentLimit;
+    @NonNull
     Boolean mandateAcceptanceOutdated;
 }

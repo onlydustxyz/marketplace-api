@@ -43,7 +43,6 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.api.read.mapper.ProjectMapper.mapSortByParameter;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapProjectVisibility;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -242,7 +241,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .map(moreInfo -> new SimpleLink().url(moreInfo.getUrl()).value(moreInfo.getName()))
                         .collect(Collectors.toList()))
                 .hiring(project.getHiring())
-                .visibility(mapProjectVisibility(project.getVisibility()))
+                .visibility(project.getVisibility())
                 .contributorCount(contributorCount)
                 .hasRemainingBudget(hasRemainingBudget)
                 .rewardSettings(mapRewardSettings(new ProjectRewardSettings(

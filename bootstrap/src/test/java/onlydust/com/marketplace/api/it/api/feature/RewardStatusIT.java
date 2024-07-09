@@ -2799,7 +2799,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(1);
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(5001)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
@@ -3013,7 +3015,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(1)
-                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(1);
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(20001)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualIndiaBPId)))
@@ -3227,7 +3231,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3)
-                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(3);
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(3)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(null)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(ME_BILLING_PROFILES))
@@ -3238,7 +3244,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(3)
-                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(0);
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(null)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBPId)))
@@ -3454,7 +3462,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.billingProfiles.length()").isEqualTo(1)
                 .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(2)
-                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(2);
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(2)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(null)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(0);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(selfEmployedBPId)))
@@ -4952,6 +4962,20 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles.length()").isEqualTo(2) // individual and self-employed
+                .jsonPath("$.billingProfiles[?(@.type=='INDIVIDUAL')].invoiceableRewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[?(@.type=='INDIVIDUAL')].requestableRewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[?(@.type=='INDIVIDUAL')].currentYearPaymentLimit").isEqualTo(5001)
+                .jsonPath("$.billingProfiles[?(@.type=='INDIVIDUAL')].currentYearPaymentAmount").isEqualTo(34.0);
+
+        client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBPId)))
                 .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualBPAdminGithubId).jwt())
                 .exchange()
@@ -4962,6 +4986,18 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.currentYearPaymentLimit").isEqualTo(5001)
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(34);
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateUser(individualIndiaBPAdminGithubId).jwt())
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[0].invoiceableRewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[0].requestableRewardCount").isEqualTo(0)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentLimit").isEqualTo(20001)
+                .jsonPath("$.billingProfiles[0].currentYearPaymentAmount").isEqualTo(37.4);
 
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualIndiaBPId)))

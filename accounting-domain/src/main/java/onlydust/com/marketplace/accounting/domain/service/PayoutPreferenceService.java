@@ -8,9 +8,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacade
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.PayoutPreferenceView;
-
-import java.util.List;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
@@ -20,11 +17,6 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
     private final PayoutPreferenceStoragePort payoutPreferenceStoragePort;
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingObserverPort accountingObserverPort;
-
-    @Override
-    public List<PayoutPreferenceView> getPayoutPreferences(UserId userId) {
-        return payoutPreferenceStoragePort.findAllByUserId(userId);
-    }
 
     @Override
     public void setPayoutPreference(ProjectId projectId, BillingProfile.Id billingProfileId, UserId userId) {
@@ -41,7 +33,7 @@ public class PayoutPreferenceService implements PayoutPreferenceFacadePort {
         if (!billingProfile.enabled())
             throw forbidden("Cannot set payout preference for user %s on project %s because billing profile %s is disabled"
                     .formatted(userId, projectId, billingProfileId));
-        
+
         payoutPreferenceStoragePort.save(projectId, billingProfileId, userId);
         accountingObserverPort.onPayoutPreferenceChanged(billingProfileId, userId, projectId);
     }

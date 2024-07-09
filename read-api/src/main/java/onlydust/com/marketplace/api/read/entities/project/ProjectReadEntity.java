@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.GithubOrganizationInstallationStatus;
-import onlydust.com.marketplace.api.contract.model.GithubOrganizationResponse;
-import onlydust.com.marketplace.api.contract.model.GithubRepoResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectLinkResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
@@ -16,7 +13,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -184,5 +180,15 @@ public class ProjectReadEntity {
                 .name(name)
                 .logoUrl(logoUrl)
                 .slug(slug);
+    }
+
+    public ProjectShortResponse toShortResponse() {
+        return new ProjectShortResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .slug(slug)
+                .shortDescription(shortDescription)
+                .visibility(visibility);
     }
 }
