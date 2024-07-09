@@ -3,14 +3,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.view.Money;
-import onlydust.com.marketplace.project.domain.view.TotalsEarned;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.util.List;
 import java.util.Set;
 
-import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 
 public interface UserMapper {
@@ -86,12 +83,6 @@ public interface UserMapper {
             case ONE_TO_THREE_DAYS -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
             case GREATER_THAN_THREE_DAYS -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
         };
-    }
-
-    static RewardTotalAmountsResponse totalsEarnedToResponse(TotalsEarned totalsEarned) {
-        return new RewardTotalAmountsResponse()
-                .totalAmount(totalsEarned.getTotalDollarsEquivalent())
-                .details(totalsEarned.getDetails().stream().sorted(comparing(Money::amount)).map(MoneyMapper::toMoney).toList());
     }
 
     static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {

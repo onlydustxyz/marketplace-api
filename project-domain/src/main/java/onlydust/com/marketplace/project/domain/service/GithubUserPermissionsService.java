@@ -13,7 +13,7 @@ public class GithubUserPermissionsService implements GithubUserPermissionsFacade
     @Override
     public void logout(Long githubUserId) {
         githubAuthenticationPort.logout(githubUserId)
-                .ifPresent(accessToken -> githubAuthenticationInfoPort.logout(accessToken));
+                .ifPresent(githubAuthenticationInfoPort::logout);
     }
 
     @Override

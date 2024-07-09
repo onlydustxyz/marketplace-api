@@ -25,14 +25,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 class ApplicationsUpdaterTest {
-    final UserStoragePort userStoragePort = mock(UserStoragePort.class);
     final ProjectApplicationStoragePort projectApplicationStoragePort = mock(ProjectApplicationStoragePort.class);
     final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
     final LLMPort llmPort = mock(LLMPort.class);
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final ApplicationObserverPort applicationObserverPort = mock(ApplicationObserverPort.class);
-    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, userStoragePort, projectApplicationStoragePort, llmPort,
+    final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, projectApplicationStoragePort, llmPort,
             indexerPort, githubStoragePort,
             applicationObserverPort);
 
@@ -51,7 +50,7 @@ class ApplicationsUpdaterTest {
 
     @BeforeEach
     void setup() {
-        reset(userStoragePort, projectStoragePort, llmPort, indexerPort, githubStoragePort, applicationObserverPort);
+        reset(projectStoragePort, llmPort, indexerPort, githubStoragePort, applicationObserverPort);
     }
 
     @Nested

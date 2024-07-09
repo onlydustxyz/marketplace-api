@@ -5,7 +5,6 @@ import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
-import onlydust.com.marketplace.project.domain.view.ProjectOrganizationRepoView;
 import onlydust.com.marketplace.project.domain.view.UserLinkView;
 
 import java.util.Date;
@@ -82,21 +81,6 @@ public interface ProjectMapper {
         );
     }
 
-    private static GithubRepoResponse mapOrganizationRepo(final ProjectOrganizationRepoView repo) {
-        final GithubRepoResponse repoResponse = new GithubRepoResponse();
-        repoResponse.setId(repo.getGithubRepoId());
-        repoResponse.setOwner(repo.getOwner());
-        repoResponse.setName(repo.getName());
-        repoResponse.setHtmlUrl(repo.getUrl());
-        repoResponse.setDescription(repo.getDescription());
-        repoResponse.setForkCount(isNull(repo.getForkCount()) ? null : Math.toIntExact(repo.getForkCount()));
-        repoResponse.setStars(isNull(repo.getStarCount()) ? null : Math.toIntExact(repo.getStarCount()));
-        repoResponse.setHasIssues(repo.getHasIssues());
-        repoResponse.setIsIncludedInProject(repo.getIsIncludedInProject());
-        repoResponse.setIsAuthorizedInGithubApp(repo.getIsAuthorizedInGithubApp());
-        return repoResponse;
-    }
-
     static GithubUserResponse mapGithubUser(final UserLinkView userLinkView) {
         final var user = new GithubUserResponse();
         user.setGithubUserId(userLinkView.getGithubUserId());
@@ -116,7 +100,6 @@ public interface ProjectMapper {
         }
         throw new IllegalArgumentException("Could not map project visibility");
     }
-
 
     static ProjectShortResponse mapShortProjectResponse(Project project) {
         return new ProjectShortResponse()

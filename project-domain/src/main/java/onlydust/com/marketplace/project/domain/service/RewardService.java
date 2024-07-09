@@ -7,13 +7,10 @@ import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.AccountingServicePort;
 import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
-import onlydust.com.marketplace.project.domain.view.ProjectRewardView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
@@ -75,10 +72,5 @@ public class RewardService implements RewardFacadePort {
 
         accountingServicePort.cancelReward(rewardId, reward.currencyId());
         rewardStoragePort.delete(rewardId);
-    }
-
-    @Override
-    public Optional<Reward> getReward(UUID rewardId) {
-        return rewardStoragePort.get(rewardId);
     }
 }

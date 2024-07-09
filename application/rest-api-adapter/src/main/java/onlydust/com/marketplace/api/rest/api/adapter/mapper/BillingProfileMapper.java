@@ -191,7 +191,6 @@ public interface BillingProfileMapper {
         };
     }
 
-
     static BillingProfileInvoicesPageResponse map(Page<InvoiceView> page, Integer pageIndex) {
         return new BillingProfileInvoicesPageResponse()
                 .invoices(page.getContent().stream().map(BillingProfileMapper::mapToBillingProfileInvoicesPageItemResponse).toList())
@@ -280,7 +279,6 @@ public interface BillingProfileMapper {
             case MEMBER -> BillingProfileCoworkerRole.MEMBER;
         };
     }
-
 
     static BillingProfileInvoiceableRewardsResponse mapToInvoiceableRewardsResponse(List<BillingProfileRewardView> invoiceableRewards,
                                                                                     Map<UUID, List<Network>> rewardNetworks,
