@@ -18,10 +18,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -131,6 +128,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .ignoreCodeReviews(true)
                 .ignoreIssues(true)
                 .ignoreContributionsBefore(new Date())
+                .categorySuggestions(Set.of())
                 .build();
 
         assertIsSaved(expected, projectRepository);
