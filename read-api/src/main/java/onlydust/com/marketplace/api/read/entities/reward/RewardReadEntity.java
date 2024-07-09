@@ -80,6 +80,14 @@ public class RewardReadEntity {
         return statusData.amountUsdEquivalent();
     }
 
+    public BigDecimal usdEquivalentAfterTax() {
+        return (BigDecimal.ONE.add(taxRate())).multiply(statusData.amountUsdEquivalent());
+    }
+
+    private BigDecimal taxRate() {
+        return invoice == null ? BigDecimal.ZERO : invoice.data().taxRate();
+    }
+
     public ShortRewardResponse toShortResponse() {
         return new ShortRewardResponse()
                 .id(id)

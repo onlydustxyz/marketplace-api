@@ -328,7 +328,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "status": "TO_PAY",
                           "network": "ETHEREUM",
                           "rewardCount": 2,
-                          "totalUsdEquivalent": 2020.00,
+                          "totalUsdEquivalent": 2222.00,
                           "totalsPerCurrency": [
                             {
                               "amount": 2000,
@@ -391,7 +391,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           ]
                         }
                         """);
-        
+
         assertThat(csv.getValue().split("\\R")).containsExactlyInAnyOrder(
                 "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,fc92397c-3431-4a84-8054-845376b630a0.eth,1200.0,",
                 "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,"
@@ -508,7 +508,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                           "network": "ETHEREUM",
                           "status": "PAID",
                           "rewardCount": 2,
-                          "totalUsdEquivalent": 2020.00,
+                          "totalUsdEquivalent": 2222.00,
                           "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
                         }
                         """);

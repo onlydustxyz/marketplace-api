@@ -78,6 +78,12 @@ public class BatchPaymentReadEntity {
                 .dollarsEquivalent(left.getDollarsEquivalent().add(right.getDollarsEquivalent()));
     }
 
+    public BigDecimal totalUsdEquivalentAfterTax() {
+        return rewards.stream()
+                .map(RewardReadEntity::usdEquivalentAfterTax)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
     public BigDecimal totalUsdEquivalent() {
         return rewards.stream()
                 .map(RewardReadEntity::usdEquivalent)
@@ -106,6 +112,6 @@ public class BatchPaymentReadEntity {
                 .rewardCount((long) rewards.size())
                 .rewards(rewards.stream().map(RewardReadEntity::toShortResponse).toList())
                 .totalsPerCurrency(totalsPerCurrency())
-                .totalUsdEquivalent(totalUsdEquivalent());
+                .totalUsdEquivalent(totalUsdEquivalentAfterTax());
     }
 }

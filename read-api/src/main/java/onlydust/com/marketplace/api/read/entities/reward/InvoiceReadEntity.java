@@ -55,6 +55,7 @@ public class InvoiceReadEntity {
     String rejectionReason;
 
     @JdbcTypeCode(SqlTypes.JSON)
+    @NonNull
     Data data;
 
     public record Data(@NonNull ZonedDateTime dueAt,
