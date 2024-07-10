@@ -5,7 +5,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEnt
 
 public interface NetworkMapper {
     static TransactionNetwork map(NetworkEnumEntity network) {
-        return switch (network) {
+        return network == null ? null : switch (network) {
             case sepa -> TransactionNetwork.SEPA;
             case ethereum -> TransactionNetwork.ETHEREUM;
             case aptos -> TransactionNetwork.APTOS;

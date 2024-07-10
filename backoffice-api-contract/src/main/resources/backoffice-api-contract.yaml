@@ -324,7 +324,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get the list of all transactions related to this sponsor
       operationId: getSponsorTransactionHistory
       parameters:

@@ -299,9 +299,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresSponsorAccountStorageAdapter postgresSponsorAccountStorageAdapter(final SponsorAccountRepository sponsorAccountRepository,
-                                                                                     final SponsorAccountTransactionViewRepository sponsorAccountTransactionViewRepository) {
-        return new PostgresSponsorAccountStorageAdapter(sponsorAccountRepository, sponsorAccountTransactionViewRepository);
+    public PostgresSponsorAccountStorageAdapter postgresSponsorAccountStorageAdapter(final SponsorAccountRepository sponsorAccountRepository) {
+        return new PostgresSponsorAccountStorageAdapter(sponsorAccountRepository);
     }
 
     @Bean

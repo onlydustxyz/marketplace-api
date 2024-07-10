@@ -1,20 +1,18 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import lombok.NonNull;
 import onlydust.com.backoffice.api.contract.model.ProjectLinkResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.HistoricalTransaction;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.api.contract.model.Money;
+import onlydust.com.marketplace.api.contract.model.ProjectWithBudgetResponse;
+import onlydust.com.marketplace.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,32 +51,6 @@ public interface SponsorMapper {
                 .slug(view.slug())
                 .logoUrl(view.logoUrl())
                 .name(view.name());
-    }
-
-    static onlydust.com.marketplace.api.contract.model.ProjectLinkResponse projectToResponse(final ProjectShortView view) {
-        return new onlydust.com.marketplace.api.contract.model.ProjectLinkResponse()
-                .id(view.id().value())
-                .slug(view.slug())
-                .logoUrl(view.logoUrl())
-                .name(view.name());
-    }
-
-    static SponsorResponse map(Sponsor sponsor) {
-        return new SponsorResponse()
-                .id(sponsor.id())
-                .name(sponsor.name())
-                .url(sponsor.url())
-                .logoUrl(sponsor.logoUrl());
-    }
-
-    static HistoricalTransaction.Type map(SponsorAccountTransactionType type) {
-        return switch (type) {
-            // Sponsor is interested on how much he can actually spend on projects
-            case DEPOSIT -> HistoricalTransaction.Type.MINT;
-            case WITHDRAWAL -> HistoricalTransaction.Type.BURN;
-            case ALLOCATION -> HistoricalTransaction.Type.TRANSFER;
-            case UNALLOCATION -> HistoricalTransaction.Type.REFUND;
-        };
     }
 
     static SponsorDetailsResponse mapToSponsorDetailsResponse(SponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
@@ -126,44 +98,5 @@ public interface SponsorMapper {
                 .totalUsdBudget(budgets.stream().map(Money::getUsdEquivalent).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add))
                 .remainingBudgets(budgets)
                 ;
-    }
-
-    static TransactionHistoryPageResponse mapTransactionHistory(Page<HistoricalTransaction> page, int pageIndex) {
-        return new TransactionHistoryPageResponse()
-                .transactions(page.getContent().stream().map(SponsorMapper::mapHistoricalTransaction).toList())
-                .totalPageNumber(page.getTotalPageNumber())
-                .totalItemNumber(page.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
-    }
-
-    static TransactionHistoryPageItemResponse mapHistoricalTransaction(HistoricalTransaction historicalTransaction) {
-        return new TransactionHistoryPageItemResponse()
-                .id(historicalTransaction.id())
-                .date(historicalTransaction.timestamp())
-                .type(mapTransactionType(historicalTransaction))
-                .project(historicalTransaction.project() == null ? null : projectToResponse(historicalTransaction.project()))
-                .amount(toMoney(historicalTransaction.amount().getValue(), historicalTransaction.currency()));
-    }
-
-    static SponsorAccountTransactionType mapTransactionType(HistoricalTransaction transaction) {
-        return switch (transaction.type()) {
-            case MINT -> SponsorAccountTransactionType.DEPOSIT;
-            case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
-            case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
-            case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
-            default -> throw OnlyDustException
-                    .internalServerError("Unexpected transaction type: %s".formatted(transaction.type()));
-        };
-    }
-
-    static HistoricalTransaction.Sort parseTransactionSort(@NonNull String sort) {
-        return switch (sort) {
-            case "DATE" -> HistoricalTransaction.Sort.DATE;
-            case "TYPE" -> HistoricalTransaction.Sort.TYPE;
-            case "AMOUNT" -> HistoricalTransaction.Sort.AMOUNT;
-            case "PROJECT" -> HistoricalTransaction.Sort.PROJECT;
-            default -> throw OnlyDustException.badRequest("Invalid sort parameter: %s".formatted(sort));
-        };
     }
 }

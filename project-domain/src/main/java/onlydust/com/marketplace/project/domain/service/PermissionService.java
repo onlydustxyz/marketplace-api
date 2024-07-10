@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProjectSponsorStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 
 import java.util.UUID;
@@ -10,6 +11,7 @@ import java.util.UUID;
 public class PermissionService {
     private final ProjectStoragePort projectStoragePort;
     private final ContributionStoragePort contributionStoragePort;
+    private final ProjectSponsorStoragePort sponsorStoragePort;
 
     public boolean isUserProjectLead(UUID projectId, UUID projectLeadId) {
         return projectStoragePort.getProjectLeadIds(projectId).contains(projectLeadId);
@@ -29,5 +31,9 @@ public class PermissionService {
 
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
         return projectStoragePort.hasUserAccessToProject(projectSlug, userId);
+    }
+
+    public boolean isUserSponsorAdmin(UUID userId, UUID sponsorId) {
+        return sponsorStoragePort.isUserSponsorAdmin(userId, sponsorId);
     }
 }

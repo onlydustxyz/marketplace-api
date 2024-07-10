@@ -3586,7 +3586,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Sponsors
+        - ReadSponsors
       summary: Get the list of all transactions related to this sponsor
       operationId: getSponsorTransactionHistory
       parameters:
@@ -3640,17 +3640,11 @@ paths:
           name: sort
           description: Sort order
           schema:
-            enum:
-              - DATE
-              - TYPE
-              - AMOUNT
-              - PROJECT
+            $ref: '#/components/schemas/SponsorAccountTransactionSort'
         - in: query
           name: direction
           schema:
-            enum:
-              - ASC
-              - DESC
+            $ref: '#/components/schemas/SortDirection'
       responses:
         "200":
           description: 'The sponsor transaction history'
@@ -7855,6 +7849,14 @@ components:
         - WITHDRAWAL
         - ALLOCATION
         - UNALLOCATION
+
+    SponsorAccountTransactionSort:
+      type: string
+      enum:
+        - DATE
+        - TYPE
+        - AMOUNT
+        - PROJECT
 
     AllocateRequest:
       type: object

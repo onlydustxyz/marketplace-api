@@ -119,42 +119,6 @@ public interface BackOfficeMapper {
                 transaction.getThirdPartyAccountNumber());
     }
 
-    static TransactionHistoryPageResponse mapTransactionHistory(final Page<HistoricalTransaction> page, final int pageIndex) {
-        return new TransactionHistoryPageResponse()
-                .transactions(page.getContent().stream().map(BackOfficeMapper::mapHistoricalTransaction).toList())
-                .totalPageNumber(page.getTotalPageNumber())
-                .totalItemNumber(page.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, page.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
-    }
-
-    static TransactionHistoryPageItemResponse mapHistoricalTransaction(HistoricalTransaction historicalTransaction) {
-        return new TransactionHistoryPageItemResponse()
-                .date(historicalTransaction.timestamp())
-                .type(mapTransactionType(historicalTransaction.type()))
-                .network(Optional.ofNullable(historicalTransaction.network()).map(BackOfficeMapper::mapNetwork).orElse(null))
-                .lockedUntil(historicalTransaction.lockedUntil())
-                .project(mapToProjectLink(historicalTransaction.project()))
-                .amount(new MoneyWithUsdEquivalentResponse()
-                        .amount(historicalTransaction.amount().getValue())
-                        .currency(toShortCurrency(historicalTransaction.currency()))
-                        .dollarsEquivalent(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().convertedAmount().getValue())
-                        .conversionRate(historicalTransaction.usdAmount() == null ? null : historicalTransaction.usdAmount().conversionRate())
-                );
-    }
-
-    static HistoricalTransactionType mapTransactionType(HistoricalTransaction.Type type) {
-        return switch (type) {
-            case DEPOSIT -> HistoricalTransactionType.DEPOSIT;
-            case WITHDRAW -> HistoricalTransactionType.WITHDRAWAL;
-            case SPEND -> HistoricalTransactionType.SPEND;
-            case MINT -> HistoricalTransactionType.MINT;
-            case BURN -> HistoricalTransactionType.BURN;
-            case TRANSFER -> HistoricalTransactionType.TRANSFER;
-            case REFUND -> HistoricalTransactionType.REFUND;
-        };
-    }
-
     static OldSponsorPage mapSponsorPageToContract(final Page<BoSponsorView> sponsorPage, int pageIndex) {
         return new OldSponsorPage()
                 .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
@@ -230,17 +194,6 @@ public interface BackOfficeMapper {
                         )
                         .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
                         .toList())
-                ;
-    }
-
-    static ProjectLinkResponse mapToProjectLink(final ProjectShortView project) {
-        if (project == null) return null;
-
-        return new ProjectLinkResponse()
-                .id(project.id().value())
-                .slug(project.slug())
-                .name(project.name())
-                .logoUrl(project.logoUrl())
                 ;
     }
 

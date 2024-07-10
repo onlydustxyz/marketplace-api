@@ -32,7 +32,7 @@ public class SponsorAccountReadEntity {
     @NonNull
     CurrencyReadEntity currency;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "sponsorId")
     @NonNull
     SponsorReadEntity sponsor;

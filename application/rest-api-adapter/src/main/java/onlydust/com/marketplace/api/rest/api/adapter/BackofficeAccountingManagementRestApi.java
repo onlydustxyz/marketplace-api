@@ -16,9 +16,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -65,28 +63,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 accountingFacadePort.createSponsorAccountWithInitialBalance(sponsorId, currencyId, lockedUntil, transaction);
 
         return ok(mapAccountToResponse(sponsorAccountStatement));
-    }
-
-    @Override
-    public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
-        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
-        final var page = accountingFacadePort.transactionHistory(
-                SponsorId.of(sponsorId),
-                HistoricalTransaction.Filters.builder()
-                        .types(List.of(HistoricalTransaction.Type.DEPOSIT,
-                                HistoricalTransaction.Type.WITHDRAW,
-                                HistoricalTransaction.Type.TRANSFER,
-                                HistoricalTransaction.Type.REFUND))
-                        .build(),
-                sanitizedPageIndex,
-                sanitizePageSize(pageSize),
-                HistoricalTransaction.Sort.DATE,
-                SortDirection.desc);
-        final var response = mapTransactionHistory(page, sanitizedPageIndex);
-
-        return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ok(response);
     }
 
     @Override
