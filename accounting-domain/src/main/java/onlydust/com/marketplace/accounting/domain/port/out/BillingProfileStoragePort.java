@@ -25,9 +25,7 @@ public interface BillingProfileStoragePort {
 
     void savePayoutPreference(BillingProfile.Id billingProfileId, UserId userId, ProjectId projectId);
 
-    Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId);
-
-    List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId);
+    boolean individualBillingProfileExistsByUserId(UserId ownerId);
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 

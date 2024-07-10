@@ -9,7 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutInfoQueryEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -20,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.groupingBy;
@@ -42,7 +44,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull BillingProfileUserInvitationRepository billingProfileUserInvitationRepository;
     private final @NonNull PayoutPreferenceRepository payoutPreferenceRepository;
     private final @NonNull BankAccountRepository bankAccountRepository;
-    private final @NonNull ShortBillingProfileViewRepository shortBillingProfileViewRepository;
     private final @NonNull BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
     private final @NonNull RewardViewRepository rewardViewRepository;
     private final @NonNull RewardRepository rewardRepository;
@@ -50,19 +51,8 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ShortBillingProfileView> findIndividualBillingProfileForUser(UserId ownerId) {
-        return shortBillingProfileViewRepository.findBillingProfilesForUserId(ownerId.value(), List.of(BillingProfile.Type.INDIVIDUAL.name()))
-                .stream().map(ShortBillingProfileQueryEntity::toView).findFirst();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<ShortBillingProfileView> findAllBillingProfilesForUser(UserId userId) {
-        final var billingProfiles = shortBillingProfileViewRepository.findBillingProfilesForUserId(userId.value(), List.of());
-        final var billingProfilesInvitedOn = shortBillingProfileViewRepository.findBillingProfilesForUserIdInvited(userId.value());
-        return Stream.concat(billingProfiles.stream(), billingProfilesInvitedOn.stream())
-                .map(ShortBillingProfileQueryEntity::toView)
-                .toList();
+    public boolean individualBillingProfileExistsByUserId(UserId ownerId) {
+        return billingProfileRepository.individualBillingProfileExistsByUserId(ownerId.value());
     }
 
     @Override
@@ -139,9 +129,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
 
         return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> {
-            final var billingProfileCustomData = shortBillingProfileViewRepository.findById(billingProfileId.value())
-                    .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-            final var stats = billingProfileCustomData.getStats();
+            final var stats = billingProfileEntity.getStats();
             return switch (billingProfileEntity.getType()) {
                 case INDIVIDUAL -> {
                     BillingProfileView billingProfileView = BillingProfileView.builder()
@@ -161,7 +149,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .currentYearPaymentLimit(isNull(stats.currentYearPaymentLimit()) ? null :
                                     PositiveAmount.of(stats.currentYearPaymentLimit()))
                             .currentYearPaymentAmount(PositiveAmount.of(stats.currentYearPaymentAmount()))
-                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
                                     .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())
@@ -189,7 +177,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
                             .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
-                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
                                     .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())
@@ -216,7 +204,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                             .rewardCount(stats.rewardCount())
                             .invoiceableRewardCount(stats.invoiceableRewardCount())
                             .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
-                            .currentMonthRewardedAmounts(billingProfileCustomData.getCurrentMonthRewards().stream()
+                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
                                     .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
                                     .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
                                     .values().stream().toList())

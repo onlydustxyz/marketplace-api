@@ -13,13 +13,13 @@ import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacade
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.INDIVIDUAL;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,6 +71,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     private CachedAccountBookProvider accountBookProvider;
     @Autowired
     private BillingProfileFacadePort billingProfileFacadePort;
+    @Autowired
+    private BillingProfileReadRepository billingProfileReadRepository;
     @Autowired
     private PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     @Autowired
@@ -1414,10 +1417,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     }
 
     private Invoice.Id invoiceReward(UserId userId, ProjectId projectId, RewardId rewardId) {
-        final var billingProfileId = billingProfileFacadePort.getBillingProfilesForUser(userId)
-                .stream().filter(bp -> bp.getType() == BillingProfile.Type.INDIVIDUAL)
+        final var billingProfileId = billingProfileReadRepository.findByUserId(userId.value())
+                .stream().filter(bp -> bp.type() == INDIVIDUAL)
                 .findFirst()
-                .map(ShortBillingProfileView::getId)
+                .map(billingProfileReadEntity -> BillingProfile.Id.of(billingProfileReadEntity.id()))
                 .orElseGet(() -> billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null).id());
 
         final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();

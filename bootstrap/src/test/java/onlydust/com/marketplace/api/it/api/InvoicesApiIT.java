@@ -14,13 +14,13 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.contract.model.BillingProfileInvoicesPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.COMPANY;
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.INDIVIDUAL;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -47,6 +49,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromResour
 @TagAccounting
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InvoicesApiIT extends AbstractMarketplaceApiIT {
+    private static final ProjectId PROJECT_ID = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
     @Autowired
     PdfStoragePort pdfStoragePort;
     @Autowired
@@ -60,12 +63,11 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
     @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
+    @Autowired
     PayoutPreferenceFacadePort payoutPreferenceFacadePort;
-
     UserAuthHelper.AuthenticatedUser antho;
     UUID companyBillingProfileId;
-
-    private static final ProjectId PROJECT_ID = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
     @BeforeEach
     void setUp() {
@@ -78,10 +80,10 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
     private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {
         final var ownerId = UserId.of(owner.user().getId());
 
-        return billingProfileStoragePort.findAllBillingProfilesForUser(ownerId).stream()
-                .filter(bp -> bp.getType() == BillingProfile.Type.COMPANY)
+        return billingProfileReadRepository.findByUserId(ownerId.value()).stream()
+                .filter(bp -> bp.type() == COMPANY)
                 .findFirst()
-                .map(ShortBillingProfileView::getId)
+                .map(bp -> BillingProfile.Id.of(bp.id()))
                 .orElseGet(() -> createCompanyBillingProfileFor(ownerId).id());
     }
 
@@ -1112,7 +1114,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // Then switch billing profile type
         final var ownerId = UserId.of(antho.user().getId());
-        final var individualBillingProfileId = billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).orElseThrow().getId();
+        final var individualBillingProfileId = BillingProfile.Id.of(billingProfileReadRepository.findByUserId(ownerId.value())
+                .stream().filter(bp -> bp.type() == INDIVIDUAL).findFirst()
+                .orElseThrow().id());
         final var individualBillingProfile = billingProfileStoragePort.findViewById(individualBillingProfileId).orElseThrow();
         billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder()
                 .consideredUsPersonQuestionnaire(false)

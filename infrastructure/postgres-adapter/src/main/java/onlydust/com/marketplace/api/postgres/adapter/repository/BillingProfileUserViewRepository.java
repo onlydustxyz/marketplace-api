@@ -29,13 +29,14 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
                 kyc.last_name,
                 kyc.country,
                 bpu.joined_at,
-                NULL as invited_at,
+                bpui.invited_at,
                 COALESCE(reward_count.user_reward_count, 0) as reward_count,
                 COALESCE(admin_count.billing_profile_admin_count, 0) as billing_profile_admin_count
             FROM accounting.billing_profiles_users bpu
             JOIN iam.users u ON u.id = bpu.user_id
             LEFT JOIN indexer_exp.github_accounts ga ON ga.id = u.github_user_id
             LEFT JOIN accounting.kyc kyc ON kyc.owner_id = u.id AND kyc.verification_status = 'VERIFIED'
+            LEFT JOIN accounting.billing_profiles_user_invitations bpui ON bpui.billing_profile_id = bpu.billing_profile_id AND bpui.github_user_id = u.github_user_id
             LEFT JOIN LATERAL (
                 SELECT COUNT(r.id) as user_reward_count
                 FROM accounting.invoices i
@@ -72,12 +73,12 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
             """;
 
     @Query(value = SELECT_COWORKER +
-            " WHERE bpu.billing_profile_id = :billingProfileId " +
-            " AND (coalesce(roles) IS NULL OR cast(bpu.role as text) IN (:roles)) " +
-            " UNION " +
-            SELECT_INVITED_COWORKER +
-            " WHERE bpui.billing_profile_id = :billingProfileId and bpui.accepted = false" +
-            " AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles)) ",
+                   " WHERE bpu.billing_profile_id = :billingProfileId " +
+                   " AND (coalesce(roles) IS NULL OR cast(bpu.role as text) IN (:roles)) " +
+                   " UNION " +
+                   SELECT_INVITED_COWORKER +
+                   " WHERE bpui.billing_profile_id = :billingProfileId and bpui.accepted = false" +
+                   " AND (coalesce(roles) IS NULL OR cast(bpui.role as text) IN (:roles)) ",
             countQuery = """
                      SELECT count(*) from accounting.billing_profiles_users bpu
                      join iam.users u on u.id = bpu.user_id
@@ -89,17 +90,17 @@ public interface BillingProfileUserViewRepository extends JpaRepository<BillingP
     Page<BillingProfileUserQueryEntity> findByBillingProfileId(UUID billingProfileId, List<String> roles, Pageable pageable);
 
     @Query(value = SELECT_INVITED_COWORKER +
-            " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
+                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
     Optional<BillingProfileUserQueryEntity> findInvitedUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
-            " WHERE bpu.billing_profile_id = :billingProfileId AND u.github_user_id = :githubUserId " +
-            " UNION " +
-            SELECT_INVITED_COWORKER +
-            " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
+                   " WHERE bpu.billing_profile_id = :billingProfileId AND u.github_user_id = :githubUserId " +
+                   " UNION " +
+                   SELECT_INVITED_COWORKER +
+                   " WHERE bpui.billing_profile_id = :billingProfileId AND bpui.github_user_id = :githubUserId and bpui.accepted = false", nativeQuery = true)
     Optional<BillingProfileUserQueryEntity> findUserByBillingProfileIdAndGithubId(UUID billingProfileId, Long githubUserId);
 
     @Query(value = SELECT_COWORKER +
-            " WHERE u.id = :userId AND bpu.billing_profile_id = :billingProfileId AND bpu.role = 'ADMIN' ", nativeQuery = true)
+                   " WHERE u.id = :userId AND bpu.billing_profile_id = :billingProfileId AND bpu.role = 'ADMIN' ", nativeQuery = true)
     Optional<BillingProfileUserQueryEntity> findBillingProfileAdminById(UUID userId, UUID billingProfileId);
 }

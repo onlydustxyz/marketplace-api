@@ -13,13 +13,13 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagConcurrency;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
+import onlydust.com.marketplace.api.suites.tags.TagConcurrency;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.COMPANY;
 import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +51,8 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     BillingProfileFacadePort billingProfileFacadePort;
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
     @Autowired
     PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     @Autowired
@@ -80,10 +83,10 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     private BillingProfile.Id initBillingProfile(UserAuthHelper.AuthenticatedUser owner) {
         final var ownerId = UserId.of(owner.user().getId());
 
-        return billingProfileStoragePort.findAllBillingProfilesForUser(ownerId).stream()
-                .filter(bp -> bp.getType() == BillingProfile.Type.COMPANY)
+        return billingProfileReadRepository.findByUserId(ownerId.value()).stream()
+                .filter(bp -> bp.type() == COMPANY)
                 .findFirst()
-                .map(ShortBillingProfileView::getId)
+                .map(billingProfileReadEntity -> BillingProfile.Id.of(billingProfileReadEntity.id()))
                 .orElseGet(() -> createCompanyBillingProfileFor(ownerId).id());
     }
 

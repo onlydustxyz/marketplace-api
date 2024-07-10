@@ -32,4 +32,14 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
                 where id = :billingProfileId
             """)
     void updateBillingProfileType(UUID billingProfileId, String type);
+
+    @Query(value = """
+            select exists(
+                select 1
+                from accounting.billing_profiles bp
+                    join accounting.billing_profiles_users bpu on bp.id = bpu.billing_profile_id and bpu.user_id = :userId
+                where bp.type = 'INDIVIDUAL'
+            )
+            """, nativeQuery = true)
+    boolean individualBillingProfileExistsByUserId(UUID userId);
 }

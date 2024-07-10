@@ -409,3 +409,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000285_fix_project_similarities.sql
   - include:
       file: db/changelog/changelogs/00000286_fix_payment_limit_per_country.sql
+  - include:
+      file: db/changelog/changelogs/00000287_fix_all_billing_profile_users.sql

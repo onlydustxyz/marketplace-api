@@ -9,9 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagReward;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.api.suites.tags.TagReward;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -41,6 +42,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     AuthenticatedAppUserService authenticatedAppUserService;
     @Autowired
     CustomerIOProperties customerIOProperties;
+    @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
 
     @Test
     @Order(0)
@@ -92,8 +95,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         final UUID userId = pierre.user().getId();
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
 
-        final var billingProfile = billingProfileService.getBillingProfilesForUser(UserId.of(userId)).stream().findFirst().orElseThrow();
-        final BillingProfile.Id billingProfileId = billingProfile.getId();
+        final var billingProfile = billingProfileReadRepository.findByUserId(userId).stream().findFirst().orElseThrow();
+        final var billingProfileId = BillingProfile.Id.of(billingProfile.id());
         accountingHelper.patchBillingProfile(billingProfileId.value(), null, VerificationStatus.VERIFIED);
         kybRepository.findByBillingProfileId(billingProfileId.value())
                 .ifPresent(kyb -> kybRepository.save(kyb.toBuilder()
