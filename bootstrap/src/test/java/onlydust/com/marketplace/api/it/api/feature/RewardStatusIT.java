@@ -28,6 +28,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyReposito
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -55,6 +57,7 @@ import java.util.*;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static java.util.Objects.isNull;
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -80,6 +83,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     BillingProfileService billingProfileService;
     @Autowired
     BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
     @Autowired
     QuoteStorage quoteStorage;
     @Autowired
@@ -364,21 +369,21 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         userRepository.findByGithubUserId(selfEmployedBPAdminGithubId).ifPresent(userEntity -> selfEmployedBPAdminId = userEntity.getId());
 
         individualBPId = isNull(individualBPAdminId) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(individualBPAdminId)).stream()
-                        .filter(bp -> bp.getType() == BillingProfile.Type.INDIVIDUAL)
-                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
+                billingProfileReadRepository.findByUserId(individualBPAdminId).stream()
+                        .filter(bp -> bp.type() == INDIVIDUAL)
+                        .map(BillingProfileReadEntity::id).findFirst().orElse(null);
         individualIndiaBPId = isNull(individualIndiaBPAdminId) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(individualIndiaBPAdminId)).stream()
-                        .filter(bp -> bp.getType() == BillingProfile.Type.INDIVIDUAL)
-                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
+                billingProfileReadRepository.findByUserId(individualIndiaBPAdminId).stream()
+                        .filter(bp -> bp.type() == INDIVIDUAL)
+                        .map(BillingProfileReadEntity::id).findFirst().orElse(null);
         companyBPId = isNull(companyBPAdmin1Id) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(companyBPAdmin1Id)).stream()
-                        .filter(bp -> bp.getType() == BillingProfile.Type.COMPANY)
-                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
+                billingProfileReadRepository.findByUserId(companyBPAdmin1Id).stream()
+                        .filter(bp -> bp.type() == COMPANY)
+                        .map(BillingProfileReadEntity::id).findFirst().orElse(null);
         selfEmployedBPId = isNull(selfEmployedBPAdminId) ? null :
-                billingProfileService.getBillingProfilesForUser(UserId.of(selfEmployedBPAdminId)).stream()
-                        .filter(bp -> bp.getType() == BillingProfile.Type.SELF_EMPLOYED)
-                        .map(bp -> bp.getId().value()).findFirst().orElse(null);
+                billingProfileReadRepository.findByUserId(selfEmployedBPAdminId).stream()
+                        .filter(bp -> bp.type() == SELF_EMPLOYED)
+                        .map(BillingProfileReadEntity::id).findFirst().orElse(null);
     }
 
     private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {

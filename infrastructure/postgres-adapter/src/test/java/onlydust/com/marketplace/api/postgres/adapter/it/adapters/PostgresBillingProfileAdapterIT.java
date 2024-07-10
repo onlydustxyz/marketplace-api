@@ -67,8 +67,9 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
                 new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date()));
 
         final String name = faker.rickAndMorty().character();
-        postgresBillingProfileAdapter.save(new CompanyBillingProfile(name, ownerId));
-        final BillingProfile.Id billingProfileId = postgresBillingProfileAdapter.findAllBillingProfilesForUser(ownerId).get(0).getId();
+        CompanyBillingProfile billingProfile = new CompanyBillingProfile(name, ownerId);
+        postgresBillingProfileAdapter.save(billingProfile);
+        final BillingProfile.Id billingProfileId = billingProfile.id();
         final BillingProfileView billingProfileView = postgresBillingProfileAdapter.findViewById(billingProfileId).orElseThrow();
         assertEquals(name, billingProfileView.getName());
         final UUID kybId = billingProfileView.getKyb().getId();

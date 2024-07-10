@@ -338,7 +338,6 @@ public class PostgresConfiguration {
                                                                      final BillingProfileUserInvitationRepository billingProfileUserInvitationRepository,
                                                                      final PayoutPreferenceRepository payoutPreferenceRepository,
                                                                      final BankAccountRepository bankAccountRepository,
-                                                                     final ShortBillingProfileViewRepository shortBillingProfileViewRepository,
                                                                      final BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository,
                                                                      final RewardViewRepository rewardViewRepository,
                                                                      final RewardRepository rewardRepository,
@@ -346,7 +345,7 @@ public class PostgresConfiguration {
         return new PostgresBillingProfileAdapter(globalSettingsRepository,
                 billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, payoutInfoViewRepository, walletRepository,
                 billingProfileUserRepository, billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository,
-                payoutPreferenceRepository, bankAccountRepository, shortBillingProfileViewRepository, billingProfileUserRightsViewRepository,
+                payoutPreferenceRepository, bankAccountRepository, billingProfileUserRightsViewRepository,
                 rewardViewRepository, rewardRepository, userRepository);
     }
 

@@ -12,10 +12,11 @@ import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.PayoutPreferenceService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.util.*;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.COMPANY;
+import static onlydust.com.backoffice.api.contract.model.BillingProfileType.SELF_EMPLOYED;
 import static onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT.ME_PUT_PAYOUT_PREFERENCES;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,6 +40,8 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     BillingProfileService billingProfileService;
+    @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
     @Autowired
     AccountingHelper accountingHelper;
     @Autowired
@@ -523,13 +528,13 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     void should_get_all_rewards_with_billing_profile_id() {
         // Given
         anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
-        final var billingProfile = billingProfileService.getBillingProfilesForUser(anthony).stream()
-                .filter(b -> b.getType() == BillingProfile.Type.SELF_EMPLOYED)
+        final var billingProfile = billingProfileReadRepository.findByUserId(anthony.value()).stream()
+                .filter(b -> b.type() == SELF_EMPLOYED)
                 .findFirst().orElseThrow();
 
         // When
         final var rewards = client.get()
-                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "billingProfiles", billingProfile.getId().toString())))
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "billingProfiles", billingProfile.id().toString())))
                 .header("Authorization", "Bearer " + camille.jwt())
                 // Then
                 .exchange()
@@ -539,7 +544,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .returnResult().getResponseBody().getRewards();
 
         assertThat(rewards.size()).isGreaterThan(0);
-        assertThat(rewards).allMatch(reward -> reward.getBillingProfile().getId().equals(billingProfile.getId().value()));
+        assertThat(rewards).allMatch(reward -> reward.getBillingProfile().getId().equals(billingProfile.id()));
     }
 
     @Test
@@ -622,14 +627,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     void should_export_all_rewards_for_a_given_billing_profile() {
         // Given
         olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
-        final var billingProfile = billingProfileService.getBillingProfilesForUser(olivier).stream()
-                .filter(b -> b.getType() == BillingProfile.Type.COMPANY)
+        final var billingProfile = billingProfileReadRepository.findByUserId(olivier.value()).stream()
+                .filter(b -> b.type() == COMPANY)
                 .findFirst().orElseThrow();
 
         // When
         final var csv = client.get()
                 .uri(getApiURI(GET_REWARDS_CSV, Map.of(
-                                "billingProfiles", billingProfile.getId().toString(),
+                                "billingProfiles", billingProfile.id().toString(),
                                 "fromRequestedAt", "2023-03-20",
                                 "toRequestedAt", "2023-03-21"
                         ))

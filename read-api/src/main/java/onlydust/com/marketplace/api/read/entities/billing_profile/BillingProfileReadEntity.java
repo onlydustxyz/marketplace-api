@@ -116,7 +116,7 @@ public class BillingProfileReadEntity {
                 .individualLimitReached(stats.individualLimitReached())
                 .missingPayoutInfo(stats.missingPayoutInfo())
                 .missingVerification(stats.missingVerification())
-                .pendingInvitationResponse(invitations.stream().anyMatch(i -> i.getGithubUserId().equals(callerGithubUserId)))
+                .pendingInvitationResponse(caller.map(u -> !u.isInvitationAccepted()).orElse(null))
                 .requestableRewardCount(requestableRewardCount(caller))
                 .verificationBlocked(isVerificationBlocked());
     }

@@ -11,12 +11,13 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
-import onlydust.com.marketplace.accounting.domain.view.ShortBillingProfileView;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
+import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -43,6 +44,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Autowired
     BillingProfileRepository billingProfileRepository;
     @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
+    @Autowired
     AccountingHelper accountingHelper;
     @Autowired
     KycRepository kycRepository;
@@ -60,7 +63,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     UserId olivier;
     UserId pierre;
     CompanyBillingProfile olivierBillingProfile;
-    ShortBillingProfileView anthonyBillingProfile;
+    BillingProfileReadEntity anthonyBillingProfile;
     SelfEmployedBillingProfile pierreBillingProfile;
 
     static final List<Invoice.Id> anthonyInvoiceIds = new ArrayList<>();
@@ -86,10 +89,10 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .bankAccount(new BankAccount("BIC", "FR76000111222333334444")).build());
         accountingHelper.patchBillingProfile(olivierBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
 
-        anthonyBillingProfile = billingProfileService.getBillingProfilesForUser(this.anthony).get(0);
-        billingProfileService.updatePayoutInfo(anthonyBillingProfile.getId(), this.anthony,
+        anthonyBillingProfile = billingProfileReadRepository.findByUserId(this.anthony.value()).get(0);
+        billingProfileService.updatePayoutInfo(BillingProfile.Id.of(anthonyBillingProfile.id()), this.anthony,
                 PayoutInfo.builder().ethWallet(new WalletLocator(new Name(this.anthony + ".eth"))).build());
-        accountingHelper.patchBillingProfile(anthonyBillingProfile.getId().value(), null, VerificationStatus.VERIFIED);
+        accountingHelper.patchBillingProfile(anthonyBillingProfile.id(), null, VerificationStatus.VERIFIED);
 
         pierreBillingProfile = billingProfileService.createSelfEmployedBillingProfile(this.pierre, "Pierre", null);
         billingProfileService.acceptInvoiceMandate(this.pierre, pierreBillingProfile.id());
@@ -109,7 +112,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         .subjectToEuVAT(true)
                         .verificationStatus(VerificationStatus.VERIFIED).build()))
                 .orElseThrow();
-        kycRepository.findByBillingProfileId(anthonyBillingProfile.getId().value())
+        kycRepository.findByBillingProfileId(anthonyBillingProfile.id())
                 .map(kyb -> kycRepository.saveAndFlush(kyb.toBuilder()
                         .country("FRA")
                         .address("2 Infinite Loop, Cupertino, CA 95014, United States")
@@ -134,7 +137,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .orElseThrow();
 
         updatePayoutPreferences(595505L, olivierBillingProfile.id(), UUID.fromString("e41f44a2-464c-4c96-817f-81acb06b2523"));
-        updatePayoutPreferences(43467246L, anthonyBillingProfile.getId(), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
+        updatePayoutPreferences(43467246L, BillingProfile.Id.of(anthonyBillingProfile.id()), UUID.fromString("298a547f-ecb6-4ab2-8975-68f4e9bf7b39"));
         updatePayoutPreferences(16590657L, pierreBillingProfile.id(), UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"));
 
         // Given
@@ -142,7 +145,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4"),
                 RewardId.of("1fad9f3b-67ab-4499-a320-d719a986d933"))));
 
-        anthonyInvoiceIds.add(newApprovedInvoice(anthony, anthonyBillingProfile.getId(), List.of(
+        anthonyInvoiceIds.add(newApprovedInvoice(anthony, BillingProfile.Id.of(anthonyBillingProfile.id()), List.of(
                 RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"))));
 
         pierreInvoiceIds.add(newApprovedInvoice(pierre, pierreBillingProfile.id(), List.of(
@@ -150,7 +153,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         // Already paid invoice
         final var paidRewardId = RewardId.of("79209029-c488-4284-aa3f-bce8870d3a66");
-        anthonyInvoiceIds.add(newApprovedInvoice(anthony, anthonyBillingProfile.getId(), List.of(paidRewardId)));
+        anthonyInvoiceIds.add(newApprovedInvoice(anthony, BillingProfile.Id.of(anthonyBillingProfile.id()), List.of(paidRewardId)));
         backofficeAccountingManagementRestApi.payReward(paidRewardId.value(),
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference(
                         "0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));

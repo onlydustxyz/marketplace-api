@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.backoffice.api.contract.model.BillingProfileType;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     private BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    BillingProfileReadRepository billingProfileReadRepository;
 
     @Test
     void should_return_404_when_not_found() {
@@ -54,8 +58,9 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     void should_return_contribution_details_when_found() {
         // Given
         final var antho = userAuthHelper.authenticateAnthony();
-        final var billingProfile = billingProfileStoragePort.findIndividualBillingProfileForUser(UserId.of(antho.user().getId())).orElseThrow();
-        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
+        final var billingProfile = billingProfileReadRepository.findByUserId(antho.user().getId()).
+                stream().filter(bp -> bp.type() == BillingProfileType.INDIVIDUAL).findFirst().orElseThrow();
+        billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(billingProfile.id()), VerificationStatus.VERIFIED);
 
         // When
         client.get()

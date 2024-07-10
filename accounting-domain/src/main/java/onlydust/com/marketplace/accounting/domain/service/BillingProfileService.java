@@ -40,7 +40,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
     @Override
     public IndividualBillingProfile createIndividualBillingProfile(@NonNull UserId ownerId, @NonNull String name, Set<ProjectId> selectForProjects) {
-        if (billingProfileStoragePort.findIndividualBillingProfileForUser(ownerId).isPresent())
+        if (billingProfileStoragePort.individualBillingProfileExistsByUserId(ownerId))
             throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId.value()));
 
         final var billingProfile = new IndividualBillingProfile(name, ownerId);
@@ -221,11 +221,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         billingProfile.acceptMandate();
         billingProfileStoragePort.save(billingProfile);
-    }
-
-    @Override
-    public List<ShortBillingProfileView> getBillingProfilesForUser(UserId userId) {
-        return billingProfileStoragePort.findAllBillingProfilesForUser(userId);
     }
 
     @Override
