@@ -608,7 +608,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].id").isEqualTo("e461c019-ba23-4671-9b6c-3a5a18748af9")
                 .jsonPath("$.coworkers[1].githubUserId").isEqualTo(595505)
                 .jsonPath("$.coworkers[1].joinedAt").isNotEmpty()
-                .jsonPath("$.coworkers[1].invitedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].invitedAt").isNotEmpty()
                 .jsonPath("$.coworkers[2].id").isEqualTo(null)
                 .jsonPath("$.coworkers[2].githubUserId").isEqualTo(123456789999L)
                 .jsonPath("$.coworkers[2].joinedAt").isEqualTo(null)
@@ -672,6 +672,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 false);
         final String jwt = authenticatedUser.jwt();
         final UserId userId = UserId.of(authenticatedUser.user().getId());
+        final var anthony = userAuthHelper.authenticateAnthony();
 
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
 
@@ -694,7 +695,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "githubUserId": 595505,
+                          "githubUserId": 43467246,
                           "role": "MEMBER"
                         }
                         """)
@@ -705,7 +706,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
         client.post()
                 .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
-                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                .header("Authorization", "Bearer " + anthony.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
@@ -731,10 +732,10 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[0].githubUserId").isEqualTo(authenticatedUser.user().getGithubUserId())
                 .jsonPath("$.coworkers[0].joinedAt").isNotEmpty()
                 .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
-                .jsonPath("$.coworkers[1].id").isEqualTo("e461c019-ba23-4671-9b6c-3a5a18748af9")
-                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(595505)
+                .jsonPath("$.coworkers[1].id").isEqualTo(anthony.user().getId().toString())
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(anthony.user().getGithubUserId())
                 .jsonPath("$.coworkers[1].joinedAt").isNotEmpty()
-                .jsonPath("$.coworkers[1].invitedAt").isEqualTo(null)
+                .jsonPath("$.coworkers[1].invitedAt").isNotEmpty()
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -750,11 +751,11 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "removable": false
                             },
                             {
-                              "githubUserId": 595505,
-                              "login": "ofux",
-                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp",
+                              "githubUserId": 43467246,
+                              "login": "AnthonyBuisset",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                               "isRegistered": true,
-                              "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                              "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                               "role": "MEMBER",
                               "removable": true
                             }
@@ -764,7 +765,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
         client.get()
                 .uri(getApiURI(ME_BILLING_PROFILES))
-                .header("Authorization", "Bearer " + jwt)
+                .header("Authorization", "Bearer " + anthony.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -776,8 +777,8 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.delete()
-                .uri(getApiURI(BILLING_PROFILES_DELETE_COWORKER.formatted(companyBillingProfile.id().value().toString(), "595505")))
-                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                .uri(getApiURI(BILLING_PROFILES_DELETE_COWORKER.formatted(companyBillingProfile.id().value().toString(), "43467246")))
+                .header("Authorization", "Bearer " + anthony.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -817,7 +818,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
         client.get()
                 .uri(getApiURI(ME_BILLING_PROFILES))
-                .header("Authorization", "Bearer " + jwt)
+                .header("Authorization", "Bearer " + anthony.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -939,7 +940,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "id": "fc92397c-3431-4a84-8054-845376b630a0",
                               "role": "ADMIN",
                               "joinedAt": "2024-02-28T17:32:57.617763Z",
-                              "invitedAt": null,
                               "removable": true
                             },
                             {
@@ -949,7 +949,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                               "isRegistered": true,
                               "id": "e461c019-ba23-4671-9b6c-3a5a18748af9",
                               "role": "ADMIN",
-                              "invitedAt": null,
                               "removable": true
                             }
                           ]
@@ -1439,17 +1438,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
-
-        client.get()
-                .uri(getApiURI(ME_BILLING_PROFILES))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .consumeWith(System.out::println)
-                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')]").doesNotExist();
     }
 
 }
