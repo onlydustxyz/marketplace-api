@@ -3082,7 +3082,8 @@ paths:
       summary: Remove coworker from billing profile
       operationId: removeCoworker
       description: |
-        Remove a coworker (or cancel his invitation) from billing profile. Caller must be an admin of the billing profile.
+        Remove a coworker (or cancel his invitation) from billing profile. 
+        Caller must be an admin of the billing profile or the coworker being removed.
       parameters:
         - in: path
           name: billingProfileId

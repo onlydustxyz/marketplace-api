@@ -10,11 +10,14 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
@@ -25,6 +28,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TagAccounting
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
@@ -37,6 +41,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     EntityManagerFactory entityManagerFactory;
 
     @Test
+    @Order(1)
     void should_be_authenticated() {
         // When
         client.get()
@@ -48,6 +53,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_get_coworkers_of_individual_billing_profile() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -94,6 +100,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_get_coworkers_of_self_employed_billing_profile() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -139,6 +146,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(2)
     void should_get_coworkers_of_company() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -184,6 +192,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(10)
     void should_invite_coworkers_of_company() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -205,6 +214,8 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
+
+        final var invitedGithubUserId = 123456789999L;
 
         // When
         client.post()
@@ -237,7 +248,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[0].joinedAt").isNotEmpty()
                 .jsonPath("$.coworkers[0].invitedAt").isEqualTo(null)
                 .jsonPath("$.coworkers[1].id").isEqualTo(null)
-                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(123456789999L)
+                .jsonPath("$.coworkers[1].githubUserId").isEqualTo(invitedGithubUserId)
                 .jsonPath("$.coworkers[1].joinedAt").isEqualTo(null)
                 .jsonPath("$.coworkers[1].invitedAt").isNotEmpty()
                 .json("""
@@ -339,6 +350,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(2)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
 
         // When
         client.post()
@@ -414,6 +437,17 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(1)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')]").doesNotExist();
+
         // When
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
@@ -488,6 +522,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(2)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.post()
                 .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
@@ -512,8 +558,10 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.billingProfiles.length()").isEqualTo(2)
                 .jsonPath("$.billingProfiles[?(@.type == 'SELF_EMPLOYED')].pendingInvitationResponse").isEqualTo(false)
-                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true);
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
 
         // When
         client.post()
@@ -530,7 +578,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
-        // When
+        // Then
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
@@ -544,7 +592,6 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.canLeave").isEqualTo(true)
                 .jsonPath("$.me.invitation").isNotEmpty();
 
-        // Then
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_COWORKERS.formatted(companyBillingProfile.id().value().toString()),
                         Map.of("pageIndex", "0", "pageSize", "50")))
@@ -600,9 +647,24 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles.length()").isEqualTo(2)
+                .jsonPath("$.billingProfiles[?(@.type == 'SELF_EMPLOYED')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
     }
 
     @Test
+    @Order(11)
     void should_remove_coworkers_from_company() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -700,6 +762,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.delete()
                 .uri(getApiURI(BILLING_PROFILES_DELETE_COWORKER.formatted(companyBillingProfile.id().value().toString(), "595505")))
@@ -740,9 +814,21 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')]").doesNotExist();
     }
 
     @Test
+    @Order(12)
     void should_unlink_payout_preferences_and_rewards_when_removing_coworkers_from_company() {
         //Given
         final var pierre = userAuthHelper.authenticatePierre();
@@ -968,6 +1054,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    @Order(20)
     void should_update_coworkers_role() {
         // Given
         final var admin = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -1015,6 +1102,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
         ;
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.put()
                 .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().toString(), coworker.user().getGithubUserId())))
@@ -1045,6 +1144,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
                 .jsonPath("$.coworkers[1].role").isEqualTo("ADMIN")
         ;
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
 
         // When
         client.put()
@@ -1077,6 +1188,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
         ;
 
+        // When
         client.post()
                 .uri(getApiURI(ME_BILLING_PROFILES_POST_COWORKER_INVITATIONS.formatted(companyBillingProfile.id().value().toString())))
                 .header("Authorization", "Bearer " + coworker.jwt())
@@ -1091,6 +1203,19 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+        // Then
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.put()
                 .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().toString(), coworker.user().getGithubUserId())))
@@ -1122,6 +1247,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].role").isEqualTo("ADMIN")
         ;
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.put()
                 .uri(getApiURI(BILLING_PROFILES_COWORKER_ROLE.formatted(companyBillingProfile.id().value().toString(), coworker.user().getGithubUserId())))
@@ -1152,9 +1289,22 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.coworkers[1].githubUserId").isEqualTo(coworker.user().getGithubUserId())
                 .jsonPath("$.coworkers[1].role").isEqualTo("MEMBER")
         ;
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + coworker.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
     }
 
     @Test
+    @Order(21)
     void should_cancel_coworker_invitation_from_company() {
         // Given
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
@@ -1237,6 +1387,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
+
         // When
         client.delete()
                 .uri(getApiURI(BILLING_PROFILES_DELETE_COWORKER.formatted(companyBillingProfile.id().value().toString(), "123456789999")))
@@ -1277,6 +1439,17 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(ME_BILLING_PROFILES))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')]").doesNotExist();
     }
 
 }
