@@ -32,4 +32,25 @@ public class ConcurrentTesting {
         startLatch.countDown();
         endLatch.await();
     }
+
+    public static void runConcurrently(java.lang.Runnable... taskPerThread) throws InterruptedException {
+        final ExecutorService service = Executors.newFixedThreadPool(taskPerThread.length);
+        final CountDownLatch startLatch = new CountDownLatch(1);
+        final CountDownLatch endLatch = new CountDownLatch(taskPerThread.length);
+
+        for (final var task : taskPerThread) {
+            service.execute(() -> {
+                try {
+                    startLatch.await();
+                    task.run();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } finally {
+                    endLatch.countDown();
+                }
+            });
+        }
+        startLatch.countDown();
+        endLatch.await();
+    }
 }
