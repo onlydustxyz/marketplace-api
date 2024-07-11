@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+
 @AllArgsConstructor
 public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     private final RewardStatusRepository rewardStatusRepository;
@@ -32,19 +34,25 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Override
     @Transactional
     public void updateInvoiceReceivedAt(@NonNull RewardId rewardId, ZonedDateTime invoiceReceivedAt) {
-        rewardStatusRepository.updateInvoiceReceivedAt(rewardId.value(), DateMapper.ofNullable(invoiceReceivedAt));
+        if (rewardStatusRepository.updateInvoiceReceivedAt(rewardId.value(), DateMapper.ofNullable(invoiceReceivedAt)) != 1) {
+            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+        }
     }
 
     @Override
     @Transactional
     public void updatePaidAt(@NonNull RewardId rewardId, ZonedDateTime paidAt) {
-        rewardStatusRepository.updatePaidAt(rewardId.value(), DateMapper.ofNullable(paidAt));
+        if (rewardStatusRepository.updatePaidAt(rewardId.value(), DateMapper.ofNullable(paidAt)) != 1) {
+            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+        }
     }
 
     @Override
     @Transactional
     public void updateUsdAmount(@NonNull RewardId rewardId, ConvertedAmount usdAmount) {
-        rewardStatusRepository.updateUsdAmount(rewardId.value(), usdAmount.convertedAmount().getValue(), usdAmount.conversionRate());
+        if (rewardStatusRepository.updateUsdAmount(rewardId.value(), usdAmount.convertedAmount().getValue(), usdAmount.conversionRate()) != 1) {
+            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+        }
     }
 
     @Override
@@ -52,12 +60,14 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     public void updateAccountingData(@NonNull RewardId rewardId, @NonNull Boolean sponsorHasEnoughFund, ZonedDateTime unlockDate,
                                      @NonNull Set<Network> networks,
                                      ConvertedAmount usdAmount) {
-        rewardStatusRepository.updateAccountingData(rewardId.value(),
+        if (rewardStatusRepository.updateAccountingData(rewardId.value(),
                 sponsorHasEnoughFund,
                 DateMapper.ofNullable(unlockDate),
                 networks.stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new),
                 usdAmount.convertedAmount().getValue(),
-                usdAmount.conversionRate());
+                usdAmount.conversionRate()) != 1) {
+            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+        }
     }
 
     @Override

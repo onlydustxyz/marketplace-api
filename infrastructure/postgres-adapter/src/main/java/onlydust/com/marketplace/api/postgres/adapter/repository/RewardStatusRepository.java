@@ -32,13 +32,13 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
 
     @Modifying(clearAutomatically = true)
     @Query("update RewardStatusDataEntity r set r.invoiceReceivedAt = :invoiceReceivedAt where r.rewardId = :rewardId")
-    void updateInvoiceReceivedAt(@NonNull UUID rewardId,
-                                 Date invoiceReceivedAt);
+    int updateInvoiceReceivedAt(@NonNull UUID rewardId,
+                                Date invoiceReceivedAt);
 
     @Modifying(clearAutomatically = true)
     @Query("update RewardStatusDataEntity r set r.paidAt = :paidAt where r.rewardId = :rewardId")
-    void updatePaidAt(@NonNull UUID rewardId,
-                      Date paidAt);
+    int updatePaidAt(@NonNull UUID rewardId,
+                     Date paidAt);
 
     @Modifying(clearAutomatically = true)
     @Query("""
@@ -47,9 +47,9 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
             r.usdConversionRate = :usdConversionRate
             where r.rewardId = :rewardId
             """)
-    void updateUsdAmount(@NonNull UUID rewardId,
-                         BigDecimal amountUsdEquivalent,
-                         BigDecimal usdConversionRate);
+    int updateUsdAmount(@NonNull UUID rewardId,
+                        BigDecimal amountUsdEquivalent,
+                        BigDecimal usdConversionRate);
 
     @Modifying(clearAutomatically = true)
     @Query("""
@@ -61,10 +61,10 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
             r.usdConversionRate = :usdConversionRate
             where r.rewardId = :rewardId
             """)
-    void updateAccountingData(@NonNull UUID rewardId,
-                              @NonNull Boolean sponsorHasEnoughFund,
-                              Date unlockDate,
-                              @NonNull NetworkEnumEntity[] networks,
-                              BigDecimal amountUsdEquivalent,
-                              BigDecimal usdConversionRate);
+    int updateAccountingData(@NonNull UUID rewardId,
+                             @NonNull Boolean sponsorHasEnoughFund,
+                             Date unlockDate,
+                             @NonNull NetworkEnumEntity[] networks,
+                             BigDecimal amountUsdEquivalent,
+                             BigDecimal usdConversionRate);
 }
