@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,6 @@ import java.util.Set;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.ETH;
 import static onlydust.com.marketplace.accounting.domain.stubs.Currencies.USD;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 public class RewardStatusServiceTest {
@@ -81,7 +79,7 @@ public class RewardStatusServiceTest {
 
         // Then
         final var capturedRewardStatus = ArgumentCaptor.forClass(RewardStatusData.class);
-        verify(rewardStatusStorage).save(capturedRewardStatus.capture());
+        verify(rewardStatusStorage).persist(capturedRewardStatus.capture());
         final var savedRewardStatus = capturedRewardStatus.getValue();
         assertThat(savedRewardStatus.rewardId()).isEqualTo(rewardId);
         assertThat(savedRewardStatus.sponsorHasEnoughFund()).isTrue();
@@ -110,22 +108,6 @@ public class RewardStatusServiceTest {
         final RewardId rewardId = RewardId.random();
 
         @Nested
-        class GivenANonExistingReward {
-            @BeforeEach
-            void setup() {
-                when(rewardUsdEquivalentStorage.get(rewardId)).thenReturn(Optional.empty());
-                when(rewardStatusStorage.get(List.of(rewardId))).thenReturn(List.of());
-            }
-
-            @Test
-            void should_fail_if_reward_does_not_exist() {
-                assertThatThrownBy(() -> rewardStatusService.refreshRewardsUsdEquivalentOf(rewardId))
-                        .isInstanceOf(OnlyDustException.class)
-                        .hasMessage("Some reward statuses were not found");
-            }
-        }
-
-        @Nested
         class GivenAReward {
             final RewardUsdEquivalent rewardUsdEquivalent = mock(RewardUsdEquivalent.class);
             final BigDecimal rewardAmount = BigDecimal.valueOf(faker.number().randomNumber(3, true));
@@ -147,10 +129,11 @@ public class RewardStatusServiceTest {
                 rewardStatusService.refreshRewardsUsdEquivalentOf(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount()).isEmpty();
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+                verify(rewardStatusStorage).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId);
+                assertThat(rewardUsdAmountCaptor.getValue()).isNull();
             }
 
             @Test
@@ -166,11 +149,13 @@ public class RewardStatusServiceTest {
                 rewardStatusService.refreshRewardsUsdEquivalentOf(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount().get().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
-                assertThat(rewardStatus.usdAmount().get().conversionRate()).isEqualTo(price);
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+                verify(rewardStatusStorage).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId);
+                assertThat(rewardUsdAmountCaptor.getValue()).isNotNull();
+                assertThat(rewardUsdAmountCaptor.getValue().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
+                assertThat(rewardUsdAmountCaptor.getValue().conversionRate()).isEqualTo(price);
             }
         }
 
@@ -188,11 +173,11 @@ public class RewardStatusServiceTest {
             rewardStatusService.refreshRewardsUsdEquivalents();
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
+            final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+            final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+            verify(rewardStatusStorage, times(2)).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+            assertThat(rewardIdCaptor.getAllValues()).hasSize(2);
+            assertThat(rewardUsdAmountCaptor.getAllValues()).allMatch(r -> r != null && r.convertedAmount().getValue().compareTo(BigDecimal.ZERO) > 0);
         }
     }
 }

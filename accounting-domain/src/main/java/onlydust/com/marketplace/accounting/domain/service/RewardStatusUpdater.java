@@ -46,7 +46,7 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
 
     @Override
     public void onRewardPaid(RewardId rewardId) {
-        rewardStatusStorage.save(mustGetRewardStatus(rewardId).paidAt(ZonedDateTime.now()));
+        rewardStatusStorage.updatePaidAt(rewardId, ZonedDateTime.now());
 
         invoiceStorage.invoiceOf(rewardId).ifPresent(invoice -> {
             if (invoice.rewards().stream().allMatch(reward -> mustGetRewardStatus(reward.id()).isPaid())) {
@@ -59,7 +59,7 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     public void onInvoiceUploaded(BillingProfile.Id billingProfileId, Invoice.Id invoiceId, boolean isExternal) {
         final var invoice = invoiceStorage.get(invoiceId).orElseThrow(() -> notFound("Invoice %s not found".formatted(invoiceId)));
         invoice.rewards().forEach(reward -> {
-            rewardStatusStorage.save(mustGetRewardStatus(reward.id()).invoiceReceivedAt(invoice.createdAt()));
+            rewardStatusStorage.updateInvoiceReceivedAt(reward.id(), invoice.createdAt());
         });
     }
 
@@ -67,7 +67,7 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     public void onInvoiceRejected(final @NonNull Invoice.Id invoiceId, final @NonNull String rejectionReason) {
         final var invoice = invoiceStorage.get(invoiceId)
                 .orElseThrow(() -> internalServerError("Invoice %s not found".formatted(invoiceId)));
-        invoice.rewards().forEach(reward -> rewardStatusStorage.save(mustGetRewardStatus(reward.id()).invoiceReceivedAt(null)));
+        invoice.rewards().forEach(reward -> rewardStatusStorage.updateInvoiceReceivedAt(reward.id(), null));
     }
 
     private RewardStatusData mustGetRewardStatus(RewardId rewardId) {

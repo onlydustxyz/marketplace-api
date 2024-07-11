@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @Slf4j
 public class RewardStatusService implements RewardStatusFacadePort {
@@ -45,55 +43,44 @@ public class RewardStatusService implements RewardStatusFacadePort {
     @Override
     public void refreshRewardsUsdEquivalents() {
         rewardStatusStorage.notRequested()
-                .forEach(this::refreshUsdAmount);
+                .stream().map(RewardStatusData::rewardId)
+                .forEach(this::refreshRewardsUsdEquivalentOf);
     }
 
     @Override
     public void refreshRelatedRewardsStatuses(SponsorAccountStatement sponsorAccount) {
-        sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> {
-            final var rewardStatus = rewardStatusStorage.get(rewardId)
-                    .orElseThrow(() -> notFound("RewardStatus not found for reward %s".formatted(rewardId)));
-            update(sponsorAccount.accountBookFacade(), rewardStatus);
-        });
+        final var accountBookFacade = sponsorAccount.accountBookFacade();
+
+        sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> rewardStatusStorage.updateAccountingData(rewardId,
+                accountBookFacade.isFunded(rewardId),
+                accountBookFacade.unlockDateOf(rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null),
+                accountBookFacade.networksOf(rewardId),
+                usdAmountOf(rewardId).orElse(null)));
     }
 
     @Override
     public void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
         rewardStatusStorage.notRequested(billingProfileId)
-                .forEach(this::refreshUsdAmount);
-    }
-
-    private void refreshUsdAmount(RewardStatusData rewardStatus) {
-        rewardStatusStorage.save(rewardStatus
-                .usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null))
-        );
-    }
-
-    private void update(AccountBookFacade accountBookFacade, RewardStatusData rewardStatus) {
-        rewardStatusStorage.save(rewardStatus
-                .sponsorHasEnoughFund(accountBookFacade.isFunded(rewardStatus.rewardId()))
-                .unlockDate(accountBookFacade.unlockDateOf(rewardStatus.rewardId()).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .withAdditionalNetworks(accountBookFacade.networksOf(rewardStatus.rewardId()))
-                .usdAmount(usdAmountOf(rewardStatus.rewardId()).orElse(null)));
+                .stream().map(RewardStatusData::rewardId)
+                .forEach(this::refreshRewardsUsdEquivalentOf);
     }
 
     @Override
     public void refreshRewardsUsdEquivalentOf(List<RewardId> rewardIds) {
-        final var statuses = rewardStatusStorage.get(rewardIds);
-        if (statuses.size() != rewardIds.size())
-            throw OnlyDustException.internalServerError("Some reward statuses were not found");
-
-        statuses.forEach(this::refreshUsdAmount);
+        rewardIds.forEach(this::refreshRewardsUsdEquivalentOf);
     }
 
     @Override
     public void refreshRewardsUsdEquivalentOf(RewardId rewardId) {
-        refreshRewardsUsdEquivalentOf(List.of(rewardId));
+        rewardStatusStorage.updateUsdAmount(rewardId, usdAmountOf(rewardId).orElse(null));
     }
 
     @Override
     public void create(AccountBookFacade accountBookFacade, RewardId rewardId) {
-        update(accountBookFacade, new RewardStatusData(rewardId));
+        rewardStatusStorage.persist(new RewardStatusData(rewardId).sponsorHasEnoughFund(accountBookFacade.isFunded(rewardId))
+                .unlockDate(accountBookFacade.unlockDateOf(rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
+                .withAdditionalNetworks(accountBookFacade.networksOf(rewardId))
+                .usdAmount(usdAmountOf(rewardId).orElse(null)));
     }
 
     @Override

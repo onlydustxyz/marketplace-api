@@ -28,12 +28,12 @@ import static java.util.Objects.isNull;
 @Table(name = "reward_status_data", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@Builder(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Accessors(fluent = true, chain = true)
 public class RewardStatusDataEntity {
     @Id
     @NonNull
+    @EqualsAndHashCode.Include
     UUID rewardId;
 
     Boolean sponsorHasEnoughFund;
@@ -53,11 +53,11 @@ public class RewardStatusDataEntity {
     BigDecimal usdConversionRate;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reward_id", referencedColumnName = "reward_id", insertable = false, updatable = false)
+    @JoinColumn(name = "rewardId", referencedColumnName = "rewardId", insertable = false, updatable = false)
     RewardStatusEntity status;
 
     public static RewardStatusDataEntity of(RewardStatusData rewardStatusData) {
-        return RewardStatusDataEntity.builder()
+        return new RewardStatusDataEntity()
                 .rewardId(rewardStatusData.rewardId().value())
                 .sponsorHasEnoughFund(rewardStatusData.sponsorHasEnoughFund())
                 .unlockDate(rewardStatusData.unlockDate().map(ZonedDateTime::toInstant).map(Date::from).orElse(null))
@@ -65,8 +65,7 @@ public class RewardStatusDataEntity {
                 .paidAt(rewardStatusData.paidAt().map(ZonedDateTime::toInstant).map(Date::from).orElse(null))
                 .networks(rewardStatusData.networks().stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new))
                 .amountUsdEquivalent(rewardStatusData.usdAmount().map(ConvertedAmount::convertedAmount).map(Amount::getValue).orElse(null))
-                .usdConversionRate(rewardStatusData.usdAmount().map(ConvertedAmount::conversionRate).orElse(null))
-                .build();
+                .usdConversionRate(rewardStatusData.usdAmount().map(ConvertedAmount::conversionRate).orElse(null));
     }
 
     public RewardStatusData toRewardStatus() {

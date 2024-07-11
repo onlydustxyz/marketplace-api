@@ -156,7 +156,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
         uploadInvoice(billingProfile, invoiceId, fileName, Invoice.Status.TO_REVIEW, data);
     }
 
-    @Transactional
     private void uploadInvoice(@NonNull BillingProfile billingProfile, Invoice.@NonNull Id invoiceId, String fileName,
                                @NonNull Invoice.Status status,
                                @NonNull InputStream data) {
