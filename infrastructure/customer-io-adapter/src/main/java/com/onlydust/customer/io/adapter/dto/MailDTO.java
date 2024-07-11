@@ -83,16 +83,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 NewCommitteeApplicationDTO.fromEvent(newCommitteeApplication));
     }
 
-    public static MailDTO<ProjectApplicationsToReviewByUserDTO> fromProjectApplicationsToReviewByUser(@NonNull CustomerIOProperties customerIOProperties,
-                                                                                                      @NonNull ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
-        return new MailDTO<>(customerIOProperties.getProjectApplicationsToReviewByUserEmailId().toString(),
-                mapIdentifiers(projectApplicationsToReviewByUser.getEmail(), projectApplicationsToReviewByUser.getUserId()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
-                projectApplicationsToReviewByUser.getEmail(),
-                "Applications to review daily report",
-                ProjectApplicationsToReviewByUserDTO.fromEvent(projectApplicationsToReviewByUser));
-    }
-
     public static MailDTO<ProjectApplicationAcceptedDTO> fromProjectApplicationAccepted(@NonNull CustomerIOProperties customerIOProperties,
                                                                                         @NonNull ProjectApplicationAccepted projectApplicationAccepted) {
         return new MailDTO<>(customerIOProperties.getProjectApplicationAcceptedEmailId().toString(),

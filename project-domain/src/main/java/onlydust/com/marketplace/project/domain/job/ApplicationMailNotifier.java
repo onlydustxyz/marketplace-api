@@ -19,10 +19,10 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubStoragePort githubStoragePort;
     private final UserStoragePort userStoragePort;
+    private final NewsBroadcasterPort newsBroadcasterPort;
 
     public void notifyProjectApplicationsToReview() {
-        final List<ProjectApplicationsToReviewByUser> applications = projectApplicationStoragePort.findProjectApplicationsToReview();
-        applications.forEach(projectMailOutboxPort::push);
+        newsBroadcasterPort.broadcastProjectApplicationsToReview(projectApplicationStoragePort.findProjectApplicationsToReview());
     }
 
     @Override
