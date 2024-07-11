@@ -265,6 +265,10 @@ public class AbstractMarketplaceApiIT {
         if (firstRun)
             postgresSQLContainer.start();
 
+        restoreDB(firstRun);
+    }
+
+    protected static void restoreDB(boolean firstRun) throws IOException, InterruptedException {
         assertThat(postgresSQLContainer.execInContainer("/scripts/restore_db.sh", Boolean.toString(firstRun)).getExitCode()).isEqualTo(0);
     }
 

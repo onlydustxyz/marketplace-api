@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -86,10 +87,11 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     );
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException, InterruptedException {
+        restoreDB(false);
+
         antho = userAuthHelper.authenticateAnthony();
         companyBillingProfileId = initBillingProfile(antho).value();
-
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));
     }
 
@@ -161,7 +163,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
         assertThat(invoiceIds).containsAll(rewardInvoiceIds);
     }
 
-    @Test
+    @RepeatedTest(10)
     @Order(2)
     void upload_invoice_while_refreshing_reward_usd_value() throws InterruptedException {
 
