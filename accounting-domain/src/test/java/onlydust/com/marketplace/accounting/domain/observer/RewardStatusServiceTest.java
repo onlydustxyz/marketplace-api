@@ -81,7 +81,7 @@ public class RewardStatusServiceTest {
 
         // Then
         final var capturedRewardStatus = ArgumentCaptor.forClass(RewardStatusData.class);
-        verify(rewardStatusStorage).save(capturedRewardStatus.capture());
+        verify(rewardStatusStorage).persist(capturedRewardStatus.capture());
         final var savedRewardStatus = capturedRewardStatus.getValue();
         assertThat(savedRewardStatus.rewardId()).isEqualTo(rewardId);
         assertThat(savedRewardStatus.sponsorHasEnoughFund()).isTrue();
@@ -147,10 +147,11 @@ public class RewardStatusServiceTest {
                 rewardStatusService.refreshRewardsUsdEquivalentOf(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount()).isEmpty();
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+                verify(rewardStatusStorage).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId);
+                assertThat(rewardUsdAmountCaptor.getValue()).isNull();
             }
 
             @Test
@@ -166,11 +167,13 @@ public class RewardStatusServiceTest {
                 rewardStatusService.refreshRewardsUsdEquivalentOf(rewardId);
 
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var rewardStatus = rewardStatusCaptor.getValue();
-                assertThat(rewardStatus.usdAmount().get().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
-                assertThat(rewardStatus.usdAmount().get().conversionRate()).isEqualTo(price);
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+                verify(rewardStatusStorage).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId);
+                assertThat(rewardUsdAmountCaptor.getValue()).isNotNull();
+                assertThat(rewardUsdAmountCaptor.getValue().convertedAmount().getValue()).isEqualTo(price.multiply(rewardAmount));
+                assertThat(rewardUsdAmountCaptor.getValue().conversionRate()).isEqualTo(price);
             }
         }
 
@@ -188,11 +191,11 @@ public class RewardStatusServiceTest {
             rewardStatusService.refreshRewardsUsdEquivalents();
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(2)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(2);
-            assertThat(rewardStatuses).allMatch(r -> r.usdAmount().isPresent());
+            final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+            final var rewardUsdAmountCaptor = ArgumentCaptor.forClass(ConvertedAmount.class);
+            verify(rewardStatusStorage, times(2)).updateUsdAmount(rewardIdCaptor.capture(), rewardUsdAmountCaptor.capture());
+            assertThat(rewardIdCaptor.getAllValues()).hasSize(2);
+            assertThat(rewardUsdAmountCaptor.getAllValues()).allMatch(r -> r != null && r.convertedAmount().getValue().compareTo(BigDecimal.ZERO) > 0);
         }
     }
 }

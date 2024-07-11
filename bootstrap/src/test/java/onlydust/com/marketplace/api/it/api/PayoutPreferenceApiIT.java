@@ -390,8 +390,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
 
         assertEquals(companyBillingProfile.id().value(), rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
 
-        final var r2Status = rewardStatusRepository.findById(r2.id()).orElseThrow();
-        rewardStatusRepository.save(r2Status.paidAt(new Date())); // Mark as paid without invoice (case for rewards before pennylane)
+        rewardStatusRepository.updatePaidAt(r2.id(), new Date()); // Mark as paid without invoice (case for rewards before pennylane)
 
         client.put()
                 .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))

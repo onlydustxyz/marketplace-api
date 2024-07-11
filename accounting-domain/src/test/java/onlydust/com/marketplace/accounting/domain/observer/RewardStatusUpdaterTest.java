@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -23,10 +24,7 @@ import org.mockito.ArgumentCaptor;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static onlydust.com.marketplace.accounting.domain.AccountBookTest.accountBookFromEvents;
 import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHelper.newKyb;
@@ -142,11 +140,11 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onRewardPaid(rewardId);
             {
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var newRewardStatus = rewardStatusCaptor.getValue();
-                assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId);
-                assertThat(newRewardStatus.paidAt()).isNotNull();
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardPaidAtCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
+                verify(rewardStatusStorage).updatePaidAt(rewardIdCaptor.capture(), rewardPaidAtCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId);
+                assertThat(rewardPaidAtCaptor.getValue()).isNotNull();
 
                 verify(invoiceStorage, never()).update(invoice.status(Invoice.Status.PAID));
             }
@@ -161,11 +159,11 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onRewardPaid(rewardId2);
             {
                 // Then
-                final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-                verify(rewardStatusStorage).save(rewardStatusCaptor.capture());
-                final var newRewardStatus = rewardStatusCaptor.getValue();
-                assertThat(newRewardStatus.rewardId()).isEqualTo(rewardId2);
-                assertThat(newRewardStatus.paidAt()).isNotNull();
+                final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+                final var rewardPaidAtCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
+                verify(rewardStatusStorage).updatePaidAt(rewardIdCaptor.capture(), rewardPaidAtCaptor.capture());
+                assertThat(rewardIdCaptor.getValue()).isEqualTo(rewardId2);
+                assertThat(rewardPaidAtCaptor.getValue()).isNotNull();
 
                 verify(invoiceStorage).update(invoice.status(Invoice.Status.PAID));
             }
@@ -259,11 +257,11 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onInvoiceUploaded(BillingProfile.Id.random(), invoice.id(), true);
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(3);
-            assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().orElseThrow().equals(invoice.createdAt()));
+            final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+            final var rewardInvoiceReceivedAtCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
+            verify(rewardStatusStorage, times(3)).updateInvoiceReceivedAt(rewardIdCaptor.capture(), rewardInvoiceReceivedAtCaptor.capture());
+            assertThat(rewardIdCaptor.getAllValues()).hasSize(3);
+            assertThat(rewardInvoiceReceivedAtCaptor.getAllValues()).allMatch(invoiceReceivedAt -> invoiceReceivedAt.equals(invoice.createdAt()));
         }
     }
 
@@ -310,11 +308,11 @@ public class RewardStatusUpdaterTest {
             rewardStatusUpdater.onInvoiceRejected(invoice.id(), "Invalid invoice");
 
             // Then
-            final var rewardStatusCaptor = ArgumentCaptor.forClass(RewardStatusData.class);
-            verify(rewardStatusStorage, times(3)).save(rewardStatusCaptor.capture());
-            final var rewardStatuses = rewardStatusCaptor.getAllValues();
-            assertThat(rewardStatuses).hasSize(3);
-            assertThat(rewardStatuses).allMatch(r -> r.invoiceReceivedAt().isEmpty());
+            final var rewardIdCaptor = ArgumentCaptor.forClass(RewardId.class);
+            final var rewardInvoiceReceivedAtCaptor = ArgumentCaptor.forClass(ZonedDateTime.class);
+            verify(rewardStatusStorage, times(3)).updateInvoiceReceivedAt(rewardIdCaptor.capture(), rewardInvoiceReceivedAtCaptor.capture());
+            assertThat(rewardIdCaptor.getAllValues()).hasSize(3);
+            assertThat(rewardInvoiceReceivedAtCaptor.getAllValues()).allMatch(Objects::isNull);
         }
     }
 

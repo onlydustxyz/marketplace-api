@@ -1378,7 +1378,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 RewardId.of("b0ceb0cc-294d-49e3-807e-d1a04acea11d")
         );
 
-        rewardIds.forEach(rewardId -> rewardStatusRepository.findById(rewardId.value()).ifPresent(r -> rewardStatusRepository.save(r.paidAt(new Date()))));
+        rewardIds.forEach(rewardId -> rewardStatusRepository.updatePaidAt(rewardId.value(), new Date()));
 
 
         client.get()
