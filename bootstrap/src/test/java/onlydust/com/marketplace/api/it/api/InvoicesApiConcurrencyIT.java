@@ -2,9 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
@@ -14,12 +12,11 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.api.contract.model.InvoicePreviewResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.GlobalSettingsRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.InvoiceRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagConcurrency;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -30,7 +27,10 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,7 +70,13 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     @Autowired
     RewardRepository rewardRepository;
     @Autowired
+    RewardStatusRepository rewardStatusRepository;
+    @Autowired
     RewardStatusService rewardStatusService;
+    @Autowired
+    QuoteStorage quoteStorage;
+    @Autowired
+    CurrencyRepository currencyRepository;
 
     UserAuthHelper.AuthenticatedUser antho;
     UUID companyBillingProfileId;
@@ -167,6 +173,12 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void upload_invoice_while_refreshing_reward_usd_value() throws InterruptedException {
 
+        quoteStorage.save(currencyRepository.findAll().stream()
+                .map(currency -> new Quote(Currency.Id.of(currency.id()), Currency.Id.of(accountingHelper.usd().id()), BigDecimal.ONE,
+                        Instant.now().minus(10, ChronoUnit.MINUTES)))
+                .toList());
+        rewardStatusService.refreshRewardsUsdEquivalents();
+
         final var invoicePreview = client.get()
                 .uri(getApiURI(BILLING_PROFILE_INVOICE_PREVIEW.formatted(companyBillingProfileId), Map.of(
                         "rewardIds", REWARD_IDS.stream().map(UUID::toString).collect(Collectors.joining(","))
@@ -180,9 +192,11 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
         assertThat(invoicePreview).isNotNull();
 
         // Assert that all rewards have the right invoice id
-        var rewards = rewardRepository.findAllById(REWARD_IDS);
+        final var rewards = rewardRepository.findAllById(REWARD_IDS);
+        final var rewardsStatusData = rewardStatusRepository.findAllById(REWARD_IDS);
         rewards.forEach(r -> assertThat(r.invoiceId()).isEqualTo(invoicePreview.getId()));
         rewards.forEach(r -> assertThat(r.status().status()).isEqualTo(RewardStatus.Input.PENDING_REQUEST));
+        rewardsStatusData.forEach(r -> assertThat(r.amountUsdEquivalent()).isEqualTo(rewards.stream().filter(reward -> reward.id().equals(r.rewardId())).findFirst().orElseThrow().amount()));
 
         // Accept the mandate
         client.put()
@@ -204,6 +218,12 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
             final var fileName = invocation.getArgument(0, String.class);
             return new URL("https://s3.storage.com/%s".formatted(fileName));
         });
+
+        // Change quotes to make sure rewards usd amount is updated
+        quoteStorage.save(currencyRepository.findAll().stream()
+                .map(currency -> new Quote(Currency.Id.of(currency.id()), Currency.Id.of(accountingHelper.usd().id()), BigDecimal.valueOf(2),
+                        Instant.now().minus(5, ChronoUnit.MINUTES)))
+                .toList());
 
         final CountDownLatch invoiceUploadDone = new CountDownLatch(1);
         runConcurrently(
@@ -230,9 +250,12 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
                 }
         );
 
-        rewards = rewardRepository.findAllById(REWARD_IDS);
-        rewards.forEach(r -> assertThat(r.invoiceId()).isEqualTo(invoicePreview.getId()));
-        rewards.forEach(r -> assertThat(r.status().status()).isEqualTo(RewardStatus.Input.PROCESSING));
+        final var updatedRewards = rewardRepository.findAllById(REWARD_IDS);
+        final var updatedRewardsStatusData = rewardStatusRepository.findAllById(REWARD_IDS);
+        updatedRewards.forEach(r -> assertThat(r.invoiceId()).isEqualTo(invoicePreview.getId()));
+        updatedRewards.forEach(r -> assertThat(r.status().status()).isEqualTo(RewardStatus.Input.PROCESSING));
+        updatedRewardsStatusData.forEach(r -> assertThat(r.amountUsdEquivalent())
+                .isEqualTo(updatedRewards.stream().filter(reward -> reward.id().equals(r.rewardId())).findFirst().orElseThrow().amount().multiply(BigDecimal.valueOf(2))));
     }
 
 }
