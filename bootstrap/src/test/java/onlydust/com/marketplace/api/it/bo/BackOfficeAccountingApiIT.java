@@ -12,12 +12,12 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
@@ -36,7 +36,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -80,7 +80,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Autowired
     PdfStoragePort pdfStoragePort;
     @Autowired
-    RewardStatusRepository rewardStatusRepository;
+    RewardStatusStorage rewardStatusStorage;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
 
     @BeforeEach
@@ -1378,7 +1378,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 RewardId.of("b0ceb0cc-294d-49e3-807e-d1a04acea11d")
         );
 
-        rewardIds.forEach(rewardId -> rewardStatusRepository.updatePaidAt(rewardId.value(), new Date()));
+        rewardIds.forEach(rewardId -> rewardStatusStorage.updatePaidAt(rewardId, ZonedDateTime.now()));
 
 
         client.get()

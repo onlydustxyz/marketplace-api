@@ -1,5 +1,8 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
@@ -1465,25 +1468,28 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
         reward1.currencyId(currencyRepository.findByCode("ETH").orElseThrow().id());
         reward1.amount(BigDecimal.valueOf(20.5));
         rewardRepository.save(reward1);
-        rewardStatusRepository.updateUsdAmount(reward1.id(), BigDecimal.valueOf(31426.5), BigDecimal.valueOf(31426.5).divide(reward1.amount()));
+        rewardStatusStorage.updateUsdAmount(RewardId.of(reward1.id()),
+                new ConvertedAmount(Amount.of(BigDecimal.valueOf(31426.5)), BigDecimal.valueOf(31426.5).divide(reward1.amount())));
 
         final var reward2 = rewardRepository.findById(UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a")).orElseThrow();
         reward2.currencyId(currencyRepository.findByCode("APT").orElseThrow().id());
         reward2.amount(BigDecimal.valueOf(2000));
         rewardRepository.save(reward2);
-        rewardStatusRepository.updateUsdAmount(reward2.id(), BigDecimal.valueOf(1120), BigDecimal.valueOf(1120).divide(reward2.amount()));
+        rewardStatusStorage.updateUsdAmount(RewardId.of(reward2.id()),
+                new ConvertedAmount(Amount.of(BigDecimal.valueOf(1120)), BigDecimal.valueOf(1120).divide(reward2.amount())));
 
         final var reward3 = rewardRepository.findById(UUID.fromString("40fda3c6-2a3f-4cdd-ba12-0499dd232d53")).orElseThrow();
         reward3.currencyId(currencyRepository.findByCode("OP").orElseThrow().id());
         reward3.amount(BigDecimal.valueOf(450));
         rewardRepository.save(reward3);
-        rewardStatusRepository.updateUsdAmount(reward3.id(), BigDecimal.valueOf(643.5), BigDecimal.valueOf(643.5).divide(reward3.amount()));
+        rewardStatusStorage.updateUsdAmount(RewardId.of(reward3.id()),
+                new ConvertedAmount(Amount.of(BigDecimal.valueOf(643.5)), BigDecimal.valueOf(643.5).divide(reward3.amount())));
 
         final var reward4 = rewardRepository.findById(UUID.fromString("5b96ca1e-4ad2-41c1-8819-520b885d9223")).orElseThrow();
         reward4.currencyId(currencyRepository.findByCode("STRK").orElseThrow().id());
         reward4.amount(BigDecimal.valueOf(500000));
         rewardRepository.save(reward4);
-        rewardStatusRepository.updateUsdAmount(reward4.id(), null, null);
+        rewardStatusStorage.updateUsdAmount(RewardId.of(reward4.id()), null);
 
         // When
         client.get()

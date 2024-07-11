@@ -1,14 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardStatusDataEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
@@ -20,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -91,10 +91,9 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
                 authenticatedUser.user().getGithubUserId(),
                 STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), STRK, null, null, null));
 
-        Stream.of(r1, r2, r3).forEach(r -> rewardStatusRepository.save(new RewardStatusDataEntity()
-                .rewardId(r.id())
-                .amountUsdEquivalent(BigDecimal.ONE)
-                .networks(new NetworkEnumEntity[]{NetworkEnumEntity.starknet}))
+        Stream.of(r1, r2, r3).forEach(r -> rewardStatusStorage.persist(new RewardStatusData(RewardId.of(r.id()))
+                .usdAmount(new ConvertedAmount(Amount.of(1L), BigDecimal.ONE))
+                .withAdditionalNetworks(Network.STARKNET))
         );
 
         // When
@@ -390,7 +389,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
 
         assertEquals(companyBillingProfile.id().value(), rewardRepository.findById(r1.id()).orElseThrow().billingProfileId());
 
-        rewardStatusRepository.updatePaidAt(r2.id(), new Date()); // Mark as paid without invoice (case for rewards before pennylane)
+        rewardStatusStorage.updatePaidAt(RewardId.of(r2.id()), ZonedDateTime.now()); // Mark as paid without invoice (case for rewards before pennylane)
 
         client.put()
                 .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))

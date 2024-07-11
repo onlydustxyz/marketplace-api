@@ -10,6 +10,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
@@ -240,7 +241,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     RewardRepository rewardRepository;
     @Autowired
-    RewardStatusRepository rewardStatusRepository;
+    RewardStatusStorage rewardStatusStorage;
     @Autowired
     InvoiceRewardRepository invoiceRewardRepository;
     @Autowired
