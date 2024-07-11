@@ -49,7 +49,7 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
 
     @Override
     public ResponseEntity<BatchPaymentPageResponse> getBatchPayments(Integer pageIndex, Integer pageSize, List<BatchPaymentStatus> statuses) {
-        final var page = batchPaymentReadRepository.findAllByStatusIn(statuses, PageRequest.of(pageIndex, pageSize));
+        final var page = batchPaymentReadRepository.findAllByStatusIn(statuses, PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
 
         final var response = new BatchPaymentPageResponse()
                 .batchPayments(page.getContent().stream().map(BatchPaymentReadEntity::toResponse).toList())
