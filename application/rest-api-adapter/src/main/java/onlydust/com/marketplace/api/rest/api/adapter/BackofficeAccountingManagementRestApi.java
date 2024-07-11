@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -124,9 +125,9 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
         final var network = mapTransactionNetwork(payRewardRequest.getNetwork());
-        final var transactionTimestamp = blockchainFacadePort.getTransactionTimestamp(
-                network.blockchain().orElseThrow(),
-                payRewardRequest.getReference());
+        final var transactionTimestamp = network.blockchain()
+                .map(blockchain -> blockchainFacadePort.getTransactionTimestamp(blockchain, payRewardRequest.getReference()))
+                .orElse(ZonedDateTime.now());
 
         accountingFacadePort.pay(
                 RewardId.of(rewardId),
