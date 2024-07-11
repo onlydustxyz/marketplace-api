@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -43,12 +44,14 @@ public class RewardStatusService implements RewardStatusFacadePort {
     }
 
     @Override
+    @Transactional
     public void refreshRewardsUsdEquivalents() {
         rewardStatusStorage.notRequested()
                 .forEach(this::refreshUsdAmount);
     }
 
     @Override
+    @Transactional
     public void refreshRelatedRewardsStatuses(SponsorAccountStatement sponsorAccount) {
         sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> {
             final var rewardStatus = rewardStatusStorage.get(rewardId)
@@ -58,6 +61,7 @@ public class RewardStatusService implements RewardStatusFacadePort {
     }
 
     @Override
+    @Transactional
     public void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
         rewardStatusStorage.notRequested(billingProfileId)
                 .forEach(this::refreshUsdAmount);
@@ -78,6 +82,7 @@ public class RewardStatusService implements RewardStatusFacadePort {
     }
 
     @Override
+    @Transactional
     public void refreshRewardsUsdEquivalentOf(List<RewardId> rewardIds) {
         final var statuses = rewardStatusStorage.get(rewardIds);
         if (statuses.size() != rewardIds.size())
@@ -87,6 +92,7 @@ public class RewardStatusService implements RewardStatusFacadePort {
     }
 
     @Override
+    @Transactional
     public void refreshRewardsUsdEquivalentOf(RewardId rewardId) {
         refreshRewardsUsdEquivalentOf(List.of(rewardId));
     }
