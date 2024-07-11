@@ -19,7 +19,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
 public class PostgresRewardStatusAdapter implements RewardStatusStorage {
@@ -35,7 +36,7 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Transactional
     public void updateInvoiceReceivedAt(@NonNull RewardId rewardId, ZonedDateTime invoiceReceivedAt) {
         if (rewardStatusRepository.updateInvoiceReceivedAt(rewardId.value(), DateMapper.ofNullable(invoiceReceivedAt)) != 1) {
-            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+            throw internalServerError("Reward %s could not be updated as it does not exist".formatted(rewardId));
         }
     }
 
@@ -43,15 +44,16 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
     @Transactional
     public void updatePaidAt(@NonNull RewardId rewardId, ZonedDateTime paidAt) {
         if (rewardStatusRepository.updatePaidAt(rewardId.value(), DateMapper.ofNullable(paidAt)) != 1) {
-            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+            throw internalServerError("Reward %s could not be updated as it does not exist".formatted(rewardId));
         }
     }
 
     @Override
     @Transactional
     public void updateUsdAmount(@NonNull RewardId rewardId, ConvertedAmount usdAmount) {
-        if (rewardStatusRepository.updateUsdAmount(rewardId.value(), usdAmount.convertedAmount().getValue(), usdAmount.conversionRate()) != 1) {
-            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+        if (rewardStatusRepository.updateUsdAmount(rewardId.value(), isNull(usdAmount) ? null : usdAmount.convertedAmount().getValue(), isNull(usdAmount) ?
+                null : usdAmount.conversionRate()) != 1) {
+            throw internalServerError("Reward %s could not be updated as it does not exist".formatted(rewardId));
         }
     }
 
@@ -64,9 +66,9 @@ public class PostgresRewardStatusAdapter implements RewardStatusStorage {
                 sponsorHasEnoughFund,
                 DateMapper.ofNullable(unlockDate),
                 networks.stream().map(NetworkEnumEntity::of).toArray(NetworkEnumEntity[]::new),
-                usdAmount.convertedAmount().getValue(),
-                usdAmount.conversionRate()) != 1) {
-            throw notFound("Reward %s could not be updated as it does not exist".formatted(rewardId));
+                isNull(usdAmount) ? null : usdAmount.convertedAmount().getValue(),
+                isNull(usdAmount) ? null : usdAmount.conversionRate()) != 1) {
+            throw internalServerError("Reward %s could not be updated as it does not exist".formatted(rewardId));
         }
     }
 

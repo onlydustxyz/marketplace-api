@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -51,7 +50,7 @@ public class RewardStatusService implements RewardStatusFacadePort {
     @Override
     public void refreshRelatedRewardsStatuses(SponsorAccountStatement sponsorAccount) {
         final var accountBookFacade = sponsorAccount.accountBookFacade();
-        
+
         sponsorAccount.awaitingPayments().forEach((rewardId, amount) -> rewardStatusStorage.updateAccountingData(rewardId,
                 accountBookFacade.isFunded(rewardId),
                 accountBookFacade.unlockDateOf(rewardId).map(d -> d.atZone(ZoneOffset.UTC)).orElse(null),
@@ -60,7 +59,6 @@ public class RewardStatusService implements RewardStatusFacadePort {
     }
 
     @Override
-    @Transactional
     public void refreshRewardsUsdEquivalentOf(BillingProfile.Id billingProfileId) {
         rewardStatusStorage.notRequested(billingProfileId)
                 .stream().map(RewardStatusData::rewardId)
