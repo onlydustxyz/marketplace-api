@@ -189,6 +189,7 @@ public class ProjectReadEntity {
                 .logoUrl(logoUrl)
                 .slug(slug)
                 .shortDescription(shortDescription)
-                .visibility(visibility);
+                .visibility(visibility)
+                .languages(languages.stream().map(LanguageReadEntity::toDto).toList());
     }
 }

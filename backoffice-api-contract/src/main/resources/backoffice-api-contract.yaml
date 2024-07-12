@@ -4785,7 +4785,7 @@ components:
         - slug
         - status
         - title
-        - githubLabel
+        - githubLabels
         - subscriberCount
         - startDate
         - endDate
@@ -4854,6 +4854,7 @@ components:
       type: object
       required:
         - status
+        - githubLabels
         - title
         - subtitle
         - description

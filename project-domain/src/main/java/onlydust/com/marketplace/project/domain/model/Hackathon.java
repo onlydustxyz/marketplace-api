@@ -6,8 +6,9 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -28,7 +29,6 @@ public class Hackathon {
     Status status;
     @NonNull
     String title;
-    @NonNull
     String subtitle;
     String description;
     String location;
@@ -38,23 +38,28 @@ public class Hackathon {
     @NonNull
     ZonedDateTime endDate;
     @NonNull
-    List<NamedLink> links = new ArrayList<>();
+    Set<String> githubLabels = new HashSet<>();
     @NonNull
-    List<UUID> sponsorIds = new ArrayList<>();
+    Set<NamedLink> communityLinks = new HashSet<>();
     @NonNull
-    List<Track> tracks = new ArrayList<>();
+    Set<NamedLink> links = new HashSet<>();
+    @NonNull
+    Set<UUID> sponsorIds = new HashSet<>();
+    @NonNull
+    Set<UUID> projectIds = new HashSet<>();
 
     public @NonNull String slug() {
         return title.replaceAll("[^a-zA-Z0-9_\\- ]+", "").trim().replaceAll("\\s+", "-").toLowerCase();
     }
 
-    public Hackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
+    public Hackathon(@NonNull String title, @NonNull Collection<String> githubLabels, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate) {
         this.id = Id.random();
         this.status = Status.DRAFT;
         this.title = title;
-        this.subtitle = subtitle;
+        this.githubLabels.addAll(githubLabels);
         this.startDate = startDate;
         this.endDate = endDate;
+        this.subtitle = null;
         this.description = null;
         this.location = null;
         this.totalBudget = null;
@@ -80,14 +85,5 @@ public class Hackathon {
     public enum Status {
         DRAFT,
         PUBLISHED
-    }
-
-    public record Track(
-            @NonNull String name,
-            String subtitle,
-            String description,
-            String iconSlug,
-            @NonNull List<UUID> projectIds
-    ) {
     }
 }

@@ -4,10 +4,11 @@ import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 public interface HackathonFacadePort {
-    void createHackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate);
+    void createHackathon(@NonNull String title, @NonNull Collection<String> githubLabels, @NonNull ZonedDateTime startDate, @NonNull ZonedDateTime endDate);
 
     void updateHackathon(@NonNull Hackathon hackathon);
 
