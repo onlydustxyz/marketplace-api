@@ -9,7 +9,7 @@ echo 'init_config:
           username: datadog
           password: $DD_DATABASE_PWD
 ' >> /app/.apt/etc/datadog-agent/conf.d/postgres.d/conf.yaml
-sudo systemctl restart datadog-agent
+systemctl restart datadog-agent
 
 wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
 java -javaagent:dd-java-agent.jar "$@" -XX:FlightRecorderOptions=stackdepth=256 -jar bootstrap/target/marketplace-api.jar
