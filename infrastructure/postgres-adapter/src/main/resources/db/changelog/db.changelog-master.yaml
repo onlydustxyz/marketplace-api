@@ -411,3 +411,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000286_fix_payment_limit_per_country.sql
   - include:
       file: db/changelog/changelogs/00000287_fix_all_billing_profile_users.sql
+  - include:
+      file: db/changelog/changelogs/00000288_alter_hackathon_tables.sql

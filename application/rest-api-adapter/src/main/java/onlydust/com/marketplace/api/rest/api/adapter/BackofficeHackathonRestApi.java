@@ -26,7 +26,7 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
 
     @Override
     public ResponseEntity<Void> createHackathon(CreateHackathonRequest request) {
-        hackathonFacadePort.createHackathon(request.getTitle(), request.getSubtitle(), request.getStartDate(),
+        hackathonFacadePort.createHackathon(request.getTitle(), request.getGithubLabels(), request.getStartDate(),
                 request.getEndDate());
         return ResponseEntity.noContent().build();
     }

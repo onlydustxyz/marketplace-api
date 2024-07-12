@@ -21,20 +21,20 @@ public interface HackathonMapper {
                 .endDate(request.getEndDate())
                 .build();
 
+        hackathon.githubLabels().addAll(request.getGithubLabels());
+
+        hackathon.communityLinks().addAll(request.getCommunityLinks().stream().map(link -> NamedLink.builder()
+                .url(link.getUrl())
+                .value(link.getValue())
+                .build()).toList());
+
         hackathon.links().addAll(request.getLinks().stream().map(link -> NamedLink.builder()
                 .url(link.getUrl())
                 .value(link.getValue())
                 .build()).toList());
 
         hackathon.sponsorIds().addAll(request.getSponsorIds());
-
-        hackathon.tracks().addAll(request.getTracks().stream().map(track -> new Hackathon.Track(
-                track.getName(),
-                track.getSubtitle(),
-                track.getDescription(),
-                track.getIconSlug(),
-                track.getProjectIds()
-        )).toList());
+        hackathon.projectIds().addAll(request.getProjectIds());
         return hackathon;
     }
 

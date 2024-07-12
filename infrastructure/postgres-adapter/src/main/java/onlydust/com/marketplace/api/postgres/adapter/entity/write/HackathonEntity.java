@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import io.hypersistence.utils.hibernate.type.array.UUIDArrayType;
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.json.HackathonTrack;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import org.hibernate.annotations.JdbcType;
@@ -17,7 +16,9 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
 
@@ -44,7 +45,6 @@ public class HackathonEntity {
 
     @NonNull
     String title;
-    @NonNull
     String subtitle;
     String description;
     String location;
@@ -54,15 +54,23 @@ public class HackathonEntity {
     @NonNull
     Date endDate;
 
+    @Type(value = StringArrayType.class)
+    @Column(nullable = false, columnDefinition = "text[]")
+    String[] githubLabels;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    List<NamedLink> communityLinks;
+
     @JdbcTypeCode(SqlTypes.JSON)
     List<NamedLink> links;
 
-    @Type(value = UUIDArrayType.class)
-    @Column(nullable = false, columnDefinition = "uuid[]")
-    UUID[] sponsorIds;
+    @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @NonNull
+    Set<HackathonSponsorEntity> sponsors;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    List<HackathonTrack> tracks;
+    @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @NonNull
+    Set<HackathonProjectEntity> projects;
 
     public static HackathonEntity of(Hackathon hackathon) {
         return HackathonEntity.builder()
@@ -76,32 +84,41 @@ public class HackathonEntity {
                 .budget(hackathon.totalBudget())
                 .startDate(Date.from(hackathon.startDate().toInstant()))
                 .endDate(Date.from(hackathon.endDate().toInstant()))
-                .links(hackathon.links())
-                .sponsorIds(hackathon.sponsorIds().toArray(UUID[]::new))
-                .tracks(hackathon.tracks().stream().map(HackathonTrack::of).toList())
+                .githubLabels(hackathon.githubLabels().toArray(String[]::new))
+                .communityLinks(hackathon.communityLinks().stream().toList())
+                .links(hackathon.links().stream().toList())
+                .sponsors(hackathon.sponsorIds().stream()
+                        .map(sponsorId -> new HackathonSponsorEntity(hackathon.id().value(), sponsorId))
+                        .collect(Collectors.toSet()))
+                .projects(hackathon.projectIds().stream()
+                        .map(projectId -> new HackathonProjectEntity(hackathon.id().value(), projectId))
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
     public Hackathon toDomain() {
         final Hackathon hackathon = Hackathon.builder()
                 .id(Hackathon.Id.of(id))
-                .description(description)
+                .status(Hackathon.Status.valueOf(status.name()))
                 .title(title)
                 .subtitle(subtitle)
+                .description(description)
+                .location(location)
                 .totalBudget(budget)
-                .status(Hackathon.Status.valueOf(status.name()))
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
                 .build();
-        if (nonNull(tracks)) {
-            hackathon.tracks().addAll(tracks.stream().map(HackathonTrack::toDomain).toList());
+        if (nonNull(githubLabels)) {
+            hackathon.githubLabels().addAll(List.of(githubLabels));
         }
-        if (nonNull(sponsorIds)) {
-            hackathon.sponsorIds().addAll(List.of(sponsorIds));
+        if (nonNull(communityLinks)) {
+            hackathon.communityLinks().addAll(communityLinks);
         }
         if (nonNull(links)) {
             hackathon.links().addAll(links);
         }
+        hackathon.sponsorIds().addAll(sponsors.stream().map(HackathonSponsorEntity::getSponsorId).toList());
+        hackathon.projectIds().addAll(projects.stream().map(HackathonProjectEntity::getProjectId).toList());
         return hackathon;
     }
 }

@@ -5,15 +5,13 @@ import onlydust.com.backoffice.api.contract.BackofficeHackathonsReadApi;
 import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
-import onlydust.com.marketplace.api.read.entities.hackathon.HackathonShortReadEntity;
+import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
-import onlydust.com.marketplace.api.read.repositories.HackathonDetailsReadRepository;
-import onlydust.com.marketplace.api.read.repositories.HackathonShortReadRepository;
+import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -34,8 +32,7 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.saniti
 public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHackathonsReadApi {
 
     private UserReadRepository userReadRepository;
-    private HackathonShortReadRepository hackathonShortReadRepository;
-    private HackathonDetailsReadRepository hackathonDetailsReadRepository;
+    private HackathonReadRepository hackathonReadRepository;
 
     @Override
     public ResponseEntity<UserPage> getRegisteredUserPage(UUID hackathonId, Integer pageIndex, Integer pageSize, String login) {
@@ -53,7 +50,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonById(UUID hackathonId) {
         return ResponseEntity.ok(
-                hackathonDetailsReadRepository.findById(hackathonId)
+                hackathonReadRepository.findById(hackathonId)
                         .orElseThrow(() -> OnlyDustException.notFound("Hackathon %s not found".formatted(hackathonId)))
                         .toBoResponse()
         );
@@ -63,8 +60,8 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
     public ResponseEntity<HackathonsPageResponse> getHackathons(Integer pageIndex, Integer pageSize) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final Page<HackathonShortReadEntity> page = hackathonShortReadRepository.findAll(PageRequest.of(sanitizePageIndex, sanitizePageSize,
-                Sort.by(Sort.Direction.ASC, "start_date")));
+        final var page = hackathonReadRepository.findAll(PageRequest.of(sanitizePageIndex, sanitizePageSize,
+                Sort.by(Sort.Direction.ASC, "startDate")));
 
         final HackathonsPageResponse hackathonsPageResponse = new HackathonsPageResponse();
         hackathonsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, page.getTotalPages()));
@@ -72,7 +69,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
         hackathonsPageResponse.setTotalPageNumber(page.getTotalPages());
         hackathonsPageResponse.setTotalItemNumber((int) page.getTotalElements());
         page.stream()
-                .map(HackathonShortReadEntity::toHackathonsPageItemResponse)
+                .map(HackathonReadEntity::toHackathonsPageItemResponse)
                 .forEach(hackathonsPageResponse::addHackathonsItem);
 
         return hackathonsPageResponse.getHasMore() ?
