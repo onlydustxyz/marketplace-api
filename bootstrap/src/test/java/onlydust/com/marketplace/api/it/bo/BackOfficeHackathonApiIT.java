@@ -108,9 +108,11 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "totalBudget": "$1.000.000",
                           "startDate": "2024-04-19T00:00:00Z",
                           "endDate": "2024-04-22T00:00:00Z",
+                          "githubLabels": [],
+                          "communityLinks": [],
                           "links": [],
                           "sponsorIds": [],
-                          "tracks": []
+                          "projectIds": []
                         }
                         """)
                 .exchange()
@@ -162,7 +164,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .bodyValue("""
                         {
                             "title": "Hackathon 2021",
-                            "subtitle": "subtitle",
+                            "githubLabels": ["label1", "label2"],
                             "startDate": "2024-01-01T10:10:00Z",
                             "endDate": "2024-01-05T20:20:00Z"
                         }
@@ -203,18 +205,24 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .jsonPath("$.id").isEqualTo(hackathonId1.getValue())
                 .json("""
                         {
-                            "slug": "hackathon-2021",
-                            "status": "DRAFT",
-                            "title": "Hackathon 2021",
-                            "subtitle": "subtitle",
-                            "description": null,
-                            "location": null,
-                            "totalBudget": null,
-                            "startDate": "2024-01-01T10:10:00Z",
-                            "endDate": "2024-01-05T20:20:00Z",
-                            "links": [],
-                            "sponsors": [],
-                            "tracks": []
+                          "slug": "hackathon-2021",
+                          "status": "DRAFT",
+                          "title": "Hackathon 2021",
+                          "githubLabels": [
+                            "label1",
+                            "label2"
+                          ],
+                          "subscriberCount": 0,
+                          "startDate": "2024-01-01T10:10:00Z",
+                          "endDate": "2024-01-05T20:20:00Z",
+                          "subtitle": null,
+                          "description": null,
+                          "location": null,
+                          "totalBudget": null,
+                          "communityLinks": [],
+                          "links": [],
+                          "sponsors": [],
+                          "projects": []
                         }
                         """);
     }
@@ -237,6 +245,13 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "totalBudget": "$1.000.000",
                           "startDate": "2024-04-19T11:00:00Z",
                           "endDate": "2024-04-22T13:00:00Z",
+                          "githubLabels": ["label2", "label3"],
+                          "communityLinks": [
+                            {
+                              "url": "https://a.bc",
+                              "value": "ABC"
+                            }
+                          ],
                           "links": [
                             {
                               "url": "https://www.google.com",
@@ -251,34 +266,9 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
                             "85435c9b-da7f-4670-bf65-02b84c5da7f0"
                           ],
-                          "tracks": [
-                            {
-                              "name": "First track",
-                              "subtitle": "First track subtitle",
-                              "description": "First track description",
-                              "iconSlug": "icon-1",
-                              "projectIds": [
-                                "8156fc5f-cec5-4f70-a0de-c368772edcd4",
-                                "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"
-                              ]
-                            },
-                            {
-                              "name": "Second track",
-                              "subtitle": "Second track subtitle",
-                              "description": "Second track description",
-                              "iconSlug": "icon-2",
-                              "projectIds": [
-                                "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
-                                "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"
-                              ]
-                            },
-                            {
-                              "name": "Third track",
-                              "subtitle": "Third track subtitle",
-                              "description": "Third track description",
-                              "iconSlug": "icon-3",
-                              "projectIds": []
-                            }
+                          "projectIds": [
+                            "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                            "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"
                           ]
                         }
                         """)
@@ -311,12 +301,23 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "slug": "hackathon-2021-updated",
                           "status": "PUBLISHED",
                           "title": "Hackathon 2021 updated",
+                          "githubLabels": [
+                            "label2",
+                            "label3"
+                          ],
+                          "subscriberCount": 1,
+                          "startDate": "2024-04-19T11:00:00Z",
+                          "endDate": "2024-04-22T13:00:00Z",
                           "subtitle": "subtitle updated",
                           "description": "My hackathon description",
                           "location": "Paris",
                           "totalBudget": "$1.000.000",
-                          "startDate": "2024-04-19T11:00:00Z",
-                          "endDate": "2024-04-22T13:00:00Z",
+                          "communityLinks": [
+                            {
+                              "url": "https://a.bc",
+                              "value": "ABC"
+                            }
+                          ],
                           "links": [
                             {
                               "url": "https://www.google.com",
@@ -329,65 +330,30 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           ],
                           "sponsors": [
                             {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                            },
-                            {
                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                               "name": "AS Nancy Lorraine",
                               "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
+                            },
+                            {
+                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
+                              "name": "Red Bull",
+                              "url": "https://www.redbull.com/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                             }
                           ],
-                          "tracks": [
+                          "projects": [
                             {
-                              "name": "First track",
-                              "subtitle": "First track subtitle",
-                              "description": "First track description",
-                              "iconSlug": "icon-1",
-                              "projects": [
-                                {
-                                  "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
-                                  "slug": "cairo-foundry",
-                                  "name": "Cairo foundry",
-                                  "logoUrl": null
-                                },
-                                {
-                                  "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
-                                  "slug": "cairo-streams",
-                                  "name": "Cairo streams",
-                                  "logoUrl": null
-                                }
-                              ]
+                              "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
+                              "slug": "cairo-streams",
+                              "name": "Cairo streams",
+                              "logoUrl": null
                             },
                             {
-                              "name": "Second track",
-                              "subtitle": "Second track subtitle",
-                              "description": "Second track description",
-                              "iconSlug": "icon-2",
-                              "projects": [
-                                {
-                                  "id": "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed",
-                                  "slug": "red-bull",
-                                  "name": "Red bull",
-                                  "logoUrl": "https://cdn.filestackcontent.com/cZCHED10RzuEloOXuk7A"
-                                },
-                                {
-                                  "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
-                                  "slug": "cairo-streams",
-                                  "name": "Cairo streams",
-                                  "logoUrl": null
-                                }
-                              ]
-                            },
-                            {
-                              "name": "Third track",
-                              "subtitle": "Third track subtitle",
-                              "description": "Third track description",
-                              "iconSlug": "icon-3",
-                              "projects": []
+                              "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
+                              "slug": "cairo-foundry",
+                              "name": "Cairo foundry",
+                              "logoUrl": null
                             }
                           ]
                         }
@@ -405,13 +371,20 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .bodyValue("""
                         {
                           "status": "PUBLISHED",
-                          "title": "Hackathon 2021 updated",
+                          "title": "Hackathon 2021 updated 2",
                           "subtitle": "subtitle updated 2",
                           "description": "My hackathon description 2",
                           "location": "Paris 2",
                           "totalBudget": "$2.000.000",
                           "startDate": "2024-04-23T11:00:00Z",
                           "endDate": "2024-04-25T13:00:00Z",
+                          "githubLabels": ["label99", "label100"],
+                          "communityLinks": [
+                            {
+                              "url": "https://yoooo.yo",
+                              "value": "Yo"
+                            }
+                          ],
                           "links": [
                             {
                               "url": "https://www.foo.com",
@@ -429,16 +402,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "sponsorIds": [
                             "44c6807c-48d1-4987-a0a6-ac63f958bdae"
                           ],
-                          "tracks": [
-                            {
-                              "name": "First track",
-                              "subtitle": "First track subtitle",
-                              "description": "First track description",
-                              "iconSlug": "icon-1",
-                              "projectIds": [
-                                "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
-                              ]
-                            }
+                          "projectIds": [
+                            "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
                           ]
                         }
                         """)
@@ -458,23 +423,34 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .jsonPath("$.id").isEqualTo(hackathonId1.getValue())
                 .json("""
                         {
-                          "slug": "hackathon-2021-updated",
+                          "slug": "hackathon-2021-updated-2",
                           "status": "PUBLISHED",
-                          "title": "Hackathon 2021 updated",
+                          "title": "Hackathon 2021 updated 2",
+                          "githubLabels": [
+                            "label100",
+                            "label99"
+                          ],
+                          "subscriberCount": 1,
+                          "startDate": "2024-04-23T11:00:00Z",
+                          "endDate": "2024-04-25T13:00:00Z",
                           "subtitle": "subtitle updated 2",
                           "description": "My hackathon description 2",
                           "location": "Paris 2",
                           "totalBudget": "$2.000.000",
-                          "startDate": "2024-04-23T11:00:00Z",
-                          "endDate": "2024-04-25T13:00:00Z",
-                          "links": [
+                          "communityLinks": [
                             {
-                              "url": "https://www.foo.com",
-                              "value": "Foo"
-                            },
+                              "url": "https://yoooo.yo",
+                              "value": "Yo"
+                            }
+                          ],
+                          "links": [
                             {
                               "url": "https://www.facebook.com",
                               "value": "Facebook"
+                            },
+                            {
+                              "url": "https://www.foo.com",
+                              "value": "Foo"
                             },
                             {
                               "url": "https://www.bar.com",
@@ -489,20 +465,12 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
                             }
                           ],
-                          "tracks": [
+                          "projects": [
                             {
-                              "name": "First track",
-                              "subtitle": "First track subtitle",
-                              "description": "First track description",
-                              "iconSlug": "icon-1",
-                              "projects": [
-                                {
-                                  "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
-                                  "slug": "apibara",
-                                  "name": "Apibara",
-                                  "logoUrl": null
-                                }
-                              ]
+                              "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
+                              "slug": "apibara",
+                              "name": "Apibara",
+                              "logoUrl": null
                             }
                           ]
                         }
@@ -521,7 +489,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .bodyValue("""
                         {
                             "title": "OD Hack",
-                            "subtitle": "The best hackathon",
+                            "githubLabels": ["ODHack5"],
                             "startDate": "2024-06-01T00:00:00Z",
                             "endDate": "2024-06-05T00:00:00Z"
                         }
@@ -557,18 +525,23 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .jsonPath("$.id").isEqualTo(hackathonId2.getValue())
                 .json("""
                         {
-                            "slug": "od-hack",
-                            "status": "DRAFT",
-                            "title": "OD Hack",
-                            "subtitle": "The best hackathon",
-                            "description": null,
-                            "location": null,
-                            "totalBudget": null,
-                            "startDate": "2024-06-01T00:00:00Z",
-                            "endDate": "2024-06-05T00:00:00Z",
-                            "links": [],
-                            "sponsors": [],
-                            "tracks": []
+                          "slug": "od-hack",
+                          "status": "DRAFT",
+                          "title": "OD Hack",
+                          "githubLabels": [
+                            "ODHack5"
+                          ],
+                          "subscriberCount": 0,
+                          "startDate": "2024-06-01T00:00:00Z",
+                          "endDate": "2024-06-05T00:00:00Z",
+                          "subtitle": null,
+                          "description": null,
+                          "location": null,
+                          "totalBudget": null,
+                          "communityLinks": [],
+                          "links": [],
+                          "sponsors": [],
+                          "projects": []
                         }
                         """);
     }
@@ -593,10 +566,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "nextPageIndex": 0,
                           "hackathons": [
                             {
-                              "slug": "hackathon-2021-updated",
+                              "slug": "hackathon-2021-updated-2",
                               "status": "PUBLISHED",
-                              "title": "Hackathon 2021 updated",
-                              "location": "Paris 2",
+                              "title": "Hackathon 2021 updated 2",
+                              "githubLabels": [
+                                "label100",
+                                "label99"
+                              ],
+                              "subscriberCount": 1,
                               "startDate": "2024-04-23T11:00:00Z",
                               "endDate": "2024-04-25T13:00:00Z"
                             },
@@ -604,7 +581,10 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "slug": "od-hack",
                               "status": "DRAFT",
                               "title": "OD Hack",
-                              "location": null,
+                              "githubLabels": [
+                                "ODHack5"
+                              ],
+                              "subscriberCount": 0,
                               "startDate": "2024-06-01T00:00:00Z",
                               "endDate": "2024-06-05T00:00:00Z"
                             }
@@ -636,7 +616,10 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "slug": "od-hack",
                               "status": "DRAFT",
                               "title": "OD Hack",
-                              "location": null,
+                              "githubLabels": [
+                                "ODHack5"
+                              ],
+                              "subscriberCount": 0,
                               "startDate": "2024-06-01T00:00:00Z",
                               "endDate": "2024-06-05T00:00:00Z"
                             }
@@ -683,7 +666,10 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "slug": "od-hack",
                               "status": "PUBLISHED",
                               "title": "OD Hack",
-                              "location": null,
+                              "githubLabels": [
+                                "ODHack5"
+                              ],
+                              "subscriberCount": 0,
                               "startDate": "2024-06-01T00:00:00Z",
                               "endDate": "2024-06-05T00:00:00Z"
                             }
@@ -769,10 +755,14 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "nextPageIndex": 0,
                           "hackathons": [
                             {
-                              "slug": "hackathon-2021-updated",
+                              "slug": "hackathon-2021-updated-2",
                               "status": "PUBLISHED",
-                              "title": "Hackathon 2021 updated",
-                              "location": "Paris 2",
+                              "title": "Hackathon 2021 updated 2",
+                              "githubLabels": [
+                                "label100",
+                                "label99"
+                              ],
+                              "subscriberCount": 3,
                               "startDate": "2024-04-23T11:00:00Z",
                               "endDate": "2024-04-25T13:00:00Z"
                             }

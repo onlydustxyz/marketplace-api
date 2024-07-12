@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 
 import java.time.ZonedDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -18,9 +19,9 @@ public class HackathonService implements HackathonFacadePort {
     private final HackathonObserverPort hackathonObserverPort;
 
     @Override
-    public void createHackathon(@NonNull String title, @NonNull String subtitle, @NonNull ZonedDateTime startDate,
+    public void createHackathon(@NonNull String title, @NonNull Collection<String> githubLabels, @NonNull ZonedDateTime startDate,
                                 @NonNull ZonedDateTime endDate) {
-        final var hackathon = new Hackathon(title, subtitle, startDate, endDate);
+        final var hackathon = new Hackathon(title, githubLabels, startDate, endDate);
         hackathonStoragePort.save(hackathon);
     }
 
