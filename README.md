@@ -42,3 +42,4 @@ data in the same transaction. This also allows to write custom optimized queries
 - A read-only entity that is binded to a real table MUST end with `ViewEntity`.
 - A read-only entity that is NOT binded to a real table (ie. it is used as a result DTO for custom queries)
   MUST end with `QueryEntity`.
+
