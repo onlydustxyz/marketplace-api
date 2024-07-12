@@ -4749,33 +4749,7 @@ components:
               items:
                 $ref: '#/components/schemas/ShortRewardResponse'
 
-    HackathonsPageItemResponse:
-      type: object
-      required:
-        - slug
-        - id
-        - status
-        - title
-        - location
-        - startDate
-        - endDate
-      properties:
-        id:
-          $ref: '#/components/schemas/HackathonId'
-        slug:
-          $ref: '#/components/schemas/HackathonSlug'
-        status:
-          $ref: '#/components/schemas/HackathonStatus'
-        title:
-          type: string
-        location:
-          type: string
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
+
 
     HackathonsPageResponse:
       type: object
@@ -4800,44 +4774,21 @@ components:
           items:
             $ref: '#/components/schemas/HackathonsPageItemResponse'
 
-    HackathonsTrackResponse:
-      type: object
-      required:
-        - name
-        - subtitle
-        - description
-        - iconSlug
-        - projects
-      properties:
-        name:
-          type: string
-        subtitle:
-          type: string
-        description:
-          type: string
-        iconSlug:
-          type: string
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLinkResponse'
+    GithubLabel:
+      type: string
+      description: The label used to filter the hackathon's issues on Github
 
-    HackathonsDetailsResponse:
+    HackathonsPageItemResponse:
       type: object
       required:
-        - slug
         - id
+        - slug
         - status
         - title
-        - subtitle
-        - description
-        - location
+        - githubLabel
+        - subscriberCount
         - startDate
         - endDate
-        - totalBudget
-        - links
-        - sponsors
-        - tracks
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -4847,50 +4798,57 @@ components:
           $ref: '#/components/schemas/HackathonStatus'
         title:
           type: string
-        subtitle:
-          type: string
-        description:
-          type: string
-        location:
-          type: string
-        totalBudget:
-          type: string
+        githubLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubLabel'
+        subscriberCount:
+          type: integer
         startDate:
           type: string
           format: date-time
         endDate:
           type: string
           format: date-time
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleLink'
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorResponse'
-        tracks:
-          type: array
-          items:
-            $ref: '#/components/schemas/HackathonsTrackResponse'
-        registeredUsersCount:
-          type: integer
 
-    UpdateTracksRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        subtitle:
-          type: string
-        description:
-          type: string
-        iconSlug:
-          type: string
-        projectIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectId'
+    HackathonsDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/HackathonsPageItemResponse'
+        - type: object
+          required:
+            - subtitle
+            - description
+            - location
+            - totalBudget
+            - communityLinks
+            - links
+            - sponsors
+            - projects
+          properties:
+            subtitle:
+              type: string
+            description:
+              type: string
+            location:
+              type: string
+            totalBudget:
+              type: string
+            communityLinks:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorResponse'
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLinkResponse'
 
     UpdateHackathonRequest:
       type: object
@@ -4903,12 +4861,17 @@ components:
         - totalBudget
         - startDate
         - endDate
+        - communityLinks
         - links
         - sponsorIds
-        - tracks
+        - projectIds
       properties:
         status:
           $ref: '#/components/schemas/HackathonStatus'
+        githubLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubLabel'
         title:
           type: string
         subtitle:
@@ -4925,6 +4888,10 @@ components:
         endDate:
           type: string
           format: date-time
+        communityLinks:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
         links:
           type: array
           items:
@@ -4933,10 +4900,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SponsorId'
-        tracks:
+        projectIds:
           type: array
           items:
-            $ref: '#/components/schemas/UpdateTracksRequest'
+            $ref: '#/components/schemas/ProjectId'
 
     PatchHackathonRequest:
       type: object
@@ -4948,14 +4915,16 @@ components:
       type: object
       required:
         - title
-        - subtitle
+        - githubLabel
         - startDate
         - endDate
       properties:
         title:
           type: string
-        subtitle:
-          type: string
+        githubLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubLabel'
         startDate:
           type: string
           format: date-time

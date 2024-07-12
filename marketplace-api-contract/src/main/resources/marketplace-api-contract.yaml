@@ -5490,24 +5490,18 @@ components:
         - type: object
           required:
             - shortDescription
+            - visibility
+            - languages
           properties:
-            id:
-              $ref: '#/components/schemas/ProjectId'
-            slug:
-              $ref: '#/components/schemas/ProjectSlug'
-            name:
-              type: string
-              example: Verkle Tries
             shortDescription:
               type: string
               example: A short project description
-            logoUrl:
-              type: string
-              format: url
-              description: Direct URL to project's logo image
-              example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2529199823275297272.jpg'
             visibility:
               $ref: '#/components/schemas/ProjectVisibility'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
 
     ProjectVisibility:
       type: string
@@ -7873,40 +7867,6 @@ components:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
 
-    HackathonsListItemResponse:
-      type: object
-      required:
-        - slug
-        - id
-        - title
-        - location
-        - startDate
-        - endDate
-        - projects
-        - index
-      properties:
-        id:
-          $ref: '#/components/schemas/HackathonId'
-        slug:
-          $ref: '#/components/schemas/HackathonSlug'
-        title:
-          type: string
-        location:
-          type: string
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLinkResponse'
-        index:
-          type: integer
-          description: unique auto-incremented index of the hackathon
-
     HackathonsListResponse:
       type: object
       required:
@@ -7917,60 +7877,32 @@ components:
           items:
             $ref: '#/components/schemas/HackathonsListItemResponse'
 
-    HackathonsTrackResponse:
+    HackathonsListItemResponse:
       type: object
       required:
-        - name
-        - subtitle
-        - description
-        - iconSlug
-        - projects
-      properties:
-        name:
-          type: string
-        subtitle:
-          type: string
-        description:
-          type: string
-        iconSlug:
-          type: string
-        projects:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectShortResponse'
-
-    HackathonsDetailsResponse:
-      type: object
-      required:
-        - slug
         - id
+        - slug
+        - index
         - title
-        - subtitle
-        - description
         - location
         - startDate
         - endDate
-        - totalBudget
-        - me
-        - links
-        - sponsors
         - projects
-        - tracks
-        - index
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
         slug:
           $ref: '#/components/schemas/HackathonSlug'
+        index:
+          type: integer
+          description: unique auto-incremented index of the hackathon
         title:
           type: string
-        subtitle:
-          type: string
-        description:
-          type: string
+        githubLabels:
+          type: array
+          items:
+            type: string
         location:
-          type: string
-        totalBudget:
           type: string
         startDate:
           type: string
@@ -7978,32 +7910,57 @@ components:
         endDate:
           type: string
           format: date-time
-        me:
-          type: object
-          required:
-            - hasRegistered
-          properties:
-            hasRegistered:
-              type: boolean
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/SimpleLink'
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorResponse'
         projects:
           type: array
           items:
             $ref: '#/components/schemas/ProjectLinkResponse'
-        tracks:
-          type: array
-          items:
-            $ref: '#/components/schemas/HackathonsTrackResponse'
-        index:
-          type: integer
-          description: unique auto-incremented index of the hackathon
+
+    HackathonsDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/HackathonsListItemResponse'
+        - type: object
+          required:
+            - subtitle
+            - description
+            - location
+            - totalBudget
+            - communityLinks
+            - links
+            - sponsors
+            - projects
+            - me
+          properties:
+            subtitle:
+              type: string
+            description:
+              type: string
+            location:
+              type: string
+            totalBudget:
+              type: string
+            communityLinks:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            links:
+              type: array
+              items:
+                $ref: '#/components/schemas/SimpleLink'
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorResponse'
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectShortResponse'
+            me:
+              type: object
+              required:
+                - hasRegistered
+              properties:
+                hasRegistered:
+                  type: boolean
 
     CommitteeResponse:
       type: object
