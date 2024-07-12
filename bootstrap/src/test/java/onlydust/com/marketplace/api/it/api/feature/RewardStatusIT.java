@@ -32,17 +32,20 @@ import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfile
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
+import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
@@ -129,6 +132,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     // 12 for project1 reward2
     private UUID selfEmployedBPAdminRewardId12;
     private UUID selfEmployedBPAdminRewardId2;
+    private UUID selfEmployedBPAdminRewardIdUsd;
     private UUID projectId1;
     private UUID projectId2;
     private UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
@@ -245,6 +249,14 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
         accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
+        final UUID usdId = currencyRepository.findByCode("USD").orElseThrow().id();
+        final SponsorAccountStatement usdSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+                Currency.Id.of(usdId), null,
+                new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
+                        PositiveAmount.of(100000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        accountingService.allocate(usdSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(50000L), Currency.Id.of(usdId));
+
         final var em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
@@ -269,17 +281,17 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         Instant.now().minus(10, ChronoUnit.DAYS))
         ));
 
-        sendRewardToRecipient(individualBPAdminGithubId, 10L, projectId1);
-        sendRewardToRecipient(individualIndiaBPAdminGithubId, 11L, projectId1);
-        sendRewardToRecipient(individualBPAdminGithubId, 100L, projectId2);
-        sendRewardToRecipient(companyBPAdmin1GithubId, 20L, projectId1);
-        sendRewardToRecipient(companyBPAdmin1GithubId, 200L, projectId2);
-        sendRewardToRecipient(companyBPAdmin2GithubId, 30L, projectId1);
-        sendRewardToRecipient(companyBPAdmin2GithubId, 300L, projectId2);
-        sendRewardToRecipient(companyBPMember1GithubId, 40L, projectId1);
-        sendRewardToRecipient(companyBPMember1GithubId, 400L, projectId2);
-        sendRewardToRecipient(selfEmployedBPAdminGithubId, 50L, projectId1);
-        sendRewardToRecipient(selfEmployedBPAdminGithubId, 500L, projectId2);
+        sendRewardToRecipient(individualBPAdminGithubId, 10L, projectId1, strkId);
+        sendRewardToRecipient(individualIndiaBPAdminGithubId, 11L, projectId1, strkId);
+        sendRewardToRecipient(individualBPAdminGithubId, 100L, projectId2, strkId);
+        sendRewardToRecipient(companyBPAdmin1GithubId, 20L, projectId1, strkId);
+        sendRewardToRecipient(companyBPAdmin1GithubId, 200L, projectId2, strkId);
+        sendRewardToRecipient(companyBPAdmin2GithubId, 30L, projectId1, strkId);
+        sendRewardToRecipient(companyBPAdmin2GithubId, 300L, projectId2, strkId);
+        sendRewardToRecipient(companyBPMember1GithubId, 40L, projectId1, strkId);
+        sendRewardToRecipient(companyBPMember1GithubId, 400L, projectId2, strkId);
+        sendRewardToRecipient(selfEmployedBPAdminGithubId, 50L, projectId1, strkId);
+        sendRewardToRecipient(selfEmployedBPAdminGithubId, 500L, projectId2, strkId);
 
         setUp();
     }
@@ -386,11 +398,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .map(BillingProfileReadEntity::id).findFirst().orElse(null);
     }
 
-    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
+    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId, UUID currencyId) {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(amount))
-                .currencyId(CurrencyHelper.STRK.value())
+                .currencyId(currencyId)
                 .recipientId(recipientId)
                 .items(List.of(
                         new RewardItemRequest().id("0011051356")
@@ -1358,7 +1370,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     void should_add_billing_profile_on_new_reward_based_on_payout_preferences() {
         // Given
         setUp();
-        sendRewardToRecipient(selfEmployedBPAdminGithubId, 55L, projectId1);
+        sendRewardToRecipient(selfEmployedBPAdminGithubId, 55L, projectId1, CurrencyHelper.STRK.value());
         selfEmployedBPAdminRewardId12 = rewardRepository.findAll().stream()
                 .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
                 .findFirst().map(RewardEntity::id).orElse(null);
@@ -2605,7 +2617,6 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     void should_not_display_transaction_details_given_a_billing_profile_member() {
         // TODO X: ne pas remonter les receipt details pour un BP member
     }
-
 
     @Test
     @Order(50)
@@ -4767,6 +4778,17 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     InvoiceStoragePort invoiceStoragePort;
 
+    private @NotNull BackofficeAccountingManagementRestApi getBackofficeAccountingManagementRestApi() {
+        return new BackofficeAccountingManagementRestApi(
+                accountingService,
+                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
+                        sponsorStoragePort, accountingMailOutboxConsumer),
+                new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
+                billingProfileService,
+                authenticatedBackofficeUserService,
+                blockchainFacadePort);
+    }
+
     @Test
     @Order(70)
     void should_display_reward_statuses_given_completed() {
@@ -4777,14 +4799,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 new Quote(Currency.Id.of(accountingHelper.strk().id()), Currency.Id.of(accountingHelper.usd().id()), BigDecimal.valueOf(strkToUsd3),
                         Instant.now())
         ));
-        final var backofficeAccountingManagementRestApi = new BackofficeAccountingManagementRestApi(
-                accountingService,
-                new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
-                        sponsorStoragePort, accountingMailOutboxConsumer),
-                new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
-                billingProfileService,
-                authenticatedBackofficeUserService,
-                blockchainFacadePort);
+        final var backofficeAccountingManagementRestApi = getBackofficeAccountingManagementRestApi();
         backofficeAccountingManagementRestApi.payReward(individualBPAdminRewardId1,
                 new PayRewardRequest().network(TransactionNetwork.ETHEREUM).reference("0xb1c3579ffbe3eabe6f88c58a037367dee7de6c06262cfecc3bd2e8c013cc5156"));
         backofficeAccountingManagementRestApi.payReward(individualIndiaBPAdminRewardId1,
@@ -5025,10 +5040,11 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         // Given
         setUp();
         resetAuth0Mock();
-        sendRewardToRecipient(individualBPAdminGithubId, 4900L, projectId1);
-        sendRewardToRecipient(individualIndiaBPAdminGithubId, 19900L, projectId1);
-        sendRewardToRecipient(individualBPAdminGithubId, 5000L, projectId1);
-        sendRewardToRecipient(individualIndiaBPAdminGithubId, 20000L, projectId1);
+        final UUID strkId = CurrencyHelper.STRK.value();
+        sendRewardToRecipient(individualBPAdminGithubId, 4900L, projectId1, strkId);
+        sendRewardToRecipient(individualIndiaBPAdminGithubId, 19900L, projectId1, strkId);
+        sendRewardToRecipient(individualBPAdminGithubId, 5000L, projectId1, strkId);
+        sendRewardToRecipient(individualIndiaBPAdminGithubId, 20000L, projectId1, strkId);
 
         final List<RewardEntity> allRewards = rewardRepository.findAll();
         final var rewardBelowLimit =
@@ -5213,6 +5229,36 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         ))
                         .build()
         ));
+    }
+
+    @Test
+    @Order(80)
+    void should_pay_usd_reward() {
+        // Given
+        setUp();
+        final UUID usdId = CurrencyHelper.USD.value();
+        sendRewardToRecipient(selfEmployedBPAdminGithubId, 212L, projectId1, usdId);
+        final List<RewardEntity> allRewards = rewardRepository.findAll();
+        billingProfileService.updatePayoutInfo(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId), PayoutInfo.builder()
+                .bankAccount(new BankAccount(faker.rickAndMorty().character(), faker.rickAndMorty().location()))
+                .build());
+        final RewardEntity usdRewardEntity = allRewards.stream()
+                .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 212L)
+                .findFirst()
+                .orElseThrow();
+        billingProfileService.acceptInvoiceMandate(UserId.of(selfEmployedBPAdminId), BillingProfile.Id.of(selfEmployedBPId));
+        final Invoice usdInvoice = billingProfileService.previewInvoice(UserId.of(selfEmployedBPAdminId), BillingProfile.Id.of(selfEmployedBPId),
+                List.of(RewardId.of(usdRewardEntity.id())));
+        billingProfileService.uploadGeneratedInvoice(UserId.of(selfEmployedBPAdminId), BillingProfile.Id.of(selfEmployedBPId), usdInvoice.id(),
+                new ByteArrayInputStream(faker.address().fullAddress().getBytes()));
+
+        // When
+        final ResponseEntity<Void> voidResponseEntity = getBackofficeAccountingManagementRestApi().payReward(usdRewardEntity.id(),
+                new PayRewardRequest(TransactionNetwork.SEPA,
+                faker.lordOfTheRings().character()));
+
+        // Then
+        assertThat(voidResponseEntity.getStatusCode().value()).isEqualTo(204);
     }
 
     private void assertGetMyRewardsStatus(final List<MyRewardDatum> myRewardData) {
@@ -5467,7 +5513,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "mmaderic_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
-              
+            
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",
@@ -5503,7 +5549,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5526,7 +5572,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 200
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5539,7 +5585,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5562,7 +5608,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 30
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5575,7 +5621,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5598,7 +5644,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 300
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5611,7 +5657,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5634,7 +5680,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 50
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5647,7 +5693,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5670,7 +5716,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 55
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5683,7 +5729,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5706,7 +5752,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 500
                },
-               
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5719,7 +5765,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-               
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5743,7 +5789,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 },
                 "amount": 40
               },
-              
+            
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -5756,7 +5802,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-              
+            
               "project": {
                 "slug": "super-project-1",
                 "name": "Super Project 1",
@@ -5791,7 +5837,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-              
+            
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",
