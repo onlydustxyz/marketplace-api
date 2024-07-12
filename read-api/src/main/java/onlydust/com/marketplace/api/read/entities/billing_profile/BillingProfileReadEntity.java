@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
-import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
 import onlydust.com.backoffice.api.contract.model.BillingProfileType;
 import onlydust.com.backoffice.api.contract.model.UserSearchBillingProfile;
@@ -23,9 +25,8 @@ import java.util.UUID;
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Accessors(fluent = true)
+@Data
+@Accessors(fluent = true, chain = true)
 @Table(name = "billing_profiles", schema = "accounting")
 @Immutable
 public class BillingProfileReadEntity {
@@ -97,7 +98,7 @@ public class BillingProfileReadEntity {
     }
 
     public ShortBillingProfileResponse toShortResponse(Long callerGithubUserId) {
-        final var caller = users.stream().filter(u -> u.getGithubUserId().equals(callerGithubUserId)).findFirst();
+        final var caller = users.stream().filter(u -> u.githubUserId().equals(callerGithubUserId)).findFirst();
         return new ShortBillingProfileResponse()
                 .id(id)
                 .type(switch (type) {
@@ -107,7 +108,7 @@ public class BillingProfileReadEntity {
                 })
                 .name(name)
                 .enabled(enabled)
-                .role(caller.map(AllBillingProfileUserReadEntity::getRole).orElse(null))
+                .role(caller.map(AllBillingProfileUserReadEntity::role).orElse(null))
                 .invoiceMandateAccepted(isInvoiceMandateAccepted())
                 .rewardCount(stats.rewardCount())
                 .invoiceableRewardCount(stats.invoiceableRewardCount())
@@ -116,13 +117,13 @@ public class BillingProfileReadEntity {
                 .individualLimitReached(stats.individualLimitReached())
                 .missingPayoutInfo(stats.missingPayoutInfo())
                 .missingVerification(stats.missingVerification())
-                .pendingInvitationResponse(caller.map(u -> !u.isInvitationAccepted()).orElse(null))
+                .pendingInvitationResponse(caller.map(u -> !u.invitationAccepted()).orElse(null))
                 .requestableRewardCount(requestableRewardCount(caller))
                 .verificationBlocked(isVerificationBlocked());
     }
 
     private Integer requestableRewardCount(Optional<AllBillingProfileUserReadEntity> user) {
-        return user.map(u -> u.getRole() == BillingProfileCoworkerRole.ADMIN ? stats.invoiceableRewardCount() : 0).orElse(null);
+        return user.map(u -> u.role() == BillingProfileCoworkerRole.ADMIN && u.invitationAccepted() ? stats.invoiceableRewardCount() : 0).orElse(null);
     }
 
     private boolean isInvoiceMandateAccepted() {
