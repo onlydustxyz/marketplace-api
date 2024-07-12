@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
 import org.hibernate.annotations.Immutable;
@@ -11,10 +11,10 @@ import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Data
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@Accessors(fluent = true, chain = true)
 @IdClass(AllBillingProfileUserReadEntity.PrimaryKey.class)
 @Table(name = "all_billing_profile_users", schema = "accounting")
 @Immutable
