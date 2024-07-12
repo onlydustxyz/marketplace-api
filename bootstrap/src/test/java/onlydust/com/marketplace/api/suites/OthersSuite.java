@@ -11,6 +11,7 @@ import org.junit.platform.suite.api.ExcludeTags;
         TagProject.VALUE,
         TagReward.VALUE,
         TagUser.VALUE,
+        TagConcurrency.VALUE,
 })
 public class OthersSuite {
 }
