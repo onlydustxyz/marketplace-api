@@ -15,6 +15,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static java.util.Objects.isNull;
@@ -58,8 +59,15 @@ public class GithubHttpClient {
         return switch (httpResponse.statusCode()) {
             case 200 -> Optional.of(decode(httpResponse.body(), responseClass));
             case 403, 404 -> Optional.empty();
-            default -> throw internalServerError("Unable to fetch github API: " + path, null);
+            default -> {
+                final String errorMessage = bodyString(httpResponse.body());
+                throw internalServerError("Unable to fetch github API: %s, response body: %s".formatted(path, errorMessage), null);
+            }
         };
+    }
+
+    private static String bodyString(byte[] body) {
+        return body != null ? new String(body, StandardCharsets.UTF_8) : "null";
     }
 
 
