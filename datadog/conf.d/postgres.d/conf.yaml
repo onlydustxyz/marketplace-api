@@ -1,0 +1,11 @@
+init_config:
+  instances:
+    - host: ${DB_HOST}
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      dbm: true
+      port: ${DB_PORT}
+      dbname: ${DB_NAME}
+      ssl: required
+      collect_schemas:
+        enabled: true
