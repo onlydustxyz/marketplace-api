@@ -17,7 +17,7 @@ import java.util.UUID;
 
 
 @TagProject
-public class ProjectGoodFirstIssuesApiIT extends AbstractMarketplaceApiIT {
+public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
     private final static UUID CAL_DOT_COM = UUID.fromString("1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e");
 
     @Autowired

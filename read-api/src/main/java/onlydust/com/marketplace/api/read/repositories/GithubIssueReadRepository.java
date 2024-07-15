@@ -23,15 +23,41 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
             """)
     Optional<GithubIssueReadEntity> findById(Long issueId);
 
-    @Query("""
-            SELECT i
-            FROM GithubIssueReadEntity i
-            JOIN i.goodFirstIssueOf p
-            JOIN FETCH i.author
-            JOIN FETCH i.repo
-            WHERE p.projectId = :projectId
-            """)
-    Page<GithubIssueReadEntity> findGoodFirstIssuesOf(UUID projectId, Pageable pageable);
+    @Query(value = """
+            SELECT i.*
+            FROM indexer_exp.github_issues i
+                     JOIN project_github_repos pgr ON pgr.github_repo_id = i.repo_id
+                     JOIN repo_languages rl ON rl.repo_id = i.repo_id
+                     LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
+                     LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
+                     LEFT JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
+                     LEFT JOIN hackathons h ON gl.name = ANY (h.github_labels)
+                     LEFT JOIN applications a ON a.issue_id = i.id AND a.project_id = pgr.project_id
+            WHERE pgr.project_id = :projectId
+              AND (coalesce(:statuses) IS NULL OR i.status = ANY (cast(:statuses as indexer_exp.github_issue_status[])))
+              AND (:isAssigned IS NULL
+                OR :isAssigned = TRUE AND gia.user_id IS NOT NULL
+                OR :isAssigned = FALSE AND gia.user_id IS NULL)
+              AND (:isApplied IS NULL
+                OR :isApplied = TRUE AND a.id IS NOT NULL
+                OR :isApplied = FALSE AND a.id IS NULL)
+              AND (:isGoodFirstIssue IS NULL
+                OR :isGoodFirstIssue = TRUE AND gl.name ILIKE '%good%first%issue%'
+                OR :isGoodFirstIssue = FALSE AND gl.name NOT ILIKE '%good%first%issue%')
+              AND (:hackathonId IS NULL OR h.id = :hackathonId)
+              AND (coalesce(:languageIds) IS NULL OR rl.language_id = ANY (:languageIds))
+              AND (coalesce(:search) IS NULL OR i.title ILIKE '%' || :search || '%')
+            GROUP BY i.id
+            """, nativeQuery = true)
+    Page<GithubIssueReadEntity> findIssuesOf(UUID projectId,
+                                             String[] statuses,
+                                             Boolean isAssigned,
+                                             Boolean isApplied,
+                                             Boolean isGoodFirstIssue,
+                                             UUID hackathonId,
+                                             UUID[] languageIds,
+                                             String search,
+                                             Pageable pageable);
 
     @Query("""
             SELECT i
