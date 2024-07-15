@@ -84,6 +84,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_HIDE_CONTRIBUTOR = "/api/v1/projects/%s/contributors/%d/hidden";
     protected static final String PROJECTS_GET_CONTRIBUTIONS = "/api/v1/projects/%s/contributions";
     protected static final String PROJECT_GOOD_FIRST_ISSUES = "/api/v1/projects/%s/good-first-issues";
+    protected static final String PROJECT_PUBLIC_ISSUES = "/api/v1/projects/%s/public-issues";
     protected static final String PROJECTS_INSIGHTS_STALED_CONTRIBUTIONS = "/api/v1/projects/%s/insights" +
                                                                            "/contributions/staled";
     protected static final String PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors" +
