@@ -1,6 +1,0 @@
-init_config:
-  instances:
-    - dbm: true
-      ssl: required
-      collect_schemas:
-        enabled: true
