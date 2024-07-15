@@ -6,7 +6,7 @@ DB_PASSWORD=$(echo $DATABASE_URL | cut -d '/' -f 3 | cut -d ':' -f 2 | cut -d '@
 DB_PORT=$(echo $DATABASE_URL | cut -d ':' -f 4 | cut -d '/' -f 1);
 DB_NAME=$(echo $DATABASE_URL | cut -d ':' -f 4 | cut -d '/' -f 2);
 
-echo 'init_config:
+echo "init_config:
       instances:
         - host: ${DB_HOST}
           username: ${DB_USERNAME}
@@ -17,7 +17,7 @@ echo 'init_config:
           ssl: required
           collect_schemas:
             enabled: true
-' >> /app/.apt/etc/datadog-agent/conf.d/postgres.d/conf.yaml
+" >> /app/.apt/etc/datadog-agent/conf.d/postgres.d/conf.yaml
 
 wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
 java -javaagent:dd-java-agent.jar "$@" -XX:FlightRecorderOptions=stackdepth=256 -jar bootstrap/target/marketplace-api.jar
