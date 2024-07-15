@@ -1,1 +1,1 @@
-web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=bo
+web: ./heroku/start-dyno-with-datadog-apm-and-dbm.sh -Dspring.profiles.active=bo
