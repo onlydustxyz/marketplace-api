@@ -15,7 +15,7 @@ instances:
     dbm: true
     port: ${DB_PORT}
     dbname: ${DB_NAME}
-    ssl: required
+    ssl: require
     collect_schemas:
       enabled: true
 " >> /app/.apt/etc/datadog-agent/conf.d/postgres.d/conf.yaml;
