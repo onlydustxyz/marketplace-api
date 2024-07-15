@@ -1,6 +1,6 @@
 init_config:
   instances:
-    - host: ${DB_HOST}
+    - host: ${$(echo $DATABASE_URL | cut -d '@' -f 2 | cut -d ':' -f 1)}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       dbm: true
