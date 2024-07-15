@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x;
 
 DB_HOST=$(echo $DATABASE_URL | cut -d '@' -f 2 | cut -d ':' -f 1);
 DB_USERNAME=$(echo $DATABASE_URL | cut -d '/' -f 3 | cut -d ':' -f 1);
