@@ -19,6 +19,3 @@ instances:
     collect_schemas:
       enabled: true
 " >> /app/.apt/etc/datadog-agent/conf.d/postgres.d/conf.yaml;
-
-#agent-wrapper stop;
-#agent-wrapper run;
