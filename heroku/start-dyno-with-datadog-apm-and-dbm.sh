@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x;
 
 function setup_datadog() {
   DB_HOST=$(echo $DATABASE_URL | cut -d '@' -f 2 | cut -d ':' -f 1);
@@ -24,4 +23,4 @@ function setup_datadog() {
 
 
 wget -O dd-java-agent.jar https://dtdg.co/latest-java-tracer
-setup_datadog() && java -javaagent:dd-java-agent.jar "$@" -XX:FlightRecorderOptions=stackdepth=256 -jar bootstrap/target/marketplace-api.jar
+java -javaagent:dd-java-agent.jar "$@" -XX:FlightRecorderOptions=stackdepth=256 -jar bootstrap/target/marketplace-api.jar
