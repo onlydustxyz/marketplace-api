@@ -41,6 +41,7 @@ import static java.lang.String.format;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
+import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
 import static onlydust.com.marketplace.api.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
@@ -195,10 +196,40 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     @Override
-    public ResponseEntity<GoodFirstIssuesPageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = githubIssueReadRepository.findGoodFirstIssuesOf(projectId, PageRequest.of(pageIndex, pageSize, Sort.by("createdAt").descending()));
-        return ok(new GoodFirstIssuesPageResponse()
+        final var page = githubIssueReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true,
+                null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
+        return ok(new GithubIssuePageResponse()
+                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+    }
+
+    @Override
+    public ResponseEntity<GithubIssuePageResponse> getProjectPublicIssues(UUID projectId,
+                                                                          Integer pageIndex,
+                                                                          Integer pageSize,
+                                                                          UUID hackathonId,
+                                                                          List<UUID> languageIds,
+                                                                          List<GithubIssueStatus> statuses,
+                                                                          Boolean isAssigned,
+                                                                          Boolean isApplied,
+                                                                          Boolean isGoodFirstIssue,
+                                                                          String search) {
+        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var page = githubIssueReadRepository.findIssuesOf(projectId,
+                isNull(statuses) ? null : statuses.stream().distinct().map(Enum::name).toArray(String[]::new),
+                isAssigned,
+                isApplied,
+                isGoodFirstIssue,
+                hackathonId,
+                isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
+                search,
+                PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
+        return ok(new GithubIssuePageResponse()
                 .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())

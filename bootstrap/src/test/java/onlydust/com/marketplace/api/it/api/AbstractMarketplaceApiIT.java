@@ -84,6 +84,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_HIDE_CONTRIBUTOR = "/api/v1/projects/%s/contributors/%d/hidden";
     protected static final String PROJECTS_GET_CONTRIBUTIONS = "/api/v1/projects/%s/contributions";
     protected static final String PROJECT_GOOD_FIRST_ISSUES = "/api/v1/projects/%s/good-first-issues";
+    protected static final String PROJECT_PUBLIC_ISSUES = "/api/v1/projects/%s/public-issues";
     protected static final String PROJECTS_INSIGHTS_STALED_CONTRIBUTIONS = "/api/v1/projects/%s/insights" +
                                                                            "/contributions/staled";
     protected static final String PROJECTS_INSIGHTS_CHURNED_CONTRIBUTORS = "/api/v1/projects/%s/insights/contributors" +
@@ -167,6 +168,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
     protected static final String HACKATHONS = "/api/v1/hackathons";
     protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
+    protected static final String HACKATHON_BY_ID_PROJECT_ISSUES = "/api/v1/hackathons/%s/project-issues";
     protected static final String USER_LANGUAGES = "/api/v1/users/%d/languages";
     protected static final String USER_ECOSYSTEMS = "/api/v1/users/%d/ecosystems";
     protected static final String USER_STATS = "/api/v1/users/%d/stats";
