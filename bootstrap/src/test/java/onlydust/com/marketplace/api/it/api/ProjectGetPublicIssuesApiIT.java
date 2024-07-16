@@ -110,6 +110,65 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_applicant_count_and_issue_count_in_hackathon() {
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.applicantCount").isEqualTo(1)
+                .jsonPath("$.openIssueCount").isEqualTo(5);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAssigned", "false"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.totalItemNumber").isEqualTo(3);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8"), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAssigned", "false"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.totalItemNumber").isEqualTo(2);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isApplied", "true"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.totalItemNumber").isEqualTo(1);
+    }
+
+    @Test
     void should_get_applied_issues_of_cal_dot_com_within_hackathon() {
         // When
         client.get()
@@ -342,37 +401,10 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "project": {
-                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                                "slug": "taco-tuesday",
-                                "name": "Taco Tuesday",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
-                              },
-                              "issueCount": 6
-                            },
-                            {
-                              "project": {
-                                "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                                "slug": "zero-title-11",
-                                "name": "Zero title 11",
-                                "logoUrl": null
-                              },
-                              "issueCount": 2
-                            },
-                            {
-                              "project": {
                                 "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
                                 "slug": "pizzeria-yoshi-",
                                 "name": "Pizzeria Yoshi !",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
-                              },
-                              "issueCount": 2
-                            },
-                            {
-                              "project": {
-                                "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
-                                "slug": "pacos-project",
-                                "name": "Paco's project",
-                                "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
                               },
                               "issueCount": 2
                             }
@@ -722,15 +754,6 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
                               },
                               "issueCount": 4
-                            },
-                            {
-                              "project": {
-                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                                "slug": "taco-tuesday",
-                                "name": "Taco Tuesday",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
-                              },
-                              "issueCount": 5
                             }
                           ]
                         }
@@ -1041,48 +1064,12 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                             },
                             {
                               "project": {
-                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                                "slug": "taco-tuesday",
-                                "name": "Taco Tuesday",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
-                              },
-                              "issueCount": 38
-                            },
-                            {
-                              "project": {
-                                "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
-                                "slug": "zero-title-11",
-                                "name": "Zero title 11",
-                                "logoUrl": null
-                              },
-                              "issueCount": 35
-                            },
-                            {
-                              "project": {
                                 "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
                                 "slug": "pizzeria-yoshi-",
                                 "name": "Pizzeria Yoshi !",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
                               },
                               "issueCount": 73
-                            },
-                            {
-                              "project": {
-                                "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
-                                "slug": "pacos-project",
-                                "name": "Paco's project",
-                                "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
-                              },
-                              "issueCount": 35
-                            },
-                            {
-                              "project": {
-                                "id": "f992349c-e30c-4156-8b55-0a9dbc20b873",
-                                "slug": "gregs-project",
-                                "name": "Greg's project",
-                                "logoUrl": "https://dl.airtable.com/.attachments/75bca1dce6735d434b19631814ec84b0/2a9cad0b/aeZxLjpJQre2uXBQDoQf"
-                              },
-                              "issueCount": 1
                             }
                           ]
                         }

@@ -8,7 +8,6 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectsGoodFirstIssuesReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -95,9 +94,6 @@ public class GithubIssueReadEntity {
     )
     @NonNull
     List<AllUserReadEntity> assignees;
-
-    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY)
-    Set<ProjectsGoodFirstIssuesReadEntity> goodFirstIssueOf;
 
     @OneToMany(mappedBy = "issue")
     @NonNull
