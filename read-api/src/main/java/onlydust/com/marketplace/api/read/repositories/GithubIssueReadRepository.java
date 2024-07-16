@@ -31,7 +31,9 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
                      LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
                      LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
                      LEFT JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
-                     LEFT JOIN hackathons h ON gl.name = ANY (h.github_labels)
+                     LEFT JOIN indexer_exp.github_issues_labels gil_hackathon ON i.id = gil_hackathon.issue_id
+                     LEFT JOIN indexer_exp.github_labels gl_hackathon ON gil_hackathon.label_id = gl_hackathon.id
+                     LEFT JOIN hackathons h ON gl_hackathon.name = ANY (h.github_labels)
                      LEFT JOIN applications a ON a.issue_id = i.id AND a.project_id = pgr.project_id
             WHERE pgr.project_id = :projectId
               AND (coalesce(:statuses) IS NULL OR i.status = ANY (cast(:statuses as indexer_exp.github_issue_status[])))
