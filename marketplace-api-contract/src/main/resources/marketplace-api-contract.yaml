@@ -1714,6 +1714,14 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: isIncludedInAnyHackathon
+          description: |
+            When true, only issues that are included in at least one hackathon are returned.
+            When false, only issues that are not included in any hackathon are returned.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
+        - in: query
           name: search
           description: Filter by title (case-insensitive search by title)
           schema:

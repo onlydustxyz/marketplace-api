@@ -294,6 +294,87 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_get_not_applied_issues_of_cal_dot_com_within_hackathon() {
+        // When
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isApplied", "false"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.totalItemNumber").isEqualTo(3)
+                .jsonPath("$.issues[?(@.id == 1978423500)]").doesNotExist();
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "statuses", "OPEN",
+                        "isApplied", "false"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 3
+                            },
+                            {
+                              "project": {
+                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                                "slug": "taco-tuesday",
+                                "name": "Taco Tuesday",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
+                              },
+                              "issueCount": 6
+                            },
+                            {
+                              "project": {
+                                "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                "slug": "zero-title-11",
+                                "name": "Zero title 11",
+                                "logoUrl": null
+                              },
+                              "issueCount": 2
+                            },
+                            {
+                              "project": {
+                                "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                                "slug": "pizzeria-yoshi-",
+                                "name": "Pizzeria Yoshi !",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                              },
+                              "issueCount": 2
+                            },
+                            {
+                              "project": {
+                                "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
+                                "slug": "pacos-project",
+                                "name": "Paco's project",
+                                "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
+                              },
+                              "issueCount": 2
+                            }
+                          ]
+                        }
+                        """);
+    }
 
     @Test
     void should_get_good_first_issues_of_cal_dot_com_within_hackathon() {
@@ -388,6 +469,26 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Test
+    void should_get_good_first_issues_of_cal_dot_com_that_are_not_within_any_hackathon() {
+        // When
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "isIncludedInAnyHackathon", "false",
+                        "isGoodFirstIssue", "true"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.totalItemNumber").isEqualTo(15)
+                .jsonPath("$.issues[?(@.id == 1975516187)]").doesNotExist();
     }
 
     @Test
@@ -1087,8 +1188,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 3,
-                          "totalItemNumber": 11,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 10,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "issues": [
@@ -1097,21 +1198,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "number": 12255,
                               "title": "[CAL-2679] Nice find. Unit testable (could be follow up)?",
                               "status": "OPEN",
-                              "createdAt": "2023-11-07T09:40:41Z",
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12255",
-                              "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
-                              "author": {
-                                "githubUserId": 1780212,
-                                "login": "hariombalhara",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
-                                "isRegistered": false
-                              },
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
+                              "author": {
+                                "githubUserId": 1780212,
+                                "login": "hariombalhara",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-07T09:40:41Z",
+                              "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -1150,21 +1251,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "number": 12253,
                               "title": "[CAL-2678] No loader on clicking install button from apps listing page.",
                               "status": "OPEN",
-                              "createdAt": "2023-11-07T07:36:17Z",
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12253",
-                              "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
-                              "author": {
-                                "githubUserId": 1780212,
-                                "login": "hariombalhara",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
-                                "isRegistered": false
-                              },
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
+                              "author": {
+                                "githubUserId": 1780212,
+                                "login": "hariombalhara",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-07T07:36:17Z",
+                              "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -1183,21 +1284,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "number": 12244,
                               "title": "Read skippable events to calculate realistic availability",
                               "status": "OPEN",
-                              "createdAt": "2023-11-06T15:01:09Z",
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12244",
-                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
-                              "author": {
-                                "githubUserId": 467258,
-                                "login": "leog",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/467258?v=4",
-                                "isRegistered": false
-                              },
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
+                              "author": {
+                                "githubUserId": 467258,
+                                "login": "leog",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/467258?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-06T15:01:09Z",
+                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -1216,66 +1317,25 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "currentUserApplication": null
                             },
                             {
-                              "id": 1975516187,
-                              "number": 12215,
-                              "title": "[CAL-2671] Individual Insights Page has Team Insights",
+                              "id": 1943730312,
+                              "number": 11900,
+                              "title": "Conditional Questions on Event Types",
                               "status": "OPEN",
-                              "createdAt": "2023-11-03T06:12:34Z",
-                              "htmlUrl": "https://github.com/calcom/cal.com/issues/12215",
-                              "body": "Individual insights page has insights from from \\"most booked\\" and \\"least booked\\" members. It should just be data that pretains to them:\\n\\n![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/e74bdb02-5e26-41e8-87be-8dda7e382fd4/f48ddf61-24ba-4a09-b94c-ed1aa2b50df4?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy9lNzRiZGIwMi01ZTI2LTQxZTgtODdiZS04ZGRhN2UzODJmZDQvZjQ4ZGRmNjEtMjRiYS00YTA5LWI5NGMtZWQxYWEyYjUwZGY0IiwiaWF0IjoxNjk4OTkxOTYyLCJleHAiOjE2OTkwNzgzNjJ9.dSRqQBHSC2TupIr9T7wnYSh8Vm3x1KlTsSEo1NIejwI)\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2671](https://linear.app/calcom/issue/CAL-2671/individual-insights-page-has-team-insights)</sub>",
-                              "author": {
-                                "githubUserId": 16177678,
-                                "login": "shirazdole",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/16177678?v=4",
-                                "isRegistered": false
-                              },
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
-                              "labels": [
-                                {
-                                  "name": "Low priority",
-                                  "description": "Created by Linear-GitHub Sync"
-                                },
-                                {
-                                  "name": "good first issue",
-                                  "description": null
-                                },
-                                {
-                                  "name": "insights",
-                                  "description": "area: insights, analytics"
-                                },
-                                {
-                                  "name": "\\uD83D\\uDC1B bug",
-                                  "description": "Something isn't working"
-                                }
-                              ],
-                              "applicants": [],
-                              "currentUserApplication": null
-                            },
-                            {
-                              "id": 1943730312,
-                              "number": 11900,
-                              "title": "Conditional Questions on Event Types",
-                              "status": "OPEN",
-                              "createdAt": "2023-10-15T05:42:44Z",
-                              "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
-                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
                               "author": {
                                 "githubUserId": 10899980,
                                 "login": "moilejter",
                                 "avatarUrl": "https://avatars.githubusercontent.com/u/10899980?v=4",
                                 "isRegistered": false
                               },
-                              "repo": {
-                                "id": 350360184,
-                                "name": "cal.com",
-                                "description": "Scheduling infrastructure for absolutely everyone.",
-                                "htmlUrl": "https://github.com/calcom/cal.com"
-                              },
+                              "createdAt": "2023-10-15T05:42:44Z",
+                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
                               "labels": [
                                 {
                                   "name": "Low priority",
@@ -1292,6 +1352,43 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "name": "✨ feature",
                                   "description": "New feature or request"
+                                }
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null
+                            },
+                            {
+                              "id": 1930038179,
+                              "number": 11732,
+                              "title": "organization - org owners and admins should show their respective badge when they join a sub-team",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/11732",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 32706411,
+                                "login": "SomayChauhan",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/32706411?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-10-06T12:10:09Z",
+                              "body": "## Issue Summary\\r\\n### this is my organization members page\\r\\n![Screenshot from 2023-10-06 17-17-07](https://github.com/calcom/cal.com/assets/32706411/d1f1aad3-2947-4467-be21-e726430874a1)\\r\\n* as you can see i have temp1 as admin and somay and somay2  as owners\\r\\n### this is one the teams under my organizations\\r\\n![Screenshot from 2023-10-06 17-22-20](https://github.com/calcom/cal.com/assets/32706411/ac148a94-56c7-405b-977c-02fa3b495c5b)\\r\\n* as you can see all of them are joined as members but temp1, somay and somay2 all have the admin access to these teams i.e. they can add and remove members from teams so they should show owner/admin instead of member\\r\\n\\r\\nPS: this is just a suggestion however, I may be wrong here.",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "organizations",
+                                  "description": "area: organizations, orgs"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
                                 }
                               ],
                               "applicants": [],
@@ -1318,9 +1415,45 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 10,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
                           "issues": [
                             {
                               "id": 1980935024,
+                              "number": 12255,
+                              "title": "[CAL-2679] Nice find. Unit testable (could be follow up)?",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/12255",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 1780212,
+                                "login": "hariombalhara",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-07T09:40:41Z",
+                              "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "api",
+                                  "description": "area: API, enterprise API, access token, OAuth"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ],
                               "applicants": [
                                 {
                                   "githubUserId": 595505,
@@ -1346,21 +1479,163 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                   "isRegistered": true
                                 },
+                                "project": {
+                                  "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                  "slug": "calcom",
+                                  "name": "Cal.com",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                                },
                                 "motivations": "I could do it",
                                 "problemSolvingApproach": "No idea yet ¯\\\\_(ツ)_/¯"
                               }
                             },
                             {
-                              "id": 1980731400
+                              "id": 1980731400,
+                              "number": 12253,
+                              "title": "[CAL-2678] No loader on clicking install button from apps listing page.",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/12253",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 1780212,
+                                "login": "hariombalhara",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/1780212?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-07T07:36:17Z",
+                              "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null
                             },
                             {
-                              "id": 1979376167
+                              "id": 1979376167,
+                              "number": 12244,
+                              "title": "Read skippable events to calculate realistic availability",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/12244",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 467258,
+                                "login": "leog",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/467258?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-11-06T15:01:09Z",
+                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                },
+                                {
+                                  "name": "✨ feature",
+                                  "description": "New feature or request"
+                                }
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null
                             },
                             {
-                              "id": 1975516187
+                              "id": 1943730312,
+                              "number": 11900,
+                              "title": "Conditional Questions on Event Types",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 10899980,
+                                "login": "moilejter",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/10899980?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-10-15T05:42:44Z",
+                              "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "booking-page",
+                                  "description": "area: booking page, public booking page, booker"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                },
+                                {
+                                  "name": "✨ feature",
+                                  "description": "New feature or request"
+                                }
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null
                             },
                             {
-                              "id": 1943730312
+                              "id": 1930038179,
+                              "number": 11732,
+                              "title": "organization - org owners and admins should show their respective badge when they join a sub-team",
+                              "status": "OPEN",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/11732",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 32706411,
+                                "login": "SomayChauhan",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/32706411?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-10-06T12:10:09Z",
+                              "body": "## Issue Summary\\r\\n### this is my organization members page\\r\\n![Screenshot from 2023-10-06 17-17-07](https://github.com/calcom/cal.com/assets/32706411/d1f1aad3-2947-4467-be21-e726430874a1)\\r\\n* as you can see i have temp1 as admin and somay and somay2  as owners\\r\\n### this is one the teams under my organizations\\r\\n![Screenshot from 2023-10-06 17-22-20](https://github.com/calcom/cal.com/assets/32706411/ac148a94-56c7-405b-977c-02fa3b495c5b)\\r\\n* as you can see all of them are joined as members but temp1, somay and somay2 all have the admin access to these teams i.e. they can add and remove members from teams so they should show owner/admin instead of member\\r\\n\\r\\nPS: this is just a suggestion however, I may be wrong here.",
+                              "labels": [
+                                {
+                                  "name": "Low priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "organizations",
+                                  "description": "area: organizations, orgs"
+                                },
+                                {
+                                  "name": "✅ good first issue",
+                                  "description": "Good for newcomers"
+                                }
+                              ],
+                              "applicants": [],
+                              "currentUserApplication": null
                             }
                           ]
                         }
