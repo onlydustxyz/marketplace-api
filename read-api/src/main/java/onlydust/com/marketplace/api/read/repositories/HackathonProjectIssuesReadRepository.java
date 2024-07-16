@@ -21,7 +21,8 @@ public interface HackathonProjectIssuesReadRepository extends Repository<Hackath
                      LEFT JOIN repo_languages rl ON rl.repo_id = i.repo_id
                      JOIN indexer_exp.github_issues_labels gil_hackathon ON i.id = gil_hackathon.issue_id
                      JOIN indexer_exp.github_labels gl_hackathon ON gil_hackathon.label_id = gl_hackathon.id
-                     JOIN hackathons h ON gl_hackathon.name = ANY (h.github_labels)
+                     JOIN hackathon_projects hp ON hp.project_id = pgr.project_id
+                     JOIN hackathons h ON gl_hackathon.name = ANY (h.github_labels) AND hp.hackathon_id = h.id
                      LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
                      LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
                      LEFT JOIN indexer_exp.github_labels gl ON gil.label_id = gl.id
