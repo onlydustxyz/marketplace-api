@@ -137,12 +137,17 @@ public class HackathonReadEntity {
                         .url(link.getUrl())
                 ).toList())
                 .sponsors(sponsors.stream().map(sponsor -> new SponsorResponse()
-                        .id(sponsor.getId())
-                        .name(sponsor.getName())
-                        .url(sponsor.getUrl())
-                        .logoUrl(sponsor.getLogoUrl())
-                ).toList())
-                .projects(projects.stream().map(ProjectReadEntity::toShortResponse).toList());
+                                .id(sponsor.getId())
+                                .name(sponsor.getName())
+                                .url(sponsor.getUrl())
+                                .logoUrl(sponsor.getLogoUrl())
+                        )
+                        .sorted(Comparator.comparing(SponsorResponse::getName))
+                        .toList())
+                .projects(projects.stream()
+                        .map(ProjectReadEntity::toShortResponse)
+                        .sorted(Comparator.comparing(ProjectShortResponse::getName))
+                        .toList());
     }
 
 
