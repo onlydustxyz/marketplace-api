@@ -3879,12 +3879,36 @@ paths:
             items:
               $ref: '#/components/schemas/LanguageId'
         - in: query
-          name: states
-          description: Filter by states
+          name: statuses
+          description: Filter by statuses
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/GithubIssueState'
+              $ref: '#/components/schemas/GithubIssueStatus'
+        - in: query
+          name: isAssigned
+          description: |
+            When true, only issues that have been assigned are returned.
+            When false, only issues that have not been assigned are returned.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
+        - in: query
+          name: isApplied
+          description: |
+            When true, only issues that have been applied to are returned.
+            When false, only issues that have not been applied to are returned.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
+        - in: query
+          name: isGoodFirstIssue
+          description: |
+            When true, only issues that are tagged as good first issues.
+            When false, only issues that are not tagged as good first issues.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
         - in: query
           name: search
           description: Filter by title (case-insensitive search by title)

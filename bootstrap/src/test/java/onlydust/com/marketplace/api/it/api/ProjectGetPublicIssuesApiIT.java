@@ -97,8 +97,10 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .endDate(startDate.plusDays(1))
                 .status(Hackathon.Status.PUBLISHED)
                 .build();
-        hackathon.githubLabels().addAll(List.of("label1", "insights"));
-        hackathon.projectIds().add(CAL_DOT_COM);
+        hackathon.githubLabels().addAll(List.of("bug", "insights"));
+        hackathon.projectIds().addAll(List.of(CAL_DOT_COM,
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                UUID.fromString("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8")));
         hackathonStoragePort.save(hackathon);
     }
 
@@ -171,6 +173,32 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "currentUserApplication": null
+                            }
+                          ]
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "statuses", "OPEN",
+                        "isApplied", "true"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 1
                             }
                           ]
                         }
@@ -330,6 +358,32 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null
+                            }
+                          ]
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "statuses", "OPEN",
+                        "isGoodFirstIssue", "true"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 1
                             }
                           ]
                         }
@@ -536,6 +590,41 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null
+                            }
+                          ]
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "statuses", "OPEN",
+                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,c83881b3-5aef-4819-9596-fdbbbedf2b0b"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 4
+                            },
+                            {
+                              "project": {
+                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                                "slug": "taco-tuesday",
+                                "name": "Taco Tuesday",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
+                              },
+                              "issueCount": 5
                             }
                           ]
                         }
@@ -776,6 +865,76 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "statuses", "COMPLETED"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 7
+                            },
+                            {
+                              "project": {
+                                "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                                "slug": "taco-tuesday",
+                                "name": "Taco Tuesday",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg"
+                              },
+                              "issueCount": 38
+                            },
+                            {
+                              "project": {
+                                "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
+                                "slug": "zero-title-11",
+                                "name": "Zero title 11",
+                                "logoUrl": null
+                              },
+                              "issueCount": 35
+                            },
+                            {
+                              "project": {
+                                "id": "57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8",
+                                "slug": "pizzeria-yoshi-",
+                                "name": "Pizzeria Yoshi !",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/14305950553200301786.png"
+                              },
+                              "issueCount": 73
+                            },
+                            {
+                              "project": {
+                                "id": "b0f54343-3732-4118-8054-dba40f1ffb85",
+                                "slug": "pacos-project",
+                                "name": "Paco's project",
+                                "logoUrl": "https://dl.airtable.com/.attachments/01f2dd7497313a1fa13b4c5546429318/764531e3/8bUn9t8ORk6LLyMRcu78"
+                              },
+                              "issueCount": 35
+                            },
+                            {
+                              "project": {
+                                "id": "f992349c-e30c-4156-8b55-0a9dbc20b873",
+                                "slug": "gregs-project",
+                                "name": "Greg's project",
+                                "logoUrl": "https://dl.airtable.com/.attachments/75bca1dce6735d434b19631814ec84b0/2a9cad0b/aeZxLjpJQre2uXBQDoQf"
+                              },
+                              "issueCount": 1
+                            }
+                          ]
+                        }
+                        """);
     }
 
     @Test
@@ -881,6 +1040,32 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [],
                               "currentUserApplication": null
+                            }
+                          ]
+                        }
+                        """);
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "isAssigned", "true",
+                        "search", "counting managed event"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "issueCount": 1
                             }
                           ]
                         }
