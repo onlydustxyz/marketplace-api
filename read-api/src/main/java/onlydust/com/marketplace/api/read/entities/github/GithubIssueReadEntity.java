@@ -118,12 +118,14 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl)
-                .repo(repo.toLinkResponse())
+                .repo(repo.toShortResponse())
                 .author(author.toContributorResponse())
                 .createdAt(createdAt)
+                .closedAt(closedAt)
                 .body(body)
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
                 .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
+                .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
                 .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
                 ;
     }
