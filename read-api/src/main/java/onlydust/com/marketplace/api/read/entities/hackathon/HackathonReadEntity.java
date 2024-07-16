@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.read.entities.hackathon;
 
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -12,10 +13,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEnti
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
@@ -93,6 +91,26 @@ public class HackathonReadEntity {
     @NonNull
     Set<HackathonRegistrationReadEntity> registrations;
 
+    @Formula("""
+            (SELECT count(distinct a.id)
+             FROM hackathon_issues hi
+                      JOIN indexer_exp.github_issues i on i.id = hi.issue_id
+                      LEFT JOIN applications a ON a.issue_id = i.id AND a.project_id = ANY( hi.project_ids )
+             WHERE hi.hackathon_id = id)
+            """)
+    Integer applicantCount;
+
+    @Formula("""
+            (SELECT count(distinct i.id)
+             FROM hackathon_issues hi
+                      JOIN indexer_exp.github_issues i on i.id = hi.issue_id
+                      LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
+             WHERE hi.hackathon_id = id
+               AND i.status = 'OPEN'
+               AND gia.user_id IS NULL)
+            """)
+    Integer openIssueCount;
+
 
     public HackathonsDetailsResponse toResponse(final Boolean isRegistered) {
         return new HackathonsDetailsResponse()
@@ -105,6 +123,8 @@ public class HackathonReadEntity {
                 .description(this.description)
                 .location(this.location)
                 .totalBudget(this.budget)
+                .applicantCount(applicantCount)
+                .openIssueCount(openIssueCount)
                 .startDate(ZonedDateTime.ofInstant(this.startDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(this.endDate.toInstant(), ZoneOffset.UTC))
                 .githubLabels(isNull(this.githubLabels) ? List.of() : Arrays.asList(this.githubLabels))

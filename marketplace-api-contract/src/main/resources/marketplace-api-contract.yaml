@@ -8155,6 +8155,10 @@ components:
               type: string
             totalBudget:
               type: string
+            applicantCount:
+              type: integer
+            openIssueCount:
+              type: integer
             communityLinks:
               type: array
               items:

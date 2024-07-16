@@ -110,6 +110,65 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_applicant_count_and_issue_count_in_hackathon() {
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_SLUG.formatted("hackathon-1")))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.applicantCount").isEqualTo(1)
+                .jsonPath("$.openIssueCount").isEqualTo(5);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAssigned", "false"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.totalItemNumber").isEqualTo(3);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8"), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "statuses", "OPEN",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAssigned", "false"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.totalItemNumber").isEqualTo(2);
+
+        client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isApplied", "true"
+                )))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.totalItemNumber").isEqualTo(1);
+    }
+
+    @Test
     void should_get_applied_issues_of_cal_dot_com_within_hackathon() {
         // When
         client.get()
