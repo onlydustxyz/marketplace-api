@@ -178,7 +178,9 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                             }
                           ],
-                          "me": null
+                          "me": null,
+                          "applicantCount": 0,
+                          "openIssueCount": 0
                         }
                         """);
     }
