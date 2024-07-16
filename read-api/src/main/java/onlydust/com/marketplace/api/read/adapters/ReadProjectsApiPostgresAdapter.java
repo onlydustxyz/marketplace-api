@@ -198,7 +198,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = githubIssueReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true,
+        final var page = githubIssueReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, false,
                 null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
         return ok(new GithubIssuePageResponse()
                 .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
@@ -218,6 +218,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           Boolean isAssigned,
                                                                           Boolean isApplied,
                                                                           Boolean isGoodFirstIssue,
+                                                                          Boolean isIncludedInAnyHackathon,
                                                                           String search) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = githubIssueReadRepository.findIssuesOf(projectId,
@@ -225,6 +226,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 isAssigned,
                 isApplied,
                 isGoodFirstIssue,
+                isIncludedInAnyHackathon,
                 hackathonId,
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search,

@@ -46,6 +46,13 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
               AND (:isGoodFirstIssue IS NULL
                 OR :isGoodFirstIssue = TRUE AND gl.name ILIKE '%good%first%issue%'
                 OR :isGoodFirstIssue = FALSE AND gl.name NOT ILIKE '%good%first%issue%')
+              AND (:isIncludedInAnyHackathon IS NULL
+                OR :isIncludedInAnyHackathon = TRUE AND h.id IS NOT NULL
+                OR :isIncludedInAnyHackathon = FALSE AND NOT exists(SELECT 1
+                                                                    FROM hackathons h2
+                                                                             JOIN indexer_exp.github_labels gl2 ON gl2.name = ANY (h2.github_labels)
+                                                                             JOIN indexer_exp.github_issues_labels gil2 ON gil2.label_id = gl2.id
+                                                                    WHERE gil2.issue_id = i.id))
               AND (:hackathonId IS NULL OR h.id = :hackathonId)
               AND (coalesce(:languageIds) IS NULL OR rl.language_id = ANY (:languageIds))
               AND (coalesce(:search) IS NULL OR i.title ILIKE '%' || :search || '%')
@@ -56,6 +63,7 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
                                              Boolean isAssigned,
                                              Boolean isApplied,
                                              Boolean isGoodFirstIssue,
+                                             Boolean isIncludedInAnyHackathon,
                                              UUID hackathonId,
                                              UUID[] languageIds,
                                              String search,
