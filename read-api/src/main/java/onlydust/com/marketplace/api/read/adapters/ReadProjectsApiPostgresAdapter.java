@@ -219,7 +219,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           Boolean isApplied,
                                                                           Boolean isGoodFirstIssue,
                                                                           Boolean isIncludedInAnyHackathon,
-                                                                          String search) {
+                                                                          String search,
+                                                                          ProjectIssuesSort sort,
+                                                                          SortDirection direction) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var page = githubIssueReadRepository.findIssuesOf(projectId,
                 isNull(statuses) ? null : statuses.stream().distinct().map(Enum::name).toArray(String[]::new),
@@ -230,7 +232,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 hackathonId,
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search,
-                PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
+                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, switch (sort) {
+                    case CREATED_AT -> "created_at";
+                    case CLOSED_AT -> "closed_at";
+                })));
         return ok(new GithubIssuePageResponse()
                 .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())

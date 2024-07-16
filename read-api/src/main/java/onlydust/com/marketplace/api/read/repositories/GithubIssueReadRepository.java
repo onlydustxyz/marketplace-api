@@ -27,7 +27,7 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
             SELECT i.*
             FROM indexer_exp.github_issues i
                      JOIN project_github_repos pgr ON pgr.github_repo_id = i.repo_id
-                     JOIN repo_languages rl ON rl.repo_id = i.repo_id
+                     LEFT JOIN repo_languages rl ON rl.repo_id = i.repo_id
                      LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
                      LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
                      LEFT JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
