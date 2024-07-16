@@ -1727,6 +1727,15 @@ paths:
           schema:
             type: string
         - in: query
+          name: sort
+          description: Sort order
+          schema:
+            $ref: '#/components/schemas/ProjectIssuesSort'
+        - in: query
+          name: direction
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+        - in: query
           name: pageIndex
           required: true
           schema:
@@ -1842,6 +1851,7 @@ paths:
 
   /api/v1/projects/{projectId}/issues:
     get:
+      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -6138,14 +6148,22 @@ components:
         - type: object
           description: Github issue
           required:
+            - repo
             - createdAt
             - labels
             - applicants
+            - assignees
           properties:
+            repo:
+              $ref: '#/components/schemas/ShortGithubRepoResponse'
             createdAt:
               type: string
               format: date-time
               description: When the issue was created.
+            closedAt:
+              type: string
+              format: date-time
+              description: When the issue was cancelled or closed.
             body:
               type: string
               description: The body of the issue.
@@ -6157,6 +6175,11 @@ components:
             applicants:
               type: array
               description: The list of applicants for this issue
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
+            assignees:
+              type: array
+              description: The list of assignees for this issue
               items:
                 $ref: '#/components/schemas/GithubUserResponse'
             currentUserApplication:

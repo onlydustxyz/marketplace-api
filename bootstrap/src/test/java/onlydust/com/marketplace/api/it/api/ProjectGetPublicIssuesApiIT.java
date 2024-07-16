@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
+import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
@@ -7,8 +9,7 @@ import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneOffset;
@@ -16,6 +17,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.api.it.api.ApplicationsApiIT.fakeApplication;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @TagProject
@@ -739,6 +744,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
+                        "sort", "CLOSED_AT",
+                        "direction", "DESC",
                         "statuses", "COMPLETED",
                         "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25"
                 )))
@@ -754,6 +761,108 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "issues": [
+                            {
+                              "id": 1849986822,
+                              "number": 10747,
+                              "title": "[CAL-2347] /insights: be able to access raw data via csv api endpoint",
+                              "status": "COMPLETED",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10747",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 8019099,
+                                "login": "PeerRich",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8019099?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-08-14T15:11:54Z",
+                              "closedAt": "2023-10-16T11:27:27Z",
+                              "body": "same as metabase, it would be great if you can copy the link to the real-time raw data as a csv:\\n\\n![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/2d88ae81-840a-4067-b3bc-5a5cde4ae6a7/b7afb9d4-b2f6-43e8-bb6b-25fb06c136a4?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy8yZDg4YWU4MS04NDBhLTQwNjctYjNiYy01YTVjZGU0YWU2YTcvYjdhZmI5ZDQtYjJmNi00M2U4LWJiNmItMjVmYjA2YzEzNmE0IiwiaWF0IjoxNjkyMDI1OTIwLCJleHAiOjE2OTIxMTIzMjB9.92VOOK1GJQRZlOu11gw65GUcX6ntT1OxSG_elgcMelY)\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2347](https://linear.app/calcom/issue/CAL-2347/insights-be-able-to-access-raw-data-via-csv-api-endpoint)</sub>",
+                              "labels": [
+                                {
+                                  "name": "Medium priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "insights",
+                                  "description": "area: insights, analytics"
+                                },
+                                {
+                                  "name": "✨ feature",
+                                  "description": "New feature or request"
+                                },
+                                {
+                                  "name": "\\uD83D\\uDEA7  wip / in the making",
+                                  "description": "This is currently being worked on"
+                                }
+                              ],
+                              "applicants": [],
+                              "assignees": [
+                                {
+                                  "githubUserId": 2538462,
+                                  "login": "keithwillcode",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/2538462?v=4"
+                                }
+                              ],
+                              "currentUserApplication": null
+                            },
+                            {
+                              "id": 1829562256,
+                              "number": 10486,
+                              "title": "Several bugs in insights",
+                              "status": "COMPLETED",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10486",
+                              "repo": {
+                                "id": 350360184,
+                                "name": "cal.com",
+                                "description": "Scheduling infrastructure for absolutely everyone.",
+                                "htmlUrl": "https://github.com/calcom/cal.com"
+                              },
+                              "author": {
+                                "githubUserId": 81948346,
+                                "login": "anikdhabal",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/81948346?v=4",
+                                "isRegistered": false
+                              },
+                              "createdAt": "2023-07-31T16:00:31Z",
+                              "closedAt": "2023-10-04T19:10:11Z",
+                              "body": "Found a bug? Please fill out the sections below. \\uD83D\\uDC4D\\r\\n\\r\\n### Issue Summary\\r\\n\\r\\nI found bugs in the insights section. Today, I created two team meetings: one was scheduled, and the other was canceled. However, the insights section is showing that 2 events were created and 0 events were canceled.\\r\\n![Screenshot 2023-07-31 212150](https://github.com/calcom/cal.com/assets/81948346/892f89ed-9bdd-464c-aad7-828da5236ec7)\\r\\n\\r\\nToday is the 31st, but I noticed that the trace graph's end date varies when using different filters.\\r\\n![Screenshot 2023-07-31 211352](https://github.com/calcom/cal.com/assets/81948346/6e7fb7da-9afd-452f-92c7-ef7cd71454dc)\\r\\n\\r\\n![Screenshot 2023-07-31 211003](https://github.com/calcom/cal.com/assets/81948346/383e4a55-7590-44af-bd52-490d3f6b878e)\\r\\n\\r\\n![Screenshot 2023-07-31 210644](https://github.com/calcom/cal.com/assets/81948346/7d4e8f2e-c99b-4503-b6dc-615d9a88707d)\\r\\n\\r\\n\\r\\n\\r\\n\\r\\n\\r\\n### Steps to Reproduce\\r\\n\\r\\n1. Go to insights\\r\\n\\r\\n",
+                              "labels": [
+                                {
+                                  "name": "Medium priority",
+                                  "description": "Created by Linear-GitHub Sync"
+                                },
+                                {
+                                  "name": "insights",
+                                  "description": "area: insights, analytics"
+                                },
+                                {
+                                  "name": "\\uD83D\\uDC1B bug",
+                                  "description": "Something isn't working"
+                                },
+                                {
+                                  "name": "\\uD83D\\uDC69‍\\uD83D\\uDD2C needs investigation",
+                                  "description": "Needs to be investigated further"
+                                },
+                                {
+                                  "name": "\\uD83D\\uDEA7  wip / in the making",
+                                  "description": "This is currently being worked on"
+                                }
+                              ],
+                              "applicants": [],
+                              "assignees": [
+                                {
+                                  "githubUserId": 4461358,
+                                  "login": "alannnc",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/4461358?v=4"
+                                }
+                              ],
+                              "currentUserApplication": null
+                            },
                             {
                               "id": 1895586558,
                               "number": 11352,
@@ -773,6 +882,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-09-14T03:20:34Z",
+                              "closedAt": "2023-09-18T23:36:10Z",
                               "body": "\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2466](https://linear.app/calcom/issue/CAL-2466/insights-re-renders-and-loads-every-endpoint-again-possible-bug-with)</sub>",
                               "labels": [
                                 {
@@ -793,6 +903,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [
+                                {
+                                  "githubUserId": 4461358,
+                                  "login": "alannnc",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/4461358?v=4"
+                                }
+                              ],
                               "currentUserApplication": null
                             },
                             {
@@ -814,6 +931,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-09-01T18:40:43Z",
+                              "closedAt": "2023-09-04T15:47:56Z",
                               "body": "In an org enviroment this happened recently. Let's figure out where they should be listed on the settings page.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2401](https://linear.app/calcom/issue/CAL-2401/teams-are-listed-on-insights-but-then-you-cant-find-them-on-settings)</sub>",
                               "labels": [
                                 {
@@ -842,55 +960,21 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null
-                            },
-                            {
-                              "id": 1849986822,
-                              "number": 10747,
-                              "title": "[CAL-2347] /insights: be able to access raw data via csv api endpoint",
-                              "status": "COMPLETED",
-                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10747",
-                              "repo": {
-                                "id": 350360184,
-                                "name": "cal.com",
-                                "description": "Scheduling infrastructure for absolutely everyone.",
-                                "htmlUrl": "https://github.com/calcom/cal.com"
-                              },
-                              "author": {
-                                "githubUserId": 8019099,
-                                "login": "PeerRich",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/8019099?v=4",
-                                "isRegistered": false
-                              },
-                              "createdAt": "2023-08-14T15:11:54Z",
-                              "body": "same as metabase, it would be great if you can copy the link to the real-time raw data as a csv:\\n\\n![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/2d88ae81-840a-4067-b3bc-5a5cde4ae6a7/b7afb9d4-b2f6-43e8-bb6b-25fb06c136a4?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy8yZDg4YWU4MS04NDBhLTQwNjctYjNiYy01YTVjZGU0YWU2YTcvYjdhZmI5ZDQtYjJmNi00M2U4LWJiNmItMjVmYjA2YzEzNmE0IiwiaWF0IjoxNjkyMDI1OTIwLCJleHAiOjE2OTIxMTIzMjB9.92VOOK1GJQRZlOu11gw65GUcX6ntT1OxSG_elgcMelY)\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2347](https://linear.app/calcom/issue/CAL-2347/insights-be-able-to-access-raw-data-via-csv-api-endpoint)</sub>",
-                              "labels": [
+                              "assignees": [
                                 {
-                                  "name": "Medium priority",
-                                  "description": "Created by Linear-GitHub Sync"
-                                },
-                                {
-                                  "name": "insights",
-                                  "description": "area: insights, analytics"
-                                },
-                                {
-                                  "name": "✨ feature",
-                                  "description": "New feature or request"
-                                },
-                                {
-                                  "name": "\\uD83D\\uDEA7  wip / in the making",
-                                  "description": "This is currently being worked on"
+                                  "githubUserId": 4461358,
+                                  "login": "alannnc",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/4461358?v=4"
                                 }
                               ],
-                              "applicants": [],
                               "currentUserApplication": null
                             },
                             {
-                              "id": 1829562256,
-                              "number": 10486,
-                              "title": "Several bugs in insights",
+                              "id": 1799417431,
+                              "number": 10068,
+                              "title": "[CAL-2147] Insights getTotalRescheduledEvents goes wrong for large booking counts",
                               "status": "COMPLETED",
-                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10486",
+                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10068",
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
@@ -898,13 +982,14 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
                               "author": {
-                                "githubUserId": 81948346,
-                                "login": "anikdhabal",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/81948346?v=4",
+                                "githubUserId": 1046695,
+                                "login": "emrysal",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/1046695?v=4",
                                 "isRegistered": false
                               },
-                              "createdAt": "2023-07-31T16:00:31Z",
-                              "body": "Found a bug? Please fill out the sections below. \\uD83D\\uDC4D\\r\\n\\r\\n### Issue Summary\\r\\n\\r\\nI found bugs in the insights section. Today, I created two team meetings: one was scheduled, and the other was canceled. However, the insights section is showing that 2 events were created and 0 events were canceled.\\r\\n![Screenshot 2023-07-31 212150](https://github.com/calcom/cal.com/assets/81948346/892f89ed-9bdd-464c-aad7-828da5236ec7)\\r\\n\\r\\nToday is the 31st, but I noticed that the trace graph's end date varies when using different filters.\\r\\n![Screenshot 2023-07-31 211352](https://github.com/calcom/cal.com/assets/81948346/6e7fb7da-9afd-452f-92c7-ef7cd71454dc)\\r\\n\\r\\n![Screenshot 2023-07-31 211003](https://github.com/calcom/cal.com/assets/81948346/383e4a55-7590-44af-bd52-490d3f6b878e)\\r\\n\\r\\n![Screenshot 2023-07-31 210644](https://github.com/calcom/cal.com/assets/81948346/7d4e8f2e-c99b-4503-b6dc-615d9a88707d)\\r\\n\\r\\n\\r\\n\\r\\n\\r\\n\\r\\n### Steps to Reproduce\\r\\n\\r\\n1. Go to insights\\r\\n\\r\\n",
+                              "createdAt": "2023-07-11T17:28:42Z",
+                              "closedAt": "2023-08-10T17:36:31Z",
+                              "body": "Insights getTotalRescheduledEvents goes wrong for large booking counts. - probably same for getTotalCanceledEvents. Looks like we crash when there's a large amount of bookings due to a limit of 32767 on the Prisma `in` clause. \\r\\n\\r\\n \\n\\n<sub>[CAL-2147](https://linear.app/calcom/issue/CAL-2147/insights-gettotalrescheduledevents-goes-wrong-for-large-booking-counts)</sub>",
                               "labels": [
                                 {
                                   "name": "Medium priority",
@@ -917,50 +1002,16 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "name": "\\uD83D\\uDC1B bug",
                                   "description": "Something isn't working"
-                                },
-                                {
-                                  "name": "\\uD83D\\uDC69‍\\uD83D\\uDD2C needs investigation",
-                                  "description": "Needs to be investigated further"
-                                },
-                                {
-                                  "name": "\\uD83D\\uDEA7  wip / in the making",
-                                  "description": "This is currently being worked on"
                                 }
                               ],
                               "applicants": [],
-                              "currentUserApplication": null
-                            },
-                            {
-                              "id": 1812887405,
-                              "number": 10261,
-                              "title": "[CAL-2209] Insights, not counting managed event type bookings",
-                              "status": "COMPLETED",
-                              "htmlUrl": "https://github.com/calcom/cal.com/issues/10261",
-                              "repo": {
-                                "id": 350360184,
-                                "name": "cal.com",
-                                "description": "Scheduling infrastructure for absolutely everyone.",
-                                "htmlUrl": "https://github.com/calcom/cal.com"
-                              },
-                              "author": {
-                                "githubUserId": 4461358,
-                                "login": "alannnc",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/4461358?v=4",
-                                "isRegistered": false
-                              },
-                              "createdAt": "2023-07-19T23:40:18Z",
-                              "body": "Since managed event type bookings are special case when looking up specific eventTypeId, we should add to conditional to also look for parentId eventTypeId.\\n\\nThis means 2 things:\\n\\n* No bookings will happen with managedEventTypeId\\n* Bookings will only count once when using parentId field.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2209](https://linear.app/calcom/issue/CAL-2209/insights-not-counting-managed-event-type-bookings)</sub>",
-                              "labels": [
+                              "assignees": [
                                 {
-                                  "name": "insights",
-                                  "description": "area: insights, analytics"
-                                },
-                                {
-                                  "name": "\\uD83D\\uDC1B bug",
-                                  "description": "Something isn't working"
+                                  "githubUserId": 4461358,
+                                  "login": "alannnc",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/4461358?v=4"
                                 }
                               ],
-                              "applicants": [],
                               "currentUserApplication": null
                             }
                           ]
@@ -1640,5 +1691,237 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Nested
+    @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+    public class ProjectsGetIssuesApiIT {
+
+        final UUID projectAppliedTo1 = UUID.fromString("27ca7e18-9e71-468f-8825-c64fe6b79d66");
+        final UUID projectAppliedTo2 = UUID.fromString("57f76bd5-c6fb-4ef0-8a0a-74450f4ceca8");
+
+        @Test
+        @Order(0)
+        void setupOnce() {
+            final var pierre = userAuthHelper.authenticatePierre();
+            final var antho = userAuthHelper.authenticateAnthony();
+            final var olivier = userAuthHelper.authenticateOlivier();
+
+            applicationRepository.saveAll(List.of(
+                    // 1652216316L has 2 applicants on project 2
+                    // 1652216317L has 2 applicants on project 1 and 1 applicant on project 2
+                    fakeApplication(projectAppliedTo1, pierre, 1651834617L, 112L),
+                    fakeApplication(projectAppliedTo2, pierre, 1652216316L, 113L),
+
+                    fakeApplication(projectAppliedTo2, antho, 1652216316L, 112L),
+                    fakeApplication(projectAppliedTo2, antho, 1651834617L, 113L),
+
+                    fakeApplication(projectAppliedTo1, olivier, 1651834617L, 112L)
+            ));
+        }
+
+        @Test
+        @Order(1)
+        void should_return_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "3")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 564,
+                              "totalItemNumber": 1691,
+                              "hasMore": true,
+                              "nextPageIndex": 1,
+                              "issues": [
+                                {
+                                  "id": 1564131775,
+                                  "number": 1,
+                                  "title": "testing",
+                                  "status": "OPEN",
+                                  "createdAt": "2023-01-31T11:26:54Z",
+                                  "closedAt": null,
+                                  "htmlUrl": "https://github.com/gregcha/crew-app/issues/1",
+                                  "author": {
+                                    "githubUserId": 8642470,
+                                    "login": "gregcha",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                                    "isRegistered": true
+                                  },
+                                  "repo": {
+                                    "id": 302082426,
+                                    "owner": "gregcha",
+                                    "name": "crew-app",
+                                    "description": null,
+                                    "htmlUrl": "https://github.com/gregcha/crew-app"
+                                  },
+                                  "applicants": [],
+                                  "assignees": []
+                                },
+                                {
+                                  "id": 1642022365,
+                                  "number": 6,
+                                  "title": "This is a new issue",
+                                  "status": "COMPLETED",
+                                  "createdAt": "2023-03-27T12:56:04Z",
+                                  "closedAt": "2023-08-30T09:20:48Z",
+                                  "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/6",
+                                  "author": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                    "isRegistered": true
+                                  },
+                                  "repo": {
+                                    "id": 602953043,
+                                    "owner": "od-mocks",
+                                    "name": "cool-repo-A",
+                                    "description": "This is repo A for our e2e tests",
+                                    "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
+                                  },
+                                  "applicants": [],
+                                  "assignees": [
+                                    {
+                                      "githubUserId": 43467246,
+                                      "login": "AnthonyBuisset",
+                                      "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "id": 1642022454,
+                                  "number": 7,
+                                  "title": "This one has been cancelled",
+                                  "status": "CANCELLED",
+                                  "createdAt": "2023-03-27T12:56:32Z",
+                                  "closedAt": "2023-03-27T12:57:25Z",
+                                  "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/7",
+                                  "author": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                    "isRegistered": true
+                                  },
+                                  "repo": {
+                                    "id": 602953043,
+                                    "owner": "od-mocks",
+                                    "name": "cool-repo-A",
+                                    "description": "This is repo A for our e2e tests",
+                                    "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
+                                  },
+                                  "applicants": [],
+                                  "assignees": []
+                                }
+                              ]
+                            }
+                            """);
+        }
+
+        @Test
+        @Order(1)
+        void should_return_assigned_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            final var issues = client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "true")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+
+            assertThat(issues).isNotEmpty();
+            issues.forEach(issue -> assertThat(issue.getAssignees()).isNotEmpty());
+        }
+
+        @Test
+        @Order(1)
+        void should_return_unassigned_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            final var issues = client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "false")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+
+            assertThat(issues).isNotEmpty();
+            issues.forEach(issue -> assertThat(issue.getAssignees()).isEmpty());
+        }
+
+        @Test
+        @Order(1)
+        void should_return_unassigned_open_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            final var issues = client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of(
+                            "pageIndex", "0",
+                            "pageSize", "30",
+                            "isAssigned", "false",
+                            "statuses", "OPEN")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+
+            assertThat(issues).isNotEmpty();
+            assertThat(issues).allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
+        }
+
+        @Test
+        @Order(1)
+        void should_return_applied_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            final var issues = client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "true")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+
+            assertThat(issues).isNotEmpty();
+            issues.forEach(issue -> assertThat(issue.getApplicants()).isNotEmpty());
+        }
+
+        @Test
+        @Order(1)
+        void should_return_not_applied_project_issues() {
+            // Given
+            final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
+
+            final var issues = client.get()
+                    .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "false")))
+                    .header("Authorization", BEARER_PREFIX + jwt)
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
+
+            assertThat(issues).isNotEmpty();
+            issues.forEach(issue -> assertThat(issue.getApplicants()).isEmpty());
+        }
+
     }
 }
