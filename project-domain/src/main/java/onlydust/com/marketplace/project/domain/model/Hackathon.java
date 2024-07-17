@@ -29,7 +29,6 @@ public class Hackathon {
     Status status;
     @NonNull
     String title;
-    String subtitle;
     String description;
     String location;
     String totalBudget;
@@ -59,7 +58,6 @@ public class Hackathon {
         this.githubLabels.addAll(githubLabels);
         this.startDate = startDate;
         this.endDate = endDate;
-        this.subtitle = null;
         this.description = null;
         this.location = null;
         this.totalBudget = null;

@@ -48,7 +48,6 @@ public class HackathonReadEntity {
 
     @NonNull
     String title;
-    String subtitle;
     String description;
     String location;
     String budget;
@@ -126,7 +125,6 @@ public class HackathonReadEntity {
                 .index(this.index)
                 .me(Optional.ofNullable(isRegistered).map(value -> new HackathonsDetailsResponseAllOfMe().hasRegistered(value)).orElse(null))
                 .title(this.title)
-                .subtitle(this.subtitle)
                 .description(this.description)
                 .location(this.location)
                 .totalBudget(this.budget)
@@ -164,7 +162,6 @@ public class HackathonReadEntity {
                 .id(this.id)
                 .slug(this.slug)
                 .title(this.title)
-                .subtitle(this.subtitle)
                 .description(this.description)
                 .location(this.location)
                 .totalBudget(this.budget)

@@ -4816,7 +4816,6 @@ components:
         - $ref: '#/components/schemas/HackathonsPageItemResponse'
         - type: object
           required:
-            - subtitle
             - description
             - location
             - totalBudget
@@ -4825,8 +4824,6 @@ components:
             - sponsors
             - projects
           properties:
-            subtitle:
-              type: string
             description:
               type: string
             location:
@@ -4856,7 +4853,6 @@ components:
         - status
         - githubLabels
         - title
-        - subtitle
         - description
         - location
         - totalBudget
@@ -4874,8 +4870,6 @@ components:
           items:
             $ref: '#/components/schemas/GithubLabel'
         title:
-          type: string
-        subtitle:
           type: string
         description:
           type: string

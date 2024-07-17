@@ -13,7 +13,6 @@ public interface HackathonMapper {
                 .id(Hackathon.Id.of(hackathonId))
                 .status(Hackathon.Status.valueOf(request.getStatus().name()))
                 .title(request.getTitle())
-                .subtitle(request.getSubtitle())
                 .description(request.getDescription())
                 .location(request.getLocation())
                 .totalBudget(request.getTotalBudget())

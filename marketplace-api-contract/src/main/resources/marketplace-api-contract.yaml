@@ -8146,7 +8146,6 @@ components:
         - $ref: '#/components/schemas/HackathonsListItemResponse'
         - type: object
           required:
-            - subtitle
             - description
             - location
             - totalBudget
@@ -8159,8 +8158,6 @@ components:
             - issueCount
             - openIssueCount
           properties:
-            subtitle:
-              type: string
             description:
               type: string
             location:
