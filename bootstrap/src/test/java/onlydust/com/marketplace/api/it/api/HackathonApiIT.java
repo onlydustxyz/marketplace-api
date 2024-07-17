@@ -40,7 +40,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         final var hackathon1 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 1")
-                .subtitle("Subtitle 1")
                 .startDate(startDate)
                 .endDate(startDate.plusDays(1))
                 .description("Description 1")
@@ -58,7 +57,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         final var hackathon2 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 2")
-                .subtitle("Subtitle 2")
                 .startDate(startDate)
                 .endDate(startDate.plusDays(1))
                 .description("Description 2")
@@ -68,7 +66,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         final var hackathon3 = Hackathon.builder()
                 .id(Hackathon.Id.random())
                 .title("Hackathon 3")
-                .subtitle("Subtitle 3")
                 .location("Location 3")
                 .startDate(startDate)
                 .endDate(startDate.plusDays(1))
@@ -145,7 +142,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                               "languages": []
                             }
                           ],
-                          "subtitle": "Subtitle 1",
                           "description": "Description 1",
                           "totalBudget": null,
                           "communityLinks": [
