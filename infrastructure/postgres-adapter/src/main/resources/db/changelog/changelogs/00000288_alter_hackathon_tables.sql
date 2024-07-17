@@ -28,6 +28,18 @@ CREATE TRIGGER hackathon_projects_set_tech_updated_at
     FOR EACH ROW
 EXECUTE PROCEDURE set_tech_updated_at();
 
+INSERT INTO hackathon_sponsors (hackathon_id, sponsor_id)
+SELECT DISTINCT h.id, sponsor.id
+FROM hackathons h
+         CROSS JOIN unnest(h.sponsor_ids) as sponsor(id);
+
+INSERT INTO hackathon_projects (hackathon_id, project_id)
+SELECT DISTINCT h.id, project.id
+FROM hackathons h
+         JOIN LATERAL (SELECT jsonb_array_elements_text(jsonb_array_elements(h2.tracks) -> 'projectIds')::text::uuid as id
+                       FROM hackathons h2
+                       WHERE h2.id = h.id) as project ON TRUE;
+
 ALTER TABLE hackathons
     ADD COLUMN github_labels   text[] NOT NULL DEFAULT '{}',
     ADD COLUMN community_links jsonb  NOT NULL DEFAULT '[]',
