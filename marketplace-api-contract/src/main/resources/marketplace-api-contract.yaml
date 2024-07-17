@@ -8146,6 +8146,9 @@ components:
             - sponsors
             - projects
             - me
+            - applicantCount
+            - issueCount
+            - openIssueCount
           properties:
             subtitle:
               type: string
@@ -8156,6 +8159,8 @@ components:
             totalBudget:
               type: string
             applicantCount:
+              type: integer
+            issueCount:
               type: integer
             openIssueCount:
               type: integer
