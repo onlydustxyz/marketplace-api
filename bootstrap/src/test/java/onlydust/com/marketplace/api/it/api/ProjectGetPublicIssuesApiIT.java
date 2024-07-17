@@ -118,7 +118,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.applicantCount").isEqualTo(1)
+                .jsonPath("$.subscriberCount").isEqualTo(0)
                 .jsonPath("$.issueCount").isEqualTo(141)
                 .jsonPath("$.openIssueCount").isEqualTo(5);
 
@@ -129,7 +129,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].applicantCount").isEqualTo(1)
+                .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].subscriberCount").isEqualTo(0)
                 .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].issueCount").isEqualTo(141)
                 .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].openIssueCount").isEqualTo(5);
 

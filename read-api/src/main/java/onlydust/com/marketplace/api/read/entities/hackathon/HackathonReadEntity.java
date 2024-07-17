@@ -91,15 +91,6 @@ public class HackathonReadEntity {
     Set<HackathonRegistrationReadEntity> registrations;
 
     @Formula("""
-            (SELECT count(distinct a.id)
-             FROM hackathon_issues hi
-                      JOIN indexer_exp.github_issues i on i.id = hi.issue_id
-                      LEFT JOIN applications a ON a.issue_id = i.id AND a.project_id = ANY( hi.project_ids )
-             WHERE hi.hackathon_id = id)
-            """)
-    Integer applicantCount;
-
-    @Formula("""
             (SELECT count(distinct hi.issue_id)
              FROM hackathon_issues hi
              WHERE hi.hackathon_id = id)
@@ -128,7 +119,7 @@ public class HackathonReadEntity {
                 .description(this.description)
                 .location(this.location)
                 .totalBudget(this.budget)
-                .applicantCount(applicantCount)
+                .subscriberCount(this.registrations.size())
                 .issueCount(issueCount)
                 .openIssueCount(openIssueCount)
                 .startDate(ZonedDateTime.ofInstant(this.startDate.toInstant(), ZoneOffset.UTC))
@@ -199,7 +190,7 @@ public class HackathonReadEntity {
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
                 .projects(projects.stream().map(ProjectReadEntity::toLinkResponse).toList())
-                .applicantCount(applicantCount)
+                .subscriberCount(this.registrations.size())
                 .issueCount(issueCount)
                 .openIssueCount(openIssueCount);
     }

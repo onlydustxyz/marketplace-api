@@ -175,7 +175,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                             }
                           ],
                           "me": null,
-                          "applicantCount": 0,
+                          "subscriberCount": 0,
                           "issueCount": 0,
                           "openIssueCount": 0
                         }
@@ -324,7 +324,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null
                                 }
                               ],
-                              "applicantCount": 0,
+                              "subscriberCount": 1,
                               "issueCount": 0,
                               "openIssueCount": 0
                             },
@@ -344,7 +344,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null
                                 }
                               ],
-                              "applicantCount": 0,
+                              "subscriberCount": 0,
                               "issueCount": 0,
                               "openIssueCount": 0
                             }

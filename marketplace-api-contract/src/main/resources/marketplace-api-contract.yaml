@@ -8105,7 +8105,7 @@ components:
         - startDate
         - endDate
         - projects
-        - applicantCount
+        - subscriberCount
         - issueCount
         - openIssueCount
       properties:
@@ -8134,7 +8134,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectLinkResponse'
-        applicantCount:
+        subscriberCount:
           type: integer
         issueCount:
           type: integer
@@ -8154,7 +8154,7 @@ components:
             - sponsors
             - projects
             - me
-            - applicantCount
+            - subscriberCount
             - issueCount
             - openIssueCount
           properties:
@@ -8164,7 +8164,7 @@ components:
               type: string
             totalBudget:
               type: string
-            applicantCount:
+            subscriberCount:
               type: integer
             issueCount:
               type: integer
