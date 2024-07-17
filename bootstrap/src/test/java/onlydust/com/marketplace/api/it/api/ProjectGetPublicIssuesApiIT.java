@@ -123,6 +123,17 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.openIssueCount").isEqualTo(5);
 
         client.get()
+                .uri(getApiURI(HACKATHONS))
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].applicantCount").isEqualTo(1)
+                .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].issueCount").isEqualTo(141)
+                .jsonPath("$.hackathons[?(@.slug == 'hackathon-1')].openIssueCount").isEqualTo(5);
+
+        client.get()
                 .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",

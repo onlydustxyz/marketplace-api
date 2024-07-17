@@ -8105,6 +8105,9 @@ components:
         - startDate
         - endDate
         - projects
+        - applicantCount
+        - issueCount
+        - openIssueCount
       properties:
         id:
           $ref: '#/components/schemas/HackathonId'
@@ -8131,6 +8134,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectLinkResponse'
+        applicantCount:
+          type: integer
+        issueCount:
+          type: integer
+        openIssueCount:
+          type: integer
 
     HackathonsDetailsResponse:
       allOf:

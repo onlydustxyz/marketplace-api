@@ -201,7 +201,10 @@ public class HackathonReadEntity {
                 .location(location)
                 .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
                 .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .projects(projects.stream().map(ProjectReadEntity::toLinkResponse).toList());
+                .projects(projects.stream().map(ProjectReadEntity::toLinkResponse).toList())
+                .applicantCount(applicantCount)
+                .issueCount(issueCount)
+                .openIssueCount(openIssueCount);
     }
 
     public HackathonsPageItemResponse toHackathonsPageItemResponse() {
