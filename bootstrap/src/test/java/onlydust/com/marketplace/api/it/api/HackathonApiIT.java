@@ -327,7 +327,10 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Cairo foundry",
                                   "logoUrl": null
                                 }
-                              ]
+                              ],
+                              "applicantCount": 0,
+                              "issueCount": 0,
+                              "openIssueCount": 0
                             },
                             {
                               "slug": "hackathon-3",
@@ -344,7 +347,10 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                                   "name": "Cairo foundry",
                                   "logoUrl": null
                                 }
-                              ]
+                              ],
+                              "applicantCount": 0,
+                              "issueCount": 0,
+                              "openIssueCount": 0
                             }
                           ]
                         }
