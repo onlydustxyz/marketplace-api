@@ -45,7 +45,6 @@ public class HackathonEntity {
 
     @NonNull
     String title;
-    String subtitle;
     String description;
     String location;
     String budget;
@@ -78,7 +77,6 @@ public class HackathonEntity {
                 .slug(hackathon.slug())
                 .status(hackathon.status())
                 .title(hackathon.title())
-                .subtitle(hackathon.subtitle())
                 .description(hackathon.description())
                 .location(hackathon.location())
                 .budget(hackathon.totalBudget())
@@ -101,7 +99,6 @@ public class HackathonEntity {
                 .id(Hackathon.Id.of(id))
                 .status(Hackathon.Status.valueOf(status.name()))
                 .title(title)
-                .subtitle(subtitle)
                 .description(description)
                 .location(location)
                 .totalBudget(budget)
