@@ -101,6 +101,13 @@ public class HackathonReadEntity {
     Integer applicantCount;
 
     @Formula("""
+            (SELECT count(distinct hi.issue_id)
+             FROM hackathon_issues hi
+             WHERE hi.hackathon_id = id)
+            """)
+    Integer issueCount;
+
+    @Formula("""
             (SELECT count(distinct i.id)
              FROM hackathon_issues hi
                       JOIN indexer_exp.github_issues i on i.id = hi.issue_id
@@ -124,6 +131,7 @@ public class HackathonReadEntity {
                 .location(this.location)
                 .totalBudget(this.budget)
                 .applicantCount(applicantCount)
+                .issueCount(issueCount)
                 .openIssueCount(openIssueCount)
                 .startDate(ZonedDateTime.ofInstant(this.startDate.toInstant(), ZoneOffset.UTC))
                 .endDate(ZonedDateTime.ofInstant(this.endDate.toInstant(), ZoneOffset.UTC))

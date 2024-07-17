@@ -180,6 +180,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           ],
                           "me": null,
                           "applicantCount": 0,
+                          "issueCount": 0,
                           "openIssueCount": 0
                         }
                         """);

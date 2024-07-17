@@ -119,6 +119,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.applicantCount").isEqualTo(1)
+                .jsonPath("$.issueCount").isEqualTo(141)
                 .jsonPath("$.openIssueCount").isEqualTo(5);
 
         client.get()
