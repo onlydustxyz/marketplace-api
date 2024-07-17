@@ -164,6 +164,20 @@ class ApplicationsUpdaterTest {
         }
 
         @Test
+        void should_not_create_application_if_issue_is_within_hackathon() {
+            // Given
+            when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
+
+            // When
+            applicationsUpdater.process(event);
+
+            // Then
+            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
+            verifyNoInteractions(applicationObserverPort);
+            verify(indexerPort).indexUser(event.authorId());
+        }
+
+        @Test
         void should_create_application() {
             // Given
             when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
