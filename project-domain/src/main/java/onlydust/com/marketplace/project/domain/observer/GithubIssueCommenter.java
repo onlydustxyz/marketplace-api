@@ -2,9 +2,7 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubAppAccessToken;
-import onlydust.com.marketplace.project.domain.model.GlobalConfig;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 
@@ -48,5 +46,23 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
 
     @Override
     public void onApplicationAccepted(Application application) {
+    }
+
+    @Override
+    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
+        final var applicant = userStoragePort.getIndexedUserByGithubId(applicantId)
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(applicantId)));
+
+        githubAppService.getInstallationTokenFor(issue.repoId())
+                .filter(GithubAppAccessToken::canWriteIssues)
+                .ifPresentOrElse(
+                        token -> githubApiPort.createComment(token.token(), issue, """
+                                Hey @%s!
+                                Thanks for showing interest.
+                                This issue is part of the OnlyDust hackathon %s. Please apply through OnlyDust to get a chance to be assigned!\\n\
+                                Go check it out on [OnlyDust](%s/hackathons/%s)!
+                                """.formatted(applicant.getGithubLogin(), hackathon.title(), globalConfig.getAppBaseUrl(), hackathon.slug())),
+                        () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
+                );
     }
 }

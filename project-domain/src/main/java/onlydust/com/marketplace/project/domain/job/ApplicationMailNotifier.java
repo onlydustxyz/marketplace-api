@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.job;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -44,5 +46,9 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
                     new ProjectApplicationAccepted.Issue(issue.id().value(), issue.htmlUrl(), issue.title(), issue.repoName(), issue.description())
             ));
         });
+    }
+
+    @Override
+    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
 }

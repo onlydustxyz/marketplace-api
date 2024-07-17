@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 
 import java.util.Optional;
@@ -19,4 +20,5 @@ public interface HackathonStoragePort {
 
     void registerUser(UUID userId, Hackathon.Id hackathonId);
 
+    Optional<Hackathon> findUpcomingHackathonByIssueId(@NonNull GithubIssue.Id issueId);
 }
