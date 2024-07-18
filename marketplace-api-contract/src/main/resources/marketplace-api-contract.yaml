@@ -6108,6 +6108,11 @@ components:
               description: The list of applicants for this issue
               items:
                 $ref: '#/components/schemas/GithubUserResponse'
+            assignees:
+              type: array
+              description: The list of assignees for this issue
+              items:
+                $ref: '#/components/schemas/GithubUserResponse'
             languages:
               type: array
               items:

@@ -42,6 +42,7 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "commentCount": 0,
                           "labels": [],
                           "applicants": [],
+                          "assignees": [],
                           "languages": [],
                           "githubAppInstallationStatus": null,
                           "githubAppInstallationPermissionsUpdateUrl": null
@@ -88,6 +89,7 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "commentCount": 0,
                           "labels": [],
                           "applicants": [],
+                          "assignees": [],
                           "languages": [],
                           "githubAppInstallationStatus": "MISSING_PERMISSIONS",
                           "githubAppInstallationPermissionsUpdateUrl": "https://github.com/organizations/onlydustxyz/settings/installations/44741576/permissions/update"
