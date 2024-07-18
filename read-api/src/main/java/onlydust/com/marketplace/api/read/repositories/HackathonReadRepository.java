@@ -14,9 +14,7 @@ public interface HackathonReadRepository extends Repository<HackathonReadEntity,
 
     @Query("""
             select h from HackathonReadEntity h
-                left join fetch h.sponsors
-                left join fetch h.projects
-                left join fetch h.registrations
+                left join fetch h.issueCounts
             where h.id = :id
             """)
     @NonNull
@@ -24,9 +22,7 @@ public interface HackathonReadRepository extends Repository<HackathonReadEntity,
 
     @Query("""
             select h from HackathonReadEntity h
-                left join fetch h.sponsors
-                left join fetch h.projects
-                left join fetch h.registrations
+                left join fetch h.issueCounts
             where h.slug = :slug
             """)
     @NonNull
@@ -39,6 +35,7 @@ public interface HackathonReadRepository extends Repository<HackathonReadEntity,
 
     @Query("""
             select h from HackathonReadEntity h
+                left join fetch h.issueCounts
             where h.status = 'PUBLISHED'
             """)
     Page<HackathonReadEntity> findAllPublished(Pageable pageable);
