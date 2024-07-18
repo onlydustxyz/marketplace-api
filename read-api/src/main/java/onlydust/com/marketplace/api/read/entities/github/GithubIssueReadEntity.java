@@ -133,7 +133,7 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl)
-                .repo(repo.toLinkResponse())
+                .repo(repo.toShortResponse())
                 .author(author.toContributorResponse())
                 ;
     }
@@ -165,7 +165,7 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl)
-                .repo(repo.toLinkResponse())
+                .repo(repo.toShortResponse())
                 .author(author.toContributorResponse())
                 .createdAt(createdAt)
                 .closedAt(closedAt)
@@ -173,6 +173,7 @@ public class GithubIssueReadEntity {
                 .commentCount(commentsCount)
                 .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
                 .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
+                .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
                 .languages(repo.languages().stream().distinct().map(LanguageReadEntity::toDto).toList());
 
         if (asProjectLead) {

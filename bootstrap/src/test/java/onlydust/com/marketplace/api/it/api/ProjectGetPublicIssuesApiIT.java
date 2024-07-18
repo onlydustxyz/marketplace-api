@@ -1119,6 +1119,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "repo": {
                                 "id": 350360184,
                                 "name": "cal.com",
+                                "owner": "calcom",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
                               },
