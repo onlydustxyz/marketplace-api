@@ -1209,6 +1209,43 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "languages": [
+                            {
+                              "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
+                              "slug": "javascript",
+                              "name": "Javascript",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
+                            },
+                            {
+                              "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                              "slug": "typescript",
+                              "name": "Typescript",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-typescript.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
+                            },
+                            {
+                              "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
+                              "slug": "solidity",
+                              "name": "Solidity",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
+                            },
+                            {
+                              "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
+                              "slug": "python",
+                              "name": "Python",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
+                            },
+                            {
+                              "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                              "slug": "cairo",
+                              "name": "Cairo",
+                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
+                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
+                            }
+                          ],
                           "projects": [
                             {
                               "project": {
