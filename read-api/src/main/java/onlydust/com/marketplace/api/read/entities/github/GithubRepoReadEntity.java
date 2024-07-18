@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.GithubRepoLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
@@ -77,14 +76,6 @@ public class GithubRepoReadEntity {
                 .name(name)
                 .description(description)
                 .owner(ownerLogin)
-                .htmlUrl(htmlUrl);
-    }
-
-    public GithubRepoLinkResponse toLinkResponse() {
-        return new GithubRepoLinkResponse()
-                .id(id)
-                .name(name)
-                .description(description)
                 .htmlUrl(htmlUrl);
     }
 
