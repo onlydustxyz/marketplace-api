@@ -133,7 +133,7 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl)
-                .repo(repo.toLinkResponse())
+                .repo(repo.toShortResponse())
                 .author(author.toContributorResponse())
                 ;
     }
@@ -165,7 +165,7 @@ public class GithubIssueReadEntity {
                 .title(title)
                 .status(status)
                 .htmlUrl(htmlUrl)
-                .repo(repo.toLinkResponse())
+                .repo(repo.toShortResponse())
                 .author(author.toContributorResponse())
                 .createdAt(createdAt)
                 .closedAt(closedAt)
