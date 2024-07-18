@@ -5184,6 +5184,11 @@ components:
       required:
         - projects
       properties:
+        languages:
+          type: array
+          description: List of languages used in the hackathon projects. Filters are not taken into account.
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
         projects:
           type: array
           items:
