@@ -625,7 +625,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .expectBody(HackathonsPageResponse.class)
                 .returnResult()
                 .getResponseBody();
-        hackathonId2.setValue(hackathonsPageResponse.getHackathons().get(1).getId().toString());
+        hackathonId2.setValue(hackathonsPageResponse.getHackathons().get(0).getId().toString());
         assertThat(hackathonId2.getValue()).isNotEmpty();
         assertThat(UUID.fromString(hackathonId2.getValue())).isNotNull();
         assertThat(hackathonId2.getValue()).isNotEqualTo(hackathonId1.getValue());
@@ -713,7 +713,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     void should_get_hackathons_paginated() {
         // When
         client.get()
-                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "1", "pageSize", "1")))
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "1")))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
@@ -724,7 +724,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                         {
                           "totalPageNumber": 2,
                           "totalItemNumber": 2,
-                          "hasMore": false,
+                          "hasMore": true,
                           "nextPageIndex": 1,
                           "hackathons": [
                             {
@@ -763,7 +763,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
 
         // And when
         client.get()
-                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "1", "pageSize", "1")))
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "1")))
                 .header("Authorization", "Bearer " + emilie.jwt())
                 .exchange()
                 // Then
@@ -774,7 +774,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                         {
                           "totalPageNumber": 2,
                           "totalItemNumber": 2,
-                          "hasMore": false,
+                          "hasMore": true,
                           "nextPageIndex": 1,
                           "hackathons": [
                             {
