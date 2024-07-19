@@ -8070,6 +8070,44 @@ components:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
 
+    HackathonsEventLinkItemResponse:
+      type: object
+      required:
+        - label
+        - url
+      properties:
+        label:
+          type: string
+        url:
+          type: string
+
+    HackathonsEventItemResponse:
+      type: object
+      required:
+        - name
+        - subtitle
+        - iconSlug
+        - startDate
+        - endDate
+        - links
+      properties:
+        name:
+          type: string
+        subtitle:
+          type: string
+        iconSlug:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsEventLinkItemResponse'
+
     HackathonsListResponse:
       type: object
       required:
@@ -8143,6 +8181,7 @@ components:
             - subscriberCount
             - issueCount
             - openIssueCount
+            - events
           properties:
             description:
               type: string
@@ -8172,6 +8211,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectShortResponse'
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/HackathonsEventItemResponse'
             me:
               type: object
               required:
