@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -53,6 +54,24 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon1.projectIds().addAll(List.of(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"),
                 UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"),
                 UUID.fromString("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")));
+        hackathon1.events().add(Hackathon.Event.builder()
+                .id(UUID.randomUUID())
+                .name("Event 1")
+                .subtitle("Event 1 is awesome")
+                .iconSlug("icon1")
+                .startDate(startDate.plusHours(1))
+                .endDate(startDate.plusHours(2))
+                .links(Set.of(NamedLink.builder().url("https://www.foo.bar").value("Foo").build()))
+                .build());
+        hackathon1.events().add(Hackathon.Event.builder()
+                .id(UUID.randomUUID())
+                .name("Event 2")
+                .subtitle("Event 2 is awesome")
+                .iconSlug("icon2")
+                .startDate(startDate.plusHours(2))
+                .endDate(startDate.plusHours(3))
+                .links(Set.of(NamedLink.builder().url("https://www.foo2.bar").value("Foo2").build()))
+                .build());
 
         final var hackathon2 = Hackathon.builder()
                 .id(Hackathon.Id.random())
@@ -177,7 +196,35 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                           "me": null,
                           "subscriberCount": 0,
                           "issueCount": 0,
-                          "openIssueCount": 0
+                          "openIssueCount": 0,
+                          "events": [
+                            {
+                              "name": "Event 1",
+                              "subtitle": "Event 1 is awesome",
+                              "iconSlug": "icon1",
+                              "startDate": "2024-04-19T01:00:00Z",
+                              "endDate": "2024-04-19T02:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.foo.bar",
+                                  "value": "Foo"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Event 2",
+                              "subtitle": "Event 2 is awesome",
+                              "iconSlug": "icon2",
+                              "startDate": "2024-04-19T02:00:00Z",
+                              "endDate": "2024-04-19T03:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.foo2.bar",
+                                  "value": "Foo2"
+                                }
+                              ]
+                            }
+                          ]
                         }
                         """);
     }

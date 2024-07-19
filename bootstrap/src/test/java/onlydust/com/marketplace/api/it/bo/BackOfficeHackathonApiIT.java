@@ -111,7 +111,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "communityLinks": [],
                           "links": [],
                           "sponsorIds": [],
-                          "projectIds": []
+                          "projectIds": [],
+                          "events": []
                         }
                         """)
                 .exchange()
@@ -220,7 +221,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "communityLinks": [],
                           "links": [],
                           "sponsors": [],
-                          "projects": []
+                          "projects": [],
+                          "events": []
                         }
                         """);
     }
@@ -266,6 +268,34 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "projectIds": [
                             "8156fc5f-cec5-4f70-a0de-c368772edcd4",
                             "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"
+                          ],
+                          "events": [
+                            {
+                              "name": "Event 1",
+                              "subtitle": "Event 1 subtitle",
+                              "iconSlug": "event1",
+                              "startDate": "2024-04-19T11:00:00Z",
+                              "endDate": "2024-04-19T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event1.com",
+                                  "value": "Event 1"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Event 2",
+                              "subtitle": "Event 2 subtitle",
+                              "iconSlug": "event2",
+                              "startDate": "2024-04-20T11:00:00Z",
+                              "endDate": "2024-04-20T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event2.com",
+                                  "value": "Event 2"
+                                }
+                              ]
+                            }
                           ]
                         }
                         """)
@@ -351,6 +381,34 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "name": "Cairo foundry",
                               "logoUrl": null
                             }
+                          ],
+                          "events": [
+                            {
+                              "name": "Event 1",
+                              "subtitle": "Event 1 subtitle",
+                              "iconSlug": "event1",
+                              "startDate": "2024-04-19T11:00:00Z",
+                              "endDate": "2024-04-19T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event1.com",
+                                  "value": "Event 1"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Event 2",
+                              "subtitle": "Event 2 subtitle",
+                              "iconSlug": "event2",
+                              "startDate": "2024-04-20T11:00:00Z",
+                              "endDate": "2024-04-20T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event2.com",
+                                  "value": "Event 2"
+                                }
+                              ]
+                            }
                           ]
                         }
                         """);
@@ -399,6 +457,38 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           ],
                           "projectIds": [
                             "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
+                          ],
+                          "events": [
+                            {
+                              "name": "Event 1",
+                              "subtitle": "Event 1 subtitle",
+                              "iconSlug": "event1",
+                              "startDate": "2024-04-19T11:00:00Z",
+                              "endDate": "2024-04-19T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event1.com",
+                                  "value": "Event 1"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Event 3",
+                              "subtitle": "Event 3 subtitle",
+                              "iconSlug": "event3",
+                              "startDate": "2024-04-21T11:00:00Z",
+                              "endDate": "2024-04-21T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event3.com",
+                                  "value": "Event 3"
+                                },
+                                {
+                                  "url": "https://www.event333.com",
+                                  "value": "Event 333"
+                                }
+                              ]
+                            }
                           ]
                         }
                         """)
@@ -465,6 +555,38 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "slug": "apibara",
                               "name": "Apibara",
                               "logoUrl": null
+                            }
+                          ],
+                          "events": [
+                            {
+                              "name": "Event 1",
+                              "subtitle": "Event 1 subtitle",
+                              "iconSlug": "event1",
+                              "startDate": "2024-04-19T11:00:00Z",
+                              "endDate": "2024-04-19T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event1.com",
+                                  "value": "Event 1"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Event 3",
+                              "subtitle": "Event 3 subtitle",
+                              "iconSlug": "event3",
+                              "startDate": "2024-04-21T11:00:00Z",
+                              "endDate": "2024-04-21T12:00:00Z",
+                              "links": [
+                                {
+                                  "url": "https://www.event3.com",
+                                  "value": "Event 3"
+                                },
+                                {
+                                  "url": "https://www.event333.com",
+                                  "value": "Event 333"
+                                }
+                              ]
                             }
                           ]
                         }
@@ -715,7 +837,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             }
                           ]
                         }
-                                                
                         """);
     }
 
