@@ -71,6 +71,10 @@ public class HackathonEntity {
     @NonNull
     Set<HackathonProjectEntity> projects;
 
+    @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @NonNull
+    Set<HackathonEventEntity> events;
+
     public static HackathonEntity of(Hackathon hackathon) {
         return HackathonEntity.builder()
                 .id(hackathon.id().value())
@@ -90,6 +94,8 @@ public class HackathonEntity {
                         .collect(Collectors.toSet()))
                 .projects(hackathon.projectIds().stream()
                         .map(projectId -> new HackathonProjectEntity(hackathon.id().value(), projectId))
+                        .collect(Collectors.toSet()))
+                .events(hackathon.events().stream().map(e -> HackathonEventEntity.of(hackathon.id(), e))
                         .collect(Collectors.toSet()))
                 .build();
     }
@@ -116,6 +122,7 @@ public class HackathonEntity {
         }
         hackathon.sponsorIds().addAll(sponsors.stream().map(HackathonSponsorEntity::getSponsorId).toList());
         hackathon.projectIds().addAll(projects.stream().map(HackathonProjectEntity::getProjectId).toList());
+        hackathon.events().addAll(events.stream().map(HackathonEventEntity::toDomain).toList());
         return hackathon;
     }
 }

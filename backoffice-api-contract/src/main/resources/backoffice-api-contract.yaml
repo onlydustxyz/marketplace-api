@@ -3215,6 +3215,10 @@ components:
         - DRAFT
         - PUBLISHED
 
+    HackathonEventId:
+      type: string
+      format: uuid
+
     SimpleLink:
       type: object
       required:
@@ -4846,6 +4850,39 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectLinkResponse'
+            events:
+              type: array
+              items:
+                $ref: '#/components/schemas/HackathonsEvent'
+
+    HackathonsEvent:
+      type: object
+      required:
+        - name
+        - subtitle
+        - iconSlug
+        - startDate
+        - endDate
+        - links
+      properties:
+        id:
+          $ref: '#/components/schemas/HackathonEventId'
+        name:
+          type: string
+        subtitle:
+          type: string
+        iconSlug:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/SimpleLink'
 
     UpdateHackathonRequest:
       type: object
@@ -4899,6 +4936,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectId'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/HackathonsEvent'
 
     PatchHackathonRequest:
       type: object

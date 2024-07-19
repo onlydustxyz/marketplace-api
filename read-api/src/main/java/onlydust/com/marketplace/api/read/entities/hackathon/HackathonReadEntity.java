@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HackathonStatus;
+import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
@@ -96,6 +97,10 @@ public class HackathonReadEntity {
     @JoinColumn(name = "id", referencedColumnName = "hackathonId")
     HackathonIssueCountReadEntity issueCounts;
 
+    @OneToMany(mappedBy = "hackathonId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<HackathonEventReadEntity> events;
+
 
     public HackathonsDetailsResponse toResponse(final Boolean isRegistered) {
         return new HackathonsDetailsResponse()
@@ -132,6 +137,12 @@ public class HackathonReadEntity {
                 .projects(projects.stream()
                         .map(ProjectReadEntity::toShortResponse)
                         .sorted(Comparator.comparing(ProjectShortResponse::getName))
+                        .toList())
+                .events(events.stream()
+                        .map(HackathonEventReadEntity::toDto)
+                        .sorted(Comparator.comparing(HackathonsEventItemResponse::getStartDate)
+                                .thenComparing(HackathonsEventItemResponse::getEndDate)
+                                .thenComparing(HackathonsEventItemResponse::getName))
                         .toList());
     }
 
@@ -164,7 +175,13 @@ public class HackathonReadEntity {
                         .url(sponsor.getUrl())
                         .logoUrl(sponsor.getLogoUrl())
                 ).toList())
-                .projects(projects.stream().map(ProjectReadEntity::toBoLinkResponse).toList());
+                .projects(projects.stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .events(events.stream()
+                        .map(HackathonEventReadEntity::toBoDto)
+                        .sorted(Comparator.comparing(HackathonsEvent::getStartDate)
+                                .thenComparing(HackathonsEvent::getEndDate)
+                                .thenComparing(HackathonsEvent::getName))
+                        .toList());
     }
 
     public HackathonsListItemResponse toHackathonsListItemResponse() {

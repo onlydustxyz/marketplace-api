@@ -419,3 +419,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000290_drop_hackathon_subtitle.sql
   - include:
       file: db/changelog/changelogs/00000291_create_hackathon_issues_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000292_create_hackathon_events.sql

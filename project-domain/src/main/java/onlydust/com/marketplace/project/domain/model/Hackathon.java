@@ -6,10 +6,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
@@ -46,6 +43,8 @@ public class Hackathon {
     Set<UUID> sponsorIds = new HashSet<>();
     @NonNull
     Set<UUID> projectIds = new HashSet<>();
+    @NonNull
+    List<Event> events = new ArrayList<>();
 
     public @NonNull String slug() {
         return title.replaceAll("[^a-zA-Z0-9_\\- ]+", "").trim().replaceAll("\\s+", "-").toLowerCase();
@@ -83,5 +82,15 @@ public class Hackathon {
     public enum Status {
         DRAFT,
         PUBLISHED
+    }
+
+    @Builder
+    public record Event(@NonNull UUID id,
+                        @NonNull String name,
+                        @NonNull String subtitle,
+                        @NonNull String iconSlug,
+                        @NonNull ZonedDateTime startDate,
+                        @NonNull ZonedDateTime endDate,
+                        @NonNull Set<NamedLink> links) {
     }
 }

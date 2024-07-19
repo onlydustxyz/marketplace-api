@@ -5,6 +5,9 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static java.util.Objects.isNull;
 
 public interface HackathonMapper {
 
@@ -34,6 +37,18 @@ public interface HackathonMapper {
 
         hackathon.sponsorIds().addAll(request.getSponsorIds());
         hackathon.projectIds().addAll(request.getProjectIds());
+        hackathon.events().addAll(request.getEvents().stream().map(event -> Hackathon.Event.builder()
+                .id(isNull(event.getId()) ? UUID.randomUUID() : event.getId())
+                .name(event.getName())
+                .subtitle(event.getSubtitle())
+                .iconSlug(event.getIconSlug())
+                .startDate(event.getStartDate())
+                .endDate(event.getEndDate())
+                .links(event.getLinks().stream().map(link -> NamedLink.builder()
+                        .url(link.getUrl())
+                        .value(link.getValue())
+                        .build()).collect(Collectors.toSet()))
+                .build()).toList());
         return hackathon;
     }
 
