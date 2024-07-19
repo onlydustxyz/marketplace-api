@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
+import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
@@ -51,5 +53,9 @@ public class OutboxService implements ProjectObserverPort, UserObserverPort, App
 
     @Override
     public void onApplicationAccepted(Application application) {
+    }
+
+    @Override
+    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
 }

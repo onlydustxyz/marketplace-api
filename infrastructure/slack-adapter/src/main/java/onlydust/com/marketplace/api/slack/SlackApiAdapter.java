@@ -11,6 +11,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserve
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
@@ -88,6 +89,10 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onApplicationAccepted(Application application) {
+    }
+
+    @Override
+    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
 
     @Override
