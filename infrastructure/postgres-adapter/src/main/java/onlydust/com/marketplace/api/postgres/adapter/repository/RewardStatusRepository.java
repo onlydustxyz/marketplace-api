@@ -30,17 +30,17 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
     List<RewardStatusDataEntity> findNotRequestedByBillingProfile(UUID billingProfileId);
 
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update RewardStatusDataEntity r set r.invoiceReceivedAt = :invoiceReceivedAt where r.rewardId = :rewardId")
     int updateInvoiceReceivedAt(@NonNull UUID rewardId,
                                 Date invoiceReceivedAt);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update RewardStatusDataEntity r set r.paidAt = :paidAt where r.rewardId = :rewardId")
     int updatePaidAt(@NonNull UUID rewardId,
                      Date paidAt);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
             update RewardStatusDataEntity r set
             r.amountUsdEquivalent = :amountUsdEquivalent,
@@ -51,7 +51,7 @@ public interface RewardStatusRepository extends JpaRepository<RewardStatusDataEn
                         BigDecimal amountUsdEquivalent,
                         BigDecimal usdConversionRate);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("""
             update RewardStatusDataEntity r set
             r.sponsorHasEnoughFund = :sponsorHasEnoughFund,

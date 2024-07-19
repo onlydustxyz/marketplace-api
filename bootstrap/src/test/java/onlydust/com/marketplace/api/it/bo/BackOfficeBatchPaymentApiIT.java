@@ -39,6 +39,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeApiIT {
+    static final List<Invoice.Id> anthonyInvoiceIds = new ArrayList<>();
+    static final List<Invoice.Id> olivierInvoiceIds = new ArrayList<>();
+    static final List<Invoice.Id> pierreInvoiceIds = new ArrayList<>();
+    static Payment.Id sepaBatchPaymentId;
+    static Payment.Id ethBatchPaymentId;
+    private final Faker faker = new Faker();
     @Autowired
     BillingProfileService billingProfileService;
     @Autowired
@@ -56,21 +62,12 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
     @Autowired
     BackofficeAccountingManagementRestApi backofficeAccountingManagementRestApi;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
-
-    private final Faker faker = new Faker();
-
     UserId anthony;
     UserId olivier;
     UserId pierre;
     CompanyBillingProfile olivierBillingProfile;
     BillingProfileReadEntity anthonyBillingProfile;
     SelfEmployedBillingProfile pierreBillingProfile;
-
-    static final List<Invoice.Id> anthonyInvoiceIds = new ArrayList<>();
-    static final List<Invoice.Id> olivierInvoiceIds = new ArrayList<>();
-    static final List<Invoice.Id> pierreInvoiceIds = new ArrayList<>();
-    static Payment.Id sepaBatchPaymentId;
-    static Payment.Id ethBatchPaymentId;
 
     @BeforeEach
     void login() {
@@ -142,14 +139,15 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         // Given
         olivierInvoiceIds.add(newInvoiceToReview(olivier, olivierBillingProfile.id(), List.of(
-                RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4"),
-                RewardId.of("1fad9f3b-67ab-4499-a320-d719a986d933"))));
+                RewardId.of("5c668b61-e42c-4f0e-b31f-44c4e50dc2f4"),    //SEPA
+                RewardId.of("1fad9f3b-67ab-4499-a320-d719a986d933")))); //SEPA
 
         anthonyInvoiceIds.add(newApprovedInvoice(anthony, BillingProfile.Id.of(anthonyBillingProfile.id()), List.of(
-                RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"))));
+                RewardId.of("d22f75ab-d9f5-4dc6-9a85-60dcd7452028"),    //ETHEREUM (USDC)
+                RewardId.of("e33ea956-d2f5-496b-acf9-e2350faddb16")))); //ETHEREUM (USDC)
 
         pierreInvoiceIds.add(newApprovedInvoice(pierre, pierreBillingProfile.id(), List.of(
-                RewardId.of("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0"))));
+                RewardId.of("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")))); //ETHEREUM (USDC)
 
         // Already paid invoice
         final var paidRewardId = RewardId.of("79209029-c488-4284-aa3f-bce8870d3a66");
@@ -268,7 +266,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "TO_PAY",
                               "network": "ETHEREUM",
-                              "rewardCount": 2
+                              "rewardCount": 3
                             },
                             {
                               "status": "TO_PAY",
@@ -302,11 +300,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         {
                           "status": "TO_PAY",
                           "network": "ETHEREUM",
-                          "rewardCount": 2,
-                          "totalUsdEquivalent": 2222.00,
+                          "rewardCount": 3,
+                          "totalUsdEquivalent": 3232.000,
                           "totalsPerCurrency": [
                             {
-                              "amount": 2000,
+                              "amount": 3000,
                               "currency": {
                                 "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                 "code": "USDC",
@@ -314,13 +312,13 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "dollarsEquivalent": 2020.00
+                              "dollarsEquivalent": 3030.00
                             }
                           ],
                           "transactionHash": null,
                           "rewards": [
                             {
-                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "id": "e33ea956-d2f5-496b-acf9-e2350faddb16",
                               "project": {
                                 "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
                                 "slug": "kaaper",
@@ -338,7 +336,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000
+                                "conversionRate": 1.01
                               }
                             },
                             {
@@ -360,7 +358,29 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 1010.00,
-                                "conversionRate": 1.0100000000000000
+                                "conversionRate": 1.01
+                              }
+                            },
+                            {
+                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "status": "PROCESSING",
+                              "money": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": 1.01
                               }
                             }
                           ]
@@ -369,6 +389,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
         assertThat(csv.getValue().split("\\R")).containsExactlyInAnyOrder(
                 "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,fc92397c-3431-4a84-8054-845376b630a0.eth,1200.0,",
+                "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,",
                 "erc20,0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,747e663f-4e68-4b42-965b-b5aebedcd4c4.eth,1000,"
         );
     }
@@ -394,11 +415,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "TO_PAY",
                               "network": "ETHEREUM",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2020.00,
+                              "rewardCount": 3,
+                              "totalUsdEquivalent": 3030.00,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 2000,
+                                  "amount": 3000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -406,7 +427,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 2020.00
+                                  "dollarsEquivalent": 3030.00
                                 }
                               ]
                             },
@@ -482,8 +503,8 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                         {
                           "network": "ETHEREUM",
                           "status": "PAID",
-                          "rewardCount": 2,
-                          "totalUsdEquivalent": 2222.00,
+                          "rewardCount": 3,
+                          "totalUsdEquivalent": 3232.0,
                           "transactionHash": "0x313d09b7aa7d113ebd99cd58a59741d9e547813989d94ece7725b841a776b47e"
                         }
                         """);
@@ -506,11 +527,11 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             {
                               "status": "PAID",
                               "network": "ETHEREUM",
-                              "rewardCount": 2,
-                              "totalUsdEquivalent": 2020.00,
+                              "rewardCount": 3,
+                              "totalUsdEquivalent": 3030.00,
                               "totalsPerCurrency": [
                                 {
-                                  "amount": 2000,
+                                  "amount": 3000,
                                   "currency": {
                                     "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                     "code": "USDC",
@@ -518,13 +539,193 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "dollarsEquivalent": 2020.00
+                                  "dollarsEquivalent": 3030.00
                                 }
                               ]
                             }
                           ]
                         }
                         """);
+
+        client
+                .get()
+                .uri(getApiURI(INVOICE.formatted(pierreInvoiceIds.get(0))))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "number": "OD-PIERRE-INC--001",
+                          "status": "PAID",
+                          "billingProfile": {
+                            "subject": "Pierre Inc.",
+                            "type": "SELF_EMPLOYED",
+                            "name": null,
+                            "verificationStatus": "VERIFIED",
+                            "kyb": {
+                              "name": "Pierre Inc.",
+                              "registrationNumber": "123456789",
+                              "registrationDate": null,
+                              "address": "1 Infinite Loop, Cupertino, CA 95014, United States",
+                              "country": "France",
+                              "countryCode": "FRA",
+                              "usEntity": false,
+                              "subjectToEuropeVAT": true,
+                              "euVATNumber": "FR12345678901",
+                              "sumsubUrl": null
+                            },
+                            "kyc": null
+                          },
+                          "rejectionReason": null,
+                          "createdBy": {
+                            "githubUserId": 16590657,
+                            "githubLogin": "PierreOucif",
+                            "githubAvatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "email": "pierre.oucif@gadz.org",
+                            "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                            "name": "Pierre Oucif"
+                          },
+                          "totalEquivalent": {
+                            "amount": 1212.000,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
+                          },
+                          "rewards": [
+                            {
+                              "id": "8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0",
+                              "project": {
+                                "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                                "slug": "qa-new-contributions",
+                                "name": "QA new contributions",
+                                "logoUrl": null
+                              },
+                              "status": "COMPLETE",
+                              "money": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": 1.01
+                              }
+                            }
+                          ]
+                        }
+                        """)
+        ;
+
+        client
+                .get()
+                .uri(getApiURI(INVOICE.formatted(anthonyInvoiceIds.get(0))))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "number": "OD-ARBUSTE-ANTHO-001",
+                          "status": "PAID",
+                          "billingProfile": {
+                            "subject": "Antho Arbuste",
+                            "type": "INDIVIDUAL",
+                            "name": null,
+                            "verificationStatus": "VERIFIED",
+                            "kyb": null,
+                            "kyc": {
+                              "firstName": "Antho",
+                              "lastName": "Arbuste",
+                              "birthdate": null,
+                              "address": "2 Infinite Loop, Cupertino, CA 95014, United States",
+                              "country": "France",
+                              "countryCode": "FRA",
+                              "usCitizen": false,
+                              "idDocumentType": null,
+                              "idDocumentNumber": null,
+                              "validUntil": null,
+                              "idDocumentCountryCode": null,
+                              "sumsubUrl": null
+                            }
+                          },
+                          "rejectionReason": null,
+                          "createdBy": {
+                            "githubUserId": 43467246,
+                            "githubLogin": "AnthonyBuisset",
+                            "githubAvatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                            "email": "abuisset@gmail.com",
+                            "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                            "name": "Anthony BUISSET"
+                          },
+                          "totalEquivalent": {
+                            "amount": 2020.00,
+                            "currency": {
+                              "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2
+                            }
+                          },
+                          "rewards": [
+                            {
+                              "id": "e33ea956-d2f5-496b-acf9-e2350faddb16",
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "status": "COMPLETE",
+                              "money": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": 1.01
+                              }
+                            },
+                            {
+                              "id": "d22f75ab-d9f5-4dc6-9a85-60dcd7452028",
+                              "project": {
+                                "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                                "slug": "kaaper",
+                                "name": "kaaper",
+                                "logoUrl": null
+                              },
+                              "status": "COMPLETE",
+                              "money": {
+                                "amount": 1000,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "dollarsEquivalent": 1010.00,
+                                "conversionRate": 1.01
+                              }
+                            }
+                          ]
+                        }
+                        """)
+        ;
     }
 
     @Test
