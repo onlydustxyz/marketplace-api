@@ -8070,17 +8070,6 @@ components:
         currencyId:
           $ref: '#/components/schemas/CurrencyId'
 
-    HackathonsEventLinkItemResponse:
-      type: object
-      required:
-        - label
-        - url
-      properties:
-        label:
-          type: string
-        url:
-          type: string
-
     HackathonsEventItemResponse:
       type: object
       required:
@@ -8106,7 +8095,7 @@ components:
         links:
           type: array
           items:
-            $ref: '#/components/schemas/HackathonsEventLinkItemResponse'
+            $ref: '#/components/schemas/SimpleLink'
 
     HackathonsListResponse:
       type: object
