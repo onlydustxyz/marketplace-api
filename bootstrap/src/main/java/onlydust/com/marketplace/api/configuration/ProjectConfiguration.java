@@ -216,14 +216,16 @@ public class ProjectConfiguration {
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
                                               final ApplicationObserverPort applicationObservers,
-                                              final LangchainLLMAdapter langchainLLMAdapter) {
+                                              final LangchainLLMAdapter langchainLLMAdapter,
+                                              final HackathonStoragePort hackathonStoragePort) {
         return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         projectApplicationStoragePort,
                         langchainLLMAdapter,
                         indexerPort,
                         githubStoragePort,
-                        applicationObservers)));
+                        applicationObservers,
+                        hackathonStoragePort)));
     }
 
     @Bean
