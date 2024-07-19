@@ -61,7 +61,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var page = hackathonReadRepository.findAll(PageRequest.of(sanitizePageIndex, sanitizePageSize,
-                Sort.by(Sort.Direction.ASC, "startDate")));
+                Sort.by(Sort.Direction.DESC, "startDate")));
 
         final HackathonsPageResponse hackathonsPageResponse = new HackathonsPageResponse();
         hackathonsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, page.getTotalPages()));
