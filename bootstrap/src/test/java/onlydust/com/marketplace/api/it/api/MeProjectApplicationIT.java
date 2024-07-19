@@ -777,10 +777,9 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 ));
 
         final var expectedComment = """
-                Hey @AnthonyBuisset!\\n\
-                Thanks for showing interest.\\n\
-                This issue is part of the OnlyDust hackathon Hackathon 1. Please apply through OnlyDust to get a chance to be assigned!\\n\
-                Go check it out on [OnlyDust](https://local-app.onlydust.com/hackathons/hackathon-1)!\\n\
+                Hi @AnthonyBuisset!\\n\
+                Maintainers during the Hackathon 1 will be tracking applications via [OnlyDust](https://local-app.onlydust.com/hackathons/hackathon-1).\\n\
+                Therefore, in order for you to have a chance at being assigned to this issue, please [apply directly here](https://local-app.onlydust.com/hackathons/hackathon-1), or else your application may not be considered.\\n\
                 """;
 
         githubWireMockServer.stubFor(post(urlEqualTo("/repositories/466482535/issues/1/comments"))

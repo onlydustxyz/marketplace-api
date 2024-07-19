@@ -57,11 +57,12 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                 .filter(GithubAppAccessToken::canWriteIssues)
                 .ifPresentOrElse(
                         token -> githubApiPort.createComment(token.token(), issue, """
-                                Hey @%s!
-                                Thanks for showing interest.
-                                This issue is part of the OnlyDust hackathon %s. Please apply through OnlyDust to get a chance to be assigned!\\n\
-                                Go check it out on [OnlyDust](%s/hackathons/%s)!
-                                """.formatted(applicant.getGithubLogin(), hackathon.title(), globalConfig.getAppBaseUrl(), hackathon.slug())),
+                                Hi @%s!
+                                Maintainers during the %s will be tracking applications via [OnlyDust](%s/hackathons/%s).
+                                Therefore, in order for you to have a chance at being assigned to this issue, please [apply directly here](%s/hackathons/%s), or else your application may not be considered.
+                                """.formatted(applicant.getGithubLogin(), hackathon.title(),
+                                globalConfig.getAppBaseUrl(), hackathon.slug(),
+                                globalConfig.getAppBaseUrl(), hackathon.slug())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }
