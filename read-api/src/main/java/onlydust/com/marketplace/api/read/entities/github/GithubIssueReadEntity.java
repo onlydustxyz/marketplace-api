@@ -138,26 +138,6 @@ public class GithubIssueReadEntity {
                 ;
     }
 
-    public ProjectIssuesPageItemResponse toProjectIssueDto(@NonNull UUID projectId) {
-        final var projectApplications = applications.stream()
-                .filter(application -> application.projectId().equals(projectId))
-                .toList();
-
-        return new ProjectIssuesPageItemResponse()
-                .id(id)
-                .number(number)
-                .repository(repo.toShortResponse())
-                .createdAt(createdAt)
-                .closedAt(closedAt)
-                .title(title)
-                .htmlUrl(htmlUrl)
-                .status(status)
-                .author(author.toContributorResponse())
-                .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
-                .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
-                ;
-    }
-
     public GithubIssueResponse toDto(boolean asProjectLead) {
         final var response = new GithubIssueResponse()
                 .id(id)
