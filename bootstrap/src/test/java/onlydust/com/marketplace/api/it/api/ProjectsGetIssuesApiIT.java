@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.contract.model.GithubIssuePageResponse;
 import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
-import onlydust.com.marketplace.api.contract.model.ProjectIssuesPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.MethodOrderer;
@@ -51,28 +51,12 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(1)
-    void should_return_forbidden_status_when_caller_is_not_lead() {
-        // Given
-        final String jwt = userAuthHelper.authenticateHayden().jwt();
-
-        // When
-        client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "3")))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isForbidden();
-    }
-
-    @Test
-    @Order(1)
     void should_return_project_issues() {
         // Given
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "3")))
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "3")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -91,46 +75,51 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "number": 1,
                               "title": "testing",
                               "status": "OPEN",
-                              "createdAt": "2023-01-31T11:26:54Z",
-                              "closedAt": null,
                               "htmlUrl": "https://github.com/gregcha/crew-app/issues/1",
-                              "author": {
-                                "githubUserId": 8642470,
-                                "login": "gregcha",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                                "isRegistered": true
-                              },
-                              "repository": {
+                              "repo": {
                                 "id": 302082426,
                                 "owner": "gregcha",
                                 "name": "crew-app",
                                 "description": null,
                                 "htmlUrl": "https://github.com/gregcha/crew-app"
                               },
+                              "author": {
+                                "githubUserId": 8642470,
+                                "login": "gregcha",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                                "isRegistered": true
+                              },
+                              "createdAt": "2023-01-31T11:26:54Z",
+                              "closedAt": null,
+                              "body": "testing issues",
+                              "labels": [],
                               "applicants": [],
-                              "assignees": []
+                              "assignees": [],
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1642022365,
                               "number": 6,
                               "title": "This is a new issue",
                               "status": "COMPLETED",
-                              "createdAt": "2023-03-27T12:56:04Z",
-                              "closedAt": "2023-08-30T09:20:48Z",
                               "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/6",
-                              "author": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                "isRegistered": true
-                              },
-                              "repository": {
+                              "repo": {
                                 "id": 602953043,
                                 "owner": "od-mocks",
                                 "name": "cool-repo-A",
                                 "description": "This is repo A for our e2e tests",
                                 "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
                               },
+                              "author": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "isRegistered": true
+                              },
+                              "createdAt": "2023-03-27T12:56:04Z",
+                              "closedAt": "2023-08-30T09:20:48Z",
+                              "body": null,
+                              "labels": [],
                               "applicants": [],
                               "assignees": [
                                 {
@@ -138,31 +127,35 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                 }
-                              ]
+                              ],
+                              "currentUserApplication": null
                             },
                             {
                               "id": 1642022454,
                               "number": 7,
                               "title": "This one has been cancelled",
                               "status": "CANCELLED",
-                              "createdAt": "2023-03-27T12:56:32Z",
-                              "closedAt": "2023-03-27T12:57:25Z",
                               "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/7",
-                              "author": {
-                                "githubUserId": 43467246,
-                                "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                "isRegistered": true
-                              },
-                              "repository": {
+                              "repo": {
                                 "id": 602953043,
                                 "owner": "od-mocks",
                                 "name": "cool-repo-A",
                                 "description": "This is repo A for our e2e tests",
                                 "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
                               },
+                              "author": {
+                                "githubUserId": 43467246,
+                                "login": "AnthonyBuisset",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "isRegistered": true
+                              },
+                              "createdAt": "2023-03-27T12:56:32Z",
+                              "closedAt": "2023-03-27T12:57:25Z",
+                              "body": null,
+                              "labels": [],
                               "applicants": [],
-                              "assignees": []
+                              "assignees": [],
+                              "currentUserApplication": null
                             }
                           ]
                         }
@@ -176,13 +169,13 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "true")))
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "true")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getAssignees()).isNotEmpty());
@@ -195,13 +188,13 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "false")))
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isAssigned", "false")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getAssignees()).isEmpty());
@@ -214,17 +207,17 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of(
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of(
                         "pageIndex", "0",
                         "pageSize", "30",
                         "isAssigned", "false",
-                        "status", "OPEN")))
+                        "statuses", "OPEN")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
 
         assertThat(issues).isNotEmpty();
         assertThat(issues).allMatch(issue -> issue.getAssignees().isEmpty() && issue.getStatus() == GithubIssueStatus.OPEN);
@@ -237,13 +230,13 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "true")))
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "true")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getApplicants()).isNotEmpty());
@@ -256,13 +249,13 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateUser(134486697L).jwt();
 
         final var issues = client.get()
-                .uri(getApiURI(PROJECTS_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "false")))
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(projectAppliedTo1), Map.of("pageIndex", "0", "pageSize", "30", "isApplied", "false")))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(ProjectIssuesPageResponse.class).returnResult().getResponseBody().getIssues();
+                .expectBody(GithubIssuePageResponse.class).returnResult().getResponseBody().getIssues();
 
         assertThat(issues).isNotEmpty();
         issues.forEach(issue -> assertThat(issue.getApplicants()).isEmpty());

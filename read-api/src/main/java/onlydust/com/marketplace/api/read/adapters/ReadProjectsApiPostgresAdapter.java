@@ -432,32 +432,4 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
-
-    @Override
-    public ResponseEntity<ProjectIssuesPageResponse> getProjectIssues(UUID projectId,
-                                                                      ProjectIssuesSort sort,
-                                                                      SortDirection direction,
-                                                                      Integer pageIndex,
-                                                                      Integer pageSize,
-                                                                      GithubIssueStatus status,
-                                                                      Boolean isAssigned,
-                                                                      Boolean isApplied) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId())) {
-            throw forbidden("Only project leads can read issues on their projects");
-        }
-
-        final var page = githubIssueReadRepository.findAllOf(projectId, status, isAssigned, isApplied,
-                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, switch (sort) {
-                    case CREATED_AT -> "createdAt";
-                    case CLOSED_AT -> "closedAt";
-                })));
-
-        return ok(new ProjectIssuesPageResponse()
-                .issues(page.stream().map(i -> i.toProjectIssueDto(projectId)).toList())
-                .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
-    }
 }
