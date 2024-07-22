@@ -23,6 +23,9 @@ public interface LanguageReadRepository extends Repository<LanguageReadEntity, U
             FROM languages l
                      JOIN project_languages pl ON pl.language_id = l.id
                      JOIN hackathon_projects hp ON hp.project_id = pl.project_id
+                     JOIN hackathon_issues h ON h.hackathon_id = hp.hackathon_id
+                     JOIN indexer_exp.github_issues i ON i.id = h.issue_id
+                     JOIN repo_languages rl ON rl.repo_id = i.repo_id AND rl.language_id = l.id
             WHERE hp.hackathon_id = :hackathonId
             """, nativeQuery = true)
     List<LanguageReadEntity> findAllByHackathonId(UUID hackathonId);
