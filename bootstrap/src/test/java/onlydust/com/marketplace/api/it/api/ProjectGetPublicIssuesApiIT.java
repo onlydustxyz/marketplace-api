@@ -1225,25 +1225,11 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-Typescript.png"
                             },
                             {
-                              "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                              "slug": "solidity",
-                              "name": "Solidity",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                            },
-                            {
                               "id": "e1842c39-fcfa-4289-9b5e-61bf50386a72",
                               "slug": "python",
                               "name": "Python",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-python.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-python.png"
-                            },
-                            {
-                              "id": "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                              "slug": "cairo",
-                              "name": "Cairo",
-                              "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-cairo.png",
-                              "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-cairo.png"
                             }
                           ],
                           "projects": [
