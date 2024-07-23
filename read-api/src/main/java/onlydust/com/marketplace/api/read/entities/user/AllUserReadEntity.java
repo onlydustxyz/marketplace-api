@@ -174,6 +174,7 @@ public class AllUserReadEntity {
                 .leadedProjectCount(globalUsersRanks().map(GlobalUsersRanksReadEntity::leadedProjectCount).orElse(0L).intValue())
                 .totalEarnedUsd(receivedRewardStats().map(ReceivedRewardStatsPerUserReadEntity::usdTotal).orElse(ZERO))
                 .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
+                .leadedProjects(Optional.ofNullable(projectsLed).orElse(Set.of()).stream().map(ProjectReadEntity::toBoLinkResponse).toList())
                 ;
     }
 

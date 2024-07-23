@@ -187,6 +187,20 @@ public class BackofficeUserApiIT extends onlydust.com.marketplace.api.it.bo.Abst
                                 "sumsubUrl": null
                               }
                             }
+                          ],
+                          "leadedProjects": [
+                            {
+                              "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
+                              "slug": "onlydust-marketplace",
+                              "name": "OnlyDust Marketplace",
+                              "logoUrl": null
+                            },
+                            {
+                              "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                              "slug": "kaaper",
+                              "name": "kaaper",
+                              "logoUrl": null
+                            }
                           ]
                         }
                         """);
@@ -257,6 +271,20 @@ public class BackofficeUserApiIT extends onlydust.com.marketplace.api.it.bo.Abst
                                 "idDocumentCountryCode": null,
                                 "sumsubUrl": null
                               }
+                            }
+                          ],
+                          "leadedProjects": [
+                            {
+                              "id": "a852e8fd-de3c-4a14-813e-4b592af40d54",
+                              "slug": "onlydust-marketplace",
+                              "name": "OnlyDust Marketplace",
+                              "logoUrl": null
+                            },
+                            {
+                              "id": "298a547f-ecb6-4ab2-8975-68f4e9bf7b39",
+                              "slug": "kaaper",
+                              "name": "kaaper",
+                              "logoUrl": null
                             }
                           ]
                         }
