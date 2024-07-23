@@ -7,8 +7,12 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.InvoiceInternalStatus;
+import onlydust.com.backoffice.api.contract.model.InvoiceLinkResponse;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.InvoiceRewardEntity;
+import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -34,6 +38,12 @@ public class InvoiceReadEntity {
     UUID id;
     @NonNull
     UUID billingProfileId;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "billingProfileId", referencedColumnName = "id", insertable = false, updatable = false)
+    @NonNull
+    BillingProfileReadEntity billingProfile;
+
     @NonNull
     String number;
     @NonNull
@@ -57,6 +67,24 @@ public class InvoiceReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     @NonNull
     Data data;
+
+    public InvoiceLinkResponse toBoLinkResponse() {
+        return new InvoiceLinkResponse()
+                .id(id)
+                .number(number)
+                .status(map(status))
+                ;
+    }
+
+    private static InvoiceInternalStatus map(Invoice.Status status) {
+        return switch (status) {
+            case PAID -> InvoiceInternalStatus.PAID;
+            case TO_REVIEW -> InvoiceInternalStatus.TO_REVIEW;
+            case REJECTED -> InvoiceInternalStatus.REJECTED;
+            case APPROVED -> InvoiceInternalStatus.APPROVED;
+            default -> throw OnlyDustException.internalServerError("Unknown status: " + status);
+        };
+    }
 
     public record Data(@NonNull ZonedDateTime dueAt,
                        @NonNull BigDecimal taxRate,

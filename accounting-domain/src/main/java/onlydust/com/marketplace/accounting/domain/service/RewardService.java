@@ -18,7 +18,6 @@ import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 
 import java.util.*;
@@ -36,18 +35,6 @@ public class RewardService implements AccountingRewardPort {
     private final AccountingFacadePort accountingFacadePort;
     private final SponsorStoragePort sponsorStoragePort;
     private final OutboxConsumer mailOutboxConsumer;
-
-    @Override
-    public Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
-                                              List<RewardStatus.Input> statuses,
-                                              List<BillingProfile.Id> billingProfileIds,
-                                              List<GithubUserId> recipients,
-                                              Date fromRequestedAt, Date toRequestedAt,
-                                              Date fromProcessedAt, Date toProcessedAt) {
-        final Set<RewardStatus.Input> sanitizedStatuses = isNull(statuses) ? Set.of() : statuses.stream().collect(Collectors.toUnmodifiableSet());
-        return accountingRewardStoragePort.findRewards(pageIndex, pageSize, sanitizedStatuses, Optional.ofNullable(billingProfileIds).orElse(List.of()),
-                Optional.ofNullable(recipients).orElse(List.of()), fromRequestedAt, toRequestedAt, fromProcessedAt, toProcessedAt);
-    }
 
     @Override
     public EarningsView getEarnings(List<RewardStatus.Input> statuses,

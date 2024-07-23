@@ -203,4 +203,13 @@ public class AllUserReadEntity {
                 .globalRankCategory(globalUsersRanks().map(GlobalUsersRanksReadEntity::rankCategory).orElse(null))
                 ;
     }
+
+    public UserLinkResponse toBoLinkResponse() {
+        return new UserLinkResponse()
+                .userId(userId)
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                ;
+    }
 }

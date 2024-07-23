@@ -438,41 +438,6 @@ public interface BackOfficeMapper {
                 .dollarsEquivalent(view.dollarsEquivalent());
     }
 
-    static RewardPageResponse rewardPageToResponse(int pageIndex, Page<RewardDetailsView> page, AuthenticatedUser authenticatedUser) {
-        final RewardPageResponse response = new RewardPageResponse();
-        response.setTotalPageNumber(page.getTotalPageNumber());
-        response.setTotalItemNumber(page.getTotalItemNumber());
-        response.setHasMore(hasMore(pageIndex, page.getTotalPageNumber()));
-        response.setNextPageIndex(nextPageIndex(pageIndex, page.getTotalPageNumber()));
-        page.getContent().forEach(rewardDetailsView -> response.addRewardsItem(new RewardPageItemResponse()
-                .id(rewardDetailsView.id().value())
-                .status(BackOfficeMapper.map(rewardDetailsView.status().as(authenticatedUser)))
-                .requestedAt(rewardDetailsView.requestedAt())
-                .project(new ProjectLinkResponse()
-                        .id(rewardDetailsView.project().id().value())
-                        .slug(rewardDetailsView.project().slug())
-                        .name(rewardDetailsView.project().name())
-                        .logoUrl(rewardDetailsView.project().logoUrl()))
-                .money(moneyViewToResponse(rewardDetailsView.money()))
-                .billingProfile(mapToLinkResponse(rewardDetailsView.billingProfile()))
-                .invoice(rewardDetailsView.invoice() != null ?
-                        new InvoiceLinkResponse()
-                                .id(rewardDetailsView.invoice().id().value())
-                                .number(rewardDetailsView.invoice().number().toString())
-                                .status(mapInvoiceInternalStatus(rewardDetailsView.invoice().status()))
-                        : null
-                )
-                .recipient(rewardDetailsView.recipient() != null ?
-                        new UserLinkResponse()
-                                .githubUserId(rewardDetailsView.recipient().githubUserId().value())
-                                .userId(rewardDetailsView.recipient().userId() != null ? rewardDetailsView.recipient().userId().value() : null)
-                                .login(rewardDetailsView.recipient().login())
-                                .avatarUrl(rewardDetailsView.recipient().avatarUrl())
-                        : null)
-        ));
-        return response;
-    }
-
     static InvoiceStatus mapInvoiceStatus(final Invoice.Status status) {
         return switch (status) {
             case DRAFT -> throw internalServerError("Unknown invoice status: %s".formatted(status));

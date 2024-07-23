@@ -623,7 +623,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get all (paginated) rewards
       operationId: getRewards
       description: |
