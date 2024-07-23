@@ -94,7 +94,7 @@ public class ApplicationService implements ApplicationFacadePort {
                 .orElseThrow(() -> notFound("Issue %s not found".formatted(issueId)));
 
         if (issue.isAssigned())
-            throw forbidden("Issue %s is already assigned".formatted(issueId));
+            throw badRequest("Issue %s is already assigned".formatted(issueId));
 
         if (projectApplicationStoragePort.findApplication(githubUserId, projectId, issueId).isPresent())
             throw badRequest("User already applied to this issue");
