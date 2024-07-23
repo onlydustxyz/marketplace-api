@@ -19,7 +19,7 @@ public interface RewardReadRepository extends JpaRepository<RewardReadEntity, UU
             JOIN FETCH r.requestor
             JOIN FETCH r.recipient
             JOIN FETCH r.currency c
-            JOIN FETCH r.project
+            JOIN FETCH r.project p
             JOIN FETCH r.status s
             JOIN FETCH r.statusData sd
             LEFT JOIN FETCH r.invoice i
@@ -31,6 +31,7 @@ public interface RewardReadRepository extends JpaRepository<RewardReadEntity, UU
                 (:statuses IS NULL OR s.status IN :statuses) AND
                 (:billingProfileIds IS NULL OR i.billingProfileId IN :billingProfileIds) AND
                 (:recipientIds IS NULL OR r.recipientId IN :recipientIds) AND
+                (:projectIds IS NULL OR p.id IN :projectIds) AND
                 (CAST(:fromRequestedAt AS String) IS NULL OR r.requestedAt >= :fromRequestedAt) AND
                 (CAST(:toRequestedAt AS String) IS NULL OR DATE_TRUNC('DAY', r.requestedAt) <= :toRequestedAt) AND
                 (CAST(:fromProcessedAt AS String) IS NULL OR sd.paidAt >= :fromProcessedAt) AND
@@ -39,6 +40,7 @@ public interface RewardReadRepository extends JpaRepository<RewardReadEntity, UU
     Page<RewardReadEntity> find(List<RewardStatus.Input> statuses,
                                 List<UUID> billingProfileIds,
                                 List<Long> recipientIds,
+                                List<UUID> projectIds,
                                 Date fromRequestedAt,
                                 Date toRequestedAt,
                                 Date fromProcessedAt,
