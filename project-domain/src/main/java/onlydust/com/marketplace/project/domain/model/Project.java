@@ -27,7 +27,8 @@ public class Project {
         WORK_IN_PROGRESS,
         FAST_AND_FURIOUS,
         BIG_WHALE,
-        UPDATED_ROADMAP
+        UPDATED_ROADMAP,
+        HAS_GOOD_FIRST_ISSUES,
     }
 
     public static String slugOf(String name) {

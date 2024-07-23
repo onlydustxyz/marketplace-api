@@ -421,3 +421,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000291_create_hackathon_issues_stats_view.sql
   - include:
       file: db/changelog/changelogs/00000292_create_hackathon_events.sql
+  - include:
+      file: db/changelog/changelogs/00000293_add_has_good_first_issues_project_tag.sql

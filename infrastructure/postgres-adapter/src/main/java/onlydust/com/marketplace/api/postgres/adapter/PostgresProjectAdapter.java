@@ -401,6 +401,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
         projectTagRepository.updateWorkInProgress(now);
         projectTagRepository.updateFastAndFurious(now);
         projectTagRepository.updateBigWhale(now);
+        projectTagRepository.updateHasGoodFirstIssues();
     }
 
     @Override

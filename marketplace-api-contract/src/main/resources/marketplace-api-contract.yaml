@@ -7340,6 +7340,7 @@ components:
         - FAST_AND_FURIOUS
         - BIG_WHALE
         - UPDATED_ROADMAP
+        - HAS_GOOD_FIRST_ISSUES
 
     VerificationStatus:
       type: string

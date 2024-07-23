@@ -134,5 +134,12 @@ public interface ProjectTagRepository extends JpaRepository<ProjectTagEntity, Pr
             """, nativeQuery = true)
     void updateBigWhale(@Param("now") Date now);
 
+    @Modifying
+    @Query(value = """
+            insert into projects_tags (project_id, tag)
+            select distinct pgfi.project_id, cast('HAS_GOOD_FIRST_ISSUES' as project_tag)
+            from projects_good_first_issues pgfi
+            """, nativeQuery = true)
+    void updateHasGoodFirstIssues();
 
 }

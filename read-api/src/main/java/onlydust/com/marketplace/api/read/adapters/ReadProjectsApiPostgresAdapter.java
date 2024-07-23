@@ -312,6 +312,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                             case FAST_AND_FURIOUS -> ProjectTag.FAST_AND_FURIOUS;
                             case BIG_WHALE -> ProjectTag.BIG_WHALE;
                             case UPDATED_ROADMAP -> ProjectTag.UPDATED_ROADMAP;
+                            case HAS_GOOD_FIRST_ISSUES -> ProjectTag.HAS_GOOD_FIRST_ISSUES;
                         })
                         .sorted(comparing(ProjectTag::name))
                         .toList())
