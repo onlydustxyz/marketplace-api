@@ -6,10 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.backoffice.api.contract.model.BillingProfileShortResponse;
-import onlydust.com.backoffice.api.contract.model.BillingProfileType;
-import onlydust.com.backoffice.api.contract.model.UserSearchBillingProfile;
-import onlydust.com.backoffice.api.contract.model.VerificationStatus;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
 import org.hibernate.annotations.Formula;
@@ -132,5 +129,13 @@ public class BillingProfileReadEntity {
 
     private boolean isVerificationBlocked() {
         return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
+    }
+
+    public BillingProfileLinkResponse toBoLinkResponse() {
+        return new BillingProfileLinkResponse()
+                .id(id)
+                .type(type)
+                .subject(kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null)
+                ;
     }
 }

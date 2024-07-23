@@ -623,7 +623,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeAccountingManagement
+        - BackofficeAccountingRead
       summary: Get all (paginated) rewards
       operationId: getRewards
       description: |
@@ -662,6 +662,14 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/GithubUserId'
+          style: form
+        - in: query
+          name: projects
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
           style: form
         - in: query
           name: fromRequestedAt

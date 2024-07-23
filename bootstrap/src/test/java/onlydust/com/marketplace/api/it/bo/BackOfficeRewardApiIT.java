@@ -591,6 +591,24 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    @Order(5)
+    void should_get_all_rewards_with_project_id() {
+        // When
+        final var rewards = client.get()
+                .uri(getApiURI(REWARDS, Map.of("pageIndex", "0", "pageSize", "5", "projects", "7d04163c-4187-4313-8066-61504d34fc56")))
+                .header("Authorization", "Bearer " + camille.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(RewardPageResponse.class)
+                .returnResult().getResponseBody().getRewards();
+
+        assertThat(rewards.size()).isGreaterThan(0);
+        assertThat(rewards).allMatch(reward -> reward.getProject().getName().equals("Bretzel"));
+    }
+
+    @Test
     @Order(10)
     void should_export_all_rewards_between_requested_dates() {
 

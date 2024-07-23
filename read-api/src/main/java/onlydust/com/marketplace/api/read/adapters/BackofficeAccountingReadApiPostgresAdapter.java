@@ -7,9 +7,13 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.read.entities.accounting.AllSponsorAccountTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
+import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
+import onlydust.com.marketplace.api.read.entities.reward.RewardStatusReadEntity;
 import onlydust.com.marketplace.api.read.repositories.AllSponsorAccountTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.BatchPaymentReadRepository;
+import onlydust.com.marketplace.api.read.repositories.RewardReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorAccountReadRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -38,6 +42,7 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
     private final AccountingFacadePort accountingFacadePort;
     private final BatchPaymentReadRepository batchPaymentReadRepository;
     private final AllSponsorAccountTransactionReadRepository allSponsorAccountTransactionReadRepository;
+    private final RewardReadRepository rewardReadRepository;
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
@@ -53,6 +58,38 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
 
         final var response = new BatchPaymentPageResponse()
                 .batchPayments(page.getContent().stream().map(BatchPaymentReadEntity::toResponse).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
+
+        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @Override
+    public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex,
+                                                         Integer pageSize,
+                                                         List<RewardStatusContract> statuses,
+                                                         List<UUID> billingProfiles,
+                                                         List<Long> recipients,
+                                                         List<UUID> projects,
+                                                         String fromRequestedAt,
+                                                         String toRequestedAt,
+                                                         String fromProcessedAt,
+                                                         String toProcessedAt) {
+        final var page = rewardReadRepository.find(
+                statuses == null ? null : statuses.stream().map(RewardStatusReadEntity::of).toList(),
+                billingProfiles,
+                recipients,
+                projects,
+                DateMapper.parseNullable(fromRequestedAt),
+                DateMapper.parseNullable(toRequestedAt),
+                DateMapper.parseNullable(fromProcessedAt),
+                DateMapper.parseNullable(toProcessedAt),
+                PageRequest.of(pageIndex, pageSize, Sort.by("requestedAt").descending()));
+
+        final var response = new RewardPageResponse()
+                .rewards(page.getContent().stream().map(RewardReadEntity::toBoPageItemResponse).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

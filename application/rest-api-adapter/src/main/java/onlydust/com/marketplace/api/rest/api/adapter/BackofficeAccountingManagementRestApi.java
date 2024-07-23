@@ -10,12 +10,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
-import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
-import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,8 +27,6 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -136,34 +132,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 payRewardRequest.getReference());
 
         return ResponseEntity.noContent().build();
-    }
-
-    @Override
-    public ResponseEntity<RewardPageResponse> getRewards(Integer pageIndex, Integer pageSize,
-                                                         List<RewardStatusContract> statuses,
-                                                         List<UUID> billingProfiles,
-                                                         List<Long> recipients,
-                                                         String fromRequestedAt,
-                                                         String toRequestedAt,
-                                                         String fromProcessedAt,
-                                                         String toProcessedAt) {
-        final var authenticatedUser = authenticatedBackofficeUserService.getAuthenticatedBackofficeUser().asAuthenticatedUser();
-
-        final int sanitizedPageSize = sanitizePageSize(pageSize);
-        final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
-
-        final Page<RewardDetailsView> rewards = accountingRewardPort.getRewards(
-                sanitizedPageIndex,
-                sanitizedPageSize,
-                statuses != null ? statuses.stream().map(BackOfficeMapper::map).toList() : null,
-                billingProfiles != null ? billingProfiles.stream().map(BillingProfile.Id::of).toList() : null,
-                recipients != null ? recipients.stream().map(GithubUserId::of).toList() : null,
-                DateMapper.parseNullable(fromRequestedAt),
-                DateMapper.parseNullable(toRequestedAt),
-                DateMapper.parseNullable(fromProcessedAt),
-                DateMapper.parseNullable(toProcessedAt)
-        );
-        return ok(rewardPageToResponse(sanitizedPageIndex, rewards, authenticatedUser));
     }
 
     @Override

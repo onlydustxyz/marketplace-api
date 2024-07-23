@@ -48,4 +48,19 @@ public class RewardStatusReadEntity {
             case PROCESSING -> PROCESSING;
         };
     }
+
+    public static RewardStatus.Input of(RewardStatusContract status) {
+        return switch (status) {
+            case LOCKED -> RewardStatus.Input.LOCKED;
+            case PENDING_BILLING_PROFILE -> RewardStatus.Input.PENDING_BILLING_PROFILE;
+            case PENDING_VERIFICATION -> RewardStatus.Input.PENDING_VERIFICATION;
+            case COMPLETE -> RewardStatus.Input.COMPLETE;
+            case GEO_BLOCKED -> RewardStatus.Input.GEO_BLOCKED;
+            case INDIVIDUAL_LIMIT_REACHED -> RewardStatus.Input.INDIVIDUAL_LIMIT_REACHED;
+            case PAYOUT_INFO_MISSING -> RewardStatus.Input.PAYOUT_INFO_MISSING;
+            case PENDING_REQUEST -> RewardStatus.Input.PENDING_REQUEST;
+            case PENDING_SIGNUP -> RewardStatus.Input.PENDING_SIGNUP;
+            case PROCESSING -> RewardStatus.Input.PROCESSING;
+        };
+    }
 }

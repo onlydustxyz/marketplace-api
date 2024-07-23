@@ -7,20 +7,11 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.util.Date;
 import java.util.List;
 
 public interface AccountingRewardPort {
-
-    // TODO: move to read-api
-    Page<RewardDetailsView> getRewards(int pageIndex, int pageSize,
-                                       List<RewardStatus.Input> statuses,
-                                       List<BillingProfile.Id> billingProfileIds,
-                                       List<GithubUserId> recipients,
-                                       Date fromRequestedAt, Date toRequestedAt,
-                                       Date fromProcessedAt, Date toProcessedAt);
 
     EarningsView getEarnings(List<RewardStatus.Input> statuses,
                              List<GithubUserId> recipientIds,
