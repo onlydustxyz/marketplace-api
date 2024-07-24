@@ -8,6 +8,8 @@ import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity.PrimaryKey;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -25,6 +27,7 @@ import java.util.*;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -43,6 +46,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final UserReadRepository userReadRepository;
     private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
     private final PayoutPreferenceReadRepository payoutPreferenceReadRepository;
+    private final NotificationSettingsForProjectReadRepository notificationSettingsForProjectReadRepository;
+    private final ProjectReadRepository projectReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -141,9 +146,20 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var payoutPreferences = payoutPreferenceReadRepository.findAllForUser(authenticatedUser.getId());
-        return ResponseEntity.ok(payoutPreferences.stream()
+        return ok(payoutPreferences.stream()
                 .map(p -> p.toDto(authenticatedUser.getGithubUserId()))
                 .sorted(Comparator.comparing(p -> p.getProject().getName()))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<NotificationSettingsForProjectResponse> getMyNotificationSettingsForProject(UUID projectId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var dto = notificationSettingsForProjectReadRepository.findById(new PrimaryKey(authenticatedUser.getId(), projectId))
+                .map(NotificationSettingsForProjectReadEntity::toDto)
+                .orElseGet(() -> projectReadRepository.findById(projectId)
+                        .map(NotificationSettingsForProjectReadEntity::defaultDto)
+                        .orElseThrow(() -> notFound("Project %s not found".formatted(projectId))));
+        return ok(dto);
     }
 }
