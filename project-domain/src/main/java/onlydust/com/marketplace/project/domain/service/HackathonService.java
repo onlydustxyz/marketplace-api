@@ -11,6 +11,7 @@ import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -33,14 +34,18 @@ public class HackathonService implements HackathonFacadePort {
     }
 
     @Override
-    public void updateHackathonStatus(@NonNull UUID hackathonId, Hackathon.@NonNull Status status) {
-        if (!hackathonStoragePort.exists(Hackathon.Id.of(hackathonId)))
+    public void updateHackathonStatus(@NonNull Hackathon.Id hackathonId, Hackathon.@NonNull Status status) {
+        if (!hackathonStoragePort.exists(hackathonId))
             throw notFound("Hackathon %s not found".formatted(hackathonId));
-        hackathonStoragePort.saveStatus(Hackathon.Id.of(hackathonId), status);
+        hackathonStoragePort.saveStatus(hackathonId, status);
     }
 
     @Override
     public void deleteHackathon(Hackathon.Id hackathonId) {
+        if (!hackathonStoragePort.exists(hackathonId))
+            throw notFound("Hackathon %s not found".formatted(hackathonId));
+        if (hackathonStoragePort.hasUserRegistered(hackathonId))
+            throw badRequest("Hackathon %s cannot be deleted because some users have registered to it".formatted(hackathonId));
         hackathonStoragePort.delete(hackathonId);
     }
 

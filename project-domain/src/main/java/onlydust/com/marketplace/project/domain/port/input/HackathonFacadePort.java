@@ -12,7 +12,7 @@ public interface HackathonFacadePort {
 
     void updateHackathon(@NonNull Hackathon hackathon);
 
-    void updateHackathonStatus(@NonNull UUID hackathonId, @NonNull Hackathon.Status status);
+    void updateHackathonStatus(@NonNull Hackathon.Id hackathonId, @NonNull Hackathon.Status status);
 
     void deleteHackathon(Hackathon.Id hackathonId);
 

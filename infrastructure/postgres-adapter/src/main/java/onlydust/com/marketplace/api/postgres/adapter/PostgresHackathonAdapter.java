@@ -41,6 +41,11 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     }
 
     @Override
+    public boolean hasUserRegistered(Hackathon.Id hackathonId) {
+        return hackathonRegistrationRepository.existsByHackathonId(hackathonId.value());
+    }
+
+    @Override
     @Transactional
     public void delete(Hackathon.Id hackathonId) {
         hackathonRepository.deleteById(hackathonId.value());
