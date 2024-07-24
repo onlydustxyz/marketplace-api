@@ -25,6 +25,8 @@ import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import onlydust.com.marketplace.user.domain.model.NotificationSettings;
+import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -61,6 +63,7 @@ public class MeRestApi implements MeApi {
     private final HackathonFacadePort hackathonFacadePort;
     private final CommitteeFacadePort committeeFacadePort;
     private final BannerFacadePort bannerFacadePort;
+    private final NotificationSettingsPort notificationSettingsPort;
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
@@ -292,6 +295,17 @@ public class MeRestApi implements MeApi {
                 voteForCommitteeAssignmentRequest.getVotes().stream()
                         .collect(Collectors.toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), v -> v.getVote())));
 
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> patchMyNotificationSettingsForProject(UUID projectId,
+                                                                      NotificationSettingsForProjectPatchRequest request) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        notificationSettingsPort.patchNotificationSettingsForProject(
+                onlydust.com.marketplace.user.domain.model.UserId.of(authenticatedUser.getId()),
+                new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
+                        Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();
     }
 }
