@@ -409,4 +409,9 @@ public class PostgresConfiguration {
     PostgresBannersAdapter postgresBannersAdapter(final BannerRepository bannerRepository) {
         return new PostgresBannersAdapter(bannerRepository);
     }
+
+    @Bean
+    PostgresNotificationSettingsAdapter postgresNotificationSettingsAdapter(final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository) {
+        return new PostgresNotificationSettingsAdapter(notificationSettingsForProjectRepository);
+    }
 }

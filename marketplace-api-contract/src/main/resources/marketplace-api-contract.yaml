@@ -137,6 +137,84 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  # This what we might have when we'll implement the new notifications:
+  #  /api/v1/me/notification-settings:
+  #    get:
+  #      security:
+  #        - bearerAuth: [ ]
+  #      tags:
+  #        - ReadMe
+  #      summary: Get notification settings
+  #      operationId: getMyNotificationSettings
+  #      description: |
+  #        Get notification settings
+  #      responses:
+  #        "200":
+  #          description: 'Notification settings'
+  #          content:
+  #            application/json:
+  #              schema:
+  #                $ref: '#/components/schemas/NotificationSettingsResponse'
+  #        "401":
+  #          $ref: '#/components/responses/UnauthorizedError'
+  #        "500":
+  #          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/notification-settings/projects/{projectId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get notification settings
+      operationId: getMyNotificationSettingsForProject
+      description: |
+        Get notification settings
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Notification settings'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsForProjectResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Me
+      summary: Patch notification settings for given project
+      operationId: patchMyNotificationSettingsForProject
+      description: |
+        Patch notification settings for given project.
+        Only provided fields will be updated.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        description: 'Notification settings for project'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettingsForProjectPatchRequest'
+      responses:
+        "204":
+          description: 'Notification settings for project updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/profile:
     get:
       security:
@@ -8575,3 +8653,44 @@ components:
     BannerId:
       type: string
       format: uuid
+
+    NotificationChannels:
+      type: object
+      required:
+        - email
+        - inApp
+      properties:
+        email:
+          type: boolean
+        inApp:
+          type: boolean
+
+    NotificationSettingsResponse:
+      type: object
+      required:
+        - projects
+      properties:
+        projectsChannels:
+          $ref: '#/components/schemas/NotificationChannels'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSettingsForProjectResponse'
+
+    NotificationSettingsForProjectResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - onGoodFirstIssueAdded
+          properties:
+            onGoodFirstIssueAdded:
+              type: boolean
+
+    NotificationSettingsForProjectPatchRequest:
+      type: object
+      properties:
+        onGoodFirstIssueAdded:
+          type: boolean
+
+
