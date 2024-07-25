@@ -39,7 +39,7 @@ public class BackofficeHackathonRestApi implements BackofficeHackathonManagement
 
     @Override
     public ResponseEntity<Void> patchHackathonById(UUID hackathonId, PatchHackathonRequest patchHackathonRequest) {
-        hackathonFacadePort.updateHackathonStatus(hackathonId, Hackathon.Status.valueOf(patchHackathonRequest.getStatus().name()));
+        hackathonFacadePort.updateHackathonStatus(Hackathon.Id.of(hackathonId), Hackathon.Status.valueOf(patchHackathonRequest.getStatus().name()));
         return ResponseEntity.noContent().build();
     }
 

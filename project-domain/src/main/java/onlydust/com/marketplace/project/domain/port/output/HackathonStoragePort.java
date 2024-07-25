@@ -16,6 +16,8 @@ public interface HackathonStoragePort {
 
     boolean exists(Hackathon.Id id);
 
+    boolean hasUserRegistered(Hackathon.Id hackathonId);
+
     void delete(Hackathon.Id hackathonId);
 
     void registerUser(UUID userId, Hackathon.Id hackathonId);

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRegistrationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
@@ -23,6 +24,9 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     final static MutableObject<String> hackathonId2 = new MutableObject<>();
 
     UserAuthHelper.AuthenticatedBackofficeUser emilie;
+
+    @Autowired
+    HackathonRegistrationRepository hackathonRegistrationRepository;
 
     @BeforeEach
     void login() {
@@ -842,6 +846,62 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     @Order(100)
+    void should_not_delete_hackathon_with_registered_users() {
+        // When
+        client.delete()
+                .uri(getApiURI(HACKATHONS_BY_ID.formatted(hackathonId1.getValue())))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isBadRequest();
+
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "hackathons": [
+                            {
+                              "slug": "od-hack",
+                              "status": "PUBLISHED",
+                              "title": "OD Hack",
+                              "githubLabels": [
+                                "ODHack5"
+                              ],
+                              "subscriberCount": 0,
+                              "startDate": "2024-06-01T00:00:00Z",
+                              "endDate": "2024-06-05T00:00:00Z"
+                            },
+                            {
+                              "slug": "hackathon-2021-updated-2",
+                              "status": "PUBLISHED",
+                              "title": "Hackathon 2021 updated 2",
+                              "githubLabels": [
+                                "label100",
+                                "label99"
+                              ],
+                              "subscriberCount": 3,
+                              "startDate": "2024-04-23T11:00:00Z",
+                              "endDate": "2024-04-25T13:00:00Z"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(101)
     void should_delete_hackathon() {
         // When
         client.delete()
