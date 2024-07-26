@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -65,5 +66,21 @@ public class UserEntity {
 
     public ShortContributorView toDomain() {
         return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), githubEmail);
+    }
+
+    public NotificationRecipient toNotificationRecipient() {
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        // TODO: get contact email!!!!!!!!!
+        return new NotificationRecipient(id, githubEmail, githubLogin);
     }
 }
