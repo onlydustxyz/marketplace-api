@@ -11,6 +11,7 @@ import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.ProjectId;
 import onlydust.com.marketplace.user.domain.model.UserId;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,20 +23,35 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
     private final NotificationSettingsChannelRepository notificationSettingsChannelRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<NotificationSettings.Project> getNotificationSettingsForProject(UserId userId, ProjectId projectId) {
         return notificationSettingsForProjectRepository.findById(new NotificationSettingsForProjectEntity.PrimaryKey(userId.value(), projectId.value()))
                 .map(NotificationSettingsForProjectEntity::toDomain);
     }
 
     @Override
+    @Transactional
     public void saveNotificationSettingsForProject(UserId userId, NotificationSettings.Project settings) {
         notificationSettingsForProjectRepository.save(NotificationSettingsForProjectEntity.of(userId, settings));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<NotificationChannel> getNotificationChannels(UUID recipientId, NotificationCategory category) {
         return notificationSettingsChannelRepository.findAllByUserIdAndCategory(recipientId, category).stream()
                 .map(NotificationSettingsChannelEntity::channel)
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void save(UserId userId, NotificationSettings settings) {
+        final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))
+                .toList();
+
+        notificationSettingsChannelRepository.deleteAllByUserId(userId.value());
+        notificationSettingsChannelRepository.saveAll(entities);
     }
 }

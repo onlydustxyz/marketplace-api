@@ -9,15 +9,19 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.kernel.model.notification.NotificationSender;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements OutboxConsumer {
+public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
+    private final NotificationPort notificationPort;
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
 
@@ -33,8 +37,6 @@ public class CustomerIOAdapter implements OutboxConsumer {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
         } else if (event instanceof RewardsPaid rewardsPaid) {
             sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
-        } else if (event instanceof NewCommitteeApplication newCommitteeApplication) {
-            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, newCommitteeApplication));
         } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else if (event instanceof ProjectApplicationAccepted projectApplicationAccepted) {
@@ -43,6 +45,28 @@ public class CustomerIOAdapter implements OutboxConsumer {
             LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
         }
     }
+
+    @Override
+    public void sendAll() {
+        sendPendingEmails();
+        sendPendingDailyEmails();
+    }
+
+    private void sendPendingEmails() {
+        final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(NotificationChannel.EMAIL);
+        pendingNotificationsPerRecipient.forEach((recipient, notifications) -> {
+            notifications.forEach(notification -> {
+                if (notification instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+                    sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, recipient, committeeApplicationSuccessfullyCreated));
+                }
+            });
+        });
+    }
+
+    private void sendPendingDailyEmails() {
+        // TODO
+    }
+
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
         customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);

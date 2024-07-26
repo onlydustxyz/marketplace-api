@@ -12,6 +12,11 @@ public class NotificationSettingsService implements NotificationSettingsPort {
     private final NotificationSettingsStoragePort notificationSettingsStoragePort;
 
     @Override
+    public void updateNotificationSettings(UserId userId, NotificationSettings settings) {
+        notificationSettingsStoragePort.save(userId, settings);
+    }
+
+    @Override
     public void patchNotificationSettingsForProject(UserId userId, NotificationSettings.Project settings) {
         final var currentSettings = notificationSettingsStoragePort.getNotificationSettingsForProject(userId, settings.projectId())
                 .orElse(settings);

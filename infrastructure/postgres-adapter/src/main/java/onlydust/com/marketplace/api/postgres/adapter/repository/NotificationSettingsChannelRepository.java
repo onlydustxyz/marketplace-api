@@ -2,13 +2,14 @@ package onlydust.com.marketplace.api.postgres.adapter.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
-import org.springframework.data.repository.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface NotificationSettingsChannelRepository extends Repository<NotificationSettingsChannelEntity, NotificationSettingsChannelEntity.PrimaryKey> {
+public interface NotificationSettingsChannelRepository extends JpaRepository<NotificationSettingsChannelEntity, NotificationSettingsChannelEntity.PrimaryKey> {
 
     List<NotificationSettingsChannelEntity> findAllByUserIdAndCategory(UUID userId, NotificationCategory category);
 
+    void deleteAllByUserId(UUID userId);
 }

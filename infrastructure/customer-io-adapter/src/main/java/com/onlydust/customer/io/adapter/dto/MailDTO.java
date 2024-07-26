@@ -6,9 +6,10 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
+import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
 
 import java.math.RoundingMode;
 import java.util.List;
@@ -76,11 +77,14 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
     }
 
     public static MailDTO<NewCommitteeApplicationDTO> fromNewCommitteeApplication(@NonNull CustomerIOProperties customerIOProperties,
-                                                                                  @NonNull NewCommitteeApplication newCommitteeApplication) {
-        return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(), mapIdentifiers(newCommitteeApplication.getEmail(),
-                newCommitteeApplication.getUserId()), customerIOProperties.getOnlyDustMarketingEmail(), newCommitteeApplication.getEmail(),
-                "Your application to committee %s".formatted(newCommitteeApplication.getCommitteeName()),
-                NewCommitteeApplicationDTO.fromEvent(newCommitteeApplication));
+                                                                                  @NonNull NotificationRecipient recipient,
+                                                                                  @NonNull CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+        return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(),
+                mapIdentifiers(recipient.email(), recipient.userId()),
+                customerIOProperties.getOnlyDustMarketingEmail(),
+                recipient.email(),
+                "Your application to committee %s".formatted(committeeApplicationSuccessfullyCreated.getCommitteeName()),
+                NewCommitteeApplicationDTO.fromEvent(recipient, committeeApplicationSuccessfullyCreated));
     }
 
     public static MailDTO<ProjectApplicationsToReviewByUserDTO> fromProjectApplicationsToReviewByUser(@NonNull CustomerIOProperties customerIOProperties,

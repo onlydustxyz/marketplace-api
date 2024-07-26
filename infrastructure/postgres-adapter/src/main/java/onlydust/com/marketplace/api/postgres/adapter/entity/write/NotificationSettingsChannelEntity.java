@@ -5,6 +5,8 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -26,12 +28,14 @@ public class NotificationSettingsChannelEntity {
 
     @Id
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false, updatable = false)
     @NonNull
     NotificationCategory category;
 
     @Id
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(nullable = false, updatable = false)
     @NonNull
     NotificationChannel channel;
@@ -39,7 +43,9 @@ public class NotificationSettingsChannelEntity {
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
         UUID userId;
+        @Enumerated(EnumType.STRING)
         NotificationCategory category;
+        @Enumerated(EnumType.STRING)
         NotificationChannel channel;
     }
 }

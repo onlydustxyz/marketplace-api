@@ -9,7 +9,9 @@ import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationIdResolver;
+import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -40,8 +42,10 @@ public class NotificationEntity {
     @NonNull
     UUID recipientId;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @NonNull
     NotificationCategory category;
 
     @JdbcTypeCode(SqlTypes.JSON)
@@ -52,16 +56,17 @@ public class NotificationEntity {
     ZonedDateTime createdAt;
 
     @OneToMany(mappedBy = "notificationId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @NonNull
     Set<NotificationChannelEntity> channels;
 
     @ManyToOne
     @JoinColumn(name = "recipientId", insertable = false, updatable = false)
     UserEntity recipient;
 
-    public static NotificationEntity of(UUID recipientId, Notification notification, List<NotificationChannel> channels) {
+    public static NotificationEntity of(@NonNull UUID recipientId, @NonNull Notification notification, @NonNull List<NotificationChannel> channels) {
         final var notificationId = UUID.randomUUID();
         return NotificationEntity.builder()
-                .id(UUID.randomUUID())
+                .id(notificationId)
                 .recipientId(recipientId)
                 .category(notification.category())
                 .data(new Data(notification))

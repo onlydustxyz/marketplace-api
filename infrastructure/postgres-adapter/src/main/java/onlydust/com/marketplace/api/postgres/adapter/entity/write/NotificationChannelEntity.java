@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
@@ -29,6 +31,7 @@ public class NotificationChannelEntity {
     @Id
     @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
     NotificationChannel channel;
 
     ZonedDateTime sentAt;
