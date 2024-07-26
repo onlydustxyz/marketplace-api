@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationRepository;
+import onlydust.com.marketplace.kernel.model.notification.IdentifiableNotification;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
@@ -26,15 +27,15 @@ public class PostgresNotificationAdapter implements NotificationStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Map<NotificationRecipient, List<Notification>> getPendingNotificationsPerRecipient(@NonNull NotificationChannel notificationChannel) {
-        final Map<NotificationRecipient, List<Notification>> pendingNotificationsPerRecipient =
+    public Map<NotificationRecipient, List<IdentifiableNotification>> getPendingNotificationsPerRecipient(@NonNull NotificationChannel notificationChannel) {
+        final Map<NotificationRecipient, List<IdentifiableNotification>> pendingNotificationsPerRecipient =
                 notificationRepository.findAllPendingByChannel(notificationChannel).stream()
                         .collect(HashMap::new,
                                 (map, notification) -> map.computeIfAbsent(notification.recipient().toNotificationRecipient(), k -> new ArrayList<>())
                                         .add(notification.toDomain()),
                                 Map::putAll);
 
-        pendingNotificationsPerRecipient.forEach((recipient, notifications) -> notifications.sort(comparing(Notification::createdAt)));
+        pendingNotificationsPerRecipient.forEach((recipient, notifications) -> notifications.sort(comparing(IdentifiableNotification::createdAt)));
         return pendingNotificationsPerRecipient;
     }
 }

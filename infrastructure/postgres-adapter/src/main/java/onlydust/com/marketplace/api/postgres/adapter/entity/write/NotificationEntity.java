@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.model.notification.Notification;
-import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
-import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
-import onlydust.com.marketplace.kernel.model.notification.NotificationIdResolver;
+import onlydust.com.marketplace.kernel.model.notification.*;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -70,13 +67,13 @@ public class NotificationEntity {
                 .recipientId(recipientId)
                 .category(notification.category())
                 .data(new Data(notification))
-                .createdAt(notification.createdAt())
+                .createdAt(ZonedDateTime.now())
                 .channels(channels.stream().map(channel -> NotificationChannelEntity.of(notificationId, channel)).collect(Collectors.toSet()))
                 .build();
     }
 
-    public Notification toDomain() {
-        return data.notification;
+    public IdentifiableNotification toDomain() {
+        return new IdentifiableNotification(id, data.notification, createdAt);
     }
 
     @lombok.Data

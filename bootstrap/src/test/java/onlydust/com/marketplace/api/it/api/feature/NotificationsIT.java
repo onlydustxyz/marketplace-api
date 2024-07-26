@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.api.feature;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.kernel.model.notification.*;
@@ -13,6 +14,7 @@ import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -230,6 +232,15 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         ), NotificationChannel.EMAIL);
     }
 
+    @Test
+    @Order(40)
+    void should_mark_notifications_as_sent() {
+        // When
+        //TODO notificationPort.markAsSent(rewardNotification1);
+
+        // Then
+    }
+
     private void assertNoPendingNotification(NotificationChannel... channels) {
         for (var channel : channels) {
             final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
@@ -240,14 +251,20 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
             final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
-            assertThat(pendingNotificationsPerRecipient).containsAllEntriesOf(expectedNotifications);
-            assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsPerRecipient);
+
+            final Map<NotificationRecipient, List<Notification>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet().stream()
+                    .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
+                                    entry.getValue().stream().map(IdentifiableNotification::notification).toList()),
+                            Map::putAll);
+            assertThat(pendingNotificationsDataPerRecipient).containsAllEntriesOf(expectedNotifications);
+            assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsDataPerRecipient);
         }
     }
 
     @Data
+    @ToString(callSuper = true)
     @NoArgsConstructor
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
+    @EqualsAndHashCode(callSuper = true)
     @NotificationType("TestNotification")
     static class TestNotification extends Notification {
         @EqualsAndHashCode.Include
