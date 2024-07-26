@@ -411,7 +411,14 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresNotificationSettingsAdapter postgresNotificationSettingsAdapter(final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository) {
-        return new PostgresNotificationSettingsAdapter(notificationSettingsForProjectRepository);
+    PostgresNotificationSettingsAdapter postgresNotificationSettingsAdapter(final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository,
+                                                                            final NotificationSettingsChannelRepository notificationSettingsChannelRepository) {
+        return new PostgresNotificationSettingsAdapter(notificationSettingsForProjectRepository,
+                notificationSettingsChannelRepository);
+    }
+
+    @Bean
+    PostgresNotificationAdapter postgresNotificationAdapter(final NotificationRepository notificationRepository) {
+        return new PostgresNotificationAdapter(notificationRepository);
     }
 }

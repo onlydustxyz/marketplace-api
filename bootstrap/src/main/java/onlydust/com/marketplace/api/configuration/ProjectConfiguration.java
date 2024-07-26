@@ -397,11 +397,10 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public CommitteeObserverPort committeeObserverPort(final OutboxPort projectMailOutbox,
+    public CommitteeObserverPort committeeObserverPort(final NotificationPort notificationPort,
                                                        final ProjectStoragePort projectStoragePort,
-                                                       final UserStoragePort userStoragePort,
                                                        final CommitteeStoragePort committeeStoragePort) {
-        return new ProjectMailNotifier(projectMailOutbox, projectStoragePort, userStoragePort, committeeStoragePort);
+        return new ProjectNotifier(notificationPort, projectStoragePort, committeeStoragePort);
     }
 
     @Bean
