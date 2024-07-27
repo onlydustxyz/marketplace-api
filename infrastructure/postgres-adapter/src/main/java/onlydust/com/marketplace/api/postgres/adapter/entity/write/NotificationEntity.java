@@ -68,7 +68,7 @@ public class NotificationEntity {
                 .recipientId(notification.recipientId())
                 .category(notification.data().category())
                 .data(new Data(notification.data()))
-                .createdAt(ZonedDateTime.now())
+                .createdAt(notification.createdAt())
                 .channels(notification.channels().stream().map(channel -> NotificationChannelEntity.of(notification.id(), channel)).collect(Collectors.toSet()))
                 .build();
     }

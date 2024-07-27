@@ -20,9 +20,11 @@ public class NotificationService implements NotificationPort {
     private final NotificationStoragePort notificationStoragePort;
 
     @Override
-    public void push(UUID recipientId, NotificationData notificationData) {
+    public Notification push(UUID recipientId, NotificationData notificationData) {
         final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notificationData.category());
-        notificationStoragePort.save(Notification.of(recipientId, notificationData, new HashSet<>(channels)));
+        final var notification = Notification.of(recipientId, notificationData, new HashSet<>(channels));
+        notificationStoragePort.save(notification);
+        return notification;
     }
 
     @Override

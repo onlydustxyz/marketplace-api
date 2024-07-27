@@ -14,7 +14,6 @@ import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -34,12 +33,27 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private UUID pierreId;
     private NotificationRecipient pierreRecipient;
 
-    private final TestNotification rewardNotification1 = new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification2 = new TestNotification(2, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification3 = new TestNotification(3, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification4 = new TestNotification(4, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification1 = new TestNotification(100, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification2 = new TestNotification(101, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.REWARD_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.REWARD_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.REWARD_AS_CONTRIBUTOR);
+    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
+    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
+
+    private static Notification olivierRewardNotification1;
+    private static Notification olivierRewardNotification2;
+    private static Notification olivierRewardNotification3;
+    private static Notification olivierRewardNotification4;
+    private static Notification olivierGfiNotification1;
+    private static Notification olivierGfiNotification2;
+
+
+    private static Notification pierreRewardNotification1;
+    private static Notification pierreRewardNotification2;
+    private static Notification pierreRewardNotification3;
+    private static Notification pierreRewardNotification4;
+    private static Notification pierreGfiNotification1;
+    private static Notification pierreGfiNotification2;
 
     @BeforeEach
     void setUp() {
@@ -79,11 +93,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 .build());
 
         // When
-        notificationPort.push(olivierId, rewardNotification1);
+        olivierRewardNotification1 = notificationPort.push(olivierId, rewardNotification1Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1)
+                olivierRecipient, List.of(olivierRewardNotification1)
         ), NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP);
 
         assertNoPendingNotification(NotificationChannel.EMAIL);
@@ -101,18 +115,18 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 .build());
 
         // When
-        notificationPort.push(olivierId, rewardNotification2);
-        notificationPort.push(olivierId, gfiNotification1);
+        olivierRewardNotification2 = notificationPort.push(olivierId, rewardNotification2Data);
+        olivierGfiNotification1 = notificationPort.push(olivierId, gfiNotification1Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1)
+                olivierRecipient, List.of(olivierGfiNotification1)
         ), NotificationChannel.EMAIL);
     }
 
@@ -130,13 +144,13 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1)
+                olivierRecipient, List.of(olivierGfiNotification1)
         ), NotificationChannel.EMAIL);
     }
 
@@ -144,17 +158,17 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(11)
     void should_impact_new_notifications_when_channel_is_added_for_category() {
         // When
-        notificationPort.push(olivierId, gfiNotification2);
+        olivierGfiNotification2 = notificationPort.push(olivierId, gfiNotification2Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1, gfiNotification2)
+                olivierRecipient, List.of(olivierGfiNotification1, olivierGfiNotification2)
         ), NotificationChannel.EMAIL);
     }
 
@@ -172,13 +186,13 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1, gfiNotification2)
+                olivierRecipient, List.of(olivierGfiNotification1, olivierGfiNotification2)
         ), NotificationChannel.EMAIL);
     }
 
@@ -186,17 +200,18 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(21)
     void should_impact_new_notifications_when_channel_is_removed_for_category() {
         // When
-        notificationPort.push(olivierId, rewardNotification3);
+        olivierRewardNotification3 = notificationPort.push(olivierId, rewardNotification3Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1, gfiNotification2, rewardNotification3)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                        olivierRewardNotification3)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1, gfiNotification2)
+                olivierRecipient, List.of(olivierGfiNotification1, olivierGfiNotification2)
         ), NotificationChannel.EMAIL);
     }
 
@@ -212,23 +227,24 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 .build());
 
         // When
-        notificationPort.push(pierreId, rewardNotification1);
-        notificationPort.push(pierreId, rewardNotification4);
-        notificationPort.push(pierreId, gfiNotification1);
-        notificationPort.push(olivierId, rewardNotification4);
+        pierreRewardNotification1 = notificationPort.push(pierreId, rewardNotification1Data);
+        pierreRewardNotification4 = notificationPort.push(pierreId, rewardNotification4Data);
+        pierreGfiNotification1 = notificationPort.push(pierreId, gfiNotification1Data);
+        olivierRewardNotification4 = notificationPort.push(olivierId, rewardNotification4Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(rewardNotification1, rewardNotification2, gfiNotification1, gfiNotification2, rewardNotification3,
-                        rewardNotification4),
-                pierreRecipient, List.of(rewardNotification1, rewardNotification4)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                        olivierRewardNotification3,
+                        olivierRewardNotification4),
+                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4)
         ), NotificationChannel.IN_APP);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(gfiNotification1, gfiNotification2),
-                pierreRecipient, List.of(rewardNotification1, rewardNotification4)
+                olivierRecipient, List.of(olivierGfiNotification1, olivierGfiNotification2),
+                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4)
         ), NotificationChannel.EMAIL);
     }
 
@@ -248,16 +264,17 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         }
     }
 
-    private void assertPendingNotifications(Map<NotificationRecipient, List<NotificationData>> expectedNotifications, NotificationChannel... channels) {
+    private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
             final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
 
-            final Map<NotificationRecipient, List<NotificationData>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet().stream()
-                    .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
-                                    entry.getValue().stream().map(Notification::data).toList()),
-                            Map::putAll);
-            assertThat(pendingNotificationsDataPerRecipient).containsAllEntriesOf(expectedNotifications);
-            assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsDataPerRecipient);
+//            final Map<NotificationRecipient, List<NotificationData>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet()
+//            .stream()
+//                    .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
+//                                    entry.getValue().stream().map(Notification::data).toList()),
+//                            Map::putAll);
+            assertThat(pendingNotificationsPerRecipient).containsAllEntriesOf(expectedNotifications);
+            assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsPerRecipient);
         }
     }
 
@@ -267,7 +284,6 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @EqualsAndHashCode(callSuper = true)
     @NotificationType("TestNotification")
     static class TestNotification extends NotificationData {
-        @EqualsAndHashCode.Include
         int id;
         NotificationCategory category;
 
