@@ -254,7 +254,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
             final Map<NotificationRecipient, List<NotificationData>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet().stream()
                     .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
-                                    entry.getValue().stream().map(IdentifiableNotification::data).toList()),
+                                    entry.getValue().stream().map(Notification::data).toList()),
                             Map::putAll);
             assertThat(pendingNotificationsDataPerRecipient).containsAllEntriesOf(expectedNotifications);
             assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsDataPerRecipient);

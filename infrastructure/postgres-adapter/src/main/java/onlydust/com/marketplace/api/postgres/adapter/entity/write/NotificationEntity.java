@@ -72,8 +72,8 @@ public class NotificationEntity {
                 .build();
     }
 
-    public IdentifiableNotification toDomain() {
-        return new IdentifiableNotification(id, data.notification, createdAt);
+    public Notification toDomain() {
+        return new Notification(id, data.notification, createdAt);
     }
 
     @lombok.Data

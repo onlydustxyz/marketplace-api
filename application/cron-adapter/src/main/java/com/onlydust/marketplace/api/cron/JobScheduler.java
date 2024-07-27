@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.model.notification.NotificationSenderJob;
+import onlydust.com.marketplace.kernel.model.notification.NotificationSender;
 import onlydust.com.marketplace.project.domain.job.ApplicationMailNotifier;
 import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
@@ -40,7 +40,7 @@ public class JobScheduler {
     private final LanguageFacadePort languageFacadePort;
     private final ApplicationsCleaner applicationsCleaner;
     private final ApplicationMailNotifier applicationMailNotifier;
-    private final NotificationSenderJob notificationEmailSenderJob;
+    private final NotificationSender customerIOAdapter;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -101,7 +101,7 @@ public class JobScheduler {
         LOGGER.info("Sending emails");
         accountingMailOutboxJob.run();
         projectMailOutboxJob.run();
-        notificationEmailSenderJob.sendAll();
+        customerIOAdapter.sendAll();
     }
 
     @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")

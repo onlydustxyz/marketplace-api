@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.user.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.kernel.model.notification.IdentifiableNotification;
+import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
@@ -25,7 +25,7 @@ public class NotificationService implements NotificationPort {
     }
 
     @Override
-    public Map<NotificationRecipient, List<IdentifiableNotification>> getPendingNotificationsPerRecipient(NotificationChannel notificationChannel) {
+    public Map<NotificationRecipient, List<Notification>> getPendingNotificationsPerRecipient(NotificationChannel notificationChannel) {
         return notificationStoragePort.getPendingNotificationsPerRecipient(notificationChannel);
     }
 }
