@@ -60,7 +60,7 @@ public class NotificationEntity {
     @JoinColumn(name = "recipientId", insertable = false, updatable = false)
     UserEntity recipient;
 
-    public static NotificationEntity of(@NonNull UUID recipientId, @NonNull Notification notification, @NonNull List<NotificationChannel> channels) {
+    public static NotificationEntity of(@NonNull UUID recipientId, @NonNull NotificationData notification, @NonNull List<NotificationChannel> channels) {
         final var notificationId = UUID.randomUUID();
         return NotificationEntity.builder()
                 .id(notificationId)
@@ -83,6 +83,6 @@ public class NotificationEntity {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
         @JsonTypeIdResolver(NotificationIdResolver.class)
-        private Notification notification;
+        private NotificationData notification;
     }
 }

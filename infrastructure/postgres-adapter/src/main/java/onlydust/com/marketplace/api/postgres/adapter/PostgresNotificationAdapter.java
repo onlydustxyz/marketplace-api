@@ -5,8 +5,8 @@ import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationRepository;
 import onlydust.com.marketplace.kernel.model.notification.IdentifiableNotification;
-import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ public class PostgresNotificationAdapter implements NotificationStoragePort {
 
     @Override
     @Transactional
-    public void save(@NonNull UUID recipientId, @NonNull Notification notification, @NonNull List<NotificationChannel> channels) {
+    public void save(@NonNull UUID recipientId, @NonNull NotificationData notification, @NonNull List<NotificationChannel> channels) {
         notificationRepository.save(NotificationEntity.of(recipientId, notification, channels));
     }
 

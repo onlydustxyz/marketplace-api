@@ -56,7 +56,7 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
         final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(NotificationChannel.EMAIL);
         pendingNotificationsPerRecipient.forEach((recipient, notifications) -> {
             notifications.forEach(notification -> {
-                if (notification instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+                if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
                     sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, recipient, committeeApplicationSuccessfullyCreated));
                 }
             });

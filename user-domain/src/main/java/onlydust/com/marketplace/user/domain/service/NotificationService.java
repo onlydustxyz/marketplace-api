@@ -2,8 +2,8 @@ package onlydust.com.marketplace.user.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.notification.IdentifiableNotification;
-import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
@@ -19,7 +19,7 @@ public class NotificationService implements NotificationPort {
     private final NotificationStoragePort notificationStoragePort;
 
     @Override
-    public void push(UUID recipientId, Notification notification) {
+    public void push(UUID recipientId, NotificationData notification) {
         final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notification.category());
         notificationStoragePort.save(recipientId, notification, channels);
     }

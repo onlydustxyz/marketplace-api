@@ -248,13 +248,13 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         }
     }
 
-    private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
+    private void assertPendingNotifications(Map<NotificationRecipient, List<NotificationData>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
             final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
 
-            final Map<NotificationRecipient, List<Notification>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet().stream()
+            final Map<NotificationRecipient, List<NotificationData>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet().stream()
                     .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
-                                    entry.getValue().stream().map(IdentifiableNotification::notification).toList()),
+                                    entry.getValue().stream().map(IdentifiableNotification::data).toList()),
                             Map::putAll);
             assertThat(pendingNotificationsDataPerRecipient).containsAllEntriesOf(expectedNotifications);
             assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsDataPerRecipient);
@@ -266,7 +266,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @NoArgsConstructor
     @EqualsAndHashCode(callSuper = true)
     @NotificationType("TestNotification")
-    static class TestNotification extends Notification {
+    static class TestNotification extends NotificationData {
         @EqualsAndHashCode.Include
         int id;
         NotificationCategory category;
