@@ -5,7 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.model.notification.*;
+import onlydust.com.marketplace.kernel.model.notification.Notification;
+import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
+import onlydust.com.marketplace.kernel.model.notification.NotificationData;
+import onlydust.com.marketplace.kernel.model.notification.NotificationIdResolver;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -13,7 +16,6 @@ import org.hibernate.type.SqlTypes;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,20 +62,25 @@ public class NotificationEntity {
     @JoinColumn(name = "recipientId", insertable = false, updatable = false)
     UserEntity recipient;
 
-    public static NotificationEntity of(@NonNull UUID recipientId, @NonNull NotificationData notification, @NonNull List<NotificationChannel> channels) {
-        final var notificationId = UUID.randomUUID();
+    public static NotificationEntity of(@NonNull Notification notification) {
         return NotificationEntity.builder()
-                .id(notificationId)
-                .recipientId(recipientId)
-                .category(notification.category())
-                .data(new Data(notification))
+                .id(notification.id())
+                .recipientId(notification.recipientId())
+                .category(notification.data().category())
+                .data(new Data(notification.data()))
                 .createdAt(ZonedDateTime.now())
-                .channels(channels.stream().map(channel -> NotificationChannelEntity.of(notificationId, channel)).collect(Collectors.toSet()))
+                .channels(notification.channels().stream().map(channel -> NotificationChannelEntity.of(notification.id(), channel)).collect(Collectors.toSet()))
                 .build();
     }
 
     public Notification toDomain() {
-        return new Notification(id, data.notification, createdAt);
+        return Notification.builder()
+                .id(id)
+                .recipientId(recipientId)
+                .data(data.notification)
+                .createdAt(createdAt)
+                .channels(channels.stream().map(NotificationChannelEntity::channel).collect(Collectors.toSet()))
+                .build();
     }
 
     @lombok.Data

@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,9 +20,9 @@ public class NotificationService implements NotificationPort {
     private final NotificationStoragePort notificationStoragePort;
 
     @Override
-    public void push(UUID recipientId, NotificationData notification) {
-        final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notification.category());
-        notificationStoragePort.save(recipientId, notification, channels);
+    public void push(UUID recipientId, NotificationData notificationData) {
+        final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notificationData.category());
+        notificationStoragePort.save(Notification.of(recipientId, notificationData, new HashSet<>(channels)));
     }
 
     @Override
