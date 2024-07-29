@@ -101,13 +101,7 @@ public interface UserMapper {
         return contacts.stream().map(contact -> ContactInformationEntity.builder()
                 .id(ContactInformationIdEntity.builder()
                         .userId(userId)
-                        .channel(switch (contact.getChannel()) {
-                            case TELEGRAM -> ContactChanelEnumEntity.TELEGRAM;
-                            case TWITTER -> ContactChanelEnumEntity.TWITTER;
-                            case DISCORD -> ContactChanelEnumEntity.DISCORD;
-                            case LINKEDIN -> ContactChanelEnumEntity.LINKEDIN;
-                            case WHATSAPP -> ContactChanelEnumEntity.WHATSAPP;
-                        })
+                        .channel(contact.getChannel())
                         .build())
                 .contact(contact.getContact())
                 .isPublic(switch (contact.getVisibility()) {

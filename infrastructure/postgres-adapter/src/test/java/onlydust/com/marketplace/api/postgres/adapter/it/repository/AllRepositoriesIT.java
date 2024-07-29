@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
 import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
@@ -11,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -163,7 +163,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .contactInformations(List.of(ContactInformationEntity.builder()
                         .contact(faker.rickAndMorty().location())
                         .id(ContactInformationIdEntity.builder()
-                                .channel(ContactChanelEnumEntity.TELEGRAM)
+                                .channel(Contact.Channel.TELEGRAM)
                                 .userId(UUID.randomUUID())
                                 .build())
                         .isPublic(false)
@@ -181,7 +181,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         final ContactInformationEntity expected = ContactInformationEntity.builder()
                 .contact(faker.rickAndMorty().location())
                 .id(ContactInformationIdEntity.builder()
-                        .channel(ContactChanelEnumEntity.TELEGRAM)
+                        .channel(Contact.Channel.TELEGRAM)
                         .userId(UUID.randomUUID())
                         .build())
                 .isPublic(false)
