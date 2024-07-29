@@ -81,20 +81,7 @@ public class NotificationEntity {
                 .data(data.notification)
                 .createdAt(createdAt)
                 .channels(channels.stream().map(NotificationChannelEntity::channel).collect(Collectors.toSet()))
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                // TODO: get contact email!!!!!!!!!
-                .recipientEmail(recipient.getGithubEmail())
-                .recipientLogin(recipient.getGithubLogin())
+                .recipient(recipient.toUser())
                 .build();
     }
 

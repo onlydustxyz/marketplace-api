@@ -10,6 +10,7 @@ import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 import static java.util.Comparator.comparing;
@@ -31,5 +32,11 @@ public class PostgresNotificationAdapter implements NotificationStoragePort {
                 .map(NotificationEntity::toDomain)
                 .sorted(comparing(SendableNotification::createdAt))
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public void markAsSent(NotificationChannel channel, Collection<Notification.Id> notificationIds) {
+        notificationRepository.markAsSent(channel, notificationIds.stream().map(Notification.Id::value).toList());
     }
 }

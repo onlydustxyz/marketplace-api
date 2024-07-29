@@ -27,6 +27,7 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import onlydust.com.marketplace.user.domain.model.UserId;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
@@ -308,5 +309,10 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Transactional
     public void replaceUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
         userRepository.replaceUserByGithubUser(userId, currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
+    }
+
+    @Override
+    public Optional<onlydust.com.marketplace.user.domain.model.User> findById(UserId userId) {
+        return userRepository.findById(userId.value()).map(UserEntity::toUser);
     }
 }

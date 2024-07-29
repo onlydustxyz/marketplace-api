@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.user.domain.model.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -63,7 +64,11 @@ public class UserEntity {
         return "{" + String.join(",", Arrays.stream(roles).map(Enum::name).toList()) + "}";
     }
 
-    public ShortContributorView toDomain() {
+    public ShortContributorView toShortContributorView() {
         return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), githubEmail);
+    }
+
+    public User toUser() {
+        return new User(onlydust.com.marketplace.user.domain.model.UserId.of(id), githubEmail, githubLogin);
     }
 }

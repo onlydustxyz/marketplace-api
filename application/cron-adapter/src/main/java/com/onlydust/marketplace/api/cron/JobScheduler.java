@@ -13,7 +13,6 @@ import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewa
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.user.domain.job.NotificationInstantEmailJob;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -40,7 +39,6 @@ public class JobScheduler {
     private final LanguageFacadePort languageFacadePort;
     private final ApplicationsCleaner applicationsCleaner;
     private final ApplicationMailNotifier applicationMailNotifier;
-    private final NotificationInstantEmailJob notificationInstantEmailJob;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -101,7 +99,6 @@ public class JobScheduler {
         LOGGER.info("Sending emails");
         accountingMailOutboxJob.run();
         projectMailOutboxJob.run();
-        notificationInstantEmailJob.run();
     }
 
     @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")

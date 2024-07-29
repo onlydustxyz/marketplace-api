@@ -436,7 +436,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
 
     @Override
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
-        return userRepository.findById(ownerId.value()).map(UserEntity::toDomain);
+        return userRepository.findById(ownerId.value()).map(UserEntity::toShortContributorView);
     }
 
     @Override

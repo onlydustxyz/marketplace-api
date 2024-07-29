@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.configuration;
 
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.user.domain.job.NotificationInstantEmailJob;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
@@ -38,13 +37,12 @@ public class UserDomainConfiguration {
 
     @Bean
     public NotificationPort notificationPort(final NotificationSettingsStoragePort notificationSettingsStoragePort,
-                                             final NotificationStoragePort notificationStoragePort) {
-        return new NotificationService(notificationSettingsStoragePort, notificationStoragePort);
-    }
-
-    @Bean
-    public NotificationInstantEmailJob notificationInstantEmailJob(final NotificationStoragePort notificationStoragePort,
-                                                                   final NotificationSender notificationInstantEmailSender) {
-        return new NotificationInstantEmailJob(notificationStoragePort, notificationInstantEmailSender);
+                                             final NotificationStoragePort notificationStoragePort,
+                                             final AppUserStoragePort userStoragePort,
+                                             final NotificationSender notificationSender) {
+        return new NotificationService(notificationSettingsStoragePort,
+                notificationStoragePort,
+                userStoragePort,
+                notificationSender);
     }
 }

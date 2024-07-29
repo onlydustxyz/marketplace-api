@@ -2,11 +2,17 @@ package onlydust.com.marketplace.user.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
+import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.user.domain.model.SendableNotification;
+import onlydust.com.marketplace.user.domain.model.UserId;
+import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 
@@ -14,12 +20,30 @@ import java.util.UUID;
 public class NotificationService implements NotificationPort {
     private final NotificationSettingsStoragePort notificationSettingsStoragePort;
     private final NotificationStoragePort notificationStoragePort;
+    private final AppUserStoragePort userStoragePort;
+    private final NotificationSender notificationEmailSender;
 
     @Override
     public Notification push(UUID recipientId, NotificationData notificationData) {
         final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notificationData.category());
         final var notification = Notification.of(recipientId, notificationData, new HashSet<>(channels));
         notificationStoragePort.save(notification);
+
+        if (channels.contains(NotificationChannel.EMAIL)) {
+            sendEmail(recipientId, notification);
+        }
         return notification;
+    }
+
+    private void sendEmail(UUID recipientId, Notification notification) {
+        userStoragePort.findById(UserId.of(recipientId)).ifPresent(user -> {
+            notificationEmailSender.send(SendableNotification.of(user, notification));
+            markAsSent(NotificationChannel.EMAIL, notification.id());
+        });
+    }
+
+    @Override
+    public void markAsSent(NotificationChannel channel, Collection<Notification.Id> notificationIds) {
+        notificationStoragePort.markAsSent(channel, notificationIds);
     }
 }

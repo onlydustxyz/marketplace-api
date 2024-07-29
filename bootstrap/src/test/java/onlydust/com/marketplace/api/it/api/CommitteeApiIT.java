@@ -150,7 +150,6 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
-        notificationInstantEmailJob.run();
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
