@@ -103,12 +103,11 @@ public interface UserMapper {
                 .id(ContactInformationIdEntity.builder()
                         .userId(userId)
                         .channel(switch (contact.getChannel()) {
-                            case EMAIL -> ContactChanelEnumEntity.email;
-                            case TELEGRAM -> ContactChanelEnumEntity.telegram;
-                            case TWITTER -> ContactChanelEnumEntity.twitter;
-                            case DISCORD -> ContactChanelEnumEntity.discord;
-                            case LINKEDIN -> ContactChanelEnumEntity.linkedin;
-                            case WHATSAPP -> ContactChanelEnumEntity.whatsapp;
+                            case TELEGRAM -> ContactChanelEnumEntity.TELEGRAM;
+                            case TWITTER -> ContactChanelEnumEntity.TWITTER;
+                            case DISCORD -> ContactChanelEnumEntity.DISCORD;
+                            case LINKEDIN -> ContactChanelEnumEntity.LINKEDIN;
+                            case WHATSAPP -> ContactChanelEnumEntity.WHATSAPP;
                         })
                         .build())
                 .contact(contact.getContact())

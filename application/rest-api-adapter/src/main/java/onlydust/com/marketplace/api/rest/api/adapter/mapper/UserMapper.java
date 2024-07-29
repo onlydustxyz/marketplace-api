@@ -34,7 +34,6 @@ public interface UserMapper {
                         case PRIVATE -> Contact.Visibility.PRIVATE;
                     };
                     final Contact.Channel channel = switch (contactInformation.getChannel()) {
-                        case EMAIL -> Contact.Channel.EMAIL;
                         case LINKEDIN -> Contact.Channel.LINKEDIN;
                         case TWITTER -> Contact.Channel.TWITTER;
                         case TELEGRAM -> Contact.Channel.TELEGRAM;
@@ -89,7 +88,6 @@ public interface UserMapper {
                     final ContactInformation response = new ContactInformation();
                     response.setContact(contactInformation.getContact());
                     response.setChannel(switch (contactInformation.getChannel()) {
-                        case EMAIL -> ContactInformationChannel.EMAIL;
                         case LINKEDIN -> ContactInformationChannel.LINKEDIN;
                         case TWITTER -> ContactInformationChannel.TWITTER;
                         case TELEGRAM -> ContactInformationChannel.TELEGRAM;

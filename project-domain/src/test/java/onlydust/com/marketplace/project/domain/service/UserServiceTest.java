@@ -190,8 +190,12 @@ public class UserServiceTest {
         // Given
         final UUID userId = UUID.randomUUID();
 
-        final UserProfile profile =
-                UserProfile.builder().avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
+        final UserProfile profile = UserProfile.builder()
+                .avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence())
+                .website(faker.internet().url())
+                .location(faker.address().city())
+                .contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build()))
+                .build();
 
         final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
 

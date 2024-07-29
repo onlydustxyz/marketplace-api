@@ -3,9 +3,8 @@ package onlydust.com.marketplace.api.read.entities.user;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.backoffice.api.contract.model.ContactInformation;
-import onlydust.com.backoffice.api.contract.model.ContactInformationChannel;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
+import onlydust.com.marketplace.api.contract.model.ContactInformation;
+import onlydust.com.marketplace.api.contract.model.ContactInformationChannel;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -29,7 +28,7 @@ public class ContactInformationReadEntity {
     @EqualsAndHashCode.Include
     @Enumerated(EnumType.STRING)
     @NonNull
-    ContactChanelEnumEntity channel;
+    ContactInformationChannel channel;
 
     @NonNull
     String contact;
@@ -42,20 +41,22 @@ public class ContactInformationReadEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "userId", insertable = false, updatable = false)
     AllUserReadEntity user;
 
-    public ContactInformation toBODto() {
-        return new ContactInformation()
-                .channel(ContactInformationChannel.valueOf(channel.name().toUpperCase()))
-                .contact(contact)
-                .visibility(isPublic ? ContactInformation.VisibilityEnum.PUBLIC : ContactInformation.VisibilityEnum.PRIVATE);
-    }
-
-    public onlydust.com.marketplace.api.contract.model.ContactInformation toDto() {
-        return new onlydust.com.marketplace.api.contract.model.ContactInformation()
-                .channel(onlydust.com.marketplace.api.contract.model.ContactInformationChannel.valueOf(channel.name().toUpperCase()))
+    public onlydust.com.backoffice.api.contract.model.ContactInformation toBODto() {
+        return new onlydust.com.backoffice.api.contract.model.ContactInformation()
+                .channel(onlydust.com.backoffice.api.contract.model.ContactInformationChannel.valueOf(channel.name().toUpperCase()))
                 .contact(contact)
                 .visibility(isPublic ?
-                        onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC :
-                        onlydust.com.marketplace.api.contract.model.ContactInformation.VisibilityEnum.PRIVATE);
+                        onlydust.com.backoffice.api.contract.model.ContactInformation.VisibilityEnum.PUBLIC :
+                        onlydust.com.backoffice.api.contract.model.ContactInformation.VisibilityEnum.PRIVATE);
+    }
+
+    public ContactInformation toDto() {
+        return new ContactInformation()
+                .channel(channel)
+                .contact(contact)
+                .visibility(isPublic ?
+                        ContactInformation.VisibilityEnum.PUBLIC :
+                        ContactInformation.VisibilityEnum.PRIVATE);
     }
 
     @EqualsAndHashCode
@@ -63,6 +64,6 @@ public class ContactInformationReadEntity {
         @NonNull
         UUID userId;
         @NonNull
-        ContactChanelEnumEntity channel;
+        ContactInformationChannel channel;
     }
 }

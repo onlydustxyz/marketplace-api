@@ -177,7 +177,7 @@ public class BackofficeUserSearchApiIT extends AbstractMarketplaceBackOfficeApiI
                 PierreOucif,pierre.oucif@gadz.org,
                 danilowhk,,
                 gregcha,gcm.charles@gmail.com,https://t.me/gregoirecharles
-                ofux,olivier.fuxet@gmail.com,
+                ofux,abuisset@gmail.com,
                 oscarwroche,oscar.w.roche@gmail.com,
                 """);
     }

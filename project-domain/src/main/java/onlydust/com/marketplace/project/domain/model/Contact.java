@@ -16,7 +16,6 @@ public class Contact {
     @AllArgsConstructor
     @Getter
     public enum Channel {
-        EMAIL,
         TELEGRAM,
         TWITTER,
         DISCORD,

@@ -4645,6 +4645,8 @@ components:
             website:
               type: string
               description: User website as in Github profile
+            contactEmail:
+              type: string
             contacts:
               type: array
               items:
@@ -5064,7 +5066,6 @@ components:
     ContactInformationChannel:
       type: string
       enum:
-        - EMAIL
         - TELEGRAM
         - TWITTER
         - DISCORD

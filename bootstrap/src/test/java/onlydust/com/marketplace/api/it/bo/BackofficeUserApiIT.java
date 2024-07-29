@@ -148,11 +148,6 @@ public class BackofficeUserApiIT extends onlydust.com.marketplace.api.it.bo.Abst
                               "visibility": "public"
                             },
                             {
-                              "channel": "EMAIL",
-                              "contact": "abuisset@gmail.com",
-                              "visibility": "private"
-                            },
-                            {
                               "channel": "TWITTER",
                               "contact": "https://twitter.com/abuisset",
                               "visibility": "public"
@@ -241,11 +236,6 @@ public class BackofficeUserApiIT extends onlydust.com.marketplace.api.it.bo.Abst
                               "channel": "TELEGRAM",
                               "contact": "https://t.me/abuisset",
                               "visibility": "public"
-                            },
-                            {
-                              "channel": "EMAIL",
-                              "contact": "abuisset@gmail.com",
-                              "visibility": "private"
                             }
                           ],
                           "leadedProjectCount": 2,

@@ -225,6 +225,7 @@ public class AllUserReadEntity {
                 .bio(profile().map(UserProfileInfoReadEntity::bio).orElse(null))
                 .website(profile().map(UserProfileInfoReadEntity::website).orElse(null))
                 .location(profile().map(UserProfileInfoReadEntity::location).orElse(null))
+                .contactEmail(email)
                 .contacts(profile().map(p -> p.allContacts().stream().map(ContactInformationReadEntity::toDto).toList()).orElse(null))
                 .allocatedTimeToContribute(profile().flatMap(UserProfileInfoReadEntity::weeklyAllocatedTime).map(t -> switch (t) {
                     case none -> AllocatedTime.NONE;
