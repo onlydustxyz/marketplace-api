@@ -1,15 +1,14 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
-import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
@@ -75,8 +74,40 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public UserProfileView updateProfile(UUID userId, UserProfile userProfile) {
+    public UserProfileView updateProfile(final @NonNull UUID userId,
+                                         final String avatarUrl,
+                                         final String location,
+                                         final String bio,
+                                         final String website,
+                                         final String contactEmail,
+                                         final List<Contact> contacts,
+                                         final UserAllocatedTimeToContribute allocatedTimeToContribute,
+                                         final Boolean isLookingForAJob,
+                                         final String firstName,
+                                         final String lastName
+    ) {
+        final var user = userStoragePort.getRegisteredUserById(userId)
+                .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
+
+        final var userProfile = userStoragePort.findProfileById(userId)
+                .orElse(UserProfile.builder().build());
+
+        user.setGithubEmail(contactEmail == null ? user.getGithubEmail() : contactEmail);
+
+        userProfile
+                .avatarUrl(avatarUrl == null ? userProfile.avatarUrl() : avatarUrl)
+                .location(location == null ? userProfile.location() : location)
+                .bio(bio == null ? userProfile.bio() : bio)
+                .website(website == null ? userProfile.website() : website)
+                .contacts(contacts == null ? userProfile.contacts() : contacts)
+                .allocatedTimeToContribute(allocatedTimeToContribute == null ? userProfile.allocatedTimeToContribute() : allocatedTimeToContribute)
+                .isLookingForAJob(isLookingForAJob == null ? userProfile.isLookingForAJob() : isLookingForAJob)
+                .firstName(firstName == null ? userProfile.firstName() : firstName)
+                .lastName(lastName == null ? userProfile.lastName() : lastName);
+
+        userStoragePort.saveUser(user);
         userStoragePort.saveProfile(userId, userProfile);
+
         return userStoragePort.getProfileById(userId);
     }
 

@@ -42,8 +42,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileRequestToDomain;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileToPrivateResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -109,7 +108,18 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<PrivateUserProfileResponse> updateMyProfile(UserProfileUpdateRequest userProfileRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(),
-                userProfileRequestToDomain(userProfileRequest));
+                userProfileRequest.getAvatarUrl(),
+                userProfileRequest.getLocation(),
+                userProfileRequest.getBio(),
+                userProfileRequest.getWebsite(),
+                userProfileRequest.getContactEmail(),
+                contactToDomain(userProfileRequest.getContacts()),
+                allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()),
+                userProfileRequest.getIsLookingForAJob(),
+                userProfileRequest.getFirstName(),
+                userProfileRequest.getLastName()
+        );
+
         // TODO remove Profile from response ?
         final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
         return ResponseEntity.ok(userProfileResponse);

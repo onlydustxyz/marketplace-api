@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 @ToString
+@Accessors(fluent = true, chain = true)
 public class UserProfile {
     private String avatarUrl;
     private String location;

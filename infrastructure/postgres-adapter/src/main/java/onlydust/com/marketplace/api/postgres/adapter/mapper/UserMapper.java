@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.mapper;
 
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectLedIdQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
@@ -76,15 +75,15 @@ public interface UserMapper {
 
     static UserProfileInfoEntity mapUserProfileToEntity(UUID userId, UserProfile userProfile) {
         return UserProfileInfoEntity.builder()
-                .avatarUrl(userProfile.getAvatarUrl())
-                .bio(userProfile.getBio())
-                .location(userProfile.getLocation())
-                .website(userProfile.getWebsite())
-                .contactInformations(mapContactInformationsToEntity(userId, userProfile.getContacts()))
-                .weeklyAllocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
-                .isLookingForAJob(userProfile.getIsLookingForAJob())
-                .lastName(userProfile.getLastName())
-                .firstName(userProfile.getFirstName())
+                .avatarUrl(userProfile.avatarUrl())
+                .bio(userProfile.bio())
+                .location(userProfile.location())
+                .website(userProfile.website())
+                .contactInformations(mapContactInformationsToEntity(userId, userProfile.contacts()))
+                .weeklyAllocatedTime(mapAllocatedTimeToEntity(userProfile.allocatedTimeToContribute()))
+                .isLookingForAJob(userProfile.isLookingForAJob())
+                .lastName(userProfile.lastName())
+                .firstName(userProfile.firstName())
                 .id(userId)
                 .build();
     }

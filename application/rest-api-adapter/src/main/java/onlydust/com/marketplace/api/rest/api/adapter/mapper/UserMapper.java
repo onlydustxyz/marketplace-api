@@ -12,20 +12,6 @@ import static java.util.Objects.isNull;
 
 public interface UserMapper {
 
-    static UserProfile userProfileRequestToDomain(final UserProfileUpdateRequest userProfileRequest) {
-        return UserProfile.builder()
-                .avatarUrl(userProfileRequest.getAvatarUrl())
-                .bio(userProfileRequest.getBio())
-                .website(userProfileRequest.getWebsite())
-                .location(userProfileRequest.getLocation())
-                .contacts(contactToDomain(userProfileRequest.getContacts()))
-                .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
-                .isLookingForAJob(userProfileRequest.getIsLookingForAJob())
-                .firstName(userProfileRequest.getFirstName())
-                .lastName(userProfileRequest.getLastName())
-                .build();
-    }
-
     static List<Contact> contactToDomain(List<ContactInformation> contacts) {
         return contacts.stream()
                 .map(contactInformation -> {

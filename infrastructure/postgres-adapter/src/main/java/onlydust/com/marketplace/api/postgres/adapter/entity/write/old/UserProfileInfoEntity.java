@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -35,4 +36,18 @@ public class UserProfileInfoEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
+
+    public UserProfile toDomain() {
+        return UserProfile.builder()
+                .bio(bio)
+                .location(location)
+                .website(website)
+                .isLookingForAJob(isLookingForAJob)
+                .avatarUrl(avatarUrl)
+                .allocatedTimeToContribute(weeklyAllocatedTime.toDomain())
+                .firstName(firstName)
+                .lastName(lastName)
+                .contacts(contactInformations.stream().map(ContactInformationEntity::toDomain).toList())
+                .build();
+    }
 }
