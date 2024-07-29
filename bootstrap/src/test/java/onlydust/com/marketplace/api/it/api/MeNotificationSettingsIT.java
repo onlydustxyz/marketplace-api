@@ -90,4 +90,44 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    @Order(30)
+    void should_patch_again_notification_settings_for_project() {
+        // Given
+        final var user = userAuthHelper.authenticateOlivier();
+
+        // When
+        client.patch()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS_BY_PROJECT_ID.formatted(projectId)))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "onGoodFirstIssueAdded": false
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        client.get()
+                .uri(ME_NOTIFICATION_SETTINGS_BY_PROJECT_ID.formatted(projectId))
+                .header("Authorization", BEARER_PREFIX + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                          "slug": "bretzel",
+                          "name": "Bretzel",
+                          "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                          "onGoodFirstIssueAdded": false
+                        }
+                        """);
+    }
 }
