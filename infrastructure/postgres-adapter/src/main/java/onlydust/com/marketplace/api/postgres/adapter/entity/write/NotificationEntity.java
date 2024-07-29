@@ -65,18 +65,18 @@ public class NotificationEntity {
 
     public static NotificationEntity of(@NonNull Notification notification) {
         return NotificationEntity.builder()
-                .id(notification.id())
+                .id(notification.id().value())
                 .recipientId(notification.recipientId())
                 .category(notification.data().category())
                 .data(new Data(notification.data()))
                 .createdAt(notification.createdAt())
-                .channels(notification.channels().stream().map(channel -> NotificationChannelEntity.of(notification.id(), channel)).collect(Collectors.toSet()))
+                .channels(notification.channels().stream().map(channel -> NotificationChannelEntity.of(notification.id().value(), channel)).collect(Collectors.toSet()))
                 .build();
     }
 
     public SendableNotification toDomain() {
         return SendableNotification.builder()
-                .id(id)
+                .id(Notification.Id.of(id))
                 .recipientId(recipientId)
                 .data(data.notification)
                 .createdAt(createdAt)
