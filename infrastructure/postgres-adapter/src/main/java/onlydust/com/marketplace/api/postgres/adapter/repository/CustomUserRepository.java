@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -172,9 +170,6 @@ public class CustomUserRepository {
                    where u.github_user_id = :githubUserId)) as p
             left join granted_usd on granted_usd.project_id = p.id
             order by p.is_lead desc""";
-    private final static TypeReference<HashMap<String, Long>> typeRef
-            = new TypeReference<>() {
-    };
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EntityManager entityManager;
 
@@ -190,7 +185,6 @@ public class CustomUserRepository {
                 .htmlUrl(row.htmlUrl())
                 .location(row.location())
                 .website(row.website())
-                .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
                         .totalsEarned(new TotalsEarned(isNull(row.totalEarnedPerCurrencies())
                                 ? List.of()
@@ -244,17 +238,6 @@ public class CustomUserRepository {
                 .build());
 
         return new HashSet<>(contacts.values());
-    }
-
-    private HashMap<String, Long> getTechnologies(UserProfileQueryEntity row) {
-        if (isNull(row.languages())) {
-            return new HashMap<>();
-        }
-        try {
-            return objectMapper.readValue(row.languages(), typeRef);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public Optional<UserProfileView> findProfileById(final UUID userId) {

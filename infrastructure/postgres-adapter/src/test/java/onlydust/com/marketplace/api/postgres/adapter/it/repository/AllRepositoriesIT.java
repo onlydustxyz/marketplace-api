@@ -18,7 +18,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -157,7 +160,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .bio(faker.hacker().abbreviation())
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())
-                .languages(Map.of(faker.rickAndMorty().location(), 5L, faker.hacker().adjective(), 10L))
                 .contactInformations(List.of(ContactInformationEntity.builder()
                         .contact(faker.rickAndMorty().location())
                         .id(ContactInformationIdEntity.builder()

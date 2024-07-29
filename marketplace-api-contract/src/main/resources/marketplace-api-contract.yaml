@@ -982,46 +982,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/onboarding:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - ReadMe
-      summary: Get the caller's onboarding completion
-      operationId: getOnboardingCompletion
-      description: |
-        Get the caller's onboarding completion
-      responses:
-        "200":
-          description: 'Onboarding completion'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OnboardingCompletionResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
-  /api/v1/technologies:
-    get:
-      tags:
-        - Technologies
-      summary: Technologies used in OnlyDust projects
-      operationId: getTechnologies
-      description: |
-        Get the list of all technologies (languages, frameworks, tools, etc.) used by at least one OnlyDust project
-      responses:
-        "200":
-          description: 'Technologies'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AllTechnologiesResponse'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/users/search:
     get:
       security:
@@ -4629,8 +4589,6 @@ components:
         website:
           type: string
           description: User website as in Github profile
-        technologies:
-          $ref: '#/components/schemas/Technologies'
         contacts:
           type: array
           items:
@@ -4687,8 +4645,6 @@ components:
             website:
               type: string
               description: User website as in Github profile
-            technologies:
-              $ref: '#/components/schemas/Technologies'
             contacts:
               type: array
               items:
@@ -5549,7 +5505,6 @@ components:
         - contributorCount
         - leaders
         - ecosystems
-        - technologies
         - isInvitedAsProjectLead
       properties:
         id:
@@ -5886,30 +5841,6 @@ components:
             isAuthorizedInGithubApp:
               type: boolean
               description: Is the repo authorized in the Github app?
-
-
-    Technologies:
-      type: object
-      description: List fo technologies ordered by mastering level (the higher the better) or usage (ie. line count of a language)
-      additionalProperties:
-        type: integer
-        format: int64
-      example:
-        Rust: 91283
-        Go: 12388
-        Java: 1233
-
-    AllTechnologiesResponse:
-      type: object
-      properties:
-        technologies:
-          type: array
-          items:
-            type: string
-          example:
-            - Rust
-            - Go
-            - Java
 
     CreateRewardResponse:
       type: object
@@ -8515,7 +8446,7 @@ components:
         - name
         - shortDescription
         - leaders
-        - technologies
+        - languages
       properties:
         id:
           $ref: '#/components/schemas/ProjectId'

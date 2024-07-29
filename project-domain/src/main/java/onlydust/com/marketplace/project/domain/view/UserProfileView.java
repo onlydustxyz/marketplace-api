@@ -32,7 +32,6 @@ public class UserProfileView {
     String linkedin;
     String github;
     String discord;
-    Map<String, Long> technologies;
     ProfileStats profileStats;
     UserAllocatedTimeToContribute allocatedTimeToContribute;
     Boolean isLookingForAJob;

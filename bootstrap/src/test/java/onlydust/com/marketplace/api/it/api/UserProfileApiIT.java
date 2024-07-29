@@ -17,22 +17,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "location": "Vence, France",
               "bio": "FullStack engineerr",
               "website": "https://linktr.ee/abuisset",
-              "technologies": {
-                "CSS": 4473,
-                "Rust": 404344,
-                "Procfile": 507,
-                "PLpgSQL": 10486,
-                "Makefile": 8658,
-                "HTML": 435,
-                "HCL": 23317,
-                "TypeScript": 2030401,
-                "Dockerfile": 951,
-                "Shell": 1455,
-                "Cairo": 42100,
-                "JavaScript": 2205,
-                "Nix": 12902,
-                "Python": 45301
-              },
               "contacts": [
                 {
                   "channel": "TWITTER",
