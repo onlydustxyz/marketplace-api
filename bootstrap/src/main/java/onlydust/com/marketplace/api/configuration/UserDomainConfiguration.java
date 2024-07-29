@@ -6,10 +6,7 @@ import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import onlydust.com.marketplace.user.domain.port.output.*;
-import onlydust.com.marketplace.user.domain.service.AppUserService;
-import onlydust.com.marketplace.user.domain.service.BackofficeUserService;
-import onlydust.com.marketplace.user.domain.service.NotificationService;
-import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
+import onlydust.com.marketplace.user.domain.service.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -36,13 +33,19 @@ public class UserDomainConfiguration {
     }
 
     @Bean
+    public AsyncNotificationEmailProcessor asyncNotificationEmailProcessor(final NotificationSender notificationSender,
+                                                                           final NotificationStoragePort notificationStoragePort) {
+        return new AsyncNotificationEmailProcessor(notificationSender, notificationStoragePort);
+    }
+
+    @Bean
     public NotificationPort notificationPort(final NotificationSettingsStoragePort notificationSettingsStoragePort,
                                              final NotificationStoragePort notificationStoragePort,
                                              final AppUserStoragePort userStoragePort,
-                                             final NotificationSender notificationSender) {
+                                             final AsyncNotificationEmailProcessor asyncNotificationEmailProcessor) {
         return new NotificationService(notificationSettingsStoragePort,
                 notificationStoragePort,
                 userStoragePort,
-                notificationSender);
+                asyncNotificationEmailProcessor);
     }
 }

@@ -15,12 +15,12 @@ import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsTo
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
-
-import java.util.Collection;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOInstantEmailSenderAdapter implements OutboxConsumer, NotificationSender {
+public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
@@ -51,11 +51,10 @@ public class CustomerIOInstantEmailSenderAdapter implements OutboxConsumer, Noti
     }
 
     @Override
-    public void send(Collection<SendableNotification> notifications) {
-        notifications.forEach(notification -> {
-            if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
-                sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
-            }
-        });
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
+    public void send(SendableNotification notification) {
+        if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
+        }
     }
 }

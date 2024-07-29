@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.configuration;
 
-import com.onlydust.customer.io.adapter.CustomerIOInstantEmailSenderAdapter;
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -410,8 +410,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer projectMailOutboxConsumer(final CustomerIOInstantEmailSenderAdapter customerIOInstantEmailSenderAdapter) {
-        return new RetriedOutboxConsumer(customerIOInstantEmailSenderAdapter);
+    public OutboxConsumer projectMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
+        return new RetriedOutboxConsumer(customerIOAdapter);
     }
 
     @Bean

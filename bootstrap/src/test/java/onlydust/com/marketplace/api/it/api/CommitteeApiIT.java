@@ -112,7 +112,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
-    void should_put_application() {
+    void should_put_application() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
@@ -149,6 +149,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .isEqualTo(204);
+
+        Thread.sleep(1000);
 
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
