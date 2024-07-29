@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.JourneyCompletionResponse;
+import onlydust.com.marketplace.api.contract.model.OnboardingCompletionResponse;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
@@ -22,7 +23,7 @@ import java.util.UUID;
 @Immutable
 @Accessors(fluent = true)
 @Table(name = "users", schema = "iam")
-public class JourneyCompletionEntity {
+public class OnboardingCompletionEntity {
     @Id
     @NonNull
     @EqualsAndHashCode.Include
@@ -36,6 +37,24 @@ public class JourneyCompletionEntity {
                    where bpu.user_id = id)
             """)
     boolean billingProfileVerified;
+
+    @Formula("""
+            exists(select 1
+                   from accounting.billing_profiles_users bpu
+                      join accounting.billing_profiles bp on bpu.billing_profile_id = bp.id
+                   where bpu.user_id = id and bpu.role = 'ADMIN')
+            """)
+    boolean payoutInformationProvided;
+
+    @Formula("""
+            exists(select 1
+                   from onboardings o
+                   join global_settings gs on gs.id = 1
+                   where o.user_id = id and
+                   o.terms_and_conditions_acceptance_date is not null and
+                   o.terms_and_conditions_acceptance_date >= gs.terms_and_conditions_latest_version_date)
+            """)
+    boolean termsAndConditionsAccepted;
 
     @Formula("""
             exists(select 1
@@ -54,6 +73,13 @@ public class JourneyCompletionEntity {
                      and length(coalesce(upi.bio, '')) > 0)
             """)
     boolean descriptionUpdated;
+
+    @Formula("""
+            exists(select 1
+                   from user_profile_info upi
+                   where upi.id = id)
+            """)
+    boolean profileCompleted;
 
     @Formula("""
             exists(select 1
@@ -81,8 +107,7 @@ public class JourneyCompletionEntity {
             """)
     boolean rewardClaimed;
 
-
-    public JourneyCompletionResponse toResponse() {
+    public JourneyCompletionResponse toJourneyResponse() {
         final var allItems = List.of(billingProfileVerified, companyBillingProfileVerified, descriptionUpdated, telegramAdded, rewardReceived, rewardClaimed);
         final var completedItems = allItems.stream().filter(Boolean::booleanValue).count();
 
@@ -95,6 +120,25 @@ public class JourneyCompletionEntity {
                 .telegramAdded(telegramAdded)
                 .rewardReceived(rewardReceived)
                 .rewardClaimed(rewardClaimed)
+                ;
+    }
+
+    public OnboardingCompletionResponse toResponse() {
+        final var allItems = List.of(telegramAdded,
+                termsAndConditionsAccepted,
+//                projectPreferencesProvided,
+                profileCompleted,
+                payoutInformationProvided);
+        final var completedItems = allItems.stream().filter(Boolean::booleanValue).count();
+
+        return new OnboardingCompletionResponse()
+                .completion(BigDecimal.valueOf(completedItems * 100 / allItems.size()))
+                .completed(completedItems == allItems.size())
+                .verificationInformationProvided(telegramAdded)
+                .termsAndConditionsAccepted(termsAndConditionsAccepted)
+//                .projectPreferencesProvided(projectPreferencesProvided) TODO
+                .profileCompleted(profileCompleted)
+                .payoutInformationProvided(payoutInformationProvided)
                 ;
     }
 }

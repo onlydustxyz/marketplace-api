@@ -132,6 +132,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_PUT_HACKATHON_REGISTRATIONS = "/api/v1/me/hackathons/%s/registrations";
     protected static final String ME_RECOMMENDED_PROJECTS = "/api/v1/me/recommended-projects";
     protected static final String ME_JOURNEY = "/api/v1/me/journey";
+    protected static final String ME_ONBOARDING = "/api/v1/me/onboarding";
     protected static final String ME_NOTIFICATION_SETTINGS_BY_PROJECT_ID = "/api/v1/me/notification-settings/projects/%s";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";

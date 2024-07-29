@@ -83,10 +83,19 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var journeyCompletion = userReadRepository.findMeJourney(authenticatedUser.getId())
+        final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.getId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
 
-        return ok(journeyCompletion.journeyCompletion().toResponse());
+        return ok(journeyCompletion.onboardingCompletion().toJourneyResponse());
+    }
+
+    @Override
+    public ResponseEntity<OnboardingCompletionResponse> getOnboardingCompletion() {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.getId())
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
+
+        return ok(journeyCompletion.onboardingCompletion().toResponse());
     }
 
     @Override

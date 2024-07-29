@@ -135,7 +135,7 @@ public class AllUserReadEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
-    JourneyCompletionEntity journeyCompletion;
+    OnboardingCompletionEntity onboardingCompletion;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)

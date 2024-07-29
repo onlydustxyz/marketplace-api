@@ -60,8 +60,8 @@ public interface UserReadRepository extends Repository<AllUserReadEntity, UUID> 
     @Query(value = """
             SELECT u
             FROM AllUserReadEntity u
-            JOIN FETCH u.journeyCompletion
+            JOIN FETCH u.onboardingCompletion
             WHERE u.userId = :userId
             """)
-    Optional<AllUserReadEntity> findMeJourney(UUID userId);
+    Optional<AllUserReadEntity> findMeOnboarding(UUID userId);
 }
