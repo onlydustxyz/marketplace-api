@@ -13,7 +13,7 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Builder
 @Table(name = "user_projects_notification_settings", schema = "iam")
@@ -21,10 +21,12 @@ import java.util.UUID;
 public class NotificationSettingsForProjectEntity {
     @Id
     @Column(nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
     UUID userId;
 
     @Id
     @Column(nullable = false, updatable = false)
+    @EqualsAndHashCode.Include
     UUID projectId;
 
     Boolean onGoodFirstIssueAdded;
