@@ -9,7 +9,6 @@ import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.model.User;
-import onlydust.com.marketplace.user.domain.model.UserId;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.*;
@@ -90,7 +89,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_return_notification_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(UserId.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
                         NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
                 ))
@@ -111,7 +110,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_return_multiple_notifications_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(UserId.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
                         NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
                         NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
@@ -136,7 +135,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(10)
     void should_not_impact_old_notifications_when_channel_is_added_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(UserId.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
                         NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
                         NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
@@ -174,7 +173,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_not_impact_old_notifications_when_channel_is_removed_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(UserId.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
                         NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.IN_APP),
                         NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
@@ -213,7 +212,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(30)
     void should_not_mix_notifications_between_users() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(UserId.of(pierreId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierreId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
                         NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
                         NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of()
@@ -305,7 +304,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                                     .data(notification.data())
                                     .createdAt(notification.createdAt())
                                     .channels(notification.channels())
-                                    .recipient(new User(UserId.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()))
+                                    .recipient(new User(User.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()))
                                     .build())
                             .collect(Collectors.toList()))
                     .flatMap(List::stream)

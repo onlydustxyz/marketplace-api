@@ -69,6 +69,6 @@ public class UserEntity {
     }
 
     public User toUser() {
-        return new User(onlydust.com.marketplace.user.domain.model.UserId.of(id), githubEmail, githubLogin);
+        return new User(User.Id.of(id), githubEmail, githubLogin);
     }
 }

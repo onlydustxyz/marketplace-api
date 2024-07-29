@@ -14,7 +14,7 @@ import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
-import onlydust.com.marketplace.user.domain.model.UserId;
+import onlydust.com.marketplace.user.domain.model.User;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -115,7 +115,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_put_application() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        notificationSettingsPort.updateNotificationSettings(UserId.of(pierre.user().getId()), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER, List.of(NotificationChannel.EMAIL)))
                 .build());
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));

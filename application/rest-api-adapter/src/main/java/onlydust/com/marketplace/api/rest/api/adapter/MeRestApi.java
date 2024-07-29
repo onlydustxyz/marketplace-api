@@ -320,7 +320,7 @@ public class MeRestApi implements MeApi {
                                                                       NotificationSettingsForProjectPatchRequest request) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationSettingsPort.patchNotificationSettingsForProject(
-                onlydust.com.marketplace.user.domain.model.UserId.of(authenticatedUser.getId()),
+                onlydust.com.marketplace.user.domain.model.User.Id.of(authenticatedUser.getId()),
                 new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();

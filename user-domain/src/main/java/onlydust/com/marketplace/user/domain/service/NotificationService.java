@@ -6,7 +6,7 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
-import onlydust.com.marketplace.user.domain.model.UserId;
+import onlydust.com.marketplace.user.domain.model.User;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
@@ -36,7 +36,7 @@ public class NotificationService implements NotificationPort {
     }
 
     private void sendEmail(UUID recipientId, Notification notification) {
-        userStoragePort.findById(UserId.of(recipientId)).ifPresent(user -> {
+        userStoragePort.findById(User.Id.of(recipientId)).ifPresent(user -> {
             notificationEmailSender.send(SendableNotification.of(user, notification));
             markAsSent(NotificationChannel.EMAIL, notification.id());
         });
