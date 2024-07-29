@@ -9,13 +9,12 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
-import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
-import onlydust.com.marketplace.api.helper.CurrencyHelper;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
 import onlydust.com.marketplace.api.contract.model.RewardRequest;
 import onlydust.com.marketplace.api.contract.model.RewardType;
+import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectRepoEntity;
@@ -23,6 +22,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +65,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
 
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -75,7 +75,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(ME_PATCH)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -89,7 +89,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -99,7 +99,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.patch()
-                .uri(ME_PATCH)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -113,7 +113,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -203,7 +203,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -226,7 +226,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + jwt)
                 // Then
                 .exchange()
@@ -248,7 +248,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 .exchange()
                 .expectStatus()
@@ -269,7 +269,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()
@@ -326,7 +326,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
 
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
                 .exchange()
                 .expectStatus()
@@ -346,7 +346,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When user has no BP and no reward
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -363,7 +363,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var individualBillingProfile = billingProfileService.createIndividualBillingProfile(UserId.of(authenticatedUser.user().getId()),
                 faker.rickAndMorty().character(), null);
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -388,7 +388,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         accountingService.allocate(usdcSponsorAccount.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -404,7 +404,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When the user set missing payout preferences
         updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId.value());
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -420,7 +420,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When the user gets his BP verification blocked
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.CLOSED);
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -436,7 +436,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When the user gets his BP verified
         accountingHelper.patchBillingProfile(individualBillingProfile.id().value(), null, VerificationStatus.VERIFIED);
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -471,7 +471,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -494,7 +494,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When user has no sponsor
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()
@@ -513,7 +513,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
 
         // When user no sponsors
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
                 // Then
                 .exchange()

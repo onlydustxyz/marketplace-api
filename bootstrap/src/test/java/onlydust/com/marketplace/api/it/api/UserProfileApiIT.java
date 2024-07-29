@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.suites.tags.TagUser;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -201,7 +200,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(ME_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then
@@ -228,7 +227,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(ME_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 // Then

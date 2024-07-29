@@ -236,19 +236,19 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
-    put:
+    patch:
       tags:
         - Me
       summary: Update caller profile
-      operationId: setMyProfile
+      operationId: updateMyProfile
       description: |
-        Set the whole user profile (including private data)
+        Set the provided user profile data
       requestBody:
         description: 'User profile'
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserProfileRequest'
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
       responses:
         "200":
           description: 'User profile'
@@ -961,6 +961,7 @@ paths:
 
   /api/v1/me/journey:
     get:
+      deprecated: true
       security:
         - bearerAuth: [ ]
       tags:
@@ -976,6 +977,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JourneyCompletionResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/onboarding:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get the caller's onboarding completion
+      operationId: getOnboardingCompletion
+      description: |
+        Get the caller's onboarding completion
+      responses:
+        "200":
+          description: 'Onboarding completion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingCompletionResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4123,6 +4146,26 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/languages:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadLanguages
+      summary: Get all supported languages
+      operationId: getAllLanguages
+      description: |
+        Get all supported languages
+      responses:
+        "200":
+          description: 'List of supported languages'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LanguagesResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/public-activity:
     get:
       security:
@@ -4565,7 +4608,7 @@ components:
           type: string
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
 
-    UserProfileRequest:
+    UserProfileUpdateRequest:
       type: object
       properties:
         avatarUrl:
@@ -4573,6 +4616,8 @@ components:
           format: url
           description: Direct URL to user's avatar image
           example: 'https://avatars.githubusercontent.com/u/595505?v=4'
+        contactEmail:
+          type: string
         location:
           type: string
           description: User location as in Github profile
@@ -4590,6 +4635,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContactInformation'
+        joiningReason:
+          $ref: '#/components/schemas/UserJoiningReason'
+        goal:
+          $ref: '#/components/schemas/UserGoal'
         allocatedTimeToContribute:
           $ref: '#/components/schemas/AllocatedTime'
         isLookingForAJob:
@@ -4600,6 +4649,15 @@ components:
         lastName:
           type: string
 
+        preferredLanguages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageId'
+        preferredCategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryId'
+    
     UserProfileCoverColor:
       type: string
       enum:
@@ -4644,6 +4702,8 @@ components:
             isLookingForAJob:
               type: boolean
               description: Whether the user is looking for a job or not
+            joiningReason:
+              $ref: '#/components/schemas/UserJoiningReason'
 
     PublicUserProfileResponseV2:
       allOf:
@@ -5414,6 +5474,16 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectCategoryResponse'
+
+    LanguagesResponse:
+      type: object
+      required:
+        - languages
+      properties:
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
 
     LanguageResponse:
       type: object
@@ -8547,6 +8617,40 @@ components:
           type: boolean
           description: True if the user has requested the payment for at least one reward
 
+    OnboardingCompletionResponse:
+      type: object
+      required:
+        - completed
+        - completion
+        - verificationInformationProvided
+        - termsAndConditionsAccepted
+        - projectPreferencesProvided
+        - profileCompleted
+        - payoutInformationProvided
+      properties:
+        completed:
+          type: boolean
+          description: True if the journey is completed
+        completion:
+          type: number
+          format: int32
+          description: Completion percentage of the journey
+        verificationInformationProvided:
+          type: boolean
+          description: True if the user has provided the verification information
+        termsAndConditionsAccepted:
+          type: boolean
+          description: True if the user has accepted the terms and conditions
+        projectPreferencesProvided:
+          type: boolean
+          description: True if the user has provided its project preferences (categories, languages, ...)
+        profileCompleted:
+          type: boolean
+          description: True if the user has completed its profile (bio, location, ...)
+        payoutInformationProvided:
+          type: boolean
+          description: True if the user has provided the payout information
+
     PublicActivityPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -8693,4 +8797,18 @@ components:
         onGoodFirstIssueAdded:
           type: boolean
 
+    UserJoiningReason:
+      description: Reason why the user has chosen to join OnlyDust.
+      type: string
+      enum:
+        - CONTRIBUTOR
+        - MAINTAINER
 
+    UserGoal:
+      description: Goal the user wants to achieve on OnlyDust.
+      type: string
+      enum:
+        - LEARN
+        - CHALLENGE
+        - EARN
+        - NOTORIETY

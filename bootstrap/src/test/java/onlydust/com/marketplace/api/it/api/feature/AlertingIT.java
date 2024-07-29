@@ -10,13 +10,13 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.Verificat
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
+import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
+import onlydust.com.marketplace.api.contract.model.RewardRequest;
+import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
-import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
-import onlydust.com.marketplace.api.contract.model.RewardRequest;
-import onlydust.com.marketplace.api.contract.model.RewardType;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -235,7 +235,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
 
             {
                 final WebTestClient.BodyContentSpec bodyContentSpec = client.get()
-                        .uri(getApiURI(ME_GET))
+                        .uri(getApiURI(ME))
                         .header("Authorization", BEARER_PREFIX + authenticatedUser.jwt())
                         // Then
                         .exchange()
