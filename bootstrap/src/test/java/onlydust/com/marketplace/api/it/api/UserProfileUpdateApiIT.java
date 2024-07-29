@@ -29,8 +29,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.website").isEqualTo("https://linktr.ee/abuisset")
                 .jsonPath("$.firstName").isEqualTo("Anthony")
                 .jsonPath("$.lastName").isEqualTo("BUISSET")
-                .jsonPath("$.technologies.length()").isEqualTo(14)
-                .jsonPath("$.technologies['Rust']").isEqualTo(404344)
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("NONE")
                 .jsonPath("$.isLookingForAJob").isEqualTo(false)
                 .jsonPath("$.contacts.length()").isEqualTo(4)
@@ -56,11 +54,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "website": "https://croute.org",
                             "firstName": "AnthonyTest",
                             "lastName": "BuissetTest",
-                            "technologies": {
-                                "C++": 100,
-                                "Rust": 90,
-                                "Java": 20
-                            },
                             "contacts": [
                                 {
                                     "contact": "_____THIS-WONT-CHANGE-RETURNED-THE-EMAIL____@croute.com",
@@ -87,10 +80,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.website").isEqualTo("https://croute.org")
                 .jsonPath("$.firstName").isEqualTo("AnthonyTest")
                 .jsonPath("$.lastName").isEqualTo("BuissetTest")
-                .jsonPath("$.technologies.length()").isEqualTo(3)
-                .jsonPath("$.technologies['C++']").isEqualTo(100)
-                .jsonPath("$.technologies['Rust']").isEqualTo(90)
-                .jsonPath("$.technologies['Java']").isEqualTo(20)
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("ONE_TO_THREE_DAYS")
                 .jsonPath("$.isLookingForAJob").isEqualTo(true)
                 .jsonPath("$.contacts.length()").isEqualTo(2)
@@ -122,7 +111,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                           "bio": null,
                           "website": null,
                           "contacts": [],
-                          "technologies": {},
                           "allocatedTimeToContribute": null,
                           "isLookingForAJob": null
                         }
@@ -146,11 +134,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "location": "Paris, France",
                             "bio": "FullStack engineer",
                             "website": "https://croute.org",
-                            "technologies": {
-                                "C++": 100,
-                                "Rust": 90,
-                                "Java": 20
-                            },
                             "cover": "YELLOW",
                             "contacts": [
                                 {

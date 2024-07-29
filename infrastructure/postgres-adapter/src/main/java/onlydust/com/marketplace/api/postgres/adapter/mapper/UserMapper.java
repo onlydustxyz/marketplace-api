@@ -81,7 +81,6 @@ public interface UserMapper {
                 .location(userProfile.getLocation())
                 .website(userProfile.getWebsite())
                 .contactInformations(mapContactInformationsToEntity(userId, userProfile.getContacts()))
-                .languages(userProfile.getTechnologies())
                 .weeklyAllocatedTime(mapAllocatedTimeToEntity(userProfile.getAllocatedTimeToContribute()))
                 .isLookingForAJob(userProfile.getIsLookingForAJob())
                 .lastName(userProfile.getLastName())

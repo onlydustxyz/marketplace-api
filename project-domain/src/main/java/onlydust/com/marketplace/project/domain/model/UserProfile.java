@@ -5,9 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 @Builder(toBuilder = true)
@@ -17,8 +15,6 @@ public class UserProfile {
     private String location;
     private String bio;
     private String website;
-    @Builder.Default
-    private Map<String, Long> technologies = new HashMap<>();
     @Builder.Default
     private List<Contact> contacts = new ArrayList<>();
     private UserAllocatedTimeToContribute allocatedTimeToContribute;

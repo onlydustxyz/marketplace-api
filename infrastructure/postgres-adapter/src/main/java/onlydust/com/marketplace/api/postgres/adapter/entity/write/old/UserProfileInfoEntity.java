@@ -4,12 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
 import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
-import org.hibernate.type.SqlTypes;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -32,8 +29,6 @@ public class UserProfileInfoEntity {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     AllocatedTimeEnumEntity weeklyAllocatedTime;
-    @JdbcTypeCode(SqlTypes.JSON)
-    Map<String, Long> languages;
     String firstName;
     String lastName;
 

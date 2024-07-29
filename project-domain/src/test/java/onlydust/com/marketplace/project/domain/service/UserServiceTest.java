@@ -7,7 +7,10 @@ import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -21,7 +24,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -201,7 +207,7 @@ public class UserServiceTest {
         final UUID userId = UUID.randomUUID();
 
         final UserProfile profile =
-                UserProfile.builder().avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(), faker.programmingLanguage().name(), faker.number().randomNumber())).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
+                UserProfile.builder().avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
 
         final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
 
