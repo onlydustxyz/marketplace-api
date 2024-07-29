@@ -9,19 +9,19 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
-import onlydust.com.marketplace.kernel.model.notification.NotificationSender;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
-import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
+import onlydust.com.marketplace.user.domain.model.SendableNotification;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
+
+import java.util.Collection;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
+public class CustomerIOInstantEmailSenderAdapter implements OutboxConsumer, NotificationSender {
 
-    private final NotificationStoragePort notificationStoragePort;
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
 
@@ -46,27 +46,16 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
         }
     }
 
-    @Override
-    public void sendAll() {
-        sendPendingEmails();
-        sendPendingDailyEmails();
+    private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
+        customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
     }
 
-    private void sendPendingEmails() {
-        final var pendingNotifications = notificationStoragePort.getPendingNotifications(NotificationChannel.EMAIL);
-        pendingNotifications.forEach(notification -> {
+    @Override
+    public void send(Collection<SendableNotification> notifications) {
+        notifications.forEach(notification -> {
             if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
                 sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
             }
         });
-    }
-
-    private void sendPendingDailyEmails() {
-        // TODO
-    }
-
-
-    private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
-        customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
     }
 }

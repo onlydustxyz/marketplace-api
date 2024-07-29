@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.configuration;
 
-import com.onlydust.customer.io.adapter.CustomerIOAdapter;
+import com.onlydust.customer.io.adapter.CustomerIOInstantEmailSenderAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
@@ -156,8 +156,8 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public OutboxConsumer accountingMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
-        return new RetriedOutboxConsumer(customerIOAdapter);
+    public OutboxConsumer accountingMailOutboxConsumer(final CustomerIOInstantEmailSenderAdapter customerIOInstantEmailSenderAdapter) {
+        return new RetriedOutboxConsumer(customerIOInstantEmailSenderAdapter);
     }
 
     @Bean
