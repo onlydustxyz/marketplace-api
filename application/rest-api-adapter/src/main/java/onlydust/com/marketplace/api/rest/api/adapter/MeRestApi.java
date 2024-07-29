@@ -114,7 +114,7 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<PrivateUserProfileResponse> setMyProfile(UserProfileRequest userProfileRequest) {
+    public ResponseEntity<PrivateUserProfileResponse> updateMyProfile(UserProfileUpdateRequest userProfileRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(),
                 userProfileRequestToDomain(userProfileRequest));

@@ -12,7 +12,7 @@ import static java.util.Objects.isNull;
 
 public interface UserMapper {
 
-    static UserProfile userProfileRequestToDomain(final UserProfileRequest userProfileRequest) {
+    static UserProfile userProfileRequestToDomain(final UserProfileUpdateRequest userProfileRequest) {
         return UserProfile.builder()
                 .avatarUrl(userProfileRequest.getAvatarUrl())
                 .bio(userProfileRequest.getBio())

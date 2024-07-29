@@ -45,8 +45,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM");
 
         // When
-        client.put()
                 .uri(getApiURI(ME_PUT_PROFILE))
+        client.patch()
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -110,8 +110,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
-        client.put()
                 .uri(getApiURI(ME_PUT_PROFILE))
+        client.patch()
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
