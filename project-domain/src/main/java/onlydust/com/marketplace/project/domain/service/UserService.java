@@ -74,11 +74,6 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public UserProfileView getProfileById(UUID userId) {
-        return userStoragePort.getProfileById(userId);
-    }
-
-    @Override
     @Transactional
     public UserProfileView updateProfile(UUID userId, UserProfile userProfile) {
         userStoragePort.saveProfile(userId, userProfile);

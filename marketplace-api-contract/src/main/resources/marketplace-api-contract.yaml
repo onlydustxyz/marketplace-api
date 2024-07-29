@@ -220,7 +220,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Me
+        - ReadMe
       summary: Get caller profile
       operationId: getMyProfile
       description: |

@@ -141,25 +141,9 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
-        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true)).isInstanceOf(OnlyDustException.class).hasMessage(("User %d " +
-                                                                                                                                                  "not" +
-                                                                                                                                                  " found").formatted(githubUserIdentity.getGithubUserId()));
-    }
-
-
-    @Test
-    void should_find_user_profile_given_an_id() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserProfileView userProfileView =
-                UserProfileView.builder().id(userId).avatarUrl(faker.pokemon().name()).githubId(faker.number().randomNumber()).login(faker.hacker().verb()).build();
-
-        // When
-        when(userStoragePort.getProfileById(userId)).thenReturn(userProfileView);
-        final UserProfileView profileById = userService.getProfileById(userId);
-
-        // Then
-        assertEquals(userProfileView, profileById);
+        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage(("User %d not found").formatted(githubUserIdentity.getGithubUserId()));
     }
 
     @Test

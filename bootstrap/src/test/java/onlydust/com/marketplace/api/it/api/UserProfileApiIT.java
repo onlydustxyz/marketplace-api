@@ -203,7 +203,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
     }
 
-
     @Test
     void should_get_email_if_user_profile_has_no_contact() {
         // Given
