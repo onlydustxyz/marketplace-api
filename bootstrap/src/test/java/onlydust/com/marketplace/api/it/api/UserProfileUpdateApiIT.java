@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.suites.tags.TagUser;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -18,7 +17,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
         // Proves that the initial user profile is different from the updated one
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(ME_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -45,8 +44,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM");
 
         // When
-                .uri(getApiURI(ME_PUT_PROFILE))
         client.patch()
+                .uri(getApiURI(ME_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -110,8 +109,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
         final String jwt = userAuthHelper.authenticateHayden().jwt();
 
         // When
-                .uri(getApiURI(ME_PUT_PROFILE))
         client.patch()
+                .uri(getApiURI(ME_PROFILE))
                 .header("Authorization", BEARER_PREFIX + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -140,7 +139,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.put()
-                .uri(getApiURI(ME_PUT_PROFILE))
+                .uri(getApiURI(ME_PROFILE))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

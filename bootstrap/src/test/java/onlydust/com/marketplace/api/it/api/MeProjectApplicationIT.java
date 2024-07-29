@@ -917,7 +917,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(ME_GET)
+                .uri(ME)
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 // Then
                 .exchange()

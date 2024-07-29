@@ -111,11 +111,9 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECT_CONTRIBUTION_UNASSIGN = "/api/v1/projects/%s/contributions/%s/unassign";
     protected static final String APPLICATIONS = "/api/v1/applications";
     protected static final String APPLICATIONS_BY_ID = "/api/v1/applications/%s";
-    protected static final String ME_GET = "/api/v1/me";
+    protected static final String ME = "/api/v1/me";
     protected static final String ME_LOGOUT = "/api/v1/me/logout";
-    protected static final String ME_PATCH = "/api/v1/me";
-    protected static final String ME_GET_PROFILE = "/api/v1/me/profile";
-    protected static final String ME_PUT_PROFILE = "/api/v1/me/profile";
+    protected static final String ME_PROFILE = "/api/v1/me/profile";
     protected static final String ME_ACCEPT_PROJECT_LEADER_INVITATION = "/api/v1/me/project-leader-invitations/%s";
     protected static final String ME_CLAIM_PROJECT = "/api/v1/me/project-claims/%s";
     protected static final String ME_APPLICATIONS = "/api/v1/me/applications";

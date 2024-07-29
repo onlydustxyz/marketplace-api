@@ -4,16 +4,16 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.helper.JwtVerifierStub;
-import onlydust.com.marketplace.api.suites.tags.TagUser;
-import onlydust.com.marketplace.api.contract.model.GetMeResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter;
+import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,7 +76,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
     public void should_be_unauthorized() {
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -91,7 +91,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         var me = client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -100,7 +100,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // Then
         client.get()
-                .uri(getApiURI(ME_GET_PROFILE))
+                .uri(getApiURI(ME_PROFILE))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 // Then
@@ -125,7 +125,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         indexerApiWireMockServer.resetRequests();
 
         me = client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -147,7 +147,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().isNoContent();
 
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus()
@@ -167,7 +167,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
         userAuthHelper.mockAuth0UserInfo(githubUserId, login, login, avatarUrl, faker.internet().emailAddress());
 
         me = client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 .expectStatus().is2xxSuccessful()
@@ -235,7 +235,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .exchange()
                 // Then
@@ -279,7 +279,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
@@ -315,7 +315,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUserId)
@@ -352,7 +352,7 @@ public class Auth0MeApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_GET))
+                .uri(getApiURI(ME))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                 .header(AuthenticationFilter.IMPERSONATION_HEADER,
                         "{\"sub\":\"github|%d\"}".formatted(impersonatedUser.getGithubUserId())
