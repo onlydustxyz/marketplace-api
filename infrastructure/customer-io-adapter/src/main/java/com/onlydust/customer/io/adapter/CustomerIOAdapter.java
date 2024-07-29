@@ -11,17 +11,17 @@ import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationSender;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 
 @AllArgsConstructor
 @Slf4j
 public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
-    private final NotificationPort notificationPort;
+    private final NotificationStoragePort notificationStoragePort;
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
 
@@ -53,13 +53,11 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
     }
 
     private void sendPendingEmails() {
-        final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(NotificationChannel.EMAIL);
-        pendingNotificationsPerRecipient.forEach((recipient, notifications) -> {
-            notifications.forEach(notification -> {
-                if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
-                    sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, recipient, committeeApplicationSuccessfullyCreated));
-                }
-            });
+        final var pendingNotifications = notificationStoragePort.getPendingNotifications(NotificationChannel.EMAIL);
+        pendingNotifications.forEach(notification -> {
+            if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+                sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
+            }
         });
     }
 

@@ -8,7 +8,8 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
-import onlydust.com.marketplace.kernel.model.notification.NotificationIdResolver;
+import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdResolver;
+import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -73,13 +74,27 @@ public class NotificationEntity {
                 .build();
     }
 
-    public Notification toDomain() {
-        return Notification.builder()
+    public SendableNotification toDomain() {
+        return SendableNotification.builder()
                 .id(id)
                 .recipientId(recipientId)
                 .data(data.notification)
                 .createdAt(createdAt)
                 .channels(channels.stream().map(NotificationChannelEntity::channel).collect(Collectors.toSet()))
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                // TODO: get contact email!!!!!!!!!
+                .recipientEmail(recipient.getGithubEmail())
+                .recipientLogin(recipient.getGithubLogin())
                 .build();
     }
 
@@ -89,7 +104,7 @@ public class NotificationEntity {
     public static class Data {
 
         @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "@type")
-        @JsonTypeIdResolver(NotificationIdResolver.class)
+        @JsonTypeIdResolver(NotificationTypeIdResolver.class)
         private NotificationData notification;
     }
 }

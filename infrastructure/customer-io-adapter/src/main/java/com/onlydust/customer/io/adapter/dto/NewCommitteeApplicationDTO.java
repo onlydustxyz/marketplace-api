@@ -1,7 +1,6 @@
 package com.onlydust.customer.io.adapter.dto;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.model.notification.NotificationRecipient;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
 
 import java.time.ZoneId;
@@ -15,12 +14,12 @@ public record NewCommitteeApplicationDTO(@NonNull UUID projectId,
                                          @NonNull String username,
                                          @NonNull String applicationEndDate) {
 
-    public static NewCommitteeApplicationDTO fromEvent(@NonNull final NotificationRecipient recipient,
+    public static NewCommitteeApplicationDTO fromEvent(@NonNull final String recipientLogin,
                                                        @NonNull final CommitteeApplicationSuccessfullyCreated event) {
         return new NewCommitteeApplicationDTO(
                 event.getProjectId(), event.getProjectName(),
                 event.getCommitteeId(), event.getCommitteeName(),
-                recipient.login(),
+                recipientLogin,
                 event.getApplicationEndDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy - HH:mm:ss z").withZone(ZoneId.systemDefault())));
     }
 }

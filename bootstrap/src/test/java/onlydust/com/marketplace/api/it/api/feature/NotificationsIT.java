@@ -1,22 +1,23 @@
 package onlydust.com.marketplace.api.it.api.feature;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.kernel.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
+import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.model.UserId;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
+import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +28,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     NotificationSettingsPort notificationSettingsPort;
     @Autowired
     NotificationPort notificationPort;
+    @Autowired
+    NotificationStoragePort notificationStoragePort;
 
     private UUID olivierId;
     private NotificationRecipient olivierRecipient;
@@ -252,29 +255,39 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(40)
     void should_mark_notifications_as_sent() {
         // When
-        //TODO notificationPort.markAsSent(rewardNotification1);
+        //TODO notificationPort.markAsSent(olivierRewardNotification1.id(), NotificationChannel.DAILY_EMAIL);
 
         // Then
     }
 
     private void assertNoPendingNotification(NotificationChannel... channels) {
         for (var channel : channels) {
-            final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
+            final var pendingNotificationsPerRecipient = notificationStoragePort.getPendingNotifications(channel);
             assertThat(pendingNotificationsPerRecipient).isEmpty();
         }
     }
 
     private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
-            final var pendingNotificationsPerRecipient = notificationPort.getPendingNotificationsPerRecipient(channel);
+            final var pendingNotificationsPerRecipient = notificationStoragePort.getPendingNotifications(channel);
 
-//            final Map<NotificationRecipient, List<NotificationData>> pendingNotificationsDataPerRecipient = pendingNotificationsPerRecipient.entrySet()
-//            .stream()
-//                    .collect(HashMap::new, (map, entry) -> map.put(entry.getKey(),
-//                                    entry.getValue().stream().map(Notification::data).toList()),
-//                            Map::putAll);
-            assertThat(pendingNotificationsPerRecipient).containsAllEntriesOf(expectedNotifications);
-            assertThat(expectedNotifications).containsAllEntriesOf(pendingNotificationsPerRecipient);
+            final List<SendableNotification> sendableExpectedNotifications = expectedNotifications.entrySet().stream()
+                    .map(entry -> entry.getValue().stream()
+                            .map(notification -> SendableNotification.builder()
+                                    .id(notification.id())
+                                    .recipientId(entry.getKey().userId())
+                                    .data(notification.data())
+                                    .createdAt(notification.createdAt())
+                                    .channels(notification.channels())
+                                    .recipientEmail(entry.getKey().email())
+                                    .recipientLogin(entry.getKey().login())
+                                    .build())
+                            .collect(Collectors.toList()))
+                    .flatMap(List::stream)
+                    .collect(Collectors.toList());
+
+            assertThat(pendingNotificationsPerRecipient).containsAll(sendableExpectedNotifications);
+            assertThat(sendableExpectedNotifications).containsAll(pendingNotificationsPerRecipient);
         }
     }
 
@@ -296,5 +309,15 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         public NotificationCategory category() {
             return category;
         }
+    }
+
+    @Value
+    @Accessors(fluent = true, chain = true)
+    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    static class NotificationRecipient {
+        @EqualsAndHashCode.Include
+        UUID userId;
+        String email;
+        String login;
     }
 }
