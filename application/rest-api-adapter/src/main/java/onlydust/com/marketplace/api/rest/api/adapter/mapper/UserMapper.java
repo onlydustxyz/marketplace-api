@@ -13,7 +13,7 @@ import static java.util.Objects.isNull;
 public interface UserMapper {
 
     static List<Contact> contactToDomain(List<ContactInformation> contacts) {
-        return contacts.stream()
+        return isNull(contacts) ? null : contacts.stream()
                 .map(contactInformation -> {
                     final Contact.Visibility visibility = switch (contactInformation.getVisibility()) {
                         case PUBLIC -> Contact.Visibility.PUBLIC;
