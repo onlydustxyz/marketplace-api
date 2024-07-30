@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -159,10 +160,25 @@ public class GithubIssueReadEntity {
         if (asProjectLead) {
             final var installationStatus = map(repo.owner().installation().map(GithubAppInstallationViewEntity::getStatus).orElse(null));
             response.setGithubAppInstallationStatus(installationStatus);
-            if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS)
-                response.setGithubAppInstallationPermissionsUpdateUrl(
-                        URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
-                                .formatted(repoOwnerLogin, repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
+            if (installationStatus == GithubOrganizationInstallationStatus.MISSING_PERMISSIONS) {
+                final var isAPersonalOrganization = switch (repo.owner().type()) {
+                    case "USER":
+                        yield true;
+                    case "ORGANIZATION":
+                        yield false;
+                    default:
+                        throw OnlyDustException.internalServerError("Invalid github organization type %s".formatted(repo.owner().type()));
+                };
+                if (isAPersonalOrganization) {
+                    response.setGithubAppInstallationPermissionsUpdateUrl(
+                            URI.create("https://github.com/settings/installations/%s"
+                                    .formatted(repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
+                } else {
+                    response.setGithubAppInstallationPermissionsUpdateUrl(
+                            URI.create("https://github.com/organizations/%s/settings/installations/%d/permissions/update"
+                                    .formatted(repoOwnerLogin, repo.owner().installation().map(GithubAppInstallationViewEntity::getId).orElse(null))));
+                }
+            }
         }
 
         return response;
