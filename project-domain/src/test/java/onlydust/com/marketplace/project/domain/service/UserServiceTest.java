@@ -220,6 +220,10 @@ public class UserServiceTest {
                 null,
                 null,
                 null,
+                null,
+                null,
+                null,
+                null,
                 null);
 
         // Then

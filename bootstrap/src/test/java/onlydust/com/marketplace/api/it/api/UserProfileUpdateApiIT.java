@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.suites.tags.TagUser;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
+import onlydust.com.marketplace.project.domain.service.ProjectCategoryService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -9,10 +12,14 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 @TagUser
 public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
 
+    @Autowired
+    ProjectCategoryService projectCategoryService;
 
     @Test
     void should_update_user_profile() {
         // Given
+        final ProjectCategory category1 = projectCategoryService.createCategory("category1", "category1", "icon", null);
+        final ProjectCategory category2 = projectCategoryService.createCategory("category2", "category2", "icon", null);
         final String jwt = userAuthHelper.authenticateAnthony().jwt();
 
         // Proves that the initial user profile is different from the updated one
@@ -37,7 +44,11 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].visibility").isEqualTo("public")
                 .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].channel").isEqualTo("TWITTER")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].visibility").isEqualTo("public")
-                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM");
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
+                .jsonPath("$.joiningGoal").isEmpty()
+                .jsonPath("$.joiningReason").isEqualTo("MAINTAINER")
+                .jsonPath("$.preferredLanguages").isEmpty()
+                .jsonPath("$.preferredCategories").isEmpty();
 
         // When
         client.patch()
@@ -60,9 +71,13 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                                 }
                             ],
                             "allocatedTimeToContribute": "ONE_TO_THREE_DAYS",
-                            "isLookingForAJob": true
+                            "isLookingForAJob": true,
+                            "joiningGoal": "EARN",
+                            "joiningReason": "CONTRIBUTOR",
+                            "preferredLanguages": ["ca600cac-0f45-44e9-a6e8-25e21b0c6887", "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42"],
+                            "preferredCategories": ["%s", "%s"]
                         }
-                        """)
+                        """.formatted(category1.id().value(), category2.id().value()))
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful();
@@ -75,6 +90,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.location").isEqualTo("Paris, France")
                 .jsonPath("$.bio").isEqualTo("FullStack engineer")
                 .jsonPath("$.avatarUrl").isEqualTo("https://foobar.org/plop.jpg")
@@ -88,7 +104,9 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')]").doesNotExist()
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')]").doesNotExist()
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].visibility").isEqualTo("private")
-                .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM");
+                .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM")
+                .jsonPath("$.joiningReason").isEqualTo("CONTRIBUTOR")
+                .jsonPath("$.joiningGoal").isEqualTo("EARN");
     }
 
     @Test
@@ -111,7 +129,11 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                           "website": null,
                           "contacts": [],
                           "allocatedTimeToContribute": null,
-                          "isLookingForAJob": null
+                          "isLookingForAJob": null,
+                          "joiningGoal": null,
+                          "joiningReason": "CONTRIBUTOR",
+                          "preferredLanguages": null,
+                          "preferredCategories": null
                         }
                         """)
                 .exchange()

@@ -85,6 +85,10 @@ public interface UserMapper {
                 .lastName(userProfile.lastName())
                 .firstName(userProfile.firstName())
                 .id(userId)
+                .joiningGoal(userProfile.joiningGoal())
+                .joiningReason(userProfile.joiningReason())
+                .preferredCategoryIds(isNull(userProfile.preferredCategoriesIds()) ? null : userProfile.preferredCategoriesIds().toArray(new UUID[0]))
+                .preferredLanguageIds(isNull(userProfile.preferredLanguageIds()) ? null : userProfile.preferredLanguageIds().toArray(new UUID[0]))
                 .build();
     }
 

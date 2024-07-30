@@ -23,4 +23,11 @@ public interface ProjectCategoryReadRepository extends Repository<ProjectCategor
             WHERE e.slug = :ecosystemSlug
             """)
     Page<ProjectCategoryReadEntity> findAllByEcosystemSlug(String ecosystemSlug, Pageable pageable);
+
+    @Query(value = """
+            SELECT DISTINCT pc.*
+            FROM project_categories pc
+            JOIN user_profile_info upi ON pc.id = ANY (upi.preferred_category_ids) and upi.id = :userId
+            """, nativeQuery = true)
+    List<ProjectCategoryReadEntity> findPreferredOnesForUser(UUID userId);
 }

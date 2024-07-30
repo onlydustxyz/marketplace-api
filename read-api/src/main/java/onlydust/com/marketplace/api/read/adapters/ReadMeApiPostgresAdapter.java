@@ -3,8 +3,10 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
@@ -49,6 +51,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final PayoutPreferenceReadRepository payoutPreferenceReadRepository;
     private final NotificationSettingsForProjectReadRepository notificationSettingsForProjectReadRepository;
     private final ProjectReadRepository projectReadRepository;
+    private final ProjectCategoryReadRepository projectCategoryReadRepository;
+    private final LanguageReadRepository languageReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -67,6 +71,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .hasSeenOnboardingWizard(user.onboarding() != null && user.onboarding().getCompletionDate() != null)
                 .hasCompletedOnboarding(user.onboarding() != null && user.onboarding().getCompletionDate() != null)
                 .hasAcceptedLatestTermsAndConditions(user.onboarding() != null && user.onboarding().isHasAcceptedTermsAndConditions())
+                .hasCompletedVerificationInformation(user.onboardingCompletion() != null && user.onboardingCompletion().telegramAdded())
                 .isAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues)
                 .projectsLed(user.projectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
                 .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
@@ -169,8 +174,9 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var user = userReadRepository.findMeProfile(authenticatedUser.getId())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
-
-        return ok(user.toPrivateUserProfileResponse());
+        final List<ProjectCategoryReadEntity> preferredCategories = projectCategoryReadRepository.findPreferredOnesForUser(authenticatedUser.getId());
+        final List<LanguageReadEntity> preferredLanguages = languageReadRepository.findPreferredOnesForUser(authenticatedUser.getId());
+        return ok(user.toPrivateUserProfileResponse(preferredCategories, preferredLanguages));
     }
 
     @Override
