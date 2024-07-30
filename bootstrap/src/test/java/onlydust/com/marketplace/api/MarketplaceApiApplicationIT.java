@@ -9,7 +9,9 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.helper.JwtVerifierStub;
+import onlydust.com.marketplace.api.slack.AsyncSlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
@@ -61,15 +63,22 @@ public class MarketplaceApiApplicationIT {
     }
 
     @Bean
-    public SlackApiAdapter slackApiAdapter(final SlackProperties slackProperties,
-                                           final UserStoragePort userStoragePort,
-                                           final ProjectStoragePort projectStoragePort,
-                                           final HackathonStoragePort hackathonStoragePort) throws SlackApiException, IOException {
+    @Primary
+    public SlackApiClient slackApiClient(final SlackProperties slackProperties) throws SlackApiException, IOException {
         final var slackClient = mock(MethodsClient.class);
         final var response = new ChatPostMessageResponse();
         response.setOk(true);
         when(slackClient.chatPostMessage(any(ChatPostMessageRequest.class))).thenReturn(response);
         when(slackClient.chatPostMessage(any(RequestConfigurator.class))).thenReturn(response);
-        return spy(new SlackApiAdapter(slackProperties, slackClient, userStoragePort, projectStoragePort, hackathonStoragePort));
+        return new AsyncSlackApiClient(slackClient, slackProperties);
+    }
+
+    @Bean
+    public SlackApiAdapter slackApiAdapter(final SlackProperties slackProperties,
+                                           final SlackApiClient slackApiClient,
+                                           final UserStoragePort userStoragePort,
+                                           final ProjectStoragePort projectStoragePort,
+                                           final HackathonStoragePort hackathonStoragePort) {
+        return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort));
     }
 }
