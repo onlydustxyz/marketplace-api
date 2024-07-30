@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class IssuesApiIT extends AbstractMarketplaceApiIT {
 
@@ -50,6 +53,8 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
 
     @Test
     void should_return_issue_by_id_as_project_lead() {
@@ -93,6 +98,54 @@ public class IssuesApiIT extends AbstractMarketplaceApiIT {
                           "languages": [],
                           "githubAppInstallationStatus": "MISSING_PERMISSIONS",
                           "githubAppInstallationPermissionsUpdateUrl": "https://github.com/organizations/onlydustxyz/settings/installations/44741576/permissions/update"
+                        }
+                        """);
+
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("update indexer_exp.github_accounts set type = 'USER' where id = 98735558").executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
+
+        // When
+        client.get()
+                .uri(getApiURI(String.format(ISSUES_BY_ID, "1835403768")))
+                .header("Authorization", "Bearer " + olivier.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": 1835403768,
+                          "number": 6,
+                          "title": "Test #2",
+                          "status": "OPEN",
+                          "htmlUrl": "https://github.com/onlydustxyz/od-rust-template/issues/6",
+                          "repo": {
+                            "id": 663102799,
+                            "name": "od-rust-template",
+                            "description": null,
+                            "htmlUrl": "https://github.com/onlydustxyz/od-rust-template"
+                          },
+                          "author": {
+                            "githubUserId": 16590657,
+                            "login": "PierreOucif",
+                            "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                            "isRegistered": true
+                          },
+                          "createdAt": "2023-08-03T16:46:40Z",
+                          "closedAt": null,
+                          "body": "aaaaaa",
+                          "commentCount": 0,
+                          "labels": [],
+                          "applicants": [],
+                          "assignees": [],
+                          "languages": [],
+                          "githubAppInstallationStatus": "MISSING_PERMISSIONS",
+                          "githubAppInstallationPermissionsUpdateUrl": "https://github.com/settings/installations/44741576"
                         }
                         """);
     }
