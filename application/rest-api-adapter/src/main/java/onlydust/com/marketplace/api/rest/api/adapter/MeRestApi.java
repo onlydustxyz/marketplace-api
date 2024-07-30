@@ -73,6 +73,9 @@ public class MeRestApi implements MeApi {
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
             userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
         }
+        if (Boolean.TRUE.equals(patchMeContract.getHasCompletedOnboarding())){
+            userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
+        }
         return noContent().build();
     }
 

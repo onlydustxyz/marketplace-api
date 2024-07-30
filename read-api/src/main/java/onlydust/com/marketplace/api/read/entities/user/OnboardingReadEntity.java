@@ -26,7 +26,7 @@ public class OnboardingReadEntity {
 
     @Getter(AccessLevel.NONE)
     ZonedDateTime termsAndConditionsAcceptanceDate;
-    ZonedDateTime profileWizardDisplayDate;
+    ZonedDateTime completionDate;
 
     @Setter(AccessLevel.NONE)
     @Formula("""

@@ -19,5 +19,5 @@ public class OnboardingEntity {
     @Id
     UUID userId;
     Date termsAndConditionsAcceptanceDate;
-    Date profileWizardDisplayDate;
+    Date completionDate;
 }

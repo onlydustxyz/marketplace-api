@@ -82,7 +82,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .build();
         final OnboardingEntity onboarding = OnboardingEntity.builder().userId(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
-                .profileWizardDisplayDate(new Date())
+                .completionDate(new Date())
                 .build();
 
         userRepository.deleteAll();
@@ -94,7 +94,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         // Then
         assertThat(userRepository.findAll()).hasSize(1);
-        assertThat(result.onboarding().getProfileWizardDisplayDate()).isEqualToIgnoringNanos(onboarding.getProfileWizardDisplayDate().toInstant().atZone(ZoneOffset.UTC));
+        assertThat(result.onboarding().getCompletionDate()).isEqualToIgnoringNanos(onboarding.getCompletionDate()   .toInstant().atZone(ZoneOffset.UTC));
         assertThat(result.onboarding().getTermsAndConditionsAcceptanceDate()).isEqualToIgnoringNanos(onboarding.getTermsAndConditionsAcceptanceDate().toInstant().atZone(ZoneOffset.UTC));
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
@@ -145,7 +145,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Given
         final OnboardingEntity expected = OnboardingEntity.builder().userId(UUID.randomUUID())
                 .termsAndConditionsAcceptanceDate(new Date())
-                .profileWizardDisplayDate(new Date())
+                .completionDate(new Date())
                 .build();
 
         assertIsSaved(expected, onboardingRepository);

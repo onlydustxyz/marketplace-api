@@ -164,7 +164,7 @@ public class UserService implements UserFacadePort {
     @Override
     @Transactional
     public void markUserAsOnboarded(UUID userId) {
-        userStoragePort.updateOnboardingWizardDisplayDate(userId, dateProvider.now());
+        userStoragePort.updateOnboardingCompletionDate(userId, dateProvider.now());
     }
 
     @Override

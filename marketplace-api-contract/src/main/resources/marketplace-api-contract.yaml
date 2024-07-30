@@ -6494,6 +6494,8 @@ components:
           required:
             - hasSeenOnboardingWizard
             - hasAcceptedLatestTermsAndConditions
+            - hasCompletedVerificationInformation
+            - hasCompletedOnboarding
             - isAdmin
             - createdAt
             - hasPendingApplications
@@ -6540,6 +6542,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SponsorResponse'
+            hasCompletedVerificationInformation:
+              type: boolean
+            hasCompletedOnboarding:
+              type: boolean
 
     BillingProfileType:
       type: string
@@ -6646,6 +6652,9 @@ components:
         hasAcceptedTermsAndConditions:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
+        hasCompletedOnboarding:
+          type: boolean
+          description: True if the user has completed the mandatory onboarding steps
 
     ProjectApplicationCreateRequest:
       type: object
