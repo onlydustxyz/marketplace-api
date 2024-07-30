@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CommitteeEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
@@ -36,6 +36,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     private final UUID pacoId = UUID.fromString("f20e6812-8de8-432b-9c31-2920434fe7d0");
     private final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
     private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+    private final UUID calDotCom = UUID.fromString("1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e");
     static UUID committeeId;
     static UUID projectQuestionId1;
     static String projectQuestion1;
@@ -324,6 +325,12 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 projectAnswer
         )));
 
+        projectLeadRepository.save(new ProjectLeadEntity(calDotCom, pierreAppId));
+        final Committee.ProjectAnswer projectAnswer2 = new Committee.ProjectAnswer(ProjectQuestion.Id.of(projectQuestionId1), faker.lorem().paragraph());
+        committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), new Committee.Application(pierreAppId, calDotCom, List.of(
+                projectAnswer2
+        )));
+
         // When
         client.get()
                 .uri(getApiURI(COMMITTEES_BY_ID.formatted(committeeId)))
@@ -336,6 +343,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .json("""
                         {
                           "applications": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocation": null
+                            },
                             {
                               "project": {
                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -420,6 +443,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .json("""
                         {
                           "applications": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocation": null
+                            },
                             {
                               "project": {
                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
