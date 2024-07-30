@@ -10,6 +10,8 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -44,7 +46,7 @@ public class UserProfileInfoEntity {
                 .website(website)
                 .isLookingForAJob(isLookingForAJob)
                 .avatarUrl(avatarUrl)
-                .allocatedTimeToContribute(weeklyAllocatedTime.toDomain())
+                    .allocatedTimeToContribute(isNull(weeklyAllocatedTime) ? null : weeklyAllocatedTime.toDomain())
                 .firstName(firstName)
                 .lastName(lastName)
                 .contacts(contactInformations.stream().map(ContactInformationEntity::toDomain).toList())
