@@ -56,7 +56,6 @@ public interface UserReadRepository extends Repository<AllUserReadEntity, UUID> 
             """)
     Optional<AllUserReadEntity> findMe(UUID userId);
 
-
     @Query(value = """
             SELECT u
             FROM AllUserReadEntity u
@@ -64,4 +63,12 @@ public interface UserReadRepository extends Repository<AllUserReadEntity, UUID> 
             WHERE u.userId = :userId
             """)
     Optional<AllUserReadEntity> findMeJourney(UUID userId);
+
+    @Query(value = """
+            SELECT u
+            FROM AllUserReadEntity u
+            LEFT JOIN FETCH u.profile
+            WHERE u.userId = :userId
+            """)
+    Optional<AllUserReadEntity> findMeProfile(UUID userId);
 }

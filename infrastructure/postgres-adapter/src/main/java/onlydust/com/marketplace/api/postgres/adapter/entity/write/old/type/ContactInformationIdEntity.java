@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
+import onlydust.com.marketplace.project.domain.model.Contact;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -26,5 +26,5 @@ public class ContactInformationIdEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
     @Column(columnDefinition = "contact_channel", name = "channel", updatable = false, nullable = false)
-    ContactChanelEnumEntity channel;
+    Contact.Channel channel;
 }

@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -21,6 +20,8 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.project.domain.model.Contact.Channel;
 
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -151,7 +152,7 @@ public class UserProfileQueryEntity {
         @JsonProperty("is_public")
         Boolean isPublic;
         @JsonProperty("channel")
-        ContactChanelEnumEntity channel;
+        Channel channel;
         @JsonProperty("contact")
         String contact;
     }

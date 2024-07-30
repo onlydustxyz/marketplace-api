@@ -12,20 +12,6 @@ import static java.util.Objects.isNull;
 
 public interface UserMapper {
 
-    static UserProfile userProfileRequestToDomain(final UserProfileUpdateRequest userProfileRequest) {
-        return UserProfile.builder()
-                .avatarUrl(userProfileRequest.getAvatarUrl())
-                .bio(userProfileRequest.getBio())
-                .website(userProfileRequest.getWebsite())
-                .location(userProfileRequest.getLocation())
-                .contacts(contactToDomain(userProfileRequest.getContacts()))
-                .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
-                .isLookingForAJob(userProfileRequest.getIsLookingForAJob())
-                .firstName(userProfileRequest.getFirstName())
-                .lastName(userProfileRequest.getLastName())
-                .build();
-    }
-
     static List<Contact> contactToDomain(List<ContactInformation> contacts) {
         return contacts.stream()
                 .map(contactInformation -> {
@@ -34,7 +20,6 @@ public interface UserMapper {
                         case PRIVATE -> Contact.Visibility.PRIVATE;
                     };
                     final Contact.Channel channel = switch (contactInformation.getChannel()) {
-                        case EMAIL -> Contact.Channel.EMAIL;
                         case LINKEDIN -> Contact.Channel.LINKEDIN;
                         case TWITTER -> Contact.Channel.TWITTER;
                         case TELEGRAM -> Contact.Channel.TELEGRAM;
@@ -89,7 +74,6 @@ public interface UserMapper {
                     final ContactInformation response = new ContactInformation();
                     response.setContact(contactInformation.getContact());
                     response.setChannel(switch (contactInformation.getChannel()) {
-                        case EMAIL -> ContactInformationChannel.EMAIL;
                         case LINKEDIN -> ContactInformationChannel.LINKEDIN;
                         case TWITTER -> ContactInformationChannel.TWITTER;
                         case TELEGRAM -> ContactInformationChannel.TELEGRAM;

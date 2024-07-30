@@ -16,7 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity.email;
 
 @AllArgsConstructor
 @Slf4j
@@ -217,25 +216,17 @@ public class CustomUserRepository {
         final List<UserProfileQueryEntity.Contact> contactEntities = row.contacts() != null ? row.contacts() : List.of();
 
         final var contacts = contactEntities.stream().map(contact -> Contact.builder()
-                .contact(email.equals(contact.channel()) ? row.email() : contact.contact())
                 .channel(isNull(contact.channel()) ? null : switch (contact.channel()) {
-                    case email -> Contact.Channel.EMAIL;
-                    case telegram -> Contact.Channel.TELEGRAM;
-                    case twitter -> Contact.Channel.TWITTER;
-                    case discord -> Contact.Channel.DISCORD;
-                    case linkedin -> Contact.Channel.LINKEDIN;
-                    case whatsapp -> Contact.Channel.WHATSAPP;
+                    case TELEGRAM -> Contact.Channel.TELEGRAM;
+                    case TWITTER -> Contact.Channel.TWITTER;
+                    case DISCORD -> Contact.Channel.DISCORD;
+                    case LINKEDIN -> Contact.Channel.LINKEDIN;
+                    case WHATSAPP -> Contact.Channel.WHATSAPP;
                 })
                 .visibility(Boolean.TRUE.equals(contact.isPublic()) ? Contact.Visibility.PUBLIC :
                         Contact.Visibility.PRIVATE)
                 .build()
         ).collect(Collectors.toMap(Contact::getChannel, contact -> contact, (a, b) -> a));
-
-        contacts.putIfAbsent(Contact.Channel.EMAIL, Contact.builder()
-                .contact(row.email())
-                .channel(Contact.Channel.EMAIL)
-                .visibility(Contact.Visibility.PRIVATE)
-                .build());
 
         return new HashSet<>(contacts.values());
     }
