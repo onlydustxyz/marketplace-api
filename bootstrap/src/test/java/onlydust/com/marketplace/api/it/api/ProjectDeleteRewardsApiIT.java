@@ -161,7 +161,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(pierre.user().getGithubLogin())))
                         .withRequestBody(matchingJsonPath("$.message_data.currency", equalTo("USDC")))
                         .withRequestBody(matchingJsonPath("$.message_data.rewardName", equalTo("#E1498 - QA new contributions")))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Reward #E1498 - QA new contributions got canceled"))));
     }

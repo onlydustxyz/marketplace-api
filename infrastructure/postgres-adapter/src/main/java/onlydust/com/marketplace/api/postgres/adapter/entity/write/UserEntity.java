@@ -35,8 +35,8 @@ public class UserEntity {
     Long githubUserId;
     String githubLogin;
     String githubAvatarUrl;
-    @Column(name = "email", nullable = false)
-    String githubEmail;
+    @Column(nullable = false)
+    String email;
 
     @Type(
             value = EnumArrayType.class,
@@ -65,10 +65,10 @@ public class UserEntity {
     }
 
     public ShortContributorView toShortContributorView() {
-        return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), githubEmail);
+        return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), email);
     }
 
     public User toUser() {
-        return new User(User.Id.of(id), githubEmail, githubLogin);
+        return new User(User.Id.of(id), email, githubLogin);
     }
 }

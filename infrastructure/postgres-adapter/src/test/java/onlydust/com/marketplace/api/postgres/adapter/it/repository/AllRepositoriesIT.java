@@ -59,7 +59,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .githubEmail(faker.internet().emailAddress())
+                .email(faker.internet().emailAddress())
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
@@ -76,7 +76,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber(15, true))
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .githubEmail(faker.internet().emailAddress())
+                .email(faker.internet().emailAddress())
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();

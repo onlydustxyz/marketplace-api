@@ -62,11 +62,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     void setUp() {
         final var olivier = userAuthHelper.authenticateOlivier();
         olivierId = olivier.user().getId();
-        olivierRecipient = new NotificationRecipient(olivierId, olivier.user().getGithubEmail(), olivier.user().getGithubLogin());
+        olivierRecipient = new NotificationRecipient(olivierId, olivier.user().getEmail(), olivier.user().getGithubLogin());
 
         final var pierre = userAuthHelper.authenticatePierre();
         pierreId = pierre.user().getId();
-        pierreRecipient = new NotificationRecipient(pierreId, pierre.user().getGithubEmail(), pierre.user().getGithubLogin());
+        pierreRecipient = new NotificationRecipient(pierreId, pierre.user().getEmail(), pierre.user().getGithubLogin());
     }
 
     @Test

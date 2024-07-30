@@ -270,7 +270,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .map(userEntity -> userEntity.toBuilder()
                         .githubLogin(u.getGithubLogin())
                         .githubAvatarUrl(u.getGithubAvatarUrl())
-                        .githubEmail(u.getGithubEmail())
+                        .email(u.getGithubEmail())
                         .build())
                 .ifPresent(userRepository::save));
     }
@@ -281,7 +281,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .map(userEntity -> userEntity.toBuilder()
                         .githubLogin(user.getGithubLogin())
                         .githubAvatarUrl(user.getGithubAvatarUrl())
-                        .githubEmail(user.getGithubEmail())
+                        .email(user.getGithubEmail())
                         .build())
                 .ifPresent(userRepository::save);
     }

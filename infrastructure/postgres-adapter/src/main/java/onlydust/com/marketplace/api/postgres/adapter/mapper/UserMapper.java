@@ -54,7 +54,7 @@ public interface UserMapper {
                 .id(userEntity.getId())
                 .githubUserId(userEntity.getGithubUserId())
                 .githubLogin(userEntity.getGithubLogin())
-                .githubEmail(userEntity.getGithubEmail())
+                .githubEmail(userEntity.getEmail())
                 .githubAvatarUrl(userEntity.getGithubAvatarUrl())
                 .roles(Arrays.stream(userEntity.getRoles()).toList())
                 .build();
@@ -67,7 +67,7 @@ public interface UserMapper {
                 .githubUserId(user.getGithubUserId())
                 .githubLogin(user.getGithubLogin())
                 .githubAvatarUrl(user.getGithubAvatarUrl())
-                .githubEmail(user.getGithubEmail())
+                .email(user.getGithubEmail())
                 .roles(user.getRoles() != null ? user.getRoles().toArray(AuthenticatedUser.Role[]::new) : new AuthenticatedUser.Role[0])
                 .lastSeenAt(new Date())
                 .build();

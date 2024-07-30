@@ -50,7 +50,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .githubEmail(faker.internet().emailAddress())
+                .email(faker.internet().emailAddress())
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
@@ -82,7 +82,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .githubEmail(faker.internet().emailAddress())
+                .email(faker.internet().emailAddress())
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
@@ -114,7 +114,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
                 .githubLogin(faker.name().name())
                 .githubAvatarUrl(faker.internet().avatar())
-                .githubEmail(faker.internet().emailAddress())
+                .email(faker.internet().emailAddress())
                 .roles(new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN})
                 .lastSeenAt(new Date())
                 .build();
