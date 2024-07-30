@@ -345,6 +345,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "applications": [
                             {
                               "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocation": null
+                            },
+                            {
+                              "project": {
                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
                                 "slug": "bretzel",
                                 "name": "Bretzel",
@@ -427,6 +443,22 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .json("""
                         {
                           "applications": [
+                            {
+                              "project": {
+                                "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                                "slug": "calcom",
+                                "name": "Cal.com",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
+                              },
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "userId": "fc92397c-3431-4a84-8054-845376b630a0",
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                              },
+                              "score": null,
+                              "allocation": null
+                            },
                             {
                               "project": {
                                 "id": "7d04163c-4187-4313-8066-61504d34fc56",
