@@ -12,12 +12,13 @@ import java.util.List;
 
 @Slf4j
 @AllArgsConstructor
-public class AsyncNotificationEmailProcessor {
+public class AsyncNotificationEmailProcessor implements NotificationSender {
 
     private final NotificationSender notificationSender;
     private final NotificationStoragePort notificationStoragePort;
 
     @Async
+    @Override
     public void send(SendableNotification notification) {
         try {
             notificationSender.send(notification);

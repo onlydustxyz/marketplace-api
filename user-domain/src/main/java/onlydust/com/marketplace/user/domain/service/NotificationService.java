@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.model.User;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 
@@ -21,7 +22,7 @@ public class NotificationService implements NotificationPort {
     private final NotificationSettingsStoragePort notificationSettingsStoragePort;
     private final NotificationStoragePort notificationStoragePort;
     private final AppUserStoragePort userStoragePort;
-    private final AsyncNotificationEmailProcessor asyncNotificationEmailProcessor;
+    private final NotificationSender asyncNotificationEmailProcessor;
 
     @Override
     public Notification push(UUID recipientId, NotificationData notificationData) {
