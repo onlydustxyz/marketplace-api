@@ -1,6 +1,7 @@
 package com.onlydust.customer.io.adapter;
 
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.dto.BroadcastDTO;
 import com.onlydust.customer.io.adapter.dto.MailDTO;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import io.netty.handler.codec.http.HttpMethod;
@@ -13,10 +14,14 @@ import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.port.output.NewsBroadcasterPort;
+
+import java.util.List;
+import java.util.UUID;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements OutboxConsumer {
+public class CustomerIOAdapter implements OutboxConsumer, NewsBroadcasterPort {
 
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
@@ -35,8 +40,6 @@ public class CustomerIOAdapter implements OutboxConsumer {
             sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
         } else if (event instanceof NewCommitteeApplication newCommitteeApplication) {
             sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, newCommitteeApplication));
-        } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
-            sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else if (event instanceof ProjectApplicationAccepted projectApplicationAccepted) {
             sendEmail(MailDTO.fromProjectApplicationAccepted(customerIOProperties, projectApplicationAccepted));
         } else {
@@ -44,7 +47,20 @@ public class CustomerIOAdapter implements OutboxConsumer {
         }
     }
 
+    @Override
+    public void broadcastProjectApplicationsToReview(@NonNull List<ProjectApplicationsToReviewByUser> applications) {
+        sendBroadcast(BroadcastDTO.fromProjectApplicationsToReviewByUserDTO(applications),
+                customerIOProperties.getProjectApplicationsToReviewByUserBroadcastId());
+    }
+
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
         customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
     }
+
+    private <RecipientData> void sendBroadcast(BroadcastDTO<RecipientData> broadcast, final Integer broadcastId) {
+        customerIOHttpClient.send("/campaigns/%s/triggers".formatted(broadcastId), HttpMethod.POST, broadcast, Void.class);
+    }
+
+
+
 }

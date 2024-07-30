@@ -179,8 +179,8 @@ infrastructure:
     invoice-rejected-email-id: 10
     verification-failed-email-id: 15
     new-committee-application-email-id: 14
-    project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: 17
+    project-applications-to-review-by-user-broadcast-id: 5
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
