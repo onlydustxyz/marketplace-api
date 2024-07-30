@@ -21,5 +21,5 @@ public class OnboardingViewEntity {
     @Id
     UUID userId;
     ZonedDateTime termsAndConditionsAcceptanceDate;
-    ZonedDateTime profileWizardDisplayDate;
+    ZonedDateTime completionDate;
 }

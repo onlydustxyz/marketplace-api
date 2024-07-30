@@ -30,7 +30,7 @@ public interface UserStoragePort {
 
     void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
 
-    void updateOnboardingWizardDisplayDate(UUID userId, Date date);
+    void updateOnboardingCompletionDate(UUID userId, Date date);
 
     void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
 

@@ -1,0 +1,1 @@
+ALTER TABLE onboardings RENAME COLUMN profile_wizard_display_date TO completion_date;

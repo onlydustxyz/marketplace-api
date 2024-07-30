@@ -152,15 +152,15 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public void updateOnboardingWizardDisplayDate(UUID userId, Date date) {
+    public void updateOnboardingCompletionDate(UUID userId, Date date) {
         onboardingRepository.findById(userId)
                 .ifPresentOrElse(onboardingEntity -> {
-                    onboardingEntity.setProfileWizardDisplayDate(date);
+                    onboardingEntity.setCompletionDate(date);
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
                             .userId(userId)
-                            .profileWizardDisplayDate(date)
+                            .completionDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 });

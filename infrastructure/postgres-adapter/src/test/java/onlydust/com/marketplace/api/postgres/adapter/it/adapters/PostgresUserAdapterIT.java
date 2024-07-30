@@ -59,7 +59,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final OnboardingEntity onboarding = OnboardingEntity.builder()
                 .userId(user.getId())
                 .termsAndConditionsAcceptanceDate(new Date())
-                .profileWizardDisplayDate(new Date())
+                .completionDate(new Date())
                 .build();
         onboardingRepository.save(onboarding);
 
@@ -91,7 +91,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final OnboardingEntity onboarding = OnboardingEntity.builder()
                 .userId(user.getId())
                 .termsAndConditionsAcceptanceDate(faker.date().birthday())
-                .profileWizardDisplayDate(new Date())
+                .completionDate(new Date())
                 .build();
         onboardingRepository.save(onboarding);
 
@@ -139,18 +139,18 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final OnboardingEntity onboarding = OnboardingEntity.builder()
                 .userId(userId)
                 .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
-                .profileWizardDisplayDate(faker.date().birthday(0, 3))
+                .completionDate(faker.date().birthday(0, 3))
                 .build();
         onboardingRepository.save(onboarding);
 
         final Date newDate = faker.date().birthday(0, 3);
 
         // When
-        postgresUserAdapter.updateOnboardingWizardDisplayDate(userId, newDate);
+        postgresUserAdapter.updateOnboardingCompletionDate(userId, newDate);
 
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
-        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate()).isEqualTo(newDate);
+        assertThat(updatedOnboardingEntity.getCompletionDate()).isEqualTo(newDate);
         assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate().toInstant()).isEqualTo(onboarding.getTermsAndConditionsAcceptanceDate().toInstant());
     }
 
@@ -162,7 +162,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final OnboardingEntity onboarding = OnboardingEntity.builder()
                 .userId(userId)
                 .termsAndConditionsAcceptanceDate(faker.date().birthday(0, 3))
-                .profileWizardDisplayDate(faker.date().birthday(0, 3))
+                .completionDate(faker.date().birthday(0, 3))
                 .build();
         onboardingRepository.save(onboarding);
 
@@ -173,7 +173,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
 
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
-        assertThat(updatedOnboardingEntity.getProfileWizardDisplayDate().toInstant()).isEqualTo(onboarding.getProfileWizardDisplayDate().toInstant());
+        assertThat(updatedOnboardingEntity.getCompletionDate().toInstant()).isEqualTo(onboarding.getCompletionDate().toInstant());
         assertThat(updatedOnboardingEntity.getTermsAndConditionsAcceptanceDate()).isEqualTo(newDate);
     }
 

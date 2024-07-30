@@ -159,7 +159,7 @@ public class UserServiceTest {
         userService.markUserAsOnboarded(userId);
 
         // Then
-        verify(userStoragePort, times(1)).updateOnboardingWizardDisplayDate(userId, dateProvider.now());
+        verify(userStoragePort, times(1)).updateOnboardingCompletionDate(userId, dateProvider.now());
     }
 
     @Test

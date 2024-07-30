@@ -427,3 +427,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000294_create_notification_settings_for_project_table.sql
   - include:
       file: db/changelog/changelogs/00000295_migrate_user_contact_email.sql
+  - include:
+      file: db/changelog/changelogs/00000296_renaming_onboarding_column.sql
