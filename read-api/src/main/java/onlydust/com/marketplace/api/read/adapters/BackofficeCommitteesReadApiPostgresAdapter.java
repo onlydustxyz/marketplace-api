@@ -10,12 +10,12 @@ import onlydust.com.marketplace.api.read.entities.ShortCurrencyResponseEntity;
 import onlydust.com.marketplace.api.read.entities.committee.CommitteeBudgetAllocationReadEntity;
 import onlydust.com.marketplace.api.read.entities.committee.CommitteeJuryVoteReadEntity;
 import onlydust.com.marketplace.api.read.entities.committee.CommitteeProjectAnswerReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.api.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.api.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.api.read.repositories.CommitteeReadRepository;
-import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.*;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
 import static onlydust.com.marketplace.api.read.mapper.CommitteeMapper.roundScore;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper.statusToResponse;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -71,7 +71,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         .applicant(a.user().toLinkResponse())
                         .score(Optional.ofNullable(averageVotePerProjects.get(a.projectId())).map(BigDecimal::valueOf).map(CommitteeMapper::roundScore).orElse(null))
                         .allocation(projectAllocations.get(a.projectId())))
-                .sorted(Comparator.nullsLast(Comparator.comparing(ApplicationResponse::getScore).reversed()))
+                .sorted(Comparator.comparing(ApplicationResponse::getScore, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
 
         final Map<AllUserReadEntity, Map<ProjectLinkViewEntity, List<CommitteeJuryVoteReadEntity>>> votesPerUserPerProject = committee.juryVotes().stream()
