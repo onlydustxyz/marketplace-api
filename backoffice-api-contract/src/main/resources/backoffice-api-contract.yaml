@@ -3669,7 +3669,6 @@ components:
     ContactInformationChannel:
       type: string
       enum:
-        - EMAIL
         - TELEGRAM
         - TWITTER
         - DISCORD

@@ -85,7 +85,7 @@ public class OnboardingCompletionEntity {
             exists(select 1
                    from contact_informations ci
                    where ci.user_id = id
-                     and ci.channel = 'telegram'
+                     and ci.channel = 'TELEGRAM'
                      and length(ci.contact) > 0)
             """)
     boolean telegramAdded;

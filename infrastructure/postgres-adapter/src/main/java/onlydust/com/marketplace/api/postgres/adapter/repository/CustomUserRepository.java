@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
@@ -18,7 +16,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.postgres.adapter.entity.enums.ContactChanelEnumEntity.email;
 
 @AllArgsConstructor
 @Slf4j
@@ -172,9 +169,6 @@ public class CustomUserRepository {
                    where u.github_user_id = :githubUserId)) as p
             left join granted_usd on granted_usd.project_id = p.id
             order by p.is_lead desc""";
-    private final static TypeReference<HashMap<String, Long>> typeRef
-            = new TypeReference<>() {
-    };
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final EntityManager entityManager;
 
@@ -190,7 +184,6 @@ public class CustomUserRepository {
                 .htmlUrl(row.htmlUrl())
                 .location(row.location())
                 .website(row.website())
-                .technologies(getTechnologies(row))
                 .profileStats(UserProfileView.ProfileStats.builder()
                         .totalsEarned(new TotalsEarned(isNull(row.totalEarnedPerCurrencies())
                                 ? List.of()
@@ -223,38 +216,19 @@ public class CustomUserRepository {
         final List<UserProfileQueryEntity.Contact> contactEntities = row.contacts() != null ? row.contacts() : List.of();
 
         final var contacts = contactEntities.stream().map(contact -> Contact.builder()
-                .contact(email.equals(contact.channel()) ? row.email() : contact.contact())
                 .channel(isNull(contact.channel()) ? null : switch (contact.channel()) {
-                    case email -> Contact.Channel.EMAIL;
-                    case telegram -> Contact.Channel.TELEGRAM;
-                    case twitter -> Contact.Channel.TWITTER;
-                    case discord -> Contact.Channel.DISCORD;
-                    case linkedin -> Contact.Channel.LINKEDIN;
-                    case whatsapp -> Contact.Channel.WHATSAPP;
+                    case TELEGRAM -> Contact.Channel.TELEGRAM;
+                    case TWITTER -> Contact.Channel.TWITTER;
+                    case DISCORD -> Contact.Channel.DISCORD;
+                    case LINKEDIN -> Contact.Channel.LINKEDIN;
+                    case WHATSAPP -> Contact.Channel.WHATSAPP;
                 })
                 .visibility(Boolean.TRUE.equals(contact.isPublic()) ? Contact.Visibility.PUBLIC :
                         Contact.Visibility.PRIVATE)
                 .build()
         ).collect(Collectors.toMap(Contact::getChannel, contact -> contact, (a, b) -> a));
 
-        contacts.putIfAbsent(Contact.Channel.EMAIL, Contact.builder()
-                .contact(row.email())
-                .channel(Contact.Channel.EMAIL)
-                .visibility(Contact.Visibility.PRIVATE)
-                .build());
-
         return new HashSet<>(contacts.values());
-    }
-
-    private HashMap<String, Long> getTechnologies(UserProfileQueryEntity row) {
-        if (isNull(row.languages())) {
-            return new HashMap<>();
-        }
-        try {
-            return objectMapper.readValue(row.languages(), typeRef);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public Optional<UserProfileView> findProfileById(final UUID userId) {

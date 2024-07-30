@@ -7,9 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
-import onlydust.com.marketplace.api.contract.model.ContributorResponse;
-import onlydust.com.marketplace.api.contract.model.GithubUserResponse;
-import onlydust.com.marketplace.api.contract.model.RankedContributorResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
@@ -61,7 +59,12 @@ public class AllUserReadEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", insertable = false, updatable = false)
+    @Getter(AccessLevel.NONE)
     UserProfileInfoReadEntity profile;
+
+    public Optional<UserProfileInfoReadEntity> profile() {
+        return ofNullable(profile);
+    }
 
     @ManyToMany
     @JoinTable(
@@ -170,11 +173,11 @@ public class AllUserReadEntity {
                 .email(email)
                 .lastSeenAt(registered == null ? null : registered.lastSeenAt())
                 .signedUpAt(registered == null ? null : toZoneDateTime(registered.createdAt()))
-                .contacts(Optional.ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toBODto).toList())
+                .contacts(ofNullable(contacts).orElse(Set.of()).stream().map(ContactInformationReadEntity::toBODto).toList())
                 .leadedProjectCount(globalUsersRanks().map(GlobalUsersRanksReadEntity::leadedProjectCount).orElse(0L).intValue())
                 .totalEarnedUsd(receivedRewardStats().map(ReceivedRewardStatsPerUserReadEntity::usdTotal).orElse(ZERO))
-                .billingProfiles(Optional.ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
-                .leadedProjects(Optional.ofNullable(projectsLed).orElse(Set.of()).stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .billingProfiles(ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
+                .leadedProjects(ofNullable(projectsLed).orElse(Set.of()).stream().map(ProjectReadEntity::toBoLinkResponse).toList())
                 ;
     }
 
@@ -210,6 +213,29 @@ public class AllUserReadEntity {
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl)
+                ;
+    }
+
+    public PrivateUserProfileResponse toPrivateUserProfileResponse() {
+        return new PrivateUserProfileResponse()
+                .githubUserId(githubUserId)
+                .id(userId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .bio(profile().map(UserProfileInfoReadEntity::bio).orElse(null))
+                .website(profile().map(UserProfileInfoReadEntity::website).orElse(null))
+                .location(profile().map(UserProfileInfoReadEntity::location).orElse(null))
+                .contactEmail(email)
+                .contacts(profile().map(p -> p.allContacts().stream().map(ContactInformationReadEntity::toDto).toList()).orElse(null))
+                .allocatedTimeToContribute(profile().flatMap(UserProfileInfoReadEntity::weeklyAllocatedTime).map(t -> switch (t) {
+                    case none -> AllocatedTime.NONE;
+                    case less_than_one_day -> AllocatedTime.LESS_THAN_ONE_DAY;
+                    case one_to_three_days -> AllocatedTime.ONE_TO_THREE_DAYS;
+                    case greater_than_three_days -> AllocatedTime.GREATER_THAN_THREE_DAYS;
+                }).orElse(null))
+                .isLookingForAJob(profile().map(UserProfileInfoReadEntity::isLookingForAJob).orElse(null))
+                .firstName(profile().map(UserProfileInfoReadEntity::firstName).orElse(null))
+                .lastName(profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
                 ;
     }
 }

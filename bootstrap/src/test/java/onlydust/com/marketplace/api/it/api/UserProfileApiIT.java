@@ -17,22 +17,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
               "location": "Vence, France",
               "bio": "FullStack engineerr",
               "website": "https://linktr.ee/abuisset",
-              "technologies": {
-                "CSS": 4473,
-                "Rust": 404344,
-                "Procfile": 507,
-                "PLpgSQL": 10486,
-                "Makefile": 8658,
-                "HTML": 435,
-                "HCL": 23317,
-                "TypeScript": 2030401,
-                "Dockerfile": 951,
-                "Shell": 1455,
-                "Cairo": 42100,
-                "JavaScript": 2205,
-                "Nix": 12902,
-                "Python": 45301
-              },
               "contacts": [
                 {
                   "channel": "TWITTER",
@@ -48,11 +32,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                   "channel": "DISCORD",
                   "contact": "antho",
                   "visibility": "public"
-                },
-                {
-                  "channel": "EMAIL",
-                  "contact": "abuisset@gmail.com",
-                  "visibility": "private"
                 }
               ],
               "firstName": "Anthony",
@@ -208,8 +187,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.allocatedTimeToContribute").isEqualTo("NONE")
                 .jsonPath("$.isLookingForAJob").isEqualTo(false)
-                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].visibility").isEqualTo("private")
-                .jsonPath("$.contacts[?(@.contact=='abuisset@gmail.com')].channel").isEqualTo("EMAIL")
                 .jsonPath("$.contacts[?(@.contact=='antho')].visibility").isEqualTo("public")
                 .jsonPath("$.contacts[?(@.contact=='antho')].channel").isEqualTo("DISCORD")
                 .jsonPath("$.contacts[?(@.contact=='https://twitter.com/abuisset')].visibility").isEqualTo("public")
@@ -218,7 +195,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
     }
-
 
     @Test
     void should_get_email_if_user_profile_has_no_contact() {
@@ -233,6 +209,6 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.contacts[?(@.channel=='EMAIL')].contact").isEqualTo("haydenclearymusic@gmail.com");
+                .jsonPath("$.contactEmail").isEqualTo("haydenclearymusic@gmail.com");
     }
 }

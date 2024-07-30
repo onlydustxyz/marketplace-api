@@ -425,3 +425,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000293_add_has_good_first_issues_project_tag.sql
   - include:
       file: db/changelog/changelogs/00000294_create_notification_settings_for_project_table.sql
+  - include:
+      file: db/changelog/changelogs/00000295_migrate_user_contact_email.sql

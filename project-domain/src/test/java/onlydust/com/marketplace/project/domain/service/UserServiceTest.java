@@ -7,12 +7,18 @@ import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.mocks.DeterministicDateProvider;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.*;
+import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
+import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
+import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -21,7 +27,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -135,25 +144,9 @@ public class UserServiceTest {
 
         // Then
         verify(userStoragePort, never()).updateUserLastSeenAt(any(), any());
-        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true)).isInstanceOf(OnlyDustException.class).hasMessage(("User %d " +
-                                                                                                                                                  "not" +
-                                                                                                                                                  " found").formatted(githubUserIdentity.getGithubUserId()));
-    }
-
-
-    @Test
-    void should_find_user_profile_given_an_id() {
-        // Given
-        final UUID userId = UUID.randomUUID();
-        final UserProfileView userProfileView =
-                UserProfileView.builder().id(userId).avatarUrl(faker.pokemon().name()).githubId(faker.number().randomNumber()).login(faker.hacker().verb()).build();
-
-        // When
-        when(userStoragePort.getProfileById(userId)).thenReturn(userProfileView);
-        final UserProfileView profileById = userService.getProfileById(userId);
-
-        // Then
-        assertEquals(userProfileView, profileById);
+        assertThatThrownBy(() -> userService.getUserByGithubIdentity(githubUserIdentity, true))
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage(("User %d not found").formatted(githubUserIdentity.getGithubUserId()));
     }
 
     @Test
@@ -200,18 +193,49 @@ public class UserServiceTest {
         // Given
         final UUID userId = UUID.randomUUID();
 
-        final UserProfile profile =
-                UserProfile.builder().avatarUrl(faker.internet().avatar()).bio(faker.lorem().sentence()).website(faker.internet().url()).location(faker.address().city()).technologies(Map.of(faker.programmingLanguage().name(), faker.number().randomNumber(), faker.programmingLanguage().name(), faker.number().randomNumber())).contacts(List.of(Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build(), Contact.builder().contact(faker.internet().emailAddress()).channel(Contact.Channel.EMAIL).visibility(Contact.Visibility.PRIVATE).build())).build();
-
-        final UserProfileView userProfileView = UserProfileView.builder().id(userId).bio(profile.getBio()).build();
+        final var avatar = faker.internet().avatar();
+        final var bio = faker.lorem().sentence();
+        final var website = faker.internet().url();
+        final var location = faker.address().city();
+        final var contactEmail = faker.internet().emailAddress();
+        final var contacts = List.of(
+                Contact.builder().contact(faker.internet().url()).channel(Contact.Channel.WHATSAPP).visibility(Contact.Visibility.PUBLIC).build()
+        );
 
         // When
-        when(userStoragePort.getProfileById(userId)).thenReturn(userProfileView);
-        final UserProfileView updatedUser = userService.updateProfile(userId, profile);
+        when(userStoragePort.findProfileById(userId)).thenReturn(Optional.empty());
+        when(userStoragePort.getRegisteredUserById(userId)).thenReturn(Optional.of(User.builder()
+                .id(userId)
+                .githubUserId(faker.number().randomNumber())
+                .githubLogin(faker.pokemon().name())
+                .build()));
+
+        userService.updateProfile(userId,
+                avatar,
+                location,
+                bio,
+                website,
+                contactEmail,
+                contacts,
+                null,
+                null,
+                null,
+                null);
 
         // Then
-        verify(userStoragePort, times(1)).saveProfile(userId, profile);
-        assertThat(updatedUser.getBio()).isEqualTo(userProfileView.getBio());
+        final var userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userStoragePort).saveUser(userCaptor.capture());
+        final var updatedUser = userCaptor.getValue();
+        assertThat(updatedUser.getGithubEmail()).isEqualTo(contactEmail);
+
+        final var profileCaptor = ArgumentCaptor.forClass(UserProfile.class);
+        verify(userStoragePort).saveProfile(eq(userId), profileCaptor.capture());
+        final var updatedProfile = profileCaptor.getValue();
+        assertThat(updatedProfile.avatarUrl()).isEqualTo(avatar);
+        assertThat(updatedProfile.location()).isEqualTo(location);
+        assertThat(updatedProfile.bio()).isEqualTo(bio);
+        assertThat(updatedProfile.website()).isEqualTo(website);
+        assertThat(updatedProfile.contacts()).isEqualTo(contacts);
     }
 
     @Test

@@ -37,7 +37,7 @@ public class AllUserRSQLEntity {
     String avatarUrl;
     String email;
 
-    @Formula("(select ci.contact from contact_informations ci where ci.user_id = user_id and ci.channel = 'telegram')")
+    @Formula("(select ci.contact from contact_informations ci where ci.user_id = user_id and ci.channel = 'TELEGRAM')")
     String telegram;
 
     @OneToOne(fetch = FetchType.EAGER)

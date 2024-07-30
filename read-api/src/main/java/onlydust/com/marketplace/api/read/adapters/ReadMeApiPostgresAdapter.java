@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntit
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity.PrimaryKey;
+import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -72,8 +73,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .isAdmin(Arrays.stream(user.registered().roles()).anyMatch(r -> r == AuthenticatedUser.Role.ADMIN))
                 .createdAt(toZoneDateTime(user.registered().createdAt()))
                 .email(user.email())
-                .firstName(user.profile() == null ? null : user.profile().firstName())
-                .lastName(user.profile() == null ? null : user.profile().lastName())
+                .firstName(user.profile().map(UserProfileInfoReadEntity::firstName).orElse(null))
+                .lastName(user.profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
                 .missingPayoutPreference(hasMissingPayoutPreferences)
                 .sponsors(user.sponsors().stream().map(SponsorReadEntity::toDto).toList());
 
@@ -159,6 +160,15 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .map(p -> p.toDto(authenticatedUser.getGithubUserId()))
                 .sorted(Comparator.comparing(p -> p.getProject().getName()))
                 .toList());
+    }
+
+    @Override
+    public ResponseEntity<PrivateUserProfileResponse> getMyProfile() {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var user = userReadRepository.findMeProfile(authenticatedUser.getId())
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
+
+        return ok(user.toPrivateUserProfileResponse());
     }
 
     @Override

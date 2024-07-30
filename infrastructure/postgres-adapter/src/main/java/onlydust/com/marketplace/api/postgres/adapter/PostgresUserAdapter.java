@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -112,6 +113,11 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
         return customUserRepository.findProfileById(userId)
                 .map(this::addProjectsStats)
                 .orElseThrow(() -> notFound(format("User profile %s not found", userId)));
+    }
+
+    @Override
+    public Optional<UserProfile> findProfileById(UUID userId) {
+        return userProfileInfoRepository.findById(userId).map(UserProfileInfoEntity::toDomain);
     }
 
     private UserProfileView addProjectsStats(UserProfileView userProfileView) {
