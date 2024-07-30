@@ -38,9 +38,13 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
     @Override
     @Transactional(readOnly = true)
     public List<NotificationChannel> getNotificationChannels(UUID recipientId, NotificationCategory category) {
-        return notificationSettingsChannelRepository.findAllByUserIdAndCategory(recipientId, category).stream()
+        final var channels = notificationSettingsChannelRepository.findAllByUserIdAndCategory(recipientId, category).stream()
                 .map(NotificationSettingsChannelEntity::channel)
                 .toList();
+
+        // TODO: This is a temporary workaround to provide default channels for all users.
+        // TODO: In the future, we will remove this and set default settings when the user signs-up.
+        return channels.isEmpty() ? category.defaultChannels() : channels;
     }
 
     @Override

@@ -8,13 +8,9 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
-import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
-import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
-import onlydust.com.marketplace.user.domain.model.NotificationSettings;
-import onlydust.com.marketplace.user.domain.model.User;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -115,9 +111,9 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_put_application() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
-                .channelsPerCategory(Map.of(NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER, List.of(NotificationChannel.EMAIL)))
-                .build());
+//        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
+//                .channelsPerCategory(Map.of(NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER, List.of(NotificationChannel.EMAIL)))
+//                .build());
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
 
         final var answerRequest1 = new CommitteeProjectAnswerRequest()
