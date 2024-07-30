@@ -8,9 +8,11 @@ import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -216,7 +218,8 @@ public class AllUserReadEntity {
                 ;
     }
 
-    public PrivateUserProfileResponse toPrivateUserProfileResponse() {
+    public PrivateUserProfileResponse toPrivateUserProfileResponse(List<ProjectCategoryReadEntity> preferredCategories,
+                                                                   List<LanguageReadEntity> preferredLanguages) {
         return new PrivateUserProfileResponse()
                 .githubUserId(githubUserId)
                 .id(userId)
@@ -236,6 +239,17 @@ public class AllUserReadEntity {
                 .isLookingForAJob(profile().map(UserProfileInfoReadEntity::isLookingForAJob).orElse(null))
                 .firstName(profile().map(UserProfileInfoReadEntity::firstName).orElse(null))
                 .lastName(profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
-                ;
+                .joiningReason(profile().map(UserProfileInfoReadEntity::joiningReason).map(joiningReason -> switch (joiningReason) {
+                    case CONTRIBUTOR -> UserJoiningReason.CONTRIBUTOR;
+                    case MAINTAINER -> UserJoiningReason.MAINTAINER;
+                }).orElse(null))
+                .joiningGoal(profile().map(UserProfileInfoReadEntity::joiningGoal).map(joiningGoal -> switch (joiningGoal) {
+                    case EARN -> UserJoiningGoal.EARN;
+                    case LEARN -> UserJoiningGoal.LEARN;
+                    case NOTORIETY -> UserJoiningGoal.NOTORIETY;
+                    case CHALLENGE -> UserJoiningGoal.CHALLENGE;
+                }).orElse(null))
+                .preferredCategories(preferredCategories.stream().map(ProjectCategoryReadEntity::toDto).toList())
+                .preferredLanguages(preferredLanguages.stream().map(LanguageReadEntity::toDto).toList());
     }
 }

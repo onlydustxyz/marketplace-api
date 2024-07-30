@@ -1,10 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 
+import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import io.hypersistence.utils.hibernate.type.array.UUIDArrayType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.List;
@@ -38,6 +41,25 @@ public class UserProfileInfoEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id", updatable = false, insertable = false)
     List<ContactInformationEntity> contactInformations;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "user_joining_goals")
+    UserProfile.JoiningGoal joiningGoal;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "user_joining_reasons")
+    UserProfile.JoiningReason joiningReason;
+
+    @Type(value = UUIDArrayType.class)
+    @Column(nullable = false, columnDefinition = "uuid[]")
+    UUID[] preferredLanguageIds;
+
+    @Type(value = UUIDArrayType.class)
+    @Column(nullable = false, columnDefinition = "uuid[]")
+    UUID[] preferredCategoryIds;
+
 
     public UserProfile toDomain() {
         return UserProfile.builder()

@@ -17,7 +17,6 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -74,17 +73,21 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public UserProfileView updateProfile(final @NonNull UUID userId,
-                                         final String avatarUrl,
-                                         final String location,
-                                         final String bio,
-                                         final String website,
-                                         final String contactEmail,
-                                         final List<Contact> contacts,
-                                         final UserAllocatedTimeToContribute allocatedTimeToContribute,
-                                         final Boolean isLookingForAJob,
-                                         final String firstName,
-                                         final String lastName
+    public void updateProfile(final @NonNull UUID userId,
+                              final String avatarUrl,
+                              final String location,
+                              final String bio,
+                              final String website,
+                              final String contactEmail,
+                              final List<Contact> contacts,
+                              final UserAllocatedTimeToContribute allocatedTimeToContribute,
+                              final Boolean isLookingForAJob,
+                              final String firstName,
+                              final String lastName,
+                              final UserProfile.JoiningReason joiningReason,
+                              final UserProfile.JoiningGoal joiningGoal,
+                              final List<UUID> preferredLanguageIds,
+                              final List<UUID> preferredCategoryIds
     ) {
         final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
@@ -103,12 +106,14 @@ public class UserService implements UserFacadePort {
                 .allocatedTimeToContribute(allocatedTimeToContribute == null ? userProfile.allocatedTimeToContribute() : allocatedTimeToContribute)
                 .isLookingForAJob(isLookingForAJob == null ? userProfile.isLookingForAJob() : isLookingForAJob)
                 .firstName(firstName == null ? userProfile.firstName() : firstName)
-                .lastName(lastName == null ? userProfile.lastName() : lastName);
+                .lastName(lastName == null ? userProfile.lastName() : lastName)
+                .preferredCategoriesIds(isNull(preferredCategoryIds) ? userProfile.preferredCategoriesIds() : preferredCategoryIds)
+                .preferredLanguageIds(isNull(preferredLanguageIds) ? userProfile.preferredLanguageIds() : preferredLanguageIds)
+                .joiningReason(joiningReason == null ? userProfile.joiningReason() : joiningReason)
+                .joiningGoal(joiningGoal == null ? userProfile.joiningGoal() : joiningGoal);
 
         userStoragePort.saveUser(user);
         userStoragePort.saveProfile(userId, userProfile);
-
-        return userStoragePort.getProfileById(userId);
     }
 
     @Override

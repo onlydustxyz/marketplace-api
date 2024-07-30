@@ -250,12 +250,8 @@ paths:
             schema:
               $ref: '#/components/schemas/UserProfileUpdateRequest'
       responses:
-        "200":
-          description: 'User profile'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PrivateUserProfileResponse'
+        "204":
+          description: 'User profile updated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4617,8 +4613,8 @@ components:
             $ref: '#/components/schemas/ContactInformation'
         joiningReason:
           $ref: '#/components/schemas/UserJoiningReason'
-        goal:
-          $ref: '#/components/schemas/UserGoal'
+        joiningGoal:
+          $ref: '#/components/schemas/UserJoiningGoal'
         allocatedTimeToContribute:
           $ref: '#/components/schemas/AllocatedTime'
         isLookingForAJob:
@@ -4628,7 +4624,6 @@ components:
           type: string
         lastName:
           type: string
-
         preferredLanguages:
           type: array
           items:
@@ -4684,6 +4679,16 @@ components:
               description: Whether the user is looking for a job or not
             joiningReason:
               $ref: '#/components/schemas/UserJoiningReason'
+            joiningGoal:
+              $ref: '#/components/schemas/UserJoiningGoal'
+            preferredLanguages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
+            preferredCategories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
 
     PublicUserProfileResponseV2:
       allOf:
@@ -8767,7 +8772,7 @@ components:
         - CONTRIBUTOR
         - MAINTAINER
 
-    UserGoal:
+    UserJoiningGoal:
       description: Goal the user wants to achieve on OnlyDust.
       type: string
       enum:

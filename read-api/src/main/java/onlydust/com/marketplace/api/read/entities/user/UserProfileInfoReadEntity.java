@@ -5,6 +5,9 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -47,6 +50,17 @@ public class UserProfileInfoReadEntity {
     @Getter(AccessLevel.NONE)
     AllocatedTimeEnumEntity weeklyAllocatedTime;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "user_joining_goals")
+    UserProfile.JoiningGoal joiningGoal;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "user_joining_reasons")
+    UserProfile.JoiningReason joiningReason;
+
+
     public Optional<AllocatedTimeEnumEntity> weeklyAllocatedTime() {
         return Optional.ofNullable(weeklyAllocatedTime);
     }
@@ -58,4 +72,5 @@ public class UserProfileInfoReadEntity {
     public List<ContactInformationReadEntity> allContacts() {
         return contacts == null ? List.of() : contacts;
     }
+
 }

@@ -24,7 +24,6 @@ import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.springframework.context.annotation.Profile;
@@ -42,7 +41,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
+import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.allocatedTimeToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.contactToDomain;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -73,7 +74,7 @@ public class MeRestApi implements MeApi {
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
             userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
         }
-        if (Boolean.TRUE.equals(patchMeContract.getHasCompletedOnboarding())){
+        if (Boolean.TRUE.equals(patchMeContract.getHasCompletedOnboarding())) {
             userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
         }
         return noContent().build();
@@ -108,9 +109,9 @@ public class MeRestApi implements MeApi {
     }
 
     @Override
-    public ResponseEntity<PrivateUserProfileResponse> updateMyProfile(UserProfileUpdateRequest userProfileRequest) {
+    public ResponseEntity<Void> updateMyProfile(UserProfileUpdateRequest userProfileRequest) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final UserProfileView updatedProfile = userFacadePort.updateProfile(authenticatedUser.getId(),
+        userFacadePort.updateProfile(authenticatedUser.getId(),
                 userProfileRequest.getAvatarUrl(),
                 userProfileRequest.getLocation(),
                 userProfileRequest.getBio(),
@@ -120,12 +121,22 @@ public class MeRestApi implements MeApi {
                 allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()),
                 userProfileRequest.getIsLookingForAJob(),
                 userProfileRequest.getFirstName(),
-                userProfileRequest.getLastName()
+                userProfileRequest.getLastName(),
+                isNull(userProfileRequest.getJoiningReason()) ? null : switch (userProfileRequest.getJoiningReason()) {
+                    case MAINTAINER -> UserProfile.JoiningReason.MAINTAINER;
+                    case CONTRIBUTOR -> UserProfile.JoiningReason.CONTRIBUTOR;
+                },
+                isNull(userProfileRequest.getJoiningGoal()) ? null : switch (userProfileRequest.getJoiningGoal()) {
+                    case CHALLENGE -> UserProfile.JoiningGoal.CHALLENGE;
+                    case EARN -> UserProfile.JoiningGoal.EARN;
+                    case LEARN -> UserProfile.JoiningGoal.LEARN;
+                    case NOTORIETY -> UserProfile.JoiningGoal.NOTORIETY;
+                },
+                userProfileRequest.getPreferredLanguages(),
+                userProfileRequest.getPreferredCategories()
         );
 
-        // TODO remove Profile from response ?
-        final PrivateUserProfileResponse userProfileResponse = userProfileToPrivateResponse(updatedProfile);
-        return ResponseEntity.ok(userProfileResponse);
+        return ResponseEntity.noContent().build();
     }
 
     @Override

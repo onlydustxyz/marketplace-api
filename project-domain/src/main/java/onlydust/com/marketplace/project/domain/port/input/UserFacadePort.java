@@ -6,6 +6,7 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
@@ -20,17 +21,21 @@ public interface UserFacadePort {
 
     User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly);
 
-    UserProfileView updateProfile(final @NonNull UUID userId,
-                                  final String avatarUrl,
-                                  final String location,
-                                  final String bio,
-                                  final String website,
-                                  final String contactEmail,
-                                  final List<Contact> contacts,
-                                  final UserAllocatedTimeToContribute allocatedTimeToContribute,
-                                  final Boolean isLookingForAJob,
-                                  final String firstName,
-                                  final String lastName);
+    void updateProfile(final @NonNull UUID userId,
+                       final String avatarUrl,
+                       final String location,
+                       final String bio,
+                       final String website,
+                       final String contactEmail,
+                       final List<Contact> contacts,
+                       final UserAllocatedTimeToContribute allocatedTimeToContribute,
+                       final Boolean isLookingForAJob,
+                       final String firstName,
+                       final String lastName,
+                       final UserProfile.JoiningReason joiningReason,
+                       final UserProfile.JoiningGoal joiningGoal,
+                       final List<UUID> preferredLanguageIds,
+                       final List<UUID> preferredCategoryIds);
 
     void refreshActiveUserProfiles(ZonedDateTime since);
 

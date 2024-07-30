@@ -30,4 +30,11 @@ public interface LanguageReadRepository extends Repository<LanguageReadEntity, U
             WHERE hp.hackathon_id = :hackathonId
             """, nativeQuery = true)
     List<LanguageReadEntity> findAllByHackathonId(UUID hackathonId);
+
+    @Query(value = """
+            SELECT DISTINCT l.*
+            FROM languages l
+            JOIN user_profile_info upi ON l.id = ANY (upi.preferred_language_ids) and upi.id = :userId
+            """, nativeQuery = true)
+    List<LanguageReadEntity> findPreferredOnesForUser(UUID userId);
 }

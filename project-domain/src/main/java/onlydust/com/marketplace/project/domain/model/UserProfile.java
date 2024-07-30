@@ -7,6 +7,7 @@ import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder(toBuilder = true)
@@ -23,4 +24,18 @@ public class UserProfile {
     private Boolean isLookingForAJob;
     private String firstName;
     private String lastName;
+    @Builder.Default
+    private List<UUID> preferredLanguageIds = new ArrayList<>();
+    @Builder.Default
+    private List<UUID> preferredCategoriesIds = new ArrayList<>();
+    private JoiningGoal joiningGoal;
+    private JoiningReason joiningReason;
+
+    public enum JoiningReason {
+        CONTRIBUTOR, MAINTAINER
+    }
+
+    public enum JoiningGoal {
+        LEARN, CHALLENGE, EARN, NOTORIETY
+    }
 }
