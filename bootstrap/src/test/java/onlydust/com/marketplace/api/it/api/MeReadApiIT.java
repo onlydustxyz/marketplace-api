@@ -133,7 +133,6 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
-
     @Test
     void should_get_caller_journey_for_non_indexed_users() {
         // Given
@@ -158,6 +157,60 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                           "telegramAdded": false,
                           "rewardReceived": false,
                           "rewardClaimed": false
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_caller_onboarding() {
+        // Given
+        final var anthony = userAuthHelper.authenticateAnthony();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_ONBOARDING))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + anthony.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "completed": true,
+                          "completion": 100,
+                          "verificationInformationProvided": true,
+                          "termsAndConditionsAccepted": true,
+                          "projectPreferencesProvided": null,
+                          "profileCompleted": true,
+                          "payoutInformationProvided": true
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_caller_onboarding_for_non_indexed_users() {
+        // Given
+        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 777, "DeViL", "https://devil.com/avatar.jpg", false);
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_ONBOARDING))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + newUser.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "completed": false,
+                          "completion": 0,
+                          "verificationInformationProvided": false,
+                          "termsAndConditionsAccepted": false,
+                          "projectPreferencesProvided": null,
+                          "profileCompleted": false,
+                          "payoutInformationProvided": false
                         }
                         """);
     }

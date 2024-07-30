@@ -982,6 +982,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/onboarding:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get the caller's onboarding completion
+      operationId: getOnboardingCompletion
+      description: |
+        Get the caller's onboarding completion
+      responses:
+        "200":
+          description: 'Onboarding completion'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OnboardingCompletionResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/users/search:
     get:
       security:
@@ -4615,7 +4637,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectCategoryId'
-    
+
     UserProfileCoverColor:
       type: string
       enum:
