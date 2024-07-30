@@ -191,7 +191,7 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_caller_onboarding_for_non_indexed_users() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 666, "DeViL", "https://devil.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 777, "DeViL", "https://devil.com/avatar.jpg", false);
 
         // When
         client.get()

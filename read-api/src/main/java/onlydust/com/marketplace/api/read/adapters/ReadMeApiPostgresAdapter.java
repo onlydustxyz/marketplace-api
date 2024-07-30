@@ -82,6 +82,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     }
 
     @Override
+    @Deprecated
     public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.getId())
