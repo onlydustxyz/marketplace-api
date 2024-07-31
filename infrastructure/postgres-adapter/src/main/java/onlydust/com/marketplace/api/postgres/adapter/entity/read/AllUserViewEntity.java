@@ -62,8 +62,8 @@ public class AllUserViewEntity {
     public GithubUserIdentity toGithubIdentity() {
         return GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
-                .githubLogin(login)
-                .githubAvatarUrl(avatarUrl)
+                .login(login)
+                .avatarUrl(avatarUrl)
                 .email(email)
                 .build();
     }

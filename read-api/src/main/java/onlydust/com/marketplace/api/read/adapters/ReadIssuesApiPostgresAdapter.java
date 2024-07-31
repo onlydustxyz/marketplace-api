@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.contract.model.GithubIssueResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.read.repositories.GithubIssueReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +31,7 @@ public class ReadIssuesApiPostgresAdapter implements ReadIssuesApi {
 
         final var issueProjectIds = issue.repo().projects().stream().map(ProjectViewEntity::getId).toList();
         final var projectLedIds = authenticatedAppUserService.tryGetAuthenticatedUser()
-                .map(user -> user.getProjectsLed().stream().map(ProjectLedView::getId).toList())
+                .map(user -> user.projectsLed().stream().toList())
                 .orElse(List.of());
 
         final var asProjectLead = projectLedIds.stream().anyMatch(issueProjectIds::contains);

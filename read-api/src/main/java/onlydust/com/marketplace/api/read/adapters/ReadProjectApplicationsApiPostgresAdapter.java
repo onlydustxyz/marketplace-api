@@ -46,7 +46,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         }
 
         final var caller = authenticatedAppUserService.getAuthenticatedUser();
-        if (!caller.getGithubUserId().equals(applicantId) && !permissionService.isUserProjectLead(projectId, caller.getId())) {
+        if (!caller.githubUserId().equals(applicantId) && !permissionService.isUserProjectLead(projectId, caller.id())) {
             throw forbidden("Only project leads can get project applications");
         }
 
@@ -71,8 +71,8 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         final var caller = authenticatedAppUserService.getAuthenticatedUser();
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
-        if (!caller.getGithubUserId().equals(application.applicant().githubUserId()) &&
-            !permissionService.isUserProjectLead(application.projectId(), caller.getId())) {
+        if (!caller.githubUserId().equals(application.applicant().githubUserId()) &&
+            !permissionService.isUserProjectLead(application.projectId(), caller.id())) {
             throw forbidden("Only project leads and applicant can get application details");
         }
         return ok(application.toDto());

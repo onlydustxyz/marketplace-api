@@ -24,7 +24,10 @@ import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
-import onlydust.com.marketplace.project.domain.observer.*;
+import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
+import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
+import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.*;
@@ -103,14 +106,12 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public UserFacadePort userFacadePort(final UserObserverPort userObservers,
-                                         final PostgresUserAdapter postgresUserAdapter,
+    public UserFacadePort userFacadePort(final PostgresUserAdapter postgresUserAdapter,
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
                                          final ImageStoragePort imageStoragePort) {
         return new UserService(
-                userObservers,
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
@@ -182,8 +183,9 @@ public class ProjectConfiguration {
 
     @Bean
     public OutboxConsumerJob indexerOutboxJob(final OutboxPort indexerOutbox,
-                                              final OutboxConsumer indexerApiOutboxConsumer) {
-        return new OutboxConsumerJob(indexerOutbox, indexerApiOutboxConsumer);
+                                              final OutboxConsumer indexerApiProjectOutboxConsumer,
+                                              final OutboxConsumer indexerApiUserOutboxConsumer) {
+        return new OutboxConsumerJob(indexerOutbox, new OutboxConsumerComposite(indexerApiProjectOutboxConsumer, indexerApiUserOutboxConsumer));
     }
 
     @Bean
@@ -276,8 +278,8 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxConsumer indexerApiOutboxConsumer(final IndexerPort indexerPort) {
-        return new IndexerApiOutboxConsumer(indexerPort);
+    public OutboxConsumer indexerApiProjectOutboxConsumer(final IndexerPort indexerPort) {
+        return new IndexerApiProjectOutboxConsumer(indexerPort);
     }
 
     @Bean
@@ -286,29 +288,24 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public OutboxService outboxService(final OutboxPort indexerOutbox,
-                                       final OutboxPort trackingOutbox) {
-        return new OutboxService(indexerOutbox, trackingOutbox);
+    public OutboxProjectService outboxProjectService(final OutboxPort indexerOutbox,
+                                                     final OutboxPort trackingOutbox) {
+        return new OutboxProjectService(indexerOutbox, trackingOutbox);
     }
 
     @Bean
-    public ProjectObserverPort projectObservers(final OutboxService outboxService,
+    public ProjectObserverPort projectObservers(final OutboxProjectService outboxProjectService,
                                                 final SlackApiAdapter slackApiAdapter,
                                                 final ContributionService contributionService) {
-        return new ProjectObserverComposite(outboxService, contributionService, slackApiAdapter);
+        return new ProjectObserverComposite(outboxProjectService, contributionService, slackApiAdapter);
     }
 
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
                                                         final GithubIssueCommenter githubIssueCommenter,
-                                                        final OutboxService outboxService,
+                                                        final OutboxProjectService outboxProjectService,
                                                         final ApplicationMailNotifier applicationMailNotifier) {
-        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxService, applicationMailNotifier);
-    }
-
-    @Bean
-    public UserObserverPort userObservers(final OutboxService outboxService) {
-        return new UserObserverComposite(outboxService);
+        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxProjectService, applicationMailNotifier);
     }
 
     @Bean

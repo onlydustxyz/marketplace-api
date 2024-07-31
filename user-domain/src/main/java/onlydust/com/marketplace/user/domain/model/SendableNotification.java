@@ -14,9 +14,9 @@ import onlydust.com.marketplace.kernel.model.notification.Notification;
 @ToString(callSuper = true)
 @SuperBuilder(toBuilder = true)
 public class SendableNotification extends Notification {
-    User recipient;
+    SmallUser recipient;
 
-    public static SendableNotification of(User recipient, Notification notification) {
+    public static SendableNotification of(SmallUser recipient, Notification notification) {
         return SendableNotification.builder()
                 .recipient(recipient)
                 .id(notification.id())

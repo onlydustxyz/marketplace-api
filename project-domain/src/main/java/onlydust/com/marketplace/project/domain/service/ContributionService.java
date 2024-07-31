@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
@@ -25,9 +25,9 @@ public class ContributionService implements ContributionFacadePort, Contribution
     final GithubApiPort githubApiPort;
 
     @Override
-    public ContributionDetailsView getContribution(UUID projectId, String contributionId, User caller) {
-        if (!permissionService.isUserContributor(contributionId, caller.getGithubUserId()) &&
-            !permissionService.isUserProjectLead(projectId, caller.getId()))
+    public ContributionDetailsView getContribution(UUID projectId, String contributionId, AuthenticatedUser caller) {
+        if (!permissionService.isUserContributor(contributionId, caller.githubUserId()) &&
+            !permissionService.isUserProjectLead(projectId, caller.id()))
             throw forbidden("User is not the contributor of this contribution, nor a project leader" +
                             " of this project");
         return contributionStoragePort.findContributionById(projectId, contributionId);

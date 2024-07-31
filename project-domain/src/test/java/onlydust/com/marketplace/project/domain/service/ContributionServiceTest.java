@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -48,7 +49,7 @@ class ContributionServiceTest {
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
         when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
         final var contribution = contributionService.getContribution(projectId, contributionId,
-                User.builder().id(userId).githubUserId(githubUserId).build());
+                AuthenticatedUser.builder().id(userId).githubUserId(githubUserId).build());
 
         // Then
         assertThat(contribution).isEqualTo(expectedContribution);
@@ -69,7 +70,7 @@ class ContributionServiceTest {
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(true);
         when(contributionStoragePort.findContributionById(projectId, contributionId)).thenReturn(expectedContribution);
         final var contribution = contributionService.getContribution(projectId, contributionId,
-                User.builder().id(userId).githubUserId(githubUserId).build());
+                AuthenticatedUser.builder().id(userId).githubUserId(githubUserId).build());
 
         // Then
         assertThat(contribution).isEqualTo(expectedContribution);
@@ -88,7 +89,7 @@ class ContributionServiceTest {
         when(permissionService.isUserProjectLead(projectId, userId)).thenReturn(false);
 
         assertThatThrownBy(() -> contributionService.getContribution(projectId, contributionId,
-                User.builder().id(userId).githubUserId(githubUserId).build()))
+                AuthenticatedUser.builder().id(userId).githubUserId(githubUserId).build()))
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("User is not the contributor of this contribution, nor a project leader of this project");
     }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.ProjectId;
-import onlydust.com.marketplace.user.domain.model.User;
+import onlydust.com.marketplace.user.domain.model.SmallUser;
 
 import java.io.Serializable;
 import java.util.Optional;
@@ -39,7 +39,7 @@ public class NotificationSettingsForProjectEntity {
         UUID projectId;
     }
 
-    public static NotificationSettingsForProjectEntity of(User.Id userId, NotificationSettings.Project settings) {
+    public static NotificationSettingsForProjectEntity of(SmallUser.Id userId, NotificationSettings.Project settings) {
         return NotificationSettingsForProjectEntity.builder()
                 .userId(userId.value())
                 .projectId(settings.projectId().value())

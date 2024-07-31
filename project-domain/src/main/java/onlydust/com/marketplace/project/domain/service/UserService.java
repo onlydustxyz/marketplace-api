@@ -4,13 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
@@ -34,42 +35,12 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @Slf4j
 public class UserService implements UserFacadePort {
 
-    private final UserObserverPort userObserverPort;
     private final UserStoragePort userStoragePort;
     private final DateProvider dateProvider;
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
 
-    @Override
-    @Transactional
-    public User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
-        return userStoragePort
-                .getRegisteredUserByGithubId(githubUserIdentity.getGithubUserId())
-                .map(user -> {
-                    if (!readOnly)
-                        userStoragePort.updateUserLastSeenAt(user.getId(), dateProvider.now());
-
-                    return user;
-                })
-                .orElseGet(() -> {
-                    if (readOnly) {
-                        throw notFound("User %d not found".formatted(githubUserIdentity.getGithubUserId()));
-                    }
-
-                    final var user = userStoragePort.createUser(User.builder()
-                            .id(UUID.randomUUID())
-                            .roles(List.of(AuthenticatedUser.Role.USER))
-                            .githubUserId(githubUserIdentity.getGithubUserId())
-                            .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
-                            .githubLogin(githubUserIdentity.getGithubLogin())
-                            .email(githubUserIdentity.getEmail())
-                            .build());
-
-                    userObserverPort.onUserSignedUp(user);
-                    return user;
-                });
-    }
 
     @Override
     @Transactional
@@ -95,7 +66,7 @@ public class UserService implements UserFacadePort {
         final var userProfile = userStoragePort.findProfileById(userId)
                 .orElse(UserProfile.builder().build());
 
-        user.setEmail(contactEmail == null ? user.getEmail() : contactEmail);
+        user.email(contactEmail == null ? user.email() : contactEmail);
 
         userProfile
                 .avatarUrl(avatarUrl == null ? userProfile.avatarUrl() : avatarUrl)
@@ -127,16 +98,10 @@ public class UserService implements UserFacadePort {
         final var activeUsers = userStoragePort.getUsersLastSeenSince(since);
 
         final var userProfiles = activeUsers.stream()
-                .map(User::getGithubUserId)
+                .map(AuthenticatedUser::githubUserId)
                 .map(githubSearchPort::getUserProfile)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map(githubUserProfile -> User.builder()
-                        .githubUserId(githubUserProfile.getGithubUserId())
-                        .githubLogin(githubUserProfile.getGithubLogin())
-                        .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
-                        .email(githubUserProfile.getEmail())
-                        .build())
                 .toList();
 
         if (userProfiles.size() < activeUsers.size()) {
@@ -148,15 +113,9 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void updateGithubProfile(User user) {
-        userStoragePort.saveUser(githubSearchPort.getUserProfile(user.getGithubUserId())
-                .map(githubUserProfile -> User.builder()
-                        .githubUserId(githubUserProfile.getGithubUserId())
-                        .githubLogin(githubUserProfile.getGithubLogin())
-                        .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
-                        .email(githubUserProfile.getEmail())
-                        .build()).orElseThrow(() -> notFound(String.format("Github user %s to update was not found",
-                        user.getGithubUserId()))));
+    public void updateGithubProfile(Long githubUserId) {
+        userStoragePort.saveUser(githubSearchPort.getUserProfile(githubUserId)
+                .orElseThrow(() -> notFound(String.format("Github user %s to update was not found", githubUserId))));
     }
 
     @Override
@@ -214,7 +173,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void claimProjectForAuthenticatedUser(UUID projectId, User user) {
+    public void claimProjectForAuthenticatedUser(UUID projectId, AuthenticatedUser user) {
         final var projectLeaders = projectStoragePort.getProjectLeadIds(projectId);
         final var projectInvitedLeaders = projectStoragePort.getProjectInvitedLeadIds(projectId);
         if (!projectLeaders.isEmpty() || !projectInvitedLeaders.isEmpty()) {
@@ -234,7 +193,7 @@ public class UserService implements UserFacadePort {
                             "project");
 
         }
-        userStoragePort.saveProjectLead(user.getId(), projectId);
+        userStoragePort.saveProjectLead(user.id(), projectId);
     }
 
     @Override
@@ -243,13 +202,13 @@ public class UserService implements UserFacadePort {
         return this.imageStoragePort.storeImage(imageInputStream);
     }
 
-    private boolean cannotBeClaimedByUser(User user, ProjectOrganizationView org) {
-        if (org.getId().equals(user.getGithubUserId())) {
+    private boolean cannotBeClaimedByUser(AuthenticatedUser user, ProjectOrganizationView org) {
+        if (org.getId().equals(user.githubUserId())) {
             return false;
         }
         final GithubMembership githubMembership =
-                githubSearchPort.getGithubUserMembershipForOrganization(user.getGithubUserId(),
-                        user.getGithubLogin(), org.getLogin());
+                githubSearchPort.getGithubUserMembershipForOrganization(user.githubUserId(),
+                        user.login(), org.getLogin());
         if (org.getIsInstalled() && (githubMembership.equals(GithubMembership.MEMBER) || githubMembership.equals(GithubMembership.ADMIN))) {
             return false;
         }

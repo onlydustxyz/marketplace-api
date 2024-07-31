@@ -47,13 +47,13 @@ public class ContributionRewardQueryEntity {
 
     public ContributionRewardView toView() {
         final var requestor = GithubUserIdentity.builder()
-                .githubLogin(requestorLogin)
-                .githubAvatarUrl(requestorAvatarUrl)
+                .login(requestorLogin)
+                .avatarUrl(requestorAvatarUrl)
                 .githubUserId(requestorId)
                 .build();
         final var recipient = GithubUserIdentity.builder()
-                .githubLogin(recipientLogin)
-                .githubAvatarUrl(recipientAvatarUrl)
+                .login(recipientLogin)
+                .avatarUrl(recipientAvatarUrl)
                 .githubUserId(recipientId)
                 .build();
 

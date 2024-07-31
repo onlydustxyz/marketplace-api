@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributionMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchResponseMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.springframework.context.annotation.Profile;
@@ -98,7 +98,7 @@ public class UsersRestApi implements UsersApi {
                 .build();
 
         final var contributions = contributorFacadePort.contributions(
-                caller.map(User::getGithubUserId),
+                caller.map(AuthenticatedUser::githubUserId),
                 filters,
                 ContributionMapper.mapSort(sort),
                 SortDirectionMapper.requestToDomain(direction),

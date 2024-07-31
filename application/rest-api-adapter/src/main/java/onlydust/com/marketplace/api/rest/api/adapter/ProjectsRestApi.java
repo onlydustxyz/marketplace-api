@@ -13,8 +13,10 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.port.input.*;
+import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.view.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Profile;
@@ -46,7 +48,6 @@ import static org.springframework.http.ResponseEntity.noContent;
 public class ProjectsRestApi implements ProjectsApi {
 
     private final ProjectFacadePort projectFacadePort;
-    private final ProjectCategoryFacadePort projectCategoryFacadePort;
     private final ProjectRewardFacadePort projectRewardFacadePort;
     private final ProjectRewardFacadePort projectRewardFacadePortV2;
     private final AuthenticatedAppUserService authenticatedAppUserService;
@@ -55,11 +56,11 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<CreateProjectResponse> createProject(CreateProjectRequest createProjectRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var projectIdentity =
-                projectFacadePort.createProject(authenticatedUser.getId(), mapCreateProjectCommandToDomain(createProjectRequest,
-                        authenticatedUser.getId()));
+                projectFacadePort.createProject(authenticatedUser.id(), mapCreateProjectCommandToDomain(createProjectRequest,
+                        authenticatedUser.id()));
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
         createProjectResponse.setProjectId(projectIdentity.getLeft());
@@ -70,8 +71,8 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<UpdateProjectResponse> updateProject(UUID projectId,
                                                                UpdateProjectRequest updateProjectRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.getId(),
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.id(),
                 mapUpdateProjectCommandToDomain(projectId,
                         updateProjectRequest));
         return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft()).projectSlug(projectIdAndSlug.getRight()));
@@ -94,16 +95,16 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
-                authenticatedUser.getId());
+                authenticatedUser.id());
         return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
     }
 
     @Override
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var rewardId = rewardFacadePort.createReward(authenticatedUser.getId(),
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var rewardId = rewardFacadePort.createReward(authenticatedUser.id(),
                 RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
         final var response = new CreateRewardResponse();
         response.setId(rewardId);
@@ -112,17 +113,17 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<Void> cancelReward(UUID projectId, UUID rewardId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        rewardFacadePort.cancelReward(authenticatedUser.getId(), projectId, rewardId);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        rewardFacadePort.cancelReward(authenticatedUser.id(), projectId, rewardId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
-                authenticatedUser.getId());
-        return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView, authenticatedUser.asAuthenticatedUser()));
+                authenticatedUser.id());
+        return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView, authenticatedUser));
     }
 
     @Override
@@ -130,9 +131,9 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                              Integer pageIndex, Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Page<RewardItemView> page = projectRewardFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
-                authenticatedUser.getId(), sanitizedPageIndex, sanitizedPageSize);
+                authenticatedUser.id(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
@@ -150,7 +151,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                                          Boolean includeIgnoredItems) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final ContributionType contributionType = isNull(type) ? null : switch (type) {
             case ISSUE -> ContributionType.ISSUE;
             case PULL_REQUEST -> ContributionType.PULL_REQUEST;
@@ -165,7 +166,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final Page<RewardableItemView> rewardableItemsPage =
                 projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
                         contributionType, contributionStatus,
-                        authenticatedUser.getId(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
+                        authenticatedUser.id(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
                         isNull(includeIgnoredItems) ? false : includeIgnoredItems);
         final RewardableItemsPageResponse rewardableItemsPageResponse =
                 RewardableItemMapper.pageToResponse(sanitizedPageIndex,
@@ -178,10 +179,10 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<AllRewardableItemsResponse> getAllCompletedProjectRewardableContributions(UUID projectId,
                                                                                                     Long githubUserId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final List<RewardableItemView> rewardableItems =
                 projectFacadePort.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId,
-                        authenticatedUser.getId(), githubUserId);
+                        authenticatedUser.id(), githubUserId);
         final AllRewardableItemsResponse response =
                 RewardableItemMapper.listToResponse(rewardableItems);
         return ResponseEntity.ok(response);
@@ -189,26 +190,26 @@ public class ProjectsRestApi implements ProjectsApi {
 
     @Override
     public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var contribution = contributionsFacadePort.getContribution(projectId, contributionId, authenticatedUser);
 
-        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution, authenticatedUser.asAuthenticatedUser()));
+        return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution, authenticatedUser));
     }
 
     @Override
     public ResponseEntity<Void> updateIgnoredContributions(UUID projectId,
                                                            UpdateProjectIgnoredContributionsRequest updateProjectIgnoredContributionsRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
             !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
-            contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.getId(),
+            contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.id(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
             !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
-            contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.getId(),
+            contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.id(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }
         return noContent().build();
@@ -217,8 +218,8 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardableItemResponse> addRewardableOtherIssue(UUID projectId,
                                                                           AddOtherIssueRequest addOtherIssueRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardableItemView issue = projectFacadePort.addRewardableIssue(projectId, authenticatedUser.getId(),
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final RewardableItemView issue = projectFacadePort.addRewardableIssue(projectId, authenticatedUser.id(),
                 addOtherIssueRequest.getGithubIssueHtmlUrl());
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
@@ -226,9 +227,9 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardableItemResponse> addRewardableOtherPullRequest(UUID projectId,
                                                                                 AddOtherPullRequestRequest addOtherPullRequestRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardableItemView pullRequest = projectFacadePort.addRewardablePullRequest(projectId,
-                authenticatedUser.getId(),
+                authenticatedUser.id(),
                 addOtherPullRequestRequest.getGithubPullRequestHtmlUrl());
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(pullRequest));
     }
@@ -236,11 +237,11 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<RewardableItemResponse> addRewardableOtherWork(UUID projectId,
                                                                          AddOtherWorkRequest addOtherWorkRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardableItemView issue = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
                 CreateAndCloseIssueCommand.builder()
                         .projectId(projectId)
-                        .projectLeadId(authenticatedUser.getId())
+                        .projectLeadId(authenticatedUser.id())
                         .githubRepoId(addOtherWorkRequest.getGithubRepoId())
                         .title(addOtherWorkRequest.getTitle())
                         .description(addOtherWorkRequest.getDescription())
@@ -261,7 +262,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                             String direction,
                                                                             Integer pageIndex,
                                                                             Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -296,7 +297,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<ContributionPageResponse> getProjectStaledContributions(UUID projectId, Integer pageIndex,
                                                                                   Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -320,7 +321,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectChurnedContributorsPageResponse> getProjectChurnedContributors(UUID projectId,
                                                                                                 Integer pageIndex,
                                                                                                 Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -343,7 +344,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<ProjectNewcomersPageResponse> getProjectNewcomers(UUID projectId, Integer pageIndex,
                                                                             Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -367,7 +368,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ProjectContributorActivityPageResponse> getProjectMostActiveContributors(UUID projectId,
                                                                                                    Integer pageIndex,
                                                                                                    Integer pageSize) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
@@ -389,21 +390,21 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<Void> hideContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectFacadePort.hideContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
+        projectFacadePort.hideContributorForProjectLead(projectId, authenticatedUser.id(), githubUserId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> showContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.getId(), githubUserId);
+        projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.id(), githubUserId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> unassignContribution(UUID projectId, String contributionId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        contributionsFacadePort.unassign(projectId, authenticatedUser.getId(), contributionId);
+        contributionsFacadePort.unassign(projectId, authenticatedUser.id(), contributionId);
         return noContent().build();
     }
 }

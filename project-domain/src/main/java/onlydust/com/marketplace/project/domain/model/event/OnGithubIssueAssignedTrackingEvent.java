@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
-import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -27,11 +26,11 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     boolean isGoodFirstIssue;
 
     public static OnGithubIssueAssignedTrackingEvent of(@NonNull OnGithubIssueAssigned onGithubIssueAssigned,
-                                                        @NonNull Optional<User> user) {
+                                                        @NonNull Optional<UUID> userId) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
-                .assigneeUserId(user.map(User::getId).orElse(null))
+                .assigneeUserId(userId.orElse(null))
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))

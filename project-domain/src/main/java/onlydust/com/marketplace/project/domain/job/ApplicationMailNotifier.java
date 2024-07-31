@@ -40,9 +40,9 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
             final var issue = githubStoragePort.findIssueById(application.issueId())
                     .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
             projectMailOutboxPort.push(new ProjectApplicationAccepted(
-                    applicant.getId(),
-                    applicant.getEmail(),
-                    applicant.getGithubLogin(),
+                    applicant.id(),
+                    applicant.email(),
+                    applicant.login(),
                     new ProjectApplicationAccepted.Project(project.getId(), project.getSlug(), project.getName()),
                     new ProjectApplicationAccepted.Issue(issue.id().value(), issue.htmlUrl(), issue.title(), issue.repoName(), issue.description())
             ));

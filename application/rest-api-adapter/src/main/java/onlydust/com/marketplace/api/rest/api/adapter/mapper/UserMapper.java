@@ -2,7 +2,11 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.Application;
+import onlydust.com.marketplace.project.domain.model.Contact;
+import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
+import onlydust.com.marketplace.project.domain.model.UserProfileCover;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.util.List;
@@ -123,7 +127,7 @@ public interface UserMapper {
         };
     }
 
-    static ProjectApplicationShortResponse map(final User authenticatedUser, final Application application) {
+    static ProjectApplicationShortResponse map(final AuthenticatedUser authenticatedUser, final Application application) {
         return new ProjectApplicationShortResponse()
                 .id(application.id().value())
                 .applicant(map(authenticatedUser))
@@ -131,11 +135,11 @@ public interface UserMapper {
                 .problemSolvingApproach(application.problemSolvingApproach());
     }
 
-    static ContributorResponse map(User authenticatedUser) {
+    static ContributorResponse map(AuthenticatedUser authenticatedUser) {
         return new ContributorResponse()
-                .githubUserId(authenticatedUser.getGithubUserId())
-                .login(authenticatedUser.getGithubLogin())
-                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
+                .githubUserId(authenticatedUser.githubUserId())
+                .login(authenticatedUser.login())
+                .avatarUrl(authenticatedUser.avatarUrl())
                 .isRegistered(true);
     }
 }

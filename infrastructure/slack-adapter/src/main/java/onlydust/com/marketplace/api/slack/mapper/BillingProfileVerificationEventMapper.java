@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.slack.mapper;
 
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 
 import static java.util.Objects.nonNull;
 
@@ -46,7 +46,7 @@ public interface BillingProfileVerificationEventMapper {
 
 
     static String mapToSlackBlock(final BillingProfileVerificationUpdated billingProfileVerificationUpdated,
-                                  final User user,
+                                  final AuthenticatedUser user,
                                   final Boolean tagAllChannel) {
         String mainMessage = "*New %s event : <%s|Check on Sumsub>*".formatted(billingProfileVerificationUpdated.getType().name(),
                 "https://cockpit.sumsub.com/checkus/#/applicant/%s/basicInfo?clientId=onlydust".formatted(billingProfileVerificationUpdated.getExternalApplicantId()));
@@ -57,10 +57,10 @@ public interface BillingProfileVerificationEventMapper {
         return SLACK_BLOCKS_TEMPLATE.formatted(
                 mainMessage,
                 nonNull(billingProfileVerificationUpdated.getUserId()) ? billingProfileVerificationUpdated.getUserId().toString() : null,
-                user.getGithubLogin(),
-                nonNull(user.getGithubUserId()) ? user.getGithubUserId().toString() : null,
-                user.getEmail(),
-                user.getGithubAvatarUrl(),
+                user.login(),
+                nonNull(user.githubUserId()) ? user.githubUserId().toString() : null,
+                user.email(),
+                user.administratedBillingProfiles(),
                 nonNull(billingProfileVerificationUpdated.getType()) ? billingProfileVerificationUpdated.getType().toString() : null,
                 nonNull(billingProfileVerificationUpdated.getVerificationStatus()) ?
                         billingProfileVerificationUpdated.getVerificationStatus().name() : null,

@@ -2,9 +2,14 @@ package onlydust.com.marketplace.api.configuration;
 
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import onlydust.com.marketplace.user.domain.job.IndexerApiUserOutboxConsumer;
+import onlydust.com.marketplace.user.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
+import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.user.domain.port.output.*;
 import onlydust.com.marketplace.user.domain.service.*;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +28,9 @@ public class UserDomainConfiguration {
                                                final GithubOAuthAppPort githubOAuthAppPort,
                                                final IdentityProviderPort identityProviderPort,
                                                final GithubUserStoragePort githubUserStoragePort,
-                                               final IndexerPort indexerPort) {
-        return new AppUserService(appUserStoragePort, githubOAuthAppPort, identityProviderPort, githubUserStoragePort, indexerPort);
+                                               final IndexerPort indexerPort,
+                                               final UserObserverPort userObservers) {
+        return new AppUserService(appUserStoragePort, githubOAuthAppPort, identityProviderPort, githubUserStoragePort, indexerPort, userObservers);
     }
 
     @Bean
@@ -47,5 +53,21 @@ public class UserDomainConfiguration {
                 notificationStoragePort,
                 userStoragePort,
                 asyncNotificationEmailProcessor);
+    }
+
+    @Bean
+    public OutboxConsumer indexerApiUserOutboxConsumer(final IndexerPort indexerPort) {
+        return new IndexerApiUserOutboxConsumer(indexerPort);
+    }
+
+    @Bean
+    public OutboxUserService outboxUserService(final OutboxPort indexerOutbox,
+                                               final OutboxPort trackingOutbox) {
+        return new OutboxUserService(indexerOutbox, trackingOutbox);
+    }
+
+    @Bean
+    public UserObserverPort userObservers(final OutboxUserService outboxUserService) {
+        return new UserObserverComposite(outboxUserService);
     }
 }

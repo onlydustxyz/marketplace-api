@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.app;
 
 import lombok.Builder;
 import lombok.Value;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -11,13 +11,13 @@ import java.util.Collection;
 @Builder
 public class Auth0OnlyDustAppAuthentication implements OnlyDustAppAuthentication {
     String credentials;
-    User user;
+    AuthenticatedUser user;
     String principal;
     Collection<? extends GrantedAuthority> authorities;
     @Builder.Default
     Boolean isAuthenticated = false;
 
-    User impersonator;
+    AuthenticatedUser impersonator;
     boolean impersonating;
 
     @Override
@@ -61,7 +61,7 @@ public class Auth0OnlyDustAppAuthentication implements OnlyDustAppAuthentication
     }
 
     @Override
-    public User getImpersonator() {
+    public AuthenticatedUser getImpersonator() {
         return impersonator;
     }
 }

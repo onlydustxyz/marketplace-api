@@ -9,8 +9,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.Auth0J
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.auth0.AuthenticationService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import org.springframework.security.core.Authentication;
 
 import java.util.Optional;
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Auth0OnlyDustAppAuthenticationService implements AuthenticationService {
     private final ObjectMapper objectMapper;
-    private final UserFacadePort userFacadePort;
+    private final AppUserFacadePort appUserFacadePort;
 
     @Override
     public Optional<Authentication> getAuthentication(@NonNull final Auth0JwtClaims userClaims,
@@ -33,30 +32,30 @@ public class Auth0OnlyDustAppAuthenticationService implements AuthenticationServ
         }
 
         return Optional.of(Auth0OnlyDustAppAuthentication.builder()
-                .authorities(user.getRoles().stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
+                .authorities(user.roles().stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(credentials)
                 .isAuthenticated(true)
                 .user(user)
-                .principal(user.getGithubUserId().toString())
+                .principal(user.githubUserId().toString())
                 .impersonating(false)
                 .build());
     }
 
-    private User getUserFromClaims(final Auth0JwtClaims jwtClaims, final boolean isImpersonated) {
+    private AuthenticatedUser getUserFromClaims(final Auth0JwtClaims jwtClaims, final boolean isImpersonated) {
         final Long githubUserId = Long.valueOf(jwtClaims.getSub().replaceFirst("github\\|", ""));
-        return this.userFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
+        return this.appUserFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
-                .githubLogin(jwtClaims.getNickname())
-                .githubAvatarUrl(jwtClaims.getPicture())
+                .login(jwtClaims.getNickname())
+                .avatarUrl(jwtClaims.getPicture())
                 .email(jwtClaims.getEmail())
                 .build(), isImpersonated);
     }
 
     private Optional<Authentication> getAuthenticationFromImpersonationHeader(final String credentials,
-                                                                              final User impersonator,
+                                                                              final AuthenticatedUser impersonator,
                                                                               final String impersonationHeader) {
-        if (!impersonator.getRoles().contains(AuthenticatedUser.Role.ADMIN)) {
-            LOGGER.warn("User {} is not allowed to impersonate", impersonator.getGithubLogin());
+        if (!impersonator.roles().contains(AuthenticatedUser.Role.ADMIN)) {
+            LOGGER.warn("User {} is not allowed to impersonate", impersonator.login());
             return Optional.empty();
         }
         final Auth0JwtClaims claims;
@@ -67,16 +66,16 @@ public class Auth0OnlyDustAppAuthenticationService implements AuthenticationServ
             return Optional.empty();
         }
 
-        final User impersonated = getUserFromClaims(claims, true);
+        final var impersonated = getUserFromClaims(claims, true);
 
         LOGGER.info("User {} is impersonating {}", impersonator, impersonated);
 
         return Optional.of(Auth0OnlyDustAppAuthentication.builder()
-                .authorities(impersonated.getRoles().stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
+                .authorities(impersonated.roles().stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
                 .credentials(credentials)
                 .isAuthenticated(true)
                 .user(impersonated)
-                .principal(impersonated.getGithubUserId().toString())
+                .principal(impersonated.githubUserId().toString())
                 .impersonating(true)
                 .impersonator(impersonator)
                 .build());

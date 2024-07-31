@@ -10,7 +10,7 @@ import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAcc
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
-import onlydust.com.marketplace.user.domain.model.User;
+import onlydust.com.marketplace.user.domain.model.SmallUser;
 
 import java.math.RoundingMode;
 import java.util.List;
@@ -112,7 +112,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
         return new IdentifiersDTO(isNull(id) ? null : id.toString(), isNull(id) ? email : null);
     }
 
-    private static IdentifiersDTO mapIdentifiers(@NonNull User user) {
+    private static IdentifiersDTO mapIdentifiers(@NonNull SmallUser user) {
         return new IdentifiersDTO(user.id().toString(), user.email());
     }
 

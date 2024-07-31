@@ -23,9 +23,9 @@ public class ContributorSearchResponseMapper {
 
     static ContributorResponse of(Contributor contributor) {
         return new ContributorResponse()
-                .githubUserId(contributor.getId().getGithubUserId())
-                .login(contributor.getId().getGithubLogin())
-                .avatarUrl(contributor.getId().getGithubAvatarUrl())
+                .githubUserId(contributor.getId().githubUserId())
+                .login(contributor.getId().login())
+                .avatarUrl(contributor.getId().avatarUrl())
                 .isRegistered(contributor.getIsRegistered());
     }
 }

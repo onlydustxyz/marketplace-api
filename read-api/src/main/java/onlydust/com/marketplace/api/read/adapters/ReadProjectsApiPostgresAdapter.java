@@ -22,8 +22,8 @@ import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -34,7 +34,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -83,14 +86,14 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final Boolean hasGoodFirstIssues,
                                                            final String sort
     ) {
-        final Optional<User> user = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var user = authenticatedAppUserService.tryGetAuthenticatedUser();
         final ProjectMapper.SortBy sortBy = mapSortByParameter(sort);
 
         final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.getId(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.id(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
                         categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
                 .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs, hasGoodFirstIssues,
                         sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
@@ -168,7 +171,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var userId = caller == null ? null : caller.getId();
+        final var userId = caller == null ? null : caller.id();
         if (!permissionService.hasUserAccessToProject(projectId, userId)) {
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
         }
@@ -183,7 +186,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var userId = caller == null ? null : caller.getId();
+        final var userId = caller == null ? null : caller.id();
         if (!permissionService.hasUserAccessToProject(slug, userId)) {
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug, userId));
         }
@@ -201,7 +204,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var page = githubIssueReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, false,
                 null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
         return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
+                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
@@ -237,14 +240,14 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CLOSED_AT -> "closed_at";
                 })));
         return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(User::getGithubUserId).orElse(null))).toList())
+                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
-    private ProjectResponse getProjectDetails(ProjectReadEntity project, User caller, final Boolean includeAllAvailableRepos) {
+    private ProjectResponse getProjectDetails(ProjectReadEntity project, AuthenticatedUser caller, final Boolean includeAllAvailableRepos) {
         final var topContributors = customContributorRepository.findProjectTopContributors(project.getId(), TOP_CONTRIBUTOR_COUNT);
         final var contributorCount = customContributorRepository.getProjectContributorCount(project.getId(), null);
         final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(project.getId());
@@ -261,9 +264,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
             }
         }
         final var me = isNull(caller) ? null : new Me(
-                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && l.getHasAcceptedInvitation()),
-                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.getGithubUserId()) && !l.getHasAcceptedInvitation()),
-                contributionViewEntityRepository.countBy(caller.getGithubUserId(), project.getId()) > 0
+                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.githubUserId()) && l.getHasAcceptedInvitation()),
+                leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.githubUserId()) && !l.getHasAcceptedInvitation()),
+                contributionViewEntityRepository.countBy(caller.githubUserId(), project.getId()) > 0
         );
 
         return new ProjectResponse()
@@ -368,8 +371,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
 
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId())) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.id())) {
             throw forbidden("Only project leads can read rewards on their projects");
         }
 
@@ -381,7 +384,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var budgetStats = budgetStatsReadRepository.findByProject(projectId, currencies, contributors, fromDate, toDate);
 
         final RewardsPageResponse rewardsPageResponse = RewardsMapper.mapProjectRewardPageToResponse(sanitizePageIndex, page, budgetStats,
-                authenticatedUser.asAuthenticatedUser());
+                authenticatedUser);
 
         return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
@@ -399,7 +402,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(projectId, authenticatedUser.get().getId());
+        final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(projectId, authenticatedUser.get().id());
         final var sortBy = switch (sort) {
             case LOGIN -> "(login)";
             case CONTRIBUTION_COUNT -> "(contribution_count)";
@@ -416,7 +419,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final var contributors = projectContributorQueryRepository.findProjectContributors(projectId,
                 login,
-                authenticatedUser.map(User::getId).orElse(null),
+                authenticatedUser.map(AuthenticatedUser::id).orElse(null),
                 showHidden,
                 pageable);
         final var hasHiddenContributors = callerIsLead && projectContributorQueryRepository.hasHiddenContributors(projectId);

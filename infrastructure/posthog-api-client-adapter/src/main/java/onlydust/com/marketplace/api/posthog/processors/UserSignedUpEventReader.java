@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.posthog.processors;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
+import onlydust.com.marketplace.user.domain.event.UserSignedUp;
 
 public class UserSignedUpEventReader implements EventReader<UserSignedUp> {
     @Override

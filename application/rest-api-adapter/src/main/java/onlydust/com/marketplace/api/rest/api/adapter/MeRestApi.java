@@ -26,6 +26,7 @@ import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
+import onlydust.com.marketplace.user.domain.model.SmallUser;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -68,27 +69,30 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        if (Boolean.TRUE.equals(patchMeContract.getHasSeenOnboardingWizard())) {
+            userFacadePort.markUserAsOnboarded(authenticatedUser.id());
+        }
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
-            userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
+            userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.id());
         }
         if (Boolean.TRUE.equals(patchMeContract.getHasCompletedOnboarding())) {
-            userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
+            userFacadePort.markUserAsOnboarded(authenticatedUser.id());
         }
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.acceptInvitationToLeadProject(authenticatedUser.getGithubUserId(), projectId);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        userFacadePort.acceptInvitationToLeadProject(authenticatedUser.githubUserId(), projectId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<ProjectApplicationCreateResponse> applyOnProject(ProjectApplicationCreateRequest applicationRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var application = applicationFacadePort.applyOnProject(authenticatedUser.getGithubUserId(),
+        final var application = applicationFacadePort.applyOnProject(authenticatedUser.githubUserId(),
                 applicationRequest.getProjectId(),
                 GithubIssue.Id.of(applicationRequest.getIssueId()),
                 applicationRequest.getMotivation(),
@@ -100,7 +104,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> updateProjectApplication(UUID applicationId, ProjectApplicationUpdateRequest applicationUpdateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         applicationFacadePort.updateApplication(Application.Id.of(applicationId),
-                authenticatedUser.getGithubUserId(),
+                authenticatedUser.githubUserId(),
                 applicationUpdateRequest.getMotivation(),
                 applicationUpdateRequest.getProblemSolvingApproach());
         return noContent().build();
@@ -108,8 +112,8 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> updateMyProfile(UserProfileUpdateRequest userProfileRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.updateProfile(authenticatedUser.getId(),
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        userFacadePort.updateProfile(authenticatedUser.id(),
                 userProfileRequest.getAvatarUrl(),
                 userProfileRequest.getLocation(),
                 userProfileRequest.getBio(),
@@ -147,13 +151,13 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyContributedProjects(List<Long> repositories) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .build();
 
-        final var projects = contributorFacadePort.contributedProjects(authenticatedUser.getGithubUserId(), filters);
+        final var projects = contributorFacadePort.contributedProjects(authenticatedUser.githubUserId(), filters);
 
         return ResponseEntity.ok(new ProjectListResponse()
                 .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
@@ -163,9 +167,9 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ProjectListResponse> getMyRewardingProjects() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var projects = contributorFacadePort.rewardingProjects(authenticatedUser.getGithubUserId());
+        final var projects = contributorFacadePort.rewardingProjects(authenticatedUser.githubUserId());
 
         return ResponseEntity.ok(new ProjectListResponse()
                 .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
@@ -180,13 +184,13 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<ContributedReposResponse> getMyContributedRepos(List<UUID> projects) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
                 .projects(Optional.ofNullable(projects).orElse(List.of()))
                 .build();
 
-        final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.getGithubUserId(),
+        final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.githubUserId(),
                 filters);
 
         return ResponseEntity.ok(new ContributedReposResponse()
@@ -197,10 +201,10 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getMyReward(UUID rewardId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
-                authenticatedUser.getGithubUserId(), authenticatedUser.getAdministratedBillingProfiles());
-        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser.asAuthenticatedUser()));
+                authenticatedUser.githubUserId(), authenticatedUser.administratedBillingProfiles());
+        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser));
     }
 
     @Override
@@ -208,10 +212,10 @@ public class MeRestApi implements MeApi {
                                                                         Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Page<RewardItemView> page = userFacadePort.getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
-                authenticatedUser.getGithubUserId(), sanitizedPageIndex, sanitizedPageSize,
-                authenticatedUser.getAdministratedBillingProfiles());
+                authenticatedUser.githubUserId(), sanitizedPageIndex, sanitizedPageSize,
+                authenticatedUser.administratedBillingProfiles());
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
@@ -220,10 +224,10 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<CurrencyListResponse> getMyRewardCurrencies() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var currencies = contributorFacadePort.getRewardCurrencies(
-                authenticatedUser.getGithubUserId(),
-                authenticatedUser.getAdministratedBillingProfiles()
+                authenticatedUser.githubUserId(),
+                authenticatedUser.administratedBillingProfiles()
         );
         return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
                 .map(RewardMapper::mapCurrency)
@@ -233,7 +237,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<List<GithubOrganizationResponse>> searchGithubUserOrganizations() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final List<GithubAccount> githubAccounts =
                 githubOrganizationFacadePort.getOrganizationsForAuthenticatedUser(authenticatedUser);
@@ -243,7 +247,7 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> claimProject(UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.claimProjectForAuthenticatedUser(
                 projectId, authenticatedUser
         );
@@ -253,7 +257,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> closeBanner(UUID bannerId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        bannerFacadePort.closeBanner(Banner.Id.of(bannerId), authenticatedUser.getId());
+        bannerFacadePort.closeBanner(Banner.Id.of(bannerId), authenticatedUser.id());
         return noContent().build();
     }
 
@@ -274,47 +278,47 @@ public class MeRestApi implements MeApi {
 
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.updateGithubProfile(authenticatedUser);
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        userFacadePort.updateGithubProfile(authenticatedUser.githubUserId());
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> setMyPayoutPreferenceForProject(PayoutPreferenceRequest payoutPreferenceRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
-                BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.getId()));
+                BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.id()));
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<Void> acceptOrRejectCoworkerInvitation(UUID billingProfileId, BillingProfileCoworkerInvitationUpdateRequest invitationUpdateRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (Boolean.TRUE.equals(invitationUpdateRequest.getAccepted())) {
             billingProfileFacadePort.acceptCoworkerInvitation(
                     BillingProfile.Id.of(billingProfileId),
-                    GithubUserId.of(authenticatedUser.getGithubUserId()));
+                    GithubUserId.of(authenticatedUser.githubUserId()));
         } else {
             billingProfileFacadePort.rejectCoworkerInvitation(
                     BillingProfile.Id.of(billingProfileId),
-                    GithubUserId.of(authenticatedUser.getGithubUserId()));
+                    GithubUserId.of(authenticatedUser.githubUserId()));
         }
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> registerToHackathon(UUID hackathonId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        hackathonFacadePort.registerToHackathon(authenticatedUser.getId(), Hackathon.Id.of(hackathonId));
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        hackathonFacadePort.registerToHackathon(authenticatedUser.id(), Hackathon.Id.of(hackathonId));
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> voteForCommitteeAssignment(UUID committeeId, UUID projectId,
                                                            VoteForCommitteeAssignmentRequest voteForCommitteeAssignmentRequest) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        committeeFacadePort.vote(authenticatedUser.getId(), Committee.Id.of(committeeId), projectId,
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        committeeFacadePort.vote(authenticatedUser.id(), Committee.Id.of(committeeId), projectId,
                 voteForCommitteeAssignmentRequest.getVotes().stream()
                         .collect(Collectors.toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), v -> v.getVote())));
 
@@ -324,9 +328,9 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> patchMyNotificationSettingsForProject(UUID projectId,
                                                                       NotificationSettingsForProjectPatchRequest request) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationSettingsPort.patchNotificationSettingsForProject(
-                onlydust.com.marketplace.user.domain.model.User.Id.of(authenticatedUser.getId()),
+                SmallUser.Id.of(authenticatedUser.id()),
                 new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();

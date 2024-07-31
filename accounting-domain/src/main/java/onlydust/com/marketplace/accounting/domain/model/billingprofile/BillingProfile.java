@@ -7,6 +7,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
@@ -80,6 +81,13 @@ public abstract class BillingProfile {
 
             public static Set<Role> all() {
                 return EnumSet.allOf(Role.class);
+            }
+
+            public AuthenticatedUser.BillingProfileMembership.Role toBillingProfileMembershipRole() {
+                return switch (this) {
+                    case ADMIN -> AuthenticatedUser.BillingProfileMembership.Role.ADMIN;
+                    case MEMBER -> AuthenticatedUser.BillingProfileMembership.Role.MEMBER;
+                };
             }
         }
     }

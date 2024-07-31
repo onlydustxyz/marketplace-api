@@ -14,8 +14,8 @@ import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreatedT
 import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssignedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestMergedTrackingEvent;
-import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
+import onlydust.com.marketplace.user.domain.event.UserSignedUp;
 
 @AllArgsConstructor
 @Slf4j

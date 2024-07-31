@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestCreated;
-import onlydust.com.marketplace.project.domain.model.User;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -23,11 +22,11 @@ public class OnPullRequestCreatedTrackingEvent extends Event {
     @NonNull
     ZonedDateTime createdAt;
 
-    public static OnPullRequestCreatedTrackingEvent of(OnPullRequestCreated onPullRequestCreated, User user) {
+    public static OnPullRequestCreatedTrackingEvent of(OnPullRequestCreated onPullRequestCreated, UUID userId) {
         return OnPullRequestCreatedTrackingEvent.builder()
                 .pullRequestId(onPullRequestCreated.id())
                 .authorGithubId(onPullRequestCreated.authorId())
-                .authorUserId(user.getId())
+                .authorUserId(userId)
                 .createdAt(onPullRequestCreated.createdAt())
                 .build();
     }

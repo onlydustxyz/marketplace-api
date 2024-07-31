@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadCommitteesApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeProjectAnswerViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProjectAnswerViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.CommitteeJuryVoteViewEntity;
 import onlydust.com.marketplace.api.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +67,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
 
     @Override
     public ResponseEntity<CommitteeApplicationResponse> getCommitteeApplication(UUID committeeId, UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var committee = committeeReadRepository.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
 
@@ -88,7 +87,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
             );
         }
 
-        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.getId()))
+        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.id()))
             throw forbidden("Only project lead can get committee application");
 
         final var project = projectInfosViewRepository.findByProjectId(projectId)
@@ -117,9 +116,9 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     @Override
     public ResponseEntity<MyCommitteeAssignmentsResponse> getCommitteeAssignments(UUID committeeId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var userVotesForCommittee = committeeJuryVoteViewRepository.findAllByCommitteeIdAndUserId(committeeId, authenticatedUser.getId());
+        final var userVotesForCommittee = committeeJuryVoteViewRepository.findAllByCommitteeIdAndUserId(committeeId, authenticatedUser.id());
         if (userVotesForCommittee.isEmpty()) {
-            throw notFound("No assignement found for user %s on committee %s".formatted(authenticatedUser.getId(), committeeId));
+            throw notFound("No assignement found for user %s on committee %s".formatted(authenticatedUser.id(), committeeId));
         }
         final var committee = committeeLinkViewRepository.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s not found".formatted(committeeId)));
@@ -146,10 +145,10 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
 
     @Override
     public ResponseEntity<MyCommitteeAssignmentResponse> getCommitteeAssignmentOnProject(UUID committeeId, UUID projectId) {
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var votes = committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectIdAndUserId(committeeId, projectId, authenticatedUser.getId());
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var votes = committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectIdAndUserId(committeeId, projectId, authenticatedUser.id());
         if (votes.isEmpty()) {
-            throw notFound("No assignement found for user %s on committee %s and project %s".formatted(authenticatedUser.getId(), committeeId, projectId));
+            throw notFound("No assignement found for user %s on committee %s and project %s".formatted(authenticatedUser.id(), committeeId, projectId));
         }
         final var project = projectInfosViewRepository.findByProjectId(projectId)
                 .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));

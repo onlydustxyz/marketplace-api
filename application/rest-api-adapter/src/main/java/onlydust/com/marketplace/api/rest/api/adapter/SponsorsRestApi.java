@@ -35,7 +35,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
         final var sponsorAccountStatements = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
         return ResponseEntity.ok(SponsorMapper.mapToSponsorDetailsResponse(sponsor, sponsorAccountStatements));
 
@@ -44,7 +44,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> allocateBudgetToProject(UUID sponsorId, AllocateRequest allocateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
 
         accountingFacadePort.allocate(
                 sponsor.id(),
@@ -59,7 +59,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> unallocateBudgetFromProject(UUID sponsorId, AllocateRequest allocateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.getId()), SponsorId.of(sponsorId));
+        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
 
         accountingFacadePort.unallocate(
                 ProjectId.of(allocateRequest.getProjectId()),

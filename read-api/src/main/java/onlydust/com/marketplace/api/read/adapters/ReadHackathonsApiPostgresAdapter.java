@@ -16,7 +16,7 @@ import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.LanguageReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -47,7 +47,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
         final var hackathon = hackathonReadRepository.findBySlug(hackathonSlug)
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
-        final Boolean isRegistered = authenticatedUser.map(User::getId)
+        final Boolean isRegistered = authenticatedUser.map(AuthenticatedUser::id)
                 .map(userId -> hackathonReadRepository.isRegisteredToHackathon(userId, hackathon.id()))
                 .orElse(null);
         return ok(hackathon.toResponse(isRegistered));

@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.slack.mapper;
 
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 
 public interface ProjectCategorySuggestionEventMapper {
 
@@ -15,10 +15,10 @@ public interface ProjectCategorySuggestionEventMapper {
             	}
             ]""";
 
-    static String mapToSlackBlock(User user, String categoryName, String environment) {
+    static String mapToSlackBlock(AuthenticatedUser user, String categoryName, String environment) {
         return BLOCK.formatted(
                 FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "project-categories", categoryName,
-                FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "users/%s".formatted(user.getId()), user.getGithubLogin()
+                FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "users/%s".formatted(user.id()), user.login()
         );
     }
 }

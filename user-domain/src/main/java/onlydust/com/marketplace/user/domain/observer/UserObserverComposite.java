@@ -1,7 +1,8 @@
-package onlydust.com.marketplace.project.domain.observer;
+package onlydust.com.marketplace.user.domain.observer;
 
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.port.input.UserObserverPort;
+
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class UserObserverComposite implements UserObserverPort {
     }
 
     @Override
-    public void onUserSignedUp(User user) {
+    public void onUserSignedUp(AuthenticatedUser user) {
         observers.forEach(observer -> observer.onUserSignedUp(user));
     }
 }

@@ -15,7 +15,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.A
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationFilter;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.token.QueryParamTokenAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -178,8 +178,8 @@ public class WebSecurityConfiguration {
 
     @Bean
     public Auth0OnlyDustAppAuthenticationService appAuthenticationService(final ObjectMapper objectMapper,
-                                                                          final UserFacadePort userFacadePort) {
-        return new Auth0OnlyDustAppAuthenticationService(objectMapper, userFacadePort);
+                                                                          final AppUserFacadePort appUserFacadePort) {
+        return new Auth0OnlyDustAppAuthenticationService(objectMapper, appUserFacadePort);
     }
 
     @Bean
