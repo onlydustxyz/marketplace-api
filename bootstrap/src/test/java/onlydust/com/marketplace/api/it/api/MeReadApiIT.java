@@ -257,7 +257,8 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                         """.formatted(category1.id().value(), category2.id().value()))
                 .exchange()
                 // Then
-                .expectStatus().is2xxSuccessful();
+                .expectStatus()
+                .is2xxSuccessful();
 
         // When
         client.get()

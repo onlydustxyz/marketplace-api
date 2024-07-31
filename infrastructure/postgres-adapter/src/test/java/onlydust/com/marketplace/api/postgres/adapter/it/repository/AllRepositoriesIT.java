@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeE
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
@@ -94,7 +93,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
 
         // Then
         assertThat(userRepository.findAll()).hasSize(1);
-        assertThat(result.onboarding().getCompletionDate()).isEqualToIgnoringNanos(onboarding.getCompletionDate()   .toInstant().atZone(ZoneOffset.UTC));
+        assertThat(result.onboarding().getCompletionDate()).isEqualToIgnoringNanos(onboarding.getCompletionDate().toInstant().atZone(ZoneOffset.UTC));
         assertThat(result.onboarding().getTermsAndConditionsAcceptanceDate()).isEqualToIgnoringNanos(onboarding.getTermsAndConditionsAcceptanceDate().toInstant().atZone(ZoneOffset.UTC));
         assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
     }
@@ -160,12 +159,10 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .bio(faker.hacker().abbreviation())
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())
-                .contactInformations(List.of(ContactInformationEntity.builder()
+                .contactInformations(Set.of(ContactInformationEntity.builder()
                         .contact(faker.rickAndMorty().location())
-                        .id(ContactInformationIdEntity.builder()
-                                .channel(Contact.Channel.TELEGRAM)
-                                .userId(UUID.randomUUID())
-                                .build())
+                        .channel(Contact.Channel.TELEGRAM)
+                        .userId(UUID.randomUUID())
                         .isPublic(false)
                         .build()))
                 .isLookingForAJob(true)
@@ -180,10 +177,8 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
         // Given
         final ContactInformationEntity expected = ContactInformationEntity.builder()
                 .contact(faker.rickAndMorty().location())
-                .id(ContactInformationIdEntity.builder()
-                        .channel(Contact.Channel.TELEGRAM)
-                        .userId(UUID.randomUUID())
-                        .build())
+                .channel(Contact.Channel.TELEGRAM)
+                .userId(UUID.randomUUID())
                 .isPublic(false)
                 .build();
 

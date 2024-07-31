@@ -36,6 +36,7 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -147,7 +148,9 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     @Transactional
     public void saveProfile(UUID userId, UserProfile userProfile) {
-        userProfileInfoRepository.saveAndFlush(mapUserProfileToEntity(userId, userProfile));
+        final UserProfileInfoEntity userProfileInfoEntity = userProfileInfoRepository.findById(userId)
+                        .orElse(new UserProfileInfoEntity());
+        userProfileInfoRepository.saveAndFlush(userProfileInfoEntity.update(userId, userProfile));
     }
 
     @Override

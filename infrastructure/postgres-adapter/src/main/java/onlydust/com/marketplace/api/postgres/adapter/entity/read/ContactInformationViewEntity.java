@@ -24,7 +24,6 @@ import java.util.UUID;
 public class ContactInformationViewEntity {
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "user_id")
     UUID userId;
 
     @Id

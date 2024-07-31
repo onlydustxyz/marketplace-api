@@ -5,7 +5,6 @@ import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.service.ProjectCategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -109,6 +108,57 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.joiningReason").isEqualTo("CONTRIBUTOR")
                 .jsonPath("$.joiningGoal").isEqualTo("EARN");
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_PROFILE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "avatarUrl": null,
+                            "location": null,
+                            "bio": null,
+                            "website": null,
+                            "firstName": null,
+                            "lastName": null,
+                            "contacts": null,
+                            "allocatedTimeToContribute": null,
+                            "isLookingForAJob": true,
+                            "joiningGoal": null,
+                            "joiningReason": null,
+                            "preferredLanguages": null,
+                            "preferredCategories": null
+                        }
+                        """)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_PROFILE))
+                .header("Authorization", BEARER_PREFIX + jwt)
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                            "location": null,
+                            "bio": null,
+                            "website": null,
+                            "firstName": null,
+                            "lastName": null,
+                            "contacts": [],
+                            "allocatedTimeToContribute": null,
+                            "isLookingForAJob": true,
+                            "joiningGoal": null,
+                            "joiningReason": null,
+                            "preferredLanguages": [],
+                            "preferredCategories": []
+                        }
+                        """);
     }
 
     @Test
@@ -129,7 +179,13 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                           "location": null,
                           "bio": null,
                           "website": null,
-                          "contacts": [],
+                          "contacts": [
+                                {
+                                    "contact": "https://t.me/yolocroute",
+                                    "channel": "TELEGRAM",
+                                    "visibility": "private"
+                                }
+                            ],
                           "allocatedTimeToContribute": null,
                           "isLookingForAJob": null,
                           "joiningGoal": null,
