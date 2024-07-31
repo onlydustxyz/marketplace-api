@@ -1,11 +1,17 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
+import onlydust.com.marketplace.project.domain.service.ProjectCategoryService;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.util.UUID;
+
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @TagMe
 public class MeReadApiIT extends AbstractMarketplaceApiIT {
@@ -177,16 +183,19 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "completed": true,
-                          "completion": 100,
+                          "completed": false,
+                          "completion": 80,
                           "verificationInformationProvided": true,
                           "termsAndConditionsAccepted": true,
-                          "projectPreferencesProvided": null,
+                          "projectPreferencesProvided": false,
                           "profileCompleted": true,
                           "payoutInformationProvided": true
                         }
                         """);
     }
+
+    @Autowired
+    ProjectCategoryService projectCategoryService;
 
     @Test
     void should_get_caller_onboarding_for_non_indexed_users() {
@@ -208,8 +217,65 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                           "completion": 0,
                           "verificationInformationProvided": false,
                           "termsAndConditionsAccepted": false,
-                          "projectPreferencesProvided": null,
+                          "projectPreferencesProvided": false,
                           "profileCompleted": false,
+                          "payoutInformationProvided": false
+                        }
+                        """);
+
+        // Given
+        final ProjectCategory category1 = projectCategoryService.createCategory("category1", "category1", "icon", null);
+        final ProjectCategory category2 = projectCategoryService.createCategory("category2", "category2", "icon", null);
+
+        // When
+        client.patch()
+                .uri(getApiURI(ME_PROFILE))
+                .header("Authorization", BEARER_PREFIX + newUser.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "avatarUrl": "https://foobar.org/plop.jpg",
+                            "location": "Paris, France",
+                            "bio": "FullStack engineer",
+                            "website": "https://croute.org",
+                            "firstName": "AnthonyTest",
+                            "lastName": "BuissetTest",
+                            "contacts": [
+                                {
+                                    "contact": "https://t.me/yolocroute",
+                                    "channel": "TELEGRAM",
+                                    "visibility": "private"
+                                }
+                            ],
+                            "allocatedTimeToContribute": "ONE_TO_THREE_DAYS",
+                            "isLookingForAJob": true,
+                            "joiningGoal": "EARN",
+                            "joiningReason": "CONTRIBUTOR",
+                            "preferredLanguages": ["ca600cac-0f45-44e9-a6e8-25e21b0c6887", "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42"],
+                            "preferredCategories": ["%s", "%s"]
+                        }
+                        """.formatted(category1.id().value(), category2.id().value()))
+                .exchange()
+                // Then
+                .expectStatus().is2xxSuccessful();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_ONBOARDING))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + newUser.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "completed": false,
+                          "completion": 60,
+                          "verificationInformationProvided": true,
+                          "termsAndConditionsAccepted": false,
+                          "projectPreferencesProvided": true,
+                          "profileCompleted": true,
                           "payoutInformationProvided": false
                         }
                         """);

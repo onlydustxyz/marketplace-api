@@ -75,9 +75,12 @@ public class OnboardingCompletionEntity {
     boolean descriptionUpdated;
 
     @Formula("""
-            exists(select 1
-                   from user_profile_info upi
-                   where upi.id = id)
+            (select coalesce(upi.first_name is not null and upi.last_name is not null
+                            and upi.location is not null and upi.bio is not null and
+                            upi.website is not null, false)
+            from iam.users u
+                     left join user_profile_info upi on upi.id = u.id
+            where u.id = id)
             """)
     boolean profileCompleted;
 
@@ -107,6 +110,20 @@ public class OnboardingCompletionEntity {
             """)
     boolean rewardClaimed;
 
+    @Formula("""
+            (select coalesce(upi.joining_reason is not null and
+                            upi.joining_goal is not null and
+                            coalesce(upi.looking_for_a_job, false) and
+                            upi.preferred_language_ids is not null and
+                            upi.preferred_category_ids is not null and
+                            cardinality(upi.preferred_language_ids) > 0 and
+                            cardinality(upi.preferred_category_ids) > 0, false)
+            from iam.users u
+                     left join user_profile_info upi on upi.id = u.id
+            where u.id = id)
+            """)
+    boolean projectPreferencesProvided;
+
     public JourneyCompletionResponse toJourneyResponse() {
         final var allItems = List.of(billingProfileVerified, companyBillingProfileVerified, descriptionUpdated, telegramAdded, rewardReceived, rewardClaimed);
         final var completedItems = allItems.stream().filter(Boolean::booleanValue).count();
@@ -126,7 +143,7 @@ public class OnboardingCompletionEntity {
     public OnboardingCompletionResponse toResponse() {
         final var allItems = List.of(telegramAdded,
                 termsAndConditionsAccepted,
-//                projectPreferencesProvided,
+                projectPreferencesProvided,
                 profileCompleted,
                 payoutInformationProvided);
         final var completedItems = allItems.stream().filter(Boolean::booleanValue).count();
@@ -136,7 +153,7 @@ public class OnboardingCompletionEntity {
                 .completed(completedItems == allItems.size())
                 .verificationInformationProvided(telegramAdded)
                 .termsAndConditionsAccepted(termsAndConditionsAccepted)
-//                .projectPreferencesProvided(projectPreferencesProvided) TODO
+                .projectPreferencesProvided(projectPreferencesProvided)
                 .profileCompleted(profileCompleted)
                 .payoutInformationProvided(payoutInformationProvided)
                 ;
