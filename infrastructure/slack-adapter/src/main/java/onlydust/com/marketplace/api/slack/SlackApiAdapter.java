@@ -88,7 +88,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
     }
 
     @Override

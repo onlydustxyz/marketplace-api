@@ -395,6 +395,27 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 """)
                 ));
 
+        final var expectedComment = """
+                The maintainer @gregcha has assigned @AnthonyBuisset to this issue via [OnlyDust](https://local-app.onlydust.com/p/bretzel) Platform.\\n\
+                Good luck!\\n\
+                """;
+
+        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/380954304/issues/6/comments"))
+                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
+                .withRequestBody(equalToJson("""
+                        {
+                            "body": "%s"
+                        }
+                        """.formatted(expectedComment)))
+                .willReturn(aResponse()
+                        .withStatus(201)
+                        .withBody("""
+                                {
+                                    "id": 123456789
+                                }
+                                """)
+                ));
+
         // When
         client.post()
                 .uri(getApiURI(APPLICATION_ACCEPT.formatted(applicationId)))

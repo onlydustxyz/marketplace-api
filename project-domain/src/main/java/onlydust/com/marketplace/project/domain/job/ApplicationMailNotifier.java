@@ -10,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsTo
 import onlydust.com.marketplace.project.domain.port.output.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -32,7 +33,7 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
         userStoragePort.getRegisteredUserByGithubId(application.applicantId()).ifPresent(applicant -> {
             final var project = projectStoragePort.getById(application.projectId())
                     .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));

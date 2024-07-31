@@ -6,6 +6,8 @@ import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
 
+import java.util.UUID;
+
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @AllArgsConstructor
@@ -45,7 +47,30 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+        if (application.origin() != Application.Origin.MARKETPLACE) return;
+
+        final var issue = githubStoragePort.findIssueById(application.issueId())
+                .orElseThrow(() -> internalServerError("Issue %s not found".formatted(application.issueId())));
+
+        final var project = projectStoragePort.getById(application.projectId())
+                .orElseThrow(() -> internalServerError("Project %s not found".formatted(application.projectId())));
+
+        final var applicant = userStoragePort.getIndexedUserByGithubId(application.applicantId())
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(application.applicantId())));
+
+        final var projectLead = userStoragePort.getRegisteredUserById(projectLeadId)
+                .orElseThrow(() -> internalServerError("User %s not found".formatted(application.applicantId())));
+
+        githubAppService.getInstallationTokenFor(issue.repoId())
+                .filter(GithubAppAccessToken::canWriteIssues)
+                .ifPresentOrElse(
+                        token -> githubApiPort.createComment(token.token(), issue, """
+                                The maintainer %s has assigned %s to this issue via [OnlyDust](%s/p/%s) Platform.
+                                Good luck!
+                                """.formatted(projectLead.getGithubLogin(), applicant.getGithubLogin(), globalConfig.getAppBaseUrl(), project.getSlug())),
+                        () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
+                );
     }
 
     @Override
