@@ -37,12 +37,12 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private UUID pierreId;
     private NotificationRecipient pierreRecipient;
 
-    private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.KYC_KYB_BILLING_PROFILE);
+    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.KYC_KYB_BILLING_PROFILE);
 
     private static Notification olivierRewardNotification1;
     private static Notification olivierRewardNotification2;
@@ -76,16 +76,15 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         assertNoPendingNotification(NotificationChannel.values());
     }
 
-    // TODO: uncomment this test when default settings are properly implemented
-//    @Test
-//    @Order(2)
-//    void should_return_nothing_when_notification_has_no_channel() {
-//        // When
-//        notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE), NotificationCategory.REWARD_AS_CONTRIBUTOR));
-//
-//        // Then
-//        assertNoPendingNotification(NotificationChannel.values());
-//    }
+    @Test
+    @Order(2)
+    void should_return_nothing_when_notification_has_no_channel() {
+        // When
+        notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE), NotificationCategory.CONTRIBUTOR_REWARD));
+
+        // Then
+        assertNoPendingNotification(NotificationChannel.values());
+    }
 
     @Test
     @Order(3)
@@ -93,7 +92,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         // Given
         notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
                 ))
                 .build());
 
@@ -114,8 +113,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         // Given
         notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
                 ))
                 .build());
 
@@ -139,8 +138,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         // When
         notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
                                 NotificationChannel.IN_APP)
                 ))
                 .build());
@@ -177,8 +176,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         // When
         notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
                                 NotificationChannel.IN_APP)
                 ))
                 .build());
@@ -216,8 +215,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         // Given
         notificationSettingsPort.updateNotificationSettings(User.Id.of(pierreId), NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
                 ))
                 .build());
 

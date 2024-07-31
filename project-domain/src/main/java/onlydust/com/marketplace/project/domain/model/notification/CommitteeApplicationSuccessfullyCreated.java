@@ -28,6 +28,6 @@ public class CommitteeApplicationSuccessfullyCreated extends NotificationData {
 
     @Override
     public NotificationCategory category() {
-        return NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER;
+        return NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
     }
 }
