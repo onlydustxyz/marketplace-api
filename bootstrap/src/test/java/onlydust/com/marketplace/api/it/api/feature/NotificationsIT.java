@@ -8,7 +8,6 @@ import onlydust.com.marketplace.kernel.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
-import onlydust.com.marketplace.user.domain.model.User;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.*;
@@ -37,12 +36,12 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private UUID pierreId;
     private NotificationRecipient pierreRecipient;
 
-    private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.REWARD_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
-    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR);
+    private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.CONTRIBUTOR_REWARD);
+    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.KYC_KYB_BILLING_PROFILE);
+    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.KYC_KYB_BILLING_PROFILE);
 
     private static Notification olivierRewardNotification1;
     private static Notification olivierRewardNotification2;
@@ -81,7 +80,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 //    @Order(2)
 //    void should_return_nothing_when_notification_has_no_channel() {
 //        // When
-//        notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE), NotificationCategory.REWARD_AS_CONTRIBUTOR));
+//        notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE), NotificationCategory.CONTRIBUTOR_REWARD));
 //
 //        // Then
 //        assertNoPendingNotification(NotificationChannel.values());
@@ -91,9 +90,10 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_return_notification_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+                NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
                 ))
                 .build());
 
@@ -112,10 +112,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_return_multiple_notifications_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+                NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
                 ))
                 .build());
 
@@ -137,10 +138,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(10)
     void should_not_impact_old_notifications_when_channel_is_added_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+                NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
                                 NotificationChannel.IN_APP)
                 ))
                 .build());
@@ -175,10 +177,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_not_impact_old_notifications_when_channel_is_removed_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(olivierId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+                NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
                                 NotificationChannel.IN_APP)
                 ))
                 .build());
@@ -214,10 +217,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(30)
     void should_not_mix_notifications_between_users() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierreId), NotificationSettings.builder()
+        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(pierreId),
+                NotificationSettings.builder()
                 .channelsPerCategory(Map.of(
-                        NotificationCategory.REWARD_AS_CONTRIBUTOR, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.PROJECT_GOOD_FIRST_ISSUE_AS_CONTRIBUTOR, List.of(NotificationChannel.IN_APP)
+                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
+                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
                 ))
                 .build());
 
@@ -324,7 +328,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
             final List<SendableNotification> sendableExpectedNotifications = expectedNotifications.entrySet().stream()
                     .map(entry -> entry.getValue().stream()
                             .map(notification -> SendableNotification.of(
-                                            new User(User.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()),
+                                            new onlydust.com.marketplace.user.domain.model.NotificationRecipient(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()),
                                             notification
                                     ).toBuilder()
                                     // Truncate createdAt to milliseconds to avoid comparison issues

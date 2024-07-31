@@ -43,13 +43,15 @@ public class GithubSearchApiAdapter implements GithubSearchPort, GithubUserStora
         return client.get("/search/users?per_page=5&q=" + encodedLogin, GithubUserSearchResponse.class)
                 .map(GithubUserSearchResponse::getItems)
                 .orElse(List.of())
-                .stream().map(
-                        githubUser -> GithubUserIdentity.builder()
-                                .githubUserId(githubUser.getId())
-                                .githubLogin(githubUser.getLogin())
-                                .githubAvatarUrl(githubUser.getAvatarUrl())
-                                .build()
-                ).toList();
+                .stream()
+                .map(githubUser -> GithubUserIdentity.builder()
+                        .githubUserId(githubUser.getId())
+                        .login(githubUser.getLogin())
+                        .avatarUrl(githubUser.getAvatarUrl())
+                        .build()
+                )
+                .map(GithubUserIdentity.class::cast)
+                .toList();
     }
 
 
@@ -61,7 +63,7 @@ public class GithubSearchApiAdapter implements GithubSearchPort, GithubUserStora
     @Override
     public List<GithubAccount> searchOrganizationsByGithubUserId(final Long githubUserId) {
         final int pageSize = githubPaginationProperties.getPageSize();
-        Integer pageIndex = 1;
+        int pageIndex = 1;
         List<GithubAccount> githubAccountsForPageIndex = getGithubAccountsForPageIndex(githubUserId, pageSize,
                 pageIndex);
         if (githubAccountsForPageIndex.isEmpty()) {
@@ -137,8 +139,8 @@ public class GithubSearchApiAdapter implements GithubSearchPort, GithubUserStora
                             .flatMap(githubUserEmails -> Arrays.stream(githubUserEmails).filter(GetUserEmailsResponseDTO::primary).findFirst())
                             .map(primaryEmail -> GithubUserIdentity.builder()
                                     .githubUserId(userProfile.getId())
-                                    .githubLogin(userProfile.getLogin())
-                                    .githubAvatarUrl(userProfile.getAvatarUrl())
+                                    .login(userProfile.getLogin())
+                                    .avatarUrl(userProfile.getAvatarUrl())
                                     .email(primaryEmail.email())
                                     .build())
                     );

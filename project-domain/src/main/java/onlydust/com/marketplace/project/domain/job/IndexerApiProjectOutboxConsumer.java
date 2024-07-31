@@ -6,13 +6,12 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
-import onlydust.com.marketplace.project.domain.model.notification.UserSignedUp;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 
 @Slf4j
 @AllArgsConstructor
-public class IndexerApiOutboxConsumer implements OutboxConsumer {
+public class IndexerApiProjectOutboxConsumer implements OutboxConsumer {
 
     private final IndexerPort indexerPort;
 
@@ -26,8 +25,6 @@ public class IndexerApiOutboxConsumer implements OutboxConsumer {
         if (event instanceof ProjectLinkedReposChanged projectLinkedReposChanged) {
             indexerPort.onRepoLinkChanged(projectLinkedReposChanged.getLinkedRepoIds(),
                     projectLinkedReposChanged.getUnlinkedRepoIds());
-        } else if (event instanceof UserSignedUp userSignedUp) {
-            indexerPort.indexUser(userSignedUp.getGithubUserId());
         }
     }
 }

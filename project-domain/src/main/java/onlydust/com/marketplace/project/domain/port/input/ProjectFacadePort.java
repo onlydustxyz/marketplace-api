@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -38,19 +39,19 @@ public interface ProjectFacadePort {
 
     RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl);
 
-    Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
+    Page<ContributionView> contributions(UUID projectId, AuthenticatedUser caller, ContributionView.Filters filters,
                                          ContributionView.Sort sort, SortDirection direction,
                                          Integer page, Integer pageSize);
 
     void updateProjectsRanking();
 
-    Page<ContributionView> staledContributions(UUID projectId, User caller, Integer page, Integer pageSize);
+    Page<ContributionView> staledContributions(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize);
 
-    Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page, Integer pageSize);
+    Page<ChurnedContributorView> churnedContributors(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize);
 
-    Page<NewcomerView> newcomers(UUID projectId, User caller, Integer page, Integer pageSize);
+    Page<NewcomerView> newcomers(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize);
 
-    Page<ContributorActivityView> mostActives(UUID projectId, User caller, Integer page, Integer pageSize);
+    Page<ContributorActivityView> mostActives(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize);
 
     void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
 

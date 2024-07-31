@@ -12,7 +12,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
@@ -46,7 +45,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onProjectCreated(UUID projectId, UUID projectLeadId) {
-        final User user = userStoragePort.getRegisteredUserById(projectLeadId)
+        final var user = userStoragePort.getRegisteredUserById(projectLeadId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectLeadId)));
         final var project = projectStoragePort.getById(projectId)
                 .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(projectId)));
@@ -56,7 +55,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        final User user = userStoragePort.getRegisteredUserById(billingProfileVerificationUpdated.getUserId().value())
+        final var user = userStoragePort.getRegisteredUserById(billingProfileVerificationUpdated.getUserId().value())
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(billingProfileVerificationUpdated.getUserId().value())));
         slackApiClient.sendNotification(slackProperties.getKycKybChannel(), "New KYC/KYB event",
                 BillingProfileVerificationEventMapper.mapToSlackBlock(billingProfileVerificationUpdated, user,
@@ -70,7 +69,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
         final var project = projectStoragePort.getById(application.projectId())
                 .orElseThrow(() -> OnlyDustException.notFound("Project not found %s".formatted(application.projectId())));
         slackApiClient.sendNotification(slackProperties.getDevRelChannel(), "New user application on project",
-                UserAppliedOnProjectEventMapper.mapToSlackBlock(user.getGithubLogin(),
+                UserAppliedOnProjectEventMapper.mapToSlackBlock(user.login(),
                         project, slackProperties.getEnvironment()));
     }
 
@@ -84,7 +83,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onProjectCategorySuggested(String categoryName, UUID userId) {
-        final User user = userStoragePort.getRegisteredUserById(userId)
+        final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
         slackApiClient.sendNotification(slackProperties.getDevRelChannel(), "New project category suggested",
                 ProjectCategorySuggestionEventMapper.mapToSlackBlock(user,

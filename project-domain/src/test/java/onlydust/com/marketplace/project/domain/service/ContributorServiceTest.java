@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.mocks.ContributorFaker;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.Test;
 
@@ -81,12 +81,12 @@ public class ContributorServiceTest {
         when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
-                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().getGithubUserId()))
-                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
-                                .githubUserId(contributor.getId().getGithubUserId())
-                                .githubLogin(contributor.getId().getGithubLogin())
-                                .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
-                                .email(contributor.getId().getEmail())
+                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().githubUserId()))
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(AuthenticatedUser.builder()
+                                .githubUserId(contributor.getId().githubUserId())
+                                .login(contributor.getId().login())
+                                .avatarUrl(contributor.getId().avatarUrl())
+                                .email(contributor.getId().email())
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
@@ -94,7 +94,10 @@ public class ContributorServiceTest {
 
         // Then
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
-        assertThat(contributors.getRight()).containsExactlyElementsOf(externalContributors);
+        assertThat(contributors.getRight().stream().map(c -> c.getId().githubUserId()).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(c -> c.getId().githubUserId()).toList());
+        assertThat(contributors.getRight().stream().map(Contributor::getIsRegistered).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(Contributor::getIsRegistered).toList());
     }
 
     @Test
@@ -184,12 +187,13 @@ public class ContributorServiceTest {
         // When
         when(githubSearchPort.searchUsersByLogin(login)).thenReturn(externalContributors.stream().map(Contributor::getId).toList());
         externalContributors.forEach(
-                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().getGithubUserId()))
-                        .thenReturn(contributor.getIsRegistered() ? Optional.of(User.builder()
-                                .githubUserId(contributor.getId().getGithubUserId())
-                                .githubLogin(contributor.getId().getGithubLogin())
-                                .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
-                                .email(contributor.getId().getEmail())
+                contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().githubUserId()))
+                        .thenReturn(contributor.getIsRegistered() ? Optional.of(AuthenticatedUser.builder()
+                                .id(UUID.randomUUID())
+                                .githubUserId(contributor.getId().githubUserId())
+                                .login(contributor.getId().login())
+                                .avatarUrl(contributor.getId().avatarUrl())
+                                .email(contributor.getId().email())
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(null, null, login, 0, 0,
@@ -199,6 +203,9 @@ public class ContributorServiceTest {
         verify(userStoragePort, never()).searchContributorsByLogin(anySet(), anyString(), anyInt());
         verify(projectStoragePort, never()).getProjectRepoIds(any(UUID.class));
         assertThat(contributors.getLeft()).isEmpty();
-        assertThat(contributors.getRight()).containsExactlyElementsOf(externalContributors);
+        assertThat(contributors.getRight().stream().map(c -> c.getId().githubUserId()).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(c -> c.getId().githubUserId()).toList());
+        assertThat(contributors.getRight().stream().map(Contributor::getIsRegistered).toList())
+                .containsExactlyElementsOf(externalContributors.stream().map(Contributor::getIsRegistered).toList());
     }
 }

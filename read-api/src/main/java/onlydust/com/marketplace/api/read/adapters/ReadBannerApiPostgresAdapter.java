@@ -6,7 +6,7 @@ import onlydust.com.marketplace.api.contract.model.BannerResponse;
 import onlydust.com.marketplace.api.read.entities.BannerReadEntity;
 import onlydust.com.marketplace.api.read.repositories.BannerReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
     @Override
     public ResponseEntity<BannerResponse> getBanner() {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var banner = bannerReadRepository.findFirstVisibleBanner(authenticatedUser.map(User::getId).orElse(null));
+        final var banner = bannerReadRepository.findFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).orElse(null));
 
         return banner.map(BannerReadEntity::toResponse)
                 .map(ResponseEntity::ok)

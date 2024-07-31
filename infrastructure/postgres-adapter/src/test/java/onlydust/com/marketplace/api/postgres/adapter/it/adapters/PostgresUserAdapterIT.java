@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,14 +63,14 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         onboardingRepository.save(onboarding);
 
         // When
-        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
+        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
+        assertThat(result.login()).isEqualTo(user.getGithubLogin());
+        assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
+        assertThat(result.roles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
     }
 
     @Test
@@ -96,14 +95,14 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         onboardingRepository.save(onboarding);
 
         // When
-        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
+        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
+        assertThat(result.login()).isEqualTo(user.getGithubLogin());
+        assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
+        assertThat(result.roles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
     }
 
     @Test
@@ -121,14 +120,14 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         userRepository.save(user);
 
         // When
-        final User result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
+        final var result = postgresUserAdapter.getRegisteredUserByGithubId(user.getGithubUserId()).orElseThrow();
 
         // Then
-        assertThat(result.getId()).isEqualTo(user.getId());
-        assertThat(result.getGithubUserId()).isEqualTo(user.getGithubUserId());
-        assertThat(result.getGithubLogin()).isEqualTo(user.getGithubLogin());
-        assertThat(result.getGithubAvatarUrl()).isEqualTo(user.getGithubAvatarUrl());
-        assertThat(result.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
+        assertThat(result.id()).isEqualTo(user.getId());
+        assertThat(result.githubUserId()).isEqualTo(user.getGithubUserId());
+        assertThat(result.login()).isEqualTo(user.getGithubLogin());
+        assertThat(result.avatarUrl()).isEqualTo(user.getGithubAvatarUrl());
+        assertThat(result.roles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN);
     }
 
     @Test
@@ -184,14 +183,14 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         final CountDownLatch latch = new CountDownLatch(numberOfThreads);
         final var thrown = new ConcurrentLinkedQueue<Throwable>();
-        final var retrievedGithubUsers = new ConcurrentLinkedQueue<User>();
+        final var retrievedGithubUsers = new ConcurrentLinkedQueue<AuthenticatedUser>();
 
         final var githubUserId = faker.number().randomNumber(10, true);
 
-        final var userData = User.builder()
+        final var userData = AuthenticatedUser.builder()
                 .githubUserId(githubUserId)
-                .githubLogin(faker.name().name())
-                .githubAvatarUrl(faker.internet().avatar())
+                .login(faker.name().name())
+                .avatarUrl(faker.internet().avatar())
                 .email(faker.internet().emailAddress())
                 .roles(List.of(AuthenticatedUser.Role.USER))
                 .build();
@@ -202,13 +201,13 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 TransactionSynchronizationManager.initSynchronization();
                 try {
                     System.out.println("Thread " + Thread.currentThread().getName() + " started");
-                    final var user = User.builder()
+                    final var user = AuthenticatedUser.builder()
                             .githubUserId(githubUserId)
                             .id(UUID.randomUUID())
-                            .githubLogin(userData.getGithubLogin())
-                            .githubAvatarUrl(userData.getGithubAvatarUrl())
-                            .email(userData.getEmail())
-                            .roles(userData.getRoles())
+                            .login(userData.login())
+                            .avatarUrl(userData.avatarUrl())
+                            .email(userData.email())
+                            .roles(userData.roles())
                             .build();
                     for (int i = 0; i < numberOfIterationPerThread; i++) {
                         try {
@@ -230,14 +229,14 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Then
         assertThat(thrown).isEmpty();
         assertThat(retrievedGithubUsers).hasSize(numberOfThreads * numberOfIterationPerThread);
-        final var userId = retrievedGithubUsers.stream().findFirst().get().getId();
+        final var userId = retrievedGithubUsers.stream().findFirst().get().id();
         retrievedGithubUsers.forEach(u -> {
-            assertThat(u.getGithubUserId()).isEqualTo(githubUserId);
-            assertThat(u.getGithubLogin()).isEqualTo(userData.getGithubLogin());
-            assertThat(u.getGithubAvatarUrl()).isEqualTo(userData.getGithubAvatarUrl());
-            assertThat(u.getEmail()).isEqualTo(userData.getEmail());
-            assertThat(u.getRoles()).containsExactlyElementsOf(userData.getRoles());
-            assertThat(u.getId()).isEqualTo(userId);
+            assertThat(u.githubUserId()).isEqualTo(githubUserId);
+            assertThat(u.login()).isEqualTo(userData.login());
+            assertThat(u.avatarUrl()).isEqualTo(userData.avatarUrl());
+            assertThat(u.email()).isEqualTo(userData.email());
+            assertThat(u.roles()).containsExactlyElementsOf(userData.roles());
+            assertThat(u.id()).isEqualTo(userId);
         });
     }
 
@@ -254,7 +253,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url) VALUES (201, 2, 2, 'B2', 'COMPLETED', '2023-11-24 15:42:24.000000', '2023-11-28 13:36:18.000000', 82421016, 'https://github.com/kkrt-labs/kakarot-ssj/issues/574', '', 1, '2023-11-24 15:57:11.509427', '2023-11-28 13:36:46.383567', 'kkrt-labs', 'kakarot-ssj', 'https://github.com/kkrt-labs/kakarot-ssj', 'greged93', 'https://github.com/greged93', 'https://avatars.githubusercontent.com/u/82421016?v=4');
                 INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url) VALUES (300, 3, 1, 'C1', 'CANCELLED', '2023-11-24 15:09:28.000000', '2023-11-24 20:43:58.000000', 147428564, 'https://github.com/calcom/cal.com/issues/12527', '', 0, '2023-11-24 15:37:42.770687', '2023-11-24 20:46:57.822598', 'calcom', 'cal.com', 'https://github.com/calcom/cal.com', 'pawar1231', 'https://github.com/pawar1231', 'https://avatars.githubusercontent.com/u/147428564?v=4');
                 INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, tech_created_at, tech_updated_at, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url) VALUES (301, 3, 2, 'C2', 'CANCELLED', '2023-11-24 15:09:28.000000', '2023-11-24 20:43:58.000000', 147428564, 'https://github.com/calcom/cal.com/issues/12527', '', 0, '2023-11-24 15:37:42.770687', '2023-11-24 20:46:57.822598', 'calcom', 'cal.com', 'https://github.com/calcom/cal.com', 'pawar1231', 'https://github.com/pawar1231', 'https://avatars.githubusercontent.com/u/147428564?v=4');
-                ALTER TABLE indexer_exp.github_issues ENABLE TRIGGER ALL;  
+                ALTER TABLE indexer_exp.github_issues ENABLE TRIGGER ALL;
                 ALTER TABLE indexer_exp.github_issues_assignees DISABLE TRIGGER ALL;
                 INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (100, 1);
                 INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (200, 1);

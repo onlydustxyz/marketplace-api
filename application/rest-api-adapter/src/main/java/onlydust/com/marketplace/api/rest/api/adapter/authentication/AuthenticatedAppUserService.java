@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +25,7 @@ public class AuthenticatedAppUserService {
      * @return the authenticated user
      * @throws OnlyDustException if the user is not authenticated
      */
-    public User getAuthenticatedUser() {
+    public AuthenticatedUser getAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication instanceof AnonymousAuthenticationToken) {
             final OnlyDustException unauthorized = unauthorized(format("Unauthorized anonymous user %s", authentication));
@@ -48,7 +48,7 @@ public class AuthenticatedAppUserService {
      * @return the authenticated user if present, empty otherwise.
      * Does not throw any exception when the user is not authenticated.
      */
-    public Optional<User> tryGetAuthenticatedUser() {
+    public Optional<AuthenticatedUser> tryGetAuthenticatedUser() {
         final Authentication authentication = authenticationContext.getAuthenticationFromContext();
         if (authentication.isAuthenticated() && authentication instanceof OnlyDustAppAuthentication) {
             return Optional.of(((OnlyDustAppAuthentication) authentication).getUser());
@@ -57,6 +57,6 @@ public class AuthenticatedAppUserService {
     }
 
     public void logout() {
-        githubUserPermissionsFacadePort.logout(getAuthenticatedUser().getGithubUserId());
+        githubUserPermissionsFacadePort.logout(getAuthenticatedUser().githubUserId());
     }
 }

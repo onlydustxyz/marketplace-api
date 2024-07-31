@@ -7,9 +7,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.A
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.OnlyDustBackofficeAuthentication;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
-import onlydust.com.marketplace.project.domain.model.User;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ class Auth0JwtServiceTest {
     private static final String VALID_AUTH0_GOOGLE_JWT = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IjJHNFZvZlVLMURVQklDUF9CcUdVcyJ9" +
                                                          ".eyJpc3MiOiJodHRwczovL2RldmVsb3Atb25seWR1c3QuZXUuYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAzMjIzMDA5NzY5OTExNzQ3Njk0IiwiYXVkIjpbImh0dHBzOi8vZGV2ZWxvcC1iby1hcGkub25seWR1c3QuY29tL2FwaSIsImh0dHBzOi8vZGV2ZWxvcC1vbmx5ZHVzdC5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNzA5MTMzODYzLCJleHAiOjE3MDkxMzUwNjMsImF6cCI6Imo3VFFRbUVNYWZwT245dkg2MW5JbHVBTmtmdWhtOUt3Iiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCBvZmZsaW5lX2FjY2VzcyJ9.w8gEFwyw1qJ4J2ldhEJyu2AXDwov-ICG2LgW-i5FQ_KAHYAg8F-65BLETzvseYPbHdxnrRlpJ3LldxTp5bFoSQP2Ngpsw4mqLLZFNQsUcIDAfzjl8GqiI1j74j08EmaszISSk0pUEjvFdYb-nmOI_sUw24T16xGDP0AY7Ca-YlDavQOiB9pUYGLSWMzlPQSkspromE9azEP2yU-T4lUejstCIzJuqHsVwh3adtYn-7lVH70m46Rd7EtjEOfldS5lASuhxA2Ruksp-dg8npgGIrtgn6Ap3kIjvVlNkJs3Lgkh2bEKt0o7be4TxY_b7uVBMAPxu4z7o6Q5zSFSYXB6ag";
 
-    UserFacadePort userFacadePort;
+    AppUserFacadePort appUserFacadePort;
     BackofficeUserFacadePort backofficeUserFacadePort;
     Auth0Properties auth0Properties;
     Auth0JwtService auth0JwtService;
@@ -40,7 +39,7 @@ class Auth0JwtServiceTest {
 
     @BeforeEach
     void setUp() {
-        userFacadePort = mock(UserFacadePort.class);
+        appUserFacadePort = mock(AppUserFacadePort.class);
         backofficeUserFacadePort = mock(BackofficeUserFacadePort.class);
         auth0UserInfoService = mock(Auth0UserInfoService.class);
 
@@ -50,7 +49,7 @@ class Auth0JwtServiceTest {
                 .build();
 
         final var jwtVerifier = new Auth0JwtVerifier(auth0Properties);
-        final var auth0OnlyDustAppAuthenticationService = new Auth0OnlyDustAppAuthenticationService(objectMapper, userFacadePort);
+        final var auth0OnlyDustAppAuthenticationService = new Auth0OnlyDustAppAuthenticationService(objectMapper, appUserFacadePort);
         final var auth0OnlyDustBackofficeAuthenticationService = new Auth0OnlyDustBackofficeAuthenticationService(backofficeUserFacadePort);
         auth0JwtService = new Auth0JwtService(auth0UserInfoService, jwtVerifier, auth0OnlyDustAppAuthenticationService,
                 auth0OnlyDustBackofficeAuthenticationService);
@@ -67,17 +66,17 @@ class Auth0JwtServiceTest {
                 .name("Mehdi")
                 .build());
 
-        when(userFacadePort
+        when(appUserFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(143011364L)
-                        .githubLogin("pixelfact")
-                        .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
+                        .login("pixelfact")
+                        .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                         .email("pixelfact.company@gmail.com")
                         .build(), false)
-        ).thenReturn(User.builder()
+        ).thenReturn(AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
-                .githubLogin("pixelfact")
-                .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
+                .login("pixelfact")
+                .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
                 .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
@@ -92,10 +91,10 @@ class Auth0JwtServiceTest {
         assertThat(authentication.getImpersonator()).isNull();
         assertThat(authentication.getName()).isEqualTo("143011364");
 
-        final User user = authentication.getUser();
-        assertThat(user.getGithubLogin()).isEqualTo("pixelfact");
-        assertThat(user.getGithubUserId()).isEqualTo(143011364L);
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
+        final var user = authentication.getUser();
+        assertThat(user.login()).isEqualTo("pixelfact");
+        assertThat(user.githubUserId()).isEqualTo(143011364L);
+        assertThat(user.roles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
     }
 
     @Test
@@ -140,7 +139,7 @@ class Auth0JwtServiceTest {
         final var authentication = auth0JwtService.getAuthenticationFromJwt(invalidJwt, null);
 
         assertThat(authentication).isEmpty();
-        verify(userFacadePort, never()).getUserByGithubIdentity(any(), anyBoolean());
+        verify(appUserFacadePort, never()).getUserByGithubIdentity(any(), anyBoolean());
         verify(auth0UserInfoService, never()).getUserInfo(any());
     }
 
@@ -155,17 +154,17 @@ class Auth0JwtServiceTest {
                 .name("Mehdi")
                 .build());
 
-        when(userFacadePort
+        when(appUserFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(143011364L)
-                        .githubLogin("pixelfact")
-                        .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
+                        .login("pixelfact")
+                        .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                         .email("pixelfact.company@gmail.com")
                         .build(), false)
-        ).thenReturn(User.builder()
+        ).thenReturn(AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
-                .githubLogin("pixelfact")
-                .githubAvatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
+                .login("pixelfact")
+                .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
                 .roles(List.of(AuthenticatedUser.Role.USER, AuthenticatedUser.Role.ADMIN))
                 .build());
@@ -175,14 +174,14 @@ class Auth0JwtServiceTest {
                   "sub": "github|595505"
                 }
                 """;
-        when(userFacadePort
+        when(appUserFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(595505L)
                         .build(), true)
-        ).thenReturn(User.builder()
+        ).thenReturn(AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
-                .githubLogin("ofux")
-                .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
+                .login("ofux")
+                .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
                 .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
@@ -197,14 +196,14 @@ class Auth0JwtServiceTest {
         assertThat(authentication.getImpersonator()).isNotNull();
         assertThat(authentication.getName()).isEqualTo("595505");
 
-        final User user = authentication.getUser();
-        assertThat(user.getGithubLogin()).isEqualTo("ofux");
-        assertThat(user.getGithubUserId()).isEqualTo(595505L);
-        assertThat(user.getRoles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
+        final var user = authentication.getUser();
+        assertThat(user.login()).isEqualTo("ofux");
+        assertThat(user.githubUserId()).isEqualTo(595505L);
+        assertThat(user.roles()).containsExactlyInAnyOrder(AuthenticatedUser.Role.USER);
 
-        final User impersonator = authentication.getImpersonator();
-        assertThat(impersonator.getGithubLogin()).isEqualTo("pixelfact");
-        assertThat(impersonator.getGithubUserId()).isEqualTo(143011364L);
+        final var impersonator = authentication.getImpersonator();
+        assertThat(impersonator.login()).isEqualTo("pixelfact");
+        assertThat(impersonator.githubUserId()).isEqualTo(143011364L);
     }
 
     @Test
@@ -218,16 +217,16 @@ class Auth0JwtServiceTest {
                 .name("Mehdi")
                 .build());
 
-        when(userFacadePort
+        when(appUserFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(31901905L)
-                        .githubLogin("kaelsky")
-                        .githubAvatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
+                        .login("kaelsky")
+                        .avatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
                         .build(), false)
-        ).thenReturn(User.builder()
+        ).thenReturn(AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
-                .githubLogin("kaelsky")
-                .githubAvatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
+                .login("kaelsky")
+                .avatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
                 .githubUserId(31901905L)
                 .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());
@@ -237,14 +236,14 @@ class Auth0JwtServiceTest {
                   "sub": "github|595505"
                 }
                 """;
-        when(userFacadePort
+        when(appUserFacadePort
                 .getUserByGithubIdentity(GithubUserIdentity.builder()
                         .githubUserId(595505L)
                         .build(), true)
-        ).thenReturn(User.builder()
+        ).thenReturn(AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
-                .githubLogin("ofux")
-                .githubAvatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
+                .login("ofux")
+                .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
                 .roles(List.of(AuthenticatedUser.Role.USER))
                 .build());

@@ -2,11 +2,10 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.*;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.util.List;
-import java.util.Set;
 
 import static java.util.Objects.isNull;
 
@@ -60,31 +59,6 @@ public interface UserMapper {
                 }).toList();
     }
 
-    static PrivateUserProfileResponse userProfileToPrivateResponse(UserProfileView userProfileView) {
-        return new PrivateUserProfileResponse()
-                .githubUserId(userProfileView.getGithubId())
-                .id(userProfileView.getId())
-                .login(userProfileView.getLogin())
-                .avatarUrl(userProfileView.getAvatarUrl())
-                .bio(userProfileView.getBio())
-                .website(userProfileView.getWebsite())
-                .location(userProfileView.getLocation())
-                .contacts(contactToResponse(userProfileView.getContacts()))
-                .allocatedTimeToContribute(allocatedTimeToResponse(userProfileView.getAllocatedTimeToContribute()))
-                .isLookingForAJob(userProfileView.getIsLookingForAJob())
-                .firstName(userProfileView.getFirstName())
-                .lastName(userProfileView.getLastName());
-    }
-
-    static AllocatedTime allocatedTimeToResponse(UserAllocatedTimeToContribute allocatedTimeToContribute) {
-        return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
-            case NONE -> AllocatedTime.NONE;
-            case LESS_THAN_ONE_DAY -> AllocatedTime.LESS_THAN_ONE_DAY;
-            case ONE_TO_THREE_DAYS -> AllocatedTime.ONE_TO_THREE_DAYS;
-            case GREATER_THAN_THREE_DAYS -> AllocatedTime.GREATER_THAN_THREE_DAYS;
-        };
-    }
-
     static UserAllocatedTimeToContribute allocatedTimeToDomain(AllocatedTime allocatedTimeToContribute) {
         return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
             case NONE -> UserAllocatedTimeToContribute.NONE;
@@ -92,26 +66,6 @@ public interface UserMapper {
             case ONE_TO_THREE_DAYS -> UserAllocatedTimeToContribute.ONE_TO_THREE_DAYS;
             case GREATER_THAN_THREE_DAYS -> UserAllocatedTimeToContribute.GREATER_THAN_THREE_DAYS;
         };
-    }
-
-    static List<ContactInformation> contactToResponse(final Set<Contact> contacts) {
-        return contacts.stream()
-                .map(contactInformation -> {
-                    final ContactInformation response = new ContactInformation();
-                    response.setContact(contactInformation.getContact());
-                    response.setChannel(switch (contactInformation.getChannel()) {
-                        case LINKEDIN -> ContactInformationChannel.LINKEDIN;
-                        case TWITTER -> ContactInformationChannel.TWITTER;
-                        case TELEGRAM -> ContactInformationChannel.TELEGRAM;
-                        case DISCORD -> ContactInformationChannel.DISCORD;
-                        case WHATSAPP -> ContactInformationChannel.WHATSAPP;
-                    });
-                    response.setVisibility(switch (contactInformation.getVisibility()) {
-                        case PUBLIC -> ContactInformation.VisibilityEnum.PUBLIC;
-                        case PRIVATE -> ContactInformation.VisibilityEnum.PRIVATE;
-                    });
-                    return response;
-                }).toList();
     }
 
     static UserProfileCoverColor coverToUserProfileResponse(final @NonNull UserProfileCover cover) {
@@ -123,7 +77,7 @@ public interface UserMapper {
         };
     }
 
-    static ProjectApplicationShortResponse map(final User authenticatedUser, final Application application) {
+    static ProjectApplicationShortResponse map(final AuthenticatedUser authenticatedUser, final Application application) {
         return new ProjectApplicationShortResponse()
                 .id(application.id().value())
                 .applicant(map(authenticatedUser))
@@ -131,11 +85,11 @@ public interface UserMapper {
                 .problemSolvingApproach(application.problemSolvingApproach());
     }
 
-    static ContributorResponse map(User authenticatedUser) {
+    static ContributorResponse map(AuthenticatedUser authenticatedUser) {
         return new ContributorResponse()
-                .githubUserId(authenticatedUser.getGithubUserId())
-                .login(authenticatedUser.getGithubLogin())
-                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
+                .githubUserId(authenticatedUser.githubUserId())
+                .login(authenticatedUser.login())
+                .avatarUrl(authenticatedUser.avatarUrl())
                 .isRegistered(true);
     }
 }

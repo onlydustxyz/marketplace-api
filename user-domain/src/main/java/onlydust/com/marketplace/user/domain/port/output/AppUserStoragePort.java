@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.user.domain.port.output;
 
-import onlydust.com.marketplace.user.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -11,5 +13,11 @@ public interface AppUserStoragePort {
 
     Optional<Long> getGithubUserId(UUID userId);
 
-    Optional<User> findById(User.Id userId);
+    Optional<NotificationRecipient> findById(NotificationRecipient.Id userId);
+
+    Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId);
+
+    void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
+
+    AuthenticatedUser createUser(AuthenticatedUser user);
 }

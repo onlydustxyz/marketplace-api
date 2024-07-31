@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppAuthentication;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.User;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
@@ -42,7 +41,7 @@ public record ApiKeyAuthentication(String apiKey) implements OnlyDustAppAuthenti
     }
 
     @Override
-    public User getUser() {
+    public AuthenticatedUser getUser() {
         return null;
     }
 
@@ -52,7 +51,7 @@ public record ApiKeyAuthentication(String apiKey) implements OnlyDustAppAuthenti
     }
 
     @Override
-    public User getImpersonator() {
+    public AuthenticatedUser getImpersonator() {
         return null;
     }
 

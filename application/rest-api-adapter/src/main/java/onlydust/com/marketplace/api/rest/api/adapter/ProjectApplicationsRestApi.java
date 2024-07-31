@@ -26,14 +26,14 @@ public class ProjectApplicationsRestApi implements ProjectApplicationsApi {
     @Override
     public ResponseEntity<Void> acceptProjectApplication(UUID applicationId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        applicationFacadePort.acceptApplication(Application.Id.of(applicationId), authenticatedUser.getId());
+        applicationFacadePort.acceptApplication(Application.Id.of(applicationId), authenticatedUser.id());
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteProjectApplication(UUID applicationId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        applicationFacadePort.deleteApplication(Application.Id.of(applicationId), authenticatedUser.getId(), authenticatedUser.getGithubUserId());
+        applicationFacadePort.deleteApplication(Application.Id.of(applicationId), authenticatedUser.id(), authenticatedUser.githubUserId());
         return noContent().build();
     }
 

@@ -434,7 +434,7 @@ public class ApplicationServiceTest {
     class AcceptApplication {
         final GithubUserIdentity applicant = GithubUserIdentity.builder()
                 .githubUserId(githubUserId)
-                .githubLogin(faker.name().username())
+                .login(faker.name().username())
                 .build();
 
         final Application application = Application.fromMarketplace(
@@ -523,7 +523,7 @@ public class ApplicationServiceTest {
             applicationService.acceptApplication(application.id(), userId);
 
             // Then
-            verify(githubApiPort).assign(githubToken.token(), issue.repoId(), issue.number(), applicant.getGithubLogin());
+            verify(githubApiPort).assign(githubToken.token(), issue.repoId(), issue.number(), applicant.login());
         }
     }
 }

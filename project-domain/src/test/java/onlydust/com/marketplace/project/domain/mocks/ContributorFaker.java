@@ -11,8 +11,9 @@ public class ContributorFaker {
         return Contributor.builder()
                 .id(GithubUserIdentity.builder()
                         .githubUserId(faker.number().randomNumber() + faker.number().randomNumber())
-                        .githubLogin(faker.name().username())
-                        .githubAvatarUrl(faker.internet().avatar())
+                        .login(faker.name().username())
+                        .avatarUrl(faker.internet().avatar())
+                        .email(faker.internet().emailAddress())
                         .build())
                 .isRegistered(faker.bool().bool())
                 .build();

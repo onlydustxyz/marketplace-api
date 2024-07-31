@@ -5,7 +5,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0Onl
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -28,10 +27,10 @@ public class AuthenticatedAppUserServiceTest {
 
     final UUID userId = UUID.randomUUID();
     final long githubUserId = faker.number().randomNumber();
-    final User user = User.builder()
+    final AuthenticatedUser user = AuthenticatedUser.builder()
             .githubUserId(githubUserId)
             .id(userId)
-            .githubLogin(faker.name().username())
+            .login(faker.name().username())
             .roles(List.of(AuthenticatedUser.Role.USER))
             .build();
 
@@ -47,12 +46,12 @@ public class AuthenticatedAppUserServiceTest {
                         .user(user)
                         .authorities(allowedRoles.stream().map(OnlyDustAppGrantedAuthority::new).collect(Collectors.toList()))
                         .build());
-        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         // Then
-        assertEquals(userId, authenticatedUser.getId());
-        assertEquals(githubUserId, authenticatedUser.getGithubUserId());
-        assertEquals(allowedRoles, authenticatedUser.getRoles());
+        assertEquals(userId, authenticatedUser.id());
+        assertEquals(githubUserId, authenticatedUser.githubUserId());
+        assertEquals(allowedRoles, authenticatedUser.roles());
     }
 
     @Test

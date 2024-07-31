@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Value
 @Accessors(fluent = true, chain = true)
-public class User {
+public class NotificationRecipient {
     Id id;
     String email;
     String login;

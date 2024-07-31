@@ -1,7 +1,11 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.project.domain.model.*;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.project.domain.model.GithubAccount;
+import onlydust.com.marketplace.project.domain.model.GithubAppInstallationStatus;
+import onlydust.com.marketplace.project.domain.model.GithubMembership;
+import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import org.junit.jupiter.api.Test;
@@ -108,7 +112,7 @@ public class GithubAccountServiceTest {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
         final var githubUserId = 5L;
-        final User authenticatedUser = User.builder().githubUserId(githubUserId).githubLogin(faker.pokemon().name()).build();
+        final var authenticatedUser = AuthenticatedUser.builder().githubUserId(githubUserId).login(faker.pokemon().name()).build();
 
         // When
         final List<GithubAccount> githubAccounts = List.of(
@@ -123,10 +127,10 @@ public class GithubAccountServiceTest {
         );
         when(githubSearchPort.searchOrganizationsByGithubUserId(githubUserId))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.login(),
                 "org1"))
                 .thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.getGithubLogin(),
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, authenticatedUser.login(),
                 "org2"))
                 .thenReturn(GithubMembership.MEMBER);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L))).thenReturn(List.of());
@@ -136,7 +140,7 @@ public class GithubAccountServiceTest {
         // Then
         assertEquals(List.of(githubAccounts.get(0).toBuilder().isCurrentUserAdmin(true).build(),
                         githubAccounts.get(1).toBuilder().isCurrentUserAdmin(false).build(),
-                        GithubAccount.builder().id(5L).login(authenticatedUser.getGithubLogin()).isPersonal(true).isCurrentUserAdmin(true).build()),
+                        GithubAccount.builder().id(5L).login(authenticatedUser.login()).isPersonal(true).isCurrentUserAdmin(true).build()),
                 organizationsForGithubPersonalToken);
     }
 
@@ -145,7 +149,7 @@ public class GithubAccountServiceTest {
         // Given
         final GithubAccountService githubAccountService = new GithubAccountService(githubStoragePort, githubSearchPort);
         final var githubUserId = 5L;
-        final User user = User.builder().githubLogin(faker.pokemon().name()).githubUserId(githubUserId).build();
+        final var user = AuthenticatedUser.builder().login(faker.pokemon().name()).githubUserId(githubUserId).build();
         // When
         final List<GithubAccount> githubAccounts = List.of(
                 GithubAccount.builder()
@@ -159,9 +163,9 @@ public class GithubAccountServiceTest {
         );
         when(githubSearchPort.searchOrganizationsByGithubUserId(githubUserId))
                 .thenReturn(githubAccounts);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.getGithubLogin(), "org1"))
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.login(), "org1"))
                 .thenReturn(GithubMembership.ADMIN);
-        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.getGithubLogin(), "org2"))
+        when(githubSearchPort.getGithubUserMembershipForOrganization(githubUserId, user.login(), "org2"))
                 .thenReturn(GithubMembership.EXTERNAL);
         when(githubStoragePort.findInstalledAccountsByIds(List.of(1L, 2L, 5L))).thenReturn(List.of(
                 GithubAccount.builder()
@@ -171,8 +175,8 @@ public class GithubAccountServiceTest {
                         .installationId(1L)
                         .build(),
                 GithubAccount.builder()
-                        .id(user.getGithubUserId())
-                        .login(user.getGithubLogin())
+                        .id(user.githubUserId())
+                        .login(user.login())
                         .installationStatus(GithubAppInstallationStatus.COMPLETE)
                         .installationId(3L)
                         .build()
@@ -192,8 +196,8 @@ public class GithubAccountServiceTest {
                                 .build(),
                         GithubAccount.builder()
                                 .installationStatus(GithubAppInstallationStatus.COMPLETE)
-                                .id(user.getGithubUserId())
-                                .login(user.getGithubLogin())
+                                .id(user.githubUserId())
+                                .login(user.login())
                                 .isPersonal(true)
                                 .isCurrentUserAdmin(true)
                                 .installationId(3L)

@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubAppInstallationStatus;
 import onlydust.com.marketplace.project.domain.model.GithubMembership;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.GithubInstallationFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.GithubOrganizationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubSearchPort;
@@ -27,23 +27,23 @@ public class GithubAccountService implements GithubInstallationFacadePort, Githu
     }
 
     @Override
-    public List<GithubAccount> getOrganizationsForAuthenticatedUser(final User authenticatedUser) {
+    public List<GithubAccount> getOrganizationsForAuthenticatedUser(final AuthenticatedUser authenticatedUser) {
         final List<GithubAccount> userGithubAccounts =
-                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubUserId(authenticatedUser.getGithubUserId()))
+                new ArrayList<>(githubSearchPort.searchOrganizationsByGithubUserId(authenticatedUser.githubUserId()))
                         .stream()
                         .map(githubAccount -> githubAccount.toBuilder()
                                 .isCurrentUserAdmin(githubSearchPort.getGithubUserMembershipForOrganization(
-                                        authenticatedUser.getGithubUserId(),
-                                        authenticatedUser.getGithubLogin(),
+                                        authenticatedUser.githubUserId(),
+                                        authenticatedUser.login(),
                                         githubAccount.getLogin()
                                 ).equals(GithubMembership.ADMIN))
                                 .build()
                         )
                         .collect(Collectors.toList());
         userGithubAccounts.add(GithubAccount.builder()
-                .id(authenticatedUser.getGithubUserId())
-                .login(authenticatedUser.getGithubLogin())
-                .avatarUrl(authenticatedUser.getGithubAvatarUrl())
+                .id(authenticatedUser.githubUserId())
+                .login(authenticatedUser.login())
+                .avatarUrl(authenticatedUser.avatarUrl())
                 .isPersonal(true)
                 .isCurrentUserAdmin(true)
                 .installationStatus(GithubAppInstallationStatus.NOT_INSTALLED)

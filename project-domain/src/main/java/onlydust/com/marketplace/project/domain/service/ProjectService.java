@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -281,13 +282,13 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ContributionView> contributions(UUID projectId, User caller, ContributionView.Filters filters,
+    public Page<ContributionView> contributions(UUID projectId, AuthenticatedUser caller, ContributionView.Filters filters,
                                                 ContributionView.Sort sort, SortDirection direction,
                                                 Integer page, Integer pageSize) {
-        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+        if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can list project contributions");
         }
-        return contributionStoragePort.findContributions(Optional.of(caller.getGithubUserId()), filters, sort, direction, page,
+        return contributionStoragePort.findContributions(Optional.of(caller.githubUserId()), filters, sort, direction, page,
                 pageSize);
     }
 
@@ -297,7 +298,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ContributionView> staledContributions(UUID projectId, User caller, Integer page, Integer pageSize) {
+    public Page<ContributionView> staledContributions(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
         final var filters = ContributionView.Filters.builder()
                 .projects(List.of(projectId))
                 .statuses(List.of(ContributionStatus.IN_PROGRESS))
@@ -308,25 +309,25 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ChurnedContributorView> churnedContributors(UUID projectId, User caller, Integer page,
+    public Page<ChurnedContributorView> churnedContributors(UUID projectId, AuthenticatedUser caller, Integer page,
                                                             Integer pageSize) {
-        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+        if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
         return projectStoragePort.getChurnedContributors(projectId, page, pageSize);
     }
 
     @Override
-    public Page<NewcomerView> newcomers(UUID projectId, User caller, Integer page, Integer pageSize) {
-        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+    public Page<NewcomerView> newcomers(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
         return projectStoragePort.getNewcomers(projectId, ZonedDateTime.now().minusMonths(NEWCOMER_THRESHOLD_IN_MONTHS), page, pageSize);
     }
 
     @Override
-    public Page<ContributorActivityView> mostActives(UUID projectId, User caller, Integer page, Integer pageSize) {
-        if (!permissionService.isUserProjectLead(projectId, caller.getId())) {
+    public Page<ContributorActivityView> mostActives(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
+        if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
         return projectStoragePort.getMostActivesContributors(projectId, page, pageSize);

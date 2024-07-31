@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.job;
 import com.github.javafaker.Faker;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestCreated;
@@ -10,7 +11,6 @@ import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.event.*;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
@@ -169,7 +169,7 @@ class TrackingEventPublisherOutboxConsumerTest {
 
     @Nested
     class GivenARegisteredUser {
-        final User user = User.builder()
+        final AuthenticatedUser user = AuthenticatedUser.builder()
                 .githubUserId(githubUserId)
                 .id(UUID.randomUUID())
                 .build();
@@ -194,7 +194,7 @@ class TrackingEventPublisherOutboxConsumerTest {
             final var capturedTrackingEvent = trackingEventCaptor.getValue();
             assertThat(capturedTrackingEvent.issueId()).isEqualTo(event.id());
             assertThat(capturedTrackingEvent.assigneeGithubId()).isEqualTo(event.assigneeId());
-            assertThat(capturedTrackingEvent.assigneeUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.assigneeUserId()).isEqualTo(user.id());
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.assignedAt()).isEqualTo(event.assignedAt());
             assertThat(capturedTrackingEvent.isGoodFirstIssue()).isFalse();
@@ -214,7 +214,7 @@ class TrackingEventPublisherOutboxConsumerTest {
             final var capturedTrackingEvent = trackingEventCaptor.getValue();
             assertThat(capturedTrackingEvent.pullRequestId()).isEqualTo(event.id());
             assertThat(capturedTrackingEvent.authorGithubId()).isEqualTo(event.authorId());
-            assertThat(capturedTrackingEvent.authorUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.authorUserId()).isEqualTo(user.id());
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
         }
 
@@ -232,7 +232,7 @@ class TrackingEventPublisherOutboxConsumerTest {
             final var capturedTrackingEvent = trackingEventCaptor.getValue();
             assertThat(capturedTrackingEvent.pullRequestId()).isEqualTo(event.id());
             assertThat(capturedTrackingEvent.authorGithubId()).isEqualTo(event.authorId());
-            assertThat(capturedTrackingEvent.authorUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.authorUserId()).isEqualTo(user.id());
             assertThat(capturedTrackingEvent.createdAt()).isEqualTo(event.createdAt());
             assertThat(capturedTrackingEvent.mergedAt()).isEqualTo(event.mergedAt());
         }
@@ -283,7 +283,7 @@ class TrackingEventPublisherOutboxConsumerTest {
             assertThat(capturedTrackingEvent.applicationId()).isEqualTo(application.id());
             assertThat(capturedTrackingEvent.projectId()).isEqualTo(application.projectId());
             assertThat(capturedTrackingEvent.applicantGithubId()).isEqualTo(application.applicantId());
-            assertThat(capturedTrackingEvent.applicantUserId()).isEqualTo(user.getId());
+            assertThat(capturedTrackingEvent.applicantUserId()).isEqualTo(user.id());
             assertThat(capturedTrackingEvent.origin()).isEqualTo(application.origin());
             assertThat(capturedTrackingEvent.appliedAt()).isEqualTo(application.appliedAt());
             assertThat(capturedTrackingEvent.issueId()).isEqualTo(application.issueId());

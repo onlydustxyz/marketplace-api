@@ -69,7 +69,7 @@ public class AutomatedRewardServiceTest {
         when(githubSearchPort.searchUsersByLogin(recipientLogin))
                 .thenReturn(List.of(GithubUserIdentity.builder()
                         .githubUserId(recipientId)
-                        .githubLogin(recipientLogin)
+                        .login(recipientLogin)
                         .build()));
         when(projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(CreateAndCloseIssueCommand.builder()
                 .projectId(projectId)

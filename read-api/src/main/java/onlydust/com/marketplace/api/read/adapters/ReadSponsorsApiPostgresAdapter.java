@@ -51,8 +51,8 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                                                        SortDirection direction) {
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserSponsorAdmin(authenticatedUser.getId(), sponsorId))
-            throw OnlyDustException.forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.getId(), sponsorId));
+        if (!permissionService.isUserSponsorAdmin(authenticatedUser.id(), sponsorId))
+            throw OnlyDustException.forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sortBy = switch (Optional.ofNullable(sort).orElse(SponsorAccountTransactionSort.DATE)) {
             case DATE -> "timestamp";

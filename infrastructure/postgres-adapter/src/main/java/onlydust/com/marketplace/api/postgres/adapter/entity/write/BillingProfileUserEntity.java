@@ -7,7 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
-import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
+import onlydust.com.marketplace.user.domain.model.BillingProfileLinkView;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;

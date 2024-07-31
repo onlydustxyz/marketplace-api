@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -527,13 +528,13 @@ public class ProjectServiceTest {
     void should_forbid_access_to_contributions_for_non_leaders() {
         // Given
         final var projectId = UUID.randomUUID();
-        final var projectLead = User.builder()
+        final var projectLead = AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
                 .githubUserId(faker.number().randomNumber())
                 .build();
 
         // When
-        when(permissionService.isUserProjectLead(projectId, projectLead.getId())).thenReturn(false);
+        when(permissionService.isUserProjectLead(projectId, projectLead.id())).thenReturn(false);
 
         // Then
         assertThatThrownBy(() -> projectService.contributions(projectId, projectLead, null, null, null, null, null))
@@ -544,7 +545,7 @@ public class ProjectServiceTest {
     void should_list_project_contributions() {
         // Given
         final var projectId = UUID.randomUUID();
-        final var projectLead = User.builder()
+        final var projectLead = AuthenticatedUser.builder()
                 .id(UUID.randomUUID())
                 .githubUserId(faker.number().randomNumber())
                 .build();
@@ -571,7 +572,7 @@ public class ProjectServiceTest {
                 .totalPageNumber(1)
                 .build();
 
-        when(contributionStoragePort.findContributions(Optional.of(projectLead.getGithubUserId()), filters, sort, direction, page,
+        when(contributionStoragePort.findContributions(Optional.of(projectLead.githubUserId()), filters, sort, direction, page,
                 pageSize))
                 .thenReturn(expectedContributions);
 

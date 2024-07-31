@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
@@ -20,15 +20,11 @@ public interface UserStoragePort {
 
     void saveProfile(UUID userId, UserProfile userProfile);
 
-    Optional<User> getRegisteredUserByGithubId(Long githubId);
+    Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId);
 
     Optional<GithubUserIdentity> getIndexedUserByGithubId(Long githubId);
 
-    Optional<User> getRegisteredUserById(UUID userId);
-
-    User createUser(User user);
-
-    void updateUserLastSeenAt(UUID userId, Date lastSeenAt);
+    Optional<AuthenticatedUser> getRegisteredUserById(UUID userId);
 
     void updateOnboardingCompletionDate(UUID userId, Date date);
 
@@ -46,11 +42,11 @@ public interface UserStoragePort {
 
     List<CurrencyView> listRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds);
 
-    List<User> getUsersLastSeenSince(ZonedDateTime since);
+    List<AuthenticatedUser> getUsersLastSeenSince(ZonedDateTime since);
 
-    void saveUsers(List<User> users);
+    void saveUsers(List<GithubUserIdentity> users);
 
-    void saveUser(User user);
+    void saveUser(GithubUserIdentity user);
 
     void refreshUserRanksAndStats();
 

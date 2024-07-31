@@ -8,8 +8,8 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationType;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
-import onlydust.com.marketplace.user.domain.model.User;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
@@ -37,11 +37,11 @@ class NotificationServiceTest {
         final var recipientId = UUID.randomUUID();
 
         // When
-        when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.REWARD_AS_CONTRIBUTOR))
+        when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.CONTRIBUTOR_REWARD))
                 .thenReturn(List.of(NotificationChannel.EMAIL));
-        when(userStoragePort.findById(User.Id.of(recipientId)))
-                .thenReturn(java.util.Optional.of(new User(User.Id.of(recipientId), "foo@bar.baz", "foo")));
-        final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR));
+        when(userStoragePort.findById(NotificationRecipient.Id.of(recipientId)))
+                .thenReturn(java.util.Optional.of(new NotificationRecipient(NotificationRecipient.Id.of(recipientId), "foo@bar.baz", "foo")));
+        final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD));
 
         // Then
         verify(notificationStoragePort).save(eq(notification));
@@ -55,12 +55,12 @@ class NotificationServiceTest {
         final var recipientId = UUID.randomUUID();
 
         // When
-        when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.REWARD_AS_CONTRIBUTOR))
+        when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.CONTRIBUTOR_REWARD))
                 .thenReturn(List.of(NotificationChannel.EMAIL));
-        when(userStoragePort.findById(User.Id.of(recipientId)))
-                .thenReturn(java.util.Optional.of(new User(User.Id.of(recipientId), "foo@bar.baz", "foo")));
+        when(userStoragePort.findById(NotificationRecipient.Id.of(recipientId)))
+                .thenReturn(java.util.Optional.of(new NotificationRecipient(NotificationRecipient.Id.of(recipientId), "foo@bar.baz", "foo")));
         doThrow(new RuntimeException("Email sending failed")).when(notificationEmailSender).send(any(SendableNotification.class));
-        final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.REWARD_AS_CONTRIBUTOR));
+        final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD));
 
         // Then
         verify(notificationStoragePort).save(eq(notification));

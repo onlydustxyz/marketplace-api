@@ -2,12 +2,12 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
@@ -88,7 +88,7 @@ public class ContributorService implements ContributorFacadePort {
     private List<Contributor> getExternalContributors(String login) {
         return githubSearchPort.searchUsersByLogin(login).stream().map(
                 identity -> {
-                    final var user = userStoragePort.getRegisteredUserByGithubId(identity.getGithubUserId()).map(User::toGithubIdentity);
+                    final var user = userStoragePort.getRegisteredUserByGithubId(identity.githubUserId()).map(GithubUserIdentity.class::cast);
                     return Contributor.builder()
                             .id(user.orElse(identity))
                             .isRegistered(user.isPresent())

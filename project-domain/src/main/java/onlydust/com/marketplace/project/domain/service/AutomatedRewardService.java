@@ -52,7 +52,7 @@ public class AutomatedRewardService implements AutomatedRewardFacadePort {
                         .projectId(projectId)
                         .projectLeadId(projectLeadId)
                         .githubRepoId(repository.getGithubRepoId())
-                        .title("%s - Recipient github login : %s".formatted(reason, recipient.getGithubLogin()))
+                        .title("%s - Recipient github login : %s".formatted(reason, recipient.login()))
                         .description("Reward sent from OnlyDust admin")
                         .build());
 
@@ -60,7 +60,7 @@ public class AutomatedRewardService implements AutomatedRewardFacadePort {
                 .amount(amount)
                 .projectId(projectId)
                 .currencyId(CurrencyView.Id.of(currencyId))
-                .recipientId(recipient.getGithubUserId())
+                .recipientId(recipient.githubUserId())
                 .items(List.of(RequestRewardCommand.Item.builder()
                         .id(otherWork.getId())
                         .type(RequestRewardCommand.Item.Type.issue)
@@ -78,7 +78,7 @@ public class AutomatedRewardService implements AutomatedRewardFacadePort {
             throw OnlyDustException.internalServerError("Github user %s not found".formatted(recipientResults));
         }
         return recipientResults.stream()
-                .filter(githubUserIdentity -> githubUserIdentity.getGithubLogin().equals(recipientLogin))
+                .filter(githubUserIdentity -> githubUserIdentity.login().equals(recipientLogin))
                 .findFirst()
                 .orElseThrow(() -> OnlyDustException.internalServerError("Github user %s not found in github search response".formatted(recipientLogin)));
     }

@@ -1,15 +1,13 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contact;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -18,8 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserFacadePort {
-
-    User getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly);
 
     void updateProfile(final @NonNull UUID userId,
                        final String avatarUrl,
@@ -52,11 +48,11 @@ public interface UserFacadePort {
     Page<RewardItemView> getRewardItemsPageByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId, int pageIndex,
                                                                                                int pageSize, List<UUID> companyAdminBillingProfileIds);
 
-    void claimProjectForAuthenticatedUser(UUID projectId, User user);
+    void claimProjectForAuthenticatedUser(UUID projectId, AuthenticatedUser user);
 
     URL saveAvatarImage(InputStream imageInputStream);
 
-    void updateGithubProfile(User authenticatedUser);
+    void updateGithubProfile(Long githubUserId);
 
     void refreshUserRanksAndStats();
 

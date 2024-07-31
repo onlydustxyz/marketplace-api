@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
@@ -15,18 +14,19 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.model.User;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,6 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -59,7 +58,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getRegisteredUserByGithubId(Long githubId) {
+    public Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId) {
         return userViewRepository.findByGithubUserId(githubId).map(this::getUserDetails);
     }
 
@@ -71,30 +70,28 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<User> getRegisteredUserById(UUID userId) {
+    public Optional<AuthenticatedUser> getRegisteredUserById(UUID userId) {
         return userViewRepository.findById(userId).map(this::getUserDetails);
     }
 
-    private User getUserDetails(@NotNull UserViewEntity user) {
+    private AuthenticatedUser getUserDetails(@NotNull UserViewEntity user) {
         final var projectLedIdsByUserId = projectLedIdRepository.findProjectLedIdsByUserId(user.id()).stream()
                 .sorted(Comparator.comparing(ProjectLedIdQueryEntity::getProjectSlug))
                 .toList();
-        final var billingProfiles = billingProfileUserRepository.findByUserId(user.id()).stream()
-                .map(BillingProfileUserEntity::toBillingProfileLinkView)
-                .toList();
+        final var billingProfiles = billingProfileUserRepository.findByUserId(user.id());
         return mapUserToDomain(user, projectLedIdsByUserId, billingProfiles);
     }
 
     @Override
     @Transactional
-    public User createUser(User user) {
+    public AuthenticatedUser createUser(AuthenticatedUser user) {
         return mapCreatedUserToDomain(tryCreateUser(user));
     }
 
-    private UserEntity tryCreateUser(User user) {
+    private UserEntity tryCreateUser(AuthenticatedUser user) {
         userRepository.tryInsert(mapUserToEntity(user));
         userRepository.flush();
-        return userRepository.findByGithubUserId(user.getGithubUserId()).orElseThrow();
+        return userRepository.findByGithubUserId(user.githubUserId()).orElseThrow();
     }
 
     @Override
@@ -149,7 +146,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Transactional
     public void saveProfile(UUID userId, UserProfile userProfile) {
         final UserProfileInfoEntity userProfileInfoEntity = userProfileInfoRepository.findById(userId)
-                        .orElse(new UserProfileInfoEntity());
+                .orElse(new UserProfileInfoEntity());
         userProfileInfoRepository.saveAndFlush(userProfileInfoEntity.update(userId, userProfile));
     }
 
@@ -196,8 +193,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
 
         projectLeaderInvitationRepository.delete(invitation);
-        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, user.getId()));
-        return user.getId();
+        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, user.id()));
+        return user.id();
     }
 
     @Override
@@ -239,8 +236,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .map(entity -> Contributor.builder()
                         .id(GithubUserIdentity.builder()
                                 .githubUserId(entity.getGithubUserId())
-                                .githubLogin(entity.getLogin())
-                                .githubAvatarUrl(entity.getAvatarUrl())
+                                .login(entity.getLogin())
+                                .avatarUrl(entity.getAvatarUrl())
                                 .build())
                         .isRegistered(entity.getIsRegistered())
                         .build()).toList();
@@ -260,7 +257,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public List<User> getUsersLastSeenSince(ZonedDateTime since) {
+    public List<AuthenticatedUser> getUsersLastSeenSince(ZonedDateTime since) {
         return userRepository.findAllByLastSeenAtAfter(Date.from(since.toInstant()))
                 .stream()
                 .map(UserMapper::mapCreatedUserToDomain)
@@ -268,23 +265,23 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public void saveUsers(List<User> users) {
-        users.forEach(u -> userRepository.findByGithubUserId(u.getGithubUserId())
+    public void saveUsers(List<GithubUserIdentity> users) {
+        users.forEach(u -> userRepository.findByGithubUserId(u.githubUserId())
                 .map(userEntity -> userEntity.toBuilder()
-                        .githubLogin(u.getGithubLogin())
-                        .githubAvatarUrl(u.getGithubAvatarUrl())
-                        .email(u.getEmail())
+                        .githubLogin(u.login())
+                        .githubAvatarUrl(u.avatarUrl())
+                        .email(u.email())
                         .build())
                 .ifPresent(userRepository::save));
     }
 
     @Override
-    public void saveUser(User user) {
-        userRepository.findByGithubUserId(user.getGithubUserId())
+    public void saveUser(GithubUserIdentity user) {
+        userRepository.findByGithubUserId(user.githubUserId())
                 .map(userEntity -> userEntity.toBuilder()
-                        .githubLogin(user.getGithubLogin())
-                        .githubAvatarUrl(user.getGithubAvatarUrl())
-                        .email(user.getEmail())
+                        .githubLogin(user.login())
+                        .githubAvatarUrl(user.avatarUrl())
+                        .email(user.email())
                         .build())
                 .ifPresent(userRepository::save);
     }
@@ -314,7 +311,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public Optional<onlydust.com.marketplace.user.domain.model.User> findById(onlydust.com.marketplace.user.domain.model.User.Id userId) {
+    public Optional<NotificationRecipient> findById(NotificationRecipient.Id userId) {
         return userRepository.findById(userId.value()).map(UserEntity::toUser);
     }
 }

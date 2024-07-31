@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.rest.api.adapter.authentication.app;
 
-import onlydust.com.marketplace.project.domain.model.User;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import org.springframework.security.core.Authentication;
 
 public interface OnlyDustAppAuthentication extends Authentication {
-    User getUser();
+    AuthenticatedUser getUser();
 
     boolean isImpersonating();
 
-    User getImpersonator();
+    AuthenticatedUser getImpersonator();
 }

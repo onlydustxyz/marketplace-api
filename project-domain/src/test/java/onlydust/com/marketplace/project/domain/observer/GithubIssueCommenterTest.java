@@ -100,13 +100,13 @@ class GithubIssueCommenterTest {
 
         final GithubUserIdentity applicant = GithubUserIdentity.builder()
                 .githubUserId(faker.number().randomNumber(10, true))
-                .githubLogin(faker.internet().slug())
+                .login(faker.internet().slug())
                 .build();
 
         final Application application = new Application(
                 Application.Id.random(),
                 project.getId(),
-                applicant.getGithubUserId(),
+                applicant.githubUserId(),
                 Application.Origin.GITHUB,
                 faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
                 issue.id(),
@@ -122,7 +122,7 @@ class GithubIssueCommenterTest {
             when(githubStoragePort.findIssueById(issue.id())).thenReturn(Optional.of(issue));
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(githubAppToken));
             when(projectStoragePort.getById(application.projectId())).thenReturn(Optional.of(project));
-            when(userStoragePort.getIndexedUserByGithubId(applicant.getGithubUserId())).thenReturn(Optional.of(applicant));
+            when(userStoragePort.getIndexedUserByGithubId(applicant.githubUserId())).thenReturn(Optional.of(applicant));
         }
 
         @Test
@@ -203,7 +203,7 @@ class GithubIssueCommenterTest {
                     Thanks for showing interest.
                     We've created an application for you to contribute to %s.
                     Go check it out on [OnlyDust](%s/p/%s)!
-                    """.formatted(applicant.getGithubLogin(), project.getName(), globalConfig.getAppBaseUrl(), project.getSlug()));
+                    """.formatted(applicant.login(), project.getName(), globalConfig.getAppBaseUrl(), project.getSlug()));
         }
     }
 }
