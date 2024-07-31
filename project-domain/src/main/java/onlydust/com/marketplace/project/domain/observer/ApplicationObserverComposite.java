@@ -6,6 +6,7 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ApplicationObserverComposite implements ApplicationObserverPort {
     private final List<ApplicationObserverPort> observers;
@@ -20,8 +21,8 @@ public class ApplicationObserverComposite implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
-        observers.forEach(observer -> observer.onApplicationAccepted(application));
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+        observers.forEach(observer -> observer.onApplicationAccepted(application, projectLeadId));
     }
 
     @Override

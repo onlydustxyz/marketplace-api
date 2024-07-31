@@ -77,7 +77,7 @@ public class ApplicationService implements ApplicationFacadePort {
                 .orElseThrow(() -> internalServerError("Could not generate GitHub App token for repository %d".formatted(issue.repoId())));
 
         githubApiPort.assign(githubAppToken.token(), issue.repoId(), issue.number(), applicant.getGithubLogin());
-        applicationObserver.onApplicationAccepted(application);
+        applicationObserver.onApplicationAccepted(application, userId);
     }
 
     @Override
