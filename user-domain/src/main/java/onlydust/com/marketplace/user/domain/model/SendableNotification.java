@@ -12,7 +12,7 @@ import onlydust.com.marketplace.kernel.model.notification.Notification;
 @Accessors(fluent = true, chain = true)
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@SuperBuilder
+@SuperBuilder(toBuilder = true)
 public class SendableNotification extends Notification {
     User recipient;
 

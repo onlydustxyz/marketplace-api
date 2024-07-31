@@ -14,6 +14,7 @@ import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -313,19 +314,23 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
     private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
-            final var pendingNotificationsPerRecipient = notificationStoragePort.getPendingNotifications(channel);
+            // Truncate createdAt to milliseconds to avoid comparison issues
+            final List<SendableNotification> pendingNotificationsPerRecipient = notificationStoragePort.getPendingNotifications(channel).stream()
+                    .map(notification -> (SendableNotification) notification.toBuilder()
+                            .createdAt(notification.createdAt().truncatedTo(ChronoUnit.MILLIS))
+                            .build())
+                    .toList();
 
             final List<SendableNotification> sendableExpectedNotifications = expectedNotifications.entrySet().stream()
                     .map(entry -> entry.getValue().stream()
-                            .map(notification -> SendableNotification.builder()
-                                    .id(notification.id())
-                                    .recipientId(entry.getKey().userId())
-                                    .data(notification.data())
-                                    .createdAt(notification.createdAt())
-                                    .channels(notification.channels())
-                                    .recipient(new User(User.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()))
+                            .map(notification -> SendableNotification.of(
+                                            new User(User.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()),
+                                            notification
+                                    ).toBuilder()
+                                    // Truncate createdAt to milliseconds to avoid comparison issues
+                                    .createdAt(notification.createdAt().truncatedTo(ChronoUnit.MILLIS))
                                     .build())
-                            .collect(Collectors.toList()))
+                            .toList())
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
 
