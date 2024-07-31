@@ -70,7 +70,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(false)
+                .jsonPath("$.hasCompletedOnboarding").isEqualTo(false)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
 
         // When
@@ -80,7 +80,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "hasSeenOnboardingWizard": true
+                            "hasCompletedOnboarding": true
                         }
                         """)
                 .exchange()
@@ -94,7 +94,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
+                .jsonPath("$.hasCompletedOnboarding").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(false);
 
         // When
@@ -118,7 +118,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.hasSeenOnboardingWizard").isEqualTo(true)
+                .jsonPath("$.hasCompletedOnboarding").isEqualTo(true)
                 .jsonPath("$.hasAcceptedLatestTermsAndConditions").isEqualTo(true);
     }
 

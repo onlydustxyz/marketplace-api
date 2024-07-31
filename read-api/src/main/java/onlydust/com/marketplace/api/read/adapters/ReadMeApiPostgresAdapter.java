@@ -68,7 +68,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .githubUserId(user.githubUserId())
                 .avatarUrl(user.avatarUrl())
                 .login(user.login())
-                .hasSeenOnboardingWizard(user.onboarding() != null && user.onboarding().getCompletionDate() != null)
                 .hasCompletedOnboarding(user.onboarding() != null && user.onboarding().getCompletionDate() != null)
                 .hasAcceptedLatestTermsAndConditions(user.onboarding() != null && user.onboarding().isHasAcceptedTermsAndConditions())
                 .hasCompletedVerificationInformation(user.onboardingCompletion() != null && user.onboardingCompletion().telegramAdded())
@@ -85,16 +84,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .sponsors(user.sponsors().stream().map(SponsorReadEntity::toDto).toList());
 
         return ok(response);
-    }
-
-    @Override
-    @Deprecated
-    public ResponseEntity<JourneyCompletionResponse> getJourneyCompletion() {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.getId())
-                .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
-
-        return ok(journeyCompletion.onboardingCompletion().toJourneyResponse());
     }
 
     @Override

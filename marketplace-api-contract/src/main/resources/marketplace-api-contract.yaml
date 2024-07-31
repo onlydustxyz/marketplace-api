@@ -975,29 +975,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/me/journey:
-    get:
-      deprecated: true
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - ReadMe
-      summary: Get the caller's journey completion
-      operationId: getJourneyCompletion
-      description: |
-        Get the caller's journey completion
-      responses:
-        "200":
-          description: 'Journey completion'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/JourneyCompletionResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /api/v1/me/onboarding:
     get:
       security:
@@ -6517,7 +6494,6 @@ components:
         - $ref: '#/components/schemas/RegisteredUserResponse'
         - type: object
           required:
-            - hasSeenOnboardingWizard
             - hasAcceptedLatestTermsAndConditions
             - hasCompletedVerificationInformation
             - hasCompletedOnboarding
@@ -6525,9 +6501,6 @@ components:
             - createdAt
             - hasPendingApplications
           properties:
-            hasSeenOnboardingWizard:
-              type: boolean
-              description: True if the user has seen the onboarding process
             hasAcceptedLatestTermsAndConditions:
               type: boolean
               description: True if the user has accepted the latest version of terms and conditions
@@ -6671,9 +6644,6 @@ components:
     PatchMeContract:
       type: object
       properties:
-        hasSeenOnboardingWizard:
-          type: boolean
-          description: True if the the onboarding process was displayed to the user
         hasAcceptedTermsAndConditions:
           type: boolean
           description: True if the user has accepted the latest version of terms and conditions
@@ -8567,44 +8537,6 @@ components:
               items:
                 $ref: '#/components/schemas/ProjectLinkWithDescriptionResponse'
 
-    JourneyCompletionResponse:
-      type: object
-      required:
-        - completed
-        - completion
-        - billingProfileVerified
-        - companyBillingProfileVerified
-        - descriptionUpdated
-        - telegramAdded
-        - rewardReceived
-        - rewardClaimed
-      properties:
-        completed:
-          type: boolean
-          description: True if the journey is completed
-        completion:
-          type: number
-          format: int32
-          description: Completion percentage of the journey
-        billingProfileVerified:
-          type: boolean
-          description: True if the user has at least one verified billing profile
-        companyBillingProfileVerified:
-          type: boolean
-          description: True if the user has at least one verified billing profile of type COMPANY or SELF_EMPLOYED
-        descriptionUpdated:
-          type: boolean
-          description: True if the user has a bio in his profile
-        telegramAdded:
-          type: boolean
-          description: True if the user has filled its telegram contact
-        rewardReceived:
-          type: boolean
-          description: True if the user has been rewarded at least once
-        rewardClaimed:
-          type: boolean
-          description: True if the user has requested the payment for at least one reward
-
     OnboardingCompletionResponse:
       type: object
       required:
@@ -8618,11 +8550,11 @@ components:
       properties:
         completed:
           type: boolean
-          description: True if the journey is completed
+          description: True if the onboarding is completed
         completion:
           type: number
           format: int32
-          description: Completion percentage of the journey
+          description: Completion percentage of the onboarding
         verificationInformationProvided:
           type: boolean
           description: True if the user has provided the verification information

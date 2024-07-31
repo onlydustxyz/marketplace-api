@@ -112,62 +112,6 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_get_caller_journey() {
-        // Given
-        final var anthony = userAuthHelper.authenticateAnthony();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_JOURNEY))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + anthony.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .json("""
-                        {
-                          "completed": false,
-                          "completion": 66,
-                          "billingProfileVerified": false,
-                          "companyBillingProfileVerified": false,
-                          "descriptionUpdated": true,
-                          "telegramAdded": true,
-                          "rewardReceived": true,
-                          "rewardClaimed": true
-                        }
-                        """);
-    }
-
-    @Test
-    void should_get_caller_journey_for_non_indexed_users() {
-        // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 666, "DeViL", "https://devil.com/avatar.jpg", false);
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_JOURNEY))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + newUser.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .json("""
-                        {
-                          "completed": false,
-                          "completion": 0,
-                          "billingProfileVerified": false,
-                          "companyBillingProfileVerified": false,
-                          "descriptionUpdated": false,
-                          "telegramAdded": false,
-                          "rewardReceived": false,
-                          "rewardClaimed": false
-                        }
-                        """);
-    }
-
-    @Test
     void should_get_caller_onboarding() {
         // Given
         final var anthony = userAuthHelper.authenticateAnthony();

@@ -133,7 +133,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
 
     @Test
     @Transactional
-    void should_update_onboarding_wizard_display_date() {
+    void should_update_onboarding_completion_date() {
         // Given
         final var userId = UUID.randomUUID();
         final OnboardingEntity onboarding = OnboardingEntity.builder()
