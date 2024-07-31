@@ -20,6 +20,7 @@ import onlydust.com.marketplace.api.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -238,6 +239,8 @@ public class AbstractMarketplaceApiIT {
     OutboxConsumerJob accountingMailOutboxJob;
     @Autowired
     OutboxConsumerJob projectMailOutboxJob;
+    @Autowired
+    NotificationSettingsPort notificationSettingsPort;
 
 
     @Autowired

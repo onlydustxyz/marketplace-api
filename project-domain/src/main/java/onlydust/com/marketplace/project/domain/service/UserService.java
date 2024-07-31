@@ -63,7 +63,7 @@ public class UserService implements UserFacadePort {
                             .githubUserId(githubUserIdentity.getGithubUserId())
                             .githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl())
                             .githubLogin(githubUserIdentity.getGithubLogin())
-                            .githubEmail(githubUserIdentity.getEmail())
+                            .email(githubUserIdentity.getEmail())
                             .build());
 
                     userObserverPort.onUserSignedUp(user);
@@ -95,7 +95,7 @@ public class UserService implements UserFacadePort {
         final var userProfile = userStoragePort.findProfileById(userId)
                 .orElse(UserProfile.builder().build());
 
-        user.setGithubEmail(contactEmail == null ? user.getGithubEmail() : contactEmail);
+        user.setEmail(contactEmail == null ? user.getEmail() : contactEmail);
 
         userProfile
                 .avatarUrl(avatarUrl == null ? userProfile.avatarUrl() : avatarUrl)
@@ -130,7 +130,7 @@ public class UserService implements UserFacadePort {
                         .githubUserId(githubUserProfile.getGithubUserId())
                         .githubLogin(githubUserProfile.getGithubLogin())
                         .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
-                        .githubEmail(githubUserProfile.getEmail())
+                        .email(githubUserProfile.getEmail())
                         .build())
                 .toList();
 
@@ -149,7 +149,7 @@ public class UserService implements UserFacadePort {
                         .githubUserId(githubUserProfile.getGithubUserId())
                         .githubLogin(githubUserProfile.getGithubLogin())
                         .githubAvatarUrl(githubUserProfile.getGithubAvatarUrl())
-                        .githubEmail(githubUserProfile.getEmail())
+                        .email(githubUserProfile.getEmail())
                         .build()).orElseThrow(() -> notFound(String.format("Github user %s to update was not found",
                         user.getGithubUserId()))));
     }

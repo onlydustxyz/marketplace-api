@@ -785,7 +785,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
                                   ]
                                 }
                                 """, true, false)))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo(gregoire.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(gregoire.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Applications to review daily report")))
         );

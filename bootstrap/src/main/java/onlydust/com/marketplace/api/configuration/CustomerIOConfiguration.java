@@ -22,7 +22,8 @@ public class CustomerIOConfiguration {
     }
 
     @Bean
-    public CustomerIOAdapter customerIOAdapter(final CustomerIOProperties customerIOProperties, final CustomerIOHttpClient customerIOHttpClient) {
+    public CustomerIOAdapter notificationInstantEmailSender(final CustomerIOProperties customerIOProperties,
+                                                            final CustomerIOHttpClient customerIOHttpClient) {
         return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
     }
 }

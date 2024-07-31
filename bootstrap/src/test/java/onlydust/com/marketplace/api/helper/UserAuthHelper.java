@@ -40,7 +40,7 @@ public class UserAuthHelper {
                 .githubUserId(githubUserId)
                 .githubLogin(login)
                 .githubAvatarUrl(avatarUrl)
-                .githubEmail("%d@foo.org".formatted(githubUserId))
+                .email("%d@foo.org".formatted(githubUserId))
                 .roles(isAdmin ?
                         new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER,
                                 onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
@@ -56,7 +56,7 @@ public class UserAuthHelper {
 
     public void mockAuth0UserInfo(UserEntity user) {
         mockAuth0UserInfo(user.getGithubUserId(), user.getGithubLogin(), user.getGithubLogin(),
-                user.getGithubAvatarUrl(), user.getGithubEmail());
+                user.getGithubAvatarUrl(), user.getEmail());
     }
 
     public void mockAuth0UserInfo(BackofficeUserEntity user) {

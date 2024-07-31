@@ -431,3 +431,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000296_renaming_onboarding_column.sql
   - include:
       file: db/changelog/changelogs/00000297_add_project_recommendations_data.sql
+  - include:
+      file: db/changelog/changelogs/00000295_create_notification_tables.sql

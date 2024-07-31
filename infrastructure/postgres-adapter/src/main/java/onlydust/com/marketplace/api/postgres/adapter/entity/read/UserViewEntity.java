@@ -39,8 +39,9 @@ public class UserViewEntity implements Serializable {
     @JoinColumn(name = "githubUserId", referencedColumnName = "id", insertable = false, updatable = false)
     GithubAccountViewEntity githubUser;
 
-    @Column(name = "email", nullable = false)
-    String githubEmail;
+    @Column(nullable = false)
+    String email;
+    
     @Type(
             value = EnumArrayType.class,
             parameters = @Parameter(

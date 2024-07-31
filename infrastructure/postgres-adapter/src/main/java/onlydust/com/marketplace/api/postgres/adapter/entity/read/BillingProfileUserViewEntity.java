@@ -54,7 +54,7 @@ public class BillingProfileUserViewEntity {
                 GithubUserId.of(user.githubUserId()),
                 user.login(),
                 URI.create(user.avatarUrl()),
-                user.githubEmail());
+                user.email());
     }
 
     public BillingProfileLinkView toBillingProfileLinkView() {

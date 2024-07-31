@@ -6,11 +6,11 @@ import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
 import org.junit.jupiter.api.MethodOrderer;
@@ -241,7 +241,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.status", equalTo("CLOSED")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(login)))
                         .withRequestBody(matchingJsonPath("$.message_data.billingProfileId", equalTo(billingProfileId.toString())))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your verification failed with status CLOSED")))
         );

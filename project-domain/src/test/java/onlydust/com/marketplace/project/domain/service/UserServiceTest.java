@@ -67,7 +67,7 @@ public class UserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).email(githubUserIdentity.getEmail()).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -86,7 +86,7 @@ public class UserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).githubAvatarUrl(faker.internet().avatar()).githubLogin(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final User user =
-                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).githubEmail(githubUserIdentity.getEmail()).build();
+                User.builder().id(UUID.randomUUID()).githubAvatarUrl(githubUserIdentity.getGithubAvatarUrl()).githubUserId(githubUserIdentity.getGithubUserId()).githubLogin(githubUserIdentity.getGithubLogin()).email(githubUserIdentity.getEmail()).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.getGithubUserId())).thenReturn(Optional.of(user));
@@ -230,7 +230,7 @@ public class UserServiceTest {
         final var userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userStoragePort).saveUser(userCaptor.capture());
         final var updatedUser = userCaptor.getValue();
-        assertThat(updatedUser.getGithubEmail()).isEqualTo(contactEmail);
+        assertThat(updatedUser.getEmail()).isEqualTo(contactEmail);
 
         final var profileCaptor = ArgumentCaptor.forClass(UserProfile.class);
         verify(userStoragePort).saveProfile(eq(userId), profileCaptor.capture());
@@ -543,7 +543,8 @@ public class UserServiceTest {
                 List.of(GithubUserIdentity.builder().githubUserId(users.get(0).getGithubUserId()).email(faker.internet().emailAddress()).build(),
                         GithubUserIdentity.builder().githubUserId(users.get(2).getGithubUserId()).email(faker.internet().emailAddress()).build());
         final var updatedUserProfiles =
-                List.of(User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).githubEmail(githubUserIdentities.get(0).getEmail()).build(), User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).githubEmail(githubUserIdentities.get(1).getEmail()).build());
+                List.of(User.builder().githubUserId(githubUserIdentities.get(0).getGithubUserId()).email(githubUserIdentities.get(0).getEmail()).build(),
+                        User.builder().githubUserId(githubUserIdentities.get(1).getGithubUserId()).email(githubUserIdentities.get(1).getEmail()).build());
 
         when(userStoragePort.getUsersLastSeenSince(since)).thenReturn(users);
 
@@ -562,7 +563,7 @@ public class UserServiceTest {
     void should_update_user_github_profile() {
         // Given
         final long githubUserId = 1L;
-        final User user = User.builder().githubUserId(githubUserId).githubLogin("a").githubAvatarUrl("b").githubEmail("c").build();
+        final User user = User.builder().githubUserId(githubUserId).githubLogin("a").githubAvatarUrl("b").email("c").build();
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().email(faker.harryPotter().book()).githubLogin(faker.rickAndMorty().character()).githubAvatarUrl(faker.gameOfThrones().character()).build();
 
@@ -575,7 +576,7 @@ public class UserServiceTest {
         verify(userStoragePort, times(1)).saveUser(userArgumentCaptor.capture());
         assertEquals(githubUserIdentity.getGithubLogin(), userArgumentCaptor.getValue().getGithubLogin());
         assertEquals(githubUserIdentity.getGithubAvatarUrl(), userArgumentCaptor.getValue().getGithubAvatarUrl());
-        assertEquals(githubUserIdentity.getEmail(), userArgumentCaptor.getValue().getGithubEmail());
+        assertEquals(githubUserIdentity.getEmail(), userArgumentCaptor.getValue().getEmail());
     }
 
     @Test

@@ -138,7 +138,7 @@ public class JobScheduler {
         applicationsCleaner.cleanUp();
     }
 
-//    @Scheduled(cron = "${application.cron.send-application-mail-cron-expression}")
+    //    @Scheduled(cron = "${application.cron.send-application-mail-cron-expression}")
     public void sendApplicationMailNotifications() {
         LOGGER.info("Sending application email notifications to project leads");
         applicationMailNotifier.notifyProjectApplicationsToReview();

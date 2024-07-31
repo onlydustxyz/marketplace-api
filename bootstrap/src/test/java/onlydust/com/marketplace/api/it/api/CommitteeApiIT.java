@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationResponse;
 import onlydust.com.marketplace.api.contract.model.CommitteeProjectAnswerRequest;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
@@ -108,9 +108,12 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
-    void should_put_application() {
+    void should_put_application() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+//        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
+//                .channelsPerCategory(Map.of(NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER, List.of(NotificationChannel.EMAIL)))
+//                .build());
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
 
         final var answerRequest1 = new CommitteeProjectAnswerRequest()
@@ -143,7 +146,8 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isEqualTo(204);
 
-        projectMailOutboxJob.run();
+        Thread.sleep(1000);
+
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
@@ -157,7 +161,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.committeeName", equalTo("Mr. Needful")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
                         .withRequestBody(matchingJsonPath("$.message_data.applicationEndDate", containing(" UTC")))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getGithubEmail())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));
 

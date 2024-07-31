@@ -270,7 +270,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .map(userEntity -> userEntity.toBuilder()
                         .githubLogin(u.getGithubLogin())
                         .githubAvatarUrl(u.getGithubAvatarUrl())
-                        .githubEmail(u.getGithubEmail())
+                        .email(u.getEmail())
                         .build())
                 .ifPresent(userRepository::save));
     }
@@ -281,7 +281,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .map(userEntity -> userEntity.toBuilder()
                         .githubLogin(user.getGithubLogin())
                         .githubAvatarUrl(user.getGithubAvatarUrl())
-                        .githubEmail(user.getGithubEmail())
+                        .email(user.getEmail())
                         .build())
                 .ifPresent(userRepository::save);
     }
@@ -308,5 +308,10 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Transactional
     public void replaceUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
         userRepository.replaceUserByGithubUser(userId, currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
+    }
+
+    @Override
+    public Optional<onlydust.com.marketplace.user.domain.model.User> findById(onlydust.com.marketplace.user.domain.model.User.Id userId) {
+        return userRepository.findById(userId.value()).map(UserEntity::toUser);
     }
 }

@@ -10,13 +10,17 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.model.event.NewCommitteeApplication;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.user.domain.model.SendableNotification;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements OutboxConsumer {
+public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
@@ -33,8 +37,6 @@ public class CustomerIOAdapter implements OutboxConsumer {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
         } else if (event instanceof RewardsPaid rewardsPaid) {
             sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
-        } else if (event instanceof NewCommitteeApplication newCommitteeApplication) {
-            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, newCommitteeApplication));
         } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else if (event instanceof ProjectApplicationAccepted projectApplicationAccepted) {
@@ -46,5 +48,13 @@ public class CustomerIOAdapter implements OutboxConsumer {
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
         customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
+    }
+
+    @Override
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
+    public void send(SendableNotification notification) {
+        if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
+        }
     }
 }
