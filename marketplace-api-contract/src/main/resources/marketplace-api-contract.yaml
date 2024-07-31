@@ -242,9 +242,29 @@ paths:
       summary: Update caller profile
       operationId: updateMyProfile
       description: |
+        Update the provided user profile data
+      requestBody:
+        description: 'User profile updated'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileUpdateRequest'
+      responses:
+        "204":
+          description: 'User profile updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags:
+        - Me
+      summary: Update caller profile
+      operationId: replaceMyProfile
+      description: |
         Set the provided user profile data
       requestBody:
-        description: 'User profile'
+        description: 'User profile replaced'
         content:
           application/json:
             schema:

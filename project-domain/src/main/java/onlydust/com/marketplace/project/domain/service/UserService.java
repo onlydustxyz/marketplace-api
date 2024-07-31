@@ -117,6 +117,11 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
+    public void replaceProfile(UUID userId, UserProfile userProfile) {
+        userStoragePort.saveProfile(userId, userProfile);
+    }
+
+    @Override
     @Transactional
     public void refreshActiveUserProfiles(ZonedDateTime since) {
         final var activeUsers = userStoragePort.getUsersLastSeenSince(since);

@@ -20,7 +20,6 @@ import java.util.UUID;
 public class ContactInformationReadEntity {
     @Id
     @EqualsAndHashCode.Include
-    @Column(name = "user_id")
     @NonNull
     UUID userId;
 
@@ -38,7 +37,7 @@ public class ContactInformationReadEntity {
     Boolean isPublic;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "userId", insertable = false, updatable = false)
+    @JoinColumn(name = "userId", referencedColumnName = "userId", insertable = false, updatable = false)
     AllUserReadEntity user;
 
     public onlydust.com.backoffice.api.contract.model.ContactInformation toBODto() {

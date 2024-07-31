@@ -37,6 +37,8 @@ public interface UserFacadePort {
                        final List<UUID> preferredLanguageIds,
                        final List<UUID> preferredCategoryIds);
 
+    void replaceProfile(UUID userId, UserProfile userProfile);
+
     void refreshActiveUserProfiles(ZonedDateTime since);
 
     void markUserAsOnboarded(UUID userId);

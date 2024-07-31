@@ -24,6 +24,7 @@ import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.springframework.context.annotation.Profile;
@@ -42,8 +43,8 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.allocatedTimeToDomain;
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.contactToDomain;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.userProfileToPrivateResponse;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -136,6 +137,14 @@ public class MeRestApi implements MeApi {
                 userProfileRequest.getPreferredCategories()
         );
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> replaceMyProfile(UserProfileUpdateRequest userProfileUpdateRequest) {
+        final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        userFacadePort.replaceProfile(authenticatedUser.getId(),
+                userProfileRequestToDomain(userProfileUpdateRequest));
         return ResponseEntity.noContent().build();
     }
 

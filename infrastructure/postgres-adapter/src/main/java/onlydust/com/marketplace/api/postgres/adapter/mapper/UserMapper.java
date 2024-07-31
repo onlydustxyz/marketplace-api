@@ -6,7 +6,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.type.ContactInformationIdEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.User;
@@ -15,13 +14,11 @@ import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.view.BillingProfileLinkView;
 import onlydust.com.marketplace.project.domain.view.ProjectLedView;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 public interface UserMapper {
 
@@ -73,25 +70,6 @@ public interface UserMapper {
                 .build();
     }
 
-    static UserProfileInfoEntity mapUserProfileToEntity(UUID userId, UserProfile userProfile) {
-        return UserProfileInfoEntity.builder()
-                .avatarUrl(userProfile.avatarUrl())
-                .bio(userProfile.bio())
-                .location(userProfile.location())
-                .website(userProfile.website())
-                .contactInformations(mapContactInformationsToEntity(userId, userProfile.contacts()))
-                .weeklyAllocatedTime(mapAllocatedTimeToEntity(userProfile.allocatedTimeToContribute()))
-                .isLookingForAJob(userProfile.isLookingForAJob())
-                .lastName(userProfile.lastName())
-                .firstName(userProfile.firstName())
-                .id(userId)
-                .joiningGoal(userProfile.joiningGoal())
-                .joiningReason(userProfile.joiningReason())
-                .preferredCategoryIds(isNull(userProfile.preferredCategoriesIds()) ? null : userProfile.preferredCategoriesIds().toArray(new UUID[0]))
-                .preferredLanguageIds(isNull(userProfile.preferredLanguageIds()) ? null : userProfile.preferredLanguageIds().toArray(new UUID[0]))
-                .build();
-    }
-
     static AllocatedTimeEnumEntity mapAllocatedTimeToEntity(UserAllocatedTimeToContribute allocatedTimeToContribute) {
         return isNull(allocatedTimeToContribute) ? null : switch (allocatedTimeToContribute) {
             case NONE -> AllocatedTimeEnumEntity.none;
@@ -101,18 +79,16 @@ public interface UserMapper {
         };
     }
 
-    static List<ContactInformationEntity> mapContactInformationsToEntity(UUID userId, List<Contact> contacts) {
-        return contacts.stream().map(contact -> ContactInformationEntity.builder()
-                .id(ContactInformationIdEntity.builder()
-                        .userId(userId)
-                        .channel(contact.getChannel())
-                        .build())
+    static Set<ContactInformationEntity> mapContactInformationsToEntity(UUID userId, List<Contact> contacts) {
+        return isNull(contacts) ? null : contacts.stream().map(contact -> ContactInformationEntity.builder()
+                .userId(userId)
+                .channel(contact.getChannel())
                 .contact(contact.getContact())
                 .isPublic(switch (contact.getVisibility()) {
                     case PRIVATE -> false;
                     case PUBLIC -> true;
                 })
                 .build()
-        ).collect(Collectors.toList());
+        ).collect(Collectors.toSet());
     }
 }

@@ -12,6 +12,32 @@ import static java.util.Objects.isNull;
 
 public interface UserMapper {
 
+    static UserProfile userProfileRequestToDomain(final UserProfileUpdateRequest userProfileRequest) {
+        return UserProfile.builder()
+                .avatarUrl(userProfileRequest.getAvatarUrl())
+                .bio(userProfileRequest.getBio())
+                .website(userProfileRequest.getWebsite())
+                .location(userProfileRequest.getLocation())
+                .contacts(contactToDomain(userProfileRequest.getContacts()))
+                .allocatedTimeToContribute(allocatedTimeToDomain(userProfileRequest.getAllocatedTimeToContribute()))
+                .isLookingForAJob(userProfileRequest.getIsLookingForAJob())
+                .firstName(userProfileRequest.getFirstName())
+                .lastName(userProfileRequest.getLastName())
+                .joiningReason(isNull(userProfileRequest.getJoiningReason()) ? null : switch (userProfileRequest.getJoiningReason()) {
+                    case MAINTAINER -> UserProfile.JoiningReason.MAINTAINER;
+                    case CONTRIBUTOR -> UserProfile.JoiningReason.CONTRIBUTOR;
+                })
+                .joiningGoal(isNull(userProfileRequest.getJoiningGoal()) ? null : switch (userProfileRequest.getJoiningGoal()) {
+                    case CHALLENGE -> UserProfile.JoiningGoal.CHALLENGE;
+                    case EARN -> UserProfile.JoiningGoal.EARN;
+                    case LEARN -> UserProfile.JoiningGoal.LEARN;
+                    case NOTORIETY -> UserProfile.JoiningGoal.NOTORIETY;
+                })
+                .preferredCategoriesIds(userProfileRequest.getPreferredCategories())
+                .preferredLanguageIds(userProfileRequest.getPreferredLanguages())
+                .build();
+    }
+
     static List<Contact> contactToDomain(List<ContactInformation> contacts) {
         return isNull(contacts) ? null : contacts.stream()
                 .map(contactInformation -> {
