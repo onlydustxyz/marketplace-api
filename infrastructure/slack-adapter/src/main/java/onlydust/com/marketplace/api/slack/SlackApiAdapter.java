@@ -75,7 +75,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
         slackApiClient.sendNotification(slackProperties.getDevRelChannel(), "New project category suggested",
                 ProjectCategorySuggestionEventMapper.mapToSlackBlock(user,
-                categoryName, slackProperties.getEnvironment()));
+                        categoryName, slackProperties.getEnvironment()));
     }
 
     @Override

@@ -52,7 +52,7 @@ public class OutboxService implements ProjectObserverPort, UserObserverPort, App
     }
 
     @Override
-    public void onApplicationAccepted(Application application) {
+    public void onApplicationAccepted(Application application, UUID projectLeadId) {
     }
 
     @Override
