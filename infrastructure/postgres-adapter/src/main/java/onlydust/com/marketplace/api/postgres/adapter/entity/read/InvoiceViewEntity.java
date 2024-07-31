@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -77,7 +80,7 @@ public class InvoiceViewEntity {
                 createdBy.githubUserId(),
                 createdBy.login(),
                 URI.create(createdBy.avatarUrl()),
-                createdBy.githubEmail(),
+                createdBy.email(),
                 UserId.of(createdBy.id()),
                 createdBy.profile() == null ? createdBy.login() :
                         createdBy.profile().firstName() + " " + createdBy.profile().lastName());

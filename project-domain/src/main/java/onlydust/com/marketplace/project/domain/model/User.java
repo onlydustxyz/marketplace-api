@@ -22,7 +22,7 @@ public class User {
     Long githubUserId;
     String githubAvatarUrl;
     String githubLogin;
-    String githubEmail;
+    String email;
     @Builder.Default
     List<ProjectLedView> projectsLed = new ArrayList<>();
     @Builder.Default

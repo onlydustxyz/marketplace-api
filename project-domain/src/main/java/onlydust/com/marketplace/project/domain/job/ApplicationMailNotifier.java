@@ -40,7 +40,7 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
                     .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
             projectMailOutboxPort.push(new ProjectApplicationAccepted(
                     applicant.getId(),
-                    applicant.getGithubEmail(),
+                    applicant.getEmail(),
                     applicant.getGithubLogin(),
                     new ProjectApplicationAccepted.Project(project.getId(), project.getSlug(), project.getName()),
                     new ProjectApplicationAccepted.Issue(issue.id().value(), issue.htmlUrl(), issue.title(), issue.repoName(), issue.description())

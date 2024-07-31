@@ -86,7 +86,7 @@ public class ContributorServiceTest {
                                 .githubUserId(contributor.getId().getGithubUserId())
                                 .githubLogin(contributor.getId().getGithubLogin())
                                 .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
-                                .githubEmail(contributor.getId().getEmail())
+                                .email(contributor.getId().getEmail())
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
@@ -189,7 +189,7 @@ public class ContributorServiceTest {
                                 .githubUserId(contributor.getId().getGithubUserId())
                                 .githubLogin(contributor.getId().getGithubLogin())
                                 .githubAvatarUrl(contributor.getId().getGithubAvatarUrl())
-                                .githubEmail(contributor.getId().getEmail())
+                                .email(contributor.getId().getEmail())
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(null, null, login, 0, 0,

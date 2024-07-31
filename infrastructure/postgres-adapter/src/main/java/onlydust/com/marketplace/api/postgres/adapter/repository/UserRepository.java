@@ -24,7 +24,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpec
                         :#{#userEntity.id},
                         :#{#userEntity.githubUserId},
                         :#{#userEntity.githubAvatarUrl},
-                        :#{#userEntity.githubEmail},
+                        :#{#userEntity.email},
                         :#{#userEntity.githubLogin},
                         cast(:#{#userEntity.rolesAsPostgresArray} as iam.user_role[])
                 )
