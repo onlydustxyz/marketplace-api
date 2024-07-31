@@ -68,7 +68,7 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
                         token -> githubApiPort.createComment(token.token(), issue, """
                                 The maintainer %s has assigned %s to this issue via [OnlyDust](%s/p/%s) Platform.
                                 Good luck!
-                                """.formatted(projectLead.getGithubLogin(), applicant.getGithubLogin(), globalConfig.getAppBaseUrl(), project.getSlug())),
+                                """.formatted(projectLead.login(), applicant.login(), globalConfig.getAppBaseUrl(), project.getSlug())),
                         () -> LOGGER.info("Could not get an authorized GitHub token to comment on issue {}", issue.repoId())
                 );
     }
