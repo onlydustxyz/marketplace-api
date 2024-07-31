@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.user.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
-import onlydust.com.marketplace.user.domain.model.SmallUser;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 
 import java.util.Date;
 import java.util.Optional;
@@ -13,7 +13,7 @@ public interface AppUserStoragePort {
 
     Optional<Long> getGithubUserId(UUID userId);
 
-    Optional<SmallUser> findById(SmallUser.Id userId);
+    Optional<NotificationRecipient> findById(NotificationRecipient.Id userId);
 
     Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId);
 

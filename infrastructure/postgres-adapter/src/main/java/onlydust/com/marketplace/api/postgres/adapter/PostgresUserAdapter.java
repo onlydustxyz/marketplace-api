@@ -26,7 +26,7 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.project.domain.view.UserProfileView;
-import onlydust.com.marketplace.user.domain.model.SmallUser;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +36,6 @@ import java.util.*;
 
 import static java.lang.String.format;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.UserMapper.*;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
@@ -147,7 +146,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Transactional
     public void saveProfile(UUID userId, UserProfile userProfile) {
         final UserProfileInfoEntity userProfileInfoEntity = userProfileInfoRepository.findById(userId)
-                        .orElse(new UserProfileInfoEntity());
+                .orElse(new UserProfileInfoEntity());
         userProfileInfoRepository.saveAndFlush(userProfileInfoEntity.update(userId, userProfile));
     }
 
@@ -312,7 +311,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public Optional<SmallUser> findById(SmallUser.Id userId) {
+    public Optional<NotificationRecipient> findById(NotificationRecipient.Id userId) {
         return userRepository.findById(userId.value()).map(UserEntity::toUser);
     }
 }

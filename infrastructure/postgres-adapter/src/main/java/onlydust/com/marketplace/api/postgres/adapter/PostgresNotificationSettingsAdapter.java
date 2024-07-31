@@ -7,9 +7,9 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSett
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSettingsForProjectRepository;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.ProjectId;
-import onlydust.com.marketplace.user.domain.model.SmallUser;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +24,14 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<NotificationSettings.Project> getNotificationSettingsForProject(SmallUser.Id userId, ProjectId projectId) {
+    public Optional<NotificationSettings.Project> getNotificationSettingsForProject(NotificationRecipient.Id userId, ProjectId projectId) {
         return notificationSettingsForProjectRepository.findById(new NotificationSettingsForProjectEntity.PrimaryKey(userId.value(), projectId.value()))
                 .map(NotificationSettingsForProjectEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void saveNotificationSettingsForProject(SmallUser.Id userId, NotificationSettings.Project settings) {
+    public void saveNotificationSettingsForProject(NotificationRecipient.Id userId, NotificationSettings.Project settings) {
         notificationSettingsForProjectRepository.save(NotificationSettingsForProjectEntity.of(userId, settings));
     }
 
@@ -49,7 +49,7 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
 
     @Override
     @Transactional
-    public void save(SmallUser.Id userId, NotificationSettings settings) {
+    public void save(NotificationRecipient.Id userId, NotificationSettings settings) {
         final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))

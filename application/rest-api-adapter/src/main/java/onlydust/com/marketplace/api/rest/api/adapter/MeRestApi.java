@@ -24,8 +24,8 @@ import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
-import onlydust.com.marketplace.user.domain.model.SmallUser;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -325,7 +325,7 @@ public class MeRestApi implements MeApi {
                                                                       NotificationSettingsForProjectPatchRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationSettingsPort.patchNotificationSettingsForProject(
-                SmallUser.Id.of(authenticatedUser.id()),
+                NotificationRecipient.Id.of(authenticatedUser.id()),
                 new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();
