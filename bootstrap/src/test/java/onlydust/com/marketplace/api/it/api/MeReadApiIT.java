@@ -127,7 +127,7 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "completed": false,
+                          "completed": true,
                           "completion": 80,
                           "verificationInformationProvided": true,
                           "termsAndConditionsAccepted": true,

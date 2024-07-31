@@ -79,6 +79,14 @@ public class OnboardingCompletionEntity {
             """)
     boolean projectPreferencesProvided;
 
+    @Formula("""
+            (select coalesce(o.completion_date is not null, false)
+            from iam.users u
+                     left join onboardings o on o.user_id = u.id
+            where u.id = id)
+            """)
+    boolean hasCompletedOnboarding;
+
     public OnboardingCompletionResponse toResponse() {
         final var allItems = List.of(telegramAdded,
                 termsAndConditionsAccepted,
@@ -89,7 +97,7 @@ public class OnboardingCompletionEntity {
 
         return new OnboardingCompletionResponse()
                 .completion(BigDecimal.valueOf(completedItems * 100 / allItems.size()))
-                .completed(completedItems == allItems.size())
+                .completed(hasCompletedOnboarding)
                 .verificationInformationProvided(telegramAdded)
                 .termsAndConditionsAccepted(termsAndConditionsAccepted)
                 .projectPreferencesProvided(projectPreferencesProvided)
