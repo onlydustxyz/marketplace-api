@@ -5,6 +5,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.service.ProjectCategoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -81,6 +82,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 // Then
                 .expectStatus().is2xxSuccessful();
+
 
         // When
         client.get()
