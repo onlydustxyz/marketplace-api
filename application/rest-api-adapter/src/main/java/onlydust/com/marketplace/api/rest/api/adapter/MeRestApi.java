@@ -69,9 +69,6 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
         final User authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (Boolean.TRUE.equals(patchMeContract.getHasSeenOnboardingWizard())) {
-            userFacadePort.markUserAsOnboarded(authenticatedUser.getId());
-        }
         if (Boolean.TRUE.equals(patchMeContract.getHasAcceptedTermsAndConditions())) {
             userFacadePort.updateTermsAndConditionsAcceptanceDate(authenticatedUser.getId());
         }
