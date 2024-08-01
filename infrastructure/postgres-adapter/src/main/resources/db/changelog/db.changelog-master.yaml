@@ -435,3 +435,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000295_create_notification_tables.sql
   - include:
       file: db/changelog/changelogs/00000298_change_notification_categories.sql
+  - include:
+      file: db/changelog/changelogs/00000299_add_contact_email.sql

@@ -70,7 +70,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .login(user.login())
                 .hasCompletedOnboarding(user.onboarding() != null && user.onboarding().getCompletionDate() != null)
                 .hasAcceptedLatestTermsAndConditions(user.onboarding() != null && user.onboarding().isHasAcceptedTermsAndConditions())
-                .hasCompletedVerificationInformation(user.onboardingCompletion() != null && user.onboardingCompletion().telegramAdded())
+                .hasCompletedVerificationInformation(user.onboardingCompletion() != null && user.onboardingCompletion().verificationInformationProvided())
                 .isAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues)
                 .projectsLed(user.projectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
                 .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())

@@ -47,6 +47,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.joiningGoal").isEmpty()
                 .jsonPath("$.joiningReason").isEqualTo("MAINTAINER")
+                .jsonPath("$.contactEmail").isEqualTo("abuisset@gmail.com")
                 .jsonPath("$.preferredLanguages").isEmpty()
                 .jsonPath("$.preferredCategories").isEmpty();
 
@@ -75,7 +76,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "joiningGoal": "EARN",
                             "joiningReason": "CONTRIBUTOR",
                             "preferredLanguages": ["ca600cac-0f45-44e9-a6e8-25e21b0c6887", "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42"],
-                            "preferredCategories": ["%s", "%s"]
+                            "preferredCategories": ["%s", "%s"],
+                            "contactEmail": "fake2@test2.com"
                         }
                         """.formatted(category1.id().value(), category2.id().value()))
                 .exchange()
@@ -91,7 +93,6 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.location").isEqualTo("Paris, France")
                 .jsonPath("$.bio").isEqualTo("FullStack engineer")
                 .jsonPath("$.avatarUrl").isEqualTo("https://foobar.org/plop.jpg")
@@ -107,7 +108,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].visibility").isEqualTo("private")
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/yolocroute')].channel").isEqualTo("TELEGRAM")
                 .jsonPath("$.joiningReason").isEqualTo("CONTRIBUTOR")
-                .jsonPath("$.joiningGoal").isEqualTo("EARN");
+                .jsonPath("$.joiningGoal").isEqualTo("EARN")
+                .jsonPath("$.contactEmail").isEqualTo("fake2@test2.com");
 
         // When
         client.put()
@@ -128,7 +130,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "joiningGoal": null,
                             "joiningReason": null,
                             "preferredLanguages": null,
-                            "preferredCategories": null
+                            "preferredCategories": null,
+                            "contactEmail": "fake@test.scam"
                         }
                         """)
                 .exchange()
@@ -156,7 +159,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                             "joiningGoal": null,
                             "joiningReason": null,
                             "preferredLanguages": [],
-                            "preferredCategories": []
+                            "preferredCategories": [],
+                            "contactEmail": "fake@test.scam"
                         }
                         """);
     }
@@ -191,7 +195,8 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                           "joiningGoal": null,
                           "joiningReason": "CONTRIBUTOR",
                           "preferredLanguages": null,
-                          "preferredCategories": null
+                          "preferredCategories": null,
+                          "contactEmail": "fake@test.scam"
                         }
                         """)
                 .exchange()

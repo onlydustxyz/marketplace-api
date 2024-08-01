@@ -30,6 +30,7 @@ public class UserProfile {
     private List<UUID> preferredCategoriesIds = new ArrayList<>();
     private JoiningGoal joiningGoal;
     private JoiningReason joiningReason;
+    private String contactEmail;
 
     public enum JoiningReason {
         CONTRIBUTOR, MAINTAINER

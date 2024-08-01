@@ -37,6 +37,7 @@ public class UserProfileInfoReadEntity {
     String avatarUrl;
     String firstName;
     String lastName;
+    String contactEmail;
 
     @OneToMany(mappedBy = "userId")
     @Getter(AccessLevel.NONE)

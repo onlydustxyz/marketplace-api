@@ -133,11 +133,6 @@ public class UserServiceTest {
                 null);
 
         // Then
-        final var userCaptor = ArgumentCaptor.forClass(AuthenticatedUser.class);
-        verify(userStoragePort).saveUser(userCaptor.capture());
-        final var updatedUser = userCaptor.getValue();
-        assertThat(updatedUser.email()).isEqualTo(contactEmail);
-
         final var profileCaptor = ArgumentCaptor.forClass(UserProfile.class);
         verify(userStoragePort).saveProfile(eq(userId), profileCaptor.capture());
         final var updatedProfile = profileCaptor.getValue();

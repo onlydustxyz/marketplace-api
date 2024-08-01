@@ -34,6 +34,7 @@ public interface UserMapper {
                 })
                 .preferredCategoriesIds(userProfileRequest.getPreferredCategories())
                 .preferredLanguageIds(userProfileRequest.getPreferredLanguages())
+                .contactEmail(userProfileRequest.getContactEmail())
                 .build();
     }
 
