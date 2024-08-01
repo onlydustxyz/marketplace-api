@@ -196,6 +196,32 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/notifications/count:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get in-app notifications count
+      operationId: getMyNotificationsCount
+      description: |
+        Get in-app notifications count
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/NotificationStatus'
+      responses:
+        "200":
+          description: 'Notifications Count'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   # This what we might have when we'll implement the new notifications:
   #  /api/v1/me/notification-settings:
   #    get:
@@ -8846,9 +8872,20 @@ components:
         type:
           $ref: '#/components/schemas/NotificationType'
         data:
-          oneOf:
-            - $ref: '#/components/schemas/NotificationMaintainerApplicationToReview'
-            - $ref: '#/components/schemas/NotificationMaintainerCommitteeApplicationCreated'
+          type: object
+          properties:
+            maintainerApplicationToReview:
+              $ref: '#/components/schemas/NotificationMaintainerApplicationToReview'
+            maintainerCommitteeApplicationCreated:
+              $ref: '#/components/schemas/NotificationMaintainerCommitteeApplicationCreated'
+
+    NotificationCountResponse:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
 
     NotificationStatus:
       type: string
