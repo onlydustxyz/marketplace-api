@@ -196,7 +196,8 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                             "joiningGoal": "EARN",
                             "joiningReason": "CONTRIBUTOR",
                             "preferredLanguages": ["ca600cac-0f45-44e9-a6e8-25e21b0c6887", "6b3f8a21-8ae9-4f73-81df-06aeaddbaf42"],
-                            "preferredCategories": ["%s", "%s"]
+                            "preferredCategories": ["%s", "%s"],
+                            "contactEmail": "fake@test.scam"
                         }
                         """.formatted(category1.id().value(), category2.id().value()))
                 .exchange()

@@ -57,15 +57,6 @@ public class OnboardingCompletionEntity {
     boolean profileCompleted;
 
     @Formula("""
-            exists(select 1
-                   from contact_informations ci
-                   where ci.user_id = id
-                     and ci.channel = 'TELEGRAM'
-                     and length(ci.contact) > 0)
-            """)
-    boolean telegramAdded;
-
-    @Formula("""
             (select coalesce(upi.joining_reason is not null and
                             upi.joining_goal is not null and
                             coalesce(upi.looking_for_a_job, false) and
@@ -87,8 +78,16 @@ public class OnboardingCompletionEntity {
             """)
     boolean hasCompletedOnboarding;
 
+    @Formula("""
+            (select coalesce(upi.contact_email is not null, false)
+            from iam.users u
+                     left join user_profile_info upi on upi.id = u.id
+            where u.id = id)
+            """)
+    boolean verificationInformationProvided;
+
     public OnboardingCompletionResponse toResponse() {
-        final var allItems = List.of(telegramAdded,
+        final var allItems = List.of(verificationInformationProvided,
                 termsAndConditionsAccepted,
                 projectPreferencesProvided,
                 profileCompleted,
@@ -98,7 +97,7 @@ public class OnboardingCompletionEntity {
         return new OnboardingCompletionResponse()
                 .completion(BigDecimal.valueOf(completedItems * 100 / allItems.size()))
                 .completed(hasCompletedOnboarding)
-                .verificationInformationProvided(telegramAdded)
+                .verificationInformationProvided(verificationInformationProvided)
                 .termsAndConditionsAccepted(termsAndConditionsAccepted)
                 .projectPreferencesProvided(projectPreferencesProvided)
                 .profileCompleted(profileCompleted)

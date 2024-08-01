@@ -60,13 +60,9 @@ public class UserService implements UserFacadePort {
                               final List<UUID> preferredLanguageIds,
                               final List<UUID> preferredCategoryIds
     ) {
-        final var user = userStoragePort.getRegisteredUserById(userId)
-                .orElseThrow(() -> notFound("User %s not found".formatted(userId)));
 
         final var userProfile = userStoragePort.findProfileById(userId)
                 .orElse(UserProfile.builder().build());
-
-        user.email(contactEmail == null ? user.email() : contactEmail);
 
         userProfile
                 .avatarUrl(avatarUrl == null ? userProfile.avatarUrl() : avatarUrl)
@@ -81,9 +77,9 @@ public class UserService implements UserFacadePort {
                 .preferredCategoriesIds(isNull(preferredCategoryIds) ? userProfile.preferredCategoriesIds() : preferredCategoryIds)
                 .preferredLanguageIds(isNull(preferredLanguageIds) ? userProfile.preferredLanguageIds() : preferredLanguageIds)
                 .joiningReason(joiningReason == null ? userProfile.joiningReason() : joiningReason)
-                .joiningGoal(joiningGoal == null ? userProfile.joiningGoal() : joiningGoal);
+                .joiningGoal(joiningGoal == null ? userProfile.joiningGoal() : joiningGoal)
+                .contactEmail(contactEmail == null ? userProfile.contactEmail() : contactEmail);
 
-        userStoragePort.saveUser(user);
         userStoragePort.saveProfile(userId, userProfile);
     }
 

@@ -62,6 +62,9 @@ public class UserProfileInfoEntity {
     @Column(columnDefinition = "uuid[]")
     UUID[] preferredCategoryIds;
 
+    @Column(nullable = false)
+    String contactEmail;
+
 
     public UserProfileInfoEntity update(final UUID userId, UserProfile userProfile) {
         final Set<ContactInformationEntity> contactInformation = mapContactInformationsToEntity(userId, userProfile.contacts());
@@ -80,6 +83,7 @@ public class UserProfileInfoEntity {
                 .joiningReason(userProfile.joiningReason())
                 .preferredCategoryIds(isNull(userProfile.preferredCategoriesIds()) ? null : userProfile.preferredCategoriesIds().toArray(new UUID[0]))
                 .preferredLanguageIds(isNull(userProfile.preferredLanguageIds()) ? null : userProfile.preferredLanguageIds().toArray(new UUID[0]))
+                .contactEmail(userProfile.contactEmail())
                 .build();
 
         userProfileInfoEntity.updateContactInfos(contactInformation);
@@ -113,6 +117,7 @@ public class UserProfileInfoEntity {
                 .firstName(firstName)
                 .lastName(lastName)
                 .contacts(contactInformations.stream().map(ContactInformationEntity::toDomain).toList())
+                .contactEmail(contactEmail)
                 .build();
     }
 }

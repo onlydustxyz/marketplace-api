@@ -195,20 +195,4 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.contacts[?(@.contact=='https://t.me/abuisset')].channel").isEqualTo("TELEGRAM")
                 .json(GET_ANTHONY_PRIVATE_PROFILE_JSON_RESPONSE);
     }
-
-    @Test
-    void should_get_email_if_user_profile_has_no_contact() {
-        // Given
-        final String jwt = userAuthHelper.authenticateHayden().jwt();
-
-        // When
-        client.get()
-                .uri(getApiURI(ME_PROFILE))
-                .header("Authorization", BEARER_PREFIX + jwt)
-                .exchange()
-                // Then
-                .expectStatus().is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.contactEmail").isEqualTo("haydenclearymusic@gmail.com");
-    }
 }
