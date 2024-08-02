@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.model.CommitteeProjectAnswerRequest
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
@@ -36,6 +37,9 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     CommitteeFacadePort committeeFacadePort;
+    @Autowired
+    UserProfileInfoRepository userProfileInfoRepository;
+
     static Committee.Id committeeId;
     static ProjectQuestion.Id projectQuestionId1;
     static ProjectQuestion.Id projectQuestionId2;
@@ -112,6 +116,10 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
+        final var contactEmail = faker.internet().emailAddress();
+        final var userProfileInfoEntity = userProfileInfoRepository.findById(pierre.user().getId()).orElseThrow();
+        userProfileInfoEntity.setContactEmail(contactEmail);
+        userProfileInfoRepository.saveAndFlush(userProfileInfoEntity);
 
         final var answerRequest1 = new CommitteeProjectAnswerRequest()
                 .answer(faker.pokemon().name())
@@ -158,7 +166,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.committeeName", equalTo("Mr. Needful")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
                         .withRequestBody(matchingJsonPath("$.message_data.applicationEndDate", containing(" UTC")))
-                        .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(contactEmail)))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));
 

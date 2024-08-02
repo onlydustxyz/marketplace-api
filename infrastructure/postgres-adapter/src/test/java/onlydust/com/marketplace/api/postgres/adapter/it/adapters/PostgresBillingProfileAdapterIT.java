@@ -55,16 +55,16 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
         // Given
         final UserId ownerId = UserId.random();
         userRepository.save(new UserEntity(ownerId.value(), 1L, faker.rickAndMorty().character(), faker.internet().url(), faker.internet().emailAddress(),
-                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.ADMIN}, new Date(), new Date(), new Date()));
+                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.ADMIN}, new Date(), new Date(), new Date(), null));
         final UserId adminId = UserId.random();
         userRepository.save(new UserEntity(adminId.value(), 2L, faker.rickAndMorty().character(), faker.internet().url(), faker.internet().emailAddress(),
-                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date()));
+                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date(), null));
         final UserId memberId = UserId.random();
         userRepository.save(new UserEntity(memberId.value(), 3L, faker.rickAndMorty().character(), faker.internet().url(), faker.internet().emailAddress(),
-                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date()));
+                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date(), null));
         final UserId coworkerId = UserId.random();
         userRepository.save(new UserEntity(coworkerId.value(), 4L, faker.rickAndMorty().character(), faker.internet().url(), faker.internet().emailAddress(),
-                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date()));
+                new AuthenticatedUser.Role[]{AuthenticatedUser.Role.USER}, new Date(), new Date(), new Date(), null));
 
         final String name = faker.rickAndMorty().character();
         CompanyBillingProfile billingProfile = new CompanyBillingProfile(name, ownerId);

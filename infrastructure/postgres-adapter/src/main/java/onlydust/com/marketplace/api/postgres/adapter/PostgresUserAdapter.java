@@ -312,6 +312,6 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     public Optional<NotificationRecipient> findById(NotificationRecipient.Id userId) {
-        return userRepository.findById(userId.value()).map(UserEntity::toUser);
+        return userRepository.findById(userId.value()).map(UserEntity::toNotificationRecipient);
     }
 }
