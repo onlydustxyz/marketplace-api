@@ -9,8 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.UUID;
-
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @TagMe
@@ -144,7 +142,7 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_caller_onboarding_for_non_indexed_users() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 777, "DeViL", "https://devil.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.signUpUser(777, "DeViL", "https://devil.com/avatar.jpg", false);
 
         // When
         client.get()

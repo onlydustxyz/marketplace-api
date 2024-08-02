@@ -59,8 +59,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false);
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false);
+        final var userId = authenticatedUser.user().getId();
         final String jwt = authenticatedUser.jwt();
 
         MutableObject<UUID> billingProfileId = new MutableObject<>();
@@ -254,8 +254,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
         MutableObject<UUID> billingProfileId = new MutableObject<>();
@@ -554,8 +553,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
         final String applicantId = "kyb-" + faker.number().randomNumber();
         MutableObject<UUID> billingProfileId = new MutableObject<>();
 

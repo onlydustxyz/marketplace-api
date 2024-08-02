@@ -56,7 +56,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_coworkers_of_individual_billing_profile() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "foo.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();
@@ -103,7 +103,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_coworkers_of_self_employed_billing_profile() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "bar.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();
@@ -149,7 +149,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_get_coworkers_of_company() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();
@@ -195,7 +195,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(10)
     void should_invite_coworkers_of_company() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();
@@ -667,7 +667,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(11)
     void should_remove_coworkers_from_company() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();
@@ -1056,7 +1056,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_update_coworkers_role() {
         // Given
-        final var admin = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final var admin = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org", false);
         final var coworker = userAuthHelper.authenticateAnthony();
         final var adminId = UserId.of(admin.user().getId());
@@ -1306,7 +1306,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
     @Order(21)
     void should_cancel_coworker_invitation_from_company() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org",
                 false);
         final String jwt = authenticatedUser.jwt();

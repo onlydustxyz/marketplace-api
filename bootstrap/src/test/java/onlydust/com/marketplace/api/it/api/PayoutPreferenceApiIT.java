@@ -53,7 +53,7 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_and_put_payout_preferences() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
                 faker.internet().url(), false);
         final UserId userId = UserId.of(authenticatedUser.user().getId());

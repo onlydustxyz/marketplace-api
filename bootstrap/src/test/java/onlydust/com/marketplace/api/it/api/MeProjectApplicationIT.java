@@ -878,8 +878,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber(10, true);
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
 
         final var projectId = UUID.fromString("77777777-4444-4444-4444-61504d34fc56");
         final var issueId = 1736474921L;

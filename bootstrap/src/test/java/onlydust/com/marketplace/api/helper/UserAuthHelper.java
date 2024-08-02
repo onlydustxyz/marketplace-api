@@ -31,32 +31,6 @@ public class UserAuthHelper {
     WireMockServer githubWireMockServer;
     AppUserFacadePort appUserFacadePort;
 
-    @NonNull
-    public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl, boolean isAdmin) {
-        return authenticateUser(signUpUser(userId, githubUserId, login, avatarUrl, isAdmin));
-    }
-
-    private UserEntity signUpUser(UUID userId, long githubUserId, String login, String avatarUrl,
-                                  boolean isAdmin) {
-        final UserEntity user = UserEntity.builder()
-                .id(userId)
-                .githubUserId(githubUserId)
-                .githubLogin(login)
-                .githubAvatarUrl(avatarUrl)
-                .email("%d@foo.org".formatted(githubUserId))
-                .roles(isAdmin ?
-                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER,
-                                onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
-                        new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER})
-                .createdAt(new Date())
-                .lastSeenAt(new Date())
-                .build();
-        userRepository.save(user);
-
-        mockAuth0UserInfo(user);
-        return user;
-    }
-
     public AuthenticatedUser signUpUser(long githubUserId, String login, String avatarUrl, boolean isAdmin) {
         appUserFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
                 .githubUserId(githubUserId)

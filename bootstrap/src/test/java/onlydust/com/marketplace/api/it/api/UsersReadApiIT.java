@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
-import java.util.UUID;
 
 @TagUser
 public class UsersReadApiIT extends AbstractMarketplaceApiIT {
@@ -420,7 +419,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_new_user_stats() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 666, "DeViL", "https://devil.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.signUpUser(666, "DeViL", "https://devil.com/avatar.jpg", false);
 
         // When
         client.get()
@@ -450,7 +449,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_new_user_profile() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 777, "AnGeL", "https://angel.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.signUpUser(777, "AnGeL", "https://angel.com/avatar.jpg", false);
 
         // When
         client.get()
@@ -521,7 +520,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_new_user_languages() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 888, "A", "https://a.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.signUpUser(888, "A", "https://a.com/avatar.jpg", false);
 
         // When
         client.get()
@@ -540,7 +539,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_new_user_ecosystems() {
         // Given
-        final var newUser = userAuthHelper.newFakeUser(UUID.randomUUID(), 999, "B", "https://a.com/avatar.jpg", false);
+        final var newUser = userAuthHelper.signUpUser(999, "B", "https://a.com/avatar.jpg", false);
 
         // When
         client.get()

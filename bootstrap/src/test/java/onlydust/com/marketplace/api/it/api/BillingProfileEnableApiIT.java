@@ -1,15 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
+import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
-import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-
-import java.util.UUID;
 
 @TagAccounting
 public class BillingProfileEnableApiIT extends AbstractMarketplaceApiIT {
@@ -20,7 +18,7 @@ public class BillingProfileEnableApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_disable_billing_profile() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
                 faker.internet().url(), false);
         final String jwt =

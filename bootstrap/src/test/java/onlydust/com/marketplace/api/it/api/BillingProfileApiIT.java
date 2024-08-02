@@ -69,7 +69,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_create_all_type_of_billing_profiles() {
         final String jwt =
-                userAuthHelper.newFakeUser(UUID.randomUUID(), faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
+                userAuthHelper.signUpUser(faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
                         faker.internet().url(), false).jwt();
 
         /// When
@@ -222,7 +222,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     @Order(30)
     void should_get_update_delete_billing_profile_by_id() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber() + faker.number().randomNumber(), faker.name().name(),
                 faker.internet().url(), false);
         final String jwt =
@@ -421,7 +421,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
         final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
         final var pierre = userAuthHelper.authenticatePierre();
-        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final var authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(11, true), faker.name().name(),
                 faker.internet().url(), false);
         final SelfEmployedBillingProfile selfEmployedBillingProfile =

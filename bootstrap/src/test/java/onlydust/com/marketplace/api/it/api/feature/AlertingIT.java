@@ -46,7 +46,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_proper_alerting_data() {
         // Given
-        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final var authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(11, true), "another-fake-user",
                 faker.internet().url(), false);
 
