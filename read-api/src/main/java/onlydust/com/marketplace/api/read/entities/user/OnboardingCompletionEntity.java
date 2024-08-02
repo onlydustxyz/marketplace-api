@@ -58,7 +58,7 @@ public class OnboardingCompletionEntity {
 
     @Formula("""
             (select coalesce(upi.joining_goal is not null and
-                            coalesce(upi.looking_for_a_job, false) and
+                            upi.looking_for_a_job is not null and
                             upi.preferred_language_ids is not null and
                             upi.preferred_category_ids is not null and
                             cardinality(upi.preferred_language_ids) > 0 and
