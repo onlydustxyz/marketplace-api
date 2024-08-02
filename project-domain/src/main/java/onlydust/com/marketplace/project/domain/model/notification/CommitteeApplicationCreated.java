@@ -14,7 +14,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @NotificationType("CommitteeApplicationSuccessfullyCreated")
 @Builder
-public class CommitteeApplicationSuccessfullyCreated extends NotificationData {
+public class CommitteeApplicationCreated extends NotificationData {
     @NonNull
     String projectName;
     @NonNull

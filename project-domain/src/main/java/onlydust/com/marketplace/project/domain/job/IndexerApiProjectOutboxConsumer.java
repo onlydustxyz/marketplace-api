@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
+import onlydust.com.marketplace.project.domain.model.event.ProjectLinkedReposChanged;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 

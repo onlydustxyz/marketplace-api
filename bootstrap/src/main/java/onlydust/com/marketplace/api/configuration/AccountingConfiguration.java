@@ -64,11 +64,12 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountingMailNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                         final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                         final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                         final @NonNull OutboxPort accountingMailOutbox) {
-        return new AccountingMailNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, accountingMailOutbox);
+    public AccountingNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
+                                                     final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
+                                                     final @NonNull InvoiceStoragePort invoiceStoragePort,
+                                                     final @NonNull OutboxPort accountingMailOutbox,
+                                                     final @NonNull NotificationPort notificationPort) {
+        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, accountingMailOutbox, notificationPort);
     }
 
     @Bean
@@ -112,16 +113,16 @@ public class AccountingConfiguration {
 
     @Bean
     public AccountingObserverPort accountingObserver(final RewardStatusUpdater rewardStatusUpdater,
-                                                     final AccountingMailNotifier accountingMailNotifier,
+                                                     final AccountingNotifier accountingNotifier,
                                                      final AccountingTrackingNotifier accountingTrackingNotifier) {
-        return new AccountingObserverComposite(accountingMailNotifier, rewardStatusUpdater, accountingTrackingNotifier);
+        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier);
     }
 
     @Bean
     public BillingProfileObserverPort billingProfileObservers(final RewardStatusUpdater rewardStatusUpdater,
-                                                              final AccountingMailNotifier accountingMailNotifier,
+                                                              final AccountingNotifier accountingNotifier,
                                                               final SlackApiAdapter slackApiAdapter) {
-        return new BillingProfileObserverComposite(rewardStatusUpdater, accountingMailNotifier, slackApiAdapter);
+        return new BillingProfileObserverComposite(rewardStatusUpdater, accountingNotifier, slackApiAdapter);
     }
 
     @Bean
