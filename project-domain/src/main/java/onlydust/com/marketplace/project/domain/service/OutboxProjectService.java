@@ -6,7 +6,7 @@ import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.ProjectLinkedReposChanged;
+import onlydust.com.marketplace.project.domain.model.event.ProjectLinkedReposChanged;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 

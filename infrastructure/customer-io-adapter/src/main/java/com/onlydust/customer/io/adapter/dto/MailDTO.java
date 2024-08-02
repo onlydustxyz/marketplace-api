@@ -8,7 +8,7 @@ import onlydust.com.marketplace.accounting.domain.events.*;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
@@ -79,13 +79,13 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
 
     public static MailDTO<NewCommitteeApplicationDTO> fromNewCommitteeApplication(@NonNull CustomerIOProperties customerIOProperties,
                                                                                   @NonNull SendableNotification notification,
-                                                                                  @NonNull CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
+                                                                                  @NonNull CommitteeApplicationCreated committeeApplicationCreated) {
         return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
                 customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
-                "Your application to committee %s".formatted(committeeApplicationSuccessfullyCreated.getCommitteeName()),
-                NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationSuccessfullyCreated));
+                "Your application to committee %s".formatted(committeeApplicationCreated.getCommitteeName()),
+                NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationCreated));
     }
 
     public static MailDTO<ProjectApplicationsToReviewByUserDTO> fromProjectApplicationsToReviewByUser(@NonNull CustomerIOProperties customerIOProperties,

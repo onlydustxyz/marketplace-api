@@ -12,7 +12,7 @@ import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import org.springframework.retry.annotation.Backoff;
@@ -53,8 +53,8 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
     @Override
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public void send(SendableNotification notification) {
-        if (notification.data() instanceof CommitteeApplicationSuccessfullyCreated committeeApplicationSuccessfullyCreated) {
-            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationSuccessfullyCreated));
+        if (notification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
+            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationCreated));
         }
     }
 }

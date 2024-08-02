@@ -5,7 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -25,7 +25,7 @@ public class ProjectNotifier implements CommitteeObserverPort {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("Committee %s not found".formatted(committeeId.value())));
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);
-        notificationPort.push(userId, new CommitteeApplicationSuccessfullyCreated(projectInfos.name(), projectId,
+        notificationPort.push(userId, new CommitteeApplicationCreated(projectInfos.name(), projectId,
                 committee.name(), committeeId.value(), committee.applicationEndDate()));
     }
 }

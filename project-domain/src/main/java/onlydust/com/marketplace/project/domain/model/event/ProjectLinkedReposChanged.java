@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.project.domain.model.notification;
+package onlydust.com.marketplace.project.domain.model.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

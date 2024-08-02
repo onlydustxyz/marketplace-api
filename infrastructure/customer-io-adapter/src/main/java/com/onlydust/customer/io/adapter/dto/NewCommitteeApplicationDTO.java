@@ -1,7 +1,7 @@
 package com.onlydust.customer.io.adapter.dto;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationSuccessfullyCreated;
+import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -15,7 +15,7 @@ public record NewCommitteeApplicationDTO(@NonNull UUID projectId,
                                          @NonNull String applicationEndDate) {
 
     public static NewCommitteeApplicationDTO fromEvent(@NonNull final String recipientLogin,
-                                                       @NonNull final CommitteeApplicationSuccessfullyCreated event) {
+                                                       @NonNull final CommitteeApplicationCreated event) {
         return new NewCommitteeApplicationDTO(
                 event.getProjectId(), event.getProjectName(),
                 event.getCommitteeId(), event.getCommitteeName(),
