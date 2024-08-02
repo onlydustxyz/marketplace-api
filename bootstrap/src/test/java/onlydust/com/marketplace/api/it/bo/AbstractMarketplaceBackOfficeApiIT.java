@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRe
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,11 +113,13 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     CurrencyFacadePort currencyFacadePort;
+    @Autowired
+    AppUserFacadePort appUserFacadePort;
 
     @BeforeEach
     void setupUserAuthHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer);
+                githubWireMockServer, appUserFacadePort);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

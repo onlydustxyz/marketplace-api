@@ -20,6 +20,7 @@ import onlydust.com.marketplace.api.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -264,6 +265,8 @@ public class AbstractMarketplaceApiIT {
     AccountingHelper accountingHelper;
     @Autowired
     EntityManagerFactory entityManagerFactory;
+    @Autowired
+    AppUserFacadePort appUserFacadePort;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
@@ -291,7 +294,7 @@ public class AbstractMarketplaceApiIT {
     @BeforeEach
     void setupUserAuthHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer);
+                githubWireMockServer, appUserFacadePort);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");

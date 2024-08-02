@@ -9,8 +9,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.backoffice.BackofficeUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
+import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 
 import java.util.Date;
 import java.util.List;
@@ -27,14 +29,15 @@ public class UserAuthHelper {
     GithubAuthenticationPort githubAuthenticationPort;
     WireMockServer auth0WireMockServer;
     WireMockServer githubWireMockServer;
+    AppUserFacadePort appUserFacadePort;
 
     @NonNull
     public AuthenticatedUser newFakeUser(UUID userId, long githubUserId, String login, String avatarUrl, boolean isAdmin) {
         return authenticateUser(signUpUser(userId, githubUserId, login, avatarUrl, isAdmin));
     }
 
-    public UserEntity signUpUser(UUID userId, long githubUserId, String login, String avatarUrl,
-                                 boolean isAdmin) {
+    private UserEntity signUpUser(UUID userId, long githubUserId, String login, String avatarUrl,
+                                  boolean isAdmin) {
         final UserEntity user = UserEntity.builder()
                 .id(userId)
                 .githubUserId(githubUserId)
@@ -52,6 +55,25 @@ public class UserAuthHelper {
 
         mockAuth0UserInfo(user);
         return user;
+    }
+
+    public AuthenticatedUser signUpUser(long githubUserId, String login, String avatarUrl, boolean isAdmin) {
+        appUserFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl)
+                .email("%d@foo.org".formatted(githubUserId))
+                .build(), false);
+
+        final var user = userRepository.findByGithubUserId(githubUserId).orElseThrow();
+        user.setRoles(isAdmin ?
+                new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER,
+                        onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.ADMIN} :
+                new onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role[]{onlydust.com.marketplace.kernel.model.AuthenticatedUser.Role.USER});
+        userRepository.saveAndFlush(user);
+
+        mockAuth0UserInfo(user);
+        return authenticateUser(user);
     }
 
     public void mockAuth0UserInfo(UserEntity user) {

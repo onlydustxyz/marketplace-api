@@ -8,7 +8,6 @@ import onlydust.com.marketplace.user.domain.job.IndexerApiUserOutboxConsumer;
 import onlydust.com.marketplace.user.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
-import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.user.domain.port.output.*;
 import onlydust.com.marketplace.user.domain.service.*;
@@ -34,7 +33,7 @@ public class UserDomainConfiguration {
     }
 
     @Bean
-    public NotificationSettingsPort notificationSettingsPort(final NotificationSettingsStoragePort notificationSettingsStoragePort) {
+    public NotificationSettingsService notificationSettingsService(final NotificationSettingsStoragePort notificationSettingsStoragePort) {
         return new NotificationSettingsService(notificationSettingsStoragePort);
     }
 
@@ -67,7 +66,8 @@ public class UserDomainConfiguration {
     }
 
     @Bean
-    public UserObserverPort userObservers(final OutboxUserService outboxUserService) {
-        return new UserObserverComposite(outboxUserService);
+    public UserObserverPort userObservers(final OutboxUserService outboxUserService,
+                                          final UserObserverPort notificationSettingsService) {
+        return new UserObserverComposite(outboxUserService, notificationSettingsService);
     }
 }
