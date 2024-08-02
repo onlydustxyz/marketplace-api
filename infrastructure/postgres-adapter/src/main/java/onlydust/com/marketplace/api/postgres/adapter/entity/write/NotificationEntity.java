@@ -81,7 +81,7 @@ public class NotificationEntity {
                 .data(data.notification)
                 .createdAt(createdAt)
                 .channels(channels.stream().map(NotificationChannelEntity::channel).collect(Collectors.toSet()))
-                .recipient(recipient.toUser())
+                .recipient(recipient.toNotificationRecipient())
                 .build();
     }
 

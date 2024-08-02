@@ -8,6 +8,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import org.hibernate.annotations.CreationTimestamp;
@@ -59,6 +60,10 @@ public class UserEntity {
     @EqualsAndHashCode.Exclude
     private Date updatedAt;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id", referencedColumnName = "id", insertable = false, updatable = false)
+    private UserProfileInfoEntity userProfileInfo;
+
     @SuppressWarnings("unused") // it is used in the repository's native insert query
     public String rolesAsPostgresArray() {
         return "{" + String.join(",", Arrays.stream(roles).map(Enum::name).toList()) + "}";
@@ -68,7 +73,9 @@ public class UserEntity {
         return new ShortContributorView(GithubUserId.of(githubUserId), githubLogin, githubAvatarUrl, UserId.of(id), email);
     }
 
-    public NotificationRecipient toUser() {
-        return new NotificationRecipient(NotificationRecipient.Id.of(id), email, githubLogin);
+    public NotificationRecipient toNotificationRecipient() {
+        return new NotificationRecipient(NotificationRecipient.Id.of(id),
+                userProfileInfo != null && !userProfileInfo.getContactEmail().isEmpty() ? userProfileInfo.getContactEmail() : email,
+                githubLogin);
     }
 }
