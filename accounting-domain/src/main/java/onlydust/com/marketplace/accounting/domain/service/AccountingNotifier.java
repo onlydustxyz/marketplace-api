@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -14,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
@@ -21,7 +21,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
-import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -68,23 +67,21 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onRewardCancelled(RewardId rewardId) {
-        final var shortRewardDetailsView = accountingRewardStoragePort.getShortReward(rewardId)
+        final var reward = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId)));
 
-        if (nonNull(shortRewardDetailsView.recipient().email())) {
-            accountingOutbox.push(new RewardCanceled(
-                    shortRewardDetailsView.recipient().email(),
-                    shortRewardDetailsView.recipient().login(),
-                    ShortReward.builder()
-                            .amount(shortRewardDetailsView.money().amount())
-                            .currencyCode(shortRewardDetailsView.money().currency().code().toString())
-                            .dollarsEquivalent(shortRewardDetailsView.money().getDollarsEquivalentValue())
+        if (nonNull(reward.recipient().email())) {
+            notificationPort.push(reward.recipient().userId().value(), RewardCanceled.builder()
+                    .shortReward(ShortReward.builder()
+                            .amount(reward.money().amount())
+                            .currencyCode(reward.money().currency().code().toString())
+                            .dollarsEquivalent(reward.money().getDollarsEquivalentValue())
                             .id(rewardId)
-                            .projectName(shortRewardDetailsView.project().name())
-                            .build(),
-                    isNull(shortRewardDetailsView.recipient().userId()) ? null : shortRewardDetailsView.recipient().userId().value()));
+                            .projectName(reward.project().name())
+                            .build())
+                    .build());
         } else {
-            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(shortRewardDetailsView.recipient().login()));
+            LOGGER.warn("Unable to send cancel reward mail to recipient %s due to missing email".formatted(reward.recipient().login()));
         }
     }
 

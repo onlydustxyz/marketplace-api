@@ -6,9 +6,9 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
@@ -66,13 +66,17 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 RewardCreatedDTO.fromEvent(notification.recipient().login(), rewardReceived));
     }
 
-    public static MailDTO<RewardCanceledDTO> fromRewardCanceled(@NonNull CustomerIOProperties customerIOProperties,
-                                                                @NonNull RewardCanceled rewardCanceled) {
-        final RewardCanceledDTO rewardCanceledDTO = RewardCanceledDTO.fromEvent(rewardCanceled);
-        return new MailDTO<>(customerIOProperties.getRewardCanceledEmailId().toString(), mapIdentifiers(rewardCanceled.recipientEmail(),
-                rewardCanceled.recipientId()),
-                customerIOProperties.getOnlyDustAdminEmail(), rewardCanceled.recipientEmail(),
-                "Reward %s got canceled".formatted(rewardCanceledDTO.rewardName()), rewardCanceledDTO);
+    public static MailDTO<RewardCanceledDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                  @NonNull SendableNotification notification,
+                                                  @NonNull RewardCanceled rewardCanceled) {
+        final var dto = RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled);
+        return new MailDTO<>(
+                customerIOProperties.getRewardCanceledEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
+                "Reward %s got canceled".formatted(dto.rewardName()),
+                dto);
     }
 
     public static MailDTO<RewardsPaidDTO> fromRewardsPaid(@NonNull CustomerIOProperties customerIOProperties,
