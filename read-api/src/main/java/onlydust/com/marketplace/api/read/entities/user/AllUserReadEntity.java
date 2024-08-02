@@ -251,6 +251,6 @@ public class AllUserReadEntity {
                 }).orElse(null))
                 .preferredCategories(preferredCategories.stream().map(ProjectCategoryReadEntity::toDto).toList())
                 .preferredLanguages(preferredLanguages.stream().map(LanguageReadEntity::toDto).toList())
-                .contactEmail(profile().map(UserProfileInfoReadEntity::contactEmail).orElse(null));
+                .contactEmail(profile().map(UserProfileInfoReadEntity::contactEmail).orElse(email));
     }
 }
