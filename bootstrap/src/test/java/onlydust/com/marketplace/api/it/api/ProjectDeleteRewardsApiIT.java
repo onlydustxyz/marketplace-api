@@ -64,7 +64,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_be_forbidden_given_authenticated_user_not_project_lead() {
         // Given
-        userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().character(), faker.internet().url(),
+        userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
         final UUID projectId = projectRepository.findAll().get(0).getId();

@@ -298,12 +298,12 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
     public void setupPendingBillingProfile() {
         setUp();
-        userAuthHelper.signUpUser(UUID.randomUUID(), 1L, "mmaderic_test", "https://avatars.githubusercontent.com/u/39437117?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 2L, "jannesblobel_test", "https://avatars.githubusercontent.com/u/72493222?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 3L, "nickdbush_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 4L, "acomminos_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 5L, "yanns_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
-        userAuthHelper.signUpUser(UUID.randomUUID(), 6L, "ind_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
+        userAuthHelper.signUpUser(1L, "mmaderic_test", "https://avatars.githubusercontent.com/u/39437117?v=4", false);
+        userAuthHelper.signUpUser(2L, "jannesblobel_test", "https://avatars.githubusercontent.com/u/72493222?v=4", false);
+        userAuthHelper.signUpUser(3L, "nickdbush_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
+        userAuthHelper.signUpUser(4L, "acomminos_test", "https://avatars.githubusercontent.com/u/628035?v=4", false);
+        userAuthHelper.signUpUser(5L, "yanns_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
+        userAuthHelper.signUpUser(6L, "ind_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
     }
 
     private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
@@ -5255,7 +5255,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         // When
         final ResponseEntity<Void> voidResponseEntity = getBackofficeAccountingManagementRestApi().payReward(usdRewardEntity.id(),
                 new PayRewardRequest(TransactionNetwork.SEPA,
-                faker.lordOfTheRings().character()));
+                        faker.lordOfTheRings().character()));
 
         // Then
         assertThat(voidResponseEntity.getStatusCode().value()).isEqualTo(204);
@@ -5513,7 +5513,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "mmaderic_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
-            
+                        
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",
@@ -5549,7 +5549,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5572,7 +5572,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 200
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5585,7 +5585,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5608,7 +5608,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 30
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5621,7 +5621,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5644,7 +5644,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 300
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5657,7 +5657,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5680,7 +5680,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 50
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5693,7 +5693,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5716,7 +5716,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 55
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5729,7 +5729,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5752,7 +5752,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 500
                },
-            
+                        
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5765,7 +5765,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-            
+                        
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5789,7 +5789,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 },
                 "amount": 40
               },
-            
+                        
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -5802,7 +5802,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-            
+                        
               "project": {
                 "slug": "super-project-1",
                 "name": "Super Project 1",
@@ -5837,7 +5837,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-            
+                        
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",

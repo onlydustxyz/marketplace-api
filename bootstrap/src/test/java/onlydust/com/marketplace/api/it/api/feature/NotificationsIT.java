@@ -1,25 +1,33 @@
 package onlydust.com.marketplace.api.it.api.feature;
 
-import lombok.*;
-import lombok.experimental.Accessors;
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.kernel.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @TagUser
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -30,6 +38,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     NotificationPort notificationPort;
     @Autowired
     NotificationStoragePort notificationStoragePort;
+    @Autowired
+    CustomerIOAdapter notificationInstantEmailSender;
 
     private UUID olivierId;
     private NotificationRecipient olivierRecipient;
@@ -40,33 +50,30 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.CONTRIBUTOR_REWARD);
     private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.CONTRIBUTOR_REWARD);
     private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.CONTRIBUTOR_REWARD);
-    private final TestNotification gfiNotification1Data = new TestNotification(100, NotificationCategory.KYC_KYB_BILLING_PROFILE);
-    private final TestNotification gfiNotification2Data = new TestNotification(101, NotificationCategory.KYC_KYB_BILLING_PROFILE);
+    private final TestNotification kycNotification1Data = new TestNotification(100, NotificationCategory.KYC_KYB_BILLING_PROFILE);
+    private final TestNotification kycNotification2Data = new TestNotification(101, NotificationCategory.KYC_KYB_BILLING_PROFILE);
 
     private static Notification olivierRewardNotification1;
     private static Notification olivierRewardNotification2;
     private static Notification olivierRewardNotification3;
     private static Notification olivierRewardNotification4;
-    private static Notification olivierGfiNotification1;
-    private static Notification olivierGfiNotification2;
+    private static Notification olivierKycNotification1;
+    private static Notification olivierKycNotification2;
 
 
     private static Notification pierreRewardNotification1;
-    private static Notification pierreRewardNotification2;
-    private static Notification pierreRewardNotification3;
     private static Notification pierreRewardNotification4;
-    private static Notification pierreGfiNotification1;
-    private static Notification pierreGfiNotification2;
+    private static Notification pierreKycNotification1;
 
     @BeforeEach
     void setUp() {
         final var olivier = userAuthHelper.authenticateOlivier();
         olivierId = olivier.user().getId();
-        olivierRecipient = new NotificationRecipient(olivierId, olivier.user().getEmail(), olivier.user().getGithubLogin());
+        olivierRecipient = new NotificationRecipient(NotificationRecipient.Id.of(olivierId), olivier.user().getEmail(), olivier.user().getGithubLogin());
 
         final var pierre = userAuthHelper.authenticatePierre();
         pierreId = pierre.user().getId();
-        pierreRecipient = new NotificationRecipient(pierreId, pierre.user().getEmail(), pierre.user().getGithubLogin());
+        pierreRecipient = new NotificationRecipient(NotificationRecipient.Id.of(pierreId), pierre.user().getEmail(), pierre.user().getGithubLogin());
     }
 
     @Test
@@ -75,27 +82,61 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         assertNoPendingNotification(NotificationChannel.values());
     }
 
-    // TODO: uncomment this test when default settings are properly implemented
-//    @Test
-//    @Order(2)
-//    void should_return_nothing_when_notification_has_no_channel() {
-//        // When
-//        notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE), NotificationCategory.CONTRIBUTOR_REWARD));
-//
-//        // Then
-//        assertNoPendingNotification(NotificationChannel.values());
-//    }
+    @Test
+    @Order(2)
+    void should_return_notification_for_default_channels_for_old_user() {
+        // When
+        final var notification = notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
+                NotificationCategory.CONTRIBUTOR_REWARD));
+
+        // Then
+        assertPendingNotifications(Map.of(
+                olivierRecipient, List.of(notification)
+        ), NotificationChannel.IN_APP);
+        assertNoPendingNotification(NotificationChannel.DAILY_EMAIL);
+        assertEmailsSent(List.of(notification));
+
+        // Cleanup
+        notificationStoragePort.markAsSent(NotificationChannel.IN_APP, List.of(notification.id()));
+    }
 
     @Test
     @Order(3)
+    void should_return_notification_for_default_channels_for_new_user() {
+        // Given
+        final var newUser = userAuthHelper.signUpUser(
+                faker.number().randomNumber(10, true),
+                faker.internet().slug(),
+                faker.internet().avatar(),
+                false);
+        final var newUserRecipient = new NotificationRecipient(NotificationRecipient.Id.of(newUser.user().getId()), newUser.user().getEmail(),
+                newUser.user().getGithubLogin());
+
+        // When
+        final var notification = notificationPort.push(newUser.user().getId(), new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
+                NotificationCategory.MAINTAINER_PROJECT_PROGRAM));
+
+        // Then
+        assertPendingNotifications(Map.of(
+                newUserRecipient, List.of(notification)
+        ), NotificationChannel.IN_APP);
+        assertNoPendingNotification(NotificationChannel.DAILY_EMAIL);
+        assertEmailsSent(List.of(notification));
+
+        // Cleanup
+        notificationStoragePort.markAsSent(NotificationChannel.IN_APP, List.of(notification.id()));
+    }
+
+    @Test
+    @Order(4)
     void should_return_notification_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
                 NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
-                ))
-                .build());
+                        .channelsPerCategory(Map.of(
+                                NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP)
+                        ))
+                        .build());
 
         // When
         olivierRewardNotification1 = notificationPort.push(olivierId, rewardNotification1Data);
@@ -105,95 +146,95 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 olivierRecipient, List.of(olivierRewardNotification1)
         ), NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP);
 
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
     }
 
     @Test
-    @Order(4)
+    @Order(5)
     void should_return_multiple_notifications_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
                 NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
-                ))
-                .build());
+                        .channelsPerCategory(Map.of(
+                                NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
+                        ))
+                        .build());
 
         // When
         olivierRewardNotification2 = notificationPort.push(olivierId, rewardNotification2Data);
-        olivierGfiNotification1 = notificationPort.push(olivierId, gfiNotification1Data);
+        olivierKycNotification1 = notificationPort.push(olivierId, kycNotification1Data);
 
         // Then
         assertPendingNotifications(Map.of(
                 olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertEmailsSent(List.of(olivierKycNotification1));
     }
 
     @Test
     @Order(10)
     void should_not_impact_old_notifications_when_channel_is_added_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
                 NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
-                                NotificationChannel.IN_APP)
-                ))
-                .build());
+                        .channelsPerCategory(Map.of(
+                                NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.IN_APP),
+                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                                        NotificationChannel.IN_APP)
+                        ))
+                        .build());
 
         // Then
         assertPendingNotifications(Map.of(
                 olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
     }
 
     @Test
     @Order(11)
     void should_impact_new_notifications_when_channel_is_added_for_category() {
         // When
-        olivierGfiNotification2 = notificationPort.push(olivierId, gfiNotification2Data);
+        olivierKycNotification2 = notificationPort.push(olivierId, kycNotification2Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertEmailsSent(List.of(olivierKycNotification2));
     }
 
     @Test
     @Order(20)
     void should_not_impact_old_notifications_when_channel_is_removed_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
                 NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
-                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
-                                NotificationChannel.IN_APP)
-                ))
-                .build());
+                        .channelsPerCategory(Map.of(
+                                NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
+                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.DAILY_EMAIL, NotificationChannel.EMAIL,
+                                        NotificationChannel.IN_APP)
+                        ))
+                        .build());
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
     }
 
     @Test
@@ -204,44 +245,44 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2,
                         olivierRewardNotification3)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
     }
 
     @Test
     @Order(30)
     void should_not_mix_notifications_between_users() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(pierreId),
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(pierreId),
                 NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
-                        NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
-                ))
-                .build());
+                        .channelsPerCategory(Map.of(
+                                NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
+                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
+                        ))
+                        .build());
 
         // When
         pierreRewardNotification1 = notificationPort.push(pierreId, rewardNotification1Data);
         pierreRewardNotification4 = notificationPort.push(pierreId, rewardNotification4Data);
-        pierreGfiNotification1 = notificationPort.push(pierreId, gfiNotification1Data);
+        pierreKycNotification1 = notificationPort.push(pierreId, kycNotification1Data);
         olivierRewardNotification4 = notificationPort.push(olivierId, rewardNotification4Data);
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2,
                         olivierRewardNotification3,
                         olivierRewardNotification4),
-                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreGfiNotification1)
+                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreKycNotification1)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertEmailsSent(List.of(pierreRewardNotification1, pierreRewardNotification4));
     }
 
     @Test
@@ -252,31 +293,31 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2,
                         olivierRewardNotification3,
                         olivierRewardNotification4),
-                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreGfiNotification1)
+                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreKycNotification1)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
 
         // When
-        notificationStoragePort.markAsSent(NotificationChannel.EMAIL, List.of(olivierGfiNotification1.id(), olivierGfiNotification2.id(),
+        notificationStoragePort.markAsSent(NotificationChannel.EMAIL, List.of(olivierKycNotification1.id(), olivierKycNotification2.id(),
                 pierreRewardNotification1.id(), pierreRewardNotification4.id()));
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierGfiNotification1, olivierGfiNotification2,
+                olivierRecipient, List.of(olivierRewardNotification1, olivierRewardNotification2, olivierKycNotification1, olivierKycNotification2,
                         olivierRewardNotification3,
                         olivierRewardNotification4),
-                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreGfiNotification1)
+                pierreRecipient, List.of(pierreRewardNotification1, pierreRewardNotification4, pierreKycNotification1)
         ), NotificationChannel.IN_APP);
-        assertNoPendingEmailNotification();
+        assertNoEmailsSent();
     }
 
     @Test
@@ -287,24 +328,20 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
         // Then
         assertPendingNotifications(Map.of(
-                olivierRecipient, List.of(olivierRewardNotification2, olivierGfiNotification2)
+                olivierRecipient, List.of(olivierRewardNotification2, olivierKycNotification2)
         ), NotificationChannel.DAILY_EMAIL);
     }
 
     private void assertNoPendingNotification(NotificationChannel... channels) {
-        // Let some time for email to be sent
         try {
             for (int test = 0; test < 10 && hasPendingNotification(channels); test++) {
+                // Let some time for email to be sent
                 Thread.sleep(100);
             }
             assertThat(hasPendingNotification(channels)).isFalse();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void assertNoPendingEmailNotification() {
-        assertNoPendingNotification(NotificationChannel.EMAIL);
     }
 
     private boolean hasPendingNotification(NotificationChannel... channels) {
@@ -318,22 +355,14 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
     private void assertPendingNotifications(Map<NotificationRecipient, List<Notification>> expectedNotifications, NotificationChannel... channels) {
         for (var channel : channels) {
-            // Truncate createdAt to milliseconds to avoid comparison issues
             final List<SendableNotification> pendingNotificationsPerRecipient = notificationStoragePort.getPendingNotifications(channel).stream()
-                    .map(notification -> (SendableNotification) notification.toBuilder()
-                            .createdAt(notification.createdAt().truncatedTo(ChronoUnit.MILLIS))
-                            .build())
+                    .map(NotificationsIT::comparable)
                     .toList();
 
+            // Build SendableNotification out of expected notifications for comparison purposes
             final List<SendableNotification> sendableExpectedNotifications = expectedNotifications.entrySet().stream()
                     .map(entry -> entry.getValue().stream()
-                            .map(notification -> SendableNotification.of(
-                                            new onlydust.com.marketplace.user.domain.model.NotificationRecipient(onlydust.com.marketplace.user.domain.model.NotificationRecipient.Id.of(entry.getKey().userId()), entry.getKey().email(), entry.getKey().login()),
-                                            notification
-                                    ).toBuilder()
-                                    // Truncate createdAt to milliseconds to avoid comparison issues
-                                    .createdAt(notification.createdAt().truncatedTo(ChronoUnit.MILLIS))
-                                    .build())
+                            .map(notification -> comparable(SendableNotification.of(entry.getKey(), notification)))
                             .toList())
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
@@ -341,6 +370,31 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
             assertThat(pendingNotificationsPerRecipient).containsAll(sendableExpectedNotifications);
             assertThat(sendableExpectedNotifications).containsAll(pendingNotificationsPerRecipient);
         }
+    }
+
+    // Truncate createdAt to milliseconds, and use ordered TreeSet for channels to avoid comparison issues
+    private static SendableNotification comparable(SendableNotification notification) {
+        return notification.toBuilder()
+                .createdAt(notification.createdAt().truncatedTo(ChronoUnit.MILLIS))
+                .channels(notification.channels().stream().sorted().collect(Collectors.toCollection(TreeSet::new)))
+                .build();
+    }
+
+    private void assertEmailsSent(List<Notification> notifications) {
+        assertNoPendingNotification(NotificationChannel.EMAIL);
+        final var captor = ArgumentCaptor.forClass(SendableNotification.class);
+        verify(notificationInstantEmailSender, times(notifications.size())).send(captor.capture());
+        final var sentNotificationIds = captor.getAllValues().stream().map(SendableNotification::id).toList();
+        final var notificationIds = notifications.stream().map(Notification::id).toList();
+        assertThat(notificationIds).containsAll(sentNotificationIds);
+        assertThat(sentNotificationIds).containsAll(notificationIds);
+        reset(notificationInstantEmailSender);
+    }
+
+    private void assertNoEmailsSent() {
+        assertNoPendingNotification(NotificationChannel.EMAIL);
+        verify(notificationInstantEmailSender, never()).send(any(SendableNotification.class));
+        reset(notificationInstantEmailSender);
     }
 
     @Data
@@ -361,15 +415,5 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         public NotificationCategory category() {
             return category;
         }
-    }
-
-    @Value
-    @Accessors(fluent = true, chain = true)
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    static class NotificationRecipient {
-        @EqualsAndHashCode.Include
-        UUID userId;
-        String email;
-        String login;
     }
 }

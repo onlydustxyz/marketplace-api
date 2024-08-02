@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.api;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.onlydust.customer.io.adapter.CustomerIOAdapter;
+import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import com.slack.api.RequestConfigurator;
 import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
@@ -80,5 +83,11 @@ public class MarketplaceApiApplicationIT {
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort) {
         return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort));
+    }
+
+    @Bean
+    public CustomerIOAdapter notificationInstantEmailSender(final CustomerIOProperties customerIOProperties,
+                                                            final CustomerIOHttpClient customerIOHttpClient) {
+        return spy(new CustomerIOAdapter(customerIOHttpClient, customerIOProperties));
     }
 }

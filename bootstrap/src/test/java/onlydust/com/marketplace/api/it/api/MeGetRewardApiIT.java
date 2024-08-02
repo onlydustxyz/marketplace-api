@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.RewardStatusRepository;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,7 +28,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_user_not_linked_to_reward() {
         // Given
-        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 1L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.signUpUser(1L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
@@ -45,7 +45,7 @@ public class MeGetRewardApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_a_403_given_user_not_linked_to_reward_to_get_reward_items() {
         // Given
-        final String jwt = userAuthHelper.newFakeUser(UUID.randomUUID(), 5L, faker.rickAndMorty().location(),
+        final String jwt = userAuthHelper.signUpUser(5L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 

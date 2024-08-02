@@ -111,9 +111,6 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_put_application() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-//        notificationSettingsPort.updateNotificationSettings(User.Id.of(pierre.user().getId()), NotificationSettings.builder()
-//                .channelsPerCategory(Map.of(NotificationCategory.COMMITTEE_APPLICATION_AS_MAINTAINER, List.of(NotificationChannel.EMAIL)))
-//                .build());
         projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
 
         final var answerRequest1 = new CommitteeProjectAnswerRequest()

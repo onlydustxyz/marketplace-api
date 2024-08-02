@@ -61,8 +61,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
 
         client.get()
                 .uri(getApiURI(ME))
@@ -129,8 +128,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -162,8 +160,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final var userId = UUID.randomUUID();
-        final String jwt = userAuthHelper.newFakeUser(userId, githubUserId, login, avatarUrl, false).jwt();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
 
         final String projectId = "7d04163c-4187-4313-8066-61504d34fc56";
 
@@ -287,7 +284,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_github_profile_data() {
         // Given
-        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().numberBetween(1, 100) + faker.number().numberBetween(200, 1000), "fake-user",
                 faker.internet().url(), false);
         final String githubPat = "github-pat-for-%s".formatted(authenticatedUser.user().getGithubUserId());
@@ -340,7 +337,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_billing_profiles_and_missingPayoutPreference() {
         // Given
-        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final var authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(11, true), "another-fake-user",
                 faker.internet().url(), false);
 
@@ -488,7 +485,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_sponsors() {
         // Given
-        final var authenticatedUser = userAuthHelper.newFakeUser(UUID.randomUUID(),
+        final var authenticatedUser = userAuthHelper.signUpUser(
                 faker.number().randomNumber(11, true), "another-fake-user",
                 faker.internet().url(), false);
 
