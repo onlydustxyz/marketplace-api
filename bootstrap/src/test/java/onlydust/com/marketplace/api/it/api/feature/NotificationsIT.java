@@ -80,20 +80,24 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         assertNoPendingNotification(NotificationChannel.values());
     }
 
-//    @Test
-//    @Order(2)
-//    void should_return_notification_for_default_channels_for_old_user() {
-//        // When
-//        final var notification = notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
-//                NotificationCategory.CONTRIBUTOR_REWARD));
-//
-//        // Then
-//        assertPendingNotifications(Map.of(
-//                olivierRecipient, List.of(notification)
-//        ), NotificationChannel.IN_APP);
-//        assertNoPendingNotification(NotificationChannel.DAILY_EMAIL);
-//        assertSentEmailCount(olivierRecipient.email(), 1);
-//    }
+    @Test
+    @Order(2)
+    void should_return_notification_for_default_channels_for_old_user() {
+        // When
+        final var notification = notificationPort.push(olivierId, new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
+                NotificationCategory.CONTRIBUTOR_REWARD));
+
+        // Then
+        assertPendingNotifications(Map.of(
+                olivierRecipient, List.of(notification)
+        ), NotificationChannel.IN_APP);
+        assertNoPendingNotification(NotificationChannel.DAILY_EMAIL);
+        assertNoPendingNotification(NotificationChannel.EMAIL);
+        //assertSentEmailCount(olivierRecipient.email(), 1);
+
+        // Cleanup
+        notificationStoragePort.markAsSent(NotificationChannel.IN_APP, List.of(notification.id()));
+    }
 
     @Test
     @Order(2)
