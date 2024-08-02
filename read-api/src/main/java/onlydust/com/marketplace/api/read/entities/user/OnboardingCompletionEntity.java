@@ -57,8 +57,7 @@ public class OnboardingCompletionEntity {
     boolean profileCompleted;
 
     @Formula("""
-            (select coalesce(upi.joining_reason is not null and
-                            upi.joining_goal is not null and
+            (select coalesce(upi.joining_goal is not null and
                             coalesce(upi.looking_for_a_job, false) and
                             upi.preferred_language_ids is not null and
                             upi.preferred_category_ids is not null and
