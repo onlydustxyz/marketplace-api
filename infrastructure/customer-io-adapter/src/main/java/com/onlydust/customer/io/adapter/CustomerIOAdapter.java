@@ -7,7 +7,11 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
+import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
+import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
@@ -29,8 +33,6 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
     public void process(@NonNull Event event) {
         if (event instanceof InvoiceRejected invoiceRejected) {
             sendEmail(MailDTO.fromInvoiceRejected(customerIOProperties, invoiceRejected));
-        } else if (event instanceof RewardCreatedMailEvent rewardCreated) {
-            sendEmail(MailDTO.fromRewardCreated(customerIOProperties, rewardCreated));
         } else if (event instanceof RewardCanceled rewardCanceled) {
             sendEmail(MailDTO.fromRewardCanceled(customerIOProperties, rewardCanceled));
         } else if (event instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
@@ -54,7 +56,9 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public void send(SendableNotification notification) {
         if (notification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
-            sendEmail(MailDTO.fromNewCommitteeApplication(customerIOProperties, notification, committeeApplicationCreated));
+            sendEmail(MailDTO.from(customerIOProperties, notification, committeeApplicationCreated));
+        } else if (notification.data() instanceof RewardReceived rewardReceived) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, rewardReceived));
         }
     }
 }

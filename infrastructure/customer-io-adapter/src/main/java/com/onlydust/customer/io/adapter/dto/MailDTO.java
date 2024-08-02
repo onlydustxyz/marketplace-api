@@ -4,8 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.Builder;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
+import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -51,14 +55,15 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 VerificationFailedDTO.fromEvent(billingProfileVerificationFailed));
     }
 
-    public static MailDTO<RewardCreatedDTO> fromRewardCreated(
-            @NonNull CustomerIOProperties customerIOProperties,
-            @NonNull RewardCreatedMailEvent rewardCreated
-    ) {
-        return new MailDTO<>(customerIOProperties.getNewRewardReceivedEmailId().toString(), mapIdentifiers(rewardCreated.email(),
-                rewardCreated.recipientId())
-                , customerIOProperties.getOnlyDustAdminEmail(), rewardCreated.email(),
-                "New reward received ✨", RewardCreatedDTO.fromEvent(rewardCreated));
+    public static MailDTO<RewardCreatedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                 @NonNull SendableNotification notification,
+                                                 @NonNull RewardReceived rewardReceived) {
+        return new MailDTO<>(customerIOProperties.getNewRewardReceivedEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
+                "New reward received ✨",
+                RewardCreatedDTO.fromEvent(notification.recipient().login(), rewardReceived));
     }
 
     public static MailDTO<RewardCanceledDTO> fromRewardCanceled(@NonNull CustomerIOProperties customerIOProperties,
@@ -77,9 +82,9 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 RewardsPaidDTO.fromEvent(rewardsPaid));
     }
 
-    public static MailDTO<NewCommitteeApplicationDTO> fromNewCommitteeApplication(@NonNull CustomerIOProperties customerIOProperties,
-                                                                                  @NonNull SendableNotification notification,
-                                                                                  @NonNull CommitteeApplicationCreated committeeApplicationCreated) {
+    public static MailDTO<NewCommitteeApplicationDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                           @NonNull SendableNotification notification,
+                                                           @NonNull CommitteeApplicationCreated committeeApplicationCreated) {
         return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
                 customerIOProperties.getOnlyDustMarketingEmail(),

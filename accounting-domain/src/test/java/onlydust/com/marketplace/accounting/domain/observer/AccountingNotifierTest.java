@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -9,16 +12,18 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.accounting.domain.service.AccountingMailNotifier;
+import onlydust.com.marketplace.accounting.domain.service.AccountingNotifier;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -40,12 +45,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
-public class AccountingMailNotifierTest {
+public class AccountingNotifierTest {
     private BillingProfileStoragePort billingProfileStoragePort;
-    AccountingMailNotifier accountingMailNotifier;
+    AccountingNotifier accountingNotifier;
     OutboxPort mailOutbox;
     InvoiceStoragePort invoiceStoragePort;
     AccountingRewardStoragePort accountingRewardStoragePort;
+    NotificationPort notificationPort;
     final Faker faker = new Faker();
 
     @BeforeEach
@@ -54,7 +60,8 @@ public class AccountingMailNotifierTest {
         mailOutbox = mock(OutboxPort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
         invoiceStoragePort = mock(InvoiceStoragePort.class);
-        accountingMailNotifier = new AccountingMailNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, mailOutbox);
+        notificationPort = mock(NotificationPort.class);
+        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, mailOutbox, notificationPort);
     }
 
     @Nested
@@ -110,17 +117,14 @@ public class AccountingMailNotifierTest {
                     .thenReturn(Optional.of(rewardDetailsView));
 
             // When
-            accountingMailNotifier.onRewardCreated(rewardId, mock(AccountBookFacade.class));
+            accountingNotifier.onRewardCreated(rewardId, mock(AccountBookFacade.class));
 
             // Then
-            verify(mailOutbox).push(new RewardCreatedMailEvent(recipient.email(), rewardDetailsView.githubUrls().size(),
-                    requester.login(), recipient.login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(shortProjectView.name())
-                    .build(), recipient.userId().value()));
+            final var notificationPushCaptor = ArgumentCaptor.forClass(RewardReceived.class);
+            verify(notificationPort).push(eq(recipient.userId().value()), notificationPushCaptor.capture());
+            assertThat(notificationPushCaptor.getValue().contributionCount()).isEqualTo(1);
+            assertThat(notificationPushCaptor.getValue().sentByGithubLogin()).isEqualTo(requester.login());
+            assertThat(notificationPushCaptor.getValue().shortReward().getAmount()).isEqualTo(moneyView.amount());
         }
     }
 
@@ -154,7 +158,7 @@ public class AccountingMailNotifierTest {
                     .build();
             when(accountingRewardStoragePort.getShortReward(rewardId))
                     .thenReturn(Optional.of(rewardDetailsView));
-            accountingMailNotifier.onRewardCancelled(rewardId);
+            accountingNotifier.onRewardCancelled(rewardId);
 
             // Then
             verify(mailOutbox).push(new RewardCanceled(recipient.email(), recipient.login(), ShortReward.builder()
@@ -191,7 +195,7 @@ public class AccountingMailNotifierTest {
                             .recipient(recipient)
                             .requester(requester)
                             .build()));
-            accountingMailNotifier.onRewardCancelled(rewardId);
+            accountingNotifier.onRewardCancelled(rewardId);
 
             // Then
             verifyNoInteractions(mailOutbox);
@@ -249,7 +253,7 @@ public class AccountingMailNotifierTest {
                     .thenReturn(Optional.of(invoiceCreator));
 
             // When
-            accountingMailNotifier.onInvoiceRejected(invoice.id(), "Invalid invoice");
+            accountingNotifier.onInvoiceRejected(invoice.id(), "Invalid invoice");
 
             // Then
             final var rejectedArgumentCaptor = ArgumentCaptor.forClass(InvoiceRejected.class);
@@ -269,7 +273,7 @@ public class AccountingMailNotifierTest {
         @Test
         void should_not_send_notification_given_a_billing_profile_admin_not_found() {
             // When
-            assertThatThrownBy(() -> accountingMailNotifier.onInvoiceRejected(invoice.id(), "Invalid invoice"))
+            assertThatThrownBy(() -> accountingNotifier.onInvoiceRejected(invoice.id(), "Invalid invoice"))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id()));
@@ -298,7 +302,7 @@ public class AccountingMailNotifierTest {
                     .thenReturn(Optional.of(shortContributorView));
             when(billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId()))
                     .thenReturn(Optional.of(kyc));
-            accountingMailNotifier.onBillingProfileUpdated(billingProfileVerificationUpdated);
+            accountingNotifier.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
             verify(mailOutbox).push(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,

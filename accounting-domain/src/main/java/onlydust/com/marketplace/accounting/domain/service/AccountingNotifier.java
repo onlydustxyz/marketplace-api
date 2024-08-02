@@ -3,7 +3,10 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.events.*;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
+import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -11,9 +14,11 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import static java.util.Objects.isNull;
@@ -23,11 +28,12 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @Slf4j
 @AllArgsConstructor
-public class AccountingMailNotifier implements AccountingObserverPort, BillingProfileObserverPort {
+public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort {
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final OutboxPort accountingOutbox;
+    private final NotificationPort notificationPort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -41,20 +47,22 @@ public class AccountingMailNotifier implements AccountingObserverPort, BillingPr
 
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
-        final var rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
+        final var reward = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
-        if (nonNull(rewardDetailsView.recipient().email())) {
-            accountingOutbox.push(new RewardCreatedMailEvent(rewardDetailsView.recipient().email(),
-                    rewardDetailsView.githubUrls().size(), rewardDetailsView.requester().login(), rewardDetailsView.recipient().login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(rewardDetailsView.project().name())
-                    .build(), isNull(rewardDetailsView.recipient().userId()) ? null : rewardDetailsView.recipient().userId().value()));
-
+        if (nonNull(reward.recipient().email())) {
+            notificationPort.push(reward.recipient().userId().value(), RewardReceived.builder()
+                    .contributionCount(reward.githubUrls().size())
+                    .sentByGithubLogin(reward.requester().login())
+                    .shortReward(ShortReward.builder()
+                            .amount(reward.money().amount())
+                            .currencyCode(reward.money().currency().code().toString())
+                            .dollarsEquivalent(reward.money().getDollarsEquivalentValue())
+                            .id(rewardId)
+                            .projectName(reward.project().name())
+                            .build())
+                    .build());
         } else {
-            LOGGER.warn("Unable to send reward created email to contributor %s".formatted(rewardDetailsView.recipient().login()));
+            LOGGER.warn("Unable to send reward created email to contributor %s".formatted(reward.recipient().login()));
         }
     }
 
