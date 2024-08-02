@@ -137,6 +137,91 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/notifications:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get in-app notifications
+      operationId: getMyNotifications
+      description: |
+        Get in-app notifications
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/NotificationStatus'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Notifications'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Me
+      summary: Patch notifications status
+      operationId: patchMyNotificationsStatus
+      description: |
+        Patch notifications status
+      requestBody:
+        description: 'Notifications patches'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationsPatchRequest'
+      responses:
+        "204":
+          description: 'Notifications status updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/notifications/count:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get in-app notifications count
+      operationId: getMyNotificationsCount
+      description: |
+        Get in-app notifications count
+      parameters:
+        - in: query
+          name: status
+          schema:
+            $ref: '#/components/schemas/NotificationStatus'
+      responses:
+        "200":
+          description: 'Notifications Count'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationCountResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
   # This what we might have when we'll implement the new notifications:
   #  /api/v1/me/notification-settings:
   #    get:
@@ -4422,6 +4507,10 @@ components:
       description: OnlyDust ecosystem pretty ID that is computed from its name. This ID CAN change over time.
       example: zama
 
+    NotificationId:
+      type: string
+      format: uuid
+      description: Notification ID
 
     Money:
       type: object
@@ -8732,3 +8821,99 @@ components:
         - CHALLENGE
         - EARN
         - NOTORIETY
+
+    NotificationsPatchRequest:
+      type: object
+      properties:
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationPatchRequest'
+
+    NotificationPatchRequest:
+      type: object
+      required:
+        - id
+        - status
+      properties:
+        id:
+          $ref: '#/components/schemas/NotificationId'
+        status:
+          $ref: '#/components/schemas/NotificationStatus'
+
+    NotificationPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - notifications
+          properties:
+            notifications:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotificationPageItemResponse'
+
+    NotificationPageItemResponse:
+      type: object
+      required:
+        - id
+        - timestamp
+        - status
+        - type
+        - data
+      properties:
+        id:
+          $ref: '#/components/schemas/NotificationId'
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/NotificationStatus'
+        type:
+          $ref: '#/components/schemas/NotificationType'
+        data:
+          type: object
+          properties:
+            maintainerApplicationToReview:
+              $ref: '#/components/schemas/NotificationMaintainerApplicationToReview'
+            maintainerCommitteeApplicationCreated:
+              $ref: '#/components/schemas/NotificationMaintainerCommitteeApplicationCreated'
+
+    NotificationCountResponse:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+
+    NotificationStatus:
+      type: string
+      enum:
+        - UNREAD
+        - READ
+
+    NotificationType:
+      type: string
+      enum:
+        - MAINTAINER_APPLICATION_TO_REVIEW
+        - MAINTAINER_COMMITTEE_APPLICATION_CREATED
+
+    NotificationMaintainerApplicationToReview:
+      type: object
+      required:
+        - project
+        - applicant
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        applicant:
+          $ref: '#/components/schemas/ContributorResponse'
+
+    NotificationMaintainerCommitteeApplicationCreated:
+      type: object
+      required:
+        - committeeName
+      properties:
+        committeeName:
+          type: string
