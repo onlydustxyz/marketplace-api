@@ -67,6 +67,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
+        reset(notificationInstantEmailSender);
+        
         final var olivier = userAuthHelper.authenticateOlivier();
         olivierId = olivier.user().getId();
         olivierRecipient = new NotificationRecipient(NotificationRecipient.Id.of(olivierId), olivier.user().getEmail(), olivier.user().getGithubLogin());
