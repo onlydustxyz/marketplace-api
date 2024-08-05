@@ -222,6 +222,25 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/me/notifications/all:
+    patch:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Mark all unread in app notifications as read
+      operationId: markAllInAppNotificationsAsRead
+      description: |
+        Mark all unread in app notifications as read
+      responses:
+        "204":
+          description: 'All unread notificats has been marked as read'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # This what we might have when we'll implement the new notifications:
   #  /api/v1/me/notification-settings:
   #    get:
@@ -8878,6 +8897,18 @@ components:
               $ref: '#/components/schemas/NotificationMaintainerApplicationToReview'
             maintainerCommitteeApplicationCreated:
               $ref: '#/components/schemas/NotificationMaintainerCommitteeApplicationCreated'
+            contributorInvoiceRejected:
+              $ref: '#/components/schemas/NotificationContributorInvoiceRejected'
+            contributorRewardCanceled:
+              $ref: '#/components/schemas/NotificationContributorRewardCanceled'
+            contributorRewardReceived:
+              $ref: '#/components/schemas/NotificationContributorRewardReceived'
+            contributorRewardsPaid:
+              $ref: '#/components/schemas/NotificationContributorRewardsPaid'
+            contributorProjectApplicationAccepted:
+              $ref: '#/components/schemas/NotificationContributorProjectApplicationAccepted'
+            globalBillingProfileVerificationFailed:
+              $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationFailed'
 
     NotificationCountResponse:
       type: object
@@ -8898,6 +8929,12 @@ components:
       enum:
         - MAINTAINER_APPLICATION_TO_REVIEW
         - MAINTAINER_COMMITTEE_APPLICATION_CREATED
+        - CONTRIBUTOR_INVOICE_REJECTED
+        - CONTRIBUTOR_REWARD_CANCELED
+        - CONTRIBUTOR_REWARD_RECEIVED
+        - CONTRIBUTOR_REWARDS_PAID
+        - CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED
+        - GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED
 
     NotificationMaintainerApplicationToReview:
       type: object
@@ -8905,10 +8942,15 @@ components:
         - project
         - applicant
       properties:
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
-        applicant:
-          $ref: '#/components/schemas/ContributorResponse'
+        projectSlug:
+          $ref: '#/components/schemas/ProjectSlug'
+        projectName:
+          type: string
+        applicantId:
+          $ref: '#/components/schemas/GithubUserId'
+        issueId:
+          $ref: '#/components/schemas/IssueId'
+
 
     NotificationMaintainerCommitteeApplicationCreated:
       type: object
@@ -8917,3 +8959,102 @@ components:
       properties:
         committeeName:
           type: string
+
+    NotificationContributorInvoiceRejected:
+      type: object
+      required:
+        - invoiceName
+        - rejectionReason
+        - currencyCode
+        - totalAmountDollarsEquivalent
+        - billingProfileId
+        - billingProfileName
+      properties:
+        invoiceName:
+          type: string
+        rejectionReason:
+          type: string
+        currencyCode:
+          type: string
+        totalAmountDollarsEquivalent:
+          type: number
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+        billingProfileName:
+          type: string
+
+    NotificationContributorRewardCanceled:
+      type: object
+      required:
+        - rewardId
+        - projectName
+        - amount
+        - currencyCode
+      properties:
+        rewardId:
+          $ref: '#/components/schemas/RewardId'
+        projectName:
+          type: string
+        amount:
+          type: number
+        currencyCode:
+          type: string
+
+    NotificationContributorRewardReceived:
+      type: object
+      required:
+        - rewardId
+        - projectName
+        - amount
+        - currencyCode
+        - sentByGithubLogin
+        - contributionCount
+      properties:
+        rewardId:
+          $ref: '#/components/schemas/RewardId'
+        projectName:
+          type: string
+        amount:
+          type: number
+        currencyCode:
+          type: string
+        sentByGithubLogin:
+          type: string
+        contributionCount:
+          type: integer
+
+    NotificationContributorRewardsPaid:
+      type: object
+      required:
+        - numberOfRewardPaid
+        - totalAmountDollarsEquivalent
+      properties:
+        numberOfRewardPaid:
+          type: integer
+        totalAmountDollarsEquivalent:
+          type: number
+
+    NotificationContributorProjectApplicationAccepted:
+      type: object
+      required:
+        - projectSlug
+        - issueId
+      properties:
+        projectSlug:
+          type: string
+        issueId:
+          $ref: '#/components/schemas/IssueId'
+
+    NotificationGlobalBillingProfileVerificationFailed:
+      type: object
+      required:
+        - billingProfileId
+        - billingProfileName
+        - verificationStatus
+      properties:
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+        billingProfileName:
+          type: string
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'
