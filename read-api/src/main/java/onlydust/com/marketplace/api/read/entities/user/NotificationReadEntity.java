@@ -77,7 +77,6 @@ public class NotificationReadEntity {
             notificationPageItemResponseData.setMaintainerCommitteeApplicationCreated(new NotificationMaintainerCommitteeApplicationCreated()
                     .committeeName(committeeApplicationCreated.getCommitteeName())
             );
-            notificationType = NotificationType.COMMITTEE_APPLICATION_CREATED;
         } else if (data.notification() instanceof RewardReceived) {
 
         } else if (data.notification() instanceof RewardCanceled) {

@@ -9,6 +9,7 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationType;
 
 import java.util.List;
+import java.util.UUID;
 
 @Value
 @AllArgsConstructor
@@ -24,6 +25,8 @@ public class InvoiceRejected extends NotificationData {
     @NonNull
     List<ShortReward> rewards;
     String rejectionReason;
+    @NonNull
+    UUID billingProfileId;
 
     @Override
     public NotificationCategory category() {

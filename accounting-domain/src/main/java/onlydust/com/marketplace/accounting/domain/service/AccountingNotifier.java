@@ -96,6 +96,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                 .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
         notificationPort.push(billingProfileAdmin.userId().value(), InvoiceRejected.builder()
+                .billingProfileId(invoice.billingProfileSnapshot().id().value())
                 .invoiceName(invoice.number().value())
                 .rejectionReason(rejectionReason)
                 .rewards(invoice.rewards().stream()
