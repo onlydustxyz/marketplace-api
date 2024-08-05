@@ -4,14 +4,13 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -129,76 +128,85 @@ public class AccountingNotifierTest {
     }
 
     @Nested
-    class OnRewardCancelled {
+    class OnRewardCanceled {
         RewardId rewardId = RewardId.random();
 
         @Test
         public void should_cancel_reward() {
-            // When
-            final MoneyView moneyView = new MoneyView(BigDecimal.ONE, Currency.crypto("OP", Currency.Code.OP, 3));
-            final ProjectShortView shortProjectView = ProjectShortView.builder()
-                    .name(faker.name().fullName())
-                    .shortDescription(faker.rickAndMorty().character())
-                    .logoUrl(faker.internet().url())
-                    .id(ProjectId.random())
-                    .slug(faker.lorem().characters())
-                    .build();
-            final ShortContributorView recipient = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final ShortContributorView requester = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            final ShortRewardDetailsView rewardDetailsView = ShortRewardDetailsView.builder()
-                    .money(moneyView)
+            // Given
+            final var amount = BigDecimal.ONE;
+            final var recipientId = UserId.random();
+            final var projectName = faker.name().fullName();
+            final var reward = RewardDetailsView.builder()
+                    .money(new MoneyView(amount, Currency.crypto("OP", Currency.Code.OP, 3)))
                     .id(rewardId)
-                    .project(shortProjectView)
-                    .recipient(recipient)
-                    .requester(requester)
+                    .project(ProjectShortView.builder()
+                            .name(projectName)
+                            .shortDescription(faker.rickAndMorty().character())
+                            .logoUrl(faker.internet().url())
+                            .id(ProjectId.random())
+                            .slug(faker.lorem().characters())
+                            .build())
+                    .recipient(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                            faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                            recipientId, faker.internet().emailAddress()))
+                    .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                            faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                            UserId.random(), faker.internet().emailAddress()))
+                    .status(mock(RewardStatus.class))
+                    .requestedAt(ZonedDateTime.now())
+                    .githubUrls(List.of("https://github.com/onlydust/onlydust"))
+                    .sponsors(List.of())
                     .build();
-            when(accountingRewardStoragePort.getShortReward(rewardId))
-                    .thenReturn(Optional.of(rewardDetailsView));
+
+            when(accountingRewardStoragePort.getReward(rewardId)).thenReturn(Optional.of(reward));
+
+            // When
             accountingNotifier.onRewardCancelled(rewardId);
 
             // Then
-            verify(mailOutbox).push(new RewardCanceled(recipient.email(), recipient.login(), ShortReward.builder()
-                    .amount(rewardDetailsView.money().amount())
-                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                    .id(rewardId)
-                    .projectName(shortProjectView.name())
-                    .build(), recipient.userId().value()));
+            final var notificationCaptor = ArgumentCaptor.forClass(RewardCanceled.class);
+            verify(notificationPort).push(eq(recipientId.value()), notificationCaptor.capture());
+            final var notification = notificationCaptor.getValue();
+            assertThat(notification.shortReward().getId()).isEqualTo(rewardId);
+            assertThat(notification.shortReward().getProjectName()).isEqualTo(projectName);
+            assertThat(notification.shortReward().getAmount()).isEqualTo(amount);
+            assertThat(notification.shortReward().getCurrencyCode()).isEqualTo(Currency.Code.OP.toString());
+            assertThat(notification.shortReward().getDollarsEquivalent()).isNull();
         }
 
         @Test
         public void should_cancel_reward_and_not_notify_mail_given_a_recipient_not_signed_up() {
-            // When
-            final MoneyView moneyView = mock(MoneyView.class);
-            final ProjectShortView shortProjectView = ProjectShortView.builder()
-                    .name(faker.name().fullName())
-                    .shortDescription(faker.rickAndMorty().character())
-                    .logoUrl(faker.internet().url())
-                    .id(ProjectId.random())
-                    .slug(faker.lorem().characters())
+            // Given
+            final var reward = RewardDetailsView.builder()
+                    .money(mock(MoneyView.class))
+                    .id(rewardId)
+                    .project(ProjectShortView.builder()
+                            .name(faker.name().fullName())
+                            .shortDescription(faker.rickAndMorty().character())
+                            .logoUrl(faker.internet().url())
+                            .id(ProjectId.random())
+                            .slug(faker.lorem().characters())
+                            .build())
+                    .recipient(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                            faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                            UserId.random(), null))
+                    .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                            faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                            UserId.random(), faker.internet().emailAddress()))
+                    .status(mock(RewardStatus.class))
+                    .requestedAt(ZonedDateTime.now())
+                    .githubUrls(List.of("https://github.com/onlydust/onlydust"))
+                    .sponsors(List.of())
                     .build();
-            final ShortContributorView recipient = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), null);
-            final ShortContributorView requester = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
-                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.random(), faker.internet().emailAddress());
-            when(accountingRewardStoragePort.getShortReward(rewardId))
-                    .thenReturn(Optional.of(ShortRewardDetailsView.builder()
-                            .money(moneyView)
-                            .id(rewardId)
-                            .project(shortProjectView)
-                            .recipient(recipient)
-                            .requester(requester)
-                            .build()));
+
+            when(accountingRewardStoragePort.getReward(rewardId)).thenReturn(Optional.of(reward));
+
+            // When
             accountingNotifier.onRewardCancelled(rewardId);
 
             // Then
-            verifyNoInteractions(mailOutbox);
+            verifyNoInteractions(notificationPort);
         }
     }
 

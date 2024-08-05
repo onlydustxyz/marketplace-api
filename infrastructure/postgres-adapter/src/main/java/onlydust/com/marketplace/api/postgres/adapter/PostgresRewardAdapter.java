@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ShortRewardQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEarningsQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoRewardQueryEntity;
@@ -153,11 +152,6 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
     @Transactional(readOnly = true)
     public Optional<RewardDetailsView> getReward(RewardId id) {
         return backofficeRewardViewRepository.findAllByRewardIds(List.of(id.value())).stream().findFirst().map(BoRewardQueryEntity::toDomain);
-    }
-
-    @Override
-    public Optional<ShortRewardDetailsView> getShortReward(RewardId rewardId) {
-        return shortRewardViewRepository.findById(rewardId.value()).map(ShortRewardQueryEntity::toAccountingDomain);
     }
 
     @Override

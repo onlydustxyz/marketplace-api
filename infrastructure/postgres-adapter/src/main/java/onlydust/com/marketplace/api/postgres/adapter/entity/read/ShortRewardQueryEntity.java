@@ -6,11 +6,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.view.MoneyView;
-import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
-import onlydust.com.marketplace.accounting.domain.view.ShortRewardDetailsView;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
@@ -52,22 +47,6 @@ public class ShortRewardQueryEntity {
     @ManyToOne
     @NonNull
     CurrencyViewEntity currency;
-
-    public ShortRewardDetailsView toAccountingDomain() {
-        return ShortRewardDetailsView.builder()
-                .id(RewardId.of(this.id))
-                .project(ProjectShortView.builder()
-                        .id(ProjectId.of(this.projectId))
-                        .name(this.projectName)
-                        .logoUrl(this.projectLogoUrl)
-                        .shortDescription(this.projectShortDescription)
-                        .slug(this.projectSlug)
-                        .build())
-                .recipient(recipient.toDomain())
-                .requester(requester.toDomain())
-                .money(new MoneyView(this.amount, this.currency.toDomain()))
-                .build();
-    }
 
     public ShortProjectRewardView toProjectDomain() {
         return ShortProjectRewardView.builder()
