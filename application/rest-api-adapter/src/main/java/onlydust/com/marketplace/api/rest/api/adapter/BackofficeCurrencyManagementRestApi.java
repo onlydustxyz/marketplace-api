@@ -48,6 +48,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                     case ETHEREUM, OPTIMISM -> currencyFacadePort.addERC20Support(blockchain, Ethereum.contractAddress(request.getAddress()));
                     case STARKNET -> currencyFacadePort.addERC20Support(blockchain, StarkNet.contractAddress(request.getAddress()));
                     case APTOS -> currencyFacadePort.addERC20Support(blockchain, Aptos.coinType(request.getAddress()));
+                    case STELLAR -> throw new UnsupportedOperationException("Stellar is not supported yet");
                 };
             }
 

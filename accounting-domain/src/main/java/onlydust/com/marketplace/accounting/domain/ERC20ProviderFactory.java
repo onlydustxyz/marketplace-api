@@ -17,6 +17,7 @@ public class ERC20ProviderFactory {
             case OPTIMISM -> optimismProvider;
             case STARKNET -> starknetProvider;
             case APTOS -> aptosProvider;
+            case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
         };
     }
 }

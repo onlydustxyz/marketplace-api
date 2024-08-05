@@ -311,6 +311,7 @@ public interface BillingProfileMapper {
             case OPTIMISM -> NetworkContract.OPTIMISM;
             case STARKNET -> NetworkContract.STARKNET;
             case APTOS -> NetworkContract.APTOS;
+            case STELLAR -> NetworkContract.STELLAR;
             case SEPA -> NetworkContract.SEPA;
         };
     }

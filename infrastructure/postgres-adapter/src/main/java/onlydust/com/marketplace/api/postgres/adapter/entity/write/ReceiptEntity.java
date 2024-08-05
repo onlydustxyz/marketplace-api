@@ -64,6 +64,7 @@ public class ReceiptEntity {
                     case aptos -> Blockchain.APTOS;
                     case optimism -> Blockchain.OPTIMISM;
                     case starknet -> Blockchain.STARKNET;
+                    case stellar -> Blockchain.STELLAR;
                     default -> null;
                 })
                 .walletAddress(network == NetworkEnumEntity.sepa ? null : thirdPartyAccountNumber)

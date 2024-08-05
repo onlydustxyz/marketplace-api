@@ -61,6 +61,7 @@ public class ERC20Entity {
                     case ETHEREUM, OPTIMISM -> Ethereum.contractAddress(address);
                     case STARKNET -> StarkNet.contractAddress(address);
                     case APTOS -> Aptos.coinType(address);
+                    case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
                 },
                 name,
                 symbol,

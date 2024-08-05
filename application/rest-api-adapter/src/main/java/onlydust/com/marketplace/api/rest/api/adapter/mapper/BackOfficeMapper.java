@@ -492,6 +492,7 @@ public interface BackOfficeMapper {
             case STARKNET -> Blockchain.STARKNET;
             case OPTIMISM -> Blockchain.OPTIMISM;
             case APTOS -> Blockchain.APTOS;
+            case STELLAR -> Blockchain.STELLAR;
         };
     }
 
@@ -501,6 +502,7 @@ public interface BackOfficeMapper {
             case STARKNET -> BlockchainContract.STARKNET;
             case OPTIMISM -> BlockchainContract.OPTIMISM;
             case APTOS -> BlockchainContract.APTOS;
+            case STELLAR -> BlockchainContract.STELLAR;
         };
     }
 
@@ -563,6 +565,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> Network.OPTIMISM;
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
+            case STELLAR -> Network.STELLAR;
             case SEPA -> Network.SEPA;
         };
     }
@@ -573,6 +576,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> TransactionNetwork.OPTIMISM;
             case STARKNET -> TransactionNetwork.STARKNET;
             case APTOS -> TransactionNetwork.APTOS;
+            case STELLAR -> TransactionNetwork.STELLAR;
             case SEPA -> TransactionNetwork.SEPA;
         };
     }

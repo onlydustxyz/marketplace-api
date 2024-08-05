@@ -11,6 +11,7 @@ public interface NetworkMapper {
             case aptos -> TransactionNetwork.APTOS;
             case starknet -> TransactionNetwork.STARKNET;
             case optimism -> TransactionNetwork.OPTIMISM;
+            case stellar -> TransactionNetwork.STELLAR;
         };
     }
 }

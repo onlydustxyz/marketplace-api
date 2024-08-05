@@ -9,6 +9,7 @@ public enum Network {
     OPTIMISM(Currency.Type.CRYPTO, Blockchain.OPTIMISM),
     STARKNET(Currency.Type.CRYPTO, Blockchain.STARKNET),
     APTOS(Currency.Type.CRYPTO, Blockchain.APTOS),
+    STELLAR(Currency.Type.CRYPTO, Blockchain.STELLAR),
     SEPA(Currency.Type.FIAT, null);
 
     private final Currency.Type type;
@@ -36,6 +37,7 @@ public enum Network {
             case OPTIMISM -> Network.OPTIMISM;
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
+            case STELLAR -> Network.STELLAR;
         };
     }
 }

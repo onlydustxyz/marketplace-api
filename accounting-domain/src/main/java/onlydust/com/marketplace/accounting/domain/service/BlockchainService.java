@@ -26,6 +26,7 @@ public class BlockchainService implements BlockchainFacadePort {
             case OPTIMISM -> optimismTransactionStoragePort.get(Optimism.transactionHash(reference)).map(EvmTransaction::timestamp);
             case APTOS -> aptosTransactionStoragePort.get(Aptos.transactionHash(reference)).map(AptosTransaction::timestamp);
             case STARKNET -> starknetTransactionStoragePort.get(StarkNet.transactionHash(reference)).map(StarknetTransaction::timestamp);
+            case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
         }).orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(reference, blockchain)));
     }
 }

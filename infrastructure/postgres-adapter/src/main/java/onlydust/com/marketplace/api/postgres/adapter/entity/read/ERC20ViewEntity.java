@@ -2,7 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
@@ -46,6 +49,7 @@ public class ERC20ViewEntity {
                     case ETHEREUM, OPTIMISM -> Ethereum.contractAddress(address);
                     case STARKNET -> StarkNet.contractAddress(address);
                     case APTOS -> Aptos.coinType(address);
+                    case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
                 },
                 name,
                 symbol,

@@ -3205,6 +3205,7 @@ components:
         - OPTIMISM
         - STARKNET
         - APTOS
+        - STELLAR
 
     ProjectId:
       type: string
@@ -4400,6 +4401,7 @@ components:
         - OPTIMISM
         - STARKNET
         - APTOS
+        - STELLAR
 
     ContractAddress:
       type: string

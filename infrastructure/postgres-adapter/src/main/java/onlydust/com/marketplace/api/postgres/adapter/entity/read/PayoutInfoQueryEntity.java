@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
@@ -84,6 +83,9 @@ public class PayoutInfoQueryEntity {
                             .build();
                     case optimism -> payoutInfo = payoutInfo.toBuilder()
                             .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
+                            .build();
+                    case stellar -> payoutInfo = payoutInfo.toBuilder()
+//                            .stellarAddress(wallet.getAddress()) TODO
                             .build();
                 }
             }
