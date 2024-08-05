@@ -1,0 +1,1 @@
+ALTER TABLE iam.notification_channels ADD COLUMN read_at TIMESTAMP;

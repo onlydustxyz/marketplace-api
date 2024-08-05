@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEnt
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity.PrimaryKey;
 import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity;
@@ -18,9 +19,13 @@ import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
+import static onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity.isReadFromContract;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -53,6 +59,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final ProjectReadRepository projectReadRepository;
     private final ProjectCategoryReadRepository projectCategoryReadRepository;
     private final LanguageReadRepository languageReadRepository;
+    private final NotificationReadRepository notificationReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -177,5 +184,33 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                         .map(NotificationSettingsForProjectReadEntity::defaultDto)
                         .orElseThrow(() -> notFound("Project %s not found".formatted(projectId))));
         return ok(dto);
+    }
+
+    @Override
+    public ResponseEntity<NotificationPageResponse> getMyNotifications(Integer pageIndex, Integer pageSize, NotificationStatus status) {
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final Boolean isRead = isReadFromContract(status);
+        final Page<NotificationReadEntity> notificationReadEntityPage = notificationReadRepository.findAllInAppByStatusAndUserId(isRead, authenticatedUser.id(),
+                PageRequest.of(sanitizedPageIndex, sanitizePageSize, JpaSort.unsafe(Sort.Direction.DESC, "created_at")));
+        final NotificationPageResponse notificationPageResponse = new NotificationPageResponse();
+        notificationReadEntityPage.stream()
+                .map(NotificationReadEntity::toNotificationPageItemResponse)
+                .forEach(notificationPageResponse::addNotificationsItem);
+        notificationPageResponse.setHasMore(notificationReadEntityPage.hasNext());
+        notificationPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, notificationReadEntityPage.getTotalPages()));
+        notificationPageResponse.setTotalPageNumber(notificationReadEntityPage.getTotalPages());
+        notificationPageResponse.setTotalItemNumber(notificationReadEntityPage.getNumberOfElements());
+
+        return notificationPageResponse.getHasMore() ? ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(notificationPageResponse) :
+                ok(notificationPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<NotificationCountResponse> getMyNotificationsCount(NotificationStatus status) {
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final Boolean isRead = isReadFromContract(status);
+        return ResponseEntity.ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id())));
     }
 }
