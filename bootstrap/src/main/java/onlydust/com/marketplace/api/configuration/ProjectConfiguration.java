@@ -262,12 +262,14 @@ public class ProjectConfiguration {
                                                            final ProjectApplicationStoragePort projectApplicationStoragePort,
                                                            final ProjectStoragePort projectStoragePort,
                                                            final GithubStoragePort githubStoragePort,
-                                                           final UserStoragePort userStoragePort) {
+                                                           final UserStoragePort userStoragePort,
+                                                           final NotificationPort notificationPort) {
         return new ApplicationMailNotifier(projectMailOutbox,
                 projectApplicationStoragePort,
                 projectStoragePort,
                 githubStoragePort,
-                userStoragePort);
+                userStoragePort,
+                notificationPort);
     }
 
     @Bean

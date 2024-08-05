@@ -10,8 +10,8 @@ import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
-import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
@@ -113,14 +113,15 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 ProjectApplicationsToReviewByUserDTO.fromEvent(projectApplicationsToReviewByUser));
     }
 
-    public static MailDTO<ProjectApplicationAcceptedDTO> fromProjectApplicationAccepted(@NonNull CustomerIOProperties customerIOProperties,
-                                                                                        @NonNull ProjectApplicationAccepted projectApplicationAccepted) {
+    public static MailDTO<ProjectApplicationAcceptedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                              @NonNull SendableNotification notification,
+                                                              @NonNull ApplicationAccepted applicationAccepted) {
         return new MailDTO<>(customerIOProperties.getProjectApplicationAcceptedEmailId().toString(),
-                mapIdentifiers(projectApplicationAccepted.getEmail(), projectApplicationAccepted.getUserId()),
+                mapIdentifiers(notification.recipient().email(), notification.recipientId()),
                 customerIOProperties.getOnlyDustMarketingEmail(),
-                projectApplicationAccepted.getEmail(),
+                notification.recipient().email(),
                 "Your application has been accepted!",
-                ProjectApplicationAcceptedDTO.fromEvent(projectApplicationAccepted));
+                ProjectApplicationAcceptedDTO.fromEvent(notification.recipient().login(), applicationAccepted));
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {

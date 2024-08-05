@@ -1,7 +1,7 @@
 package com.onlydust.customer.io.adapter.dto;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 
 public record ProjectApplicationAcceptedDTO(@NonNull String username,
                                             @NonNull String projectName,
@@ -11,9 +11,9 @@ public record ProjectApplicationAcceptedDTO(@NonNull String username,
                                             @NonNull String issueTitle,
                                             String issueDescription) {
 
-    public static ProjectApplicationAcceptedDTO fromEvent(final ProjectApplicationAccepted event) {
+    public static ProjectApplicationAcceptedDTO fromEvent(String recipientLogin, final ApplicationAccepted event) {
         return new ProjectApplicationAcceptedDTO(
-                event.getUserLogin(),
+                recipientLogin,
                 event.getProject().name(),
                 event.getIssue().id(),
                 event.getIssue().htmlUrl(),

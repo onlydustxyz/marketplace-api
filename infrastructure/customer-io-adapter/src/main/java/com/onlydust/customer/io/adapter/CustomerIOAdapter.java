@@ -14,8 +14,8 @@ import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
@@ -35,8 +35,6 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
         } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
-        } else if (event instanceof ProjectApplicationAccepted projectApplicationAccepted) {
-            sendEmail(MailDTO.fromProjectApplicationAccepted(customerIOProperties, projectApplicationAccepted));
         } else {
             LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
         }
@@ -59,6 +57,8 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardsPaid));
         } else if (notification.data() instanceof InvoiceRejected invoiceRejected) {
             sendEmail(MailDTO.from(customerIOProperties, notification, invoiceRejected));
+        } else if (notification.data() instanceof ApplicationAccepted applicationAccepted) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, applicationAccepted));
         }
     }
 }
