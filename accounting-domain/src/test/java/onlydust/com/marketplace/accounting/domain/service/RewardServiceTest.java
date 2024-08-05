@@ -1,20 +1,20 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -33,13 +33,13 @@ public class RewardServiceTest {
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
-    private final OutboxConsumer mailOutboxConsumer = mock(OutboxConsumer.class);
-    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, mailOutboxConsumer);
+    private final NotificationPort notificationPort = mock(NotificationPort.class);
+    private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, notificationPort);
 
 
     @BeforeEach
     void setUp() {
-        reset(accountingRewardStoragePort, mailOutboxConsumer);
+        reset(accountingRewardStoragePort, notificationPort);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class RewardServiceTest {
                 UserId.random(), faker.internet().emailAddress());
         final ShortContributorView recipient2 = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
                 faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                null, faker.internet().emailAddress());
+                UserId.random(), faker.internet().emailAddress());
         final var r11 = generateRewardStubForCurrencyAndEmail(Currencies.USD, recipient1);
         final var r21 = generateRewardStubForCurrencyAndEmail(Currencies.STRK, recipient2);
         final var r12 = generateRewardStubForCurrencyAndEmail(Currencies.OP, recipient1);
@@ -68,22 +68,22 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(mailOutboxConsumer, times(1)).process(new RewardsPaid(recipient1.email(), recipient1.login(), recipient1.userId().value(),
+        verify(notificationPort).push(recipient1.userId().value(), RewardsPaid.builder().shortRewards(
                 Stream.of(r11, r12).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
                         .projectName(rewardDetailsView.project().name())
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                        .build()).toList()));
-        verify(mailOutboxConsumer, times(1)).process(new RewardsPaid(recipient2.email(), recipient2.login(), null,
+                        .build()).toList()).build());
+        verify(notificationPort).push(recipient2.userId().value(), RewardsPaid.builder().shortRewards(
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
                         .projectName(rewardDetailsView.project().name())
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                        .build()).toList()));
+                        .build()).toList()).build());
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
 

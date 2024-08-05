@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
@@ -9,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
@@ -18,7 +18,7 @@ import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +34,7 @@ public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final AccountingFacadePort accountingFacadePort;
     private final SponsorStoragePort sponsorStoragePort;
-    private final OutboxConsumer mailOutboxConsumer;
+    private final NotificationPort notificationPort;
 
     @Override
     public EarningsView getEarnings(List<RewardStatus.Input> statuses,
@@ -72,22 +72,23 @@ public class RewardService implements AccountingRewardPort {
     @Override
     public void notifyAllNewPaidRewards() {
         final var rewardViews = accountingRewardStoragePort.findPaidRewardsToNotify();
-        for (final var listOfPaidRewardsMapToAdminEmail :
-                rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
+        for (final var listOfPaidRewardsMapToAdminEmail : rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
             final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
 
-            mailOutboxConsumer.process(new RewardsPaid(listOfPaidRewardsMapToAdminEmail.getKey(), recipient.login(), isNull(recipient.userId()) ? null :
-                    recipient.userId().value(),
-                    listOfPaidRewardsMapToAdminEmail.getValue().stream()
-                            .map(rewardDetailsView -> ShortReward.builder().
-                                    id(rewardDetailsView.id())
-                                    .amount(rewardDetailsView.money().amount())
-                                    .projectName(rewardDetailsView.project().name())
-                                    .currencyCode(rewardDetailsView.money().currency().code().toString())
-                                    .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
-                                    .build()).toList()
-            ));
+            notificationPort.push(recipient.userId().value(),
+                    RewardsPaid.builder()
+                            .shortRewards(listOfPaidRewardsMapToAdminEmail.getValue().stream()
+                                    .map(rewardDetailsView -> ShortReward.builder().
+                                            id(rewardDetailsView.id())
+                                            .amount(rewardDetailsView.money().amount())
+                                            .projectName(rewardDetailsView.project().name())
+                                            .currencyCode(rewardDetailsView.money().currency().code().toString())
+                                            .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                                            .build()).toList()
+                            ).build()
+            );
         }
+        
         accountingRewardStoragePort.markRewardsAsPaymentNotified(rewardViews.stream()
                 .map(RewardDetailsView::id)
                 .toList());

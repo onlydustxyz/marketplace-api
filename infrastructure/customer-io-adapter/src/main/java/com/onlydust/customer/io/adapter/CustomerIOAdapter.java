@@ -9,9 +9,9 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.events.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationAccepted;
@@ -35,8 +35,6 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
             sendEmail(MailDTO.fromInvoiceRejected(customerIOProperties, invoiceRejected));
         } else if (event instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
-        } else if (event instanceof RewardsPaid rewardsPaid) {
-            sendEmail(MailDTO.fromRewardsPaid(customerIOProperties, rewardsPaid));
         } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else if (event instanceof ProjectApplicationAccepted projectApplicationAccepted) {
@@ -59,6 +57,8 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardReceived));
         } else if (notification.data() instanceof RewardCanceled rewardCanceled) {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardCanceled));
+        } else if (notification.data() instanceof RewardsPaid rewardsPaid) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, rewardsPaid));
         }
     }
 }
