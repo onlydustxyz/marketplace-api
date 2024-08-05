@@ -30,11 +30,9 @@ public class JobScheduler {
     private final GlobalConfig globalConfig;
     private final OutboxConsumerJob billingProfileVerificationOutboxJob;
     private final RewardStatusService rewardStatusService;
-    private final OutboxConsumerJob accountingMailOutboxJob;
     private final BoostNodeGuardiansRewardsPort boostNodeGuardiansRewardsPort;
     private final NodeGuardiansBoostProperties nodeGuardiansBoostProperties;
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
-    private final OutboxConsumerJob projectMailOutboxJob;
     private final LanguageFacadePort languageFacadePort;
     private final ApplicationsCleaner applicationsCleaner;
 
@@ -90,13 +88,6 @@ public class JobScheduler {
     public void refreshRewardUsdEquivalents() {
         LOGGER.info("Refreshing reward USD equivalents");
         rewardStatusService.refreshRewardsUsdEquivalents();
-    }
-
-    @Scheduled(fixedDelayString = "${application.cron.send-emails}")
-    public void sendEmails() {
-        LOGGER.info("Sending emails");
-        accountingMailOutboxJob.run();
-        projectMailOutboxJob.run();
     }
 
     @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")

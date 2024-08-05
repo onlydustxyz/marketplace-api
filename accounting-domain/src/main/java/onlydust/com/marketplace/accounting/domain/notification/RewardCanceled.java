@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.notification;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationType;

@@ -2,8 +2,8 @@ package com.onlydust.customer.io.adapter.dto;
 
 import lombok.Builder;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

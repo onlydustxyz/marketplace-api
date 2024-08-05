@@ -7,6 +7,8 @@ import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -32,8 +34,8 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
 
         projectStoragePort.getProjectLeadIds(application.projectId())
                 .forEach(projectLeadId -> notificationPort.push(projectLeadId, ApplicationToReview.builder()
-                        .project(new ApplicationToReview.Project(project.getId(), project.getSlug(), project.getName()))
-                        .issue(new ApplicationToReview.Issue(issue.id().value(), issue.htmlUrl(), issue.title(), issue.repoName(), issue.description()))
+                        .project(NotificationProject.of(project))
+                        .issue(NotificationIssue.of(issue))
                         .build()));
     }
 
@@ -45,8 +47,8 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
             final var issue = githubStoragePort.findIssueById(application.issueId())
                     .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
             notificationPort.push(applicant.id(), ApplicationAccepted.builder()
-                    .project(new ApplicationAccepted.Project(project.getId(), project.getSlug(), project.getName()))
-                    .issue(new ApplicationAccepted.Issue(issue.id().value(), issue.htmlUrl(), issue.title(), issue.repoName(), issue.description()))
+                    .project(NotificationProject.of(project))
+                    .issue(NotificationIssue.of(issue))
                     .build());
         });
     }

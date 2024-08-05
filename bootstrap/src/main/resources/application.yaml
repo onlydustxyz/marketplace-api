@@ -29,7 +29,6 @@ application:
     billing-profile-verification-job: 5000 # 15 seconds
     update-projects-tags: 7200000 # 2 hours
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
-    send-emails: 60000 # 1 minute
     refresh-user-ranks: 300000 # 5 minutes
     historize-user-ranks-cron-expression: "0 0 0 * * *" # every day at midnight
     process-boosted-rewards-cron-expression: ${NODE_GUARDIANS_PROCESS_BOOSTED_REWARDS_CRON_EXPRESSION}
