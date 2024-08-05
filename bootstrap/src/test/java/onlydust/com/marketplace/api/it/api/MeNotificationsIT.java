@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -155,7 +155,6 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                         """);
 
 
-
         // When
         client.get()
                 .uri(getApiURI(ME_NOTIFICATIONS_COUNT))
@@ -200,8 +199,6 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                               "count": 0
                             }
                         """);
-
-
 
 
     }

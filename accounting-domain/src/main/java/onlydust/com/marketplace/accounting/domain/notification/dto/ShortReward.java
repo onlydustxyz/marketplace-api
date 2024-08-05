@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.accounting.domain.events.dto;
+package onlydust.com.marketplace.accounting.domain.notification.dto;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Builder;
@@ -6,6 +6,7 @@ import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 
 import java.math.BigDecimal;
+
 @Data
 @Builder
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
