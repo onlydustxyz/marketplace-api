@@ -67,9 +67,8 @@ public class AccountingConfiguration {
     public AccountingNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                      final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull OutboxPort accountingMailOutbox,
                                                      final @NonNull NotificationPort notificationPort) {
-        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, accountingMailOutbox, notificationPort);
+        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort);
     }
 
     @Bean

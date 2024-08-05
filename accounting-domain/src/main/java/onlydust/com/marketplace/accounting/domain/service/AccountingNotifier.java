@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -12,14 +11,13 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -31,18 +29,15 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
-    private final OutboxPort accountingOutbox;
     private final NotificationPort notificationPort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
-
     }
 
     @Override
     public void onSponsorAccountUpdated(SponsorAccountStatement sponsorAccount) {
     }
-
 
     @Override
     public void onRewardCreated(RewardId rewardId, AccountBookFacade accountBookFacade) {
@@ -118,12 +113,15 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
         if (event.failed()) {
-            final ShortContributorView owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
+            final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
                     .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
                             .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+
             if (nonNull(owner.email())) {
-                accountingOutbox.push(new BillingProfileVerificationFailed(owner.email(), owner.userId(), event.getBillingProfileId(), owner.login(),
-                        event.getVerificationStatus()));
+                notificationPort.push(owner.userId().value(), BillingProfileVerificationFailed.builder()
+                        .billingProfileId(event.getBillingProfileId())
+                        .verificationStatus(event.getVerificationStatus())
+                        .build());
             } else {
                 LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));
             }

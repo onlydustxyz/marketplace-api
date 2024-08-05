@@ -7,11 +7,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
-import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
-import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
@@ -31,9 +27,7 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
     @Override
     public void process(@NonNull Event event) {
-        if (event instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
-            sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
-        } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
+        if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
         } else {
             LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
@@ -47,7 +41,9 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
     @Override
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public void send(SendableNotification notification) {
-        if (notification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
+        if (notification.data() instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationFailed));
+        } else if (notification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
             sendEmail(MailDTO.from(customerIOProperties, notification, committeeApplicationCreated));
         } else if (notification.data() instanceof RewardReceived rewardReceived) {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardReceived));
