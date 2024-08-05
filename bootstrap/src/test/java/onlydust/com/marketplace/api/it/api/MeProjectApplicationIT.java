@@ -347,7 +347,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_approve_an_application_as_project_lead() {
+    void should_approve_an_application_as_project_lead() throws InterruptedException {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
         final var projectLead = userAuthHelper.authenticateGregoire();
@@ -427,7 +427,8 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/380954304/issues/6/assignees")));
 
-        projectMailOutboxJob.run();
+        Thread.sleep(1000);
+
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))

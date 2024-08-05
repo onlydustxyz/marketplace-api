@@ -1,8 +1,9 @@
-package onlydust.com.marketplace.project.domain.model.event;
+package onlydust.com.marketplace.project.domain.model.notification;
 
 import lombok.*;
-import onlydust.com.marketplace.kernel.model.Event;
-import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
+import onlydust.com.marketplace.kernel.model.notification.NotificationData;
+import onlydust.com.marketplace.kernel.model.notification.NotificationType;
 
 import java.util.UUID;
 
@@ -10,15 +11,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@EventType("ProjectApplicationAccepted")
+@NotificationType("ApplicationAccepted")
 @Builder
-public class ProjectApplicationAccepted extends Event {
-    @NonNull
-    UUID userId;
-    @NonNull
-    String email;
-    @NonNull
-    String userLogin;
+public class ApplicationAccepted extends NotificationData {
     @NonNull
     Project project;
     @NonNull
@@ -34,5 +29,10 @@ public class ProjectApplicationAccepted extends Event {
                         @NonNull String title,
                         @NonNull String repoName,
                         String description) {
+    }
+
+    @Override
+    public NotificationCategory category() {
+        return NotificationCategory.CONTRIBUTOR_PROJECT;
     }
 }
