@@ -5,7 +5,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
@@ -13,6 +12,7 @@ import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -100,12 +100,10 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
                 .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
-        accountingOutbox.push(new InvoiceRejected(billingProfileAdmin.email(),
-                (long) invoice.rewards().size(), billingProfileAdmin.login(),
-                billingProfileAdmin.firstName(),
-                billingProfileAdmin.userId().value(),
-                invoice.number().value(),
-                invoice.rewards().stream()
+        notificationPort.push(billingProfileAdmin.userId().value(), InvoiceRejected.builder()
+                .invoiceName(invoice.number().value())
+                .rejectionReason(rejectionReason)
+                .rewards(invoice.rewards().stream()
                         .map(reward -> ShortReward.builder()
                                 .id(reward.id())
                                 .amount(reward.amount().getValue())
@@ -113,8 +111,8 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                                 .projectName(reward.projectName())
                                 .dollarsEquivalent(reward.target().getValue())
                                 .build()
-                        ).toList(),
-                rejectionReason));
+                        ).toList())
+                .build());
     }
 
     @Override

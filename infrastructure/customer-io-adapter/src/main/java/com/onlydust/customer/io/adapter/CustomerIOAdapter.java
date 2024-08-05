@@ -8,7 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
+import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
@@ -31,9 +31,7 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
     @Override
     public void process(@NonNull Event event) {
-        if (event instanceof InvoiceRejected invoiceRejected) {
-            sendEmail(MailDTO.fromInvoiceRejected(customerIOProperties, invoiceRejected));
-        } else if (event instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
+        if (event instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
             sendEmail(MailDTO.fromVerificationFailed(customerIOProperties, billingProfileVerificationFailed));
         } else if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
             sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
@@ -59,6 +57,8 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardCanceled));
         } else if (notification.data() instanceof RewardsPaid rewardsPaid) {
             sendEmail(MailDTO.from(customerIOProperties, notification, rewardsPaid));
+        } else if (notification.data() instanceof InvoiceRejected invoiceRejected) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, invoiceRejected));
         }
     }
 }

@@ -11,17 +11,15 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
-import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.project.domain.service.UserService;
-import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -58,8 +56,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     KybRepository kybRepository;
     @Autowired
     UserProfileInfoRepository userProfileInfoRepository;
-    @Autowired
-    OutboxConsumerJob accountingMailOutboxJob;
 
     private final Faker faker = new Faker();
 
@@ -168,7 +164,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(1)
     void should_list_invoices() throws IOException {
         setUp();
-        final String jwt = userAuthHelper.authenticateBackofficeUser("pierre.oucif@gadz.org", List.of(BackofficeUser.Role.BO_READER)).jwt();
 
         // When
         client
@@ -532,7 +527,8 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .isNoContent()
         ;
 
-        accountingMailOutboxJob.run();
+        Thread.sleep(1000);
+        
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
