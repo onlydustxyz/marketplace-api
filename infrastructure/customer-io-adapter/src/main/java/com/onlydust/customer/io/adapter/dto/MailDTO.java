@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.notification.*;
-import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
@@ -99,16 +98,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 notification.recipient().email(),
                 "Your application to committee %s".formatted(committeeApplicationCreated.getCommitteeName()),
                 NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationCreated));
-    }
-
-    public static MailDTO<ProjectApplicationsToReviewByUserDTO> fromProjectApplicationsToReviewByUser(@NonNull CustomerIOProperties customerIOProperties,
-                                                                                                      @NonNull ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
-        return new MailDTO<>(customerIOProperties.getProjectApplicationsToReviewByUserEmailId().toString(),
-                mapIdentifiers(projectApplicationsToReviewByUser.getEmail(), projectApplicationsToReviewByUser.getUserId()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
-                projectApplicationsToReviewByUser.getEmail(),
-                "Applications to review daily report",
-                ProjectApplicationsToReviewByUserDTO.fromEvent(projectApplicationsToReviewByUser));
     }
 
     public static MailDTO<ProjectApplicationAcceptedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
