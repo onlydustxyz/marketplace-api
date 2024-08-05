@@ -4,12 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.Builder;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
-import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
-import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -46,15 +42,17 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected));
     }
 
-    public static MailDTO<VerificationFailedDTO> fromVerificationFailed(
+    public static MailDTO<VerificationFailedDTO> from(
             @NonNull CustomerIOProperties customerIOProperties,
+            @NonNull SendableNotification notification,
             @NonNull BillingProfileVerificationFailed billingProfileVerificationFailed
     ) {
         return new MailDTO<>(customerIOProperties.getVerificationFailedEmailId().toString(),
-                new IdentifiersDTO(billingProfileVerificationFailed.ownerId().value().toString(), null),
-                customerIOProperties.getOnlyDustAdminEmail(), billingProfileVerificationFailed.ownerEmail(),
+                new IdentifiersDTO(notification.recipientId().toString(), null),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
                 "Your verification failed with status %s".formatted(billingProfileVerificationFailed.verificationStatus().name()),
-                VerificationFailedDTO.fromEvent(billingProfileVerificationFailed));
+                VerificationFailedDTO.fromEvent(notification.recipient().login(), billingProfileVerificationFailed));
     }
 
     public static MailDTO<RewardCreatedDTO> from(@NonNull CustomerIOProperties customerIOProperties,

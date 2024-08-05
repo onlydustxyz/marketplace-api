@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.observer;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
@@ -9,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
@@ -23,7 +23,6 @@ import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,6 @@ import static org.mockito.Mockito.*;
 public class AccountingNotifierTest {
     private BillingProfileStoragePort billingProfileStoragePort;
     AccountingNotifier accountingNotifier;
-    OutboxPort mailOutbox;
     InvoiceStoragePort invoiceStoragePort;
     AccountingRewardStoragePort accountingRewardStoragePort;
     NotificationPort notificationPort;
@@ -56,11 +54,10 @@ public class AccountingNotifierTest {
     @BeforeEach
     void setUp() {
         billingProfileStoragePort = mock(BillingProfileStoragePort.class);
-        mailOutbox = mock(OutboxPort.class);
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
         invoiceStoragePort = mock(InvoiceStoragePort.class);
         notificationPort = mock(NotificationPort.class);
-        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, mailOutbox, notificationPort);
+        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort);
     }
 
     @Nested
@@ -308,9 +305,10 @@ public class AccountingNotifierTest {
             accountingNotifier.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(mailOutbox).push(new BillingProfileVerificationFailed(shortContributorView.email(), UserId.of(userId), billingProfileId,
-                    shortContributorView.login(),
-                    billingProfileVerificationUpdated.getVerificationStatus()));
+            verify(notificationPort).push(userId, BillingProfileVerificationFailed.builder()
+                    .billingProfileId(billingProfileId)
+                    .verificationStatus(billingProfileVerificationUpdated.getVerificationStatus())
+                    .build());
         }
     }
 }
