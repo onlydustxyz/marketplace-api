@@ -52,10 +52,10 @@ public class PayoutInfoEntity {
     public PayoutInfo toDomain() {
         return PayoutInfo.builder()
                 .bankAccount(nonNull(bankAccount) ? bankAccount.toDomain() : null)
-                .ethWallet(wallet(NetworkEnumEntity.ethereum).map(WalletEntity::ethereum).orElse(null))
-                .optimismAddress(wallet(NetworkEnumEntity.optimism).map(WalletEntity::optimism).orElse(null))
-                .aptosAddress(wallet(NetworkEnumEntity.aptos).map(WalletEntity::aptos).orElse(null))
-                .starknetAddress(wallet(NetworkEnumEntity.starknet).map(WalletEntity::starknet).orElse(null))
+                .ethWallet(wallet(NetworkEnumEntity.ETHEREUM).map(WalletEntity::ethereum).orElse(null))
+                .optimismAddress(wallet(NetworkEnumEntity.OPTIMISM).map(WalletEntity::optimism).orElse(null))
+                .aptosAddress(wallet(NetworkEnumEntity.APTOS).map(WalletEntity::aptos).orElse(null))
+                .starknetAddress(wallet(NetworkEnumEntity.STARKNET).map(WalletEntity::starknet).orElse(null))
                 .build();
     }
 

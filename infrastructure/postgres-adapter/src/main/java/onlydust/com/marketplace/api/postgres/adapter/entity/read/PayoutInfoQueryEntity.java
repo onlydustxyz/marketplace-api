@@ -65,7 +65,7 @@ public class PayoutInfoQueryEntity {
         if (!this.getWallets().isEmpty()) {
             for (final var wallet : this.getWallets()) {
                 switch (wallet.getNetwork()) {
-                    case ethereum -> {
+                    case ETHEREUM -> {
                         payoutInfo = switch (wallet.getType()) {
                             case address -> payoutInfo.toBuilder()
                                     .ethWallet(new WalletLocator(Ethereum.accountAddress(wallet.getAddress())))
@@ -75,16 +75,16 @@ public class PayoutInfoQueryEntity {
                                     .build();
                         };
                     }
-                    case aptos -> payoutInfo = payoutInfo.toBuilder()
+                    case APTOS -> payoutInfo = payoutInfo.toBuilder()
                             .aptosAddress(Aptos.accountAddress(wallet.getAddress()))
                             .build();
-                    case starknet -> payoutInfo = payoutInfo.toBuilder()
+                    case STARKNET -> payoutInfo = payoutInfo.toBuilder()
                             .starknetAddress(StarkNet.accountAddress(wallet.getAddress()))
                             .build();
-                    case optimism -> payoutInfo = payoutInfo.toBuilder()
+                    case OPTIMISM -> payoutInfo = payoutInfo.toBuilder()
                             .optimismAddress(Optimism.accountAddress(wallet.getAddress()))
                             .build();
-                    case stellar -> payoutInfo = payoutInfo.toBuilder()
+                    case STELLAR -> payoutInfo = payoutInfo.toBuilder()
 //                            .stellarAddress(wallet.getAddress()) TODO
                             .build();
                 }
