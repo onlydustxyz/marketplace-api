@@ -70,7 +70,4 @@ public interface BillingProfileFacadePort {
 
     // TODO: move to read-api
     List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
-
-    // TODO: move to read-api
-    BillingProfileView getById(BillingProfile.Id id);
 }

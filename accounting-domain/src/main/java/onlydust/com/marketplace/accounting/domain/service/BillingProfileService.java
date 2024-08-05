@@ -406,10 +406,4 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         return billingProfileStoragePort.findInvoiceableRewardsForBillingProfile(billingProfileId);
     }
-
-    @Override
-    public BillingProfileView getById(BillingProfile.Id id) {
-        return billingProfileStoragePort.findViewById(id)
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(id)));
-    }
 }

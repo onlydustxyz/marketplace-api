@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.UserLinkResponse;
 import onlydust.com.backoffice.api.contract.model.UserPageItemResponse;
+import onlydust.com.backoffice.api.contract.model.UserResponse;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
@@ -18,6 +19,7 @@ import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.net.URI;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -252,5 +254,14 @@ public class AllUserReadEntity {
                 .preferredCategories(preferredCategories.stream().map(ProjectCategoryReadEntity::toDto).toList())
                 .preferredLanguages(preferredLanguages.stream().map(LanguageReadEntity::toDto).toList())
                 .contactEmail(profile().map(UserProfileInfoReadEntity::contactEmail).orElse(email));
+    }
+
+    public UserResponse toBoResponse() {
+        return new UserResponse()
+                .id(userId)
+                .githubUserId(githubUserId)
+                .githubLogin(login)
+                .githubAvatarUrl(URI.create(avatarUrl))
+                .email(email);
     }
 }

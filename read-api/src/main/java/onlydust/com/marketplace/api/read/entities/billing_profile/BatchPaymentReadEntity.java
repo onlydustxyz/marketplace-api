@@ -10,6 +10,7 @@ import onlydust.com.backoffice.api.contract.model.BatchPaymentStatus;
 import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
+import onlydust.com.marketplace.api.read.utils.Arithmetic;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -67,15 +68,8 @@ public class BatchPaymentReadEntity {
         return rewards.stream()
                 .collect(groupingBy(r -> r.currency().id(),
                         mapping(RewardReadEntity::toTotalMoneyWithUsdEquivalentResponse,
-                                reducing(null, this::sum))))
+                                reducing(null, Arithmetic::sum))))
                 .values().stream().toList();
-    }
-
-    private TotalMoneyWithUsdEquivalentResponse sum(final TotalMoneyWithUsdEquivalentResponse left, @NonNull final TotalMoneyWithUsdEquivalentResponse right) {
-        return left == null ? right : new TotalMoneyWithUsdEquivalentResponse()
-                .currency(left.getCurrency())
-                .amount(left.getAmount().add(right.getAmount()))
-                .dollarsEquivalent(left.getDollarsEquivalent().add(right.getDollarsEquivalent()));
     }
 
     public BigDecimal totalUsdEquivalentAfterTax() {
