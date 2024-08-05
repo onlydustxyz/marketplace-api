@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.project.domain.model.event.ProjectApplicationsToReviewByUser;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
@@ -27,11 +26,7 @@ public class CustomerIOAdapter implements OutboxConsumer, NotificationSender {
 
     @Override
     public void process(@NonNull Event event) {
-        if (event instanceof ProjectApplicationsToReviewByUser projectApplicationsToReviewByUser) {
-            sendEmail(MailDTO.fromProjectApplicationsToReviewByUser(customerIOProperties, projectApplicationsToReviewByUser));
-        } else {
-            LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
-        }
+        LOGGER.warn("Event type {} not handle by CustomerIO to send mail", event.getClass());
     }
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
