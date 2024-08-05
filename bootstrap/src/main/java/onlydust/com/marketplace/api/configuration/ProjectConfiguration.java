@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.configuration;
 
-import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.ERC20ProviderFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -16,7 +15,6 @@ import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageA
 import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectMailEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
@@ -396,17 +394,6 @@ public class ProjectConfiguration {
                                                        final ProjectStoragePort projectStoragePort,
                                                        final CommitteeStoragePort committeeStoragePort) {
         return new ProjectNotifier(notificationPort, projectStoragePort, committeeStoragePort);
-    }
-
-    @Bean
-    public OutboxConsumerJob projectMailOutboxJob(final PostgresOutboxAdapter<ProjectMailEventEntity> projectMailOutbox,
-                                                  final OutboxConsumer projectMailOutboxConsumer) {
-        return new OutboxConsumerJob(projectMailOutbox, projectMailOutboxConsumer);
-    }
-
-    @Bean
-    public OutboxConsumer projectMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
-        return new RetriedOutboxConsumer(customerIOAdapter);
     }
 
     @Bean

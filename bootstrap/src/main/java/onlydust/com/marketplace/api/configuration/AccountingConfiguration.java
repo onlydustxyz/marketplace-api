@@ -1,6 +1,5 @@
 package onlydust.com.marketplace.api.configuration;
 
-import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
@@ -11,11 +10,8 @@ import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccoun
 import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.PostgresOutboxAdapter;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountingMailEventEntity;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
-import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -147,17 +143,6 @@ public class AccountingConfiguration {
     @Bean
     public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort, final ImageStoragePort imageStoragePort) {
         return new SponsorService(sponsorStoragePort, imageStoragePort);
-    }
-
-    @Bean
-    public OutboxConsumerJob accountingMailOutboxJob(final PostgresOutboxAdapter<AccountingMailEventEntity> accountingMailOutbox,
-                                                     final OutboxConsumer accountingMailOutboxConsumer) {
-        return new OutboxConsumerJob(accountingMailOutbox, accountingMailOutboxConsumer);
-    }
-
-    @Bean
-    public OutboxConsumer accountingMailOutboxConsumer(final CustomerIOAdapter customerIOAdapter) {
-        return new RetriedOutboxConsumer(customerIOAdapter);
     }
 
     @Bean

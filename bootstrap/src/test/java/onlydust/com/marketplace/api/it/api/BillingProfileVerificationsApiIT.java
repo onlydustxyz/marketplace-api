@@ -230,7 +230,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
         Mockito.verify(slackApiAdapter, times(2)).onBillingProfileUpdated(Mockito.any());
 
-        accountingMailOutboxJob.run();
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
