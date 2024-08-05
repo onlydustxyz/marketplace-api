@@ -154,6 +154,10 @@ public class BillingProfileReadEntity {
         return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
     }
 
+    private boolean isSwitchableToSelfEmployed() {
+        return type == BillingProfileType.COMPANY && this.users.size() == 1;
+    }
+
     public BillingProfileLinkResponse toBoLinkResponse() {
         return new BillingProfileLinkResponse()
                 .id(id)
@@ -184,4 +188,81 @@ public class BillingProfileReadEntity {
                 .payoutInfos(payoutInfo == null ? null : payoutInfo.toBoResponse())
                 ;
     }
+
+    public onlydust.com.marketplace.api.contract.model.BillingProfileResponse toResponse() {
+        return new onlydust.com.marketplace.api.contract.model.BillingProfileResponse()
+                .id(id)
+                .name(name)
+                .type(map(type))
+                .kyb(kyb == null ? null : kyb.toResponse())
+                .kyc(kyc == null ? null : kyc.toResponse())
+                .status(map(verificationStatus))
+                .enabled(enabled)
+                .currentYearPaymentLimit(stats.currentYearPaymentLimit)
+                .currentYearPaymentAmount(stats.currentYearPaymentAmount)
+                .invoiceMandateAccepted(isInvoiceMandateAccepted())
+                .rewardCount(stats.rewardCount())
+                .invoiceableRewardCount(stats.invoiceableRewardCount())
+                .missingPayoutInfo(stats.missingPayoutInfo())
+                .missingVerification(stats.missingVerification())
+                .verificationBlocked(isVerificationBlocked())
+                .individualLimitReached(stats.individualLimitReached())
+                .isSwitchableToSelfEmployed(isSwitchableToSelfEmployed());
+    }
+
+    private onlydust.com.marketplace.api.contract.model.VerificationStatus map(VerificationStatus verificationStatus) {
+        return switch (verificationStatus) {
+            case NOT_STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.NOT_STARTED;
+            case STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.STARTED;
+            case UNDER_REVIEW -> onlydust.com.marketplace.api.contract.model.VerificationStatus.UNDER_REVIEW;
+            case VERIFIED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.VERIFIED;
+            case REJECTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.REJECTED;
+            case CLOSED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.CLOSED;
+        };
+    }
+
+    private onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {
+        return switch (type) {
+            case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
+            case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
+            case SELF_EMPLOYED -> onlydust.com.marketplace.api.contract.model.BillingProfileType.SELF_EMPLOYED;
+        };
+    }
+
+    /*
+    final var response = new BillingProfileResponse();
+        response.setId(view.getId().value());
+        response.setName(view.getName());
+        response.setType(map(view.getType()));
+        response.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
+        response.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
+        response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
+        response.setEnabled(view.getEnabled());
+        response.setCurrentYearPaymentLimit(isNull(view.getCurrentYearPaymentLimit()) ? null : view.getCurrentYearPaymentLimit().getValue());
+        response.setCurrentYearPaymentAmount(isNull(view.getCurrentYearPaymentAmount()) ? null : view.getCurrentYearPaymentAmount().getValue());
+        response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
+        response.setRewardCount(view.getRewardCount());
+        response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
+        response.setMissingPayoutInfo(view.getMissingPayoutInfo());
+        response.setMissingVerification(view.getMissingVerification());
+        response.setVerificationBlocked(view.isVerificationBlocked());
+        response.setIndividualLimitReached(view.getIndividualLimitReached());
+        response.setMe(isNull(view.getMe()) ? null :
+                new BillingProfileResponseMe()
+                        .canLeave(view.getMe().canLeave())
+                        .canDelete(view.getMe().canDelete())
+                        .role(mapRole(view.getMe().role()))
+                        .invitation(isNull(view.getMe().invitation()) ? null :
+                                new BillingProfileCoworkerInvitation()
+                                        .invitedBy(new ContributorResponse()
+                                                .avatarUrl(view.getMe().invitation().githubAvatarUrl())
+                                                .login(view.getMe().invitation().githubLogin())
+                                                .githubUserId(view.getMe().invitation().githubUserId().value()))
+                                        .role(mapRole(view.getMe().invitation().role()))
+                                        .invitedAt(view.getMe().invitation().invitedAt())
+                        )
+        );
+        response.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
+        return response;
+     */
 }

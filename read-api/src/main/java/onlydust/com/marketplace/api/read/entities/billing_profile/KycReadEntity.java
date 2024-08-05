@@ -9,6 +9,7 @@ import onlydust.com.backoffice.api.contract.model.KycResponse;
 import onlydust.com.backoffice.api.contract.model.UserSearchKyc;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.api.contract.model.KYCResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
@@ -84,5 +85,25 @@ public class KycReadEntity {
                 .usCitizen(usCitizen)
                 .idDocumentCountryCode(idDocumentCountryCode)
                 ;
+    }
+
+    public KYCResponse toResponse() {
+        return new KYCResponse()
+                .address(address)
+                .birthdate(birthdate)
+                .country(country == null ? null : Country.fromIso3(country).display().orElse(country))
+                .firstName(firstName)
+                .lastName(lastName)
+                .idDocumentCountryCode(idDocumentCountryCode)
+                .idDocumentNumber(idDocumentNumber)
+                .idDocumentType(idDocumentType == null ? null : switch (idDocumentType) {
+                    case ID_CARD -> KYCResponse.IdDocumentTypeEnum.ID_CARD;
+                    case PASSPORT -> KYCResponse.IdDocumentTypeEnum.PASSPORT;
+                    case DRIVER_LICENSE -> KYCResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
+                    case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
+                })
+                .id(id)
+                .usCitizen(usCitizen)
+                .validUntil(validUntil);
     }
 }

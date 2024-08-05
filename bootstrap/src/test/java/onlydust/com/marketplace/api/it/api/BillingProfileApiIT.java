@@ -88,11 +88,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("company")
-                .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.kyb.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty();
 
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -109,10 +105,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("company")
-                .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(true)
                 .jsonPath("$.id").isNotEmpty();
 
 
@@ -132,12 +124,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("self_employed")
-                .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
-                .jsonPath("$.kyb.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty();
 
         client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
@@ -154,12 +141,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("self_employed")
-                .jsonPath("$.type").isEqualTo("SELF_EMPLOYED")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
-                .jsonPath("$.kyb.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty();
 
 
         // When
@@ -178,12 +160,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("individual")
-                .jsonPath("$.type").isEqualTo("INDIVIDUAL")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.isSwitchableToSelfEmployed").isEqualTo(false)
-                .jsonPath("$.kyc.id").isNotEmpty();
+                .jsonPath("$.id").isNotEmpty();
 
         // When
         client.post()
@@ -313,7 +290,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo(companyBillingProfile.type().name())
                 .jsonPath("$.status").isEqualTo(companyBillingProfile.status().name())
                 .jsonPath("$.currentYearPaymentLimit").isEqualTo(null)
-                .jsonPath("$.currentYearPaymentAmount").isEqualTo(null)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(0)
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")
@@ -333,7 +310,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.type").isEqualTo(selfEmployedBillingProfile.type().name())
                 .jsonPath("$.status").isEqualTo(selfEmployedBillingProfile.status().name())
                 .jsonPath("$.currentYearPaymentLimit").isEqualTo(null)
-                .jsonPath("$.currentYearPaymentAmount").isEqualTo(null)
+                .jsonPath("$.currentYearPaymentAmount").isEqualTo(0)
                 .jsonPath("$.me.canDelete").isEqualTo(true)
                 .jsonPath("$.me.canLeave").isEqualTo(false)
                 .jsonPath("$.me.role").isEqualTo("ADMIN")

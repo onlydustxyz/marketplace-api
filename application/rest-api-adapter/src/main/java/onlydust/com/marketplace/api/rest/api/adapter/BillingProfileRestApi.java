@@ -14,7 +14,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.contract.BillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -123,10 +122,11 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     }
 
     @Override
-    public ResponseEntity<BillingProfileResponse> createBillingProfile(BillingProfileRequest billingProfileRequest) {
+    public ResponseEntity<BillingProfileCreateResponse> createBillingProfile(BillingProfileRequest billingProfileRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Set<ProjectId> projectIds = isNull(billingProfileRequest.getSelectForProjects()) ? Set.of() :
                 billingProfileRequest.getSelectForProjects().stream().map(ProjectId::of).collect(Collectors.toSet());
+        
         final var newBillingProfile = switch (billingProfileRequest.getType()) {
             case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(
                     UserId.of(authenticatedUser.id()),
@@ -141,15 +141,8 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                     billingProfileRequest.getName(),
                     projectIds);
         };
-        return getBillingProfile(newBillingProfile.id().value());
-    }
 
-    @Override
-    public ResponseEntity<BillingProfileResponse> getBillingProfile(UUID billingProfileId) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final BillingProfileView billingProfileView = billingProfileFacadePort.getBillingProfile(BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.id()), GithubUserId.of(authenticatedUser.githubUserId()));
-        return ok(BillingProfileMapper.billingProfileViewToResponse(billingProfileView));
+        return ok(new BillingProfileCreateResponse().id(newBillingProfile.id().value()));
     }
 
     @Override

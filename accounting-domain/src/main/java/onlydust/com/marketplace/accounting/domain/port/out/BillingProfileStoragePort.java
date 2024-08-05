@@ -29,6 +29,7 @@ public interface BillingProfileStoragePort {
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
+    // TODO remove as used only in tests
     Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
 
     Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);

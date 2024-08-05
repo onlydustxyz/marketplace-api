@@ -1555,8 +1555,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // To avoid to stub all the Sumsub flow ...
-        final UUID kycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId),
-                GithubUserId.of(individualBPAdminGithubId)).getKyc().getId();
+        final UUID kycId = billingProfileStoragePort.findViewById(BillingProfile.Id.of(individualBPId)).orElseThrow().getKyc().getId();
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(kycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1745,8 +1744,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID indianKycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualIndiaBPId), UserId.of(individualIndiaBPAdminId),
-                GithubUserId.of(individualIndiaBPAdminGithubId)).getKyc().getId();
+        final UUID indianKycId = billingProfileStoragePort.findViewById(BillingProfile.Id.of(individualIndiaBPId)).orElseThrow().getKyc().getId();
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(indianKycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1935,8 +1933,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID companyKybId = billingProfileService.getBillingProfile(BillingProfile.Id.of(companyBPId), UserId.of(companyBPAdmin1Id),
-                GithubUserId.of(companyBPAdmin1GithubId)).getKyb().getId();
+        final UUID companyKybId = billingProfileStoragePort.findViewById(BillingProfile.Id.of(companyBPId)).orElseThrow().getKyb().getId();
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(companyBPId))
                 .registrationNumber(faker.idNumber().valid())
@@ -2125,8 +2122,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         // When
         final UUID selfEmployedKybId =
-                billingProfileService.getBillingProfile(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId),
-                        GithubUserId.of(selfEmployedBPAdminGithubId)).getKyb().getId();
+                billingProfileStoragePort.findViewById(BillingProfile.Id.of(selfEmployedBPId)).orElseThrow().getKyb().getId();
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(selfEmployedBPId))
                 .registrationNumber(faker.idNumber().valid())

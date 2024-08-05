@@ -9,7 +9,9 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
+import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -220,31 +222,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         billingProfile.acceptMandate();
         billingProfileStoragePort.save(billingProfile);
-    }
-
-    @Override
-    public BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId, GithubUserId githubUserId) {
-        if (!billingProfileStoragePort.isUserMemberOf(billingProfileId, userId) &&
-            !billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserId)) {
-            throw unauthorized("User %s is not a member of billing profile %s".formatted(userId, billingProfileId));
-        }
-        return getBillingProfileViewWithUserRights(billingProfileId, userId);
-    }
-
-    private BillingProfileView getBillingProfileViewWithUserRights(BillingProfile.Id billingProfileId, UserId userId) {
-        final BillingProfileView billingProfileView = billingProfileStoragePort.findViewById(billingProfileId)
-                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
-        final BillingProfileUserRightsView billingProfileUserRightsView = billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId)
-                .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
-        if (billingProfileUserRightsView.role() == BillingProfile.User.Role.MEMBER) {
-            return billingProfileView.toBuilder()
-                    .me(billingProfileUserRightsView)
-                    .payoutInfo(null)
-                    .build();
-        }
-        return billingProfileView.toBuilder()
-                .me(billingProfileUserRightsView)
-                .build();
     }
 
     @Override

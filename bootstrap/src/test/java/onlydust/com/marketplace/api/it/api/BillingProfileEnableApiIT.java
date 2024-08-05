@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
-import onlydust.com.marketplace.api.contract.model.BillingProfileResponse;
+import onlydust.com.marketplace.api.contract.model.BillingProfileCreateResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,7 +25,7 @@ public class BillingProfileEnableApiIT extends AbstractMarketplaceApiIT {
 
 
         // When
-        final BillingProfileResponse billingProfileResponse = client.post()
+        final BillingProfileCreateResponse billingProfileResponse = client.post()
                 .uri(getApiURI(BILLING_PROFILES_POST))
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -40,8 +39,7 @@ public class BillingProfileEnableApiIT extends AbstractMarketplaceApiIT {
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(BillingProfileResponse.class).returnResult().getResponseBody();
-        Assertions.assertTrue(billingProfileResponse.getEnabled());
+                .expectBody(BillingProfileCreateResponse.class).returnResult().getResponseBody();
 
         // Then
         client.put()

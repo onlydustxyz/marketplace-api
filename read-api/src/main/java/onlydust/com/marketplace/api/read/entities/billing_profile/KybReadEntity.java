@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.KybResponse;
 import onlydust.com.backoffice.api.contract.model.UserSearchKyb;
 import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.api.contract.model.KYBResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
@@ -79,5 +80,18 @@ public class KybReadEntity {
                 .subjectToEuropeVAT(subjectToEuVAT)
                 .euVATNumber(euVATNumber)
                 ;
+    }
+
+    public KYBResponse toResponse() {
+        return new KYBResponse()
+                .address(address)
+                .country(country == null ? null : Country.fromIso3(country).display().orElse(country))
+                .name(name)
+                .id(id)
+                .euVATNumber(euVATNumber)
+                .registrationDate(registrationDate)
+                .registrationNumber(registrationNumber)
+                .subjectToEuropeVAT(subjectToEuVAT)
+                .usEntity(usEntity);
     }
 }
