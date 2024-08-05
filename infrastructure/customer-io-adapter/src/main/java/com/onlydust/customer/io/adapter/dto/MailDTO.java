@@ -5,8 +5,8 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationFailed;
-import onlydust.com.marketplace.accounting.domain.events.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.events.dto.ShortReward;
+import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
@@ -34,14 +34,16 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
     public record IdentifiersDTO(String id, String email) {
     }
 
-    public static MailDTO<InvoiceRejectedDTO> fromInvoiceRejected(
+    public static MailDTO<InvoiceRejectedDTO> from(
             @NonNull CustomerIOProperties customerIOProperties,
+            @NonNull SendableNotification notification,
             @NonNull InvoiceRejected invoiceRejected) {
-        return new MailDTO<>(customerIOProperties.getInvoiceRejectedEmailId().toString(), new IdentifiersDTO(invoiceRejected.billingProfileAdminId().toString(),
-                null),
-                customerIOProperties.getOnlyDustAdminEmail(), invoiceRejected.billingProfileAdminEmail(),
-                "An invoice for %s reward(s) got rejected".formatted(invoiceRejected.rewardCount()),
-                InvoiceRejectedDTO.fromEvent(invoiceRejected));
+        return new MailDTO<>(customerIOProperties.getInvoiceRejectedEmailId().toString(),
+                new IdentifiersDTO(notification.recipientId().toString(), null),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
+                "An invoice for %d reward(s) got rejected".formatted(invoiceRejected.rewards().size()),
+                InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected));
     }
 
     public static MailDTO<VerificationFailedDTO> fromVerificationFailed(
