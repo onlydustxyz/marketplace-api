@@ -27,6 +27,10 @@
             <artifactId>stellar-sdk</artifactId>
             <version>0.44.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -151,6 +151,8 @@ infrastructure:
     api-key: ${INFURA_API_KEY}
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
+  stellar:
+    horizon-base-uri: https://horizon.stellar.org
   posthog:
     base-uri: https://eu.posthog.com
     api-key: ${POSTHOG_API_KEY}
