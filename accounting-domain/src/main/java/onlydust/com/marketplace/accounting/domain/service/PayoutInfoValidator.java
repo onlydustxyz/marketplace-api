@@ -8,6 +8,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarAccountId;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
@@ -17,12 +18,14 @@ public class PayoutInfoValidator {
     private final WalletValidator<StarknetAccountAddress> starknetAccountAddressValidator;
     private final WalletValidator<EvmAccountAddress> evmAccountAddressValidator;
     private final WalletValidator<AptosAccountAddress> aptosAccountAddressValidator;
+    private final WalletValidator<StellarAccountId> stellarAccountIdValidator;
 
     public void validate(PayoutInfo payoutInfo) {
         payoutInfo.ethWallet().ifPresent(this::validate);
         payoutInfo.optimismAddress().ifPresent(this::validate);
         payoutInfo.starknetAddress().ifPresent(this::validate);
         payoutInfo.aptosAddress().ifPresent(this::validate);
+        payoutInfo.stellarAccountId().ifPresent(this::validate);
     }
 
     private void validate(WalletLocator wallet) {
@@ -48,5 +51,10 @@ public class PayoutInfoValidator {
     private void validate(AptosAccountAddress address) {
         if (!aptosAccountAddressValidator.isValid(address))
             throw badRequest("%s is not a valid Aptos account address".formatted(address.toString()));
+    }
+
+    private void validate(StellarAccountId address) {
+        if (!stellarAccountIdValidator.isValid(address))
+            throw badRequest("%s is not a valid Stellar account id".formatted(address.toString()));
     }
 }
