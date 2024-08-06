@@ -186,6 +186,12 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         return ok(dto);
     }
 
+
+    @Override
+    public ResponseEntity<NotificationSettingsResponse> getMyNotificationSettings() {
+        return ReadMeApi.super.getMyNotificationSettings();
+    }
+
     @Override
     public ResponseEntity<NotificationPageResponse> getMyNotifications(Integer pageIndex, Integer pageSize, NotificationStatus status) {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
