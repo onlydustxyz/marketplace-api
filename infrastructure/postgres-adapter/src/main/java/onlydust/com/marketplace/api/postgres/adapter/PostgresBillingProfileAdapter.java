@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStorage
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutInfoQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -219,12 +218,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
                 }
             };
         });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
-        return payoutInfoViewRepository.findByBillingProfileId(billingProfileId.value()).map(PayoutInfoQueryEntity::toDomain);
     }
 
     @Override

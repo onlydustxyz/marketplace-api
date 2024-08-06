@@ -126,7 +126,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Set<ProjectId> projectIds = isNull(billingProfileRequest.getSelectForProjects()) ? Set.of() :
                 billingProfileRequest.getSelectForProjects().stream().map(ProjectId::of).collect(Collectors.toSet());
-        
+
         final var newBillingProfile = switch (billingProfileRequest.getType()) {
             case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(
                     UserId.of(authenticatedUser.id()),
@@ -143,13 +143,6 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         };
 
         return ok(new BillingProfileCreateResponse().id(newBillingProfile.id().value()));
-    }
-
-    @Override
-    public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var payoutInfo = billingProfileFacadePort.getPayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()));
-        return ok(PayoutInfoMapper.mapToResponse(payoutInfo));
     }
 
     @Override

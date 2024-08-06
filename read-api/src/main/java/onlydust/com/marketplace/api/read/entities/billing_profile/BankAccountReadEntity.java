@@ -29,8 +29,14 @@ public class BankAccountReadEntity {
     String bic;
     String number;
 
-    public BillingProfilePayoutInfoResponseBankAccount toBillingProfilePayoutInfoResponseBankAccount() {
+    public BillingProfilePayoutInfoResponseBankAccount toBoBillingProfilePayoutInfoResponseBankAccount() {
         return new BillingProfilePayoutInfoResponseBankAccount()
+                .bic(bic)
+                .number(number);
+    }
+
+    public onlydust.com.marketplace.api.contract.model.BillingProfilePayoutInfoResponseBankAccount toBillingProfilePayoutInfoResponseBankAccount() {
+        return new onlydust.com.marketplace.api.contract.model.BillingProfilePayoutInfoResponseBankAccount()
                 .bic(bic)
                 .number(number);
     }

@@ -2,9 +2,6 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.api.contract.ReadBillingProfilesApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileUserRightsViewRepository;
@@ -19,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @AllArgsConstructor
@@ -29,23 +27,22 @@ public class ReadBillingProfilesApiPostgresAdapter implements ReadBillingProfile
     private final BillingProfileReadRepository billingProfileReadRepository;
     // TODO migrate to read model ?
     private final BillingProfileUserRightsViewRepository billingProfileUserRightsViewRepository;
-    private final BillingProfileStoragePort billingProfileStoragePort; // TODO migrate in permission service
 
     @Override
     public ResponseEntity<BillingProfileResponse> getBillingProfile(UUID billingProfileId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!billingProfileStoragePort.isUserMemberOf(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()))
-            && !billingProfileStoragePort.isUserInvitedTo(BillingProfile.Id.of(billingProfileId), GithubUserId.of(authenticatedUser.githubUserId())))
-            throw forbidden("User %s does not have permission to read billing profile %s".formatted(authenticatedUser.id(), billingProfileId));
-
         final var billingProfile = billingProfileReadRepository.findById(billingProfileId)
                 .orElseThrow(() -> OnlyDustException.notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        if (billingProfile.users().stream().noneMatch(u -> u.githubUserId().equals(authenticatedUser.githubUserId()))
+            && billingProfile.invitations().stream().noneMatch(i -> i.getGithubUserId().equals(authenticatedUser.githubUserId())))
+            throw forbidden("User %s does not have permission to read billing profile %s".formatted(authenticatedUser.id(), billingProfileId));
 
         final var me = billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(authenticatedUser.id(), billingProfileId)
                 .orElseThrow(() -> OnlyDustException.notFound("Billing profile user rights for user %s and billing profile %s not found".formatted(authenticatedUser.id(), billingProfileId)));
 
-        return ResponseEntity.ok(
+        return ok(
                 billingProfile.toResponse()
                         .me(me == null ? null :
                                 new BillingProfileResponseMe()
@@ -63,6 +60,19 @@ public class ReadBillingProfilesApiPostgresAdapter implements ReadBillingProfile
                                         )
                         )
         );
+    }
+
+    @Override
+    public ResponseEntity<BillingProfilePayoutInfoResponse> getPayoutInfo(UUID billingProfileId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        final var billingProfile = billingProfileReadRepository.findPayoutInfosById(billingProfileId)
+                .orElseThrow(() -> OnlyDustException.notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        if (billingProfile.users().stream().noneMatch(u -> u.githubUserId().equals(authenticatedUser.githubUserId()) && u.role() == BillingProfileCoworkerRole.ADMIN))
+            throw forbidden("User %s does not have permission to read billing profile %s payout info".formatted(authenticatedUser.id(), billingProfileId));
+
+        return ok(billingProfile.payoutInfo().toResponse());
     }
 
     private BillingProfileCoworkerRole map(BillingProfile.User.Role role) {

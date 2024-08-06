@@ -1,14 +1,12 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.api.read.utils.Arithmetic;
@@ -19,10 +17,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static java.util.stream.Collectors.*;
 
@@ -90,9 +85,29 @@ public class BillingProfileReadEntity {
     @NonNull
     List<RewardReadEntity> currentMonthRewards;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id", referencedColumnName = "billingProfileId")
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "billingProfileId")
+    @SQLRestriction("""
+            id in (
+                select rs.reward_id
+                from accounting.reward_statuses rs
+                where rs.status = 'PAYOUT_INFO_MISSING'
+            )
+            """)
+    @NonNull
+    List<RewardReadEntity> missingPayoutInfoRewards;
+
+    List<NetworkEnumEntity> missingPayoutInfoRewardsNetworks() {
+        return missingPayoutInfoRewards.stream().flatMap(r -> Arrays.stream(r.statusData().networks())).toList();
+    }
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @Getter(AccessLevel.NONE)
     PayoutInfoReadEntity payoutInfo;
+
+    public PayoutInfoReadEntity payoutInfo() {
+        return Optional.ofNullable(payoutInfo).orElseGet(() -> new PayoutInfoReadEntity(this));
+    }
 
     public BillingProfileShortResponse toBoShortResponse() {
         return new BillingProfileShortResponse()
@@ -228,41 +243,4 @@ public class BillingProfileReadEntity {
             case SELF_EMPLOYED -> onlydust.com.marketplace.api.contract.model.BillingProfileType.SELF_EMPLOYED;
         };
     }
-
-    /*
-    final var response = new BillingProfileResponse();
-        response.setId(view.getId().value());
-        response.setName(view.getName());
-        response.setType(map(view.getType()));
-        response.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
-        response.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
-        response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
-        response.setEnabled(view.getEnabled());
-        response.setCurrentYearPaymentLimit(isNull(view.getCurrentYearPaymentLimit()) ? null : view.getCurrentYearPaymentLimit().getValue());
-        response.setCurrentYearPaymentAmount(isNull(view.getCurrentYearPaymentAmount()) ? null : view.getCurrentYearPaymentAmount().getValue());
-        response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
-        response.setRewardCount(view.getRewardCount());
-        response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
-        response.setMissingPayoutInfo(view.getMissingPayoutInfo());
-        response.setMissingVerification(view.getMissingVerification());
-        response.setVerificationBlocked(view.isVerificationBlocked());
-        response.setIndividualLimitReached(view.getIndividualLimitReached());
-        response.setMe(isNull(view.getMe()) ? null :
-                new BillingProfileResponseMe()
-                        .canLeave(view.getMe().canLeave())
-                        .canDelete(view.getMe().canDelete())
-                        .role(mapRole(view.getMe().role()))
-                        .invitation(isNull(view.getMe().invitation()) ? null :
-                                new BillingProfileCoworkerInvitation()
-                                        .invitedBy(new ContributorResponse()
-                                                .avatarUrl(view.getMe().invitation().githubAvatarUrl())
-                                                .login(view.getMe().invitation().githubLogin())
-                                                .githubUserId(view.getMe().invitation().githubUserId().value()))
-                                        .role(mapRole(view.getMe().invitation().role()))
-                                        .invitedAt(view.getMe().invitation().invitedAt())
-                        )
-        );
-        response.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
-        return response;
-     */
 }

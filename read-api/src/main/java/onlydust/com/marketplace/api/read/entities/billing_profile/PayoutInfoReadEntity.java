@@ -28,6 +28,11 @@ public class PayoutInfoReadEntity {
     @EqualsAndHashCode.Include
     UUID billingProfileId;
 
+    @OneToOne
+    @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
+    @NonNull
+    BillingProfileReadEntity billingProfile;
+
     @OneToMany
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     @NonNull
@@ -37,9 +42,16 @@ public class PayoutInfoReadEntity {
     @JoinColumn(name = "billingProfileId", referencedColumnName = "billingProfileId")
     BankAccountReadEntity bankAccount;
 
+    public PayoutInfoReadEntity(BillingProfileReadEntity billingProfile) {
+        this.billingProfileId = billingProfile.id();
+        this.billingProfile = billingProfile;
+        this.wallets = Set.of();
+        this.bankAccount = null;
+    }
+
     public BillingProfilePayoutInfoResponse toBoResponse() {
         return new BillingProfilePayoutInfoResponse()
-                .bankAccount(bankAccount().map(BankAccountReadEntity::toBillingProfilePayoutInfoResponseBankAccount).orElse(null))
+                .bankAccount(bankAccount().map(BankAccountReadEntity::toBoBillingProfilePayoutInfoResponseBankAccount).orElse(null))
                 .ethWallet(ethWallet().map(WalletEntity::getAddress).orElse(null))
                 .optimismAddress(optimismWallet().map(WalletEntity::getAddress).orElse(null))
                 .aptosAddress(aptosWallet().map(WalletEntity::getAddress).orElse(null))
@@ -65,5 +77,40 @@ public class PayoutInfoReadEntity {
 
     private Optional<WalletEntity> starknetWallet() {
         return wallets.stream().filter(wallet -> wallet.getNetwork() == NetworkEnumEntity.STARKNET).findFirst();
+    }
+
+    private boolean missingEthWallet() {
+        return ethWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.ETHEREUM);
+    }
+
+    private boolean missingOptimismAddress() {
+        return optimismWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.OPTIMISM);
+    }
+
+    private boolean missingAptosAddress() {
+        return aptosWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.APTOS);
+    }
+
+    private boolean missingStarknetAddress() {
+        return starknetWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.STARKNET);
+    }
+
+    private boolean missingBankAccount() {
+        return bankAccount().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.SEPA);
+    }
+
+    public onlydust.com.marketplace.api.contract.model.BillingProfilePayoutInfoResponse toResponse() {
+        return new onlydust.com.marketplace.api.contract.model.BillingProfilePayoutInfoResponse()
+                .hasValidPayoutSettings(billingProfile.missingPayoutInfoRewards().isEmpty())
+                .aptosAddress(aptosWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingAptosWallet(missingAptosAddress())
+                .optimismAddress(optimismWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingOptimismWallet(missingOptimismAddress())
+                .ethWallet(ethWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingEthWallet(missingEthWallet())
+                .starknetAddress(starknetWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingStarknetWallet(missingStarknetAddress())
+                .bankAccount(bankAccount().map(BankAccountReadEntity::toBillingProfilePayoutInfoResponseBankAccount).orElse(null))
+                .missingBankAccount(missingBankAccount());
     }
 }

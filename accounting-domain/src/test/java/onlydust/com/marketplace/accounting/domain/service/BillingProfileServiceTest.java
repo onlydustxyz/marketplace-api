@@ -39,7 +39,8 @@ import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHel
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -1059,26 +1060,6 @@ class BillingProfileServiceTest {
     }
 
     @Test
-    void should_not_authorized_to_read_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
-        // Given
-        final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
-
-        // When
-        Exception exception = null;
-        try {
-            billingProfileService.getPayoutInfo(billingProfileId, userIdNotAdmin);
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(401, ((OnlyDustException) exception).getStatus());
-        assertEquals("User %s must be admin to read payout info of billing profile %s".formatted(userIdNotAdmin, billingProfileId),
-                exception.getMessage());
-    }
-
-    @Test
     void should_update_payout_info_given_a_user_admin() {
         // When
         billingProfileService.updatePayoutInfo(billingProfileId, userId, payoutInfo);
@@ -1098,33 +1079,6 @@ class BillingProfileServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Invalid payout info");
-    }
-
-    @Test
-    void should_get_payout_info_given_a_user_admin() {
-        // Given
-        final PayoutInfoView expectedPayoutInfo = PayoutInfoView.builder().build();
-
-        // When
-        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
-                .thenReturn(Optional.of(expectedPayoutInfo));
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
-
-        // Then
-        assertEquals(expectedPayoutInfo, payoutInfo);
-        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
-    }
-
-    @Test
-    void should_get_empty_payout_info_given_a_user_admin_and_no_payout_info() {
-        // When
-        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
-                .thenReturn(Optional.empty());
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
-
-        // Then
-        assertNotNull(payoutInfo);
-        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
     }
 
     @Test

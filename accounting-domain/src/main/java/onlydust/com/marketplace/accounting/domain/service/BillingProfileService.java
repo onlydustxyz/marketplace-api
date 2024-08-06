@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
-import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -222,14 +221,6 @@ public class BillingProfileService implements BillingProfileFacadePort {
 
         billingProfile.acceptMandate();
         billingProfileStoragePort.save(billingProfile);
-    }
-
-    @Override
-    public PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId) {
-        getBillingProfileAsAdmin(billingProfileId, userId)
-                .orElseThrow(() -> unauthorized("User %s must be admin to read payout info of billing profile %s".formatted(userId, billingProfileId)));
-
-        return billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId).orElseGet(() -> PayoutInfoView.builder().build());
     }
 
     @Override

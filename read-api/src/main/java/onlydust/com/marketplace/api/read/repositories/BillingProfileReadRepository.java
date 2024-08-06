@@ -33,4 +33,14 @@ public interface BillingProfileReadRepository extends Repository<BillingProfileR
             where bp.id = :billingProfileId
             """)
     Optional<BillingProfileReadEntity> findById(UUID billingProfileId);
+
+    @Query(value = """
+            select distinct bp
+            from BillingProfileReadEntity bp
+            left join fetch bp.missingPayoutInfoRewards r
+            join fetch bp.users u
+            left join fetch bp.payoutInfo
+            where bp.id = :billingProfileId
+            """)
+    Optional<BillingProfileReadEntity> findPayoutInfosById(UUID billingProfileId);
 }
