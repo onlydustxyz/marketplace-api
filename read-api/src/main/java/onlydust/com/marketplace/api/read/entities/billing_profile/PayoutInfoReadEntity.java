@@ -56,6 +56,7 @@ public class PayoutInfoReadEntity {
                 .optimismAddress(optimismWallet().map(WalletEntity::getAddress).orElse(null))
                 .aptosAddress(aptosWallet().map(WalletEntity::getAddress).orElse(null))
                 .starknetAddress(starknetWallet().map(WalletEntity::getAddress).orElse(null))
+                .stellarAccountId(stellarWallet().map(WalletEntity::getAddress).orElse(null))
                 ;
     }
 
@@ -79,6 +80,10 @@ public class PayoutInfoReadEntity {
         return wallets.stream().filter(wallet -> wallet.getNetwork() == NetworkEnumEntity.STARKNET).findFirst();
     }
 
+    private Optional<WalletEntity> stellarWallet() {
+        return wallets.stream().filter(wallet -> wallet.getNetwork() == NetworkEnumEntity.STELLAR).findFirst();
+    }
+
     private boolean missingEthWallet() {
         return ethWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.ETHEREUM);
     }
@@ -93,6 +98,10 @@ public class PayoutInfoReadEntity {
 
     private boolean missingStarknetAddress() {
         return starknetWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.STARKNET);
+    }
+
+    private boolean missingStellarWallet() {
+        return stellarWallet().isEmpty() && billingProfile.missingPayoutInfoRewardsNetworks().contains(NetworkEnumEntity.STELLAR);
     }
 
     private boolean missingBankAccount() {
@@ -110,6 +119,8 @@ public class PayoutInfoReadEntity {
                 .missingEthWallet(missingEthWallet())
                 .starknetAddress(starknetWallet().map(WalletEntity::getAddress).orElse(null))
                 .missingStarknetWallet(missingStarknetAddress())
+                .stellarAccountId(stellarWallet().map(WalletEntity::getAddress).orElse(null))
+                .missingStellarWallet(missingStellarWallet())
                 .bankAccount(bankAccount().map(BankAccountReadEntity::toBillingProfilePayoutInfoResponseBankAccount).orElse(null))
                 .missingBankAccount(missingBankAccount());
     }

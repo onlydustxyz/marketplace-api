@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddres
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarAccountId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class PayoutInfo {
     EvmAccountAddress optimismAddress;
     AptosAccountAddress aptosAddress;
     StarknetAccountAddress starknetAddress;
+    StellarAccountId stellarAccountId;
     BankAccount bankAccount;
 
     public Optional<WalletLocator> ethWallet() {
@@ -36,6 +38,10 @@ public class PayoutInfo {
         return Optional.ofNullable(starknetAddress);
     }
 
+    public Optional<StellarAccountId> stellarAccountId() {
+        return Optional.ofNullable(stellarAccountId);
+    }
+
     public Optional<BankAccount> bankAccount() {
         return Optional.ofNullable(bankAccount);
     }
@@ -47,6 +53,7 @@ public class PayoutInfo {
         if (optimismAddress != null) wallets.add(new Wallet(Network.OPTIMISM, optimismAddress.toString()));
         if (aptosAddress != null) wallets.add(new Wallet(Network.APTOS, aptosAddress.toString()));
         if (starknetAddress != null) wallets.add(new Wallet(Network.STARKNET, starknetAddress.toString()));
+        if (stellarAccountId != null) wallets.add(new Wallet(Network.STELLAR, stellarAccountId.toString()));
 
         return wallets;
     }

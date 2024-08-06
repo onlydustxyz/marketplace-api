@@ -41,6 +41,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfil
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -95,7 +96,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
             throw badRequest("Error while reading invoice data", e);
         }
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -118,7 +119,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         if (Boolean.TRUE.equals(invoiceMandateRequest.getHasAcceptedInvoiceMandate())) {
             billingProfileFacadePort.acceptInvoiceMandate(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId));
         }
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -148,9 +149,10 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<Void> setPayoutInfo(UUID billingProfileId, BillingProfilePayoutInfoRequest billingProfilePayoutInfoRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()),
+        billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId),
+                UserId.of(authenticatedUser.id()),
                 PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -175,7 +177,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                     case ADMIN -> BillingProfile.User.Role.ADMIN;
                     case MEMBER -> BillingProfile.User.Role.MEMBER;
                 });
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -186,14 +188,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                 UserId.of(authenticatedUser.id()),
                 GithubUserId.of(authenticatedUser.githubUserId()),
                 GithubUserId.of(githubUserId));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteBillingProfile(UUID billingProfileId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.deleteBillingProfile(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -201,7 +203,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.enableBillingProfile(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId),
                 billingProfileEnableRequest.getEnable());
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -214,7 +216,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                     case SELF_EMPLOYED -> BillingProfile.Type.SELF_EMPLOYED
                     ;
                 });
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -228,7 +230,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         billingProfileFacadePort.updateCoworkerRole(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()),
                 GithubUserId.of(githubUserId), role);
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override

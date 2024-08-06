@@ -427,7 +427,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "aptosAddress": null,
                           "missingAptosWallet": false,
                           "starknetAddress": null,
-                          "missingStarknetWallet": false
+                          "missingStarknetWallet": false,
+                          "stellarAccountId": null,
+                          "missingStellarWallet": false
                         }""");
 
         client.put()
@@ -443,7 +445,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                             "bic": "DAAEFRPPCCT",
                             "number": "FR5417569000301995586997O41"
                           },
-                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
+                          "stellarAccountId": "GA6MC3D6BNEFHZBYROFJ67O6TSZ2JZCDH3Y2PFJUUIDOEX26HDBHD4PB"
                         }
                         """)
                 // Then
@@ -475,7 +478,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "aptosAddress": "0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5",
                           "missingAptosWallet": false,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "missingStarknetWallet": false
+                          "missingStarknetWallet": false,
+                          "stellarAccountId": "GA6MC3D6BNEFHZBYROFJ67O6TSZ2JZCDH3Y2PFJUUIDOEX26HDBHD4PB",
+                          "missingStellarWallet": false
                         }""");
 
         client.put()
@@ -488,7 +493,8 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "ethWallet": null,
                           "optimismAddress": "0x72C30FCD1e7bd691Ce206Cd36BbD87C4C7099545",
                           "bankAccount": null,
-                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798"
+                          "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
+                          "stellarAccountId": null
                         }
                         """)
                 // Then
@@ -517,7 +523,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "aptosAddress": null,
                           "missingAptosWallet": false,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "missingStarknetWallet": false
+                          "missingStarknetWallet": false,
+                          "stellarAccountId": null,
+                          "missingStellarWallet": false
                         }""");
 
         // When
@@ -536,6 +544,14 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         accountingService.allocate(eth.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
+
+        final UUID usdcId = currencyRepository.findByCode("USDC").orElseThrow().id();
+        final SponsorAccountStatement usdc = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+                Currency.Id.of(usdcId), null,
+                new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.STELLAR, faker.random().hex(),
+                        PositiveAmount.of(200000L),
+                        faker.rickAndMorty().character(), faker.hacker().verb()));
+        accountingService.allocate(usdc.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))
@@ -585,6 +601,25 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+
+        client.post()
+                .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
+                .header("Authorization", BEARER_PREFIX + pierre.jwt())
+                .body(BodyInserters.fromValue(new RewardRequest()
+                        .amount(BigDecimal.valueOf(20L))
+                        .currencyId(CurrencyHelper.USDC.value())
+                        .recipientId(authenticatedUser.user().getGithubUserId())
+                        .items(List.of(
+                                new RewardItemRequest().id("0011051356")
+                                        .type(RewardType.PULL_REQUEST)
+                                        .number(1L)
+                                        .repoId(55223344L)
+                        ))))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(selfEmployedBillingProfile.id().value())))
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -605,7 +640,9 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                           "aptosAddress": null,
                           "missingAptosWallet": false,
                           "starknetAddress": "0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798",
-                          "missingStarknetWallet": false
+                          "missingStarknetWallet": false,
+                          "stellarAccountId": null,
+                          "missingStellarWallet": true
                         }""");
     }
 

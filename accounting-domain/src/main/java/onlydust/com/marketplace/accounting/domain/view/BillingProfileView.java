@@ -23,7 +23,7 @@ public class BillingProfileView {
     Kyb kyb;
     BillingProfileUserRightsView me;
     VerificationStatus verificationStatus;
-    PayoutInfo payoutInfo;
+    PayoutInfo payoutInfo; // TODO remove ?
     Boolean enabled;
     List<User> admins;
 
