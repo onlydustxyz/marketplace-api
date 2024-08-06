@@ -5,14 +5,15 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdResolver;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -77,10 +78,21 @@ public class NotificationReadEntity {
             notificationPageItemResponseData.setMaintainerCommitteeApplicationCreated(new NotificationMaintainerCommitteeApplicationCreated()
                     .committeeName(committeeApplicationCreated.getCommitteeName())
             );
+            notificationType = NotificationType.MAINTAINER_COMMITTEE_APPLICATION_CREATED;
         } else if (data.notification() instanceof RewardReceived) {
-
+            notificationType = NotificationType.CONTRIBUTOR_REWARD_RECEIVED;
         } else if (data.notification() instanceof RewardCanceled) {
-
+            notificationType = NotificationType.CONTRIBUTOR_REWARD_CANCELED;
+        } else if (data.notification() instanceof InvoiceRejected) {
+            notificationType = NotificationType.CONTRIBUTOR_INVOICE_REJECTED;
+        } else if (data.notification() instanceof RewardsPaid) {
+            notificationType = NotificationType.CONTRIBUTOR_REWARDS_PAID;
+        } else if (data.notification() instanceof ApplicationToReview) {
+            notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
+        } else if (data.notification() instanceof ApplicationAccepted) {
+            notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
+        } else if (data.notification() instanceof BillingProfileVerificationFailed) {
+            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED;
         } else {
             throw OnlyDustException.internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
         }

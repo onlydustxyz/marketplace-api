@@ -17,6 +17,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -26,7 +28,9 @@ import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
+import onlydust.com.marketplace.user.domain.model.NotificationStatusUpdateRequest;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
+import onlydust.com.marketplace.user.domain.service.NotificationService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -64,6 +68,7 @@ public class MeRestApi implements MeApi {
     private final CommitteeFacadePort committeeFacadePort;
     private final BannerFacadePort bannerFacadePort;
     private final NotificationSettingsPort notificationSettingsPort;
+    private final NotificationService notificationService;
 
     @Override
     public ResponseEntity<Void> patchMe(PatchMeContract patchMeContract) {
@@ -133,7 +138,7 @@ public class MeRestApi implements MeApi {
                 userProfileRequest.getPreferredCategories()
         );
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -141,7 +146,7 @@ public class MeRestApi implements MeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.replaceProfile(authenticatedUser.id(),
                 userProfileRequestToDomain(userProfileUpdateRequest));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -328,6 +333,26 @@ public class MeRestApi implements MeApi {
                 NotificationRecipient.Id.of(authenticatedUser.id()),
                 new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> patchMyNotificationsStatus(NotificationsPatchRequest notificationsPatchRequest) {
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        notificationService.updateInAppNotificationsStatus(authenticatedUser.id(),
+                notificationsPatchRequest.getNotifications().stream()
+                        .map(notificationPatchRequest -> new NotificationStatusUpdateRequest(Notification.Id.of(notificationPatchRequest.getId()),
+                                switch (notificationPatchRequest.getStatus()) {
+                                    case READ -> NotificationStatusUpdateRequest.NotificationStatus.READ;
+                                    case UNREAD -> NotificationStatusUpdateRequest.NotificationStatus.UNREAD;
+                                })).toList());
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> markAllInAppNotificationsAsRead() {
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        notificationService.markAllInAppUnreadAsRead(authenticatedUser.id());
         return noContent().build();
     }
 }

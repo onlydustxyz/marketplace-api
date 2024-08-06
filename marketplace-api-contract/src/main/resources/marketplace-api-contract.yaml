@@ -228,14 +228,14 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - ReadMe
+        - Me
       summary: Mark all unread in app notifications as read
       operationId: markAllInAppNotificationsAsRead
       description: |
         Mark all unread in app notifications as read
       responses:
         "204":
-          description: 'All unread notificats has been marked as read'
+          description: 'All unread notifications has been marked as read'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -8939,8 +8939,12 @@ components:
     NotificationMaintainerApplicationToReview:
       type: object
       required:
-        - project
-        - applicant
+        - projectSlug
+        - projectName
+        - applicantId
+        - issueId
+        - issueName
+        - applicationLogin
       properties:
         projectSlug:
           $ref: '#/components/schemas/ProjectSlug'
@@ -8950,15 +8954,22 @@ components:
           $ref: '#/components/schemas/GithubUserId'
         issueId:
           $ref: '#/components/schemas/IssueId'
+        issueName:
+          type: string
+        applicationLogin:
+          type: string
 
 
     NotificationMaintainerCommitteeApplicationCreated:
       type: object
       required:
         - committeeName
+        - committeeId
       properties:
         committeeName:
           type: string
+        committeeId:
+          $ref: '#/components/schemas/CommitteeId'
 
     NotificationContributorInvoiceRejected:
       type: object
@@ -9039,11 +9050,14 @@ components:
       required:
         - projectSlug
         - issueId
+        - issueName
       properties:
         projectSlug:
           type: string
         issueId:
           $ref: '#/components/schemas/IssueId'
+        issueName:
+          type: string
 
     NotificationGlobalBillingProfileVerificationFailed:
       type: object

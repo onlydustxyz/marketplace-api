@@ -30,4 +30,45 @@ public interface NotificationRepository extends Repository<NotificationEntity, U
             """)
     @Modifying(flushAutomatically = true, clearAutomatically = true)
     void markAsSent(NotificationChannel channel, List<UUID> notificationIds);
+
+    @Query(value = """
+            UPDATE NotificationChannelEntity nc
+            SET nc.readAt = CURRENT_TIMESTAMP
+            WHERE nc.channel = 'IN_APP'
+            AND nc.readAt IS NULL
+            AND nc.notificationId IN (
+                SELECT n.id FROM NotificationEntity n
+                WHERE n.recipientId = :userId
+            )
+            """)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    int markAllInAppUnreadAsRead(UUID userId);
+
+    @Query(value = """
+            UPDATE NotificationChannelEntity nc
+            SET nc.readAt = CURRENT_TIMESTAMP
+            WHERE nc.channel = 'IN_APP'
+            AND nc.notificationId in :notificationIds
+            AND nc.readAt IS NULL
+            AND nc.notificationId IN (
+                SELECT n.id FROM NotificationEntity n
+                WHERE n.recipientId = :userId
+            )
+            """)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    int markAllInAppAsRead(UUID userId, List<UUID> notificationIds);
+
+    @Query(value = """
+            UPDATE NotificationChannelEntity nc
+            SET nc.readAt = null
+            WHERE nc.channel = 'IN_APP'
+            AND nc.notificationId in :notificationIds
+            AND nc.readAt IS NULL
+            AND nc.notificationId IN (
+                SELECT n.id FROM NotificationEntity n
+                WHERE n.recipientId = :userId
+            )
+            """)
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    int markAllInAppAsUnread(UUID userId, List<UUID> notificationIds);
 }

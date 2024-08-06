@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationRepository;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 
@@ -38,5 +40,21 @@ public class PostgresNotificationAdapter implements NotificationStoragePort {
     @Transactional
     public void markAsSent(NotificationChannel channel, Collection<Notification.Id> notificationIds) {
         notificationRepository.markAsSent(channel, notificationIds.stream().map(Notification.Id::value).toList());
+    }
+
+    @Override
+    @Transactional
+    public void markAllInAppUnreadAsRead(UUID userId) {
+        notificationRepository.markAllInAppUnreadAsRead(userId);
+    }
+
+    @Override
+    public void markInAppNotificationsAsUnreadForUser(UUID userId, List<Notification.Id> notificationIds) {
+     notificationRepository.markAllInAppAsUnread(userId, notificationIds.stream().map(UuidWrapper::value).toList());
+    }
+
+    @Override
+    public void markInAppNotificationsAsReadForUser(UUID userId, List<Notification.Id> notificationIds) {
+        notificationRepository.markAllInAppAsRead(userId, notificationIds.stream().map(UuidWrapper::value).toList());
     }
 }

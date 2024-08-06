@@ -7,14 +7,19 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
+import onlydust.com.marketplace.user.domain.model.NotificationStatusUpdateRequest;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @AllArgsConstructor
@@ -39,5 +44,28 @@ public class NotificationService implements NotificationPort {
     private void sendEmail(UUID recipientId, Notification notification) {
         userStoragePort.findById(NotificationRecipient.Id.of(recipientId))
                 .ifPresent(user -> asyncNotificationEmailProcessor.send(SendableNotification.of(user, notification)));
+    }
+
+    public void markAllInAppUnreadAsRead(UUID userId) {
+        notificationStoragePort.markAllInAppUnreadAsRead(userId);
+    }
+
+    @Transactional
+    public void updateInAppNotificationsStatus(UUID userId, List<NotificationStatusUpdateRequest> notificationStatusUpdateRequests) {
+        final Map<NotificationStatusUpdateRequest.NotificationStatus, List<NotificationStatusUpdateRequest>> notificationStatusListMap =
+                notificationStatusUpdateRequests.stream().collect(Collectors.groupingBy(NotificationStatusUpdateRequest::notificationStatus));
+        final List<NotificationStatusUpdateRequest> unread = notificationStatusListMap.get(NotificationStatusUpdateRequest.NotificationStatus.UNREAD);
+        if (unread != null && !unread.isEmpty()) {
+            notificationStoragePort.markInAppNotificationsAsUnreadForUser(userId, unread.stream()
+                    .map(NotificationStatusUpdateRequest::notificationId)
+                    .toList());
+        }
+        final List<NotificationStatusUpdateRequest> read = notificationStatusListMap.get(NotificationStatusUpdateRequest.NotificationStatus.READ);
+        if (read != null && !read.isEmpty()) {
+            notificationStoragePort.markInAppNotificationsAsReadForUser(userId, read.stream()
+                    .map(NotificationStatusUpdateRequest::notificationId)
+                    .toList());
+        }
+
     }
 }
