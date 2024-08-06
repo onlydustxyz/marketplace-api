@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -9,6 +10,7 @@ import onlydust.com.marketplace.project.domain.model.notification.ApplicationAcc
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -31,11 +33,19 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
                 .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));
         final var issue = githubStoragePort.findIssueById(application.issueId())
                 .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+        final NotificationUser notificationUser = userStoragePort.getRegisteredUserByGithubId(application.applicantId())
+                .map(user -> new NotificationUser(user.id(), user.githubUserId(), user.login()))
+                .orElseGet(() -> userStoragePort.getIndexedUserByGithubId(application.applicantId())
+                        .map(githubUserIdentity -> new NotificationUser(null, githubUserIdentity.githubUserId(), githubUserIdentity.login()))
+                        .orElseThrow(() ->
+                                OnlyDustException.internalServerError("Cannot send application created to project leads due to unknown github user %s"
+                                        .formatted(application.applicantId()))));
 
         projectStoragePort.getProjectLeadIds(application.projectId())
                 .forEach(projectLeadId -> notificationPort.push(projectLeadId, ApplicationToReview.builder()
                         .project(NotificationProject.of(project))
                         .issue(NotificationIssue.of(issue))
+                        .user(notificationUser)
                         .build()));
     }
 

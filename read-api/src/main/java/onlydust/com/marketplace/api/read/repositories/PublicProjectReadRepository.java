@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface PublicProjectReadRepository extends Repository<PublicProjectReadEntity, UUID> {
@@ -26,4 +27,9 @@ public interface PublicProjectReadRepository extends Repository<PublicProjectRea
                      p.name
             """, countQuery = "select count(*) from projects", nativeQuery = true)
     Page<PublicProjectReadEntity> findAllRecommendedForUser(Long githubUserId, Pageable pageable);
+
+    @Query(value = """
+            select p
+            from PublicProjectReadEntity p where p.id = :id""")
+    Optional<PublicProjectReadEntity> findById(UUID id);
 }

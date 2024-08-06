@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -71,6 +72,14 @@ class ApplicationMailNotifierTest {
 
         final var projectLeads = List.of(UUID.randomUUID(), UUID.randomUUID());
         when(projectStoragePort.getProjectLeadIds(project.getId())).thenReturn(projectLeads);
+        when(userStoragePort.getRegisteredUserByGithubId(application.applicantId()))
+                .thenReturn(Optional.empty());
+        when(userStoragePort.getIndexedUserByGithubId(application.applicantId()))
+                .thenReturn(Optional.of(GithubUserIdentity.builder()
+                        .githubUserId(application.applicantId())
+                        .login(faker.gameOfThrones().character())
+                        .build()
+                ));
 
         // When
         notifier.onApplicationCreated(application);
