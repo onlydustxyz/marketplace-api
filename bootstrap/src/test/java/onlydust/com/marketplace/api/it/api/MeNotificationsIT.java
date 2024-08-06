@@ -1,8 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.NotificationPageResponse;
 import onlydust.com.marketplace.api.contract.model.NotificationPatchRequest;
@@ -10,9 +11,12 @@ import onlydust.com.marketplace.api.contract.model.NotificationStatus;
 import onlydust.com.marketplace.api.contract.model.NotificationsPatchRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
-import onlydust.com.marketplace.user.domain.model.NotificationSettings;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
 import onlydust.com.marketplace.user.domain.service.NotificationService;
 import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
 import org.junit.jupiter.api.MethodOrderer;
@@ -28,10 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.kernel.model.notification.NotificationCategory.*;
-import static onlydust.com.marketplace.kernel.model.notification.NotificationChannel.DAILY_EMAIL;
-import static onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP;
-
 @TagMe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeNotificationsIT extends AbstractMarketplaceApiIT {
@@ -40,46 +40,59 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
     NotificationService notificationService;
     @Autowired
     NotificationSettingsService notificationSettingsService;
+    private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
     @Test
     @Order(1)
-    void shouldReadAllNotificationByStatuses() {
+    void should_read_all_notification_by_statuses() {
         // Given
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
-        final NotificationSettings notificationSettings = NotificationSettings.builder()
-                .channelsPerCategory(Map.of(
-                        CONTRIBUTOR_REWARD, List.of(DAILY_EMAIL, IN_APP),
-                        KYC_KYB_BILLING_PROFILE, List.of(IN_APP),
-                        MAINTAINER_PROJECT_CONTRIBUTOR, List.of(DAILY_EMAIL)))
-                .build();
-        notificationSettingsService.updateNotificationSettings(NotificationRecipient.Id.of(hayden.user().getId()), notificationSettings);
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
         notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())
-                .committeeId(UUID.randomUUID())
+                .committeeId(UUID.fromString("0d95a6d2-13c7-45a5-817e-2fd83111dd6a"))
                 .projectId(UUID.randomUUID())
-                .projectName(faker.rickAndMorty().character())
-                .committeeName(faker.lordOfTheRings().character())
+                .projectName("committeeProject1")
+                .committeeName("committee1")
+                .build());
+        notificationService.push(hayden.user().getId(), ApplicationToReview.builder()
+                .issue(new NotificationIssue(1L, faker.internet().url(), "issue1", faker.rickAndMorty().location(),
+                        faker.lorem().characters()))
+                .project(new NotificationProject(bretzel, "aaa", "AaA"))
+                .user(new NotificationUser(hayden.user().getId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
+                .build());
+        notificationService.push(hayden.user().getId(), InvoiceRejected.builder()
+                .billingProfileId(UUID.fromString("9c003b18-81f4-40ee-827b-b2046c07d056"))
+                .invoiceName("invoice1")
+                .rejectionReason("rejectionReason1")
+                .rewards(List.of(shortRewardStub(23, "USD"), shortRewardStub(56, "STRK")))
                 .build());
         notificationService.push(hayden.user().getId(), RewardCanceled.builder()
-                .shortReward(ShortReward.builder()
-                        .id(RewardId.random())
-                        .amount(BigDecimal.valueOf(11.1))
-                        .currencyCode("USD")
-                        .dollarsEquivalent(BigDecimal.valueOf(11.1))
-                        .projectName(faker.rickAndMorty().character())
-                        .build())
+                .shortReward(shortRewardStub(11.1, "USD"))
                 .build());
         notificationService.push(hayden.user().getId(), RewardReceived.builder()
                 .contributionCount(3)
-                .sentByGithubLogin(faker.rickAndMorty().character())
-                .shortReward(ShortReward.builder()
-                        .id(RewardId.random())
-                        .amount(BigDecimal.valueOf(22.2))
-                        .currencyCode("USDC")
-                        .dollarsEquivalent(BigDecimal.valueOf(22.2))
-                        .projectName(faker.rickAndMorty().character())
-                        .build())
+                .sentByGithubLogin("projectLead1")
+                .shortReward(shortRewardStub(22.2, "USDC"))
                 .build());
+        notificationService.push(hayden.user().getId(), RewardsPaid.builder()
+                .shortRewards(List.of(shortRewardStub(24, "USD"), shortRewardStub(25, "STRK")))
+                .build());
+        notificationService.push(hayden.user().getId(), ApplicationAccepted.builder()
+                .issue(new NotificationIssue(1L, faker.internet().url(), "title1", faker.rickAndMorty().location(),
+                        faker.lorem().characters()))
+                .project(new NotificationProject(bretzel, "bbb", "bBb"))
+                .build());
+        notificationService.push(hayden.user().getId(), BillingProfileVerificationFailed.builder()
+                .billingProfileId(BillingProfile.Id.of(UUID.fromString("a805e770-104b-4010-b849-cbf90b93ccf4")))
+                .verificationStatus(VerificationStatus.CLOSED)
+                .build());
+        notificationService.push(pierre.user().getId(), BillingProfileVerificationFailed.builder()
+                .billingProfileId(BillingProfile.Id.of(UUID.fromString("9222c39d-7c85-4cc4-8089-c1830bc457b0")))
+                .verificationStatus(VerificationStatus.CLOSED)
+                .build());
+
 
         // When
         client.get()
@@ -92,42 +105,163 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                           "totalPageNumber": 1,
-                           "totalItemNumber": 2,
-                           "hasMore": false,
-                           "nextPageIndex": 0,
-                           "notifications": [
-                             {
-                               "status": "UNREAD",
-                               "type": "CONTRIBUTOR_REWARD_RECEIVED",
-                               "data": {
-                                 "maintainerApplicationToReview": null,
-                                 "maintainerCommitteeApplicationCreated": null,
-                                 "contributorInvoiceRejected": null,
-                                 "contributorRewardCanceled": null,
-                                 "contributorRewardReceived": null,
-                                 "contributorRewardsPaid": null,
-                                 "contributorProjectApplicationAccepted": null,
-                                 "globalBillingProfileVerificationFailed": null
-                               }
-                             },
-                             {
-                               "status": "UNREAD",
-                               "type": "CONTRIBUTOR_REWARD_CANCELED",
-                               "data": {
-                                 "maintainerApplicationToReview": null,
-                                 "maintainerCommitteeApplicationCreated": null,
-                                 "contributorInvoiceRejected": null,
-                                 "contributorRewardCanceled": null,
-                                 "contributorRewardReceived": null,
-                                 "contributorRewardsPaid": null,
-                                 "contributorProjectApplicationAccepted": null,
-                                 "globalBillingProfileVerificationFailed": null
-                               }
-                             }
-                           ]
-                         }
-                         
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 8,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": {
+                                  "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
+                                  "billingProfileName": null,
+                                  "verificationStatus": "CLOSED"
+                                }
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": {
+                                  "projectName": "Bretzel",
+                                  "projectSlug": "bretzel",
+                                  "issueId": 1,
+                                  "issueName": "title1"
+                                },
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARDS_PAID",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": {
+                                  "numberOfRewardPaid": 2,
+                                  "totalAmountDollarsEquivalent": 49.0
+                                },
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARD_RECEIVED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-22.2-USDC",
+                                  "amount": 22.2,
+                                  "currencyCode": "USDC",
+                                  "sentByGithubLogin": "projectLead1",
+                                  "contributionCount": 3
+                                },
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARD_CANCELED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-11.1-USD",
+                                  "amount": 11.1,
+                                  "currencyCode": "USD"
+                                },
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_INVOICE_REJECTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": {
+                                  "invoiceName": "invoice1",
+                                  "rejectionReason": "rejectionReason1",
+                                  "billingProfileId": "9c003b18-81f4-40ee-827b-b2046c07d056"
+                                },
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "MAINTAINER_APPLICATION_TO_REVIEW",
+                              "data": {
+                                "maintainerApplicationToReview": {
+                                  "projectSlug": "bretzel",
+                                  "projectName": "Bretzel",
+                                  "applicantId": 5160414,
+                                  "issueId": 1,
+                                  "issueName": "issue1",
+                                  "applicationLogin": "haydencleary"
+                                },
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "MAINTAINER_COMMITTEE_APPLICATION_CREATED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": {
+                                  "committeeName": "committee1",
+                                  "committeeId": "0d95a6d2-13c7-45a5-817e-2fd83111dd6a"
+                                },
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            }
+                          ]
+                        }
                         """);
 
         // When
@@ -142,10 +276,64 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 2,
+                          "totalItemNumber": 8,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": {
+                                  "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
+                                  "billingProfileName": null,
+                                  "verificationStatus": "CLOSED"
+                                }
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": {
+                                  "projectName": "Bretzel",
+                                  "projectSlug": "bretzel",
+                                  "issueId": 1,
+                                  "issueName": "title1"
+                                },
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARDS_PAID",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": {
+                                  "numberOfRewardPaid": 2,
+                                  "totalAmountDollarsEquivalent": 49.0
+                                },
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_REWARD_RECEIVED",
@@ -154,7 +342,14 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "maintainerCommitteeApplicationCreated": null,
                                 "contributorInvoiceRejected": null,
                                 "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
+                                "contributorRewardReceived": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-22.2-USDC",
+                                  "amount": 22.2,
+                                  "currencyCode": "USDC",
+                                  "sentByGithubLogin": "projectLead1",
+                                  "contributionCount": 3
+                                },
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "globalBillingProfileVerificationFailed": null
@@ -166,6 +361,67 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                               "data": {
                                 "maintainerApplicationToReview": null,
                                 "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-11.1-USD",
+                                  "amount": 11.1,
+                                  "currencyCode": "USD"
+                                },
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_INVOICE_REJECTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": {
+                                  "invoiceName": "invoice1",
+                                  "rejectionReason": "rejectionReason1",
+                                  "billingProfileId": "9c003b18-81f4-40ee-827b-b2046c07d056"
+                                },
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "MAINTAINER_APPLICATION_TO_REVIEW",
+                              "data": {
+                                "maintainerApplicationToReview": {
+                                  "projectSlug": "bretzel",
+                                  "projectName": "Bretzel",
+                                  "applicantId": 5160414,
+                                  "issueId": 1,
+                                  "issueName": "issue1",
+                                  "applicationLogin": "haydencleary"
+                                },
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "MAINTAINER_COMMITTEE_APPLICATION_CREATED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": {
+                                  "committeeName": "committee1",
+                                  "committeeId": "0d95a6d2-13c7-45a5-817e-2fd83111dd6a"
+                                },
                                 "contributorInvoiceRejected": null,
                                 "contributorRewardCanceled": null,
                                 "contributorRewardReceived": null,
@@ -210,7 +466,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 2
+                              "count": 8
                             }
                         """);
 
@@ -225,7 +481,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 2
+                              "count": 8
                             }
                         """);
 
@@ -247,9 +503,19 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
 
     }
 
+    private static ShortReward shortRewardStub(double val, String currencyCode) {
+        return ShortReward.builder()
+                .id(RewardId.of(UUID.fromString("f216c7ad-1875-49a2-a8a8-c65b2d6d0675")))
+                .amount(BigDecimal.valueOf(val))
+                .currencyCode(currencyCode)
+                .dollarsEquivalent(BigDecimal.valueOf(val))
+                .projectName("project-%s-%s".formatted(val, currencyCode))
+                .build();
+    }
+
     @Test
     @Order(2)
-    void shouldMarkNotificationsAsRead() {
+    void should_mark_notifications_as_read() {
         // Given
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
 

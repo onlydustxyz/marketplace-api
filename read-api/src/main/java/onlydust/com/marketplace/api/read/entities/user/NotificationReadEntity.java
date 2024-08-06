@@ -6,8 +6,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.notification.*;
+import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
+import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
+import onlydust.com.marketplace.api.read.repositories.PublicProjectReadRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
@@ -21,6 +24,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -71,28 +75,82 @@ public class NotificationReadEntity {
         };
     }
 
-    public NotificationPageItemResponse toNotificationPageItemResponse() {
+    public NotificationPageItemResponse toNotificationPageItemResponse(final PublicProjectReadRepository publicProjectReadRepository) {
         final NotificationPageItemResponseData notificationPageItemResponseData = new NotificationPageItemResponseData();
         NotificationType notificationType = null;
         if (data.notification() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
             notificationPageItemResponseData.setMaintainerCommitteeApplicationCreated(new NotificationMaintainerCommitteeApplicationCreated()
                     .committeeName(committeeApplicationCreated.getCommitteeName())
+                    .committeeId(committeeApplicationCreated.getCommitteeId())
             );
             notificationType = NotificationType.MAINTAINER_COMMITTEE_APPLICATION_CREATED;
-        } else if (data.notification() instanceof RewardReceived) {
+        } else if (data.notification() instanceof RewardReceived rewardReceived) {
             notificationType = NotificationType.CONTRIBUTOR_REWARD_RECEIVED;
-        } else if (data.notification() instanceof RewardCanceled) {
+            notificationPageItemResponseData.setContributorRewardReceived(new NotificationContributorRewardReceived(
+                    rewardReceived.shortReward().getId().value(),
+                    rewardReceived.shortReward().getProjectName(),
+                    rewardReceived.shortReward().getAmount(),
+                    rewardReceived.shortReward().getCurrencyCode(),
+                    rewardReceived.sentByGithubLogin(),
+                    rewardReceived.contributionCount()
+            ));
+        } else if (data.notification() instanceof RewardCanceled rewardCanceled) {
             notificationType = NotificationType.CONTRIBUTOR_REWARD_CANCELED;
-        } else if (data.notification() instanceof InvoiceRejected) {
+            notificationPageItemResponseData.setContributorRewardCanceled(new NotificationContributorRewardCanceled(
+                    rewardCanceled.shortReward().getId().value(),
+                    rewardCanceled.shortReward().getProjectName(),
+                    rewardCanceled.shortReward().getAmount(),
+                    rewardCanceled.shortReward().getCurrencyCode()
+            ));
+        } else if (data.notification() instanceof InvoiceRejected invoiceRejected) {
             notificationType = NotificationType.CONTRIBUTOR_INVOICE_REJECTED;
-        } else if (data.notification() instanceof RewardsPaid) {
+            notificationPageItemResponseData.setContributorInvoiceRejected(new NotificationContributorInvoiceRejected(
+                    invoiceRejected.invoiceName(),
+                    invoiceRejected.rejectionReason(),
+                    invoiceRejected.billingProfileId()
+            ));
+        } else if (data.notification() instanceof RewardsPaid rewardsPaid) {
             notificationType = NotificationType.CONTRIBUTOR_REWARDS_PAID;
-        } else if (data.notification() instanceof ApplicationToReview) {
+            notificationPageItemResponseData.setContributorRewardsPaid(new NotificationContributorRewardsPaid(
+                    rewardsPaid.shortRewards().size(),
+                    rewardsPaid.shortRewards().stream().map(ShortReward::getDollarsEquivalent).reduce(BigDecimal.ZERO, BigDecimal::add)
+            ));
+        } else if (data.notification() instanceof ApplicationToReview applicationToReview) {
             notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
-        } else if (data.notification() instanceof ApplicationAccepted) {
+            final PublicProjectReadEntity projectReadEntity = publicProjectReadRepository.findById(applicationToReview.getProject().id())
+                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
+            notificationPageItemResponseData.setMaintainerApplicationToReview(new NotificationMaintainerApplicationToReview(
+                    projectReadEntity.getSlug(),
+                    projectReadEntity.getName(),
+                    applicationToReview.getUser().githubId(),
+                    applicationToReview.getIssue().id(),
+                    applicationToReview.getIssue().title(),
+                    applicationToReview.getUser().login()
+            ));
+        } else if (data.notification() instanceof ApplicationAccepted applicationAccepted) {
             notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
-        } else if (data.notification() instanceof BillingProfileVerificationFailed) {
+            final PublicProjectReadEntity projectReadEntity = publicProjectReadRepository.findById(applicationAccepted.getProject().id())
+                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
+            notificationPageItemResponseData.setContributorProjectApplicationAccepted(new NotificationContributorProjectApplicationAccepted(
+                    projectReadEntity.getName(),
+                    projectReadEntity.getSlug(),
+                    applicationAccepted.getIssue().id(),
+                    applicationAccepted.getIssue().title()
+            ));
+        } else if (data.notification() instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
             notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED;
+            notificationPageItemResponseData.setGlobalBillingProfileVerificationFailed(new NotificationGlobalBillingProfileVerificationFailed(
+                    billingProfileVerificationFailed.billingProfileId().value(),
+                    null,
+                    switch (billingProfileVerificationFailed.verificationStatus()) {
+                        case CLOSED -> VerificationStatus.CLOSED;
+                        case VERIFIED -> VerificationStatus.VERIFIED;
+                        case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
+                        case REJECTED -> VerificationStatus.REJECTED;
+                        case STARTED -> VerificationStatus.STARTED;
+                        case NOT_STARTED -> VerificationStatus.NOT_STARTED;
+                    }
+            ));
         } else {
             throw OnlyDustException.internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
         }

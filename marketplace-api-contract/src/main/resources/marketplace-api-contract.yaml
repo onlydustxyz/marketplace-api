@@ -8976,23 +8976,14 @@ components:
       required:
         - invoiceName
         - rejectionReason
-        - currencyCode
-        - totalAmountDollarsEquivalent
         - billingProfileId
-        - billingProfileName
       properties:
         invoiceName:
           type: string
         rejectionReason:
           type: string
-        currencyCode:
-          type: string
-        totalAmountDollarsEquivalent:
-          type: number
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
-        billingProfileName:
-          type: string
 
     NotificationContributorRewardCanceled:
       type: object
@@ -9048,12 +9039,15 @@ components:
     NotificationContributorProjectApplicationAccepted:
       type: object
       required:
+        - projectName
         - projectSlug
         - issueId
         - issueName
       properties:
-        projectSlug:
+        projectName:
           type: string
+        projectSlug:
+          $ref: '#/components/schemas/ProjectSlug'
         issueId:
           $ref: '#/components/schemas/IssueId'
         issueName:
