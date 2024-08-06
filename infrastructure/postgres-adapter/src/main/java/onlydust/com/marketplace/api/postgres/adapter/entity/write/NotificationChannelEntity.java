@@ -35,6 +35,7 @@ public class NotificationChannelEntity {
     NotificationChannel channel;
 
     ZonedDateTime sentAt;
+    ZonedDateTime readAt;
 
     public static NotificationChannelEntity of(UUID notificationId, NotificationChannel channel) {
         return new NotificationChannelEntity()
