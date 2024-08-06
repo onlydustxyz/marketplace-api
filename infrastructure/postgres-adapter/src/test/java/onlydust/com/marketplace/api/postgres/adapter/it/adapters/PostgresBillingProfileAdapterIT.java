@@ -8,7 +8,6 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInf
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBillingProfileAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
@@ -25,9 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
 
@@ -70,11 +69,10 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
         CompanyBillingProfile billingProfile = new CompanyBillingProfile(name, ownerId);
         postgresBillingProfileAdapter.save(billingProfile);
         final BillingProfile.Id billingProfileId = billingProfile.id();
-        final BillingProfileView billingProfileView = postgresBillingProfileAdapter.findViewById(billingProfileId).orElseThrow();
-        assertEquals(name, billingProfileView.getName());
-        final UUID kybId = billingProfileView.getKyb().getId();
+
+        final var kyb = kybRepository.findByBillingProfileId(billingProfileId.value()).orElseThrow().toDomain();
         final String kybApplicantId = faker.internet().emailAddress();
-        postgresBillingProfileAdapter.saveKyb(billingProfileView.getKyb().toBuilder()
+        postgresBillingProfileAdapter.saveKyb(kyb.toBuilder()
                 .usEntity(false)
                 .externalApplicantId(faker.hacker().verb())
                 .euVATNumber(faker.gameOfThrones().character())
@@ -104,8 +102,7 @@ public class PostgresBillingProfileAdapterIT extends AbstractPostgresIT {
         postgresBillingProfileAdapter.deleteBillingProfile(billingProfileId);
 
         // Then
-        assertTrue(postgresBillingProfileAdapter.findViewById(billingProfileId).isEmpty());
-        assertTrue(kybRepository.findById(kybId).isEmpty());
+        assertTrue(kybRepository.findById(kyb.getId()).isEmpty());
         assertTrue(payoutPreferenceRepository.findAll().stream()
                 .filter(payoutPreferenceEntity -> payoutPreferenceEntity.getBillingProfileId().equals(billingProfileId.value()))
                 .findAny().isEmpty());

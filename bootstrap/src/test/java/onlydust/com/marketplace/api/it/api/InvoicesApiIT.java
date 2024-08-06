@@ -1117,12 +1117,12 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         final var individualBillingProfileId = BillingProfile.Id.of(billingProfileReadRepository.findByUserId(ownerId.value())
                 .stream().filter(bp -> bp.type() == INDIVIDUAL).findFirst()
                 .orElseThrow().id());
-        final var individualBillingProfile = billingProfileStoragePort.findViewById(individualBillingProfileId).orElseThrow();
-        billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder()
-                .consideredUsPersonQuestionnaire(false)
-                .country(Country.fromIso3("FRA"))
-                .idDocumentCountry(Country.fromIso3("FRA"))
-                .build());
+
+        final var kyc = kycRepository.findByBillingProfileId(individualBillingProfileId.value()).orElseThrow();
+        kycRepository.save(kyc
+                .setConsideredUsPersonQuestionnaire(false)
+                .setCountry("FRA")
+                .setIdDocumentCountryCode("FRA"));
         billingProfileStoragePort.updateBillingProfileStatus(individualBillingProfileId, VerificationStatus.VERIFIED);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("abuisset.eth"))

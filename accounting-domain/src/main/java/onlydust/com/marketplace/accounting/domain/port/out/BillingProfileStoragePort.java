@@ -5,7 +5,10 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 
 import java.time.ZonedDateTime;
@@ -30,7 +33,7 @@ public interface BillingProfileStoragePort {
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
     // TODO remove as used only in tests
-    Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
+//    Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
 
     Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);
 

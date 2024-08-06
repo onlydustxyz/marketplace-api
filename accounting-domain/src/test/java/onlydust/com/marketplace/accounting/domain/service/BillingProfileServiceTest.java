@@ -11,7 +11,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
+import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
@@ -109,9 +112,6 @@ class BillingProfileServiceTest {
 
         @Test
         void should_prevent_invoice_upload() {
-            // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
-
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
@@ -373,8 +373,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -387,8 +385,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
             // When
@@ -691,7 +687,6 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
@@ -1240,10 +1235,6 @@ class BillingProfileServiceTest {
     void should_invite_coworker() {
         // Given
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                .type(BillingProfile.Type.COMPANY)
-                .build()
-        ));
 
         // When
         billingProfileService.inviteCoworker(billingProfileId, userId, githubUserId, BillingProfile.User.Role.MEMBER);

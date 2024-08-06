@@ -9,7 +9,10 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -615,16 +618,6 @@ public interface BackOfficeMapper {
         return new BillingProfilePayoutInfoResponseBankAccount()
                 .number(bankAccount.accountNumber())
                 .bic(bankAccount.bic())
-                ;
-    }
-
-    static UserResponse map(BillingProfileView.User user) {
-        return new UserResponse()
-                .id(user.id().value())
-                .githubUserId(user.githubUserId().value())
-                .githubLogin(user.githubLogin())
-                .githubAvatarUrl(user.githubAvatarUrl())
-                .email(user.email())
                 ;
     }
 
