@@ -242,27 +242,48 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   # This what we might have when we'll implement the new notifications:
-  #  /api/v1/me/notification-settings:
-  #    get:
-  #      security:
-  #        - bearerAuth: [ ]
-  #      tags:
-  #        - ReadMe
-  #      summary: Get notification settings
-  #      operationId: getMyNotificationSettings
-  #      description: |
-  #        Get notification settings
-  #      responses:
-  #        "200":
-  #          description: 'Notification settings'
-  #          content:
-  #            application/json:
-  #              schema:
-  #                $ref: '#/components/schemas/NotificationSettingsResponse'
-  #        "401":
-  #          $ref: '#/components/responses/UnauthorizedError'
-  #        "500":
-  #          $ref: '#/components/responses/InternalServerError'
+  /api/v1/me/notification-settings:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get notification settings
+      operationId: getMyNotificationSettings
+      description: |
+        Get notification settings
+      responses:
+        "200":
+          description: 'Notification settings'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationSettingsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Me
+      summary: Put notification settings
+      operationId: putMyNotificationSettings
+      description: |
+        Put notification settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationSettingPutRequest'
+      responses:
+        "204":
+          description: 'Notification settings replaced'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
 
   /api/v1/me/notification-settings/projects/{projectId}:
     get:
@@ -8786,28 +8807,56 @@ components:
       type: string
       format: uuid
 
-    NotificationChannels:
-      type: object
-      required:
-        - email
-        - inApp
-      properties:
-        email:
-          type: boolean
-        inApp:
-          type: boolean
+    NotificationChannel:
+      type: string
+      enum:
+        - EMAIL
+        - SUMMARY_EMAIL
 
     NotificationSettingsResponse:
       type: object
       required:
-        - projects
+        - notificationSettings
       properties:
-        projectsChannels:
-          $ref: '#/components/schemas/NotificationChannels'
-        projects:
+        notificationSettings:
           type: array
           items:
-            $ref: '#/components/schemas/NotificationSettingsForProjectResponse'
+            $ref: '#/components/schemas/NotificationSettingResponse'
+
+    NotificationSettingResponse:
+      type: object
+      required:
+        - channels
+        - category
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationChannel'
+        category:
+          $ref: '#/components/schemas/NotificationCategory'
+
+    NotificationSettingPutRequest:
+      type: object
+      required:
+        - channels
+        - category
+      properties:
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationChannel'
+        category:
+          $ref: '#/components/schemas/NotificationCategory'
+
+    NotificationCategory:
+      type: string
+      enum:
+        - MAINTAINER_PROJECT_CONTRIBUTOR
+        - MAINTAINER_PROJECT_PROGRAM
+        - CONTRIBUTOR_REWARD
+        - CONTRIBUTOR_PROJECT
+        - KYC_KYB_BILLING_PROFILE
 
     NotificationSettingsForProjectResponse:
       allOf:
