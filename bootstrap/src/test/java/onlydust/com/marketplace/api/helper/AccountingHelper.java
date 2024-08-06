@@ -176,7 +176,7 @@ public class AccountingHelper {
                 billingProfile.getKyb().verificationStatus(status);
                 kybRepository.save(billingProfile.getKyb());
             } else {
-                billingProfile.getKyc().setVerificationStatus(status);
+                billingProfile.getKyc().verificationStatus(status);
                 kycRepository.save(billingProfile.getKyc());
             }
             billingProfile.setVerificationStatus(status);

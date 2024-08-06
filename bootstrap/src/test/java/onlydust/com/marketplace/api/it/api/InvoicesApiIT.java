@@ -1120,9 +1120,9 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         final var kyc = kycRepository.findByBillingProfileId(individualBillingProfileId.value()).orElseThrow();
         kycRepository.save(kyc
-                .setConsideredUsPersonQuestionnaire(false)
-                .setCountry("FRA")
-                .setIdDocumentCountryCode("FRA"));
+                .consideredUsPersonQuestionnaire(false)
+                .country("FRA")
+                .idDocumentCountryCode("FRA"));
         billingProfileStoragePort.updateBillingProfileStatus(individualBillingProfileId, VerificationStatus.VERIFIED);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("abuisset.eth"))

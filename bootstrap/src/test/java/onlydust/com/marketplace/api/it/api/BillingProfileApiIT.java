@@ -338,7 +338,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
 
         // When
         final var kyc = kycRepository.findByBillingProfileId(individualBillingProfile.id().value()).orElseThrow();
-        kyc.setCountry("FRA");
+        kyc.country("FRA");
         kycRepository.saveAndFlush(kyc);
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBillingProfile.id().value().toString())))
@@ -353,7 +353,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.currentYearPaymentAmount").isEqualTo(0);
 
         // When
-        kyc.setCountry("IND");
+        kyc.country("IND");
         kycRepository.saveAndFlush(kyc);
         client.get()
                 .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(individualBillingProfile.id().value().toString())))

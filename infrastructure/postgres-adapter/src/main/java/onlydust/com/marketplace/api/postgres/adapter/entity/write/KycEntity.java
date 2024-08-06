@@ -24,7 +24,7 @@ import java.util.UUID;
 @Data
 @Builder(toBuilder = true)
 @Table(name = "kyc", schema = "accounting")
-@Accessors(chain = true)
+@Accessors(chain = true, fluent = true)
 @EntityListeners(AuditingEntityListener.class)
 public class KycEntity {
     @Id

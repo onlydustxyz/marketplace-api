@@ -83,8 +83,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
-        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().getId();
-
+        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kycId.toString());

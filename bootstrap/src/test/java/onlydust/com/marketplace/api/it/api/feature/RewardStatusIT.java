@@ -1557,7 +1557,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // To avoid to stub all the Sumsub flow ...
-        final UUID kycId = kycRepository.findByBillingProfileId(individualBPId).orElseThrow().getId();
+        final UUID kycId = kycRepository.findByBillingProfileId(individualBPId).orElseThrow().id();
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(kycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1746,7 +1746,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID indianKycId = kycRepository.findByBillingProfileId(individualIndiaBPId).orElseThrow().getId();
+        final UUID indianKycId = kycRepository.findByBillingProfileId(individualIndiaBPId).orElseThrow().id();
 
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(indianKycId)
