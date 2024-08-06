@@ -22,7 +22,8 @@ public enum NetworkEnumEntity {
             case APTOS -> Blockchain.APTOS;
             case STARKNET -> Blockchain.STARKNET;
             case OPTIMISM -> Blockchain.OPTIMISM;
-            default -> throw new IllegalStateException("No blockchain equivalent found for network %s".formatted(this.name()));
+            case STELLAR -> Blockchain.STELLAR;
+            case SEPA -> throw new IllegalStateException("No blockchain equivalent found for network %s".formatted(this.name()));
         };
     }
 

@@ -10,6 +10,7 @@ public class ERC20ProviderFactory {
     private final ERC20Provider optimismProvider;
     private final ERC20Provider starknetProvider;
     private final ERC20Provider aptosProvider;
+    private final ERC20Provider stellarProvider;
 
     public ERC20Provider get(Blockchain blockchain) {
         return switch (blockchain) {
@@ -17,7 +18,7 @@ public class ERC20ProviderFactory {
             case OPTIMISM -> optimismProvider;
             case STARKNET -> starknetProvider;
             case APTOS -> aptosProvider;
-            case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
+            case STELLAR -> stellarProvider;
         };
     }
 }

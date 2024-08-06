@@ -9,24 +9,23 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>onlydust.com.marketplace.api</groupId>
-    <artifactId>accounting-adapter</artifactId>
+    <artifactId>stellar-adapter</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>project-domain</artifactId>
+            <artifactId>accounting-domain</artifactId>
         </dependency>
         <dependency>
-            <groupId>onlydust.com.marketplace.api</groupId>
-            <artifactId>accounting-domain</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
+            <groupId>network.lightsail</groupId>
+            <artifactId>stellar-sdk</artifactId>
+            <version>0.44.0</version>
         </dependency>
     </dependencies>
 

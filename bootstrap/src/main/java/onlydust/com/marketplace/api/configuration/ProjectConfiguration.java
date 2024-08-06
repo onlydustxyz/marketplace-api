@@ -320,9 +320,10 @@ public class ProjectConfiguration {
     public ERC20ProviderFactory erc20ProviderFactory(final @NonNull ERC20Provider ethereumERC20Provider,
                                                      final @NonNull ERC20Provider optimismERC20Provider,
                                                      final @NonNull ERC20Provider starknetERC20Provider,
-                                                     final @NonNull ERC20Provider aptosERC20Provider
+                                                     final @NonNull ERC20Provider aptosERC20Provider,
+                                                     final @NonNull ERC20Provider stellarERC20Provider
     ) {
-        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, aptosERC20Provider);
+        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, aptosERC20Provider, stellarERC20Provider);
     }
 
 

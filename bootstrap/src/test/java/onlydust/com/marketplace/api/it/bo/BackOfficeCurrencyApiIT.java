@@ -230,6 +230,36 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
     }
 
     @Test
+    @Order(4)
+    void should_add_asset_support_on_stellar() {
+        client
+                .post()
+                .uri(getApiURI(CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + camille.jwt())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "STELLAR",
+                            "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("CRYPTO")
+                .jsonPath("$.tokens[?(@.blockchain=='STELLAR')].address").isEqualTo("CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75")
+                .jsonPath("$.name").isEqualTo("") // FIXME
+                .jsonPath("$.code").isEqualTo("") // FIXME
+                .jsonPath("$.logoUrl").doesNotExist() // FIXME
+                .jsonPath("$.decimals").isEqualTo(0) // FIXME
+        ;
+    }
+
+    @Test
     @Order(5)
     void should_add_native_cryptocurrency_support() {
         client
@@ -426,6 +456,13 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "name": "USD Coin"
                                 },
                                 {
+                                  "blockchain": "STELLAR",
+                                  "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+                                  "decimals": 6,
+                                  "symbol": "USDC",
+                                  "name": "USD Coin"
+                                },
+                                {
                                   "blockchain": "APTOS",
                                   "address": "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
                                   "decimals": 6,
@@ -448,10 +485,11 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 }
                               ],
                               "supportedOn": [
-                                "STARKNET",
                                 "APTOS",
+                                "ETHEREUM",
                                 "OPTIMISM",
-                                "ETHEREUM"
+                                "STARKNET",
+                                "STELLAR"
                               ],
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
                               "countryRestrictions": []

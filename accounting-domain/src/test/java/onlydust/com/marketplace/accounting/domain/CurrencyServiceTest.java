@@ -39,8 +39,9 @@ public class CurrencyServiceTest {
     final ERC20Provider optimismERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider starknetERC20Provider = mock(ERC20Provider.class);
     final ERC20Provider aptosERC20Provider = mock(ERC20Provider.class);
+    final ERC20Provider stellarERC20Provider = mock(ERC20Provider.class);
     final ERC20ProviderFactory erc20ProviderFactory = new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider,
-            aptosERC20Provider);
+            aptosERC20Provider, stellarERC20Provider);
     final QuoteService quoteService = mock(QuoteService.class);
     final QuoteStorage quoteStorage = mock(QuoteStorage.class);
     final IsoCurrencyService isoCurrencyService = mock(IsoCurrencyService.class);

@@ -6,10 +6,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
-import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
-import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.*;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -61,7 +58,7 @@ public class ERC20Entity {
                     case ETHEREUM, OPTIMISM -> Ethereum.contractAddress(address);
                     case STARKNET -> StarkNet.contractAddress(address);
                     case APTOS -> Aptos.coinType(address);
-                    case STELLAR -> throw new IllegalStateException("Stellar not fully supported yet");
+                    case STELLAR -> Stellar.contractAddress(address);
                 },
                 name,
                 symbol,
