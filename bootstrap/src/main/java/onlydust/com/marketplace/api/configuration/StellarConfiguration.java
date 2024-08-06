@@ -22,8 +22,8 @@ public class StellarConfiguration {
     }
 
     @Bean
-    public StellarERC20ProviderAdapter stellarERC20Provider() {
-        return new StellarERC20ProviderAdapter();
+    public StellarERC20ProviderAdapter stellarERC20Provider(StellarClient client) {
+        return new StellarERC20ProviderAdapter(client);
     }
 
     @Bean

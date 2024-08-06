@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.api.stellar;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
-import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -13,10 +14,10 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
     private final StellarClient client;
 
     @Override
-    public Optional<StellarTransaction> get(StellarTransaction.Hash reference) {
+    public Optional<StellarTransaction> get(final @NonNull StellarTransaction.Hash reference) {
         return client.transaction(reference.toString())
                 .map(t -> new StellarTransaction(
-                        Stellar.transactionHash(t.getHash()),
-                        ZonedDateTime.parse(t.getCreatedAt())));
+                        reference,
+                        Instant.ofEpochSecond(t.getCreatedAt()).atZone(ZoneOffset.UTC)));
     }
 }
