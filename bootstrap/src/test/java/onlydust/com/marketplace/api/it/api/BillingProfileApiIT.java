@@ -606,7 +606,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .uri(getApiURI(String.format(PROJECTS_REWARDS, projectId)))
                 .header("Authorization", BEARER_PREFIX + pierre.jwt())
                 .body(BodyInserters.fromValue(new RewardRequest()
-                        .amount(BigDecimal.valueOf(20L))
+                        .amount(BigDecimal.valueOf(5000L)) // More than current allowance on ETHEREUM: 400 USDC
                         .currencyId(CurrencyHelper.USDC.value())
                         .recipientId(authenticatedUser.user().getGithubUserId())
                         .items(List.of(
