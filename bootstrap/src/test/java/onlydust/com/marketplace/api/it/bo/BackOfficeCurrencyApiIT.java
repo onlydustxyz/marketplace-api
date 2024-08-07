@@ -76,7 +76,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         projectAllowanceRepository.deleteAll();
         currencyRepository.deleteAll();
         accountBookProvider.evictAll();
-
     }
 
     @BeforeEach
@@ -249,13 +248,14 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.tokens[?(@.blockchain=='STELLAR')].address").isEqualTo("CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75")
-                .jsonPath("$.name").isEqualTo("") // FIXME
-                .jsonPath("$.code").isEqualTo("") // FIXME
-                .jsonPath("$.logoUrl").doesNotExist() // FIXME
-                .jsonPath("$.decimals").isEqualTo(0) // FIXME
+                .jsonPath("$.name").isEqualTo("USD Coin")
+                .jsonPath("$.code").isEqualTo("USDC")
+                .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
+                .jsonPath("$.decimals").isEqualTo(6)
         ;
     }
 
@@ -458,9 +458,9 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 {
                                   "blockchain": "STELLAR",
                                   "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
-                                  "decimals": 6,
+                                  "decimals": 7,
                                   "symbol": "USDC",
-                                  "name": "USD Coin"
+                                  "name": "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
                                 },
                                 {
                                   "blockchain": "APTOS",
