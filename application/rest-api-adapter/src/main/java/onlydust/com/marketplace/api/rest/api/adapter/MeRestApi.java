@@ -20,7 +20,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
-import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -47,6 +46,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.contract.model.NotificationChannel.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -360,7 +360,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> putMyNotificationSettings(NotificationSettingsPutRequest notificationSettingsPutRequest) {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final Map<NotificationCategory, List<NotificationChannel>> channelsPerCategory = new HashMap<>();
+        final Map<NotificationCategory, List<onlydust.com.marketplace.kernel.model.notification.NotificationChannel>> channelsPerCategory = new HashMap<>();
 
         for (NotificationSettingPutRequest notificationSettingPutRequest : notificationSettingsPutRequest.getNotificationSettings()) {
             channelsPerCategory.put(switch (notificationSettingPutRequest.getCategory()) {
@@ -371,8 +371,9 @@ public class MeRestApi implements MeApi {
                 case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
             }, notificationSettingPutRequest.getChannels().stream()
                     .map(notificationChannel -> switch (notificationChannel) {
-                        case EMAIL -> NotificationChannel.EMAIL;
-                        case SUMMARY_EMAIL -> NotificationChannel.DAILY_EMAIL;
+                        case EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.EMAIL;
+                        case SUMMARY_EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.SUMMARY_EMAIL;
+                        case IN_APP -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP;
                     }).toList());
         }
         notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(authenticatedUser.id()),

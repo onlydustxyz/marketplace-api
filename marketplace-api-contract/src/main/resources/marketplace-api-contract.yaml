@@ -8812,6 +8812,7 @@ components:
       enum:
         - EMAIL
         - SUMMARY_EMAIL
+        - IN_APP
 
     NotificationSettingsResponse:
       type: object

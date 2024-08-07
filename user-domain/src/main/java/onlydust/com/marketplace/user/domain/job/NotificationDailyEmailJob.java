@@ -12,8 +12,8 @@ public class NotificationDailyEmailJob {
     private final NotificationSender notificationEmailSender;
 
     public void run() {
-        final var pendingNotifications = notificationStoragePort.getPendingNotifications(NotificationChannel.DAILY_EMAIL);
+        final var pendingNotifications = notificationStoragePort.getPendingNotifications(NotificationChannel.SUMMARY_EMAIL);
         notificationEmailSender.send(pendingNotifications);
-        notificationStoragePort.markAsSent(NotificationChannel.DAILY_EMAIL, pendingNotifications.stream().map(Notification::id).toList());
+        notificationStoragePort.markAsSent(NotificationChannel.SUMMARY_EMAIL, pendingNotifications.stream().map(Notification::id).toList());
     }
 }

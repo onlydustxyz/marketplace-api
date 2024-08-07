@@ -207,7 +207,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                                 .stream()
                                 .map(notificationSettingsChannelEntity -> switch (notificationSettingsChannelEntity.channel()) {
                                     case EMAIL -> NotificationChannel.EMAIL;
-                                    case DAILY_EMAIL -> NotificationChannel.SUMMARY_EMAIL;
+                                    case SUMMARY_EMAIL -> NotificationChannel.SUMMARY_EMAIL;
                                     case IN_APP -> throw OnlyDustException.internalServerError("In app notification settings cannot be read");
                                 }).toList(),
                         switch (notificationCategoryListEntry.getKey()) {
