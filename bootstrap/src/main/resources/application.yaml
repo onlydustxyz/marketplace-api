@@ -152,8 +152,9 @@ infrastructure:
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
   stellar:
-    soroban-base-uri: https://soroban-rpc.mainnet.stellar.gateway.fm
-    account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
+    soroban:
+      base-uri: https://soroban-rpc.mainnet.stellar.gateway.fm
+      account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
   posthog:
     base-uri: https://eu.posthog.com
     api-key: ${POSTHOG_API_KEY}

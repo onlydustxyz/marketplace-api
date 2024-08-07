@@ -18,22 +18,22 @@ import static org.stellar.sdk.AbstractTransaction.MIN_BASE_FEE;
 import static org.stellar.sdk.InvokeHostFunctionOperation.invokeContractFunctionOperationBuilder;
 
 @Accessors(fluent = true)
-public class StellarClient {
-    private final @NonNull SorobanServer sorobanServer;
+public class SorobanClient {
+    private final @NonNull SorobanServer server;
     private final @NonNull String accountId;
 
     @Getter(lazy = true)
     private final @NonNull TransactionBuilderAccount account = getAccount();
 
-    public StellarClient(Properties properties) {
-        sorobanServer = new SorobanServer(properties.sorobanBaseUri);
+    public SorobanClient(Properties properties) {
+        server = new SorobanServer(properties.baseUri);
         accountId = properties.accountId;
     }
 
     private TransactionBuilderAccount getAccount() {
         try {
-            assert sorobanServer != null;
-            return sorobanServer.getAccount(accountId);
+            assert server != null;
+            return server.getAccount(accountId);
         } catch (AccountNotFoundException e) {
             throw internalServerError("Account not found", e);
         } catch (SorobanRpcErrorResponse | IOException e) {
@@ -44,7 +44,7 @@ public class StellarClient {
     @Retryable(retryFor = {RetryException.class})
     public Optional<GetTransactionResponse> transaction(String hash) {
         try {
-            final var response = sorobanServer.getTransaction(hash);
+            final var response = server.getTransaction(hash);
             return switch (response.getStatus()) {
                 case NOT_FOUND -> Optional.empty();
                 case SUCCESS -> Optional.of(response);
@@ -60,7 +60,7 @@ public class StellarClient {
     @Retryable(retryFor = {RetryException.class})
     public SCVal call(final @NonNull String contractId, final @NonNull String method) {
         try {
-            final var transaction = sorobanServer.simulateTransaction(new TransactionBuilder(account(), Network.PUBLIC)
+            final var transaction = server.simulateTransaction(new TransactionBuilder(account(), Network.PUBLIC)
                     .addOperation(invokeContractFunctionOperationBuilder(contractId, method, null).build())
                     .setTimeout(30)
                     .setBaseFee(MIN_BASE_FEE)
@@ -75,11 +75,11 @@ public class StellarClient {
     }
 
     @Data
+    @Accessors(fluent = false)
     @AllArgsConstructor
     @NoArgsConstructor
     public static class Properties {
-        String sorobanBaseUri;
+        String baseUri;
         String accountId;
     }
 }
-

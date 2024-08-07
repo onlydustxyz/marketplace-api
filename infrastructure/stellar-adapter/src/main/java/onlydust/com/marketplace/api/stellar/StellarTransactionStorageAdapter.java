@@ -11,7 +11,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class StellarTransactionStorageAdapter implements BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> {
-    private final StellarClient client;
+    private final SorobanClient client;
 
     @Override
     public Optional<StellarTransaction> get(final @NonNull StellarTransaction.Hash reference) {

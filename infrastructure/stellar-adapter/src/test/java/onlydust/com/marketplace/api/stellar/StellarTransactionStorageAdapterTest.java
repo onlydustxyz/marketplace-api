@@ -3,8 +3,8 @@ package onlydust.com.marketplace.api.stellar;
 import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 
 class StellarTransactionStorageAdapterTest {
-    final StellarClient.Properties properties = new StellarClient.Properties("https://soroban-rpc.mainnet.stellar.gateway.fm", "");
-    final StellarClient client = new StellarClient(properties);
+    final SorobanClient.Properties properties = new SorobanClient.Properties("https://soroban-rpc.mainnet.stellar.gateway.fm", "");
+    final SorobanClient client = new SorobanClient(properties);
     final StellarTransactionStorageAdapter adapter = new StellarTransactionStorageAdapter(client);
 
     //    @Test

@@ -3,10 +3,10 @@ package onlydust.com.marketplace.api.stellar;
 import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 
 class StellarERC20ProviderAdapterTest {
-    final StellarClient.Properties properties = new StellarClient.Properties("https://soroban-rpc.mainnet.stellar.gateway.fm",
+    final SorobanClient.Properties properties = new SorobanClient.Properties("https://soroban-rpc.mainnet.stellar.gateway.fm",
             "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL"
     );
-    final StellarClient client = new StellarClient(properties);
+    final SorobanClient client = new SorobanClient(properties);
     final StellarERC20ProviderAdapter adapter = new StellarERC20ProviderAdapter(client);
 
     //    @Test

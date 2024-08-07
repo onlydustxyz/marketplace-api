@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.configuration;
 
+import onlydust.com.marketplace.api.stellar.SorobanClient;
 import onlydust.com.marketplace.api.stellar.StellarAccountIdValidator;
-import onlydust.com.marketplace.api.stellar.StellarClient;
 import onlydust.com.marketplace.api.stellar.StellarERC20ProviderAdapter;
 import onlydust.com.marketplace.api.stellar.StellarTransactionStorageAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -11,19 +11,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class StellarConfiguration {
     @Bean
-    @ConfigurationProperties(value = "infrastructure.stellar", ignoreUnknownFields = false)
-    public StellarClient.Properties stellarProperties() {
-        return new StellarClient.Properties();
+    @ConfigurationProperties(value = "infrastructure.stellar.soroban", ignoreUnknownFields = false)
+    public SorobanClient.Properties sorobanProperties() {
+        return new SorobanClient.Properties();
     }
 
     @Bean
-    public StellarClient stellarClient(StellarClient.Properties properties) {
-        return new StellarClient(properties);
+    public SorobanClient sorobanClient(SorobanClient.Properties sorobanProperties) {
+        return new SorobanClient(sorobanProperties);
     }
 
     @Bean
-    public StellarERC20ProviderAdapter stellarERC20Provider(StellarClient client) {
-        return new StellarERC20ProviderAdapter(client);
+    public StellarERC20ProviderAdapter stellarERC20Provider(SorobanClient sorobanClient) {
+        return new StellarERC20ProviderAdapter(sorobanClient);
     }
 
     @Bean
@@ -32,7 +32,7 @@ public class StellarConfiguration {
     }
 
     @Bean
-    public StellarTransactionStorageAdapter stellarTransactionStorageAdapter(StellarClient client) {
-        return new StellarTransactionStorageAdapter(client);
+    public StellarTransactionStorageAdapter stellarTransactionStorageAdapter(SorobanClient sorobanClient) {
+        return new StellarTransactionStorageAdapter(sorobanClient);
     }
 }

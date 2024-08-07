@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class StellarERC20ProviderAdapter implements ERC20Provider {
-    private final StellarClient client;
+    private final SorobanClient client;
 
     @Override
     public Optional<ERC20> get(@NonNull Hash address) {
