@@ -39,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
 import static onlydust.com.backoffice.api.contract.model.BillingProfileType.COMPANY;
 import static onlydust.com.marketplace.api.helper.ConcurrentTesting.runConcurrently;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
@@ -160,11 +161,10 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
         });
 
         assertThat(rawResponses.values()).isNotEmpty();
-        final var invoiceIds = rawResponses.values().stream().map(r -> r.getId()).collect(Collectors.toSet());
+        final var invoiceIds = rawResponses.values().stream().map(InvoicePreviewResponse::getId).collect(toSet());
 
         // Assert that all rewards have the same invoice id, and that it is one of the invoice ids returned by the API
-        final var rewardInvoiceIds =
-                REWARD_IDS.stream().map(rewardId -> rewardRepository.findById(rewardId).orElseThrow().invoiceId()).collect(Collectors.toSet());
+        final var rewardInvoiceIds = REWARD_IDS.stream().map(rewardId -> rewardRepository.findById(rewardId).orElseThrow().invoice().id()).collect(toSet());
         assertThat(rewardInvoiceIds).hasSize(1);
         assertThat(invoiceIds).containsAll(rewardInvoiceIds);
     }
@@ -194,7 +194,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
         // Assert that all rewards have the right invoice id
         final var rewards = rewardRepository.findAllById(REWARD_IDS);
         final var rewardsStatusData = rewardStatusRepository.findAllById(REWARD_IDS);
-        rewards.forEach(r -> assertThat(r.invoiceId()).isEqualTo(invoicePreview.getId()));
+        rewards.forEach(r -> assertThat(r.invoice().id()).isEqualTo(invoicePreview.getId()));
         rewards.forEach(r -> assertThat(r.status().status()).isEqualTo(RewardStatus.Input.PENDING_REQUEST));
         rewardsStatusData.forEach(r -> assertThat(r.amountUsdEquivalent()).isEqualTo(rewards.stream().filter(reward -> reward.id().equals(r.rewardId())).findFirst().orElseThrow().amount()));
 
@@ -252,7 +252,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
 
         final var updatedRewards = rewardRepository.findAllById(REWARD_IDS);
         final var updatedRewardsStatusData = rewardStatusRepository.findAllById(REWARD_IDS);
-        updatedRewards.forEach(r -> assertThat(r.invoiceId()).isEqualTo(invoicePreview.getId()));
+        updatedRewards.forEach(r -> assertThat(r.invoice().id()).isEqualTo(invoicePreview.getId()));
         updatedRewards.forEach(r -> assertThat(r.status().status()).isEqualTo(RewardStatus.Input.PROCESSING));
         updatedRewardsStatusData.forEach(r -> assertThat(r.amountUsdEquivalent())
                 .isEqualTo(updatedRewards.stream().filter(reward -> reward.id().equals(r.rewardId())).findFirst().orElseThrow().amount().multiply(BigDecimal.valueOf(2))));

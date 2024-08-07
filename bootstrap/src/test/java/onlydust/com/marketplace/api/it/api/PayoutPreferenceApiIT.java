@@ -82,14 +82,11 @@ public class PayoutPreferenceApiIT extends AbstractMarketplaceApiIT {
         final var STRK = currencyRepository.findByCode("STRK").orElseThrow();
 
         final RewardEntity r1 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(0).getId(), userId.value(),
-                authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), STRK, null, null, null));
+                authenticatedUser.user().getGithubUserId(), STRK.id(), BigDecimal.ONE, new Date(), List.of(), null));
         final RewardEntity r2 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(1).getId(), userId.value(),
-                authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), STRK, null, null, null));
+                authenticatedUser.user().getGithubUserId(), STRK.id(), BigDecimal.ONE, new Date(), List.of(), null));
         final RewardEntity r3 = rewardRepository.save(new RewardEntity(UUID.randomUUID(), projectEntities.get(2).getId(), userId.value(),
-                authenticatedUser.user().getGithubUserId(),
-                STRK.id(), BigDecimal.ONE, new Date(), null, List.of(), STRK, null, null, null));
+                authenticatedUser.user().getGithubUserId(), STRK.id(), BigDecimal.ONE, new Date(), List.of(), null));
 
         Stream.of(r1, r2, r3).forEach(r -> rewardStatusStorage.persist(new RewardStatusData(RewardId.of(r.id()))
                 .usdAmount(new ConvertedAmount(Amount.of(1L), BigDecimal.ONE))
