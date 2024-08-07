@@ -276,7 +276,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotificationSettingPutRequest'
+              $ref: '#/components/schemas/NotificationSettingsPutRequest'
       responses:
         "204":
           description: 'Notification settings replaced'
@@ -8848,6 +8848,16 @@ components:
             $ref: '#/components/schemas/NotificationChannel'
         category:
           $ref: '#/components/schemas/NotificationCategory'
+
+    NotificationSettingsPutRequest:
+      type: object
+      required:
+        - notificationSettings
+      properties:
+        notificationSettings:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationSettingPutRequest'
 
     NotificationCategory:
       type: string
