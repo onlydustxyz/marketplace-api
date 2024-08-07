@@ -1,8 +1,9 @@
-package onlydust.com.marketplace.api.stellar;
+package onlydust.com.marketplace.api.stellar.adapters;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
+import onlydust.com.marketplace.api.stellar.SorobanClient;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 
 import java.time.Instant;

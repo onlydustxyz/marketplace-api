@@ -248,7 +248,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.tokens[?(@.blockchain=='STELLAR')].address").isEqualTo("CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75")

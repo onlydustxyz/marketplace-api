@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.stellar;
 
+import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
 import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 
 class StellarTransactionStorageAdapterTest {

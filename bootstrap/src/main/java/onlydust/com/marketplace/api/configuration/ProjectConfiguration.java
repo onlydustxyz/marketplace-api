@@ -17,7 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
-import onlydust.com.marketplace.api.stellar.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;

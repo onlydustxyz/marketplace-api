@@ -1,9 +1,10 @@
-package onlydust.com.marketplace.api.stellar;
+package onlydust.com.marketplace.api.stellar.adapters;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
+import onlydust.com.marketplace.api.stellar.SorobanClient;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import org.stellar.sdk.scval.Scv;

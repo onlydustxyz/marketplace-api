@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.configuration;
 
 import onlydust.com.marketplace.api.stellar.SorobanClient;
-import onlydust.com.marketplace.api.stellar.StellarAccountIdValidator;
-import onlydust.com.marketplace.api.stellar.StellarERC20ProviderAdapter;
-import onlydust.com.marketplace.api.stellar.StellarTransactionStorageAdapter;
+import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
+import onlydust.com.marketplace.api.stellar.adapters.StellarERC20ProviderAdapter;
+import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
