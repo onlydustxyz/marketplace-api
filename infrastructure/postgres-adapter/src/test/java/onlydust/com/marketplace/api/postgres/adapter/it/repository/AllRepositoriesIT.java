@@ -159,6 +159,7 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
                 .bio(faker.hacker().abbreviation())
                 .website(faker.harryPotter().location())
                 .location(faker.rickAndMorty().location())
+                .contactEmail(faker.internet().emailAddress())
                 .contactInformations(Set.of(ContactInformationEntity.builder()
                         .contact(faker.rickAndMorty().location())
                         .channel(Contact.Channel.TELEGRAM)
