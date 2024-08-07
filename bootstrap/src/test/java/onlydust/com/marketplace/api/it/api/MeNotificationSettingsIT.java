@@ -165,7 +165,7 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "EMAIL"
                               ],
-                              "category": "MAINTAINER_PROJECT_CONTRIBUTOR"
+                              "category": "MAINTAINER_PROJECT_PROGRAM"
                             },
                             {
                               "channels": [
