@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadMeApi;
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
@@ -17,6 +18,7 @@ import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity.isReadFromContract;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
@@ -60,6 +63,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final ProjectCategoryReadRepository projectCategoryReadRepository;
     private final LanguageReadRepository languageReadRepository;
     private final NotificationReadRepository notificationReadRepository;
+    private final NotificationSettingsChannelReadRepository notificationSettingsChannelReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -189,7 +193,32 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
 
     @Override
     public ResponseEntity<NotificationSettingsResponse> getMyNotificationSettings() {
-        return ReadMeApi.super.getMyNotificationSettings();
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final NotificationSettingsResponse notificationSettingsResponse = new NotificationSettingsResponse();
+        notificationSettingsChannelReadRepository.findAllByUserId(authenticatedUser.id())
+                .stream()
+                .filter(notificationSettingsChannelEntity -> !notificationSettingsChannelEntity.channel()
+                        .equals(onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP))
+                .collect(Collectors.groupingBy(NotificationSettingsChannelEntity::category))
+                .entrySet()
+                .stream()
+                .map(notificationCategoryListEntry -> new NotificationSettingResponse(
+                        notificationCategoryListEntry.getValue()
+                                .stream()
+                                .map(notificationSettingsChannelEntity -> switch (notificationSettingsChannelEntity.channel()) {
+                                    case EMAIL -> NotificationChannel.EMAIL;
+                                    case SUMMARY_EMAIL -> NotificationChannel.SUMMARY_EMAIL;
+                                    case IN_APP -> throw OnlyDustException.internalServerError("In app notification settings cannot be read");
+                                }).toList(),
+                        switch (notificationCategoryListEntry.getKey()) {
+                            case CONTRIBUTOR_REWARD -> NotificationCategory.CONTRIBUTOR_REWARD;
+                            case KYC_KYB_BILLING_PROFILE -> NotificationCategory.KYC_KYB_BILLING_PROFILE;
+                            case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
+                            case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
+                            case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
+                        }))
+                .forEach(notificationSettingsResponse::addNotificationSettingsItem);
+        return ResponseEntity.ok(notificationSettingsResponse);
     }
 
     @Override

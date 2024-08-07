@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -129,5 +130,133 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                           "onGoodFirstIssueAdded": false
                         }
                         """);
+    }
+
+    @Test
+    void should_get_and_put_my_notification_settings() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
+                .header("Authorization", BEARER_PREFIX + hayden.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "notificationSettings": [
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "KYC_KYB_BILLING_PROFILE"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_REWARD"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "MAINTAINER_PROJECT_PROGRAM"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_PROJECT"
+                            }
+                          ]
+                        }
+                        """);
+
+        // When
+        client.put()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
+                .header("Authorization", BEARER_PREFIX + hayden.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "notificationSettings": [
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "KYC_KYB_BILLING_PROFILE"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL", "SUMMARY_EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_REWARD"
+                            },
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "MAINTAINER_PROJECT_CONTRIBUTOR"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_PROJECT"
+                            }
+                          ]
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
+                .header("Authorization", BEARER_PREFIX + hayden.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "notificationSettings": [
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "KYC_KYB_BILLING_PROFILE"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL", "SUMMARY_EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_REWARD"
+                            },
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "MAINTAINER_PROJECT_CONTRIBUTOR"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_PROJECT"
+                            }
+                          ]
+                        }
+                        """);
+
+
     }
 }

@@ -5,7 +5,7 @@ import onlydust.com.marketplace.kernel.model.notification.Notification;
 
 public record NotificationStatusUpdateRequest(@NonNull Notification.Id notificationId, @NonNull NotificationStatus notificationStatus) {
 
-    public static enum NotificationStatus {
+    public enum NotificationStatus {
         READ, UNREAD
     }
 }

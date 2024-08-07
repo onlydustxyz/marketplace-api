@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
+import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -40,13 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.contract.model.NotificationChannel.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -353,6 +353,31 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> markAllInAppNotificationsAsRead() {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationService.markAllInAppUnreadAsRead(authenticatedUser.id());
+        return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<Void> putMyNotificationSettings(NotificationSettingsPutRequest notificationSettingsPutRequest) {
+        final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        final Map<NotificationCategory, List<onlydust.com.marketplace.kernel.model.notification.NotificationChannel>> channelsPerCategory = new HashMap<>();
+
+        for (NotificationSettingPutRequest notificationSettingPutRequest : notificationSettingsPutRequest.getNotificationSettings()) {
+            channelsPerCategory.put(switch (notificationSettingPutRequest.getCategory()) {
+                case CONTRIBUTOR_REWARD -> NotificationCategory.CONTRIBUTOR_REWARD;
+                case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
+                case KYC_KYB_BILLING_PROFILE -> NotificationCategory.KYC_KYB_BILLING_PROFILE;
+                case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
+                case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
+            }, notificationSettingPutRequest.getChannels().stream()
+                    .map(notificationChannel -> switch (notificationChannel) {
+                        case EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.EMAIL;
+                        case SUMMARY_EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.SUMMARY_EMAIL;
+                        case IN_APP -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP;
+                    }).toList());
+        }
+        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(authenticatedUser.id()),
+                NotificationSettings.builder().channelsPerCategory(channelsPerCategory).build());
         return noContent().build();
     }
 }
