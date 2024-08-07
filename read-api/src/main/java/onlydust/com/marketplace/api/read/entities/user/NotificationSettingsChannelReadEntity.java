@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -18,6 +19,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 @Data
 @Builder
+@Immutable
 @Accessors(fluent = true)
 @Table(name = "user_notification_settings_channels", schema = "iam")
 @IdClass(NotificationSettingsChannelEntity.PrimaryKey.class)
