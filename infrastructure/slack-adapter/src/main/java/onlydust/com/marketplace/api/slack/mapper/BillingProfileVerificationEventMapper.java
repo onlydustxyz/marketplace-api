@@ -60,7 +60,7 @@ public interface BillingProfileVerificationEventMapper {
                 user.login(),
                 nonNull(user.githubUserId()) ? user.githubUserId().toString() : null,
                 user.email(),
-                user.administratedBillingProfiles(),
+                user.avatarUrl(),
                 nonNull(billingProfileVerificationUpdated.getType()) ? billingProfileVerificationUpdated.getType().toString() : null,
                 nonNull(billingProfileVerificationUpdated.getVerificationStatus()) ?
                         billingProfileVerificationUpdated.getVerificationStatus().name() : null,
