@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.sponsor.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
@@ -64,6 +65,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final LanguageReadRepository languageReadRepository;
     private final NotificationReadRepository notificationReadRepository;
     private final NotificationSettingsChannelReadRepository notificationSettingsChannelReadRepository;
+    private final ProgramReadRepository programReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -177,6 +179,22 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final List<ProjectCategoryReadEntity> preferredCategories = projectCategoryReadRepository.findPreferredOnesForUser(authenticatedUser.id());
         final List<LanguageReadEntity> preferredLanguages = languageReadRepository.findPreferredOnesForUser(authenticatedUser.id());
         return ok(user.toPrivateUserProfileResponse(preferredCategories, preferredLanguages));
+    }
+
+    @Override
+    public ResponseEntity<ProgramsPageResponse> getMyPrograms(Integer pageIndex, Integer pageSize) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var page = programReadRepository.findAllByLead(authenticatedUser.id(),
+                PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
+
+        final var response = new ProgramsPageResponse()
+                .programs(page.getContent().stream().map(ProgramReadEntity::toPageItemResponse).toList())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages());
+
+        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
     }
 
     @Override

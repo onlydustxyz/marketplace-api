@@ -15,10 +15,12 @@ import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvi
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
+import onlydust.com.marketplace.api.helper.ProgramHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
@@ -73,6 +75,7 @@ public class AbstractMarketplaceApiIT {
     protected static final Faker faker = new Faker();
     protected static final String BANNER = "/api/v1/banner";
     protected static final String ME_BANNER = "/api/v1/me/banners/%s";
+    protected static final String ME_PROGRAMS = "/api/v1/me/programs";
     protected static final String BILLING_PROFILE_INVOICE_PREVIEW = "/api/v1/billing-profiles/%s/invoice-preview";
     protected static final String BILLING_PROFILE_INVOICES = "/api/v1/billing-profiles/%s/invoices";
     protected static final String BILLING_PROFILE_INVOICE = "/api/v1/billing-profiles/%s/invoices/%s";
@@ -232,8 +235,11 @@ public class AbstractMarketplaceApiIT {
     JWTVerifier jwtVerifier;
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
+    @Autowired
+    BackofficeFacadePort backofficeFacadePort;
 
     protected UserAuthHelper userAuthHelper;
+    protected ProgramHelper programHelper;
     @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
@@ -292,9 +298,9 @@ public class AbstractMarketplaceApiIT {
     }
 
     @BeforeEach
-    void setupUserAuthHelper() {
+    void setupHelpers() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
-                githubWireMockServer, appUserFacadePort);
+                githubWireMockServer, appUserFacadePort, faker);
 
         userAuthHelper.mockAuth0UserInfo(134486697L, "axelbconseil");
         userAuthHelper.mockAuth0UserInfo(43467246L, "AnthonyBuisset", "abuisset@gmail.com");
@@ -303,6 +309,8 @@ public class AbstractMarketplaceApiIT {
         userAuthHelper.mockAuth0UserInfo(595505L, "ofux");
         userAuthHelper.mockAuth0UserInfo(21149076L, "oscarwroche");
         userAuthHelper.mockAuth0UserInfo(16590657L, "PierreOucif");
+
+        programHelper = new ProgramHelper(entityManagerFactory, backofficeFacadePort, faker);
     }
 
 
