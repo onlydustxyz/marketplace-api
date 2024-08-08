@@ -23,8 +23,13 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                    @NonNull String from,
                                    @NonNull String to,
                                    @NonNull String subject,
-                                   @NonNull @JsonProperty("message_data") MessageData messageData
+                                   @NonNull @JsonProperty("message_data") MessageData messageData,
+                                   @NonNull String body
 ) {
+
+    public MailDTO(@NonNull String transactionalMessageId, @NonNull IdentifiersDTO identifiers, @NonNull String from, @NonNull String to, @NonNull String subject, @NonNull MessageData messageData) {
+        this(transactionalMessageId, identifiers, from, to, subject, messageData, "");
+    }
 
     public record IdentifiersDTO(String id, String email) {
     }
@@ -97,7 +102,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 "Your application to committee %s".formatted(committeeApplicationCreated.getCommitteeName()),
-                NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationCreated));
+                NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationCreated, customerIOProperties.getEnvironment()));
     }
 
     public static MailDTO<ProjectApplicationAcceptedDTO> from(@NonNull CustomerIOProperties customerIOProperties,

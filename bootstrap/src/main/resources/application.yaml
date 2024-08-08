@@ -184,6 +184,7 @@ infrastructure:
     new-committee-application-email-id: 14
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: 17
+    environment: ${ENV}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
