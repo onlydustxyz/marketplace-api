@@ -340,6 +340,41 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/programs:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get my leaded programs
+      operationId: getMyPrograms
+      description: |
+        Get the list of programs the user is leading
+      parameters:
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+            default: 5
+      responses:
+        "200":
+          description: 'Programs'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/profile:
     get:
       security:
@@ -2041,6 +2076,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProjectBudgetsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/projects/{projectId}/stats:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get project stats
+      operationId: getProjectStats
+      description: |
+        Get some KPIs for the project
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: fromDate
+          description: Date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          description: Date filter
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+      responses:
+        "200":
+          description: 'Project stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectStatsResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -3787,6 +3867,148 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/programs/{programId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadPrograms
+      summary: Get program details
+      operationId: getProgram
+      description: |
+        Get program details. Only program leaders can access this information.
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+      responses:
+        "200":
+          description: 'Program details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/{programId}/stats/transactions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadPrograms
+      summary: Get program transactions stats
+      operationId: getProgramTransactionsStats
+      description: |
+        Get program transactions stats grouped by month. 
+        Only program leaders can access this information.
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: types
+          description: Transaction types filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProgramTransactionType'
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by project or sponsor name
+      responses:
+        "200":
+          description: 'Program transactions stats grouped by month'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramTransactionStatsListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/{programId}/transactions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadPrograms
+      summary: Get program transactions
+      operationId: getProgramTransactions
+      description: |
+        Get program transactions.
+        Use Accept: text/csv header to get the response in CSV format.
+        Only program leaders can access this information.
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+        - in: query
+          name: pageIndex
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: types
+          description: Transaction types filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProgramTransactionType'
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by project or sponsor name
+      responses:
+        "200":
+          description: 'The program transactions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramTransactionPageResponse'
+            text/csv:
+              schema:
+                type: string
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/sponsors/{sponsorId}:
     get:
       security:
@@ -3906,6 +4128,36 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Budget to allocate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AllocateRequest'
+      responses:
+        "204":
+          description: 'The funds have been allocated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/{programId}/grant:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Programs
+      summary: Grant a budget to a project
+      operationId: grantBudgetToProject
+      description: Grant a budget to a project
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
       requestBody:
         description: Budget to allocate
         required: true
@@ -4493,6 +4745,11 @@ components:
       type: string
       format: uuid
       description: OnlyDust sponsor ID
+
+    ProgramId:
+      type: string
+      format: uuid
+      description: OnlyDust program ID
 
     EcosystemId:
       type: string
@@ -5386,12 +5643,90 @@ components:
         issueCount:
           type: integer
 
-    SponsorResponse:
+    ProgramsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - programs
+          properties:
+            programs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProgramPageItemResponse'
+
+    ProgramShortResponse:
       type: object
       required:
         - id
         - name
-        - url
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+        name:
+          type: string
+          description: Program name
+          example: Starkware Exploration Team
+
+    ProgramPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramShortResponse'
+
+    ProgramDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramShortResponse'
+        - type: object
+          required:
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+
+    ProgramTransactionStatsListResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramTransactionStatsResponse'
+
+    ProgramTransactionStatsResponse:
+      type: object
+      required:
+        - date
+        - totalAvailable
+        - totalGranted
+        - totalRewarded
+        - transactionCount
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date of the transactions
+        totalAvailable:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalGranted:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        transactionCount:
+          type: integer
+          description: Number of transactions for this month
+          example: 42
+
+    SponsorShortResponse:
+      type: object
+      required:
+        - id
+        - name
         - logoUrl
       properties:
         id:
@@ -5400,16 +5735,28 @@ components:
           type: string
           description: Sponsor name
           example: Ethereum Foundation
-        url:
-          type: string
-          format: url
-          description: URL of sponsor's website
-          example: 'https://ethereum.org'
         logoUrl:
           type: string
           format: url
           description: Direct URL to sponsor's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
+
+    SponsorResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorShortResponse'
+        - type: object
+          required:
+            - url
+          properties:
+            url:
+              type: string
+              format: url
+              description: URL of sponsor's website
+              example: 'https://ethereum.org'
+
+    SponsorLinkResponse:
+      allOf:
+        - $ref: '#/components/schemas/SponsorShortResponse'
 
     SponsorDetailsResponse:
       allOf:
@@ -7156,6 +7503,26 @@ components:
       example:
         url: https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4137005338789730434.png
 
+    ProjectStatsResponse:
+      type: object
+      required:
+        - activeContributorCount
+        - mergedPrCount
+        - rewardCount
+        - totalGranted
+        - totalRewarded
+      properties:
+        activeContributorCount:
+          type: integer
+        mergedPrCount:
+          type: integer
+        rewardCount:
+          type: integer
+        totalGranted:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+    
     ProjectBudgetsResponse:
       type: object
       required:
@@ -8217,6 +8584,50 @@ components:
           $ref: '#/components/schemas/ProjectLinkResponse'
         amount:
           $ref: '#/components/schemas/Money'
+
+    ProgramTransactionPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - transactions
+          properties:
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProgramTransactionPageItemResponse'
+
+    ProgramTransactionPageItemResponse:
+      type: object
+      required:
+        - id
+        - date
+        - type
+        - amount
+      properties:
+        id:
+          $ref: '#/components/schemas/TransactionId'
+        date:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/ProgramTransactionType'
+        from:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectLinkResponse'
+            - $ref: '#/components/schemas/SponsorLinkResponse'
+        to:
+          oneOf:
+            - $ref: '#/components/schemas/ProjectLinkResponse'
+            - $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          $ref: '#/components/schemas/Money'
+
+    ProgramTransactionType:
+      type: string
+      enum:
+        - TRANSFER
+        - REFUND
 
     SponsorAccountTransactionType:
       type: string
