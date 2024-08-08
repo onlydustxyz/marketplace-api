@@ -11,10 +11,12 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
+import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -40,7 +42,8 @@ import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHel
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -109,9 +112,6 @@ class BillingProfileServiceTest {
 
         @Test
         void should_prevent_invoice_upload() {
-            // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
-
             // When
             assertThatThrownBy(() -> billingProfileService.uploadGeneratedInvoice(userId, billingProfileId, invoice.id(), pdf))
                     // Then
@@ -373,8 +373,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_found() {
             // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.empty());
 
             // When
@@ -387,8 +385,6 @@ class BillingProfileServiceTest {
         @Test
         void should_prevent_invoice_upload_if_not_a_draft() {
             // Given
-            when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                    .id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).invoiceMandateAcceptedAt(ZonedDateTime.now().minusDays(1)).build()));
             when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice.status(REJECTED)));
 
             // When
@@ -691,7 +687,6 @@ class BillingProfileServiceTest {
         class GivenTheMandateIsAccepted {
             @BeforeEach
             void setup() {
-                when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().id(billingProfileId).type(BillingProfile.Type.INDIVIDUAL).build()));
                 when(invoiceStoragePort.get(invoice.id())).thenReturn(Optional.of(invoice));
             }
 
@@ -1039,201 +1034,6 @@ class BillingProfileServiceTest {
         }
     }
 
-
-    @Test
-    void should_unauthorized_to_get_billing_profile_given_a_user_not_member_of_it() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdNotMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdNotInvited = GithubUserId.of(faker.number().randomNumber());
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
-        when(billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserIdNotInvited)).thenReturn(false);
-        Exception exception = null;
-        try {
-            billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdNotInvited);
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(401, ((OnlyDustException) exception).getStatus());
-        assertEquals("User %s is not a member of billing profile %s".formatted(userIdNotMember.value(), billingProfileId.value()),
-                exception.getMessage());
-    }
-
-    @Test
-    void should_throw_internal_error_given_a_billing_profile_for_a_user_without_rights_found() {
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdInvited = GithubUserId.of(faker.number().randomNumber());
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder().build()));
-        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
-                .thenReturn(Optional.empty());
-        Exception exception = null;
-        try {
-            billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(500, ((OnlyDustException) exception).getStatus());
-        assertEquals("User %s rights on billing profile %s were not found".formatted(userIdMember.value(), billingProfileId.value()),
-                exception.getMessage());
-    }
-
-    @Test
-    void should_get_billing_profile_given_a_user_member_of_it() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdInvited = GithubUserId.of(faker.number().randomNumber());
-        final BillingProfileView billingProfileView = BillingProfileView.builder()
-                .kyb(Kyb.builder().id(UUID.randomUUID())
-                        .ownerId(UserId.random())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .billingProfileId(billingProfileId)
-                        .build())
-                .kyc(Kyc.builder()
-                        .id(UUID.randomUUID())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .ownerId(UserId.random()).build())
-                .payoutInfo(PayoutInfo.builder()
-                        .aptosAddress(new AptosAccountAddress("0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5"))
-                        .build())
-                .build();
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
-        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
-                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .billingProfileProcessingRewardsCount(0L)
-                        .userProcessingRewardsCount(0L)
-                        .role(BillingProfile.User.Role.MEMBER)
-                        .build()));
-        final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
-
-        // Then
-        verify(billingProfileStoragePort).findViewById(billingProfileId);
-        assertNotNull(billingProfile.getMe());
-        assertNotNull(billingProfile.getKyb());
-        assertNotNull(billingProfile.getKyc());
-        assertNull(billingProfile.getPayoutInfo());
-    }
-
-    @Test
-    void should_get_billing_profile_given_a_user_invited_to_it() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdNotMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdInvited = GithubUserId.of(faker.number().randomNumber());
-        final BillingProfileView billingProfileView = BillingProfileView.builder()
-                .kyb(Kyb.builder().id(UUID.randomUUID())
-                        .ownerId(UserId.random())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .billingProfileId(billingProfileId)
-                        .build())
-                .kyc(Kyc.builder()
-                        .id(UUID.randomUUID())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .ownerId(UserId.random()).build())
-                .payoutInfo(PayoutInfo.builder()
-                        .aptosAddress(new AptosAccountAddress("0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5"))
-                        .build())
-                .build();
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(false);
-        when(billingProfileStoragePort.isUserInvitedTo(billingProfileId, githubUserIdInvited)).thenReturn(true);
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
-        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdNotMember))
-                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .billingProfileProcessingRewardsCount(0L)
-                        .userProcessingRewardsCount(0L)
-                        .role(BillingProfile.User.Role.MEMBER)
-                        .build()));
-        final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
-
-        // Then
-        verify(billingProfileStoragePort).findViewById(billingProfileId);
-        assertNotNull(billingProfile.getMe());
-        assertNotNull(billingProfile.getKyb());
-        assertNotNull(billingProfile.getKyc());
-        assertNull(billingProfile.getPayoutInfo());
-    }
-
-    @Test
-    void should_get_billing_profile_given_a_user_admin_of_it() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdInvited = GithubUserId.of(faker.number().randomNumber());
-        final BillingProfileView billingProfileView = BillingProfileView.builder()
-                .kyb(Kyb.builder().id(UUID.randomUUID())
-                        .ownerId(UserId.random())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .billingProfileId(billingProfileId)
-                        .build())
-                .kyc(Kyc.builder()
-                        .id(UUID.randomUUID())
-                        .status(VerificationStatus.NOT_STARTED)
-                        .ownerId(UserId.random()).build())
-                .payoutInfo(PayoutInfo.builder()
-                        .aptosAddress(new AptosAccountAddress("0xa645c3bdd0dfd0c3628803075b3b133e8426061dc915ef996cc5ed4cece6d4e5"))
-                        .build())
-                .build();
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdMember)).thenReturn(true);
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(billingProfileView));
-        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userIdMember))
-                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
-                        .billingProfileProcessingRewardsCount(0L)
-                        .userProcessingRewardsCount(0L)
-                        .role(BillingProfile.User.Role.ADMIN)
-                        .build()));
-        final BillingProfileView billingProfile = billingProfileService.getBillingProfile(billingProfileId, userIdMember, githubUserIdInvited);
-
-        // Then
-        verify(billingProfileStoragePort).findViewById(billingProfileId);
-        assertNotNull(billingProfile.getMe());
-        assertNotNull(billingProfile.getKyb());
-        assertNotNull(billingProfile.getKyc());
-        assertNotNull(billingProfile.getPayoutInfo());
-    }
-
-    @Test
-    void should_get_billing_profile_by_id_throw_not_found_given_a_user_member_of_it() {
-        // Given
-        final BillingProfile.Id billingProfileId = BillingProfile.Id.of(UUID.randomUUID());
-        final UserId userIdNotMember = UserId.of(UUID.randomUUID());
-        final GithubUserId githubUserIdInvited = GithubUserId.of(faker.number().randomNumber());
-
-        // When
-        when(billingProfileStoragePort.isUserMemberOf(billingProfileId, userIdNotMember)).thenReturn(true);
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.empty());
-        Exception exception = null;
-        try {
-            billingProfileService.getBillingProfile(billingProfileId, userIdNotMember, githubUserIdInvited);
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(404, ((OnlyDustException) exception).getStatus());
-        assertEquals("Billing profile %s not found".formatted(billingProfileId.value()),
-                exception.getMessage());
-    }
-
     @Test
     void should_not_authorized_to_modify_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
         // Given
@@ -1251,26 +1051,6 @@ class BillingProfileServiceTest {
         assertTrue(exception instanceof OnlyDustException);
         assertEquals(401, ((OnlyDustException) exception).getStatus());
         assertEquals("User %s must be admin to edit payout info of billing profile %s".formatted(userIdNotAdmin.value(), billingProfileId.value()),
-                exception.getMessage());
-    }
-
-    @Test
-    void should_not_authorized_to_read_payout_info_given_a_user_not_admin_of_linked_billing_profile() {
-        // Given
-        final UserId userIdNotAdmin = UserId.of(UUID.randomUUID());
-
-        // When
-        Exception exception = null;
-        try {
-            billingProfileService.getPayoutInfo(billingProfileId, userIdNotAdmin);
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        // Then
-        assertTrue(exception instanceof OnlyDustException);
-        assertEquals(401, ((OnlyDustException) exception).getStatus());
-        assertEquals("User %s must be admin to read payout info of billing profile %s".formatted(userIdNotAdmin, billingProfileId),
                 exception.getMessage());
     }
 
@@ -1294,33 +1074,6 @@ class BillingProfileServiceTest {
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Invalid payout info");
-    }
-
-    @Test
-    void should_get_payout_info_given_a_user_admin() {
-        // Given
-        final PayoutInfoView expectedPayoutInfo = PayoutInfoView.builder().build();
-
-        // When
-        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
-                .thenReturn(Optional.of(expectedPayoutInfo));
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
-
-        // Then
-        assertEquals(expectedPayoutInfo, payoutInfo);
-        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
-    }
-
-    @Test
-    void should_get_empty_payout_info_given_a_user_admin_and_no_payout_info() {
-        // When
-        when(billingProfileStoragePort.findPayoutInfoByBillingProfile(billingProfileId))
-                .thenReturn(Optional.empty());
-        final PayoutInfoView payoutInfo = billingProfileService.getPayoutInfo(billingProfileId, userId);
-
-        // Then
-        assertNotNull(payoutInfo);
-        verify(billingProfileStoragePort).findPayoutInfoByBillingProfile(billingProfileId);
     }
 
     @Test
@@ -1482,10 +1235,6 @@ class BillingProfileServiceTest {
     void should_invite_coworker() {
         // Given
         final GithubUserId githubUserId = GithubUserId.of(faker.number().randomNumber(10, true));
-        when(billingProfileStoragePort.findViewById(billingProfileId)).thenReturn(Optional.of(BillingProfileView.builder()
-                .type(BillingProfile.Type.COMPANY)
-                .build()
-        ));
 
         // When
         billingProfileService.inviteCoworker(billingProfileId, userId, githubUserId, BillingProfile.User.Role.MEMBER);

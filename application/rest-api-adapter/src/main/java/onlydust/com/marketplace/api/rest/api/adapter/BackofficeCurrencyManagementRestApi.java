@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.model.blockchain.Stellar;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +49,7 @@ public class BackofficeCurrencyManagementRestApi implements BackofficeCurrencyMa
                     case ETHEREUM, OPTIMISM -> currencyFacadePort.addERC20Support(blockchain, Ethereum.contractAddress(request.getAddress()));
                     case STARKNET -> currencyFacadePort.addERC20Support(blockchain, StarkNet.contractAddress(request.getAddress()));
                     case APTOS -> currencyFacadePort.addERC20Support(blockchain, Aptos.coinType(request.getAddress()));
+                    case STELLAR -> currencyFacadePort.addERC20Support(blockchain, Stellar.contractAddress(request.getAddress()));
                 };
             }
 

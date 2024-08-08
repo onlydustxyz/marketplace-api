@@ -2,16 +2,17 @@ package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
+import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
+import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileUserRightsQueryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.PayoutInfoQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -24,19 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.*;
 
-import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @AllArgsConstructor
 public class PostgresBillingProfileAdapter implements BillingProfileStoragePort {
-    private final @NonNull GlobalSettingsRepository globalSettingsRepository;
     private final @NonNull BillingProfileRepository billingProfileRepository;
     private final @NonNull KybRepository kybRepository;
     private final @NonNull KycRepository kycRepository;
     private final @NonNull PayoutInfoRepository payoutInfoRepository;
-    private final @NonNull PayoutInfoViewRepository payoutInfoViewRepository;
     private final @NonNull WalletRepository walletRepository;
     private final @NonNull BillingProfileUserRepository billingProfileUserRepository;
     private final @NonNull BillingProfileUserViewRepository billingProfileUserViewRepository;
@@ -121,110 +117,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     @Transactional(readOnly = true)
     public Optional<BillingProfile> findById(BillingProfile.Id billingProfileId) {
         return billingProfileRepository.findById(billingProfileId.value()).map(BillingProfileEntity::toDomain);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId) {
-        final var invoiceMandateLatestVersionDate = globalSettingsRepository.get().getInvoiceMandateLatestVersionDate();
-
-        return billingProfileRepository.findById(billingProfileId.value()).map(billingProfileEntity -> {
-            final var stats = billingProfileEntity.getStats();
-            return switch (billingProfileEntity.getType()) {
-                case INDIVIDUAL -> {
-                    BillingProfileView billingProfileView = BillingProfileView.builder()
-                            .enabled(billingProfileEntity.getEnabled())
-                            .type(BillingProfile.Type.INDIVIDUAL)
-                            .id(billingProfileId)
-                            .name(billingProfileEntity.getName())
-                            .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus())
-                            .missingPayoutInfo(stats.missingPayoutInfo())
-                            .missingVerification(stats.missingVerification())
-                            .individualLimitReached(stats.individualLimitReached())
-                            .rewardCount(stats.rewardCount())
-                            .invoiceableRewardCount(stats.invoiceableRewardCount())
-                            .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
-                            .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                            .currentYearPaymentLimit(isNull(stats.currentYearPaymentLimit()) ? null :
-                                    PositiveAmount.of(stats.currentYearPaymentLimit()))
-                            .currentYearPaymentAmount(PositiveAmount.of(stats.currentYearPaymentAmount()))
-                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
-                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
-                                    .values().stream().toList())
-                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
-                            .build();
-                    final Optional<KycEntity> optionalKycEntity = kycRepository.findByBillingProfileId(billingProfileId.value());
-                    if (optionalKycEntity.isPresent()) {
-                        billingProfileView = billingProfileView.toBuilder()
-                                .kyc(optionalKycEntity.get().toDomain())
-                                .build();
-                    }
-                    yield billingProfileView;
-                }
-                case COMPANY -> {
-                    BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.COMPANY)
-                            .id(billingProfileId)
-                            .name(billingProfileEntity.getName())
-                            .enabled(billingProfileEntity.getEnabled())
-                            .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus())
-                            .missingPayoutInfo(stats.missingPayoutInfo())
-                            .missingVerification(stats.missingVerification())
-                            .rewardCount(stats.rewardCount())
-                            .invoiceableRewardCount(stats.invoiceableRewardCount())
-                            .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
-                            .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
-                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
-                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
-                                    .values().stream().toList())
-                            .build();
-                    final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
-                    if (optionalKybEntity.isPresent()) {
-                        billingProfileView = billingProfileView.toBuilder()
-                                .kyb(optionalKybEntity.get().toDomain())
-                                .build();
-                    }
-                    yield billingProfileView;
-                }
-                case SELF_EMPLOYED -> {
-                    BillingProfileView billingProfileView = BillingProfileView.builder().type(BillingProfile.Type.SELF_EMPLOYED)
-                            .id(billingProfileId)
-                            .name(billingProfileEntity.getName())
-                            .enabled(billingProfileEntity.getEnabled())
-                            .invoiceMandateAcceptedAt(billingProfileEntity.getInvoiceMandateAcceptedAt())
-                            .invoiceMandateLatestVersionDate(invoiceMandateLatestVersionDate)
-                            .payoutInfo(isNull(billingProfileEntity.getPayoutInfo()) ? null : billingProfileEntity.getPayoutInfo().toDomain())
-                            .verificationStatus(billingProfileEntity.getVerificationStatus())
-                            .missingPayoutInfo(stats.missingPayoutInfo())
-                            .missingVerification(stats.missingVerification())
-                            .rewardCount(stats.rewardCount())
-                            .invoiceableRewardCount(stats.invoiceableRewardCount())
-                            .admins(billingProfileEntity.getUsers().stream().map(BillingProfileUserEntity::toView).toList())
-                            .currentMonthRewardedAmounts(billingProfileEntity.getCurrentMonthRewards().stream()
-                                    .map(r -> new TotalMoneyView(r.amount(), r.currency().toDomain().toView(), r.statusData().amountUsdEquivalent()))
-                                    .collect(groupingBy(TotalMoneyView::currency, reducing(null, TotalMoneyView::add)))
-                                    .values().stream().toList())
-                            .build();
-                    final Optional<KybEntity> optionalKybEntity = kybRepository.findByBillingProfileId(billingProfileId.value());
-                    if (optionalKybEntity.isPresent()) {
-                        billingProfileView = billingProfileView.toBuilder()
-                                .kyb(optionalKybEntity.get().toDomain())
-                                .build();
-                    }
-                    yield billingProfileView;
-                }
-            };
-        });
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<PayoutInfoView> findPayoutInfoByBillingProfile(BillingProfile.Id billingProfileId) {
-        return payoutInfoViewRepository.findByBillingProfileId(billingProfileId.value()).map(PayoutInfoQueryEntity::toDomain);
     }
 
     @Override

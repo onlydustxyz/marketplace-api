@@ -7,8 +7,6 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.accounting.domain.view.PayoutInfoView;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
@@ -42,12 +40,6 @@ public interface BillingProfileFacadePort {
 
     void acceptInvoiceMandate(UserId userId, BillingProfile.Id billingProfileId);
 
-    // TODO: move to read-api
-    BillingProfileView getBillingProfile(BillingProfile.Id billingProfileId, UserId userId, GithubUserId githubUserId);
-
-    // TODO: move to read-api
-    PayoutInfoView getPayoutInfo(BillingProfile.Id billingProfileId, UserId userId);
-
     void updatePayoutInfo(BillingProfile.Id billingProfileId, UserId userId, PayoutInfo payoutInfo);
 
     Page<BillingProfileCoworkerView> getCoworkers(BillingProfile.Id billingProfileId, UserId userId, int pageIndex, int pageSize);
@@ -70,7 +62,4 @@ public interface BillingProfileFacadePort {
 
     // TODO: move to read-api
     List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
-
-    // TODO: move to read-api
-    BillingProfileView getById(BillingProfile.Id id);
 }

@@ -2,22 +2,23 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import onlydust.com.backoffice.api.contract.model.VerificationStatus;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.view.*;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.view.MoneyView;
+import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
+import onlydust.com.marketplace.accounting.domain.view.RewardShortView;
+import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
-import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
@@ -492,6 +493,7 @@ public interface BackOfficeMapper {
             case STARKNET -> Blockchain.STARKNET;
             case OPTIMISM -> Blockchain.OPTIMISM;
             case APTOS -> Blockchain.APTOS;
+            case STELLAR -> Blockchain.STELLAR;
         };
     }
 
@@ -501,6 +503,7 @@ public interface BackOfficeMapper {
             case STARKNET -> BlockchainContract.STARKNET;
             case OPTIMISM -> BlockchainContract.OPTIMISM;
             case APTOS -> BlockchainContract.APTOS;
+            case STELLAR -> BlockchainContract.STELLAR;
         };
     }
 
@@ -563,6 +566,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> Network.OPTIMISM;
             case STARKNET -> Network.STARKNET;
             case APTOS -> Network.APTOS;
+            case STELLAR -> Network.STELLAR;
             case SEPA -> Network.SEPA;
         };
     }
@@ -573,6 +577,7 @@ public interface BackOfficeMapper {
             case OPTIMISM -> TransactionNetwork.OPTIMISM;
             case STARKNET -> TransactionNetwork.STARKNET;
             case APTOS -> TransactionNetwork.APTOS;
+            case STELLAR -> TransactionNetwork.STELLAR;
             case SEPA -> TransactionNetwork.SEPA;
         };
     }
@@ -609,47 +614,10 @@ public interface BackOfficeMapper {
         };
     }
 
-    static BillingProfileResponse map(BillingProfileView billingProfile) {
-        return new BillingProfileResponse()
-                .id(billingProfile.getId().value())
-                .subject(billingProfile.subject())
-                .type(map(billingProfile.getType()))
-                .name(billingProfile.getName())
-                .verificationStatus(map(billingProfile.getVerificationStatus()))
-                .kyb(billingProfile.getKyb() == null ? null : map(billingProfile.getKyb()))
-                .kyc(billingProfile.getKyc() == null ? null : map(billingProfile.getKyc()))
-                .admins(billingProfile.getAdmins().stream().map(BackOfficeMapper::map).toList())
-                .currentMonthRewardedAmounts(billingProfile.getCurrentMonthRewardedAmounts().stream()
-                        .map(BackOfficeMapper::totalMoneyViewToResponse)
-                        .toList())
-                .payoutInfos(map(billingProfile.getPayoutInfo()))
-                ;
-    }
-
-    static BillingProfilePayoutInfoResponse map(PayoutInfo payoutInfo) {
-        return isNull(payoutInfo) ? null : new BillingProfilePayoutInfoResponse()
-                .bankAccount(payoutInfo.bankAccount().map(BackOfficeMapper::map).orElse(null))
-                .ethWallet(payoutInfo.ethWallet().map(WalletLocator::asString).orElse(null))
-                .optimismAddress(payoutInfo.optimismAddress().map(EvmAccountAddress::toString).orElse(null))
-                .aptosAddress(payoutInfo.aptosAddress().map(AptosAccountAddress::toString).orElse(null))
-                .starknetAddress(payoutInfo.starknetAddress().map(StarknetAccountAddress::toString).orElse(null))
-                ;
-    }
-
     static BillingProfilePayoutInfoResponseBankAccount map(BankAccount bankAccount) {
         return new BillingProfilePayoutInfoResponseBankAccount()
                 .number(bankAccount.accountNumber())
                 .bic(bankAccount.bic())
-                ;
-    }
-
-    static UserResponse map(BillingProfileView.User user) {
-        return new UserResponse()
-                .id(user.id().value())
-                .githubUserId(user.githubUserId().value())
-                .githubLogin(user.githubLogin())
-                .githubAvatarUrl(user.githubAvatarUrl())
-                .email(user.email())
                 ;
     }
 

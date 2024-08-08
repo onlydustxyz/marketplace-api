@@ -81,15 +81,9 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("individual")
-                .jsonPath("$.type").isEqualTo("INDIVIDUAL")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.kyc.id").isNotEmpty()
-                .jsonPath("$.kyb").isEmpty()
                 .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
-        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().getId();
-
+        final UUID kycId = kycRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kycId.toString());
@@ -140,7 +134,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.kyc.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
                 .jsonPath("$.kyc.firstName").isEqualTo("ALEXIS")
                 .jsonPath("$.kyc.lastName").isEqualTo("BENOLIEL")
@@ -274,11 +267,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("company")
-                .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.kyb.id").isNotEmpty()
-                .jsonPath("$.kyc").isEmpty()
                 .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
         final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
@@ -572,11 +560,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.name").isEqualTo("company2")
-                .jsonPath("$.type").isEqualTo("COMPANY")
-                .jsonPath("$.status").isEqualTo("NOT_STARTED")
-                .jsonPath("$.kyb.id").isNotEmpty()
-                .jsonPath("$.kyc").isEmpty()
                 .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
 
         final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();

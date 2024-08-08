@@ -49,13 +49,12 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
     @Override
     @Transactional
     public void create(final @NonNull Invoice invoice) {
-        invoiceRepository.saveAndFlush(InvoiceEntity.fromDomain(invoice));
-
         final var rewards = rewardRepository.findAllById(invoice.rewards().stream().map(r -> r.id().value()).toList());
-        if (rewards.size() != invoice.rewards().size()) {
+        if (rewards.size() != invoice.rewards().size())
             throw notFound("Some invoice's rewards were not found (invoice %s). This may happen if a reward was cancelled in the meantime.".formatted(invoice.id()));
-        }
-        rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoiceId(invoice.id().value())).toList());
+
+        final var invoiceEntity = InvoiceEntity.fromDomain(invoice);
+        rewardRepository.saveAll(rewards.stream().map(r -> r.invoice(invoiceEntity)).toList());
     }
 
     @Override
@@ -88,7 +87,7 @@ public class PostgresInvoiceStorage implements InvoiceStoragePort {
 
         drafts.forEach(invoice -> {
             final var rewards = rewardRepository.findAllByInvoiceId(invoice.id());
-            rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoiceId(null)).toList());
+            rewardRepository.saveAllAndFlush(rewards.stream().map(pr -> pr.invoice(null)).toList());
         });
 
         invoiceRepository.deleteAll(drafts);

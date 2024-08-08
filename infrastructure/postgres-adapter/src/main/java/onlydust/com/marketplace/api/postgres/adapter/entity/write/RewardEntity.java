@@ -34,7 +34,29 @@ public class RewardEntity {
     @NonNull
     Date requestedAt;
 
-    UUID invoiceId;
+    public RewardEntity(@NonNull UUID id,
+                        @NonNull UUID projectId,
+                        @NonNull UUID requestorId,
+                        @NonNull Long recipientId,
+                        @NonNull UUID currencyId,
+                        @NonNull BigDecimal amount,
+                        @NonNull Date requestedAt,
+                        @NonNull List<RewardItemEntity> rewardItems,
+                        UUID billingProfileId) {
+        this.id = id;
+        this.projectId = projectId;
+        this.requestorId = requestorId;
+        this.recipientId = recipientId;
+        this.currencyId = currencyId;
+        this.amount = amount;
+        this.requestedAt = requestedAt;
+        this.rewardItems = rewardItems;
+        this.billingProfileId = billingProfileId;
+    }
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "invoiceId")
+    InvoiceEntity invoice;
 
     @OneToMany(mappedBy = "rewardId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @NonNull

@@ -30,6 +30,7 @@
         <module>customer-io-adapter</module>
         <module>node-guardians-api-client-adapter</module>
         <module>langchain</module>
+        <module>stellar-adapter</module>
     </modules>
 
     <properties>

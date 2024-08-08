@@ -447,4 +447,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000302_renaming_daily_email.sql
   - include:
       file: db/changelog/changelogs/00000303_fix_default_notification_settings.sql
-
+  - include:
+      file: db/changelog/changelogs/00000304_add_stellar_network.sql

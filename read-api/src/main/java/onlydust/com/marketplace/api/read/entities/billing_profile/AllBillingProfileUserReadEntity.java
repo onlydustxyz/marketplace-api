@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -29,10 +30,15 @@ public class AllBillingProfileUserReadEntity {
 
     UUID userId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)
     @NonNull
     BillingProfileReadEntity billingProfile;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
+    @NonNull
+    AllUserReadEntity user;
 
     @Enumerated(EnumType.STRING)
     BillingProfileCoworkerRole role;

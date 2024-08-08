@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.onlydust.marketplace.indexer</groupId>
+    <groupId>com.onlydust.marketplace.api</groupId>
     <artifactId>infura-adapter</artifactId>
 
     <properties>

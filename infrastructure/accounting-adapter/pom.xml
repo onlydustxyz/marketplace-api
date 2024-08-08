@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.onlydust.marketplace.indexer</groupId>
+    <groupId>onlydust.com.marketplace.api</groupId>
     <artifactId>accounting-adapter</artifactId>
 
     <properties>

@@ -1,15 +1,13 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
-import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -30,59 +28,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMor
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BillingProfileMapper {
-
-    private static @NonNull KYCResponse kycToResponse(final Kyc kyc) {
-        final KYCResponse response = new KYCResponse();
-        if (isNull(kyc)) {
-            return response;
-        }
-        response.address(kyc.getAddress());
-        response.birthdate(DateMapper.toZoneDateTime(kyc.getBirthdate()));
-        response.country(kyc.getCountry().map(c -> c.display().orElse(c.iso3Code())).orElse(null));
-        response.setFirstName(kyc.getFirstName());
-        response.setLastName(kyc.getLastName());
-        response.setIdDocumentCountryCode(kyc.getIdDocumentCountry().map(Country::iso3Code).orElse(null));
-        response.setIdDocumentNumber(kyc.getIdDocumentNumber());
-        response.setIdDocumentType(isNull(kyc.getIdDocumentType()) ? null : switch (kyc.getIdDocumentType()) {
-            case ID_CARD -> KYCResponse.IdDocumentTypeEnum.ID_CARD;
-            case PASSPORT -> KYCResponse.IdDocumentTypeEnum.PASSPORT;
-            case DRIVER_LICENSE -> KYCResponse.IdDocumentTypeEnum.DRIVER_LICENSE;
-            case RESIDENCE_PERMIT -> KYCResponse.IdDocumentTypeEnum.RESIDENCE_PERMIT;
-        });
-        response.setId(kyc.getId());
-        response.setUsCitizen(kyc.isUsCitizen());
-        response.setValidUntil(DateMapper.toZoneDateTime(kyc.getValidUntil()));
-        return response;
-    }
-
-    static @NonNull KYBResponse kybToResponse(final Kyb kyb) {
-        final KYBResponse response = new KYBResponse();
-        if (isNull(kyb)) {
-            return response;
-        }
-        response.setAddress(kyb.getAddress());
-        response.setCountry(isNull(kyb.getCountry()) ? null : kyb.getCountry().display().orElse(null));
-        response.setName(kyb.getName());
-        response.setId(kyb.getId());
-        response.setEuVATNumber(kyb.getEuVATNumber());
-        response.setRegistrationDate(DateMapper.toZoneDateTime(kyb.getRegistrationDate()));
-        response.setRegistrationNumber(kyb.getRegistrationNumber());
-        response.setSubjectToEuropeVAT(kyb.getSubjectToEuropeVAT());
-        response.setUsEntity(kyb.getUsEntity());
-        return response;
-    }
-
-    static VerificationStatus verificationStatusToResponse(final onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus verificationStatus) {
-        return isNull(verificationStatus) ? null :
-                switch (verificationStatus) {
-                    case CLOSED -> VerificationStatus.CLOSED;
-                    case REJECTED -> VerificationStatus.REJECTED;
-                    case STARTED -> VerificationStatus.STARTED;
-                    case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-                    case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-                    case VERIFIED -> VerificationStatus.VERIFIED;
-                };
-    }
 
     static InvoicePreviewResponse map(Invoice preview) {
         return new InvoicePreviewResponse()
@@ -209,43 +154,6 @@ public interface BillingProfileMapper {
                 .status(map(invoice.status()));
     }
 
-    static BillingProfileResponse billingProfileViewToResponse(BillingProfileView view) {
-        final var response = new BillingProfileResponse();
-        response.setId(view.getId().value());
-        response.setName(view.getName());
-        response.setType(map(view.getType()));
-        response.setKyb(isNull(view.getKyb()) ? null : kybToResponse(view.getKyb()));
-        response.setKyc(isNull(view.getKyc()) ? null : kycToResponse(view.getKyc()));
-        response.setStatus(verificationStatusToResponse(view.getVerificationStatus()));
-        response.setEnabled(view.getEnabled());
-        response.setCurrentYearPaymentLimit(isNull(view.getCurrentYearPaymentLimit()) ? null : view.getCurrentYearPaymentLimit().getValue());
-        response.setCurrentYearPaymentAmount(isNull(view.getCurrentYearPaymentAmount()) ? null : view.getCurrentYearPaymentAmount().getValue());
-        response.setInvoiceMandateAccepted(view.isInvoiceMandateAccepted());
-        response.setRewardCount(view.getRewardCount());
-        response.setInvoiceableRewardCount(view.getInvoiceableRewardCount());
-        response.setMissingPayoutInfo(view.getMissingPayoutInfo());
-        response.setMissingVerification(view.getMissingVerification());
-        response.setVerificationBlocked(view.isVerificationBlocked());
-        response.setIndividualLimitReached(view.getIndividualLimitReached());
-        response.setMe(isNull(view.getMe()) ? null :
-                new BillingProfileResponseMe()
-                        .canLeave(view.getMe().canLeave())
-                        .canDelete(view.getMe().canDelete())
-                        .role(mapRole(view.getMe().role()))
-                        .invitation(isNull(view.getMe().invitation()) ? null :
-                                new BillingProfileCoworkerInvitation()
-                                        .invitedBy(new ContributorResponse()
-                                                .avatarUrl(view.getMe().invitation().githubAvatarUrl())
-                                                .login(view.getMe().invitation().githubLogin())
-                                                .githubUserId(view.getMe().invitation().githubUserId().value()))
-                                        .role(mapRole(view.getMe().invitation().role()))
-                                        .invitedAt(view.getMe().invitation().invitedAt())
-                        )
-        );
-        response.setIsSwitchableToSelfEmployed(view.isSwitchableToSelfEmployed());
-        return response;
-    }
-
     static BillingProfileCoworkersPageResponse coworkersPageToResponse(Page<BillingProfileCoworkerView> coworkersPage, int pageIndex) {
         return new BillingProfileCoworkersPageResponse()
                 .coworkers(coworkersPage.getContent().stream()
@@ -311,6 +219,7 @@ public interface BillingProfileMapper {
             case OPTIMISM -> NetworkContract.OPTIMISM;
             case STARKNET -> NetworkContract.STARKNET;
             case APTOS -> NetworkContract.APTOS;
+            case STELLAR -> NetworkContract.STELLAR;
             case SEPA -> NetworkContract.SEPA;
         };
     }

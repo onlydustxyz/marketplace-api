@@ -58,16 +58,17 @@ public class ReceiptEntity {
 
     public ReceiptView toView() {
         return ReceiptView.builder()
-                .type(network == NetworkEnumEntity.sepa ? ReceiptView.Type.FIAT : ReceiptView.Type.CRYPTO)
+                .type(network == NetworkEnumEntity.SEPA ? ReceiptView.Type.FIAT : ReceiptView.Type.CRYPTO)
                 .blockchain(switch (network) {
-                    case ethereum -> Blockchain.ETHEREUM;
-                    case aptos -> Blockchain.APTOS;
-                    case optimism -> Blockchain.OPTIMISM;
-                    case starknet -> Blockchain.STARKNET;
+                    case ETHEREUM -> Blockchain.ETHEREUM;
+                    case APTOS -> Blockchain.APTOS;
+                    case OPTIMISM -> Blockchain.OPTIMISM;
+                    case STARKNET -> Blockchain.STARKNET;
+                    case STELLAR -> Blockchain.STELLAR;
                     default -> null;
                 })
-                .walletAddress(network == NetworkEnumEntity.sepa ? null : thirdPartyAccountNumber)
-                .iban(network == NetworkEnumEntity.sepa ? thirdPartyAccountNumber : null)
+                .walletAddress(network == NetworkEnumEntity.SEPA ? null : thirdPartyAccountNumber)
+                .iban(network == NetworkEnumEntity.SEPA ? thirdPartyAccountNumber : null)
                 .transactionReference(transactionReference)
                 .build();
     }

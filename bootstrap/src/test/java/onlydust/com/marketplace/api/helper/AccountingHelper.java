@@ -92,10 +92,10 @@ public class AccountingHelper {
         if (currencyCode != null) {
             final var currency = currencyRepository.findByCode(currencyCode).orElseThrow();
             final var network = switch (currencyCode) {
-                case "ETH", "USDC" -> NetworkEnumEntity.ethereum;
-                case "APT" -> NetworkEnumEntity.aptos;
-                case "OP" -> NetworkEnumEntity.optimism;
-                case "STRK" -> NetworkEnumEntity.starknet;
+                case "ETH", "USDC" -> NetworkEnumEntity.ETHEREUM;
+                case "APT" -> NetworkEnumEntity.APTOS;
+                case "OP" -> NetworkEnumEntity.OPTIMISM;
+                case "STRK" -> NetworkEnumEntity.STARKNET;
                 default -> throw new IllegalArgumentException("Currency code %s not mapped".formatted(currencyCode));
             };
 
@@ -108,8 +108,7 @@ public class AccountingHelper {
 
         if (invoiceReceivedAt != null) {
             final var invoiceEntity = fakeInvoice(UUID.randomUUID(), List.of(rewardEntity.id()));
-            invoiceRepository.save(invoiceEntity);
-            rewardEntity.invoiceId(invoiceEntity.id());
+            rewardEntity.invoice(invoiceEntity);
             rewardStatus.invoiceReceivedAt(new SimpleDateFormat("yyyy-MM-dd").parse(invoiceReceivedAt));
         }
 
@@ -176,7 +175,7 @@ public class AccountingHelper {
                 billingProfile.getKyb().verificationStatus(status);
                 kybRepository.save(billingProfile.getKyb());
             } else {
-                billingProfile.getKyc().setVerificationStatus(status);
+                billingProfile.getKyc().verificationStatus(status);
                 kycRepository.save(billingProfile.getKyc());
             }
             billingProfile.setVerificationStatus(status);

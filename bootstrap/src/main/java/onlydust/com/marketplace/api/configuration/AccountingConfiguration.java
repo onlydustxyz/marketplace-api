@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter
 import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
 import org.springframework.context.annotation.Bean;
@@ -85,9 +86,10 @@ public class AccountingConfiguration {
     public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter,
                                                    final @NonNull StarknetAccountValidatorAdapter starknetEnsValidatorAdapter,
                                                    final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter,
-                                                   final @NonNull AptosAccountValidatorAdapter aptosAccountValidatorAdapter) {
+                                                   final @NonNull AptosAccountValidatorAdapter aptosAccountValidatorAdapter,
+                                                   final @NonNull StellarAccountIdValidator stellarAccountIdValidator) {
         return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter,
-                aptosAccountValidatorAdapter);
+                aptosAccountValidatorAdapter, stellarAccountIdValidator);
     }
 
     @Bean

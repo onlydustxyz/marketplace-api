@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.it.bo;
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
@@ -16,9 +19,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -77,6 +78,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     private PayoutPreferenceFacadePort payoutPreferenceFacadePort;
     @Autowired
     private BillingProfileStoragePort billingProfileStoragePort;
+    @Autowired
+    private KycRepository kycRepository;
+    @Autowired
+    private KybRepository kybRepository;
     @Autowired
     PdfStoragePort pdfStoragePort;
     @Autowired
@@ -1301,8 +1306,10 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_get_billing_profile() {
         final var billingProfileId = BillingProfile.Id.of("1253b889-e5d5-49ee-8e8a-21405ccab8a6");
-        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
-        billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
+        final var kyb = kybRepository.findByBillingProfileId(billingProfileId.value()).orElseThrow();
+        kyb.applicantId("123456");
+        kybRepository.save(kyb);
+
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .bankAccount(BankAccount.builder()
                         .bic("AGFBFRCC")
@@ -1368,8 +1375,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_get_current_month_rewarded_amounts() {
         final var billingProfileId = BillingProfile.Id.of("9cae91ac-e70f-426f-af0d-e35c1d3578ed");
-        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
-        billingProfileStoragePort.saveKyb(billingProfile.getKyb().toBuilder().externalApplicantId("123456").build());
+        final var kyb = kybRepository.findByBillingProfileId(billingProfileId.value()).orElseThrow();
+        kyb.applicantId("123456");
+        kybRepository.save(kyb);
 
         final var rewardIds = List.of(
                 RewardId.of("1c56d096-5284-4ae3-af3c-dd2b3211fb73"),
@@ -1423,25 +1431,26 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .map(billingProfileReadEntity -> BillingProfile.Id.of(billingProfileReadEntity.id()))
                 .orElseGet(() -> billingProfileFacadePort.createIndividualBillingProfile(userId, "Personal", null).id());
 
-        final var billingProfile = billingProfileStoragePort.findViewById(billingProfileId).orElseThrow();
+        final var kyc = kycRepository.findByBillingProfileId(billingProfileId.value()).orElseThrow();
 
-        billingProfileStoragePort.updateBillingProfileStatus(billingProfile.getId(), VerificationStatus.VERIFIED);
-        billingProfileStoragePort.saveKyc(billingProfile.getKyc().toBuilder()
+        billingProfileStoragePort.updateBillingProfileStatus(billingProfileId, VerificationStatus.VERIFIED);
+        kycRepository.save(kyc.toBuilder()
                 .firstName(faker.name().firstName())
                 .address(faker.address().fullAddress())
                 .consideredUsPersonQuestionnaire(false)
-                .idDocumentCountry(Country.fromIso3("FRA"))
-                .country(Country.fromIso3("FRA"))
+                .idDocumentCountryCode("FRA")
+                .country("FRA")
                 .build());
-        billingProfileFacadePort.updatePayoutInfo(billingProfile.getId(), userId,
+
+        billingProfileFacadePort.updatePayoutInfo(billingProfileId, userId,
                 PayoutInfo.builder()
                         .ethWallet(Ethereum.wallet("ofux.eth"))
                         .starknetAddress(StarkNet.accountAddress("0x0788b45a11Ee333293a1d4389430009529bC97D814233C2A5137c4F5Ff949905"))
                         .aptosAddress(Aptos.accountAddress("0x66cb05df2d855fbae92cdb2dfac9a0b29c969a03998fa817735d27391b52b189"))
                         .build());
-        payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfile.getId(), userId);
+        payoutPreferenceFacadePort.setPayoutPreference(projectId, billingProfileId, userId);
 
-        final var invoiceId = billingProfileFacadePort.previewInvoice(userId, billingProfile.getId(), List.of(rewardId)).id();
+        final var invoiceId = billingProfileFacadePort.previewInvoice(userId, billingProfileId, List.of(rewardId)).id();
         final var pdf = new ByteArrayInputStream(faker.lorem().paragraph().getBytes());
 
         when(pdfStoragePort.upload(eq(invoiceId.value() + ".pdf"), any())).then(invocation -> {
@@ -1449,7 +1458,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
             return new URL("https://s3.storage.com/%s".formatted(fileName));
         });
 
-        billingProfileFacadePort.uploadGeneratedInvoice(userId, billingProfile.getId(), invoiceId, pdf);
+        billingProfileFacadePort.uploadGeneratedInvoice(userId, billingProfileId, invoiceId, pdf);
 
         return invoiceId;
     }

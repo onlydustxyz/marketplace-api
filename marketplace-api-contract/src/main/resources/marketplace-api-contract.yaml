@@ -3001,12 +3001,12 @@ paths:
             schema:
               $ref: '#/components/schemas/BillingProfileRequest'
       responses:
-        "200":
-          description: 'Billing profile'
+        "201":
+          description: 'Billing profile created'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BillingProfileResponse'
+                $ref: '#/components/schemas/BillingProfileCreateResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "403":
@@ -3021,7 +3021,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BillingProfiles
+        - ReadBillingProfiles
       summary: Get billing profile by id
       operationId: getBillingProfile
       description: |
@@ -3175,7 +3175,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BillingProfiles
+        - ReadBillingProfiles
       summary: Get payout info of the given billing profile
       operationId: getPayoutInfo
       description: |
@@ -4685,6 +4685,10 @@ components:
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
         missingStarknetWallet:
           type: boolean
+        stellarAccountId:
+          $ref: '#/components/schemas/StellarAccountId'
+        missingStellarWallet:
+          type: boolean
 
     BillingProfilePayoutInfoRequest:
       type: object
@@ -4711,6 +4715,8 @@ components:
         starknetAddress:
           type: string
           example: 0x056471aa79e3daebb62185cebee14fb0088b462b04ccf6e60ec9386044bec798
+        stellarAccountId:
+          $ref: '#/components/schemas/StellarAccountId'
 
     UserProfileUpdateRequest:
       type: object
@@ -7587,6 +7593,14 @@ components:
         - REJECTED
         - CLOSED
 
+    BillingProfileCreateResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/BillingProfileId'
+
     BillingProfileResponse:
       type: object
       required:
@@ -8031,6 +8045,7 @@ components:
         - OPTIMISM
         - APTOS
         - STARKNET
+        - STELLAR
 
     VatRegulationState:
       type: string
@@ -9126,3 +9141,8 @@ components:
           type: string
         verificationStatus:
           $ref: '#/components/schemas/VerificationStatus'
+
+    StellarAccountId:
+      type: string
+      description: Stellar account public key, base-32 encoded
+      example: GBAIA5U6E3FSRUW55AXACIVGX2QR5JYAS74OWLED3S22EGXVYEHPLGPA

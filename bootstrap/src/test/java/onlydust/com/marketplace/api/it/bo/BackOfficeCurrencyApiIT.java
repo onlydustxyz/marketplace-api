@@ -76,7 +76,6 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         projectAllowanceRepository.deleteAll();
         currencyRepository.deleteAll();
         accountBookProvider.evictAll();
-
     }
 
     @BeforeEach
@@ -222,6 +221,36 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.type").isEqualTo("CRYPTO")
                 .jsonPath("$.tokens[?(@.blockchain=='APTOS')].address").isEqualTo("0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T")
+                .jsonPath("$.name").isEqualTo("USD Coin")
+                .jsonPath("$.code").isEqualTo("USDC")
+                .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
+                .jsonPath("$.decimals").isEqualTo(6)
+        ;
+    }
+
+    @Test
+    @Order(4)
+    void should_add_asset_support_on_stellar() {
+        client
+                .post()
+                .uri(getApiURI(CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + camille.jwt())
+                .bodyValue("""
+                        {
+                            "type": "CRYPTO",
+                            "standard": "ERC20",
+                            "blockchain": "STELLAR",
+                            "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75"
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isNotEmpty()
+                .jsonPath("$.type").isEqualTo("CRYPTO")
+                .jsonPath("$.tokens[?(@.blockchain=='STELLAR')].address").isEqualTo("CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75")
                 .jsonPath("$.name").isEqualTo("USD Coin")
                 .jsonPath("$.code").isEqualTo("USDC")
                 .jsonPath("$.logoUrl").isEqualTo("https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png")
@@ -426,6 +455,13 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "name": "USD Coin"
                                 },
                                 {
+                                  "blockchain": "STELLAR",
+                                  "address": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+                                  "decimals": 7,
+                                  "symbol": "USDC",
+                                  "name": "USDC:GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN"
+                                },
+                                {
                                   "blockchain": "APTOS",
                                   "address": "0x5e156f1207d0ebfa19a9eeff00d62a282278fb8719f4fab3a586a0a2c0fffbea::coin::T",
                                   "decimals": 6,
@@ -448,10 +484,11 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 }
                               ],
                               "supportedOn": [
-                                "STARKNET",
                                 "APTOS",
+                                "ETHEREUM",
                                 "OPTIMISM",
-                                "ETHEREUM"
+                                "STARKNET",
+                                "STELLAR"
                               ],
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
                               "countryRestrictions": []

@@ -187,11 +187,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
-        return ok(map(billingProfileFacadePort.getById(BillingProfile.Id.of(billingProfileId))));
-    }
-
-    @Override
     public ResponseEntity<EarningsResponse> getEarnings(List<RewardStatusContract> statuses,
                                                         List<Long> recipients,
                                                         List<UUID> billingProfiles,

@@ -1,23 +1,25 @@
 package onlydust.com.marketplace.api.read.entities.billing_profile;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.BillingProfileCoworkerRole;
 import onlydust.com.marketplace.api.contract.model.ShortBillingProfileResponse;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
+import onlydust.com.marketplace.api.read.utils.Arithmetic;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.stream.Collectors.*;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -70,6 +72,42 @@ public class BillingProfileReadEntity {
 
     @Formula("(select gs.invoice_mandate_latest_version_date from global_settings gs where gs.id=1)")
     ZonedDateTime invoiceMandateLatestVersionDate;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "billingProfileId")
+    @SQLRestriction("""
+            id in (
+                select rsd.reward_id
+                from accounting.reward_status_data rsd
+                where date_trunc('month', rsd.paid_at)::date = date_trunc('month', CURRENT_DATE)::date
+            )
+            """)
+    @NonNull
+    List<RewardReadEntity> currentMonthRewards;
+
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "billingProfileId")
+    @SQLRestriction("""
+            id in (
+                select rs.reward_id
+                from accounting.reward_statuses rs
+                where rs.status = 'PAYOUT_INFO_MISSING'
+            )
+            """)
+    @NonNull
+    List<RewardReadEntity> missingPayoutInfoRewards;
+
+    List<NetworkEnumEntity> missingPayoutInfoRewardsNetworks() {
+        return missingPayoutInfoRewards.stream().flatMap(r -> Arrays.stream(r.statusData().networks())).toList();
+    }
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @Getter(AccessLevel.NONE)
+    PayoutInfoReadEntity payoutInfo;
+
+    public PayoutInfoReadEntity payoutInfo() {
+        return Optional.ofNullable(payoutInfo).orElseGet(() -> new PayoutInfoReadEntity(this));
+    }
 
     public BillingProfileShortResponse toBoShortResponse() {
         return new BillingProfileShortResponse()
@@ -131,11 +169,78 @@ public class BillingProfileReadEntity {
         return verificationStatus == VerificationStatus.REJECTED || verificationStatus == VerificationStatus.CLOSED;
     }
 
+    private boolean isSwitchableToSelfEmployed() {
+        return type == BillingProfileType.COMPANY && this.users.size() == 1;
+    }
+
     public BillingProfileLinkResponse toBoLinkResponse() {
         return new BillingProfileLinkResponse()
                 .id(id)
                 .type(type)
-                .subject(kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null)
+                .subject(subject())
                 ;
+    }
+
+    public String subject() {
+        return kyc != null ? kyc.subject() : kyb != null ? kyb.subject() : null;
+    }
+
+    public BillingProfileResponse toBoResponse() {
+        return new BillingProfileResponse()
+                .id(id)
+                .subject(subject())
+                .type(type)
+                .name(name)
+                .verificationStatus(verificationStatus)
+                .kyb(kyb == null ? null : kyb.toDto())
+                .kyc(kyc == null ? null : kyc.toDto())
+                .admins(users.stream().filter(u -> u.role() == BillingProfileCoworkerRole.ADMIN).map(AllBillingProfileUserReadEntity::user).map(AllUserReadEntity::toBoResponse).toList())
+                .currentMonthRewardedAmounts(currentMonthRewards.stream()
+                        .collect(groupingBy(r -> r.currency().id(),
+                                mapping(RewardReadEntity::toTotalMoneyWithUsdEquivalentResponse,
+                                        reducing(null, Arithmetic::sum))))
+                        .values().stream().toList())
+                .payoutInfos(payoutInfo == null ? null : payoutInfo.toBoResponse())
+                ;
+    }
+
+    public onlydust.com.marketplace.api.contract.model.BillingProfileResponse toResponse() {
+        return new onlydust.com.marketplace.api.contract.model.BillingProfileResponse()
+                .id(id)
+                .name(name)
+                .type(map(type))
+                .kyb(kyb == null ? null : kyb.toResponse())
+                .kyc(kyc == null ? null : kyc.toResponse())
+                .status(map(verificationStatus))
+                .enabled(enabled)
+                .currentYearPaymentLimit(stats.currentYearPaymentLimit)
+                .currentYearPaymentAmount(stats.currentYearPaymentAmount)
+                .invoiceMandateAccepted(isInvoiceMandateAccepted())
+                .rewardCount(stats.rewardCount())
+                .invoiceableRewardCount(stats.invoiceableRewardCount())
+                .missingPayoutInfo(stats.missingPayoutInfo())
+                .missingVerification(stats.missingVerification())
+                .verificationBlocked(isVerificationBlocked())
+                .individualLimitReached(stats.individualLimitReached())
+                .isSwitchableToSelfEmployed(isSwitchableToSelfEmployed());
+    }
+
+    private onlydust.com.marketplace.api.contract.model.VerificationStatus map(VerificationStatus verificationStatus) {
+        return switch (verificationStatus) {
+            case NOT_STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.NOT_STARTED;
+            case STARTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.STARTED;
+            case UNDER_REVIEW -> onlydust.com.marketplace.api.contract.model.VerificationStatus.UNDER_REVIEW;
+            case VERIFIED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.VERIFIED;
+            case REJECTED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.REJECTED;
+            case CLOSED -> onlydust.com.marketplace.api.contract.model.VerificationStatus.CLOSED;
+        };
+    }
+
+    private onlydust.com.marketplace.api.contract.model.BillingProfileType map(BillingProfileType type) {
+        return switch (type) {
+            case INDIVIDUAL -> onlydust.com.marketplace.api.contract.model.BillingProfileType.INDIVIDUAL;
+            case COMPANY -> onlydust.com.marketplace.api.contract.model.BillingProfileType.COMPANY;
+            case SELF_EMPLOYED -> onlydust.com.marketplace.api.contract.model.BillingProfileType.SELF_EMPLOYED;
+        };
     }
 }

@@ -314,12 +314,10 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public BillingProfileStoragePort accountingBillingProfileStorage(final GlobalSettingsRepository globalSettingsRepository,
-                                                                     final KycRepository kycRepository,
+    public BillingProfileStoragePort accountingBillingProfileStorage(final KycRepository kycRepository,
                                                                      final KybRepository kybRepository,
                                                                      final BillingProfileRepository billingProfileRepository,
                                                                      final PayoutInfoRepository payoutInfoRepository,
-                                                                     final PayoutInfoViewRepository payoutInfoViewRepository,
                                                                      final WalletRepository walletRepository,
                                                                      final BillingProfileUserRepository billingProfileUserRepository,
                                                                      final BillingProfileUserViewRepository billingProfileUserViewRepository,
@@ -331,8 +329,8 @@ public class PostgresConfiguration {
                                                                      final RewardViewRepository rewardViewRepository,
                                                                      final RewardRepository rewardRepository,
                                                                      final UserRepository userRepository) {
-        return new PostgresBillingProfileAdapter(globalSettingsRepository,
-                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, payoutInfoViewRepository, walletRepository,
+        return new PostgresBillingProfileAdapter(
+                billingProfileRepository, kybRepository, kycRepository, payoutInfoRepository, walletRepository,
                 billingProfileUserRepository, billingProfileUserViewRepository, childrenKycRepository, billingProfileUserInvitationRepository,
                 payoutPreferenceRepository, bankAccountRepository, billingProfileUserRightsViewRepository,
                 rewardViewRepository, rewardRepository, userRepository);

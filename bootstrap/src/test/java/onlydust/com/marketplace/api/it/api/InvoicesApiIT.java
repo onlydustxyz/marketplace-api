@@ -1110,19 +1110,19 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
         assertThat(invoiceOnCompany.status()).isEqualTo(Invoice.Status.DRAFT);
         assertThat(invoiceOnCompany.data().rewards().stream().anyMatch(r -> r.id().equals(UUID.fromString(rewardId)))).isTrue();
         var reward = entityManagerFactory.createEntityManager().find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceOnCompanyId.getValue());
+        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceOnCompanyId.getValue());
 
         // Then switch billing profile type
         final var ownerId = UserId.of(antho.user().getId());
         final var individualBillingProfileId = BillingProfile.Id.of(billingProfileReadRepository.findByUserId(ownerId.value())
                 .stream().filter(bp -> bp.type() == INDIVIDUAL).findFirst()
                 .orElseThrow().id());
-        final var individualBillingProfile = billingProfileStoragePort.findViewById(individualBillingProfileId).orElseThrow();
-        billingProfileStoragePort.saveKyc(individualBillingProfile.getKyc().toBuilder()
+
+        final var kyc = kycRepository.findByBillingProfileId(individualBillingProfileId.value()).orElseThrow();
+        kycRepository.save(kyc
                 .consideredUsPersonQuestionnaire(false)
-                .country(Country.fromIso3("FRA"))
-                .idDocumentCountry(Country.fromIso3("FRA"))
-                .build());
+                .country("FRA")
+                .idDocumentCountryCode("FRA"));
         billingProfileStoragePort.updateBillingProfileStatus(individualBillingProfileId, VerificationStatus.VERIFIED);
         billingProfileStoragePort.savePayoutInfoForBillingProfile(PayoutInfo.builder()
                 .ethWallet(Ethereum.wallet("abuisset.eth"))
@@ -1159,7 +1159,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // Check that the reward is part of the approved invoice
         reward = em.find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceId.getValue());
+        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceId.getValue());
 
         // Switch back to company billing profile type
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), ownerId);
@@ -1178,7 +1178,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
         // Now check that the reward is still part of the approved invoice
         reward = em.find(RewardEntity.class, UUID.fromString(rewardId));
-        assertThat(reward.invoiceId().toString()).isEqualTo(invoiceId.getValue());
+        assertThat(reward.invoice().id().toString()).isEqualTo(invoiceId.getValue());
         em.close();
     }
 

@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsView;
@@ -14,6 +16,8 @@ import java.util.UUID;
 
 @Entity
 @Immutable
+@Getter
+@Accessors(fluent = true)
 public class BillingProfileUserRightsQueryEntity {
     @Id
     UUID userId;

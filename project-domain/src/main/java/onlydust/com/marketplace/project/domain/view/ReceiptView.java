@@ -27,6 +27,7 @@ public class ReceiptView {
             case APTOS -> Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash(transactionReference));
             case OPTIMISM -> Optimism.BLOCK_EXPLORER.url(Optimism.transactionHash(transactionReference));
             case STARKNET -> StarkNet.BLOCK_EXPLORER.url(StarkNet.transactionHash(transactionReference));
+            case STELLAR -> Stellar.BLOCK_EXPLORER.url(Stellar.transactionHash(transactionReference));
         });
     }
 

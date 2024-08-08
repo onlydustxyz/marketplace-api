@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.*;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 
 import java.time.ZonedDateTime;
 
@@ -18,6 +19,7 @@ public class BlockchainService implements BlockchainFacadePort {
     private final BlockchainTransactionStoragePort<EvmTransaction, EvmTransaction.Hash> optimismTransactionStoragePort;
     private final BlockchainTransactionStoragePort<AptosTransaction, AptosTransaction.Hash> aptosTransactionStoragePort;
     private final BlockchainTransactionStoragePort<StarknetTransaction, StarknetTransaction.Hash> starknetTransactionStoragePort;
+    private final BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> stellarTransactionStoragePort;
 
     @Override
     public ZonedDateTime getTransactionTimestamp(Blockchain blockchain, String reference) {
@@ -26,6 +28,7 @@ public class BlockchainService implements BlockchainFacadePort {
             case OPTIMISM -> optimismTransactionStoragePort.get(Optimism.transactionHash(reference)).map(EvmTransaction::timestamp);
             case APTOS -> aptosTransactionStoragePort.get(Aptos.transactionHash(reference)).map(AptosTransaction::timestamp);
             case STARKNET -> starknetTransactionStoragePort.get(StarkNet.transactionHash(reference)).map(StarknetTransaction::timestamp);
+            case STELLAR -> stellarTransactionStoragePort.get(Stellar.transactionHash(reference)).map(StellarTransaction::timestamp);
         }).orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(reference, blockchain)));
     }
 }

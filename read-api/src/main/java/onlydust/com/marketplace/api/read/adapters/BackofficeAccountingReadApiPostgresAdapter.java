@@ -9,10 +9,7 @@ import onlydust.com.marketplace.api.read.entities.accounting.AllSponsorAccountTr
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardStatusReadEntity;
-import onlydust.com.marketplace.api.read.repositories.AllSponsorAccountTransactionReadRepository;
-import onlydust.com.marketplace.api.read.repositories.BatchPaymentReadRepository;
-import onlydust.com.marketplace.api.read.repositories.RewardReadRepository;
-import onlydust.com.marketplace.api.read.repositories.SponsorAccountReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +40,7 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
     private final BatchPaymentReadRepository batchPaymentReadRepository;
     private final AllSponsorAccountTransactionReadRepository allSponsorAccountTransactionReadRepository;
     private final RewardReadRepository rewardReadRepository;
+    private final BillingProfileReadRepository billingProfileReadRepository;
 
     @Override
     public ResponseEntity<BatchPaymentDetailsResponse> getBatchPayment(UUID batchPaymentId) {
@@ -64,6 +62,14 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
 
         return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @Override
+    public ResponseEntity<BillingProfileResponse> getBillingProfilesById(UUID billingProfileId) {
+        final var billingProfile = billingProfileReadRepository.findById(billingProfileId)
+                .orElseThrow(() -> notFound("Billing profile %s not found".formatted(billingProfileId)));
+
+        return ok(billingProfile.toBoResponse());
     }
 
     @Override

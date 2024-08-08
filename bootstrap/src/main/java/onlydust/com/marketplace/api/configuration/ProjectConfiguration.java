@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
+import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
@@ -320,9 +321,10 @@ public class ProjectConfiguration {
     public ERC20ProviderFactory erc20ProviderFactory(final @NonNull ERC20Provider ethereumERC20Provider,
                                                      final @NonNull ERC20Provider optimismERC20Provider,
                                                      final @NonNull ERC20Provider starknetERC20Provider,
-                                                     final @NonNull ERC20Provider aptosERC20Provider
+                                                     final @NonNull ERC20Provider aptosERC20Provider,
+                                                     final @NonNull ERC20Provider stellarERC20Provider
     ) {
-        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, aptosERC20Provider);
+        return new ERC20ProviderFactory(ethereumERC20Provider, optimismERC20Provider, starknetERC20Provider, aptosERC20Provider, stellarERC20Provider);
     }
 
 
@@ -347,9 +349,10 @@ public class ProjectConfiguration {
     public BlockchainFacadePort blockchainFacadePort(final InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter,
                                                      final InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter,
                                                      final StarknetInfuraTransactionStorageAdapter starknetTransactionStoragePort,
-                                                     final AptosTransactionStorageAdapter aptosTransactionStorageAdapter) {
+                                                     final AptosTransactionStorageAdapter aptosTransactionStorageAdapter,
+                                                     final StellarTransactionStorageAdapter stellarTransactionStorageAdapter) {
         return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,
-                starknetTransactionStoragePort);
+                starknetTransactionStoragePort, stellarTransactionStorageAdapter);
     }
 
     @Bean

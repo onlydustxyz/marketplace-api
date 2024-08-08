@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -64,7 +63,7 @@ public class WalletViewEntity {
     }
 
     public WalletLocator ethereum() {
-        assert network == NetworkEnumEntity.ethereum;
+        assert network == NetworkEnumEntity.ETHEREUM;
         return switch (type) {
             case address -> new WalletLocator(Ethereum.accountAddress(address));
             case name -> new WalletLocator(Ethereum.name(address));
@@ -72,17 +71,17 @@ public class WalletViewEntity {
     }
 
     public EvmAccountAddress optimism() {
-        assert network == NetworkEnumEntity.optimism;
+        assert network == NetworkEnumEntity.OPTIMISM;
         return new EvmAccountAddress(address);
     }
 
     public AptosAccountAddress aptos() {
-        assert network == NetworkEnumEntity.aptos;
+        assert network == NetworkEnumEntity.APTOS;
         return new AptosAccountAddress(address);
     }
 
     public StarknetAccountAddress starknet() {
-        assert network == NetworkEnumEntity.starknet;
+        assert network == NetworkEnumEntity.STARKNET;
         return new StarknetAccountAddress(address);
     }
 }

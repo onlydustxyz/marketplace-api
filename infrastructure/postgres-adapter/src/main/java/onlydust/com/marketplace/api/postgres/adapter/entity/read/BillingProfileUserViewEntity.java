@@ -5,17 +5,12 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.view.BillingProfileView;
-import onlydust.com.marketplace.user.domain.model.BillingProfileLinkView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
-import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -47,25 +42,6 @@ public class BillingProfileUserViewEntity {
     BillingProfile.User.Role role;
 
     ZonedDateTime joinedAt;
-
-    public BillingProfileView.User toView() {
-        return new BillingProfileView.User(
-                UserId.of(user.id()),
-                GithubUserId.of(user.githubUserId()),
-                user.login(),
-                URI.create(user.avatarUrl()),
-                user.email());
-    }
-
-    public BillingProfileLinkView toBillingProfileLinkView() {
-        return BillingProfileLinkView.builder()
-                .id(billingProfileId)
-                .role(switch (role) {
-                    case ADMIN -> BillingProfileLinkView.Role.ADMIN;
-                    case MEMBER -> BillingProfileLinkView.Role.MEMBER;
-                })
-                .build();
-    }
 
     @EqualsAndHashCode
     @NoArgsConstructor

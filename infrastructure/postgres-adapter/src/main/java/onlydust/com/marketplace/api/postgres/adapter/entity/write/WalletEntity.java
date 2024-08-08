@@ -5,11 +5,12 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.WalletTypeEnumEntity;
-import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
+import onlydust.com.marketplace.kernel.model.blockchain.*;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarAccountId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -70,14 +71,14 @@ public class WalletEntity {
     public static WalletEntity ethereum(@NonNull BillingProfile.Id billingProfileId, @NonNull WalletLocator wallet) {
         return WalletEntity.builder()
                 .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.ethereum)
+                .network(NetworkEnumEntity.ETHEREUM)
                 .address(wallet.asString())
                 .type(wallet.accountAddress().isPresent() ? WalletTypeEnumEntity.address : WalletTypeEnumEntity.name)
                 .build();
     }
 
     public WalletLocator ethereum() {
-        assert network == NetworkEnumEntity.ethereum;
+        assert network == NetworkEnumEntity.ETHEREUM;
         return switch (type) {
             case address -> new WalletLocator(Ethereum.accountAddress(address));
             case name -> new WalletLocator(Ethereum.name(address));
@@ -87,42 +88,56 @@ public class WalletEntity {
     public static WalletEntity optimism(@NonNull BillingProfile.Id billingProfileId, @NonNull EvmAccountAddress address) {
         return WalletEntity.builder()
                 .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.optimism)
+                .network(NetworkEnumEntity.OPTIMISM)
                 .address(address.toString())
                 .type(WalletTypeEnumEntity.address)
                 .build();
     }
 
     public EvmAccountAddress optimism() {
-        assert network == NetworkEnumEntity.optimism;
-        return new EvmAccountAddress(address);
+        assert network == NetworkEnumEntity.OPTIMISM;
+        return Optimism.accountAddress(address);
     }
 
     public static WalletEntity aptos(@NonNull BillingProfile.Id billingProfileId, @NonNull AptosAccountAddress address) {
         return WalletEntity.builder()
                 .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.aptos)
+                .network(NetworkEnumEntity.APTOS)
                 .address(address.toString())
                 .type(WalletTypeEnumEntity.address)
                 .build();
     }
 
     public AptosAccountAddress aptos() {
-        assert network == NetworkEnumEntity.aptos;
-        return new AptosAccountAddress(address);
+        assert network == NetworkEnumEntity.APTOS;
+        return Aptos.accountAddress(address);
     }
 
     public static WalletEntity starknet(@NonNull BillingProfile.Id billingProfileId, @NonNull StarknetAccountAddress address) {
         return WalletEntity.builder()
                 .billingProfileId(billingProfileId.value())
-                .network(NetworkEnumEntity.starknet)
+                .network(NetworkEnumEntity.STARKNET)
                 .address(address.toString())
                 .type(WalletTypeEnumEntity.address)
                 .build();
     }
 
     public StarknetAccountAddress starknet() {
-        assert network == NetworkEnumEntity.starknet;
-        return new StarknetAccountAddress(address);
+        assert network == NetworkEnumEntity.STARKNET;
+        return StarkNet.accountAddress(address);
+    }
+
+    public static WalletEntity stellar(@NonNull BillingProfile.Id billingProfileId, @NonNull StellarAccountId accountId) {
+        return WalletEntity.builder()
+                .billingProfileId(billingProfileId.value())
+                .network(NetworkEnumEntity.STELLAR)
+                .address(accountId.toString())
+                .type(WalletTypeEnumEntity.address)
+                .build();
+    }
+
+    public StellarAccountId stellar() {
+        assert network == NetworkEnumEntity.STELLAR;
+        return Stellar.accountId(address);
     }
 }

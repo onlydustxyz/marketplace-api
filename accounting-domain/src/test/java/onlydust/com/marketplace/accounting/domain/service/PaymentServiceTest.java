@@ -48,6 +48,7 @@ public class PaymentServiceTest {
             ethereumTransactionStoragePort,
             mock(BlockchainTransactionStoragePort.class),
             mock(BlockchainTransactionStoragePort.class),
+            mock(BlockchainTransactionStoragePort.class),
             mock(BlockchainTransactionStoragePort.class));
     private final PaymentService rewardService = new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort);
 

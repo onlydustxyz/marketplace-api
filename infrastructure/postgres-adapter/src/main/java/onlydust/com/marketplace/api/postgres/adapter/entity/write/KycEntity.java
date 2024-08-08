@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
@@ -23,6 +24,7 @@ import java.util.UUID;
 @Data
 @Builder(toBuilder = true)
 @Table(name = "kyc", schema = "accounting")
+@Accessors(chain = true, fluent = true)
 @EntityListeners(AuditingEntityListener.class)
 public class KycEntity {
     @Id

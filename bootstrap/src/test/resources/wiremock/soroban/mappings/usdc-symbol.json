@@ -1,0 +1,25 @@
+{
+    "request": {
+        "url": "/",
+        "method": "POST",
+        "bodyPatterns": [
+            {
+                "equalToJson": {
+                    "jsonrpc": "2.0",
+                    "method": "simulateTransaction"
+                },
+                "ignoreExtraElements": true
+            },
+            {
+                "matchesJsonPath": {
+                    "expression": "$.params.transaction",
+                    "contains": "Gc3ltYm9s"
+                }
+            }
+        ]
+    },
+    "response": {
+        "status": 200,
+        "bodyFileName": "body-usdc-symbol.json"
+    }
+}

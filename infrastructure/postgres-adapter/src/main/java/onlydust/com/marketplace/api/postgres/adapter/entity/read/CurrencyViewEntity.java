@@ -11,9 +11,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.net.URI;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "currencies", schema = "public")
@@ -42,9 +40,6 @@ public class CurrencyViewEntity {
     @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
     LatestUsdQuoteViewEntity latestUsdQuote;
 
-    @OneToMany(mappedBy = "currencyId", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ERC20ViewEntity> erc20;
-
     public Currency toDomain() {
         return Currency.builder()
                 .id(Currency.Id.of(id))
@@ -53,7 +48,6 @@ public class CurrencyViewEntity {
                 .code(Currency.Code.of(code))
                 .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
                 .decimals(decimals)
-                .erc20(erc20.stream().map(ERC20ViewEntity::toDomain).collect(Collectors.toUnmodifiableSet()))
                 .latestUsdQuote(latestUsdQuote == null ? null : latestUsdQuote.getPrice())
                 .build();
     }

@@ -24,9 +24,7 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.RewardRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
@@ -98,6 +96,10 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     InvoiceService invoiceService;
     @Autowired
     BlockchainFacadePort blockchainFacadePort;
+    @Autowired
+    KycRepository kycRepository;
+    @Autowired
+    KybRepository kybRepository;
 
     final AuthenticatedBackofficeUserService authenticatedBackofficeUserService = mock(AuthenticatedBackofficeUserService.class);
 
@@ -1555,8 +1557,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // To avoid to stub all the Sumsub flow ...
-        final UUID kycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualBPId), UserId.of(individualBPAdminId),
-                GithubUserId.of(individualBPAdminGithubId)).getKyc().getId();
+        final UUID kycId = kycRepository.findByBillingProfileId(individualBPId).orElseThrow().id();
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(kycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1745,8 +1746,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID indianKycId = billingProfileService.getBillingProfile(BillingProfile.Id.of(individualIndiaBPId), UserId.of(individualIndiaBPAdminId),
-                GithubUserId.of(individualIndiaBPAdminGithubId)).getKyc().getId();
+        final UUID indianKycId = kycRepository.findByBillingProfileId(individualIndiaBPId).orElseThrow().id();
+
         billingProfileStoragePort.saveKyc(Kyc.builder()
                 .id(indianKycId)
                 .externalApplicantId(faker.rickAndMorty().character())
@@ -1935,8 +1936,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID companyKybId = billingProfileService.getBillingProfile(BillingProfile.Id.of(companyBPId), UserId.of(companyBPAdmin1Id),
-                GithubUserId.of(companyBPAdmin1GithubId)).getKyb().getId();
+        final UUID companyKybId = kybRepository.findByBillingProfileId(companyBPId).orElseThrow().id();
+
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(companyBPId))
                 .registrationNumber(faker.idNumber().valid())
@@ -2124,9 +2125,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         ));
 
         // When
-        final UUID selfEmployedKybId =
-                billingProfileService.getBillingProfile(BillingProfile.Id.of(selfEmployedBPId), UserId.of(selfEmployedBPAdminId),
-                        GithubUserId.of(selfEmployedBPAdminGithubId)).getKyb().getId();
+        final UUID selfEmployedKybId = kybRepository.findByBillingProfileId(selfEmployedBPId).orElseThrow().id();
+
         billingProfileStoragePort.saveKyb(Kyb.builder()
                 .billingProfileId(BillingProfile.Id.of(selfEmployedBPId))
                 .registrationNumber(faker.idNumber().valid())

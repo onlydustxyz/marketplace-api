@@ -175,19 +175,25 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>com.onlydust.marketplace.api</groupId>
             <artifactId>infura-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>stellar-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>coinmarketcap-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>accounting-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
@@ -199,7 +205,7 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>com.onlydust.marketplace.indexer</groupId>
+            <groupId>onlydust.com.marketplace.api</groupId>
             <artifactId>aptos-rpc-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>

@@ -1,13 +1,11 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.PayableReward;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -37,7 +35,7 @@ public class BatchPaymentRewardEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rewardId", referencedColumnName = "id", insertable = false, updatable = false)
-    RewardViewEntity reward;
+    RewardEntity reward;
 
     @EqualsAndHashCode
     @AllArgsConstructor

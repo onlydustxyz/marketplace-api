@@ -16,7 +16,7 @@ import java.util.Set;
 @Profile("cli")
 public class EvmWalletSanitizer implements CommandLineRunner {
     private final WalletRepository walletRepository;
-    private final static Set<NetworkEnumEntity> EVM_NETWORKS = Set.of(NetworkEnumEntity.ethereum, NetworkEnumEntity.optimism);
+    private final static Set<NetworkEnumEntity> EVM_NETWORKS = Set.of(NetworkEnumEntity.ETHEREUM, NetworkEnumEntity.OPTIMISM);
 
     @Override
     public void run(String... args) {
