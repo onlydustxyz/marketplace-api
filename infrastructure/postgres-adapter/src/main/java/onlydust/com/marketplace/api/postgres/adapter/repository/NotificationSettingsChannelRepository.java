@@ -14,4 +14,6 @@ public interface NotificationSettingsChannelRepository extends JpaRepository<Not
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     void deleteAllByUserId(UUID userId);
+
+    boolean existsByUserId(UUID userId);
 }

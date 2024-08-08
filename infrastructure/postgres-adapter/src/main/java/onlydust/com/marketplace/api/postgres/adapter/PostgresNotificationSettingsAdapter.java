@@ -51,7 +51,9 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
                         .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))
                 .toList();
 
-        notificationSettingsChannelRepository.deleteAllByUserId(userId.value());
+        if (notificationSettingsChannelRepository.existsByUserId(userId.value())) {
+            notificationSettingsChannelRepository.deleteAllByUserId(userId.value());
+        }
         notificationSettingsChannelRepository.saveAll(entities);
     }
 }
