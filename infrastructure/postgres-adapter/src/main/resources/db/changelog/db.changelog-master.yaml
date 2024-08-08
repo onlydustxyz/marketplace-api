@@ -449,3 +449,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000303_fix_default_notification_settings.sql
   - include:
       file: db/changelog/changelogs/00000304_add_stellar_network.sql
+  - include:
+      file: db/changelog/changelogs/00000305_fix_invoice_networks.sql
