@@ -162,6 +162,7 @@ public class Currency implements Cloneable {
         return switch (code.toString()) {
             case Code.ETH_STR -> Network.ETHEREUM;
             case Code.APT_STR -> Network.APTOS;
+            case Code.XLM_STR -> Network.STELLAR;
             default -> null;
         };
     }
@@ -229,6 +230,7 @@ public class Currency implements Cloneable {
         public final static String USD_STR = "USD";
         public final static String ETH_STR = "ETH";
         public final static String APT_STR = "APT";
+        public final static String XLM_STR = "XLM";
         public final static String STRK_STR = "STRK";
         public final static String OP_STR = "OP";
         public final static String USDC_STR = "USDC";
