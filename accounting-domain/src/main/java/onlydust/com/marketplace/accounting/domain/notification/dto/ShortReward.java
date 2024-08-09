@@ -16,4 +16,6 @@ public class ShortReward {
     String currencyCode;
     BigDecimal amount;
     BigDecimal dollarsEquivalent;
+    Integer contributionsCount;
+    String sentByGithubLogin;
 }

@@ -7,26 +7,31 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
-import static com.onlydust.customer.io.adapter.dto.MailDTO.getRewardNames;
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
 
 @Builder
-public record InvoiceRejectedDTO(@NonNull String rewardsDetails,
-                                 @NonNull String reason,
+public record InvoiceRejectedDTO(@NonNull String title,
+                                 @NonNull String description,
                                  @NonNull Integer rewardsNumber,
                                  @NonNull String username,
-                                 @NonNull String invoiceName,
-                                 @NonNull String totalUsdAmount) {
+                                 @NonNull List<RewardDTO> rewards,
+                                 @NonNull ButtonDTO button) {
+    private static final String DESCRIPTION = "We're very sorry but we had to reject your invoice named %s of <b>%s USD</b> for this reason: <b>%s</b>";
 
-    public static InvoiceRejectedDTO fromEvent(@NonNull String recipientLogin, @NonNull InvoiceRejected invoiceRejected) {
-        return new InvoiceRejectedDTO(getRewardNames(invoiceRejected.rewards()),
-                invoiceRejected.rejectionReason(),
+    public static InvoiceRejectedDTO fromEvent(@NonNull String recipientLogin, @NonNull InvoiceRejected invoiceRejected, @NonNull String environment) {
+        return new InvoiceRejectedDTO("Invoice rejected",
+                DESCRIPTION.formatted(invoiceRejected.invoiceName(), invoiceRejected.rewards().stream()
+                        .map(ShortReward::getDollarsEquivalent)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(3, RoundingMode.HALF_UP).toString(), invoiceRejected.rejectionReason()),
                 invoiceRejected.rewards().size(),
                 recipientLogin,
-                invoiceRejected.invoiceName(),
                 invoiceRejected.rewards().stream()
-                        .map(ShortReward::getDollarsEquivalent)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(3, RoundingMode.HALF_UP).toString());
+                        .map(RewardDTO::from)
+                        .toList(),
+                new ButtonDTO("Upload another invoice", getMarketplaceFrontendUrlFromEnvironment(environment) + "rewards")
+        );
     }
 
 }

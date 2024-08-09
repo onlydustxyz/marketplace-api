@@ -5,14 +5,11 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.*;
-import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
-import java.math.RoundingMode;
-import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -23,12 +20,17 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                    @NonNull String from,
                                    @NonNull String to,
                                    @NonNull String subject,
-                                   @NonNull @JsonProperty("message_data") MessageData messageData,
-                                   @NonNull String body
+                                   @NonNull @JsonProperty("message_data") MessageData messageData
 ) {
 
-    public MailDTO(@NonNull String transactionalMessageId, @NonNull IdentifiersDTO identifiers, @NonNull String from, @NonNull String to, @NonNull String subject, @NonNull MessageData messageData) {
-        this(transactionalMessageId, identifiers, from, to, subject, messageData, "");
+    public MailDTO(@NonNull String transactionalMessageId, @NonNull IdentifiersDTO identifiers, @NonNull String from, @NonNull String to,
+                   @NonNull String subject, @NonNull MessageData messageData) {
+        this.transactionalMessageId = transactionalMessageId;
+        this.identifiers = identifiers;
+        this.from = from;
+        this.to = to;
+        this.subject = subject;
+        this.messageData = messageData;
     }
 
     public record IdentifiersDTO(String id, String email) {
@@ -43,7 +45,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "An invoice for %d reward(s) got rejected".formatted(invoiceRejected.rewards().size()),
-                InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected));
+                InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected, customerIOProperties.getEnvironment()));
     }
 
     public static MailDTO<VerificationFailedDTO> from(
@@ -67,20 +69,19 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "New reward received ✨",
-                RewardCreatedDTO.fromEvent(notification.recipient().login(), rewardReceived));
+                RewardCreatedDTO.fromEvent(notification.recipient().login(), rewardReceived, customerIOProperties.getEnvironment()));
     }
 
     public static MailDTO<RewardCanceledDTO> from(@NonNull CustomerIOProperties customerIOProperties,
                                                   @NonNull SendableNotification notification,
                                                   @NonNull RewardCanceled rewardCanceled) {
-        final var dto = RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled);
         return new MailDTO<>(
                 customerIOProperties.getRewardCanceledEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
-                "Reward %s got canceled".formatted(dto.rewardName()),
-                dto);
+                "Reward %s got canceled".formatted(rewardCanceled.shortReward().getId().pretty()),
+                RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled));
     }
 
     public static MailDTO<RewardsPaidDTO> from(@NonNull CustomerIOProperties customerIOProperties,
@@ -91,7 +92,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "Your rewards are processed! 🥳",
-                RewardsPaidDTO.fromEvent(notification.recipient().login(), rewardsPaid));
+                RewardsPaidDTO.fromEvent(notification.recipient().login(), rewardsPaid, customerIOProperties.getEnvironment()));
     }
 
     public static MailDTO<NewCommitteeApplicationDTO> from(@NonNull CustomerIOProperties customerIOProperties,
@@ -113,7 +114,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 "Your application has been accepted!",
-                ProjectApplicationAcceptedDTO.fromEvent(notification.recipient().login(), applicationAccepted));
+                ProjectApplicationAcceptedDTO.fromEvent(notification.recipient().login(), applicationAccepted, customerIOProperties.getEnvironment()));
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {
@@ -122,12 +123,5 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
 
     private static IdentifiersDTO mapIdentifiers(@NonNull NotificationRecipient user) {
         return new IdentifiersDTO(user.id().toString(), user.email());
-    }
-
-    public static String getRewardNames(List<ShortReward> rewards) {
-        return String.join("<br>", rewards.stream()
-                .map(r -> String.join(" - ", r.getId().pretty(), r.getProjectName(), r.getCurrencyCode(),
-                        r.getAmount().setScale(3, RoundingMode.HALF_UP).toString()))
-                .toList());
     }
 }
