@@ -134,7 +134,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(5)
-    void should_delete_reward() {
+    void should_delete_reward() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
@@ -150,18 +150,26 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
 
+        Thread.sleep(1000);
+
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                         .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getRewardCanceledEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
-                        .withRequestBody(matchingJsonPath("$.message_data.amount", equalTo("1000.000")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(pierre.user().getGithubLogin())))
-                        .withRequestBody(matchingJsonPath("$.message_data.currency", equalTo("USDC")))
-                        .withRequestBody(matchingJsonPath("$.message_data.rewardName", equalTo("#E1498 - QA new contributions")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reward.amount", equalTo("1000.000")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reward.currency", equalTo("USDC")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reward.contributionsNumber", equalTo("1")))
+                        .withRequestBody(matchingJsonPath("$.message_data.reward.sentBy", equalTo("PierreOucif")))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Reward canceled")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We're very sorry but reward of project QA new contributions got canceled.<br " +
+                                                                                                "/>" +
+                                                                                                "Please reach out to project lead(s) for more explanation or " +
+                                                                                                "contact us in case your need assistance.")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
-                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Reward #E1498 - QA new contributions got canceled"))));
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Reward #E1498 got canceled"))));
     }
 }

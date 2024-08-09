@@ -22,7 +22,7 @@ public record NewCommitteeApplicationDTO(@NonNull String title,
                                                        @NonNull final String environment) {
         final String applicationEndDate =
                 event.getApplicationEndDate().format(DateTimeFormatter.ofPattern("MM/dd/yyyy - HH:mm:ss z").withZone(ZoneId.systemDefault()));
-        return new NewCommitteeApplicationDTO("Committee application", recipientLogin, DESCRIPTION.formatted(event.getProjectName(), event.getProjectName(),
+        return new NewCommitteeApplicationDTO("Committee application", recipientLogin, DESCRIPTION.formatted(event.getProjectName(), event.getCommitteeName(),
                 applicationEndDate),
                 new ButtonDTO("Review my answer",
                         getMarketplaceFrontendUrlFromEnvironment(environment) + "c/%s/applicant?p=%s".formatted(event.getCommitteeId(), event.getProjectId())));

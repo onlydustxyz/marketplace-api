@@ -19,6 +19,8 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
+import java.util.List;
+
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -53,6 +55,8 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                             .dollarsEquivalent(reward.money().getDollarsEquivalentValue())
                             .id(rewardId)
                             .projectName(reward.project().name())
+                            .contributionsCount(reward.githubUrls().size())
+                            .sentByGithubLogin(reward.requester().login())
                             .build())
                     .build());
         } else {
@@ -73,6 +77,8 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                             .dollarsEquivalent(reward.money().getDollarsEquivalentValue())
                             .id(rewardId)
                             .projectName(reward.project().name())
+                            .sentByGithubLogin(reward.requester().login())
+                            .contributionsCount(reward.githubUrls().size())
                             .build())
                     .build());
         } else {
@@ -95,19 +101,26 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         final var billingProfileAdmin = billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id())
                 .orElseThrow(() -> notFound("Billing profile admin not found for billing profile %s".formatted(invoice.billingProfileSnapshot().id())));
 
+        final List<ShortReward> shortRewards = invoice.rewards().stream()
+                .map(Invoice.Reward::id)
+                .map(rewardId -> accountingRewardStoragePort.getReward(rewardId)
+                        .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId))))
+                .map(reward -> ShortReward.builder()
+                        .id(reward.id())
+                        .amount(reward.money().amount())
+                        .currencyCode(reward.money().currency().code().toString())
+                        .projectName(reward.project().name())
+                        .contributionsCount(reward.githubUrls().size())
+                        .sentByGithubLogin(reward.requester().login())
+                        .dollarsEquivalent(reward.money().getDollarsEquivalentValue())
+                        .build())
+                .toList();
+
         notificationPort.push(billingProfileAdmin.userId().value(), InvoiceRejected.builder()
                 .billingProfileId(invoice.billingProfileSnapshot().id().value())
                 .invoiceName(invoice.number().value())
                 .rejectionReason(rejectionReason)
-                .rewards(invoice.rewards().stream()
-                        .map(reward -> ShortReward.builder()
-                                .id(reward.id())
-                                .amount(reward.amount().getValue())
-                                .currencyCode(reward.amount().getCurrency().code().toString())
-                                .projectName(reward.projectName())
-                                .dollarsEquivalent(reward.target().getValue())
-                                .build()
-                        ).toList())
+                .rewards(shortRewards)
                 .build());
     }
 

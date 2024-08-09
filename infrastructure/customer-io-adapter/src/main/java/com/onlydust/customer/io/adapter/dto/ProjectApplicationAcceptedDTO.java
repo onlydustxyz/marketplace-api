@@ -21,7 +21,7 @@ public record ProjectApplicationAcceptedDTO(@NonNull String username,
                         event.getIssue().title(),
                         event.getIssue().description(),
                         event.getIssue().repoName(),
-                        UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) + "/applications"
+                        UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) + "applications"
                 ));
     }
 }

@@ -57,6 +57,8 @@ infrastructure:
         client-id: fake-m2m-client-id
         client-secret: fake-m2m-client-secret
         pat-cache-ttl-in-seconds: 3600
+  customer-io:
+    environment: "develop"
 application:
   web:
     machine-to-machine:

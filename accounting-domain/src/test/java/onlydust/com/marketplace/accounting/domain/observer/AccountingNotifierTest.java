@@ -256,6 +256,30 @@ public class AccountingNotifierTest {
 
             when(billingProfileStoragePort.findBillingProfileAdmin(invoice.createdBy(), invoice.billingProfileSnapshot().id()))
                     .thenReturn(Optional.of(invoiceCreator));
+            for (Invoice.Reward reward : invoice.rewards()) {
+                when(accountingRewardStoragePort.getReward(reward.id()))
+                        .thenReturn(Optional.of(RewardDetailsView.builder()
+                                .money(new MoneyView(reward.amount().getValue(), reward.amount().getCurrency()))
+                                .id(reward.id())
+                                .project(ProjectShortView.builder()
+                                        .name(reward.projectName())
+                                        .shortDescription(faker.rickAndMorty().character())
+                                        .logoUrl(faker.internet().url())
+                                        .id(ProjectId.random())
+                                        .slug(faker.lorem().characters())
+                                        .build())
+                                .recipient(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                                        faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                                        UserId.random(), faker.internet().emailAddress()))
+                                .requester(new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                                        faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                                        UserId.random(), faker.internet().emailAddress()))
+                                .status(mock(RewardStatus.class))
+                                .requestedAt(ZonedDateTime.now())
+                                .githubUrls(List.of("https://github.com/onlydust/onlydust"))
+                                .sponsors(List.of())
+                                .build()));
+            }
 
             // When
             accountingNotifier.onInvoiceRejected(invoice.id(), "Invalid invoice");

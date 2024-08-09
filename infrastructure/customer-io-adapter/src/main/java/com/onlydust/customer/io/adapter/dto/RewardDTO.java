@@ -10,8 +10,8 @@ public record RewardDTO(
         @NonNull String projectName,
         @NonNull String currency,
         @NonNull String amount,
-        String contributionsNumber,
-        String sentBy
+        @NonNull String contributionsNumber,
+        @NonNull String sentBy
 ) {
 
     public static RewardDTO from(@NonNull ShortReward reward) {
