@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -42,7 +44,11 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
                 .isOk()
                 .expectBody()
                 .jsonPath("$.id").isEqualTo(banners.get(1).id().toString())
-                .jsonPath("$.text").isEqualTo(banners.get(1).text())
+                .jsonPath("$.shortDescription").isEqualTo(banners.get(1).shortDescription())
+                .jsonPath("$.longDescription").isEqualTo(banners.get(1).longDescription())
+                .jsonPath("$.title").isEqualTo(banners.get(1).title())
+                .jsonPath("$.subTitle").isEqualTo(banners.get(1).subTitle())
+                .jsonPath("$.date").isNotEmpty()
                 .jsonPath("$.buttonText").isEqualTo(banners.get(1).buttonText())
                 .jsonPath("$.buttonIconSlug").isEqualTo(banners.get(1).buttonIconSlug())
                 .jsonPath("$.buttonLinkUrl").isEqualTo(banners.get(1).buttonLinkUrl())
@@ -50,7 +56,7 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
-    void should_return_nothing_if_no_visible_banner() {
+    void should_return_nothing_or_a_banner_if_no_visible_banner() {
         // Given
         final var user = userAuthHelper.authenticateAnthony();
         bannerRepository.save(banners.get(1).visible(true));
@@ -66,12 +72,23 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(BANNER))
+                .uri(getApiURI(BANNER, Map.of("hiddeIgnoredByMe", "true")))
                 .header("Authorization", "Bearer " + user.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(BANNER))
+                .header("Authorization", "Bearer " + user.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(banners.get(1).id().toString());
     }
 
 
@@ -89,10 +106,14 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
     private BannerEntity randomHiddenBanner() {
         return new BannerEntity(UUID.randomUUID(),
                 faker.lorem().sentence(),
+                faker.lorem().sentence(),
+                faker.lorem().word(),
+                faker.lorem().word(),
                 faker.lorem().word(),
                 faker.internet().slug(),
                 faker.internet().url(),
                 false,
+                ZonedDateTime.now(),
                 faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
                 new HashSet<>());
     }

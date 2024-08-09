@@ -3,12 +3,15 @@ package onlydust.com.marketplace.project.domain.port.input;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.net.URI;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 public interface BannerFacadePort {
-    Banner createBanner(String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl);
+    Banner createBanner(String shortDescription, String longDescription, String title, String subTitle, ZonedDateTime date, String buttonText,
+                        String buttonIconSlug, URI buttonLinkUrl);
 
-    void updateBanner(Banner.Id id, String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl);
+    void updateBanner(Banner.Id id, String shortDescription, String longDescription, String title, String subTitle, ZonedDateTime date, String buttonText,
+                      String buttonIconSlug, URI buttonLinkUrl);
 
     void deleteBanner(Banner.Id id);
 

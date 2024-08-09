@@ -20,7 +20,13 @@ public class Banner {
     private final Id id;
 
     @NonNull
-    String text;
+    String shortDescription;
+    @NonNull
+    String longDescription;
+    @NonNull
+    String title;
+    @NonNull
+    String subTitle;
     String buttonText;
     String buttonIconSlug;
     URI buttonLinkUrl;
@@ -31,10 +37,13 @@ public class Banner {
 
     @NonNull
     Set<UUID> closedBy;
+    ZonedDateTime date;
 
-    public Banner(final @NonNull String text, final String buttonText, final String buttonIconSlug, final URI buttonLinkUrl
+    public Banner(final @NonNull String shortDescription, final @NonNull String longDescription, final @NonNull String title, final @NonNull String subTitle,
+                  final String buttonText, final String buttonIconSlug, final URI buttonLinkUrl, final ZonedDateTime date
     ) {
-        this(Id.random(), text, buttonText, buttonIconSlug, buttonLinkUrl, false, ZonedDateTime.now(), new HashSet<>());
+        this(Id.random(), shortDescription, longDescription, title, subTitle, buttonText, buttonIconSlug, buttonLinkUrl, false, ZonedDateTime.now(),
+                new HashSet<>(), date);
     }
 
     public void close(final @NonNull UUID userId) {
