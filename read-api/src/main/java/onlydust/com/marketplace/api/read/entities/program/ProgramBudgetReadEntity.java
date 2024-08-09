@@ -28,6 +28,11 @@ public class ProgramBudgetReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
+    Long index;
+
+    @Id
+    @EqualsAndHashCode.Include
+    @NonNull
     UUID programId;
 
     @Id
@@ -62,6 +67,7 @@ public class ProgramBudgetReadEntity {
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
+        Long index;
         UUID programId;
         UUID currencyId;
     }

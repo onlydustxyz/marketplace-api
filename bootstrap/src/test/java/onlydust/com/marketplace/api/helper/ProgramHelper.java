@@ -3,19 +3,25 @@ package onlydust.com.marketplace.api.helper;
 import com.github.javafaker.Faker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.net.URI;
 
-@AllArgsConstructor
+@Service
 public class ProgramHelper {
-    private final @NonNull EntityManagerFactory entityManagerFactory;
-    private final @NonNull BackofficeFacadePort backofficeFacadePort;
-    private final @NonNull Faker faker;
+    @Autowired
+    private EntityManagerFactory entityManagerFactory;
+    @Autowired
+    private BackofficeFacadePort backofficeFacadePort;
+    @Autowired
+    private AccountingFacadePort accountingFacadePort;
+
+    private final Faker faker = new Faker();
 
     public Sponsor create() {
         final var sponsor = backofficeFacadePort.createSponsor(
