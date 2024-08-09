@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
 public class AccountBookProjector implements AccountBookObserver {
     private final SponsorAccountStorage sponsorAccountStorage;
     private final AccountBookStorage accountBookStorage;
-    private final Currency.Id currencyId;
+    private final Currency.Id currencyId; // TODO remove this and add the account book id to the projection
 
     // TODO remove all other methods and use only the new projection
     @Override
