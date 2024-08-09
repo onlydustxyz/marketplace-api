@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 
 import java.net.URI;
@@ -16,18 +17,21 @@ public class ProgramHelper {
     private final @NonNull BackofficeFacadePort backofficeFacadePort;
     private final @NonNull Faker faker;
 
-    public SponsorId create() {
+    public Sponsor create() {
         final var sponsor = backofficeFacadePort.createSponsor(
                 faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
                 URI.create(faker.internet().url()),
                 URI.create(faker.internet().url()));
-        return SponsorId.of(sponsor.id());
+        return Sponsor.builder()
+                .id(sponsor.id())
+                .name(sponsor.name())
+                .build();
     }
 
-    public SponsorId create(UserAuthHelper.AuthenticatedUser lead) {
-        final var sponsorId = create();
-        addLead(sponsorId, lead);
-        return sponsorId;
+    public Sponsor create(UserAuthHelper.AuthenticatedUser lead) {
+        final var sponsor = create();
+        addLead(SponsorId.of(sponsor.id()), lead);
+        return sponsor;
     }
 
     public void addLead(SponsorId sponsorId, UserAuthHelper.AuthenticatedUser lead) {

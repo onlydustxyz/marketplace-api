@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUID> {
@@ -15,4 +16,6 @@ public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUI
             JOIN sponsors_users su ON s.id = su.sponsor_id AND su.user_id = :leadId
             """, nativeQuery = true)
     Page<ProgramReadEntity> findAllByLead(final UUID leadId, final Pageable pageable);
+
+    Optional<ProgramReadEntity> findById(UUID programId);
 }

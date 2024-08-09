@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.marketplace.api.contract.model.ProgramDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import org.hibernate.annotations.Immutable;
 
@@ -30,6 +31,12 @@ public class ProgramReadEntity {
 
     public ProgramPageItemResponse toPageItemResponse() {
         return new ProgramPageItemResponse()
+                .id(id)
+                .name(name);
+    }
+
+    public ProgramDetailsResponse toDetailsResponse() {
+        return new ProgramDetailsResponse()
                 .id(id)
                 .name(name);
     }
