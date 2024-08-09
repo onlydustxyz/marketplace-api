@@ -43,14 +43,14 @@ public class BannerReadEntity {
     public BannerPageItemResponse toBoPageItemResponse() {
         return new BannerPageItemResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(text)
                 .visible(visible);
     }
 
     public BannerResponse toBoResponse() {
         return new BannerResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(text)
                 .buttonText(buttonText)
                 .buttonIconSlug(buttonIconSlug)
                 .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl))
@@ -60,7 +60,7 @@ public class BannerReadEntity {
     public onlydust.com.marketplace.api.contract.model.BannerResponse toResponse() {
         return new onlydust.com.marketplace.api.contract.model.BannerResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(text)
                 .buttonText(buttonText)
                 .buttonIconSlug(buttonIconSlug)
                 .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl));

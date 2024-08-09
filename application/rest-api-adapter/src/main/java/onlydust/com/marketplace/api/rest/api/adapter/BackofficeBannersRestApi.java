@@ -29,7 +29,7 @@ public class BackofficeBannersRestApi implements BackofficeBannersApi {
     @Override
     public ResponseEntity<BannerCreateResponse> createBanner(BannerCreateRequest bannerCreateRequest) {
         final var banner = bannerFacadePort.createBanner(
-                bannerCreateRequest.getText(),
+                bannerCreateRequest.getShortDescription(),
                 bannerCreateRequest.getButtonText(),
                 bannerCreateRequest.getButtonIconSlug(),
                 bannerCreateRequest.getButtonLinkUrl());
@@ -62,7 +62,7 @@ public class BackofficeBannersRestApi implements BackofficeBannersApi {
     public ResponseEntity<Void> updateBanner(UUID bannerId, BannerUpdateRequest bannerUpdateRequest) {
         bannerFacadePort.updateBanner(
                 Banner.Id.of(bannerId),
-                bannerUpdateRequest.getText(),
+                bannerUpdateRequest.getShortDescription(),
                 bannerUpdateRequest.getButtonText(),
                 bannerUpdateRequest.getButtonIconSlug(),
                 bannerUpdateRequest.getButtonLinkUrl());
