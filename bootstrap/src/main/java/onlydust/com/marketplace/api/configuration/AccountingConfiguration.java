@@ -152,4 +152,9 @@ public class AccountingConfiguration {
                                                                  final AccountingRewardStoragePort accountingRewardStoragePort) {
         return new AccountingTrackingNotifier(trackingOutbox, accountingRewardStoragePort);
     }
+
+    @Bean
+    public AccountingPermissionService accountingPermissionService(final @NonNull SponsorStoragePort sponsorStoragePort) {
+        return new AccountingPermissionService(sponsorStoragePort);
+    }
 }
