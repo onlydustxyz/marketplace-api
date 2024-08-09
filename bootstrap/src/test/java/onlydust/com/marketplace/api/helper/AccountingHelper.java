@@ -207,4 +207,8 @@ public class AccountingHelper {
     public void pay(RewardId... rewardIds) {
         accountingFacadePort.pay(Set.of(rewardIds));
     }
+
+    public void refund(ProjectId projectId, SponsorId programId, long amount, Currency.Id currencyId) {
+        accountingFacadePort.unallocate(projectId, programId, PositiveAmount.of(amount), currencyId);
+    }
 }

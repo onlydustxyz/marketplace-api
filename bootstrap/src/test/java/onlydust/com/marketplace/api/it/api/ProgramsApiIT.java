@@ -69,13 +69,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 2_000, USDC);
                 accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 1, BTC);
 
-                accountingHelper.grant(SponsorId.of(program.id()), project1, 300, USDC);
+                accountingHelper.grant(SponsorId.of(program.id()), project1, 500, USDC);
                 accountingHelper.grant(SponsorId.of(program.id()), project1, 2, ETH);
                 accountingHelper.grant(SponsorId.of(program.id()), project2, 200, USDC);
                 accountingHelper.grant(SponsorId.of(program.id()), project2, 3, ETH);
                 accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1, 500, USDC);
                 accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1, 1, BTC);
                 accountingHelper.grant(SponsorId.of(anotherProgram.id()), project2, 400, USDC);
+                accountingHelper.refund(project1, SponsorId.of(program.id()), 200, USDC);
 
                 final var reward1 = rewardHelper.create(project1, projectLead, recipientId, 400, USDC);
                 final var reward2 = rewardHelper.create(project1, projectLead, recipientId, 1, ETH);
