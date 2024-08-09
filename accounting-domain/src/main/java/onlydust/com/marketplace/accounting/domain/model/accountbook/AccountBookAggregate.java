@@ -29,23 +29,23 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public synchronized void mint(AccountId account, PositiveAmount amount) {
-        emit(new MintEvent(account, amount));
+    public synchronized List<Transaction> mint(AccountId account, PositiveAmount amount) {
+        return emit(new MintEvent(account, amount));
     }
 
     @Override
-    public synchronized Collection<Transaction> burn(AccountId account, PositiveAmount amount) {
+    public synchronized List<Transaction> burn(AccountId account, PositiveAmount amount) {
         return emit(new BurnEvent(account, amount));
     }
 
     @Override
-    public synchronized void transfer(AccountId from, AccountId to, PositiveAmount amount) {
-        emit(new TransferEvent(from, to, amount));
+    public synchronized List<Transaction> transfer(AccountId from, AccountId to, PositiveAmount amount) {
+        return emit(new TransferEvent(from, to, amount));
     }
 
     @Override
-    public synchronized void refund(AccountId from, AccountId to, PositiveAmount amount) {
-        emit(new RefundEvent(from, to, amount));
+    public synchronized List<Transaction> refund(AccountId from, AccountId to, PositiveAmount amount) {
+        return emit(new RefundEvent(from, to, amount));
     }
 
     @Override
@@ -98,11 +98,10 @@ public class AccountBookAggregate implements AccountBook {
 
 
     @EventType("Mint")
-    public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.mint(account, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.mint(account, amount);
         }
     }
 
@@ -115,20 +114,18 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @EventType("Transfer")
-    public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.transfer(from, to, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.transfer(from, to, amount);
         }
     }
 
     @EventType("Refund")
-    public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.refund(from, to, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.refund(from, to, amount);
         }
     }
 

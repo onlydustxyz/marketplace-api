@@ -5,18 +5,18 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.*;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 public interface AccountBook {
-    void mint(AccountId account, PositiveAmount amount);
+    List<Transaction> mint(AccountId account, PositiveAmount amount);
 
-    Collection<Transaction> burn(AccountId account, PositiveAmount amount);
+    List<Transaction> burn(AccountId account, PositiveAmount amount);
 
-    void transfer(AccountId from, AccountId to, PositiveAmount amount);
+    List<Transaction> transfer(AccountId from, AccountId to, PositiveAmount amount);
 
-    void refund(AccountId from, AccountId to, PositiveAmount amount);
+    List<Transaction> refund(AccountId from, AccountId to, PositiveAmount amount);
 
     Set<AccountId> refund(AccountId from);
 
@@ -114,6 +114,19 @@ public interface AccountBook {
         }
     }
 
-    record Transaction(AccountId from, AccountId to, @NonNull PositiveAmount amount) {
+    record Transaction(@NonNull List<AccountId> path, @NonNull Amount amount) {
+        public Transaction(AccountId from, AccountId to, Amount amount) {
+            this(List.of(from, to), amount);
+        }
+
+        public AccountId from() {
+            assert !path().isEmpty();
+            return path.get(0);
+        }
+
+        public AccountId to() {
+            assert !path().isEmpty();
+            return path.get(path().size() - 1);
+        }
     }
 }
