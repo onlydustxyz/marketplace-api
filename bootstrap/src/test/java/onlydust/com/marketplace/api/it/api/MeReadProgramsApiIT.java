@@ -97,9 +97,13 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(program.id().toString())
                     .jsonPath("$.name").isEqualTo(program.name())
-                    .jsonPath("$.totalAvailable").doesNotExist()
-                    .jsonPath("$.totalGranted").doesNotExist()
-                    .jsonPath("$.totalRewarded").doesNotExist();
+                    .jsonPath("$.totalAvailable.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalAvailable.totalPerCurrency").isEmpty()
+                    .jsonPath("$.totalGranted.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
+                    .jsonPath("$.totalRewarded.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
+            ;
         }
     }
 
