@@ -2,10 +2,12 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.AllowanceTransaction;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
@@ -14,6 +16,14 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class AccountBookProjector implements AccountBookObserver {
     private final SponsorAccountStorage sponsorAccountStorage;
+    private final AccountBookStorage accountBookStorage;
+    private final Currency.Id currencyId;
+
+    // TODO remove all other methods and use only the new projection
+    @Override
+    public void on(@NonNull AccountBook.Transaction transaction) {
+        accountBookStorage.save(AccountBookTransactionProjection.of(ZonedDateTime.now(), currencyId, transaction));
+    }
 
     @Override
     public void onMint(@NonNull ZonedDateTime timestamp, @NonNull AccountId to, @NonNull PositiveAmount amount) {

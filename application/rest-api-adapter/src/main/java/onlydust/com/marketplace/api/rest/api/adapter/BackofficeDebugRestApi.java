@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.BackofficeDebugApi;
 import onlydust.com.backoffice.api.contract.model.ReplaceAndResetUserRequest;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import org.springframework.context.annotation.Profile;
@@ -24,6 +25,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.intern
 public class BackofficeDebugRestApi implements BackofficeDebugApi {
 
     private final AccountBookEventStorage accountBookEventStorage;
+    private final AccountBookStorage accountBookStorage;
     private final CurrencyFacadePort currencyFacadePort;
     private final AppUserFacadePort appUserFacadePort;
     private final DebugProperties debugProperties;
@@ -32,7 +34,7 @@ public class BackofficeDebugRestApi implements BackofficeDebugApi {
     @Transactional
     public ResponseEntity<Void> checkAccountingEvents() {
         final var currencies = currencyFacadePort.listCurrencies();
-        final var cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage);
+        final var cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage);
         currencies.forEach(cachedAccountBookProvider::get);
         return ResponseEntity.noContent().build();
     }
