@@ -39,4 +39,8 @@ public class RewardHelper {
                 .type(RequestRewardCommand.Item.Type.pullRequest)
                 .build();
     }
+
+    public void cancel(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, RewardId rewardId) {
+        rewardFacadePort.cancelReward(lead.user().getId(), projectId.value(), rewardId.value());
+    }
 }

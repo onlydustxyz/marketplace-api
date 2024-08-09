@@ -4,7 +4,7 @@ create table accounting.account_book_transactions
     timestamp          timestamp not null,
     sponsor_account_id uuid      not null references accounting.sponsor_accounts (id),
     project_id         uuid references projects (id),
-    reward_id          uuid references rewards (id),
+    reward_id          uuid,
     payment_id         uuid references accounting.batch_payments (id),
     amount             numeric   not null,
     currency_id        uuid      not null references currencies (id)
