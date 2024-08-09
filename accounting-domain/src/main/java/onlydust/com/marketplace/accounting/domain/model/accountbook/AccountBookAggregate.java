@@ -14,8 +14,14 @@ import java.util.List;
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
+    private AccountBookObserver observer;
 
     private long lastEventId = 0;
+
+    public AccountBookAggregate observed(AccountBookObserver observer) {
+        this.observer = observer;
+        return this;
+    }
 
     public static AccountBookAggregate fromEvents(final @NonNull List<IdentifiedAccountBookEvent> events) {
         AccountBookAggregate aggregate = new AccountBookAggregate();
@@ -56,7 +62,6 @@ public class AccountBookAggregate implements AccountBook {
         return state;
     }
 
-
     public synchronized List<IdentifiedAccountBookEvent> pendingEvents() {
         return List.copyOf(pendingEvents);
     }
@@ -80,10 +85,13 @@ public class AccountBookAggregate implements AccountBook {
         return result;
     }
 
-    private <R> R emit(AccountBookEvent<R> event) {
+    private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
+        if (observer != null)
+            result.forEach(observer::on);
+
         return result;
     }
 

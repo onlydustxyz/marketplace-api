@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.exception.EventSequenceViolationException;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -21,6 +23,7 @@ import static org.springframework.transaction.support.TransactionSynchronization
 @RequiredArgsConstructor
 public class CachedAccountBookProvider {
     private final AccountBookEventStorage accountBookEventStorage;
+    private final AccountBookStorage accountBookStorage;
     private final Map<Currency, AccountBookAggregate> accountBooks = new HashMap<>();
 
     private AccountBookAggregate getOrDefault(final @NonNull Currency currency) {
@@ -36,7 +39,7 @@ public class CachedAccountBookProvider {
                 if (status != STATUS_COMMITTED) evictAccountBook(currency);
             }
         });
-        return accountBookAggregate;
+        return accountBookAggregate.observed(new AccountBookProjector(null, accountBookStorage, currency.id()));
     }
 
     @Transactional

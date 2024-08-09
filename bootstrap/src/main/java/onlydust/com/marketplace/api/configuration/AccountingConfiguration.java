@@ -20,8 +20,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AccountingConfiguration {
     @Bean
-    public CachedAccountBookProvider accountBookProvider(final @NonNull AccountBookEventStorage accountBookEventStorage) {
-        return new CachedAccountBookProvider(accountBookEventStorage);
+    public CachedAccountBookProvider accountBookProvider(final @NonNull AccountBookEventStorage accountBookEventStorage,
+                                                         final @NonNull AccountBookStorage accountBookStorage) {
+        return new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage);
     }
 
     @Bean
@@ -40,8 +41,9 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountBookProjector accountBookProjector(final @NonNull SponsorAccountStorage sponsorAccountStorage) {
-        return new AccountBookProjector(sponsorAccountStorage);
+    public AccountBookProjector accountBookProjector(final @NonNull SponsorAccountStorage sponsorAccountStorage,
+                                                     final @NonNull AccountBookStorage accountBookStorage) {
+        return new AccountBookProjector(sponsorAccountStorage, accountBookStorage, null);
     }
 
     @Bean
