@@ -14,10 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
-import onlydust.com.marketplace.api.helper.AccountingHelper;
-import onlydust.com.marketplace.api.helper.ProgramHelper;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.helper.WireMockInitializer;
+import onlydust.com.marketplace.api.helper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
@@ -238,7 +235,12 @@ public class AbstractMarketplaceApiIT {
     BackofficeFacadePort backofficeFacadePort;
 
     protected UserAuthHelper userAuthHelper;
+    @Autowired
     protected ProgramHelper programHelper;
+    @Autowired
+    protected ProjectHelper projectHelper;
+    @Autowired
+    RewardHelper rewardHelper;
     @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
@@ -297,7 +299,7 @@ public class AbstractMarketplaceApiIT {
     }
 
     @BeforeEach
-    void setupHelpers() {
+    void setupUserHelper() {
         userAuthHelper = new UserAuthHelper(userRepository, backofficeUserRepository, jwtVerifier, githubAuthenticationPort, auth0WireMockServer,
                 githubWireMockServer, appUserFacadePort, faker);
 
@@ -308,8 +310,6 @@ public class AbstractMarketplaceApiIT {
         userAuthHelper.mockAuth0UserInfo(595505L, "ofux");
         userAuthHelper.mockAuth0UserInfo(21149076L, "oscarwroche");
         userAuthHelper.mockAuth0UserInfo(16590657L, "PierreOucif");
-
-        programHelper = new ProgramHelper(entityManagerFactory, backofficeFacadePort, faker);
     }
 
 

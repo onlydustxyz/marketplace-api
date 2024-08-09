@@ -9,52 +9,60 @@ import java.util.UUID;
 
 public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetReadEntity, ProgramBudgetReadEntity.PrimaryKey> {
     @Query(value = """
-            SELECT
+            select
+                1 as index,
                 s.id as program_id,
                 abt.currency_id as currency_id,
                 sum(abt.amount) filter ( where abt.project_id is null )
                     - sum(abt.amount) filter ( where abt.project_id is not null and abt.reward_id is null ) as amount
-            FROM
+            from
                 sponsors s
-            JOIN accounting.sponsor_accounts sa ON s.id = sa.sponsor_id
-            JOIN accounting.account_book_transactions abt ON sa.id = abt.sponsor_account_id
-            WHERE
+            join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
+            join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            where
                 s.id = :programId
-            GROUP BY
+            group by
                 s.id,
                 abt.currency_id
             """, nativeQuery = true)
     List<ProgramBudgetReadEntity> getTotalAvailable(final UUID programId);
 
     @Query(value = """
-            SELECT
+            select
+                2 as index,
                 s.id as program_id,
                 abt.currency_id as currency_id,
-                sum(abt.amount) filter ( where abt.project_id is not null and abt.reward_id is null ) as amount
-            FROM
+                sum(abt.amount) as amount
+            from
                 sponsors s
-            JOIN accounting.sponsor_accounts sa ON s.id = sa.sponsor_id
-            JOIN accounting.account_book_transactions abt ON sa.id = abt.sponsor_account_id
-            WHERE
-                s.id = :programId
-            GROUP BY
+            join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
+            join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            where
+                s.id = :programId and
+                abt.project_id is not null and
+                abt.reward_id is null
+            group by
                 s.id,
                 abt.currency_id
             """, nativeQuery = true)
     List<ProgramBudgetReadEntity> getTotalGranted(final UUID programId);
 
     @Query(value = """
-            SELECT
+            select
+                3 as index,
                 s.id as program_id,
                 abt.currency_id as currency_id,
-                sum(abt.amount) filter ( where abt.project_id is not null and abt.reward_id is not null and abt.payment_id is null ) as amount
-            FROM
+                sum(abt.amount) as amount
+            from
                 sponsors s
-            JOIN accounting.sponsor_accounts sa ON s.id = sa.sponsor_id
-            JOIN accounting.account_book_transactions abt ON sa.id = abt.sponsor_account_id
-            WHERE
-                s.id = :programId
-            GROUP BY
+            join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
+            join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            where
+                s.id = :programId and
+                abt.project_id is not null and
+                abt.reward_id is not null and
+                abt.payment_id is null
+            group by
                 s.id,
                 abt.currency_id
             """, nativeQuery = true)

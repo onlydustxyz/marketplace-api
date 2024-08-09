@@ -3,12 +3,11 @@ package onlydust.com.marketplace.api.helper;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.accounting.domain.model.Quote;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
@@ -27,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -58,6 +58,8 @@ public class AccountingHelper {
     OldestQuoteRepository oldestQuoteRepository;
     @Autowired
     QuoteStorage quoteStorage;
+    @Autowired
+    AccountingFacadePort accountingFacadePort;
 
     public CurrencyEntity strk() {
         return currencyRepository.findByCode("STRK").orElseThrow();
@@ -192,5 +194,17 @@ public class AccountingHelper {
 
     public void saveQuote(Quote quote) {
         quoteStorage.save(List.of(quote));
+    }
+
+    public SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId programId, final long amount, final @NonNull Currency.Id currencyId) {
+        return accountingFacadePort.createSponsorAccountWithInitialAllowance(programId, currencyId, null, PositiveAmount.of(amount));
+    }
+
+    public void grant(SponsorId programId, ProjectId projectId, long amount, Currency.Id currencyId) {
+        accountingFacadePort.allocate(programId, projectId, PositiveAmount.of(amount), currencyId);
+    }
+
+    public void pay(RewardId... rewardIds) {
+        accountingFacadePort.pay(Set.of(rewardIds));
     }
 }
