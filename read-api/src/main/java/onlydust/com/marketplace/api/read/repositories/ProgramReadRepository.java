@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.program.sponsor.ProgramReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;

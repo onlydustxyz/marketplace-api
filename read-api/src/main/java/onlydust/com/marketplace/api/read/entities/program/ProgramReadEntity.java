@@ -1,4 +1,4 @@
-package onlydust.com.marketplace.api.read.entities.program.sponsor;
+package onlydust.com.marketplace.api.read.entities.program;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
