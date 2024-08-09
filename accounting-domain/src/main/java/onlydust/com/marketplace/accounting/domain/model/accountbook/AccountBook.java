@@ -6,7 +6,6 @@ import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface AccountBook {
@@ -18,7 +17,7 @@ public interface AccountBook {
 
     List<Transaction> refund(AccountId from, AccountId to, PositiveAmount amount);
 
-    Set<AccountId> refund(AccountId from);
+    List<Transaction> refund(AccountId from);
 
     @EqualsAndHashCode
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
