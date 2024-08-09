@@ -528,7 +528,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
         ;
 
         Thread.sleep(1000);
-        
+
         final Invoice invoice = invoiceStoragePort.get(companyBillingProfileToReviewInvoices.get(1)).orElseThrow();
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
@@ -536,13 +536,33 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                         .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getInvoiceRejectedEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo("747e663f-4e68-4b42-965b-b5aebedcd4c4")))
-                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("AnthonyBuisset")))
-                        .withRequestBody(matchingJsonPath("$.message_data.rewardsNumber", equalTo(String.valueOf(invoice.rewards().size()))))
-                        .withRequestBody(matchingJsonPath("$.message_data.invoiceName", equalTo(invoice.number().value())))
-                        .withRequestBody(matchingJsonPath("$.message_data.totalUsdAmount", equalTo("2020.000")))
-                        .withRequestBody(matchingJsonPath("$.message_data.reason", equalTo(rejectionReason)))
-                        .withRequestBody(matchingJsonPath("$.message_data.rewardsDetails", containing("#303F2 - kaaper - USDC - 1000.000")))
-                        .withRequestBody(matchingJsonPath("$.message_data.rewardsDetails", containing("#79209 - kaaper - USDC - 1000.000")))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                                              {
+                                                               "title" : "Invoice rejected",
+                                                                "description" : "We're very sorry but we had to reject your invoice named OD-APPLE-INC--002 of <b>2020.000 USD</b> for this reason: <b>%s</b>",
+                                                                "rewardsNumber" : 2,
+                                                                "username" : "AnthonyBuisset",
+                                                                "rewards" : [ {
+                                                                    "id" : "#79209",
+                                                                    "projectName" : "kaaper",
+                                                                    "currency" : "USDC",
+                                                                    "amount" : "1000.000",
+                                                                    "contributionsNumber" : "1",
+                                                                    "sentBy" : "AnthonyBuisset"
+                                                                  }, {
+                                                                    "id" : "#303F2",
+                                                                    "projectName" : "kaaper",
+                                                                    "currency" : "USDC",
+                                                                    "amount" : "1000.000",
+                                                                    "contributionsNumber" : "2",
+                                                                    "sentBy" : "AnthonyBuisset"
+                                                                  } ],
+                                                                "button": {
+                                                                  "text": "Upload another invoice",
+                                                                  "link": "https://develop-app.onlydust.com/rewards"
+                                                                }
+                                                              }
+                                """.formatted(rejectionReason), true, false)))
                         .withRequestBody(matchingJsonPath("$.to", equalTo("abuisset@gmail.com")))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("An invoice for 2 reward(s) got rejected")))

@@ -439,12 +439,14 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
                                 {
                                   "username" : "AnthonyBuisset",
-                                  "projectName" : "Bretzel",
-                                  "issueId" : 1974125983,
-                                  "issueUrl" : "https://github.com/gregcha/bretzel-app/issues/6",
-                                  "repoName" : "bretzel-app",
-                                  "issueTitle" : "Test #7",
-                                  "issueDescription" : "test"
+                                  "title": "Issue application accepted",
+                                  "description": "We are excited to inform you that your application to the issue <b>Test #7</b> in the <b>Bretzel</b> project has been assigned to you! Thank you for your interest and willingness to contribute to our project.",
+                                  "issue": {
+                                      "title": "Test #7",
+                                      "description": "test",
+                                      "repository": "bretzel-app",
+                                      "detailsUrl": "https://develop-app.onlydust.com/applications"
+                                  }
                                 }
                                 """, true, false)))
                         .withRequestBody(matchingJsonPath("$.to", containing("abuisset")))

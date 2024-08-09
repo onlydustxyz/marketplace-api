@@ -31,4 +31,6 @@ public class CustomerIOProperties {
     Integer projectApplicationsToReviewByUserEmailId;
     @NonNull
     Integer projectApplicationAcceptedEmailId;
+    @NonNull
+    String environment;
 }

@@ -176,14 +176,15 @@ infrastructure:
     api-key: ${CUSTOMER_IO_API_KEY}
     only-dust-admin-email: Camille from OnlyDust <admin@onlydust.xyz>
     only-dust-marketing-email: Emilie from OnlyDust <emilie@onlydust.xyz>
-    rewards-paid-email-id: 11
-    reward-canceled-email-id: 12
-    new-reward-received-email-id: 13
-    invoice-rejected-email-id: 10
+    rewards-paid-email-id: 24
+    reward-canceled-email-id: 23
+    new-reward-received-email-id: 30
+    invoice-rejected-email-id: 25
     verification-failed-email-id: 15
-    new-committee-application-email-id: 14
+    new-committee-application-email-id: 22
     project-applications-to-review-by-user-email-id: 16
-    project-application-accepted-email-id: 17
+    project-application-accepted-email-id: 27
+    environment: ${ENV}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}

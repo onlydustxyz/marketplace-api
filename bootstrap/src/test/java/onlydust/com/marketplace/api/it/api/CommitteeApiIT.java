@@ -160,12 +160,18 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.transactional_message_id",
                                 equalTo(customerIOProperties.getNewCommitteeApplicationEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
-                        .withRequestBody(matchingJsonPath("$.message_data.projectName", equalTo("Bretzel")))
-                        .withRequestBody(matchingJsonPath("$.message_data.projectId", equalTo(bretzel.toString())))
-                        .withRequestBody(matchingJsonPath("$.message_data.committeeId", equalTo(committeeId.value().toString())))
-                        .withRequestBody(matchingJsonPath("$.message_data.committeeName", equalTo("Mr. Needful")))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Committee application")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", containing("Thank you for taking the time to send in your application" +
+                                                                                                   " for Bretzel.<br />" +
+                                                                                                   "We confirm that we have received your answers for the Mr." +
+                                                                                                   " Needful committee.<br />" +
+                                                                                                   "Should you like to edit them, you have till")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", containing("UTC to do so.")))
+
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review my answer")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-app.onlydust.com/c/%s/applicant?p=%s".formatted(committeeId.value(), bretzel.toString()))))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
-                        .withRequestBody(matchingJsonPath("$.message_data.applicationEndDate", containing(" UTC")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(contactEmail)))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));

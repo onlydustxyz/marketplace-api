@@ -4,21 +4,24 @@ import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 
 public record ProjectApplicationAcceptedDTO(@NonNull String username,
-                                            @NonNull String projectName,
-                                            @NonNull Long issueId,
-                                            @NonNull String issueUrl,
-                                            @NonNull String repoName,
-                                            @NonNull String issueTitle,
-                                            String issueDescription) {
+                                            @NonNull String title,
+                                            @NonNull String description,
+                                            @NonNull IssueDTO issue) {
 
-    public static ProjectApplicationAcceptedDTO fromEvent(String recipientLogin, final ApplicationAccepted event) {
+    private static final String DESCRIPTION = "We are excited to inform you that your application to the issue" +
+                                              " <b>%s</b> in the <b>%s</b>" +
+                                              " project has been assigned to you! Thank you for your interest and willingness to contribute to our project.";
+
+    public static ProjectApplicationAcceptedDTO fromEvent(final String recipientLogin, final ApplicationAccepted event, final String environment) {
         return new ProjectApplicationAcceptedDTO(
                 recipientLogin,
-                event.getProject().name(),
-                event.getIssue().id(),
-                event.getIssue().htmlUrl(),
-                event.getIssue().repoName(),
-                event.getIssue().title(),
-                event.getIssue().description());
+                "Issue application accepted",
+                DESCRIPTION.formatted(event.getIssue().title(), event.getProject().name()),
+                new IssueDTO(
+                        event.getIssue().title(),
+                        event.getIssue().description(),
+                        event.getIssue().repoName(),
+                        UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) + "applications"
+                ));
     }
 }
