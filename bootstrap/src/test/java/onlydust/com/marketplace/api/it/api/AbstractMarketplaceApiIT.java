@@ -136,14 +136,12 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_GET_PROFILE_GITHUB = "/api/v1/me/profile/github";
     protected static final String ME_PUT_HACKATHON_REGISTRATIONS = "/api/v1/me/hackathons/%s/registrations";
     protected static final String ME_RECOMMENDED_PROJECTS = "/api/v1/me/recommended-projects";
-    protected static final String ME_JOURNEY = "/api/v1/me/journey";
     protected static final String ME_ONBOARDING = "/api/v1/me/onboarding";
     protected static final String ME_NOTIFICATION_SETTINGS_BY_PROJECT_ID = "/api/v1/me/notification-settings/projects/%s";
     protected static final String USERS_GET = "/api/v1/users";
     protected static final String USERS_GET_BY_LOGIN = "/api/v1/users/login";
     protected static final String USERS_GET_CONTRIBUTIONS = "/api/v2/users/%s/contributions";
     protected static final String ME_GET_ORGANIZATIONS = "/api/v1/me/organizations";
-    protected static final String GET_ALL_TECHNOLOGIES = "/api/v1/technologies";
     protected static final String GET_ALL_ECOSYSTEMS = "/api/v1/ecosystems";
     protected static final String GET_ECOSYSTEM_CONTRIBUTORS = "/api/v1/ecosystems/%s/contributors";
     protected static final String GET_ECOSYSTEM_PROJECTS = "/api/v1/ecosystems/%s/projects";
@@ -190,6 +188,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_NOTIFICATIONS_COUNT = "/api/v1/me/notifications/count";
     protected static final String ME_NOTIFICATIONS_ALL = "/api/v1/me/notifications/all";
     protected static final String ME_NOTIFICATION_SETTINGS = "/api/v1/me/notification-settings";
+    protected static final String PROGRAM_BY_ID = "/api/v1/programs/%s";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
