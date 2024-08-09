@@ -9,7 +9,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Slf4j
 public class AccountBookAggregate implements AccountBook {
@@ -49,7 +48,7 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @Override
-    public synchronized Set<AccountId> refund(AccountId from) {
+    public synchronized List<Transaction> refund(AccountId from) {
         return emit(new FullRefundEvent(from));
     }
 
@@ -130,9 +129,9 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @EventType("FullRefund")
-    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Set<AccountId>> {
+    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Set<AccountId> visit(AccountBookState state) {
+        public List<Transaction> visit(AccountBookState state) {
             return state.refund(from);
         }
     }

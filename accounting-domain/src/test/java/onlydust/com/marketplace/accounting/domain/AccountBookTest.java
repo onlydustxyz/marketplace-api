@@ -293,12 +293,12 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
+        assertThat(transactions).containsExactlyInAnyOrder(new AccountBook.Transaction(sender, recipient, amount.negate()));
     }
 
     @Test
@@ -320,13 +320,16 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount1.add(amount2));
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender1)).isEqualTo(amount1);
         assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(amount2);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender1, sender2);
+        assertThat(transactions).containsExactlyInAnyOrder(
+                new AccountBook.Transaction(sender1, recipient, amount1.negate()),
+                new AccountBook.Transaction(sender2, recipient, amount2.negate())
+        );
     }
 
     @Test
@@ -344,7 +347,7 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.pendingEvents()).containsExactly(
@@ -353,7 +356,9 @@ public class AccountBookTest {
         );
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
+        assertThat(transactions).containsExactlyInAnyOrder(
+                new AccountBook.Transaction(sender, recipient, Amount.of(-90L))
+        );
     }
 
     @Test

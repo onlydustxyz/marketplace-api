@@ -80,16 +80,16 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public synchronized Set<AccountId> refund(@NonNull final AccountId from) {
+    public synchronized List<Transaction> refund(@NonNull final AccountId from) {
         final var vertices = accountVertices(from);
-        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
+        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty()))
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
-        }
+
         return new ArrayList<>(vertices).stream().map(vertex -> {
-            final var refunded = incomingEdgeOf(vertex).source.accountId;
-            removeTransaction(vertex);
-            return refunded;
-        }).collect(Collectors.toUnmodifiableSet());
+            final var transaction = createTransaction(vertex, balanceOf(vertex).negate());
+            removeEdge(vertex);
+            return transaction;
+        }).toList();
     }
 
     @Override
@@ -230,7 +230,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
             if (graph.outgoingEdgesOf(unspentVertex.vertex()).isEmpty()) {
-                removeTransaction(unspentVertex.vertex());
+                removeEdge(unspentVertex.vertex());
             } else {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
                 transactions.add(createTransaction(unspentVertex.vertex(), remainingAmount.negate()));
@@ -343,10 +343,10 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         return path(path, incomingEdgeOf(vertex).source);
     }
 
-    private void removeTransaction(@NonNull final Vertex vertex) {
-        if (!graph.outgoingEdgesOf(vertex).isEmpty()) {
+    private void removeEdge(@NonNull final Vertex vertex) {
+        if (!graph.outgoingEdgesOf(vertex).isEmpty())
             throw new IllegalStateException("Cannot remove a vertex with outgoing edges");
-        }
+
         graph.removeEdge(incomingEdgeOf(vertex));
         graph.removeVertex(vertex);
         accountVertices.get(vertex.accountId).remove(vertex);

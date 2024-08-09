@@ -178,7 +178,7 @@ public class AccountingService implements AccountingFacadePort {
         if (invoiceStoragePort.invoiceOf(rewardId).map(i -> i.status().isActive()).orElse(false))
             throw forbidden("Reward %s cannot be cancelled because it is included in an invoice".formatted(rewardId));
 
-        final var refundedAccounts = accountBook.refund(AccountId.of(rewardId));
+        final var refundedAccounts = accountBook.refund(AccountId.of(rewardId)).stream().map(t -> t.path().get(t.path().size() - 2)).collect(toSet());
         saveAccountBook(currency, accountBook);
         accountingObserver.onRewardCancelled(rewardId);
         refundedAccounts.stream().filter(AccountId::isProject).map(AccountId::projectId)
