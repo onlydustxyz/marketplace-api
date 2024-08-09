@@ -7522,7 +7522,7 @@ components:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalRewarded:
           $ref: '#/components/schemas/DetailedTotalMoney'
-    
+
     ProjectBudgetsResponse:
       type: object
       required:
@@ -9215,12 +9215,21 @@ components:
       type: object
       required:
         - id
-        - text
+        - shortDescription
+        - longDescription
+        - title
       properties:
         id:
           $ref: '#/components/schemas/BannerId'
-        text:
+        shortDescription:
           type: string
+        longDescription:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+          format: date-time
         buttonIconSlug:
           type: string
         buttonText:

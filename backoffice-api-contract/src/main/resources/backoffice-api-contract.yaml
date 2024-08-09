@@ -5517,10 +5517,19 @@ components:
     BannerCreateRequest:
       type: object
       required:
-        - text
+        - shortDescription
+        - longDescription
+        - title
       properties:
-        text:
+        shortDescription:
           type: string
+        longDescription:
+          type: string
+        title:
+          type: string
+        date:
+          type: string
+          format: date-time
         buttonIconSlug:
           type: string
         buttonText:
@@ -5545,27 +5554,25 @@ components:
         id:
           $ref: '#/components/schemas/BannerId'
 
-    BannerUpdateResponse:
-      type: object
-      required:
-        - id
-      properties:
-        id:
-          $ref: '#/components/schemas/BannerId'
-
     BannerShortResponse:
       type: object
       required:
         - id
-        - text
+        - title
+        - shortDescription
+        - longDescription
         - visible
       properties:
         id:
           $ref: '#/components/schemas/BannerId'
-        text:
+        shortDescription:
+          type: string
+        longDescription:
           type: string
         visible:
           type: boolean
+        title:
+          type: string
 
     BannerPageItemResponse:
       allOf:
@@ -5588,6 +5595,9 @@ components:
         - $ref: '#/components/schemas/BannerShortResponse'
         - type: object
           properties:
+            date:
+              type: string
+              format: date-time
             buttonIconSlug:
               type: string
             buttonText:
