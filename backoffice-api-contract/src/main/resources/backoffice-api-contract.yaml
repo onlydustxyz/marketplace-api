@@ -5520,12 +5520,15 @@ components:
         - shortDescription
         - longDescription
         - title
+        - subTitle
       properties:
         shortDescription:
           type: string
         longDescription:
           type: string
         title:
+          type: string
+        subTitle:
           type: string
         date:
           type: string
@@ -5559,6 +5562,7 @@ components:
       required:
         - id
         - title
+        - subTitle
         - shortDescription
         - longDescription
         - visible
@@ -5572,6 +5576,8 @@ components:
         visible:
           type: boolean
         title:
+          type: string
+        subTitle:
           type: string
 
     BannerPageItemResponse:

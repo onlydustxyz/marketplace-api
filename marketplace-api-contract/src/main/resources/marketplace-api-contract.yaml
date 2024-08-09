@@ -9218,6 +9218,7 @@ components:
         - shortDescription
         - longDescription
         - title
+        - subTitle
       properties:
         id:
           $ref: '#/components/schemas/BannerId'
@@ -9226,6 +9227,8 @@ components:
         longDescription:
           type: string
         title:
+          type: string
+        subTitle:
           type: string
         date:
           type: string
