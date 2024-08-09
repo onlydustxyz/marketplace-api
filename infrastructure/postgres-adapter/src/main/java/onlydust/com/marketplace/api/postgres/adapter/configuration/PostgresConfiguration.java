@@ -408,4 +408,9 @@ public class PostgresConfiguration {
     PostgresNotificationAdapter postgresNotificationAdapter(final NotificationRepository notificationRepository) {
         return new PostgresNotificationAdapter(notificationRepository);
     }
+
+    @Bean
+    PostgresAccountBookStorageAdapter postgresAccountBookStorageAdapter(final AccountBookTransactionRepository accountBookTransactionRepository) {
+        return new PostgresAccountBookStorageAdapter(accountBookTransactionRepository);
+    }
 }
