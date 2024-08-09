@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.github.javafaker.Faker;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,15 @@ public class UserAuthHelper {
     WireMockServer auth0WireMockServer;
     WireMockServer githubWireMockServer;
     AppUserFacadePort appUserFacadePort;
+    Faker faker;
+
+    public AuthenticatedUser create() {
+        return signUpUser(
+                faker.random().nextLong(),
+                faker.internet().slug(),
+                faker.internet().avatar(),
+                false);
+    }
 
     public AuthenticatedUser signUpUser(long githubUserId, String login, String avatarUrl, boolean isAdmin) {
         appUserFacadePort.getUserByGithubIdentity(GithubUserIdentity.builder()
