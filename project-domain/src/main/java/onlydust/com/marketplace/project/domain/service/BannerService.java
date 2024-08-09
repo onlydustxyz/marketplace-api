@@ -17,19 +17,25 @@ public class BannerService implements BannerFacadePort {
     private final BannerStoragePort bannerStoragePort;
 
     @Override
-    public Banner createBanner(String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl) {
-        final var banner = new Banner(text, buttonText, buttonIconSlug, buttonLinkUrl);
+    public Banner createBanner(String shortDescription, String longDescription, String title, String subTitle, ZonedDateTime date, String buttonText,
+                               String buttonIconSlug, URI buttonLinkUrl) {
+        final var banner = new Banner(shortDescription, longDescription, title, subTitle, buttonText, buttonIconSlug, buttonLinkUrl, date);
         bannerStoragePort.save(banner);
         return banner;
     }
 
     @Override
-    public void updateBanner(Banner.Id id, String text, String buttonText, String buttonIconSlug, URI buttonLinkUrl) {
+    public void updateBanner(Banner.Id id, String shortDescription, String longDescription, String title, String subTitle, ZonedDateTime date,
+                             String buttonText, String buttonIconSlug, URI buttonLinkUrl) {
         final var banner = bannerStoragePort.findById(id)
                 .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
 
         bannerStoragePort.save(banner
-                .text(text)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .title(title)
+                .subTitle(subTitle)
+                .date(date)
                 .buttonText(buttonText)
                 .buttonIconSlug(buttonIconSlug)
                 .buttonLinkUrl(buttonLinkUrl)

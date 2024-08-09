@@ -40,6 +40,12 @@ paths:
         - ReadBanner
       summary: Get currently visible banner
       operationId: getBanner
+      parameters:
+        - in: query
+          name: hiddeIgnoredByMe
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'Banner'

@@ -25,5 +25,14 @@ public interface BannerReadRepository extends Repository<BannerReadEntity, UUID>
                 AND c.userId = :userId
             ))
             """)
-    Optional<BannerReadEntity> findFirstVisibleBanner(UUID userId);
+    Optional<BannerReadEntity> findMyFirstVisibleBanner(UUID userId);
+
+    @Query("""
+            SELECT b
+            FROM BannerReadEntity b
+            WHERE b.visible = true
+            """)
+    Optional<BannerReadEntity> findFirstVisibleBanner();
+
+
 }
