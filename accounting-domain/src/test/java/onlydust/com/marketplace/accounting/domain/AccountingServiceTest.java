@@ -123,7 +123,8 @@ public class AccountingServiceTest {
 
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
-        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage), sponsorAccountStorage, currencyStorage,
+        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class)),
+                sponsorAccountStorage, currencyStorage,
                 accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort);
     }
 
@@ -1584,7 +1585,7 @@ public class AccountingServiceTest {
                 new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
         );
 
-        verify(accountBookObserver, times(18)).on(any());
+        verify(accountBookObserver, times(18)).on(any(IdentifiedAccountBookEvent.class));
     }
 
     private void assertAccount(SponsorAccount.Id sponsorAccountId, Long expectedAllowance, Long expectedBalance, Long expectedUnlockedBalance) {
