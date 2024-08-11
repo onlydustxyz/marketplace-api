@@ -45,15 +45,22 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
 
     @Override
     @Transactional
-    public void save(NotificationRecipient.Id userId, NotificationSettings settings) {
+    public void create(NotificationRecipient.Id userId, NotificationSettings settings) {
         final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))
                 .toList();
+        notificationSettingsChannelRepository.saveAll(entities);
+    }
 
-        if (notificationSettingsChannelRepository.existsByUserId(userId.value())) {
-            notificationSettingsChannelRepository.deleteAllByUserId(userId.value());
-        }
+    @Override
+    @Transactional
+    public void update(NotificationRecipient.Id userId, NotificationSettings settings) {
+        final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))
+                .toList();
+        notificationSettingsChannelRepository.deleteAllByUserId(userId.value());
         notificationSettingsChannelRepository.saveAll(entities);
     }
 }
