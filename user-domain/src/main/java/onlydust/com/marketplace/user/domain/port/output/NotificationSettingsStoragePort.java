@@ -17,5 +17,7 @@ public interface NotificationSettingsStoragePort {
 
     List<NotificationChannel> getNotificationChannels(UUID recipientId, NotificationCategory category);
 
-    void save(NotificationRecipient.Id userId, NotificationSettings settings);
+    void create(NotificationRecipient.Id userId, NotificationSettings settings);
+
+    void update(NotificationRecipient.Id userId, NotificationSettings settings);
 }

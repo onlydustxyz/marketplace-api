@@ -15,7 +15,7 @@ public class NotificationSettingsService implements NotificationSettingsPort, Us
 
     @Override
     public void updateNotificationSettings(NotificationRecipient.Id userId, NotificationSettings settings) {
-        notificationSettingsStoragePort.save(userId, settings);
+        notificationSettingsStoragePort.update(userId, settings);
     }
 
     @Override
@@ -27,6 +27,6 @@ public class NotificationSettingsService implements NotificationSettingsPort, Us
 
     @Override
     public void onUserSignedUp(AuthenticatedUser user) {
-        notificationSettingsStoragePort.save(NotificationRecipient.Id.of(user.id()), NotificationSettings.defaultSettings());
+        notificationSettingsStoragePort.create(NotificationRecipient.Id.of(user.id()), NotificationSettings.defaultSettings());
     }
 }
