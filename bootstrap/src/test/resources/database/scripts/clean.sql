@@ -17,3 +17,4 @@ SELECT truncate_tables('public');
 SELECT truncate_tables('iam');
 SELECT truncate_tables('rfd');
 SELECT truncate_tables('accounting');
+SELECT truncate_tables('indexer_outbox');
