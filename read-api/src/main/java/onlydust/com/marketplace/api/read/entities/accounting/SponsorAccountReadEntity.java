@@ -44,11 +44,6 @@ public class SponsorAccountReadEntity {
     @NonNull
     List<SponsorAccountTransactionReadEntity> transactions;
 
-    @OneToMany(mappedBy = "account")
-    @OrderBy("timestamp DESC")
-    @NonNull
-    List<SponsorAccountAllowanceTransactionReadEntity> allowanceTransactions;
-
     public AccountResponse toDto(SponsorAccountStatement sponsorAccountStatement) {
         return new AccountResponse()
                 .id(id)

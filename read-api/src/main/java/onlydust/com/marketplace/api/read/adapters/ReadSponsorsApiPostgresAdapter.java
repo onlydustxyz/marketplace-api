@@ -6,8 +6,8 @@ import onlydust.com.marketplace.api.contract.model.SortDirection;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionSort;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
 import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
-import onlydust.com.marketplace.api.read.entities.accounting.SponsorAccountAllowanceTransactionReadEntity;
-import onlydust.com.marketplace.api.read.repositories.SponsorAccountAllowanceTransactionReadRepository;
+import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
+import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -36,7 +36,7 @@ import static org.springframework.http.ResponseEntity.status;
 public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final PermissionService permissionService;
-    private final SponsorAccountAllowanceTransactionReadRepository sponsorAccountAllowanceTransactionReadRepository;
+    private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
 
     @Override
     public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId,
@@ -61,9 +61,9 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
             case PROJECT -> "p.name";
         };
 
-        final var page = sponsorAccountAllowanceTransactionReadRepository.findAll(
+        final var page = accountBookTransactionReadRepository.findAllFromSponsor(
                 sponsorId,
-                types == null ? null : types.stream().map(SponsorAccountAllowanceTransactionReadEntity.Type::from).toList(),
+                types == null ? null : types.stream().map(AccountBookTransactionReadEntity::map).toList(),
                 currencies,
                 projects,
                 DateMapper.parseNullable(fromDate),
@@ -72,7 +72,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         );
 
         final var response = new TransactionHistoryPageResponse()
-                .transactions(page.getContent().stream().map(SponsorAccountAllowanceTransactionReadEntity::toResponse).toList())
+                .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toPageItemResponse).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))

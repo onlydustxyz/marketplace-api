@@ -21,8 +21,10 @@ import org.springframework.context.annotation.Configuration;
 public class AccountingConfiguration {
     @Bean
     public CachedAccountBookProvider accountBookProvider(final @NonNull AccountBookEventStorage accountBookEventStorage,
-                                                         final @NonNull AccountBookStorage accountBookStorage) {
-        return new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage);
+                                                         final @NonNull AccountBookStorage accountBookStorage,
+                                                         final @NonNull AccountBookObserver accountBookObserver
+    ) {
+        return new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage, accountBookObserver);
     }
 
     @Bean
@@ -32,18 +34,16 @@ public class AccountingConfiguration {
                                                      final @NonNull AccountingObserverPort accountingObserver,
                                                      final @NonNull ProjectAccountingObserver projectAccountingObserver,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull AccountBookObserver accountBookObserver,
                                                      final @NonNull RewardStatusService rewardStatusService,
                                                      final @NonNull ReceiptStoragePort receiptStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, accountBookObserver, rewardStatusService, receiptStoragePort);
+                invoiceStoragePort, rewardStatusService, receiptStoragePort);
     }
 
     @Bean
-    public AccountBookProjector accountBookProjector(final @NonNull SponsorAccountStorage sponsorAccountStorage,
-                                                     final @NonNull AccountBookStorage accountBookStorage) {
-        return new AccountBookProjector(sponsorAccountStorage, accountBookStorage);
+    public AccountBookProjector accountBookProjector(final @NonNull AccountBookStorage accountBookStorage) {
+        return new AccountBookProjector(accountBookStorage);
     }
 
     @Bean

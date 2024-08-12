@@ -35,14 +35,9 @@ public class SponsorAccountEntity {
     @Builder.Default
     Set<SponsorAccountTransactionsEntity> transactions = new HashSet<>();
 
-    @OneToMany(mappedBy = "accountId", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    Set<SponsorAccountAllowanceTransactionsEntity> allowanceTransactions = new HashSet<>();
-
     public SponsorAccount toDomain() {
         final var sponsorAccount = new SponsorAccount(SponsorAccount.Id.of(id), SponsorId.of(sponsorId), currency.toDomain(), lockedUntil);
         sponsorAccount.getTransactions().addAll(transactions.stream().map(SponsorAccountTransactionsEntity::toDomain).toList());
-        sponsorAccount.getAllowanceTransactions().addAll(allowanceTransactions.stream().map(SponsorAccountAllowanceTransactionsEntity::toDomain).toList());
         return sponsorAccount;
     }
 
@@ -54,9 +49,6 @@ public class SponsorAccountEntity {
                 .sponsorId(sponsorAccount.sponsorId().value())
                 .transactions(sponsorAccount.getTransactions().stream()
                         .map(t -> SponsorAccountTransactionsEntity.of(sponsorAccount.id(), t))
-                        .collect(toUnmodifiableSet()))
-                .allowanceTransactions(sponsorAccount.getAllowanceTransactions().stream()
-                        .map(t -> SponsorAccountAllowanceTransactionsEntity.of(sponsorAccount.id(), t))
                         .collect(toUnmodifiableSet()))
                 .build();
     }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.Transaction;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
@@ -36,6 +37,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
+import static onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -123,9 +126,9 @@ public class AccountingServiceTest {
 
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
-        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class)),
+        accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class), accountBookObserver),
                 sponsorAccountStorage, currencyStorage,
-                accountingObserver, projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort);
+                accountingObserver, projectAccountingObserver, invoiceStoragePort, rewardStatusFacadePort, receiptStoragePort);
     }
 
     @BeforeAll
@@ -223,7 +226,8 @@ public class AccountingServiceTest {
             assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
             assertThat(sponsorAccount.allowance()).isEqualTo(amountToMint);
 
-            verify(accountBookObserver).on(event);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(),
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amountToMint)));
         }
 
         /*
@@ -234,7 +238,7 @@ public class AccountingServiceTest {
         @Test
         void should_create_sponsor_account_and_funds_it() {
             // Given
-            final var amount = Amount.of(10L);
+            final var amount = PositiveAmount.of(10L);
             final var transaction = fakeTransaction(Network.ETHEREUM, amount);
 
             // When
@@ -244,7 +248,7 @@ public class AccountingServiceTest {
             // Then
             final var event = IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(amount)));
             assertThat(accountBookEventStorage.events.get(currency)).contains(event);
-            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(amount);
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(10L));
             assertThat(sponsorAccount.account().currency()).isEqualTo(currency);
             assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
             assertThat(sponsorAccount.account().network()).contains(transaction.network());
@@ -260,7 +264,8 @@ public class AccountingServiceTest {
             assertThat(savedAccount.getTransactions()).isEqualTo(sponsorAccount.account().getTransactions());
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
 
-            verify(accountBookObserver).on(event);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(),
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amount)));
         }
 
         /*
@@ -342,6 +347,7 @@ public class AccountingServiceTest {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             when(currencyStorage.all()).thenReturn(Set.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, PositiveAmount.of(100L)).account();
+            reset(accountBookObserver);
         }
 
         /*
@@ -353,10 +359,11 @@ public class AccountingServiceTest {
         void should_register_allowance() {
             // Given
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
-
+            SponsorAccount.Id sponsorAccountId;
             // When
             {
                 final var sponsorAccountStatement = accountingService.increaseAllowance(sponsorAccount.id(), amount);
+                sponsorAccountId = sponsorAccountStatement.account().id();
                 assertThat(sponsorAccountStatement.allowance()).isEqualTo(PositiveAmount.of(100L).add(amount));
             }
             {
@@ -370,7 +377,10 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            verify(accountBookObserver).on(any(), any(),
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccountId)), amount)));
+            verify(accountBookObserver).on(any(), any(),
+                    eq(new AccountBook.Transaction(Type.REFUND, List.of(AccountId.of(sponsorAccountId)), amount)));
         }
 
         /*
@@ -406,7 +416,14 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount)
+            );
         }
 
         /*
@@ -507,7 +524,7 @@ public class AccountingServiceTest {
             accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId2, true, null, Set.of(network));
 
-            accountingService.pay(rewardId2, ZonedDateTime.now(), Network.ETHEREUM, "0x123456789");
+            final var payment = accountingService.pay(rewardId2, ZonedDateTime.now(), Network.ETHEREUM, "0x123456789");
 
             // Then
             final var events = List.of(
@@ -515,7 +532,18 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), AccountId.of(rewardId2)),
+                            PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), AccountId.of(rewardId2),
+                            AccountId.of(payment.id())), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), AccountId.of(rewardId2),
+                            AccountId.of(payment.id())), PositiveAmount.of(100L))
+            );
 
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
@@ -600,7 +628,16 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(4, new FullRefundEvent(AccountId.of(rewardId1)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), AccountId.of(rewardId1)),
+                            PositiveAmount.of(40L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1), AccountId.of(rewardId1)),
+                            PositiveAmount.of(40L))
+            );
             verify(rewardStatusFacadePort).delete(rewardId1);
         }
 
@@ -654,6 +691,7 @@ public class AccountingServiceTest {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate, PositiveAmount.of(300L))
                     .account();
+            reset(accountBookObserver);
         }
 
         /*
@@ -676,7 +714,13 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.id())), amount),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id())), amount)
+            );
         }
 
         /*
@@ -699,7 +743,13 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(projectId1), AccountId.of(sponsorAccount.id()), amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount)
+            );
         }
 
         /*
@@ -758,7 +808,14 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId2), AccountId.of(rewardId2)),
+                            PositiveAmount.of(100L))
+            );
 
             assertThat(sponsorAccountStorage.get(sponsorAccount.id()).orElseThrow().unlockedBalance()).isEqualTo(Amount.ZERO);
         }
@@ -836,6 +893,7 @@ public class AccountingServiceTest {
                     PositiveAmount.of(100L)).account();
             lockedSponsorSponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate,
                     PositiveAmount.of(100L)).account();
+            reset(accountBookObserver);
         }
 
         /*
@@ -1032,7 +1090,31 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(9, new FullRefundEvent(AccountId.of(rewardId)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            events.forEach(e -> verify(accountBookObserver).on(e));
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id())), PositiveAmount.of(200L)),
+                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id())), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId)),
+                            PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId)),
+                            PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId)),
+                            PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(50L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
+                            AccountId.of(rewardId)), PositiveAmount.of(50L))
+            );
             verify(rewardStatusFacadePort).delete(rewardId);
         }
 
@@ -1585,7 +1667,57 @@ public class AccountingServiceTest {
                 new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
         );
 
-        verify(accountBookObserver, times(18)).on(any(IdentifiedAccountBookEvent.class));
+        final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+        verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+        final var transactions = transactionsCaptor.getAllValues();
+        assertThat(transactions).containsExactlyInAnyOrder(
+                new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsor1Account1)), PositiveAmount.of(10_000L)),
+                new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsor2Account1)), PositiveAmount.of(3_000L)),
+                new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsor2Account1)), PositiveAmount.of(17_000L)),
+                new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsor2Account2)), PositiveAmount.of(50_000L)),
+                new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsor2Account2)), PositiveAmount.of(30_000L)),
+
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor1Account1), AccountId.of(projectId1)), PositiveAmount.of(8_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId1)), PositiveAmount.of(3_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId1)), PositiveAmount.of(12_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor1Account1), AccountId.of(projectId2)), PositiveAmount.of(1_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2)), PositiveAmount.of(2_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2)), PositiveAmount.of(3_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account2), AccountId.of(projectId2)), PositiveAmount.of(5_000L)),
+
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor1Account1), AccountId.of(projectId2), AccountId.of(rewardId1)),
+                        PositiveAmount.of(1_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1)),
+                        PositiveAmount.of(2_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1)),
+                        PositiveAmount.of(500L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId2)),
+                        PositiveAmount.of(2_500L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account2), AccountId.of(projectId2), AccountId.of(rewardId2)),
+                        PositiveAmount.of(1_500L)),
+
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor1Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(1_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(2_000L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(500L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId2),
+                        AccountId.of(payment1.id())), PositiveAmount.of(2_500L)),
+                new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsor2Account2), AccountId.of(projectId2), AccountId.of(rewardId2),
+                        AccountId.of(payment2.id())), PositiveAmount.of(1_500L)),
+
+                new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsor1Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(1_000L)),
+                new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(2_000L)),
+                new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId1),
+                        AccountId.of(payment1.id())), PositiveAmount.of(500L)),
+                new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsor2Account1), AccountId.of(projectId2), AccountId.of(rewardId2),
+                        AccountId.of(payment1.id())), PositiveAmount.of(2_500L)),
+                new AccountBook.Transaction(BURN, List.of(AccountId.of(sponsor2Account2), AccountId.of(projectId2), AccountId.of(rewardId2),
+                        AccountId.of(payment2.id())), PositiveAmount.of(1_500L))
+        );
     }
 
     private void assertAccount(SponsorAccount.Id sponsorAccountId, Long expectedAllowance, Long expectedBalance, Long expectedUnlockedBalance) {

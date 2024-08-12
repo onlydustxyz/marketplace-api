@@ -34,7 +34,7 @@ public class BackofficeDebugRestApi implements BackofficeDebugApi {
     @Transactional
     public ResponseEntity<Void> checkAccountingEvents() {
         final var currencies = currencyFacadePort.listCurrencies();
-        final var cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage);
+        final var cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, accountBookStorage, null);
         currencies.forEach(cachedAccountBookProvider::get);
         return ResponseEntity.noContent().build();
     }

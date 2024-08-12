@@ -22,7 +22,10 @@ public interface AccountingFacadePort {
 
     void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId);
 
-    void pay(final @NonNull RewardId rewardId, final @NonNull ZonedDateTime confirmedAt, final @NonNull Network network, final @NonNull String transactionHash);
+    Payment pay(final @NonNull RewardId rewardId,
+                final @NonNull ZonedDateTime confirmedAt,
+                final @NonNull Network network,
+                final @NonNull String transactionHash);
 
     List<Payment> pay(final Set<RewardId> rewardIds);
 

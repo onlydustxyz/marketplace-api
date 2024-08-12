@@ -287,10 +287,28 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 5,
+                          "totalItemNumber": 6,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "transactions": [
+                            {
+                              "type": "REFUND",
+                              "network": null,
+                              "lockedUntil": null,
+                              "project": null,
+                              "amount": {
+                                "amount": 40,
+                                "currency": {
+                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                  "code": "STRK",
+                                  "name": "StarkNet Token",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "dollarsEquivalent": null,
+                                "conversionRate": null
+                              }
+                            },
                             {
                               "type": "WITHDRAWAL",
                               "network": "ETHEREUM",

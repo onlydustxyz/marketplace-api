@@ -22,8 +22,7 @@ import java.util.UUID;
 public class AccountBookTransactionEntity {
     @Id
     @EqualsAndHashCode.Include
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long index;
+    UUID id;
 
     @NonNull
     ZonedDateTime timestamp;
@@ -50,7 +49,7 @@ public class AccountBookTransactionEntity {
 
     public static AccountBookTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
         return new AccountBookTransactionEntity(
-                null,
+                UUID.randomUUID(),
                 projection.timestamp(),
                 projection.accountBookId().value(),
                 projection.type(),

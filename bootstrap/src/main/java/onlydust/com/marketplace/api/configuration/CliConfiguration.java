@@ -1,10 +1,15 @@
 package onlydust.com.marketplace.api.configuration;
 
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
+import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.WalletRepository;
 import onlydust.com.marketplace.cli.AccountBookDisplay;
+import onlydust.com.marketplace.cli.AccountBookRefresh;
 import onlydust.com.marketplace.cli.EvmWalletSanitizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +23,16 @@ public class CliConfiguration {
                                                  final CachedAccountBookProvider accountBookProvider) {
         return new AccountBookDisplay(currencyStorage, sponsorAccountStorage, accountBookProvider);
     }
+
+    @Bean
+    public AccountBookRefresh accountBookRefresh(final CurrencyStorage currencyStorage,
+                                                 final AccountBookStorage accountBookStorage,
+                                                 final AccountBookEventStorage accountBookEventStorage,
+                                                 final AccountBookProjector accountBookProjector,
+                                                 final AccountBookTransactionRepository accountBookTransactionRepository) {
+        return new AccountBookRefresh(currencyStorage, accountBookStorage, accountBookEventStorage, accountBookProjector, accountBookTransactionRepository);
+    }
+
 
     @Bean
     public EvmWalletSanitizer evmWalletSanitizer(final WalletRepository walletRepository) {

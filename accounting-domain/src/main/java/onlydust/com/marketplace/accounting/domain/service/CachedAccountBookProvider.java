@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.exception.EventSequenceViolationException;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
@@ -24,6 +24,7 @@ import static org.springframework.transaction.support.TransactionSynchronization
 public class CachedAccountBookProvider {
     private final AccountBookEventStorage accountBookEventStorage;
     private final AccountBookStorage accountBookStorage;
+    private final AccountBookObserver accountBookObserver;
     private final Map<Currency, AccountBookAggregate> accountBooks = new HashMap<>();
 
     private AccountBookAggregate getOrDefault(final @NonNull Currency currency) {
@@ -39,11 +40,11 @@ public class CachedAccountBookProvider {
                 if (status != STATUS_COMMITTED) evictAccountBook(currency);
             }
         });
-        return accountBookAggregate.observed(new AccountBookProjector(null, accountBookStorage));
+        return accountBookAggregate.observed(accountBookObserver);
     }
 
     @Transactional
-    public synchronized List<IdentifiedAccountBookEvent> save(final @NonNull Currency currency, final @NonNull AccountBookAggregate accountBook) {
+    public synchronized void save(final @NonNull Currency currency, final @NonNull AccountBookAggregate accountBook) {
         try {
             final var pendingEvents = accountBook.getAndClearPendingEvents();
 
@@ -51,8 +52,6 @@ public class CachedAccountBookProvider {
                 checkEventIdsSequenceIntegrity(currency, pendingEvents);
                 insertEvents(accountBook.id(), currency, pendingEvents);
             }
-
-            return pendingEvents;
         } catch (Exception e) {
             evictAccountBook(currency);
             throw internalServerError("Could not save account book", e);

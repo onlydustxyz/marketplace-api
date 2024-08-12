@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageStub;
@@ -43,7 +44,7 @@ class CachedAccountBookProviderTest {
     @BeforeEach
     void setUp() {
         accountBookEventStorage = mock(AccountBookEventStorageStub.class);
-        cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class));
+        cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class), mock(AccountBookObserver.class));
     }
 
     @Test
