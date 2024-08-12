@@ -42,7 +42,7 @@ paths:
       operationId: getBanner
       parameters:
         - in: query
-          name: hiddeIgnoredByMe
+          name: hiddenIgnoredByMe
           required: false
           schema:
             type: boolean

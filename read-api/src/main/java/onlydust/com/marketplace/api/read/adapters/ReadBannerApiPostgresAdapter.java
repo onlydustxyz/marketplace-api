@@ -23,9 +23,9 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
     private final BannerReadRepository bannerReadRepository;
 
     @Override
-    public ResponseEntity<BannerResponse> getBanner(Boolean hiddeIgnoredByMe) {
+    public ResponseEntity<BannerResponse> getBanner(Boolean hiddenIgnoredByMe) {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final Boolean hiddeIgnoredByMeFilter = Optional.ofNullable(hiddeIgnoredByMe).orElse(Boolean.FALSE);
+        final Boolean hiddeIgnoredByMeFilter = Optional.ofNullable(hiddenIgnoredByMe).orElse(Boolean.FALSE);
 
         final var banner = hiddeIgnoredByMeFilter ?
                 bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).orElse(null))

@@ -72,7 +72,7 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(BANNER, Map.of("hiddeIgnoredByMe", "true")))
+                .uri(getApiURI(BANNER, Map.of("hiddenIgnoredByMe", "true")))
                 .header("Authorization", "Bearer " + user.jwt())
                 // Then
                 .exchange()
