@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
@@ -30,7 +29,6 @@ public class AccountingService implements AccountingFacadePort {
     private final AccountingObserverPort accountingObserver;
     private final ProjectAccountingObserver projectAccountingObserver;
     private final InvoiceStoragePort invoiceStoragePort;
-    private final AccountBookObserver accountBookObserver;
     private final RewardStatusFacadePort rewardStatusFacadePort;
     private final ReceiptStoragePort receiptStorage;
 
@@ -128,16 +126,17 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void pay(final @NonNull RewardId rewardId,
-                    final @NonNull ZonedDateTime confirmedAt,
-                    final @NonNull Network network,
-                    final @NonNull String transactionHash) {
+    public Payment pay(final @NonNull RewardId rewardId,
+                       final @NonNull ZonedDateTime confirmedAt,
+                       final @NonNull Network network,
+                       final @NonNull String transactionHash) {
         final var payableRewards = filterPayableRewards(network, Set.of(rewardId));
 
         if (payableRewards.isEmpty()) throw badRequest("Reward %s is not payable on %s".formatted(rewardId, network));
 
         final var payment = pay(network, payableRewards);
         confirm(payment.confirmedAt(confirmedAt).transactionHash(transactionHash));
+        return payment;
     }
 
     @Override
@@ -343,8 +342,7 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     private void saveAccountBook(Currency currency, AccountBookAggregate accountBook) {
-        final var events = accountBookProvider.save(currency, accountBook);
-        events.forEach(accountBookObserver::on);
+        accountBookProvider.save(currency, accountBook);
     }
 
     private AccountBookAggregate getAccountBook(Currency.Id currencyId) {

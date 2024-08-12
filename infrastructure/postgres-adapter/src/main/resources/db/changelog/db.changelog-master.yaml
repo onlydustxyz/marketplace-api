@@ -455,3 +455,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000306_update_banners.sql
   - include:
       file: db/changelog/changelogs/00000307_create_account_book_transactions.sql
+  - include:
+      file: db/changelog/changelogs/00000308_remove_sponsor_account_allowance_transactions.sql

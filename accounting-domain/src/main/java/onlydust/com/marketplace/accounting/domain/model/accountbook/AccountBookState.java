@@ -232,11 +232,11 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
             if (graph.outgoingEdgesOf(unspentVertex.vertex()).isEmpty()) {
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
                 removeEdge(unspentVertex.vertex());
             } else {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
                 transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
             }
         }
 
@@ -315,7 +315,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         final var edge = new Edge(from, amount);
         graph.addEdge(from, toVertex, edge);
 
-        return createTransaction(type, toVertex, amount);
+        return createTransaction(type, to == ROOT ? from : toVertex, amount);
     }
 
     private Transaction createTransaction(@NonNull Transaction.Type type, @NonNull final Vertex vertex, @NonNull final PositiveAmount amount) {

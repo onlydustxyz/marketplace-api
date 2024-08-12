@@ -26,8 +26,6 @@ public class SponsorAccount {
 
     @Getter
     final @NonNull List<Transaction> transactions = new ArrayList<>();
-    @Getter
-    final @NonNull List<AllowanceTransaction> allowanceTransactions = new ArrayList<>();
 
     public SponsorAccount(final @NonNull SponsorId sponsorId, final @NonNull Currency currency, ZonedDateTime lockedUntil) {
         this.id = Id.random();
@@ -189,35 +187,6 @@ public class SponsorAccount {
             public boolean isDebit() {
                 return List.of(WITHDRAW, SPEND).contains(this);
             }
-        }
-    }
-
-    public record AllowanceTransaction(@NonNull Transaction.Id id,
-                                       @NonNull ZonedDateTime timestamp,
-                                       @NonNull Type type,
-                                       @NonNull PositiveAmount amount,
-                                       ProjectId projectId) {
-        public static AllowanceTransaction mint(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
-            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.MINT, amount, null);
-        }
-
-        public static AllowanceTransaction burn(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount) {
-            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.BURN, amount, null);
-        }
-
-        public static AllowanceTransaction transfer(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
-            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.TRANSFER, amount, projectId);
-        }
-
-        public static AllowanceTransaction refund(@NonNull ZonedDateTime timestamp, @NonNull PositiveAmount amount, @NonNull ProjectId projectId) {
-            return new AllowanceTransaction(Transaction.Id.random(), timestamp, Type.REFUND, amount, projectId);
-        }
-
-        public enum Type {
-            MINT, // Money the sponsor is allowed to allocate to a project
-            BURN, // Allowance removed from sponsor
-            TRANSFER, // Money allocated to a project
-            REFUND // Money unallocated to project
         }
     }
 }
