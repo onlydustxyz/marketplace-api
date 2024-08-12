@@ -13,8 +13,10 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
                 1 as index,
                 s.id as program_id,
                 ab.currency_id as currency_id,
-                sum(abt.amount) filter ( where abt.project_id is null )
-                    - sum(abt.amount) filter ( where abt.project_id is not null and abt.reward_id is null ) as amount
+                sum(abt.amount) filter ( where abt.type = 'MINT' )
+                    - sum(abt.amount) filter ( where abt.type = 'TRANSFER' and abt.project_id is not null and abt.reward_id is null )
+                    + sum(abt.amount) filter ( where abt.type = 'REFUND' and abt.project_id is not null and abt.reward_id is null )
+                    as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
@@ -33,7 +35,8 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
                 2 as index,
                 s.id as program_id,
                 ab.currency_id as currency_id,
-                sum(abt.amount) as amount
+                sum(abt.amount) filter ( where abt.type = 'TRANSFER' )
+                    - sum(abt.amount) filter ( where abt.type = 'REFUND' ) as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
@@ -54,7 +57,8 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
                 3 as index,
                 s.id as program_id,
                 ab.currency_id as currency_id,
-                sum(abt.amount) as amount
+                sum(abt.amount) filter ( where abt.type = 'TRANSFER' )
+                    - sum(abt.amount) filter ( where abt.type = 'REFUND' ) as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
