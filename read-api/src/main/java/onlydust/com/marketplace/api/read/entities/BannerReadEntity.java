@@ -31,7 +31,13 @@ public class BannerReadEntity {
     UUID id;
 
     @NonNull
-    String text;
+    String shortDescription;
+    @NonNull
+    String longDescription;
+    @NonNull
+    String title;
+    @NonNull
+    String subTitle;
     String buttonText;
     String buttonIconSlug;
     String buttonLinkUrl;
@@ -39,18 +45,26 @@ public class BannerReadEntity {
 
     @NonNull
     ZonedDateTime updatedAt;
+    ZonedDateTime date;
 
     public BannerPageItemResponse toBoPageItemResponse() {
         return new BannerPageItemResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .title(title)
+                .subTitle(subTitle)
                 .visible(visible);
     }
 
     public BannerResponse toBoResponse() {
         return new BannerResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .title(title)
+                .subTitle(subTitle)
+                .date(date)
                 .buttonText(buttonText)
                 .buttonIconSlug(buttonIconSlug)
                 .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl))
@@ -60,7 +74,11 @@ public class BannerReadEntity {
     public onlydust.com.marketplace.api.contract.model.BannerResponse toResponse() {
         return new onlydust.com.marketplace.api.contract.model.BannerResponse()
                 .id(id)
-                .text(text)
+                .shortDescription(shortDescription)
+                .longDescription(longDescription)
+                .title(title)
+                .subTitle(subTitle)
+                .date(date)
                 .buttonText(buttonText)
                 .buttonIconSlug(buttonIconSlug)
                 .buttonLinkUrl(buttonLinkUrl == null ? null : URI.create(buttonLinkUrl));

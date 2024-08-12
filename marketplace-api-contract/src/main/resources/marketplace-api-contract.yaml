@@ -40,6 +40,12 @@ paths:
         - ReadBanner
       summary: Get currently visible banner
       operationId: getBanner
+      parameters:
+        - in: query
+          name: hiddenIgnoredByMe
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'Banner'
@@ -7522,7 +7528,7 @@ components:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalRewarded:
           $ref: '#/components/schemas/DetailedTotalMoney'
-    
+
     ProjectBudgetsResponse:
       type: object
       required:
@@ -9215,12 +9221,24 @@ components:
       type: object
       required:
         - id
-        - text
+        - shortDescription
+        - longDescription
+        - title
+        - subTitle
       properties:
         id:
           $ref: '#/components/schemas/BannerId'
-        text:
+        shortDescription:
           type: string
+        longDescription:
+          type: string
+        title:
+          type: string
+        subTitle:
+          type: string
+        date:
+          type: string
+          format: date-time
         buttonIconSlug:
           type: string
         buttonText:

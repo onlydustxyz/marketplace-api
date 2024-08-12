@@ -27,11 +27,18 @@ public class BannerEntity {
     UUID id;
 
     @NonNull
-    String text;
+    String shortDescription;
+    @NonNull
+    String longDescription;
+    @NonNull
+    String title;
+    @NonNull
+    String subTitle;
     String buttonText;
     String buttonIconSlug;
     String buttonLinkUrl;
     boolean visible;
+    ZonedDateTime date;
 
     @NonNull
     ZonedDateTime updatedAt;
@@ -42,7 +49,11 @@ public class BannerEntity {
     public static BannerEntity of(Banner banner) {
         return BannerEntity.builder()
                 .id(banner.id().value())
-                .text(banner.text())
+                .shortDescription(banner.shortDescription())
+                .longDescription(banner.longDescription())
+                .title(banner.title())
+                .subTitle(banner.subTitle())
+                .date(banner.date())
                 .buttonText(banner.buttonText())
                 .buttonIconSlug(banner.buttonIconSlug())
                 .buttonLinkUrl(banner.buttonLinkUrl() == null ? null : banner.buttonLinkUrl().toString())
@@ -55,12 +66,16 @@ public class BannerEntity {
     public Banner toDomain() {
         return new Banner(
                 Banner.Id.of(id),
-                text,
+                shortDescription,
+                longDescription,
+                title,
+                subTitle,
                 buttonText,
                 buttonIconSlug,
                 buttonLinkUrl == null ? null : URI.create(buttonLinkUrl),
                 visible,
                 updatedAt,
-                closedBy.stream().map(BannerClosedByEntity::userId).collect(toSet()));
+                closedBy.stream().map(BannerClosedByEntity::userId).collect(toSet()),
+                date);
     }
 }

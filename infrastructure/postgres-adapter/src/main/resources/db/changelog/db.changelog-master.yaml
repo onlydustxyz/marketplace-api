@@ -451,3 +451,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000304_add_stellar_network.sql
   - include:
       file: db/changelog/changelogs/00000305_fix_invoice_networks.sql
+  - include:
+      file: db/changelog/changelogs/00000306_update_banners.sql

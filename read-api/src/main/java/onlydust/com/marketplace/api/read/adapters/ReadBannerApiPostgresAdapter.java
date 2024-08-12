@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
+
 @RestController
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -20,11 +22,14 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final BannerReadRepository bannerReadRepository;
 
-
     @Override
-    public ResponseEntity<BannerResponse> getBanner() {
+    public ResponseEntity<BannerResponse> getBanner(Boolean hiddenIgnoredByMe) {
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var banner = bannerReadRepository.findFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).orElse(null));
+        final Boolean hiddeIgnoredByMeFilter = Optional.ofNullable(hiddenIgnoredByMe).orElse(Boolean.FALSE);
+
+        final var banner = hiddeIgnoredByMeFilter ?
+                bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).orElse(null))
+                : bannerReadRepository.findFirstVisibleBanner();
 
         return banner.map(BannerReadEntity::toResponse)
                 .map(ResponseEntity::ok)
