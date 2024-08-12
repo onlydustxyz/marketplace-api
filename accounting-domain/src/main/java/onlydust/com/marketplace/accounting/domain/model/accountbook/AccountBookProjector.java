@@ -11,7 +11,7 @@ public class AccountBookProjector implements AccountBookObserver {
     private final AccountBookStorage accountBookStorage;
 
     @Override
-    public void on(@NonNull AccountBookAggregate.Id accountBookId, @NonNull AccountBook.Transaction transaction) {
-        accountBookStorage.save(AccountBookTransactionProjection.of(ZonedDateTime.now(), accountBookId, transaction));
+    public void on(@NonNull AccountBookAggregate.Id accountBookId, @NonNull ZonedDateTime at, @NonNull AccountBook.Transaction transaction) {
+        accountBookStorage.save(AccountBookTransactionProjection.of(at, accountBookId, transaction));
     }
 }

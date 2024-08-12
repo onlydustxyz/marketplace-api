@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
@@ -47,8 +46,7 @@ public class AccountBookRefresh implements CommandLineRunner {
         final var events = accountBookEventStorage.getAll(currency);
 
         UnsafeAccountBook.of(accountBook)
-                .observed(accountBookProjector)
-                .emit(events);
+                .refresh(events, accountBookProjector);
     }
 
     private static class UnsafeAccountBook extends AccountBookAggregate {
@@ -60,16 +58,10 @@ public class AccountBookRefresh implements CommandLineRunner {
             return new UnsafeAccountBook(accountBook.id());
         }
 
-        public UnsafeAccountBook observed(AccountBookObserver observer) {
-            super.observed(observer);
-            return this;
-        }
-
-        public void emit(List<IdentifiedAccountBookEvent> events) {
-            events
-                    .stream()
-                    .map(IdentifiedAccountBookEvent::data)
-                    .forEach(this::emit);
+        public void refresh(List<IdentifiedAccountBookEvent> events, AccountBookProjector projector) {
+            events.forEach(e -> receive((IdentifiedAccountBookEvent<List<Transaction>>) e)
+                    .forEach(t -> projector.on(id(), e.timestamp(), t))
+            );
         }
     }
 }

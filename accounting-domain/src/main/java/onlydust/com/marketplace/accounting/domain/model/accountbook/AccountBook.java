@@ -84,7 +84,6 @@ public interface AccountBook {
             return RewardId.of(id);
         }
 
-
         public Payment.Id paymentId() {
             if (!isPayment())
                 throw new IllegalArgumentException("Only payments can be converted to payment id");

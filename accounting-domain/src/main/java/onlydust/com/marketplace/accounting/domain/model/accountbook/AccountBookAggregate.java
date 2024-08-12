@@ -78,7 +78,7 @@ public class AccountBookAggregate implements AccountBook {
         events.forEach(this::receive);
     }
 
-    private <R> R receive(IdentifiedAccountBookEvent<R> event) {
+    protected <R> R receive(IdentifiedAccountBookEvent<R> event) {
         if (event.id() != nextEventId()) {
             throw new IllegalStateException("Invalid event id. Expected %d, got %d".formatted(nextEventId(), event.id()));
         }
@@ -87,12 +87,13 @@ public class AccountBookAggregate implements AccountBook {
         return result;
     }
 
-    protected List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
+    private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
-        pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
+        final var now = ZonedDateTime.now();
+        pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), now, event));
         incrementEventId();
         if (observer != null)
-            result.forEach(e -> observer.on(id, e));
+            result.forEach(e -> observer.on(id, now, e));
 
         return result;
     }

@@ -16,7 +16,8 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
@@ -37,7 +38,7 @@ public class AccountBookTransactionReadEntity {
     UUID id;
 
     @NonNull
-    ZonedDateTime timestamp;
+    Date timestamp;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -82,7 +83,7 @@ public class AccountBookTransactionReadEntity {
         final var usdQuote = accountBook.currency().latestUsdQuote() == null ? null : accountBook.currency().latestUsdQuote().getPrice();
         return new TransactionHistoryPageItemResponse()
                 .id(id)
-                .date(timestamp)
+                .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
                 .type(map(type))
                 .project(project == null ? null : project.toLinkResponse())
                 .amount(new Money()
