@@ -196,8 +196,9 @@ public class AccountingHelper {
         quoteStorage.save(List.of(quote));
     }
 
-    public SponsorAccountStatement createSponsorAccount(final @NonNull SponsorId programId, final long amount, final @NonNull Currency.Id currencyId) {
-        return accountingFacadePort.createSponsorAccountWithInitialAllowance(programId, currencyId, null, PositiveAmount.of(amount));
+    public SponsorAccount.Id createSponsorAccount(final @NonNull SponsorId programId, final long amount, final @NonNull Currency.Id currencyId) {
+        return accountingFacadePort.createSponsorAccountWithInitialAllowance(programId, currencyId, null, PositiveAmount.of(amount))
+                .account().id();
     }
 
     public void grant(SponsorId programId, ProjectId projectId, long amount, Currency.Id currencyId) {
@@ -210,5 +211,9 @@ public class AccountingHelper {
 
     public void refund(ProjectId projectId, SponsorId programId, long amount, Currency.Id currencyId) {
         accountingFacadePort.unallocate(projectId, programId, PositiveAmount.of(amount), currencyId);
+    }
+
+    public void increaseAllowance(SponsorAccount.Id accountId, long amount) {
+        accountingFacadePort.increaseAllowance(accountId, Amount.of(amount));
     }
 }

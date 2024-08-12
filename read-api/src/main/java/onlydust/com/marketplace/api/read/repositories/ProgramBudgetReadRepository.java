@@ -13,7 +13,8 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
                 1 as index,
                 s.id as program_id,
                 ab.currency_id as currency_id,
-                coalesce(sum(abt.amount) filter ( where abt.type = 'MINT' ), 0)
+                coalesce(sum(abt.amount) filter ( where abt.type in ('MINT', 'TRANSFER') and abt.project_id is null ), 0)
+                    - coalesce(sum(abt.amount) filter ( where abt.type in ('REFUND', 'BURN') and abt.project_id is null ), 0)
                     - coalesce(sum(abt.amount) filter ( where abt.type = 'TRANSFER' and abt.project_id is not null and abt.reward_id is null ), 0)
                     + coalesce(sum(abt.amount) filter ( where abt.type = 'REFUND' and abt.project_id is not null and abt.reward_id is null ), 0)
                     as amount

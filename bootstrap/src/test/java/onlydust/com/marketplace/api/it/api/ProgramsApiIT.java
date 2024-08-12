@@ -63,7 +63,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
-                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 1_500, USDC);
+                final var accountId = accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 2_200, USDC);
+                accountingHelper.increaseAllowance(accountId, -700);
                 accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 12, ETH);
 
                 accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 2_000, USDC);
