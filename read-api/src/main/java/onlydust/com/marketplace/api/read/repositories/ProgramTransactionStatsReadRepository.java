@@ -10,7 +10,6 @@ import java.util.UUID;
 public interface ProgramTransactionStatsReadRepository extends Repository<ProgramTransactionStatReadEntity, ProgramTransactionStatReadEntity.PrimaryKey> {
     @Query(value = """
             select
-                1 as index,
                 sa.sponsor_id as program_id,
                 ab.currency_id as currency_id,
                 coalesce(sum(abt.amount) filter ( where abt.type in ('MINT', 'TRANSFER') and abt.project_id is null ), 0)
@@ -34,5 +33,17 @@ public interface ProgramTransactionStatsReadRepository extends Repository<Progra
                 sa.sponsor_id,
                 ab.currency_id
             """, nativeQuery = true)
-    List<ProgramTransactionStatReadEntity> findAll(final UUID programId);
+    List<ProgramTransactionStatReadEntity> findAll2(final UUID programId);
+
+    @Query(value = """
+            select t
+            from
+                ProgramTransactionStatReadEntity t
+            where
+                t.sponsorAccountId in :sponsorAccountId
+            group by
+                t.sponsorAccountId,
+                t.accountBookId
+            """)
+    List<ProgramTransactionStatReadEntity> findAll(final List<UUID> sponsorAccountId);
 }

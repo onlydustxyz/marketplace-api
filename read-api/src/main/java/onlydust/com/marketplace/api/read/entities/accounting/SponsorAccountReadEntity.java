@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
-import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.time.ZonedDateTime;
@@ -32,10 +31,8 @@ public class SponsorAccountReadEntity {
     @NonNull
     CurrencyReadEntity currency;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "sponsorId")
     @NonNull
-    SponsorReadEntity sponsor;
+    UUID sponsorId;
 
     ZonedDateTime lockedUntil;
 
@@ -47,7 +44,7 @@ public class SponsorAccountReadEntity {
     public AccountResponse toDto(SponsorAccountStatement sponsorAccountStatement) {
         return new AccountResponse()
                 .id(id)
-                .sponsorId(sponsor.id())
+                .sponsorId(sponsorId)
                 .lockedUntil(lockedUntil)
                 .receipts(transactions.stream().map(SponsorAccountTransactionReadEntity::toDto).toList())
                 .currency(currency.toBoShortResponse())

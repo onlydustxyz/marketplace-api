@@ -21,7 +21,7 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
             LEFT JOIN FETCH t.project p
             JOIN FETCH sa.currency c
             LEFT JOIN FETCH c.latestUsdQuote
-            WHERE sa.sponsor.id = :sponsorId AND
+            WHERE sa.sponsorId = :sponsorId AND
                     t.reward IS NULL AND
                     (:types IS NULL OR t.type IN :types) AND
                     (:currencies IS NULL OR c.id IN :currencies) AND
