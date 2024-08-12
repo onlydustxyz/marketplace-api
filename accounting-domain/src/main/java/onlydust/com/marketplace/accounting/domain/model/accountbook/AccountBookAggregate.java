@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
@@ -18,10 +16,12 @@ import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
+@Accessors(fluent = true)
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
     private AccountBookObserver observer;
+    @Getter
     private final Id id;
 
     private long lastEventId = 0;

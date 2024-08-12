@@ -135,7 +135,7 @@ class CachedAccountBookProviderTest {
         cachedAccountBookProvider.save(currency, accountBook);
 
         // Then
-        verify(accountBookEventStorage, never()).insert(any(), anyList());
+        verify(accountBookEventStorage, never()).insert(any(), any(), anyList());
         assertThat(cachedAccountBookProvider.get(currency)).isSameAs(accountBook);
     }
 
@@ -156,7 +156,7 @@ class CachedAccountBookProviderTest {
                 .hasStackTraceContaining("Expected next event id to be 2 but got 3. Event ids must be strictly sequential.");
 
         // Then
-        verify(accountBookEventStorage, never()).insert(any(), anyList());
+        verify(accountBookEventStorage, never()).insert(any(), any(), anyList());
         assertThat(cachedAccountBookProvider.get(currency)).isNotSameAs(accountBook);
     }
 
@@ -170,7 +170,7 @@ class CachedAccountBookProviderTest {
 
         // When
         when(accountBookEventStorage.getLastEventId(currency)).thenReturn(Optional.of(2L));
-        doThrow(new DataIntegrityViolationException("duplicate key")).when(accountBookEventStorage).insert(any(), anyList());
+        doThrow(new DataIntegrityViolationException("duplicate key")).when(accountBookEventStorage).insert(any(), any(), anyList());
         assertThatThrownBy(() -> cachedAccountBookProvider.save(currency, accountBook))
                 .isInstanceOf(OnlyDustException.class)
                 .hasCauseInstanceOf(EventSequenceViolationException.class)
@@ -178,7 +178,7 @@ class CachedAccountBookProviderTest {
                 .hasStackTraceContaining("Failed to insert events");
 
         // Then
-        verify(accountBookEventStorage).insert(any(), anyList());
+        verify(accountBookEventStorage).insert(any(), any(), anyList());
         assertThat(cachedAccountBookProvider.get(currency)).isNotSameAs(accountBook);
     }
 }

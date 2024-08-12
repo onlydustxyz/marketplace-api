@@ -21,8 +21,8 @@ public class AccountBookEntity {
 
     private final @NonNull UUID currencyId;
 
-    public static AccountBookEntity of(UUID currencyId) {
-        return new AccountBookEntity(UUID.randomUUID(), currencyId);
+    public static AccountBookEntity of(UUID id, UUID currencyId) {
+        return new AccountBookEntity(id, currencyId);
     }
 
     public AccountBookAggregate toDomain() {
