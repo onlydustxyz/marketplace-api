@@ -37,13 +37,13 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
 
     private static ArrayList<Transaction> mapAggregatedAmountsToTransactions(Map<FromTo, PositiveAmount> aggregatedAmounts) {
         final var transactions = new ArrayList<Transaction>(aggregatedAmounts.size());
-        aggregatedAmounts.forEach((fromTo, amount) -> transactions.add(new Transaction(fromTo.from(), fromTo.to(), amount)));
+        aggregatedAmounts.forEach((fromTo, amount) -> transactions.add(new Transaction(fromTo.type(), fromTo.from(), fromTo.to(), amount)));
         return transactions;
     }
 
     @Override
-    public synchronized void mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
-        createTransaction(root, account, amount);
+    public synchronized List<Transaction> mint(@NonNull final AccountId account, @NonNull final PositiveAmount amount) {
+        return List.of(addEdge(Transaction.Type.MINT, root, account, amount));
     }
 
     @Override
@@ -58,38 +58,38 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     @Override
-    public synchronized void transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized List<Transaction> transfer(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from);
         try {
-            sendFromVertices(to, amount, unspentVertices);
+            return sendFromVertices(to, amount, unspentVertices);
         } catch (InsufficientFundsException e) {
             throw badRequest("Cannot transfer %s from %s to %s".formatted(amount, from, to), e);
         }
     }
 
     @Override
-    public synchronized void refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    public synchronized List<Transaction> refund(@NonNull final AccountId from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         checkAccountsAreNotTheSame(from, to);
         final var unspentVertices = unspentVerticesOf(from, to);
         try {
-            refundFromVertices(amount, unspentVertices);
+            return refundFromVertices(amount, unspentVertices);
         } catch (InsufficientFundsException e) {
             throw badRequest("Cannot refund %s from %s to %s".formatted(amount, from, to), e);
         }
     }
 
     @Override
-    public synchronized Set<AccountId> refund(@NonNull final AccountId from) {
+    public synchronized List<Transaction> refund(@NonNull final AccountId from) {
         final var vertices = accountVertices(from);
-        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty())) {
+        if (vertices.stream().anyMatch(v -> !graph.outgoingEdgesOf(v).isEmpty()))
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
-        }
+
         return new ArrayList<>(vertices).stream().map(vertex -> {
-            final var refunded = incomingEdgeOf(vertex).source.accountId;
-            removeTransaction(vertex);
-            return refunded;
-        }).collect(Collectors.toUnmodifiableSet());
+            final var transaction = createTransaction(Transaction.Type.REFUND, vertex, balanceOf(vertex));
+            removeEdge(vertex);
+            return transaction;
+        }).toList();
     }
 
     @Override
@@ -143,21 +143,23 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     @Override
     public synchronized @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
-                .map(v -> new Transaction(source(v).accountId, to, incomingEdgeOf(v).amount))
+                .map(v -> new Transaction(Transaction.Type.TRANSFER, source(v).accountId, to, incomingEdgeOf(v).amount))
                 .collect(Collectors.groupingBy(Transaction::from,
                         Collectors.mapping(Transaction::amount,
-                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
-                ));
+                                Collectors.mapping(PositiveAmount::of,
+                                        Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                        )));
     }
 
     @Override
     public synchronized @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
-                .map(v -> new Transaction(source(v).accountId, to, balanceOf(v)))
+                .map(v -> new Transaction(Transaction.Type.TRANSFER, source(v).accountId, to, balanceOf(v)))
                 .collect(Collectors.groupingBy(Transaction::from,
                         Collectors.mapping(Transaction::amount,
-                                Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
-                ));
+                                Collectors.mapping(PositiveAmount::of,
+                                        Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
+                        )));
     }
 
     private void aggregateOutgoingTransactions(Vertex startVertex, Map<FromTo, PositiveAmount> aggregatedAmounts) {
@@ -197,40 +199,48 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
             throw new InsufficientFundsException("Insufficient funds: %s < %s".formatted(unspentTotal, amount));
         }
 
+        final var type = to == ROOT ? Transaction.Type.BURN : Transaction.Type.TRANSFER;
+
         final var transactions = new ArrayList<Transaction>(unspentVertices.size());
         var remainingAmount = amount;
         for (VertexWithBalance unspentVertex : unspentVertices) {
             if (unspentVertex.balance().isGreaterThanOrEqual(remainingAmount)) {
-                transactions.add(createTransaction(unspentVertex.vertex(), to, remainingAmount));
+                transactions.add(addEdge(type, unspentVertex.vertex(), to, remainingAmount));
                 break;
             }
-            transactions.add(createTransaction(unspentVertex.vertex(), to, unspentVertex.balance()));
+            transactions.add(addEdge(type, unspentVertex.vertex(), to, unspentVertex.balance()));
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
         }
 
         return transactions;
     }
 
-    private void refundFromVertices(@NonNull final PositiveAmount amount,
-                                    @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
+    private List<Transaction> refundFromVertices(@NonNull final PositiveAmount amount,
+                                                 @NonNull final List<VertexWithBalance> unspentVertices) throws InsufficientFundsException {
         final var unspentTotal = unspentVertices.stream().map(VertexWithBalance::balance).reduce(PositiveAmount.ZERO, PositiveAmount::add);
         if (unspentTotal.isStrictlyLowerThan(amount)) {
             throw new InsufficientFundsException("Insufficient funds: %s < %s".formatted(unspentTotal, amount));
         }
 
         var remainingAmount = amount;
+        final var transactions = new ArrayList<Transaction>(unspentVertices.size());
         for (VertexWithBalance unspentVertex : unspentVertices) {
             if (unspentVertex.balance().isStrictlyGreaterThan(remainingAmount)) {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(remainingAmount);
-                return;
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
+                break;
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
             if (graph.outgoingEdgesOf(unspentVertex.vertex()).isEmpty()) {
-                removeTransaction(unspentVertex.vertex());
+                removeEdge(unspentVertex.vertex());
             } else {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
             }
         }
+
+        return transactions;
     }
 
     private @NonNull List<VertexWithBalance> unspentVerticesOf(@NonNull final AccountId accountId) {
@@ -293,7 +303,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         return List.of();
     }
 
-    private Transaction createTransaction(@NonNull final Vertex from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
+    private Transaction addEdge(@NonNull Transaction.Type type, @NonNull final Vertex from, @NonNull final AccountId to, @NonNull final PositiveAmount amount) {
         final var toVertex = Vertex.of(to);
         graph.addVertex(toVertex);
         if (accountVertices.containsKey(to)) {
@@ -305,7 +315,12 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         final var edge = new Edge(from, amount);
         graph.addEdge(from, toVertex, edge);
 
-        return new Transaction(source(from).accountId, to, amount);
+        return createTransaction(type, toVertex, amount);
+    }
+
+    private Transaction createTransaction(@NonNull Transaction.Type type, @NonNull final Vertex vertex, @NonNull final PositiveAmount amount) {
+        final var path = path(new ArrayDeque<>(), vertex);
+        return new Transaction(type, path.stream().toList(), amount);
     }
 
     private Vertex source(@NonNull final Vertex vertex) {
@@ -321,10 +336,19 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         return source(parent);
     }
 
-    private void removeTransaction(@NonNull final Vertex vertex) {
-        if (!graph.outgoingEdgesOf(vertex).isEmpty()) {
-            throw new IllegalStateException("Cannot remove a vertex with outgoing edges");
+    private Deque<AccountId> path(final @NonNull Deque<AccountId> path, @NonNull final Vertex vertex) {
+        if (vertex.equals(root)) {
+            return path;
         }
+
+        path.addFirst(vertex.accountId);
+        return path(path, incomingEdgeOf(vertex).source);
+    }
+
+    private void removeEdge(@NonNull final Vertex vertex) {
+        if (!graph.outgoingEdgesOf(vertex).isEmpty())
+            throw new IllegalStateException("Cannot remove a vertex with outgoing edges");
+
         graph.removeEdge(incomingEdgeOf(vertex));
         graph.removeVertex(vertex);
         accountVertices.get(vertex.accountId).remove(vertex);
@@ -350,6 +374,9 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     }
 
     private record FromTo(@NonNull AccountId from, @NonNull AccountId to) {
+        public Transaction.Type type() {
+            return from == ROOT ? Transaction.Type.MINT : to == ROOT ? Transaction.Type.BURN : Transaction.Type.TRANSFER;
+        }
     }
 
     public static class InsufficientFundsException extends Exception {

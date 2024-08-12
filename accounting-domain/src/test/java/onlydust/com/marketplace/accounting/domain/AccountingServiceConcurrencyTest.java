@@ -75,7 +75,7 @@ public class AccountingServiceConcurrencyTest {
 
         private void setupAccountingService() {
             accountBookEventStorage = new AccountBookEventStorageStub();
-            cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage);
+            cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class));
             accountingService = new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
                     projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort);
         }
@@ -153,7 +153,7 @@ public class AccountingServiceConcurrencyTest {
         private void setupAccountingService() {
             accountBookEventStorage = new AccountBookEventStorageStub();
             for (int i = 0; i < INSTANCE_COUNT; i++) {
-                accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage));
+                accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class)));
                 accountingServices.add(new AccountingService(accountBookProviders.get(i), sponsorAccountStorage, currencyStorage, accountingObserver,
                         projectAccountingObserver, invoiceStoragePort, accountBookObserver, rewardStatusFacadePort, receiptStoragePort));
             }

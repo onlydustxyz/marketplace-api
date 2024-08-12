@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.MintEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
@@ -41,6 +42,7 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
     @Test
     void should_save_and_get_events() {
         final var currency = newCurrency("FOOBAR2");
+        final var accountBookId = AccountBookAggregate.Id.random();
 
         final List<IdentifiedAccountBookEvent> events1 = List.of(
                 IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(SponsorAccount.Id.random()), PositiveAmount.of(100L))),
@@ -54,9 +56,9 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
                         PositiveAmount.of(100L)))
         );
 
-        postgresAccountBookEventAdapter.insert(currency, events1);
+        postgresAccountBookEventAdapter.insert(accountBookId, currency, events1);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(2L);
-        postgresAccountBookEventAdapter.insert(currency, events2);
+        postgresAccountBookEventAdapter.insert(accountBookId, currency, events2);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(4L);
 
         final var allEvents = Stream.of(events1, events2).flatMap(List::stream).toList();
@@ -68,6 +70,7 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
     @Test
     void should_fail_to_save_events_with_same_id() throws EventSequenceViolationException {
         final var currency = newCurrency("FOOBAR3");
+        final var accountBookId = AccountBookAggregate.Id.random();
 
         final List<IdentifiedAccountBookEvent> events1 = List.of(
                 IdentifiedAccountBookEvent.of(1, new MintEvent(AccountId.of(SponsorAccount.Id.random()), PositiveAmount.of(100L))),
@@ -81,11 +84,11 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
                         PositiveAmount.of(100L)))
         );
 
-        postgresAccountBookEventAdapter.insert(currency, events1);
+        postgresAccountBookEventAdapter.insert(accountBookId, currency, events1);
         assertThat(postgresAccountBookEventAdapter.getLastEventId(currency).get()).isEqualTo(2L);
         assertThat(postgresAccountBookEventAdapter.getAll(currency)).containsExactlyElementsOf(events1);
 
-        assertThatThrownBy(() -> postgresAccountBookEventAdapter.insert(currency, events2))
+        assertThatThrownBy(() -> postgresAccountBookEventAdapter.insert(accountBookId, currency, events2))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasStackTraceContaining("constraint [account_books_events_pkey]");
 

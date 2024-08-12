@@ -20,6 +20,8 @@ public interface AccountBookObserver {
             onFullRefund(event.timestamp(), fullRefundEvent.from());
     }
 
+    void on(@NonNull AccountBookAggregate.Id accountBookId, @NonNull AccountBook.Transaction transaction);
+
     void onMint(@NonNull ZonedDateTime timestamp, @NonNull AccountId to, @NonNull PositiveAmount amount);
 
     void onBurn(@NonNull ZonedDateTime timestamp, @NonNull AccountId from, @NonNull PositiveAmount amount);

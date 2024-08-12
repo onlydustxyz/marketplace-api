@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import org.apache.commons.cli.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -22,7 +21,7 @@ import static onlydust.com.marketplace.accounting.domain.model.accountbook.Accou
 public class AccountBookDisplay implements CommandLineRunner {
     private final CurrencyStorage currencyStorage;
     private final SponsorAccountStorage sponsorAccountStorage;
-    private final AccountBookEventStorage accountBookEventStorage;
+    private final CachedAccountBookProvider accountBookProvider;
 
     @Override
     public void run(String... args) {
@@ -41,8 +40,7 @@ public class AccountBookDisplay implements CommandLineRunner {
                 sponsorAccountStorage.getSponsorAccounts(sponsorId).stream().filter(s -> s.currency().equals(currency)).findFirst()
                         .orElseThrow(() -> new IllegalArgumentException("Sponsor %s has no account for currency %s".formatted(sponsorId, currencyCode)));
 
-        final var events = accountBookEventStorage.getAll(currency);
-        final var accountBook = AccountBookAggregate.fromEvents(events);
+        final var accountBook = accountBookProvider.get(currency);
         accountBook.state().export(ToDot("account_book.dot", sponsorAccount == null ? null : sponsorAccount.id()));
     }
 

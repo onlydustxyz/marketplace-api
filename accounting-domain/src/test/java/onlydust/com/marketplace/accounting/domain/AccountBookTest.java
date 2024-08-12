@@ -30,7 +30,9 @@ public class AccountBookTest {
         for (int i = 0; i < events.size(); i++) {
             identifiedAccountBookEvents.add(new IdentifiedAccountBookEvent<>(i + 1, ZonedDateTime.now().minusMinutes(10).plusSeconds(i), events.get(i)));
         }
-        return AccountBookAggregate.fromEvents(identifiedAccountBookEvents);
+        final var accountBookAggregate = AccountBookAggregate.empty();
+        accountBookAggregate.receive(identifiedAccountBookEvents);
+        return accountBookAggregate;
     }
 
     public static AccountBookAggregate accountBookFromEvents(final @NonNull AccountBookEvent... events) {
@@ -293,12 +295,12 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
+        assertThat(transactions).containsExactlyInAnyOrder(new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient, amount));
     }
 
     @Test
@@ -320,13 +322,16 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount1.add(amount2));
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender1)).isEqualTo(amount1);
         assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(amount2);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender1, sender2);
+        assertThat(transactions).containsExactlyInAnyOrder(
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender1, recipient, amount1),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender2, recipient, amount2)
+        );
     }
 
     @Test
@@ -344,7 +349,7 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.of(90L));
 
         // When
-        final var refundedAccounts = accountBook.refund(recipient);
+        final var transactions = accountBook.refund(recipient);
 
         // Then
         assertThat(accountBook.pendingEvents()).containsExactly(
@@ -353,7 +358,9 @@ public class AccountBookTest {
         );
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(refundedAccounts).containsExactlyInAnyOrder(sender);
+        assertThat(transactions).containsExactlyInAnyOrder(
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient, PositiveAmount.of(90L))
+        );
     }
 
     @Test
@@ -606,12 +613,12 @@ public class AccountBookTest {
 
         // Then
         assertThat(transactionsFromAccount1).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L)),
-                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L)),
-                new AccountBook.Transaction(account1, account4, PositiveAmount.of(42L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account1, account2, PositiveAmount.of(10L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account2, account3, PositiveAmount.of(4L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account1, account4, PositiveAmount.of(42L))
         );
         assertThat(transactionsFromAccount2).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account2, account3, PositiveAmount.of(4L))
         );
         assertThat(transactionsFromAccount3).isEmpty();
         assertThat(transactionsFromAccount4).isEmpty();
@@ -646,20 +653,20 @@ public class AccountBookTest {
 
         // Then
         assertThat(transactionsToAccount1).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account0, account1, PositiveAmount.of(99L))
         );
         assertThat(transactionsToAccount2).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
-                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account1, account2, PositiveAmount.of(10L))
         );
         assertThat(transactionsToAccount3).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
-                new AccountBook.Transaction(account1, account2, PositiveAmount.of(10L)),
-                new AccountBook.Transaction(account2, account3, PositiveAmount.of(4L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account1, account2, PositiveAmount.of(10L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account2, account3, PositiveAmount.of(4L))
         );
         assertThat(transactionsToAccount4).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(account0, account1, PositiveAmount.of(99L)),
-                new AccountBook.Transaction(account1, account4, PositiveAmount.of(42L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account0, account1, PositiveAmount.of(99L)),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.TRANSFER, account1, account4, PositiveAmount.of(42L))
         );
 
         assertThat(accountBook.pendingEvents()).isEmpty();

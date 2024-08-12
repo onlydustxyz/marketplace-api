@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.helper;
 
+import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 
+@AllArgsConstructor
 public class CurrencyHelper {
 
     public static final Currency.Id BTC = Currency.Id.of("3f6e1c98-8659-493a-b941-943a803bd91f");

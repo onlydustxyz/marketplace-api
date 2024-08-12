@@ -4,13 +4,10 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookEventRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,6 +34,8 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     SponsorRepository sponsorRepository;
     @Autowired
+    AccountBookTransactionRepository accountBookTransactionRepository;
+    @Autowired
     SponsorAccountRepository sponsorAccountRepository;
     @Autowired
     AccountBookRepository accountBookRepository;
@@ -48,6 +47,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setup() {
         accountBookEventRepository.deleteAll();
+        accountBookTransactionRepository.deleteAll();
         sponsorAccountRepository.deleteAll();
         accountBookRepository.deleteAll();
         accountBookProvider.evictAll();

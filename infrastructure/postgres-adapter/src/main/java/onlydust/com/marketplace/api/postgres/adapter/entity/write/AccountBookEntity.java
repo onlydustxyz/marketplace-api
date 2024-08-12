@@ -1,13 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 
 import java.util.UUID;
 
@@ -20,12 +17,15 @@ import java.util.UUID;
 public class AccountBookEntity {
     @Id
     @EqualsAndHashCode.Include
-    private final UUID id;
+    private final @NonNull UUID id;
 
-    private final UUID currencyId;
+    private final @NonNull UUID currencyId;
 
-    public static AccountBookEntity of(UUID currencyId) {
-        return new AccountBookEntity(UUID.randomUUID(), currencyId);
+    public static AccountBookEntity of(UUID id, UUID currencyId) {
+        return new AccountBookEntity(id, currencyId);
     }
 
+    public AccountBookAggregate toDomain() {
+        return new AccountBookAggregate(AccountBookAggregate.Id.of(id));
+    }
 }

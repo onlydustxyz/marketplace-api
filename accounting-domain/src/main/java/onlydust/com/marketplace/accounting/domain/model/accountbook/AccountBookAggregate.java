@@ -1,62 +1,68 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
-import lombok.NonNull;
+import lombok.*;
+import lombok.experimental.Accessors;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
+@RequiredArgsConstructor
+@Accessors(fluent = true)
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
+    private AccountBookObserver observer;
+    @Getter
+    private final Id id;
 
     private long lastEventId = 0;
 
-    public static AccountBookAggregate fromEvents(final @NonNull List<IdentifiedAccountBookEvent> events) {
-        AccountBookAggregate aggregate = new AccountBookAggregate();
-        aggregate.receive(events);
-        return aggregate;
+    public AccountBookAggregate observed(AccountBookObserver observer) {
+        this.observer = observer;
+        return this;
     }
 
     public static AccountBookAggregate empty() {
-        return fromEvents(List.of());
+        return new AccountBookAggregate(Id.random());
     }
 
     @Override
-    public synchronized void mint(AccountId account, PositiveAmount amount) {
-        emit(new MintEvent(account, amount));
+    public synchronized List<Transaction> mint(AccountId account, PositiveAmount amount) {
+        return emit(new MintEvent(account, amount));
     }
 
     @Override
-    public synchronized Collection<Transaction> burn(AccountId account, PositiveAmount amount) {
+    public synchronized List<Transaction> burn(AccountId account, PositiveAmount amount) {
         return emit(new BurnEvent(account, amount));
     }
 
     @Override
-    public synchronized void transfer(AccountId from, AccountId to, PositiveAmount amount) {
-        emit(new TransferEvent(from, to, amount));
+    public synchronized List<Transaction> transfer(AccountId from, AccountId to, PositiveAmount amount) {
+        return emit(new TransferEvent(from, to, amount));
     }
 
     @Override
-    public synchronized void refund(AccountId from, AccountId to, PositiveAmount amount) {
-        emit(new RefundEvent(from, to, amount));
+    public synchronized List<Transaction> refund(AccountId from, AccountId to, PositiveAmount amount) {
+        return emit(new RefundEvent(from, to, amount));
     }
 
     @Override
-    public synchronized Set<AccountId> refund(AccountId from) {
+    public synchronized List<Transaction> refund(AccountId from) {
         return emit(new FullRefundEvent(from));
     }
 
     public ReadOnlyAccountBookState state() {
         return state;
     }
-
 
     public synchronized List<IdentifiedAccountBookEvent> pendingEvents() {
         return List.copyOf(pendingEvents);
@@ -81,10 +87,13 @@ public class AccountBookAggregate implements AccountBook {
         return result;
     }
 
-    private <R> R emit(AccountBookEvent<R> event) {
+    private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
+        if (observer != null)
+            result.forEach(e -> observer.on(id, e));
+
         return result;
     }
 
@@ -96,13 +105,24 @@ public class AccountBookAggregate implements AccountBook {
         return lastEventId + 1;
     }
 
+    @NoArgsConstructor(staticName = "random")
+    @EqualsAndHashCode(callSuper = true)
+    @SuperBuilder
+    public static class Id extends UuidWrapper {
+        public static Id of(@NonNull final UUID uuid) {
+            return Id.builder().uuid(uuid).build();
+        }
+
+        public static Id of(@NonNull final String uuid) {
+            return Id.of(UUID.fromString(uuid));
+        }
+    }
 
     @EventType("Mint")
-    public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.mint(account, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.mint(account, amount);
         }
     }
 
@@ -115,27 +135,25 @@ public class AccountBookAggregate implements AccountBook {
     }
 
     @EventType("Transfer")
-    public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record TransferEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.transfer(from, to, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.transfer(from, to, amount);
         }
     }
 
     @EventType("Refund")
-    public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<Void> {
+    public record RefundEvent(@NonNull AccountId from, @NonNull AccountId to, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Void visit(AccountBookState state) {
-            state.refund(from, to, amount);
-            return null;
+        public List<Transaction> visit(AccountBookState state) {
+            return state.refund(from, to, amount);
         }
     }
 
     @EventType("FullRefund")
-    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<Set<AccountId>> {
+    public record FullRefundEvent(@NonNull AccountId from) implements AccountBookEvent<List<Transaction>> {
         @Override
-        public Set<AccountId> visit(AccountBookState state) {
+        public List<Transaction> visit(AccountBookState state) {
             return state.refund(from);
         }
     }

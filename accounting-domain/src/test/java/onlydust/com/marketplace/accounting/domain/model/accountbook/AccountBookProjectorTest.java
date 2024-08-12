@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 class AccountBookProjectorTest {
     private final SponsorAccountStorage storage = mock(SponsorAccountStorage.class);
-    private final AccountBookProjector observer = new AccountBookProjector(storage);
+    private final AccountBookProjector observer = new AccountBookProjector(storage, mock(AccountBookStorage.class));
     private final Faker faker = new Faker();
     public final AccountBook.AccountId sponsorAccountId = AccountBook.AccountId.of(SponsorAccount.Id.random());
     private final PositiveAmount amount = PositiveAmount.of(faker.number().randomNumber(3, true));

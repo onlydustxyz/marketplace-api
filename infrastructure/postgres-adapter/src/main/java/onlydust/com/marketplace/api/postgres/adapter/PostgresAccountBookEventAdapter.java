@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEntity;
@@ -43,9 +44,11 @@ public class PostgresAccountBookEventAdapter implements AccountBookEventStorage 
 
     @Override
     @Transactional
-    public void insert(final @NonNull Currency currency, final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
+    public void insert(final @NonNull AccountBookAggregate.Id accountBookId,
+                       final @NonNull Currency currency,
+                       final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
         final var accountBookEntity = accountBookRepository.findByCurrencyId(currency.id().value())
-                .orElseGet(() -> accountBookRepository.saveAndFlush(AccountBookEntity.of(currency.id().value())));
+                .orElseGet(() -> accountBookRepository.saveAndFlush(AccountBookEntity.of(accountBookId.value(), currency.id().value())));
 
         pendingEvents.stream()
                 .map(event -> AccountBookEventEntity.of(accountBookEntity.getId(), event))
