@@ -113,9 +113,9 @@ public interface AccountBook {
         }
     }
 
-    record Transaction(@NonNull List<AccountId> path, @NonNull Amount amount) {
-        public Transaction(AccountId from, AccountId to, Amount amount) {
-            this(List.of(from, to), amount);
+    record Transaction(@NonNull Type type, @NonNull List<AccountId> path, @NonNull Amount amount) {
+        public Transaction(@NonNull Type type, AccountId from, AccountId to, Amount amount) {
+            this(type, List.of(from, to), amount);
         }
 
         public AccountId from() {
@@ -127,5 +127,7 @@ public interface AccountBook {
             assert !path().isEmpty();
             return path.get(path().size() - 1);
         }
+
+        public enum Type {MINT, BURN, TRANSFER, REFUND}
     }
 }

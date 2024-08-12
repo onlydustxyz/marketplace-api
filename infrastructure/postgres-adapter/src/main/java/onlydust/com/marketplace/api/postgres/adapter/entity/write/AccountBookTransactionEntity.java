@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -28,6 +31,12 @@ public class AccountBookTransactionEntity {
     @NonNull
     UUID accountBookId;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "transaction_type")
+    @NonNull
+    AccountBook.Transaction.Type type;
+
     UUID sponsorAccountId;
 
     UUID projectId;
@@ -44,6 +53,7 @@ public class AccountBookTransactionEntity {
                 null,
                 projection.timestamp(),
                 projection.accountBookId().value(),
+                projection.type(),
                 projection.sponsorAccountId() == null ? null : projection.sponsorAccountId().value(),
                 projection.projectId() == null ? null : projection.projectId().value(),
                 projection.rewardId() == null ? null : projection.rewardId().value(),

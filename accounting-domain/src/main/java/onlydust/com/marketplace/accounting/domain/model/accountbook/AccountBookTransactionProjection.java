@@ -11,31 +11,20 @@ import java.util.List;
 @Data
 @Accessors(fluent = true, chain = true)
 public class AccountBookTransactionProjection {
-    private ZonedDateTime timestamp;
+    private @NonNull ZonedDateTime timestamp;
+    private @NonNull AccountBookAggregate.Id accountBookId;
+    private @NonNull AccountBook.Transaction.Type type;
     private SponsorAccount.Id sponsorAccountId;
     private ProjectId projectId;
     private RewardId rewardId;
     private Payment.Id paymentId;
-    private Amount amount;
-    private AccountBookAggregate.Id accountBookId;
+    private @NonNull Amount amount;
 
     public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime timestamp,
                                                       final @NonNull AccountBookAggregate.Id accountBookId,
                                                       final @NonNull AccountBook.Transaction transaction) {
-        return new AccountBookTransactionProjection()
-                .timestamp(timestamp)
-                .amount(transaction.amount())
-                .accountBookId(accountBookId)
+        return new AccountBookTransactionProjection(timestamp, accountBookId, transaction.type(), transaction.amount())
                 .with(transaction.path());
-    }
-
-    public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime now,
-                                                      final @NonNull AccountBookAggregate.Id accountBookId,
-                                                      final @NonNull AccountBook.AccountId accountId) {
-        return new AccountBookTransactionProjection()
-                .timestamp(now)
-                .accountBookId(accountBookId)
-                .with(accountId);
     }
 
     private AccountBookTransactionProjection with(final @NonNull List<AccountBook.AccountId> path) {
@@ -43,7 +32,7 @@ public class AccountBookTransactionProjection {
         return this;
     }
 
-    private AccountBookTransactionProjection with(final @NonNull AccountBook.AccountId accountId) {
+    private void with(final @NonNull AccountBook.AccountId accountId) {
         if (accountId.type() != null)
             switch (accountId.type()) {
                 case SPONSOR_ACCOUNT:
@@ -59,7 +48,5 @@ public class AccountBookTransactionProjection {
                     paymentId(accountId.paymentId());
                     break;
             }
-
-        return this;
     }
 }
