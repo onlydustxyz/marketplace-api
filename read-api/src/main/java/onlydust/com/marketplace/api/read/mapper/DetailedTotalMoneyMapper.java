@@ -2,17 +2,18 @@ package onlydust.com.marketplace.api.read.mapper;
 
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
 import onlydust.com.marketplace.api.contract.model.Money;
-import onlydust.com.marketplace.api.read.entities.program.ProgramBudgetReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStatReadEntity;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
 
 public interface DetailedTotalMoneyMapper {
-    static DetailedTotalMoney map(List<ProgramBudgetReadEntity> budgets) {
+    static DetailedTotalMoney map(List<ProgramTransactionStatReadEntity> stats, Function<ProgramTransactionStatReadEntity, BigDecimal> amountSupplier) {
         return new DetailedTotalMoney()
-                .totalPerCurrency(budgets.stream().map(ProgramBudgetReadEntity::toMoney).sorted(comparing(Money::getUsdEquivalent).reversed()).toList())
-                .totalUsdEquivalent(budgets.stream().map(ProgramBudgetReadEntity::usdAmount).reduce(BigDecimal::add).orElse(null));
+                .totalPerCurrency(stats.stream().map(s -> s.toMoney(amountSupplier.apply(s))).sorted(comparing(Money::getUsdEquivalent).reversed()).toList())
+                .totalUsdEquivalent(stats.stream().map(s -> s.usdAmount(amountSupplier.apply(s))).reduce(BigDecimal::add).orElse(null));
     }
 }

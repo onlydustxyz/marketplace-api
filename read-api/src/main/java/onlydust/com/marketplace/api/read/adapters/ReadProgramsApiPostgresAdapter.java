@@ -6,9 +6,10 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingPermissionService;
 import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
+import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
-import onlydust.com.marketplace.api.read.repositories.ProgramBudgetReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProgramTransactionStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ProgramReadRepository programReadRepository;
     private final AccountingPermissionService accountingPermissionService;
-    private final ProgramBudgetReadRepository programBudgetReadRepository;
+    private final ProgramTransactionStatsReadRepository programTransactionStatsReadRepository;
 
     @Override
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
@@ -41,9 +42,27 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var program = programReadRepository.findById(programId)
                 .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
 
+        final var stats = programTransactionStatsReadRepository.findAll(programId);
+
         return ok(program.toResponse()
-                .totalAvailable(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalAvailable(programId)))
-                .totalGranted(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalGranted(programId)))
-                .totalRewarded(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalRewarded(programId))));
+                .totalAvailable(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalAvailable))
+                .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalGranted))
+                .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalRewarded))
+        );
     }
+
+//    @Override
+//    public ResponseEntity<ProgramTransactionStatListResponse> getProgramTransactionsStats(UUID programId,
+//                                                                                          String fromDate,
+//                                                                                          String toDate,
+//                                                                                          List<TransactionType> types,
+//                                                                                          String search) {
+//        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+//
+//        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+//            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+//
+//        final var page = programBudgetReadRepository.findAll(programId, fromDate, toDate, types, search);
+//        return ReadProgramsApi.super.getProgramTransactionsStats(programId, fromDate, toDate, types, search);
+//    }
 }

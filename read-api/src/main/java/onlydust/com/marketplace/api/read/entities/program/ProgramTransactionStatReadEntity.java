@@ -23,8 +23,8 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
-@IdClass(ProgramBudgetReadEntity.PrimaryKey.class)
-public class ProgramBudgetReadEntity {
+@IdClass(ProgramTransactionStatReadEntity.PrimaryKey.class)
+public class ProgramTransactionStatReadEntity {
     @Id
     @EqualsAndHashCode.Include
     @NonNull
@@ -46,24 +46,26 @@ public class ProgramBudgetReadEntity {
     CurrencyReadEntity currency;
 
     @NonNull
-    BigDecimal amount;
+    BigDecimal totalAvailable;
+    @NonNull
+    BigDecimal totalGranted;
+    @NonNull
+    BigDecimal totalRewarded;
 
-    public Money toMoney() {
+    public Money toMoney(BigDecimal amount) {
         final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
 
         return new Money()
                 .amount(amount)
                 .currency(currency.toShortResponse())
                 .prettyAmount(pretty(amount, currency.decimals(), usdQuote))
-                .usdEquivalent(prettyUsd(usdAmount()))
+                .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
                 .usdConversionRate(usdQuote);
     }
 
-    public @Nullable BigDecimal usdAmount() {
-        final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
-        return usdQuote == null ? null : usdQuote.multiply(amount);
+    public @Nullable BigDecimal usdAmount(BigDecimal amount) {
+        return currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice().multiply(amount);
     }
-
 
     @EqualsAndHashCode
     public static class PrimaryKey implements Serializable {
