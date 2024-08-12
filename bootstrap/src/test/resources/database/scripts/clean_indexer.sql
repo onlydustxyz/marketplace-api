@@ -15,3 +15,4 @@ $$ LANGUAGE plpgsql;
 
 SELECT truncate_tables('indexer');
 SELECT truncate_tables('indexer_exp');
+SELECT truncate_tables('indexer_outbox');
