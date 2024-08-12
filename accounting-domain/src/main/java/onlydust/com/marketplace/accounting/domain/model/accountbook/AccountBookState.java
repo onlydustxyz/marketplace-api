@@ -86,7 +86,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
             throw badRequest("Cannot entirely refund %s because it has outgoing transactions".formatted(from));
 
         return new ArrayList<>(vertices).stream().map(vertex -> {
-            final var transaction = createTransaction(Transaction.Type.REFUND, vertex, balanceOf(vertex).negate());
+            final var transaction = createTransaction(Transaction.Type.REFUND, vertex, balanceOf(vertex));
             removeEdge(vertex);
             return transaction;
         }).toList();
@@ -227,7 +227,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         for (VertexWithBalance unspentVertex : unspentVertices) {
             if (unspentVertex.balance().isStrictlyGreaterThan(remainingAmount)) {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(remainingAmount);
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount.negate()));
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
                 break;
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
@@ -235,8 +235,8 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
                 removeEdge(unspentVertex.vertex());
             } else {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount.negate()));
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance().negate()));
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
+                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
             }
         }
 
@@ -318,7 +318,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
         return createTransaction(type, toVertex, amount);
     }
 
-    private Transaction createTransaction(@NonNull Transaction.Type type, @NonNull final Vertex vertex, @NonNull final Amount amount) {
+    private Transaction createTransaction(@NonNull Transaction.Type type, @NonNull final Vertex vertex, @NonNull final PositiveAmount amount) {
         final var path = path(new ArrayDeque<>(), vertex);
         return new Transaction(type, path.stream().toList(), amount);
     }

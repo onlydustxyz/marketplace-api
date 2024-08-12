@@ -113,8 +113,8 @@ public interface AccountBook {
         }
     }
 
-    record Transaction(@NonNull Type type, @NonNull List<AccountId> path, @NonNull Amount amount) {
-        public Transaction(@NonNull Type type, AccountId from, AccountId to, Amount amount) {
+    record Transaction(@NonNull Type type, @NonNull List<AccountId> path, @NonNull PositiveAmount amount) {
+        public Transaction(@NonNull Type type, AccountId from, AccountId to, PositiveAmount amount) {
             this(type, List.of(from, to), amount);
         }
 

@@ -300,8 +300,7 @@ public class AccountBookTest {
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
-        assertThat(transactions).containsExactlyInAnyOrder(new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient,
-                amount.negate()));
+        assertThat(transactions).containsExactlyInAnyOrder(new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient, amount));
     }
 
     @Test
@@ -330,8 +329,8 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(sender2)).isEqualTo(amount2);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
         assertThat(transactions).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender1, recipient, amount1.negate()),
-                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender2, recipient, amount2.negate())
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender1, recipient, amount1),
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender2, recipient, amount2)
         );
     }
 
@@ -360,7 +359,7 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
         assertThat(transactions).containsExactlyInAnyOrder(
-                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient, Amount.of(-90L))
+                new AccountBook.Transaction(AccountBook.Transaction.Type.REFUND, sender, recipient, PositiveAmount.of(90L))
         );
     }
 

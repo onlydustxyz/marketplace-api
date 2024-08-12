@@ -18,7 +18,7 @@ public class AccountBookTransactionProjection {
     private ProjectId projectId;
     private RewardId rewardId;
     private Payment.Id paymentId;
-    private @NonNull Amount amount;
+    private @NonNull PositiveAmount amount;
 
     public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime timestamp,
                                                       final @NonNull AccountBookAggregate.Id accountBookId,
