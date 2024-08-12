@@ -1,16 +1,20 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,7 +22,7 @@ public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
     private AccountBookObserver observer;
-    private final Currency.Id currencyId;
+    private final Id id;
 
     private long lastEventId = 0;
 
@@ -27,8 +31,8 @@ public class AccountBookAggregate implements AccountBook {
         return this;
     }
 
-    public static AccountBookAggregate empty(final @NonNull Currency.Id currencyId) {
-        return new AccountBookAggregate(currencyId);
+    public static AccountBookAggregate empty() {
+        return new AccountBookAggregate(Id.random());
     }
 
     @Override
@@ -88,7 +92,7 @@ public class AccountBookAggregate implements AccountBook {
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
         if (observer != null)
-            result.forEach(e -> observer.on(currencyId, e));
+            result.forEach(e -> observer.on(id, e));
 
         return result;
     }
@@ -101,6 +105,18 @@ public class AccountBookAggregate implements AccountBook {
         return lastEventId + 1;
     }
 
+    @NoArgsConstructor(staticName = "random")
+    @EqualsAndHashCode(callSuper = true)
+    @SuperBuilder
+    public static class Id extends UuidWrapper {
+        public static Id of(@NonNull final UUID uuid) {
+            return Id.builder().uuid(uuid).build();
+        }
+
+        public static Id of(@NonNull final String uuid) {
+            return Id.of(UUID.fromString(uuid));
+        }
+    }
 
     @EventType("Mint")
     public record MintEvent(@NonNull AccountId account, @NonNull PositiveAmount amount) implements AccountBookEvent<List<Transaction>> {

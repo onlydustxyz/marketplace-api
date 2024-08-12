@@ -27,7 +27,7 @@ public class CachedAccountBookProvider {
     private final Map<Currency, AccountBookAggregate> accountBooks = new HashMap<>();
 
     private AccountBookAggregate getOrDefault(final @NonNull Currency currency) {
-        return accountBooks.computeIfAbsent(currency, (c) -> AccountBookAggregate.empty(currency.id()));
+        return accountBooks.computeIfAbsent(currency, (c) -> accountBookStorage.get(c.id()).orElseGet(AccountBookAggregate::empty));
     }
 
     @Transactional(readOnly = true)

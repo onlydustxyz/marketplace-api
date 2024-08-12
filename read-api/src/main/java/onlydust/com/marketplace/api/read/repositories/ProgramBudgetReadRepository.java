@@ -12,18 +12,19 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
             select
                 1 as index,
                 s.id as program_id,
-                abt.currency_id as currency_id,
+                ab.currency_id as currency_id,
                 sum(abt.amount) filter ( where abt.project_id is null )
                     - sum(abt.amount) filter ( where abt.project_id is not null and abt.reward_id is null ) as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
             join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            join accounting.account_books ab on ab.id = abt.account_book_id
             where
                 s.id = :programId
             group by
                 s.id,
-                abt.currency_id
+                ab.currency_id
             """, nativeQuery = true)
     List<ProgramBudgetReadEntity> getTotalAvailable(final UUID programId);
 
@@ -31,19 +32,20 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
             select
                 2 as index,
                 s.id as program_id,
-                abt.currency_id as currency_id,
+                ab.currency_id as currency_id,
                 sum(abt.amount) as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
             join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            join accounting.account_books ab on ab.id = abt.account_book_id
             where
                 s.id = :programId and
                 abt.project_id is not null and
                 abt.reward_id is null
             group by
                 s.id,
-                abt.currency_id
+                ab.currency_id
             """, nativeQuery = true)
     List<ProgramBudgetReadEntity> getTotalGranted(final UUID programId);
 
@@ -51,12 +53,13 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
             select
                 3 as index,
                 s.id as program_id,
-                abt.currency_id as currency_id,
+                ab.currency_id as currency_id,
                 sum(abt.amount) as amount
             from
                 sponsors s
             join accounting.sponsor_accounts sa on s.id = sa.sponsor_id
             join accounting.account_book_transactions abt on sa.id = abt.sponsor_account_id
+            join accounting.account_books ab on ab.id = abt.account_book_id
             where
                 s.id = :programId and
                 abt.project_id is not null and
@@ -64,7 +67,7 @@ public interface ProgramBudgetReadRepository extends Repository<ProgramBudgetRea
                 abt.payment_id is null
             group by
                 s.id,
-                abt.currency_id
+                ab.currency_id
             """, nativeQuery = true)
     List<ProgramBudgetReadEntity> getTotalRewarded(final UUID programId);
 }

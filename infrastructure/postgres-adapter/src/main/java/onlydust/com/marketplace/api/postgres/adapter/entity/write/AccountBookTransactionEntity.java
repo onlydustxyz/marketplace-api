@@ -26,6 +26,8 @@ public class AccountBookTransactionEntity {
     ZonedDateTime timestamp;
 
     @NonNull
+    UUID accountBookId;
+
     UUID sponsorAccountId;
 
     UUID projectId;
@@ -37,19 +39,16 @@ public class AccountBookTransactionEntity {
     @NonNull
     BigDecimal amount;
 
-    @NonNull
-    UUID currencyId;
-
     public static AccountBookTransactionEntity fromDomain(AccountBookTransactionProjection projection) {
         return new AccountBookTransactionEntity(
                 null,
                 projection.timestamp(),
-                projection.sponsorAccountId().value(),
+                projection.accountBookId().value(),
+                projection.sponsorAccountId() == null ? null : projection.sponsorAccountId().value(),
                 projection.projectId() == null ? null : projection.projectId().value(),
                 projection.rewardId() == null ? null : projection.rewardId().value(),
                 projection.paymentId() == null ? null : projection.paymentId().value(),
-                projection.amount().getValue(),
-                projection.currencyId().value()
+                projection.amount().getValue()
         );
     }
 }

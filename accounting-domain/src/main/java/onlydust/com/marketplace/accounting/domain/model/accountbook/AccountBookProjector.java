@@ -2,7 +2,6 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount.AllowanceTransaction;
@@ -20,8 +19,8 @@ public class AccountBookProjector implements AccountBookObserver {
 
     // TODO remove all other methods and use only the new projection
     @Override
-    public void on(@NonNull Currency.Id currencyId, @NonNull AccountBook.Transaction transaction) {
-        accountBookStorage.save(AccountBookTransactionProjection.of(ZonedDateTime.now(), currencyId, transaction));
+    public void on(@NonNull AccountBookAggregate.Id accountBookId, @NonNull AccountBook.Transaction transaction) {
+        accountBookStorage.save(AccountBookTransactionProjection.of(ZonedDateTime.now(), accountBookId, transaction));
     }
 
     @Override

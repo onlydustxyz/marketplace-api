@@ -17,24 +17,24 @@ public class AccountBookTransactionProjection {
     private RewardId rewardId;
     private Payment.Id paymentId;
     private Amount amount;
-    private Currency.Id currencyId;
+    private AccountBookAggregate.Id accountBookId;
 
     public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime timestamp,
-                                                      final @NonNull Currency.Id currencyId,
+                                                      final @NonNull AccountBookAggregate.Id accountBookId,
                                                       final @NonNull AccountBook.Transaction transaction) {
         return new AccountBookTransactionProjection()
                 .timestamp(timestamp)
                 .amount(transaction.amount())
-                .currencyId(currencyId)
+                .accountBookId(accountBookId)
                 .with(transaction.path());
     }
 
     public static AccountBookTransactionProjection of(final @NonNull ZonedDateTime now,
-                                                      final @NonNull Currency.Id currencyId,
+                                                      final @NonNull AccountBookAggregate.Id accountBookId,
                                                       final @NonNull AccountBook.AccountId accountId) {
         return new AccountBookTransactionProjection()
                 .timestamp(now)
-                .currencyId(currencyId)
+                .accountBookId(accountBookId)
                 .with(accountId);
     }
 
@@ -59,7 +59,7 @@ public class AccountBookTransactionProjection {
                     paymentId(accountId.paymentId());
                     break;
             }
-        
+
         return this;
     }
 }

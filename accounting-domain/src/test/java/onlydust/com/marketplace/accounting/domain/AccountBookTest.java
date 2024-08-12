@@ -11,7 +11,6 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate.TransferEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
-import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +30,7 @@ public class AccountBookTest {
         for (int i = 0; i < events.size(); i++) {
             identifiedAccountBookEvents.add(new IdentifiedAccountBookEvent<>(i + 1, ZonedDateTime.now().minusMinutes(10).plusSeconds(i), events.get(i)));
         }
-        final var accountBookAggregate = AccountBookAggregate.empty(Currencies.USDC.id());
+        final var accountBookAggregate = AccountBookAggregate.empty();
         accountBookAggregate.receive(identifiedAccountBookEvents);
         return accountBookAggregate;
     }

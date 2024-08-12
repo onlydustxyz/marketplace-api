@@ -410,7 +410,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresAccountBookStorageAdapter postgresAccountBookStorageAdapter(final AccountBookTransactionRepository accountBookTransactionRepository) {
-        return new PostgresAccountBookStorageAdapter(accountBookTransactionRepository);
+    PostgresAccountBookStorageAdapter postgresAccountBookStorageAdapter(
+            final AccountBookRepository accountBookRepository,
+            final AccountBookTransactionRepository accountBookTransactionRepository) {
+        return new PostgresAccountBookStorageAdapter(accountBookRepository, accountBookTransactionRepository);
     }
 }
