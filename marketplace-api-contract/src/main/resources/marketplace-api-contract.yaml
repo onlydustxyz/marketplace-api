@@ -375,7 +375,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramsPageResponse'
+                $ref: '#/components/schemas/ProgramPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3895,7 +3895,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramDetailsResponse'
+                $ref: '#/components/schemas/ProgramResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3934,7 +3934,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProgramTransactionType'
+              $ref: '#/components/schemas/TransactionType'
         - in: query
           name: search
           schema:
@@ -3946,7 +3946,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramTransactionStatsListResponse'
+                $ref: '#/components/schemas/ProgramTransactionStatListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -3994,7 +3994,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProgramTransactionType'
+              $ref: '#/components/schemas/TransactionType'
         - in: query
           name: search
           schema:
@@ -4006,7 +4006,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramTransactionPageResponse'
+                $ref: '#/components/schemas/TransactionPageResponse'
             text/csv:
               schema:
                 type: string
@@ -5649,7 +5649,7 @@ components:
         issueCount:
           type: integer
 
-    ProgramsPageResponse:
+    ProgramPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -5659,7 +5659,7 @@ components:
             programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProgramPageItemResponse'
+                $ref: '#/components/schemas/ProgramShortResponse'
 
     ProgramShortResponse:
       type: object
@@ -5674,11 +5674,7 @@ components:
           description: Program name
           example: Starkware Exploration Team
 
-    ProgramPageItemResponse:
-      allOf:
-        - $ref: '#/components/schemas/ProgramShortResponse'
-
-    ProgramDetailsResponse:
+    ProgramResponse:
       allOf:
         - $ref: '#/components/schemas/ProgramShortResponse'
         - type: object
@@ -5694,7 +5690,7 @@ components:
             totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
 
-    ProgramTransactionStatsListResponse:
+    ProgramTransactionStatListResponse:
       type: object
       required:
         - stats
@@ -5702,9 +5698,9 @@ components:
         stats:
           type: array
           items:
-            $ref: '#/components/schemas/ProgramTransactionStatsResponse'
+            $ref: '#/components/schemas/ProgramTransactionStatResponse'
 
-    ProgramTransactionStatsResponse:
+    ProgramTransactionStatResponse:
       type: object
       required:
         - date
@@ -8591,7 +8587,7 @@ components:
         amount:
           $ref: '#/components/schemas/Money'
 
-    ProgramTransactionPageResponse:
+    TransactionPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -8617,7 +8613,7 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/ProgramTransactionType'
+          $ref: '#/components/schemas/TransactionType'
         from:
           oneOf:
             - $ref: '#/components/schemas/ProjectLinkResponse'
@@ -8629,7 +8625,7 @@ components:
         amount:
           $ref: '#/components/schemas/Money'
 
-    ProgramTransactionType:
+    TransactionType:
       type: string
       enum:
         - TRANSFER

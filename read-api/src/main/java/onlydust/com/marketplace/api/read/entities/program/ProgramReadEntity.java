@@ -6,8 +6,8 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.ProgramDetailsResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
 import org.hibernate.annotations.Immutable;
 
 import java.util.UUID;
@@ -29,14 +29,14 @@ public class ProgramReadEntity {
     @NonNull
     String name;
 
-    public ProgramPageItemResponse toPageItemResponse() {
-        return new ProgramPageItemResponse()
+    public ProgramShortResponse toShortResponse() {
+        return new ProgramShortResponse()
                 .id(id)
                 .name(name);
     }
 
-    public ProgramDetailsResponse toDetailsResponse() {
-        return new ProgramDetailsResponse()
+    public ProgramResponse toResponse() {
+        return new ProgramResponse()
                 .id(id)
                 .name(name);
     }

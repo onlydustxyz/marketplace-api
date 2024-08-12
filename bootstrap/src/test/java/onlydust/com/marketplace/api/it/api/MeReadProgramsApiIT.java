@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.contract.model.ProgramsPageResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -69,7 +69,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                     // Then
                     .expectStatus()
                     .isEqualTo(HttpStatus.PARTIAL_CONTENT)
-                    .expectBody(ProgramsPageResponse.class)
+                    .expectBody(ProgramPageResponse.class)
                     .returnResult().getResponseBody();
 
             assertThat(response).isNotNull();

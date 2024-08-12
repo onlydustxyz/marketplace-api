@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingPermissionService;
 import onlydust.com.marketplace.api.contract.ReadProgramsApi;
-import onlydust.com.marketplace.api.contract.model.ProgramDetailsResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.ProgramBudgetReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
@@ -32,7 +32,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final ProgramBudgetReadRepository programBudgetReadRepository;
 
     @Override
-    public ResponseEntity<ProgramDetailsResponse> getProgram(UUID programId) {
+    public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
@@ -41,7 +41,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var program = programReadRepository.findById(programId)
                 .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
 
-        return ok(program.toDetailsResponse()
+        return ok(program.toResponse()
                 .totalAvailable(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalAvailable(programId)))
                 .totalGranted(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalGranted(programId)))
                 .totalRewarded(DetailedTotalMoneyMapper.map(programBudgetReadRepository.getTotalRewarded(programId))));
