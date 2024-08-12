@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.EventType;
 
@@ -11,10 +13,12 @@ import java.util.Collection;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 public class AccountBookAggregate implements AccountBook {
     private final AccountBookState state = new AccountBookState();
     private final List<IdentifiedAccountBookEvent> pendingEvents = new ArrayList<>();
     private AccountBookObserver observer;
+    private final Currency.Id currencyId;
 
     private long lastEventId = 0;
 
@@ -23,14 +27,8 @@ public class AccountBookAggregate implements AccountBook {
         return this;
     }
 
-    public static AccountBookAggregate fromEvents(final @NonNull List<IdentifiedAccountBookEvent> events) {
-        AccountBookAggregate aggregate = new AccountBookAggregate();
-        aggregate.receive(events);
-        return aggregate;
-    }
-
-    public static AccountBookAggregate empty() {
-        return fromEvents(List.of());
+    public static AccountBookAggregate empty(final @NonNull Currency.Id currencyId) {
+        return new AccountBookAggregate(currencyId);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class AccountBookAggregate implements AccountBook {
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
         if (observer != null)
-            result.forEach(observer::on);
+            result.forEach(e -> observer.on(currencyId, e));
 
         return result;
     }

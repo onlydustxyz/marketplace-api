@@ -2,10 +2,10 @@ create table accounting.account_book_transactions
 (
     index              bigserial primary key,
     timestamp          timestamp not null,
-    sponsor_account_id uuid      not null references accounting.sponsor_accounts (id),
-    project_id         uuid references projects (id),
+    sponsor_account_id uuid,
+    project_id         uuid,
     reward_id          uuid,
-    payment_id         uuid references accounting.batch_payments (id),
+    payment_id         uuid,
     amount             numeric   not null,
     currency_id        uuid      not null references currencies (id)
 );

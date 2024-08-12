@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 
 class AccountBookProjectorTest {
     private final SponsorAccountStorage storage = mock(SponsorAccountStorage.class);
-    private final AccountBookProjector observer = new AccountBookProjector(storage, mock(AccountBookStorage.class), Currencies.USDC.id());
+    private final AccountBookProjector observer = new AccountBookProjector(storage, mock(AccountBookStorage.class));
     private final Faker faker = new Faker();
     public final AccountBook.AccountId sponsorAccountId = AccountBook.AccountId.of(SponsorAccount.Id.random());
     private final PositiveAmount amount = PositiveAmount.of(faker.number().randomNumber(3, true));

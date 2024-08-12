@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.model.accountbook;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 
@@ -20,7 +21,7 @@ public interface AccountBookObserver {
             onFullRefund(event.timestamp(), fullRefundEvent.from());
     }
 
-    void on(@NonNull AccountBook.Transaction transaction);
+    void on(@NonNull Currency.Id currencyId, @NonNull AccountBook.Transaction transaction);
 
     void onMint(@NonNull ZonedDateTime timestamp, @NonNull AccountId to, @NonNull PositiveAmount amount);
 

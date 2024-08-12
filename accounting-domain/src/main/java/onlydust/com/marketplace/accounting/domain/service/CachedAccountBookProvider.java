@@ -27,7 +27,7 @@ public class CachedAccountBookProvider {
     private final Map<Currency, AccountBookAggregate> accountBooks = new HashMap<>();
 
     private AccountBookAggregate getOrDefault(final @NonNull Currency currency) {
-        return accountBooks.computeIfAbsent(currency, (c) -> AccountBookAggregate.empty());
+        return accountBooks.computeIfAbsent(currency, (c) -> AccountBookAggregate.empty(currency.id()));
     }
 
     @Transactional(readOnly = true)
@@ -39,7 +39,7 @@ public class CachedAccountBookProvider {
                 if (status != STATUS_COMMITTED) evictAccountBook(currency);
             }
         });
-        return accountBookAggregate.observed(new AccountBookProjector(null, accountBookStorage, currency.id()));
+        return accountBookAggregate.observed(new AccountBookProjector(null, accountBookStorage));
     }
 
     @Transactional

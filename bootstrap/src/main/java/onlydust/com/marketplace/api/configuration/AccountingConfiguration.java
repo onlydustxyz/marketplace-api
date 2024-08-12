@@ -43,7 +43,7 @@ public class AccountingConfiguration {
     @Bean
     public AccountBookProjector accountBookProjector(final @NonNull SponsorAccountStorage sponsorAccountStorage,
                                                      final @NonNull AccountBookStorage accountBookStorage) {
-        return new AccountBookProjector(sponsorAccountStorage, accountBookStorage, null);
+        return new AccountBookProjector(sponsorAccountStorage, accountBookStorage);
     }
 
     @Bean
