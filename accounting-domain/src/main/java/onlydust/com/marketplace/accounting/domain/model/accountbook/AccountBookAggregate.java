@@ -87,7 +87,7 @@ public class AccountBookAggregate implements AccountBook {
         return result;
     }
 
-    private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
+    protected List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), ZonedDateTime.now(), event));
         incrementEventId();
