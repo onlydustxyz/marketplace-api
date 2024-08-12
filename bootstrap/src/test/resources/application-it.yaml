@@ -59,6 +59,14 @@ infrastructure:
         pat-cache-ttl-in-seconds: 3600
   customer-io:
     environment: "develop"
+    rewards-paid-email-id: 24
+    reward-canceled-email-id: 23
+    new-reward-received-email-id: 30
+    invoice-rejected-email-id: 25
+    verification-failed-email-id: 15
+    new-committee-application-email-id: 22
+    project-applications-to-review-by-user-email-id: 16
+    project-application-accepted-email-id: 27
 application:
   web:
     machine-to-machine:
