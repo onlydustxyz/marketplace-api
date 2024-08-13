@@ -127,10 +127,10 @@ public class AccountBookTransactionReadEntity {
         return project == null ? sponsorAccount.sponsor().toLinkResponse() : project().toLinkResponse();
     }
 
-    private TransactionType transactionType() {
+    private ProgramTransactionType transactionType() {
         return switch (type) {
-            case MINT, TRANSFER -> project == null ? TransactionType.DEPOSIT : TransactionType.TRANSFER;
-            case REFUND, BURN -> project == null ? TransactionType.WITHDRAWAL : TransactionType.REFUND;
+            case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
+            case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
         };
     }
 }

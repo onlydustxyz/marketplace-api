@@ -8614,7 +8614,7 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/TransactionType'
+          $ref: '#/components/schemas/ProgramTransactionType'
         thirdParty:
           oneOf:
             - $ref: '#/components/schemas/ProjectLinkResponse'

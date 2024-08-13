@@ -915,7 +915,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                   "transactions": [
                                     {
                                       "date": "2024-01-01T00:00:00Z",
-                                      "type": "DEPOSIT",
+                                      "type": "RECEIVED",
                                       "amount": {
                                         "amount": 2200,
                                         "prettyAmount": 2200,
@@ -932,7 +932,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-01-15T00:00:00Z",
-                                      "type": "WITHDRAWAL",
+                                      "type": "RETURNED",
                                       "amount": {
                                         "amount": 700,
                                         "prettyAmount": 700,
@@ -949,7 +949,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-02-03T00:00:00Z",
-                                      "type": "DEPOSIT",
+                                      "type": "RECEIVED",
                                       "amount": {
                                         "amount": 12,
                                         "prettyAmount": 12,
@@ -966,7 +966,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-04-23T00:00:00Z",
-                                      "type": "TRANSFER",
+                                      "type": "GRANTED",
                                       "amount": {
                                         "amount": 500,
                                         "prettyAmount": 500,
@@ -983,7 +983,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-04-23T00:00:00Z",
-                                      "type": "TRANSFER",
+                                      "type": "GRANTED",
                                       "amount": {
                                         "amount": 2,
                                         "prettyAmount": 2,
@@ -1064,7 +1064,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             case GRANTED -> 5;
                             case RECEIVED -> 2;
                             case RETURNED -> 1;
-                        });
+                        })
+                        .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
             }
         }
     }
