@@ -19,7 +19,7 @@ public interface AllSponsorAccountTransactionReadRepository extends Repository<A
             LEFT JOIN FETCH t.project
             JOIN FETCH sa.currency c
             LEFT JOIN FETCH c.latestUsdQuote
-            WHERE sa.sponsor.id = :sponsorId AND
+            WHERE sa.sponsorId = :sponsorId AND
                     (:types IS NULL OR t.type IN :types)
             """)
     Page<AllSponsorAccountTransactionReadEntity> findAll(@NonNull UUID sponsorId,
