@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
@@ -80,6 +81,29 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_get_program_transactions() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 0,
+                              "totalItemNumber": 0,
+                              "hasMore": false,
+                              "nextPageIndex": 0,
+                              "transactions": []
+                            }
+                            """);
+        }
+
 
         @Nested
         class GivenSomeTransactions {
@@ -863,6 +887,122 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             .allMatch(stat -> stat.getTotalUsdEquivalent().compareTo(ZERO) < 0);
                 }
             }
+
+            @Test
+            void should_get_program_transactions() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                        .expectBody()
+                        .jsonPath("$.transactions[0].thirdParty.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[1].thirdParty.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[2].thirdParty.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[3].thirdParty.id").isEqualTo(project1.getId().toString())
+                        .jsonPath("$.transactions[4].thirdParty.id").isEqualTo(project1.getId().toString())
+                        .json("""
+                                {
+                                  "totalPageNumber": 2,
+                                  "totalItemNumber": 8,
+                                  "hasMore": true,
+                                  "nextPageIndex": 1,
+                                  "transactions": [
+                                    {
+                                      "date": "2024-01-01T00:00:00Z",
+                                      "type": "DEPOSIT",
+                                      "amount": {
+                                        "amount": 2200,
+                                        "prettyAmount": 2200,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 2222.00,
+                                        "usdConversionRate": 1.01
+                                      }
+                                    },
+                                    {
+                                      "date": "2024-01-15T00:00:00Z",
+                                      "type": "WITHDRAWAL",
+                                      "amount": {
+                                        "amount": 700,
+                                        "prettyAmount": 700,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 707.00,
+                                        "usdConversionRate": 1.01
+                                      }
+                                    },
+                                    {
+                                      "date": "2024-02-03T00:00:00Z",
+                                      "type": "DEPOSIT",
+                                      "amount": {
+                                        "amount": 12,
+                                        "prettyAmount": 12,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 21383.76,
+                                        "usdConversionRate": 1781.98
+                                      }
+                                    },
+                                    {
+                                      "date": "2024-04-23T00:00:00Z",
+                                      "type": "TRANSFER",
+                                      "amount": {
+                                        "amount": 500,
+                                        "prettyAmount": 500,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 505.00,
+                                        "usdConversionRate": 1.01
+                                      }
+                                    },
+                                    {
+                                      "date": "2024-04-23T00:00:00Z",
+                                      "type": "TRANSFER",
+                                      "amount": {
+                                        "amount": 2,
+                                        "prettyAmount": 2,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 3563.96,
+                                        "usdConversionRate": 1781.98
+                                      }
+                                    }
+                                  ]
+                                }
+                                """);
+            }
         }
     }
 
@@ -892,6 +1032,18 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isUnauthorized();
+        }
+
+        @Test
+        void should_be_unauthorized_getting_program_transactions() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then

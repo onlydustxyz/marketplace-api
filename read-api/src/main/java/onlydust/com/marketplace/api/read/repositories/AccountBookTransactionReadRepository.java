@@ -37,4 +37,22 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
                                                               Date toDate,
                                                               Pageable pageable);
 
+    @Query(value = """
+            SELECT t
+            FROM AccountBookTransactionReadEntity t
+            JOIN FETCH t.sponsorAccount sa
+            JOIN FETCH sa.sponsor
+            JOIN FETCH sa.currency
+            LEFT JOIN FETCH t.project p
+            WHERE
+                sa.sponsorId = :programId AND
+                t.reward IS NULL AND
+                t.payment IS NULL
+            """)
+    Page<AccountBookTransactionReadEntity> findAllForProgram(UUID programId,
+//                                                             Date fromDate,
+//                                                             Date toDate,
+//                                                             String search,
+//                                                             List<String> types,
+                                                             Pageable pageable);
 }

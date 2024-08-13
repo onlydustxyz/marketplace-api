@@ -8605,6 +8605,7 @@ components:
         - id
         - date
         - type
+        - thirdParty
         - amount
       properties:
         id:
@@ -8614,11 +8615,7 @@ components:
           format: date-time
         type:
           $ref: '#/components/schemas/TransactionType'
-        from:
-          oneOf:
-            - $ref: '#/components/schemas/ProjectLinkResponse'
-            - $ref: '#/components/schemas/SponsorLinkResponse'
-        to:
+        thirdParty:
           oneOf:
             - $ref: '#/components/schemas/ProjectLinkResponse'
             - $ref: '#/components/schemas/SponsorLinkResponse'

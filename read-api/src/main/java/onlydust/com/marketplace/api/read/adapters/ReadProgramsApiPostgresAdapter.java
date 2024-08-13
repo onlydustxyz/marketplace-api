@@ -5,19 +5,21 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingPermissionService;
 import onlydust.com.marketplace.api.contract.ReadProgramsApi;
-import onlydust.com.marketplace.api.contract.model.ProgramResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
+import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +32,9 @@ import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -42,6 +46,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AccountingPermissionService accountingPermissionService;
     private final ProgramTransactionStatsReadRepository programTransactionStatsReadRepository;
     private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
+    private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
 
     @Override
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
@@ -60,6 +65,41 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalGranted))
                 .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalRewarded))
         );
+    }
+
+    @Override
+    public ResponseEntity<TransactionPageResponse> getProgramTransactions(UUID programId,
+                                                                          Integer pageIndex,
+                                                                          Integer pageSize,
+                                                                          String fromDate,
+                                                                          String toDate,
+                                                                          List<ProgramTransactionType> types,
+                                                                          String search) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = accountBookTransactionReadRepository.findAllForProgram(
+                programId,
+//                DateMapper.parseNullable(fromDate),
+//                DateMapper.parseNullable(toDate),
+//                search,
+//                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
+                PageRequest.of(index, size, Sort.by("timestamp"))
+        );
+
+        final var response = new TransactionPageResponse()
+                .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toProgramTransactionPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
     }
 
     @Override
