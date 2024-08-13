@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListRes
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatResponse;
 import onlydust.com.marketplace.api.contract.model.TransactionType;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStatReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
@@ -55,9 +55,9 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var stats = programTransactionStatsReadRepository.findAll(programId);
 
         return ok(program.toResponse()
-                .totalAvailable(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalAvailable))
-                .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalGranted))
-                .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStatReadEntity::totalRewarded))
+                .totalAvailable(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalAvailable))
+                .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalGranted))
+                .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalRewarded))
         );
     }
 
@@ -78,11 +78,9 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var response = new ProgramTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new ProgramTransactionStatResponse()
                                         .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                        .totalAvailable(DetailedTotalMoneyMapper.mapMonthly(e.getValue(),
-                                                ProgramTransactionMonthlyStatReadEntity::totalAvailable))
-                                        .totalGranted(DetailedTotalMoneyMapper.mapMonthly(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalGranted))
-                                        .totalRewarded(DetailedTotalMoneyMapper.mapMonthly(e.getValue(),
-                                                ProgramTransactionMonthlyStatReadEntity::totalRewarded))
+                                        .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalAvailable))
+                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalGranted))
+                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalRewarded))
                                 )
                                 .sorted(comparing(ProgramTransactionStatResponse::getDate))
                                 .toList()

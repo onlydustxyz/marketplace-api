@@ -4,16 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.contract.model.Money;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import org.hibernate.annotations.Immutable;
-import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
-import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @NoArgsConstructor(force = true)
 @Getter
@@ -23,7 +18,7 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 @Entity
 @Table(name = "account_book_transactions", schema = "accounting")
 @IdClass(ProgramTransactionStatReadEntity.PrimaryKey.class)
-public class ProgramTransactionStatReadEntity {
+public class ProgramTransactionStatReadEntity implements ProgramTransactionStat {
     @Id
     @NonNull
     UUID programId;
@@ -45,21 +40,6 @@ public class ProgramTransactionStatReadEntity {
 
     @NonNull
     BigDecimal totalRewarded;
-
-    public Money toMoney(BigDecimal amount) {
-        final var usdQuote = currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice();
-
-        return new Money()
-                .amount(amount)
-                .currency(currency().toShortResponse())
-                .prettyAmount(pretty(amount, currency().decimals(), usdQuote))
-                .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
-                .usdConversionRate(usdQuote);
-    }
-
-    public @Nullable BigDecimal usdAmount(BigDecimal amount) {
-        return currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice().multiply(amount);
-    }
 
     @EqualsAndHashCode
     public static class PrimaryKey {
