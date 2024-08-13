@@ -45,6 +45,9 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
     @NonNull
     BigDecimal totalRewarded;
 
+    @NonNull
+    Integer transactionCount;
+
     @EqualsAndHashCode
     public static class PrimaryKey {
         UUID programId;

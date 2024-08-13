@@ -87,6 +87,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                         .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalAvailable))
                                         .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalGranted))
                                         .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalRewarded))
+                                        .transactionCount(e.getValue().stream().mapToInt(ProgramTransactionMonthlyStatReadEntity::transactionCount).sum())
                                 )
                                 .sorted(comparing(ProgramTransactionStatResponse::getDate))
                                 .toList()

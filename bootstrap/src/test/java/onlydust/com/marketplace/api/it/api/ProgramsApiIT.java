@@ -311,7 +311,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 2
                                     },
                                     {
                                       "date": "2024-02-01",
@@ -369,7 +369,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 1
                                     },
                                     {
                                       "date": "2024-04-01",
@@ -466,7 +466,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 3
                                     },
                                     {
                                       "date": "2024-05-01",
@@ -524,7 +524,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 1
                                     },
                                     {
                                       "date": "2024-06-01",
@@ -582,7 +582,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 1
                                     },
                                     {
                                       "date": "2024-07-01",
@@ -679,7 +679,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 2
                                     },
                                     {
                                       "date": "2024-08-01",
@@ -776,7 +776,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": null
+                                      "transactionCount": 4
                                     }
                                   ]
                                 }
@@ -800,8 +800,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.stats.size()").isEqualTo(3)
                         .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
+                        .jsonPath("$.stats[0].transactionCount").isEqualTo(3)
                         .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
-                        .jsonPath("$.stats[2].date").isEqualTo("2024-06-01");
+                        .jsonPath("$.stats[1].transactionCount").isEqualTo(1)
+                        .jsonPath("$.stats[2].date").isEqualTo("2024-06-01")
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(1)
+                ;
             }
 
             @Test
@@ -821,9 +825,13 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.stats.size()").isEqualTo(4)
                         .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
+                        .jsonPath("$.stats[0].transactionCount").isEqualTo(2)
                         .jsonPath("$.stats[1].date").isEqualTo("2024-06-01")
+                        .jsonPath("$.stats[1].transactionCount").isEqualTo(1)
                         .jsonPath("$.stats[2].date").isEqualTo("2024-07-01")
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(2)
                         .jsonPath("$.stats[3].date").isEqualTo("2024-08-01")
+                        .jsonPath("$.stats[3].transactionCount").isEqualTo(2)
                 ;
             }
 

@@ -26,7 +26,8 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                         - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is null ), 0)                            as total_granted,
             
                     coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is not null and payment_id is null ), 0)
-                        - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is not null and payment_id is null ), 0) as total_rewarded
+                        - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is not null and payment_id is null ), 0) as total_rewarded,
+                    count(*)                                                                                                                                    as transaction_count
                 from
                     accounting.account_book_transactions abt
                 join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
@@ -54,7 +55,8 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                 s.date as                                                                                   date,
                 sum(s.total_available) over (partition by s.program_id, s.currency_id order by s.date) as   total_available,
                 s.total_granted as                                                                          total_granted,
-                s.total_rewarded as                                                                         total_rewarded
+                s.total_rewarded as                                                                         total_rewarded,
+                s.transaction_count as                                                                      transaction_count
             from
                 stats s
             """, nativeQuery = true)
