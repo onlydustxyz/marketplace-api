@@ -775,5 +775,17 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isUnauthorized();
         }
+
+        @Test
+        void should_be_unauthorized_getting_program_transactions_stats() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isUnauthorized();
+        }
     }
 }
