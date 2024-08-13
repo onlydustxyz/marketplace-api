@@ -37,7 +37,12 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                     sa.sponsor_id = :programId and
                     (cast(:fromDate as text) is null or abt.timestamp >= :fromDate) and
                     (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate) and
-                    (cast(:search as text) is null or p.name ilike '%' || :search || '%' or s.name ilike '%' || :search || '%')
+                    (cast(:search as text) is null or p.name ilike '%' || :search || '%' or s.name ilike '%' || :search || '%') and
+                    (coalesce(:types) is null or (
+                        'GRANTED' in (:types) and abt.type in ('TRANSFER', 'REFUND') and abt.project_id is not null and abt.reward_id is null or
+                        'RECEIVED' in (:types) and abt.type in ('MINT', 'TRANSFER') and abt.project_id is null or
+                        'RETURNED' in (:types) and abt.type in ('REFUND', 'BURN') and abt.project_id is null
+                    ))
                 group by
                     sa.sponsor_id,
                     ab.currency_id,
@@ -53,5 +58,5 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
             from
                 stats s
             """, nativeQuery = true)
-    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId, Date fromDate, Date toDate, String search);
+    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId, Date fromDate, Date toDate, String search, List<String> types);
 }

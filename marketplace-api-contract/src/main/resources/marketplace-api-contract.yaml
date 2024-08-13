@@ -3934,7 +3934,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/TransactionType'
+              $ref: '#/components/schemas/ProgramTransactionType'
         - in: query
           name: search
           schema:
@@ -3994,7 +3994,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/TransactionType'
+              $ref: '#/components/schemas/ProgramTransactionType'
         - in: query
           name: search
           schema:
@@ -8628,8 +8628,17 @@ components:
     TransactionType:
       type: string
       enum:
+        - DEPOSIT
+        - WITHDRAWAL
         - TRANSFER
         - REFUND
+
+    ProgramTransactionType:
+      type: string
+      enum:
+        - GRANTED
+        - RECEIVED
+        - RETURNED
 
     SponsorAccountTransactionType:
       type: string

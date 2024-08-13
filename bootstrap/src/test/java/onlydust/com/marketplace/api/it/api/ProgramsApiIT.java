@@ -2,6 +2,9 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -9,12 +12,16 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 
 import java.util.Map;
 
+import static java.math.BigDecimal.ZERO;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagMe
 public class ProgramsApiIT extends AbstractMarketplaceApiIT {
@@ -54,6 +61,24 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.totalRewarded.totalUsdEquivalent").doesNotExist()
                     .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
             ;
+        }
+
+        @Test
+        void should_get_program_monthly_transactions_stats() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json("""
+                            {
+                              "stats": []
+                            }
+                            """);
         }
 
         @Nested
@@ -800,6 +825,35 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[2].date").isEqualTo("2024-07-01")
                         .jsonPath("$.stats[3].date").isEqualTo("2024-08-01")
                 ;
+            }
+
+            @ParameterizedTest
+            @EnumSource(ProgramTransactionType.class)
+            void should_get_program_monthly_transactions_stats_filtered_by_types(ProgramTransactionType type) {
+                // When
+                final var stats = client.get()
+                        .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "types", type.name()
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody(ProgramTransactionStatListResponse.class)
+                        .returnResult().getResponseBody().getStats();
+
+                switch (type) {
+                    case GRANTED -> assertThat(stats)
+                            .extracting("totalGranted", DetailedTotalMoney.class)
+                            .allMatch(stat -> stat.getTotalUsdEquivalent().compareTo(ZERO) != 0);
+                    case RECEIVED -> assertThat(stats)
+                            .extracting("totalAvailable", DetailedTotalMoney.class)
+                            .allMatch(stat -> stat.getTotalUsdEquivalent().compareTo(ZERO) > 0);
+                    case RETURNED -> assertThat(stats)
+                            .extracting("totalAvailable", DetailedTotalMoney.class)
+                            .allMatch(stat -> stat.getTotalUsdEquivalent().compareTo(ZERO) < 0);
+                }
             }
         }
     }

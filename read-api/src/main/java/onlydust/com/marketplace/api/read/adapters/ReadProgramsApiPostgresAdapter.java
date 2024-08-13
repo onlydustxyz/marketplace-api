@@ -8,7 +8,7 @@ import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatResponse;
-import onlydust.com.marketplace.api.contract.model.TransactionType;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
@@ -66,7 +66,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramTransactionStatListResponse> getProgramTransactionsStats(UUID programId,
                                                                                           String fromDate,
                                                                                           String toDate,
-                                                                                          List<TransactionType> types,
+                                                                                          List<ProgramTransactionType> types,
                                                                                           String search) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
@@ -77,7 +77,8 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                         programId,
                         DateMapper.parseNullable(fromDate),
                         DateMapper.parseNullable(toDate),
-                        search)
+                        search,
+                        types == null ? null : types.stream().map(ProgramTransactionType::name).toList())
                 .stream().collect(groupingBy(ProgramTransactionMonthlyStatReadEntity::date));
 
         final var response = new ProgramTransactionStatListResponse()
