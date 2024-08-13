@@ -48,9 +48,10 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
     }
 
     @Override
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public void send(@NonNull String email, @NonNull Object object) {
         if (object instanceof BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
-
+            sendEmail(MailDTO.from(customerIOProperties, billingProfileChildrenKycVerification));
         } else {
             LOGGER.error("Cannot send email for unmanaged class %s".formatted(object.getClass().getSimpleName()));
         }

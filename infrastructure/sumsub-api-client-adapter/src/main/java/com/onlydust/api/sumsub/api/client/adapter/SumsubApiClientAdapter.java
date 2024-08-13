@@ -94,8 +94,8 @@ public class SumsubApiClientAdapter implements BillingProfileVerificationProvide
         final String now = Long.toString(Instant.now().getEpochSecond());
         final String method = "POST";
         final String ttlInSecs = "7257600"; // 3 months
-        final String path = String.format("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=%s&applicantId=%s&lang=en", ttlInSecs,
-                sumsubClientProperties.getKycLevel(), externalApplicantId);
+        final String path = String.format("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=%s&applicantId=%s&lang=en",
+                sumsubClientProperties.getKycLevel(), ttlInSecs, externalApplicantId);
         final String digest = SumsubSignatureVerifier.hmac((now + method + path).getBytes(StandardCharsets.UTF_8),
                 sumsubClientProperties.getSecretKey());
         return sumsubHttpClient.send(path, HttpMethod.POST, null, SumsubSdkVerificationLinkDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
