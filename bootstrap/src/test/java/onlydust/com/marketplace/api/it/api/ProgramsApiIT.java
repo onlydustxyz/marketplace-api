@@ -1003,6 +1003,49 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                 }
                                 """);
             }
+
+            @Test
+            void should_get_program_transactions_filtered_by_date() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "fromDate", "2024-04-01",
+                                "toDate", "2024-06-01"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(4)
+                        .jsonPath("$.transactions[?(@.date < '2024-04-01')]").doesNotExist()
+                        .jsonPath("$.transactions[?(@.date > '2024-06-01')]").doesNotExist();
+            }
+
+            @Test
+            void should_get_program_transactions_filtered_by_search() {
+                // Given
+                final var search = project1.getName();
+
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "search", search
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(3)
+                        .jsonPath("$.transactions[?(@.thirdParty.id != '%s')]".formatted(project1.getId())).doesNotExist();
+            }
         }
     }
 

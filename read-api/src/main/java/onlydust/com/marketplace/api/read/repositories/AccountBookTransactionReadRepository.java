@@ -41,18 +41,21 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
             SELECT t
             FROM AccountBookTransactionReadEntity t
             JOIN FETCH t.sponsorAccount sa
-            JOIN FETCH sa.sponsor
+            JOIN FETCH sa.sponsor s
             JOIN FETCH sa.currency
             LEFT JOIN FETCH t.project p
             WHERE
                 sa.sponsorId = :programId AND
                 t.reward IS NULL AND
-                t.payment IS NULL
+                t.payment IS NULL AND
+                (:search IS NULL OR p.name ilike '%' || :search || '%' OR s.name ilike '%' || :search || '%') AND
+                (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
+                (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate)
             """)
     Page<AccountBookTransactionReadEntity> findAllForProgram(UUID programId,
-//                                                             Date fromDate,
-//                                                             Date toDate,
-//                                                             String search,
+                                                             Date fromDate,
+                                                             Date toDate,
+                                                             String search,
 //                                                             List<String> types,
                                                              Pageable pageable);
 }

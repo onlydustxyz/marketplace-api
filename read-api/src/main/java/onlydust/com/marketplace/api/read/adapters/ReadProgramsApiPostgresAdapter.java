@@ -85,9 +85,9 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
 
         final var page = accountBookTransactionReadRepository.findAllForProgram(
                 programId,
-//                DateMapper.parseNullable(fromDate),
-//                DateMapper.parseNullable(toDate),
-//                search,
+                DateMapper.parseNullable(fromDate),
+                DateMapper.parseNullable(toDate),
+                search,
 //                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp"))
         );
