@@ -5,9 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
-import onlydust.com.marketplace.api.contract.model.Money;
-import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
-import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageItemResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
@@ -101,6 +99,38 @@ public class AccountBookTransactionReadEntity {
             case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
             case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
             case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
+        };
+    }
+
+    public ProgramTransactionPageItemResponse toProgramTransactionPageItemResponse() {
+        return new ProgramTransactionPageItemResponse()
+                .id(id)
+                .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
+                .type(transactionType())
+                .thirdParty(thirdParty())
+                .amount(toMoney(amount))
+                ;
+    }
+
+    private Money toMoney(@NonNull BigDecimal amount) {
+        final var usdQuote = accountBook.currency().latestUsdQuote() == null ? null : accountBook.currency().latestUsdQuote().getPrice();
+
+        return new Money()
+                .amount(amount)
+                .currency(accountBook.currency().toShortResponse())
+                .prettyAmount(pretty(amount, accountBook.currency().decimals(), usdQuote))
+                .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
+                .usdConversionRate(usdQuote);
+    }
+
+    private ProgramTransactionPageItemResponseThirdParty thirdParty() {
+        return project == null ? sponsorAccount.sponsor().toLinkResponse() : project().toLinkResponse();
+    }
+
+    private ProgramTransactionType transactionType() {
+        return switch (type) {
+            case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
+            case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
         };
     }
 }

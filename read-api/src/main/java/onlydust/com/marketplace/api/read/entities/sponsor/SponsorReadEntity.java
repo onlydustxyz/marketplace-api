@@ -6,6 +6,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorResponse;
 import org.hibernate.annotations.Immutable;
 
@@ -38,6 +39,13 @@ public class SponsorReadEntity {
                 .id(id)
                 .name(name)
                 .url(url)
+                .logoUrl(logoUrl);
+    }
+
+    public SponsorLinkResponse toLinkResponse() {
+        return new SponsorLinkResponse()
+                .id(id)
+                .name(name)
                 .logoUrl(logoUrl);
     }
 }
