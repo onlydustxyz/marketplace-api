@@ -88,7 +88,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate),
                 search,
-//                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
+                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp"))
         );
 

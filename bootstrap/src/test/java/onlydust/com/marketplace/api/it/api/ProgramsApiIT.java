@@ -104,7 +104,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
-
         @Nested
         class GivenSomeTransactions {
             Project project1;
@@ -1045,6 +1044,27 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(3)
                         .jsonPath("$.transactions[?(@.thirdParty.id != '%s')]".formatted(project1.getId())).doesNotExist();
+            }
+
+            @ParameterizedTest
+            @EnumSource(ProgramTransactionType.class)
+            void should_get_program_monthly_transactions_filtered_by_types(ProgramTransactionType type) {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "types", type.name()
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
+                            case GRANTED -> 5;
+                            case RECEIVED -> 2;
+                            case RETURNED -> 1;
+                        });
             }
         }
     }

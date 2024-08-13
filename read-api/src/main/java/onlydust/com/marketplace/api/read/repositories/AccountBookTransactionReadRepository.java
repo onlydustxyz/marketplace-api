@@ -48,14 +48,19 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
                 sa.sponsorId = :programId AND
                 t.reward IS NULL AND
                 t.payment IS NULL AND
-                (:search IS NULL OR p.name ilike '%' || :search || '%' OR s.name ilike '%' || :search || '%') AND
+                (:search IS NULL OR p.name ilike '%' || CAST(:search AS String) || '%' OR s.name ilike '%' || CAST(:search AS String) || '%') AND
                 (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
-                (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate)
+                (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate) AND
+                (COALESCE(:types, NULL) IS NULL OR (
+                    'GRANTED' in (:types) and CAST(t.type AS String) in ('TRANSFER', 'REFUND') and t.project is not null or
+                    'RECEIVED' in (:types) and CAST(t.type AS String) in ('MINT', 'TRANSFER') and t.project is null or
+                    'RETURNED' in (:types) and CAST(t.type AS String) in ('REFUND', 'BURN') and t.project is null
+                ))
             """)
     Page<AccountBookTransactionReadEntity> findAllForProgram(UUID programId,
                                                              Date fromDate,
                                                              Date toDate,
                                                              String search,
-//                                                             List<String> types,
+                                                             List<String> types,
                                                              Pageable pageable);
 }
