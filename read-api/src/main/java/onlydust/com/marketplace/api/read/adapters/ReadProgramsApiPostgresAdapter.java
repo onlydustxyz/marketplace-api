@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +73,10 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
-        final var stats = programTransactionMonthlyStatsReadRepository.findAll(programId)
+        final var stats = programTransactionMonthlyStatsReadRepository.findAll(
+                        programId,
+                        DateMapper.parseNullable(fromDate),
+                        DateMapper.parseNullable(toDate))
                 .stream().collect(groupingBy(ProgramTransactionMonthlyStatReadEntity::date));
 
         final var response = new ProgramTransactionStatListResponse()

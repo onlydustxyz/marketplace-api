@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMont
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +32,9 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                 join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
                 join accounting.account_books ab on ab.id = abt.account_book_id
                 where
-                    sa.sponsor_id = :programId
+                    sa.sponsor_id = :programId and
+                    (cast(:fromDate as text) is null or abt.timestamp >= :fromDate) and
+                    (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate)
                 group by
                     sa.sponsor_id,
                     ab.currency_id,
@@ -47,5 +50,5 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
             from
                 stats s
             """, nativeQuery = true)
-    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId);
+    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId, Date fromDate, Date toDate);
 }

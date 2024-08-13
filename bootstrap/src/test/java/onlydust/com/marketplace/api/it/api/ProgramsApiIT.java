@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Map;
+
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 
@@ -751,6 +753,26 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                 }
                                 """)
                 ;
+            }
+
+            @Test
+            void should_get_program_monthly_transactions_stats_filtered_by_date() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "fromDate", "2024-04-01",
+                                "toDate", "2024-06-01"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.stats.size()").isEqualTo(3)
+                        .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
+                        .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
+                        .jsonPath("$.stats[2].date").isEqualTo("2024-06-01");
             }
         }
     }
