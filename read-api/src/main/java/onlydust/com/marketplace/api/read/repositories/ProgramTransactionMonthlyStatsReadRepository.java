@@ -10,31 +10,42 @@ import java.util.UUID;
 public interface ProgramTransactionMonthlyStatsReadRepository extends Repository<ProgramTransactionMonthlyStatReadEntity,
         ProgramTransactionMonthlyStatReadEntity.PrimaryKey> {
     @Query(value = """
+            with stats as (
+                select
+                    sa.sponsor_id                                                                                                                               as program_id,
+                    ab.currency_id                                                                                                                              as currency_id,
+                    date_trunc('month', abt.timestamp)                                                                                                          as date,
+            
+                    coalesce(sum(amount) filter ( where type in ('MINT', 'TRANSFER') and project_id is null ), 0)
+                        - coalesce(sum(amount) filter ( where type in ('REFUND', 'BURN') and project_id is null ), 0)
+                        - coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is null ), 0)
+                        + coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is null ), 0)                            as total_available,
+            
+                    coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is null ), 0)
+                        - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is null ), 0)                            as total_granted,
+            
+                    coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is not null and payment_id is null ), 0)
+                        - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is not null and payment_id is null ), 0) as total_rewarded
+                from
+                    accounting.account_book_transactions abt
+                join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
+                join accounting.account_books ab on ab.id = abt.account_book_id
+                where
+                    sa.sponsor_id = :programId
+                group by
+                    sa.sponsor_id,
+                    ab.currency_id,
+                    date_trunc('month', abt.timestamp)
+            )
             select
-                sa.sponsor_id                                                                                                                               as program_id,
-                ab.currency_id                                                                                                                              as currency_id,
-                date_trunc('month', abt.timestamp)                                                                                                          as date,
-            
-                coalesce(sum(amount) filter ( where type in ('MINT', 'TRANSFER') and project_id is null ), 0)
-                    - coalesce(sum(amount) filter ( where type in ('REFUND', 'BURN') and project_id is null ), 0)
-                    - coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is null ), 0)
-                    + coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is null ), 0)                            as total_available,
-            
-                coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is null ), 0)
-                    - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is null ), 0)                            as total_granted,
-            
-                coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is not null and payment_id is null ), 0)
-                    - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is not null and payment_id is null ), 0) as total_rewarded
+                s.program_id as                                                                             program_id,
+                s.currency_id as                                                                            currency_id,
+                s.date as                                                                                   date,
+                sum(s.total_available) over (partition by s.program_id, s.currency_id order by s.date) as   total_available,
+                s.total_granted as                                                                          total_granted,
+                s.total_rewarded as                                                                         total_rewarded
             from
-                accounting.account_book_transactions abt
-            join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
-            join accounting.account_books ab on ab.id = abt.account_book_id
-            where
-                sa.sponsor_id = :programId
-            group by
-                sa.sponsor_id,
-                ab.currency_id,
-                date_trunc('month', abt.timestamp)
+                stats s
             """, nativeQuery = true)
     List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId);
 }
