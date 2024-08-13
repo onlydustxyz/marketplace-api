@@ -31,10 +31,13 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                     accounting.account_book_transactions abt
                 join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
                 join accounting.account_books ab on ab.id = abt.account_book_id
+                join sponsors s on s.id = sa.sponsor_id
+                left join projects p on p.id = abt.project_id
                 where
                     sa.sponsor_id = :programId and
                     (cast(:fromDate as text) is null or abt.timestamp >= :fromDate) and
-                    (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate)
+                    (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate) and
+                    (cast(:search as text) is null or p.name ilike '%' || :search || '%' or s.name ilike '%' || :search || '%')
                 group by
                     sa.sponsor_id,
                     ab.currency_id,
@@ -50,5 +53,5 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
             from
                 stats s
             """, nativeQuery = true)
-    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId, Date fromDate, Date toDate);
+    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId, Date fromDate, Date toDate, String search);
 }

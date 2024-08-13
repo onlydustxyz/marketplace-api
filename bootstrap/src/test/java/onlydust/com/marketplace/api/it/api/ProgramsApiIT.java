@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -57,11 +58,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @Nested
         class GivenSomeTransactions {
+            Project project1;
+
             @BeforeEach
             void setUp() {
                 final var projectLead = userAuthHelper.create();
-                final var project1 = projectHelper.create(projectLead);
-                final var project2 = projectHelper.create(projectLead);
+                final var project1Id = projectHelper.create(projectLead);
+                project1 = projectHelper.get(project1Id);
+                final var project2Id = projectHelper.create(projectLead);
                 final var anotherProgram = programHelper.create();
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
@@ -74,24 +78,24 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 at("2024-02-03T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 2_000, USDC));
                 at("2024-03-12T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 1, BTC));
 
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1, 500, USDC));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1, 2, ETH));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2, 200, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2, 3, ETH));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1, 500, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1, 1, BTC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project2, 400, USDC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1, SponsorId.of(program.id()), 200, USDC));
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 500, USDC));
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 2, ETH));
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 200, USDC));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 3, ETH));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 500, USDC));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 1, BTC));
+                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project2Id, 400, USDC));
+                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1Id, SponsorId.of(program.id()), 200, USDC));
 
-                final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1, projectLead, recipientId, 400, USDC));
-                final var reward2 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1, projectLead, recipientId, 1, ETH));
-                final var reward3 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1, projectLead, recipientId, 1, BTC));
+                final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 400, USDC));
+                final var reward2 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH));
+                final var reward3 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, BTC));
 
-                final var reward4 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project2, projectLead, recipientId, 100, USDC));
-                final var reward5 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project2, projectLead, recipientId, 2, ETH));
+                final var reward4 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project2Id, projectLead, recipientId, 100, USDC));
+                final var reward5 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project2Id, projectLead, recipientId, 2, ETH));
 
-                final var reward6 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project1, projectLead, recipientId, 1, ETH));
-                at("2024-08-03T00:00:00Z", () -> rewardHelper.cancel(project1, projectLead, reward6));
+                final var reward6 = at("2024-08-02T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH));
+                at("2024-08-03T00:00:00Z", () -> rewardHelper.cancel(project1Id, projectLead, reward6));
 
                 at("2024-08-15T00:00:00Z", () -> accountingHelper.pay(reward1, reward2, reward3, reward4, reward5));
             }
@@ -773,6 +777,29 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
                         .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
                         .jsonPath("$.stats[2].date").isEqualTo("2024-06-01");
+            }
+
+            @Test
+            void should_get_program_monthly_transactions_stats_filtered_by_search() {
+                final var search = project1.getName();
+
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id()), Map.of(
+                                "search", search
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.stats.size()").isEqualTo(4)
+                        .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
+                        .jsonPath("$.stats[1].date").isEqualTo("2024-06-01")
+                        .jsonPath("$.stats[2].date").isEqualTo("2024-07-01")
+                        .jsonPath("$.stats[3].date").isEqualTo("2024-08-01")
+                ;
             }
         }
     }

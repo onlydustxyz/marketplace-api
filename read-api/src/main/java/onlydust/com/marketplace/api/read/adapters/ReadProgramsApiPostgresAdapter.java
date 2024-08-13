@@ -76,7 +76,8 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var stats = programTransactionMonthlyStatsReadRepository.findAll(
                         programId,
                         DateMapper.parseNullable(fromDate),
-                        DateMapper.parseNullable(toDate))
+                        DateMapper.parseNullable(toDate),
+                        search)
                 .stream().collect(groupingBy(ProgramTransactionMonthlyStatReadEntity::date));
 
         final var response = new ProgramTransactionStatListResponse()
