@@ -5,8 +5,11 @@ import com.onlydust.customer.io.adapter.dto.MailDTO;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
+import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
@@ -16,7 +19,7 @@ import org.springframework.retry.annotation.Retryable;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements NotificationSender {
+public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
     private final CustomerIOHttpClient customerIOHttpClient;
     private CustomerIOProperties customerIOProperties;
 
@@ -42,5 +45,14 @@ public class CustomerIOAdapter implements NotificationSender {
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {
         customerIOHttpClient.send("/send/email", HttpMethod.POST, mail, Void.class);
+    }
+
+    @Override
+    public void send(@NonNull String email, @NonNull Object object) {
+        if (object instanceof BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
+
+        } else {
+            LOGGER.error("Cannot send email for unmanaged class %s".formatted(object.getClass().getSimpleName()));
+        }
     }
 }

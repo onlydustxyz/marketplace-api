@@ -165,6 +165,7 @@ infrastructure:
     secret-key: ${SUMSUB_API_SECRET_KEY}
     kyc-questionnaire-name: ${SUMSUB_KYC_QUESTIONNAIRE}
     kyb-questionnaire-name: ${SUMSUB_KYB_QUESTIONNAIRE}
+    kyc-level: ${SUMSUB_KYC_LEVEL}
   slack:
     environment: ${ENV}
     token: ${SLACK_TOKEN}
@@ -185,6 +186,7 @@ infrastructure:
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: ${CUSTOMER_IO_APPLICATION_ACCEPTED_EMAIL_ID}
     environment: ${ENV}
+    kyc-individual-verification-email-id: ${CUSTOMER_IO_KYC_INDIVIDUAL_VERIFICATION_EMAIL_ID}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}

@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.Optional;
@@ -422,6 +423,129 @@ public class BillingProfileVerificationServiceTest {
             assertEquals(expectedVerificationStatus, billingProfileVerificationService.computeBillingProfileStatusFromKybAndChildrenKycs(parentStatus,
                     childrenStatuses));
         }
+
+        @Test
+        void should_skipped_children_kyc_given_no_ubo_email_found() {
+            // Given
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = BillingProfileVerificationUpdated.builder()
+                    .verificationStatus(VerificationStatus.STARTED)
+                    .externalApplicantId(faker.rickAndMorty().location())
+                    .parentExternalApplicantId(faker.rickAndMorty().character())
+                    .type(VerificationType.KYC)
+                    .build();
+            final Event event = mock(Event.class);
+            final Kyb initialKyb = Kyb.builder()
+                    .billingProfileId(BillingProfile.Id.random())
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .status(VerificationStatus.UNDER_REVIEW)
+                    .build();
+
+            // When
+            when(eventBillingProfileVerificationUpdatedFunction.apply(event))
+                    .thenReturn(billingProfileVerificationUpdated);
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
+                    .thenReturn(Optional.of(initialKyb));
+
+            when(billingProfileVerificationProviderPort.getIndividualIdentityForKycId(billingProfileVerificationUpdated.getExternalApplicantId()))
+                    .thenReturn(Optional.empty());
+
+            Exception exception = null;
+            try {
+                billingProfileVerificationService.process(event);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Then
+            assertTrue(exception instanceof OutboxSkippingException);
+            assertEquals("Kyc identity not found for external applicant id %s".formatted(billingProfileVerificationUpdated.getExternalApplicantId()),
+                    exception.getMessage());
+        }
+
+        @Test
+        void should_skipped_children_kyc_given_no_external_verification_link_found() {
+            // Given
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = BillingProfileVerificationUpdated.builder()
+                    .verificationStatus(VerificationStatus.STARTED)
+                    .externalApplicantId(faker.rickAndMorty().location())
+                    .parentExternalApplicantId(faker.rickAndMorty().character())
+                    .type(VerificationType.KYC)
+                    .build();
+            final Event event = mock(Event.class);
+            final Kyb initialKyb = Kyb.builder()
+                    .billingProfileId(BillingProfile.Id.random())
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .status(VerificationStatus.UNDER_REVIEW)
+                    .build();
+            final IndividualKycIdentity individualKycIdentity = new IndividualKycIdentity(faker.internet().emailAddress(), faker.name().firstName(),
+                    faker.name().lastName());
+
+            // When
+            when(eventBillingProfileVerificationUpdatedFunction.apply(event))
+                    .thenReturn(billingProfileVerificationUpdated);
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
+                    .thenReturn(Optional.of(initialKyb));
+            when(billingProfileVerificationProviderPort.getIndividualIdentityForKycId(billingProfileVerificationUpdated.getExternalApplicantId()))
+                    .thenReturn(Optional.of(individualKycIdentity));
+            when(billingProfileVerificationProviderPort.getExternalVerificationLink(billingProfileVerificationUpdated.getExternalApplicantId()))
+                    .thenReturn(Optional.empty());
+
+            Exception exception = null;
+            try {
+                billingProfileVerificationService.process(event);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            // Then
+            assertTrue(exception instanceof OutboxSkippingException);
+            assertEquals("External verification link not found for external applicant id %s".formatted(billingProfileVerificationUpdated.getExternalApplicantId()),
+                    exception.getMessage());
+        }
+
+        @Test
+        void should_process_children_kyc() {
+            // Given
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = BillingProfileVerificationUpdated.builder()
+                    .verificationStatus(VerificationStatus.STARTED)
+                    .externalApplicantId(faker.rickAndMorty().location())
+                    .parentExternalApplicantId(faker.rickAndMorty().character())
+                    .type(VerificationType.KYC)
+                    .build();
+            final Event event = mock(Event.class);
+            final Kyb initialKyb = Kyb.builder()
+                    .billingProfileId(BillingProfile.Id.random())
+                    .id(UUID.randomUUID())
+                    .ownerId(UserId.random())
+                    .name(faker.rickAndMorty().character())
+                    .status(VerificationStatus.UNDER_REVIEW)
+                    .build();
+            final IndividualKycIdentity individualKycIdentity = new IndividualKycIdentity(faker.internet().emailAddress(), faker.name().firstName(),
+                    faker.name().lastName());
+            final String externalVerificationLink = faker.internet().url();
+
+            // When
+            when(eventBillingProfileVerificationUpdatedFunction.apply(event))
+                    .thenReturn(billingProfileVerificationUpdated);
+            when(billingProfileStoragePort.findKybByParentExternalId(billingProfileVerificationUpdated.getParentExternalApplicantId()))
+                    .thenReturn(Optional.of(initialKyb));
+            when(billingProfileVerificationProviderPort.getIndividualIdentityForKycId(billingProfileVerificationUpdated.getExternalApplicantId()))
+                    .thenReturn(Optional.of(individualKycIdentity));
+            when(billingProfileVerificationProviderPort.getExternalVerificationLink(billingProfileVerificationUpdated.getExternalApplicantId()))
+                    .thenReturn(Optional.of(externalVerificationLink));
+            billingProfileVerificationService.process(event);
+
+            // Then
+            final ArgumentCaptor<BillingProfileChildrenKycVerification> billingProfileChildrenKycVerificationArgumentCaptor =
+                    ArgumentCaptor.forClass(BillingProfileChildrenKycVerification.class);
+            verify(billingProfileObserver).onBillingProfileExternalVerificationRequested(billingProfileChildrenKycVerificationArgumentCaptor.capture());
+            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().individualKycIdentity(), individualKycIdentity);
+            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().billingProfile().billingProfileName(),
+                    initialKyb.getName());
+        }
+
     }
 
 }

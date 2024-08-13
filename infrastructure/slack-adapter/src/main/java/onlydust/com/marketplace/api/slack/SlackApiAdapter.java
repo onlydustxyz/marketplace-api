@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -78,10 +79,6 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
-    }
-
-    @Override
     public void onProjectCategorySuggested(String categoryName, UUID userId) {
         final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
@@ -104,5 +101,15 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onRewardSettingsChanged(UUID projectId) {
+    }
+
+    @Override
+    public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
+
+    }
+
+    @Override
+    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
+
     }
 }

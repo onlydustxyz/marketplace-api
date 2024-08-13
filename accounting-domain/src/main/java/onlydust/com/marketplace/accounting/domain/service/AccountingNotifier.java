@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationFailed;
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
@@ -32,6 +33,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final NotificationPort notificationPort;
+    private final EmailStoragePort emailStoragePort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -137,7 +139,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                         .verificationStatus(event.getVerificationStatus())
                         .build());
             } else {
-                LOGGER.warn("Unable to send billing profile verifcation failed mail to user %s".formatted(event.getUserId()));
+                LOGGER.warn("Unable to send billing profile verification failed mail to user %s".formatted(event.getUserId()));
             }
         }
     }
@@ -152,5 +154,10 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
+    }
+
+    @Override
+    public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
+        emailStoragePort.send(billingProfileChildrenKycVerification.individualKycIdentity().email(), billingProfileChildrenKycVerification);
     }
 }

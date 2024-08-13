@@ -1,11 +1,11 @@
 package com.onlydust.api.sumsub.api.client.adapter;
 
-import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyApplicantsDataDTO;
-import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubCompanyChecksDTO;
-import com.onlydust.api.sumsub.api.client.adapter.dto.SumsubIndividualApplicantsDataDTO;
+import com.onlydust.api.sumsub.api.client.adapter.dto.*;
 import com.onlydust.api.sumsub.api.client.adapter.mapper.SumsubResponseMapper;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualKycIdentity;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileVerificationProviderPort;
@@ -13,6 +13,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -74,6 +75,32 @@ public class SumsubApiClientAdapter implements BillingProfileVerificationProvide
         return sumsubHttpClient.send(path, HttpMethod.GET, null, SumsubCompanyChecksDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
                         X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
                 .orElseThrow(() -> OnlyDustException.notFound(String.format("Applicants data not found on Sumsub for applicantId = %s", applicantId)));
+    }
+
+    @Override
+    public Optional<IndividualKycIdentity> getIndividualIdentityForKycId(@NonNull String externalApplicantId) {
+        final String now = Long.toString(Instant.now().getEpochSecond());
+        final String method = "GET";
+        final String path = String.format("/resources/applicants/%s/one", externalApplicantId);
+        final String digest = SumsubSignatureVerifier.hmac((now + method + path).getBytes(StandardCharsets.UTF_8),
+                sumsubClientProperties.getSecretKey());
+        return sumsubHttpClient.send(path, HttpMethod.GET, null, SumsubIndividualApplicantsByApplicantIdDataDTO.class, X_APP_TOKEN,
+                        sumsubClientProperties.getAppToken(), X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
+                .map(SumsubIndividualApplicantsByApplicantIdDataDTO::toIndividualKycIdentity);
+    }
+
+    @Override
+    public Optional<String> getExternalVerificationLink(@NonNull String externalApplicantId) {
+        final String now = Long.toString(Instant.now().getEpochSecond());
+        final String method = "POST";
+        final String ttlInSecs = "7257600"; // 3 months
+        final String path = String.format("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=%s&applicantId=%s&lang=en", ttlInSecs,
+                sumsubClientProperties.getKycLevel(), externalApplicantId);
+        final String digest = SumsubSignatureVerifier.hmac((now + method + path).getBytes(StandardCharsets.UTF_8),
+                sumsubClientProperties.getSecretKey());
+        return sumsubHttpClient.send(path, HttpMethod.POST, null, SumsubSdkVerificationLinkDTO.class, X_APP_TOKEN, sumsubClientProperties.getAppToken(),
+                        X_APP_ACCESS_TS, now, X_APP_ACCESS_SIG, digest)
+                .map(SumsubSdkVerificationLinkDTO::getUrl);
     }
 
 }

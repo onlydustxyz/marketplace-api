@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import lombok.Builder;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -115,6 +116,17 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 notification.recipient().email(),
                 "Your application has been accepted!",
                 ProjectApplicationAcceptedDTO.fromEvent(notification.recipient().login(), applicationAccepted, customerIOProperties.getEnvironment()));
+    }
+
+    public static MailDTO<KycIdentityVerificationDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                           @NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
+        return new MailDTO<>(customerIOProperties.getKycIndividualVerificationEmailId().toString(),
+                mapIdentifiers(billingProfileChildrenKycVerification.individualKycIdentity().email(), null),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                billingProfileChildrenKycVerification.individualKycIdentity().email(),
+                "Verified your identity to validate your company",
+                KycIdentityVerificationDTO.from(billingProfileChildrenKycVerification)
+        );
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {

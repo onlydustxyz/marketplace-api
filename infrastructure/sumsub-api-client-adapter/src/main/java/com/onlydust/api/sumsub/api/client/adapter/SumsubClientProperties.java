@@ -9,4 +9,5 @@ public class SumsubClientProperties {
     String secretKey;
     String kycQuestionnaireName;
     String kybQuestionnaireName;
+    String kycLevel;
 }
