@@ -10,20 +10,21 @@ import org.hibernate.annotations.Immutable;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
+@Entity
 @NoArgsConstructor(force = true)
 @Getter
-@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
-@Entity
 @Table(name = "account_book_transactions", schema = "accounting")
-@IdClass(ProgramTransactionStatReadEntity.PrimaryKey.class)
-public class ProgramTransactionStatReadEntity {
+@IdClass(ProgramTransactionMonthlyStatReadEntity.PrimaryKey.class)
+public class ProgramTransactionMonthlyStatReadEntity {
     @Id
     @NonNull
     UUID programId;
@@ -31,6 +32,9 @@ public class ProgramTransactionStatReadEntity {
     @Id
     @NonNull
     UUID currencyId;
+
+    @Id
+    Date date;
 
     @NonNull
     @ManyToOne
@@ -65,5 +69,6 @@ public class ProgramTransactionStatReadEntity {
     public static class PrimaryKey {
         UUID programId;
         UUID currencyId;
+        Date date;
     }
 }

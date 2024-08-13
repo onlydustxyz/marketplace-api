@@ -5,10 +5,10 @@ import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.kernel.model.EventType;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -89,7 +89,7 @@ public class AccountBookAggregate implements AccountBook {
 
     private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
-        final var now = ZonedDateTime.now();
+        final var now = CurrentDateProvider.now();
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), now, event));
         incrementEventId();
         if (observer != null)

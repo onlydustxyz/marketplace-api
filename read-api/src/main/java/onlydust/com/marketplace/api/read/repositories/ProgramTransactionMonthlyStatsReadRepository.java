@@ -1,17 +1,19 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStatReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
-public interface ProgramTransactionStatsReadRepository extends Repository<ProgramTransactionStatReadEntity, ProgramTransactionStatReadEntity.PrimaryKey> {
+public interface ProgramTransactionMonthlyStatsReadRepository extends Repository<ProgramTransactionMonthlyStatReadEntity,
+        ProgramTransactionMonthlyStatReadEntity.PrimaryKey> {
     @Query(value = """
             select
                 sa.sponsor_id                                                                                                                               as program_id,
                 ab.currency_id                                                                                                                              as currency_id,
+                date_trunc('month', abt.timestamp)                                                                                                          as date,
             
                 coalesce(sum(amount) filter ( where type in ('MINT', 'TRANSFER') and project_id is null ), 0)
                     - coalesce(sum(amount) filter ( where type in ('REFUND', 'BURN') and project_id is null ), 0)
@@ -31,7 +33,8 @@ public interface ProgramTransactionStatsReadRepository extends Repository<Progra
                 sa.sponsor_id = :programId
             group by
                 sa.sponsor_id,
-                ab.currency_id
+                ab.currency_id,
+                date_trunc('month', abt.timestamp)
             """, nativeQuery = true)
-    List<ProgramTransactionStatReadEntity> findAll(final UUID programId);
+    List<ProgramTransactionMonthlyStatReadEntity> findAll(final UUID programId);
 }

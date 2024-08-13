@@ -186,6 +186,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_NOTIFICATIONS_ALL = "/api/v1/me/notifications/all";
     protected static final String ME_NOTIFICATION_SETTINGS = "/api/v1/me/notification-settings";
     protected static final String PROGRAM_BY_ID = "/api/v1/programs/%s";
+    protected static final String PROGRAM_STATS_TRANSACTIONS = "/api/v1/programs/%s/stats/transactions";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
