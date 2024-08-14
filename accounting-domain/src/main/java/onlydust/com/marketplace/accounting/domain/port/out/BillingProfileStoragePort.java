@@ -32,9 +32,6 @@ public interface BillingProfileStoragePort {
 
     boolean isUserMemberOf(BillingProfile.Id billingProfileId, UserId userId);
 
-    // TODO remove as used only in tests
-//    Optional<BillingProfileView> findViewById(BillingProfile.Id billingProfileId);
-
     Optional<BillingProfile> findById(BillingProfile.Id billingProfileId);
 
     void savePayoutInfoForBillingProfile(PayoutInfo payoutInfo, BillingProfile.Id billingProfileId);
@@ -89,8 +86,6 @@ public interface BillingProfileStoragePort {
     void updateBillingProfileType(BillingProfile.Id billingProfileId, BillingProfile.Type type);
 
     List<BillingProfileRewardView> findInvoiceableRewardsForBillingProfile(BillingProfile.Id billingProfileId);
-
-    boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId);
 
     Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId);
 
