@@ -3153,7 +3153,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
     @Order(6)
     void should_get_projects_given_authenticated_user() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100"))).header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt).exchange()

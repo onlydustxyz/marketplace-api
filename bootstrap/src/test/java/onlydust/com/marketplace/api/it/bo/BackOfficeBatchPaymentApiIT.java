@@ -76,7 +76,7 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
 
     void setUp() throws IOException {
         // Given
-        this.anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        this.anthony = UserId.of(userAuthHelper.authenticateAntho().user().getId());
         this.olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
         this.pierre = UserId.of(userAuthHelper.authenticatePierre().user().getId());
 

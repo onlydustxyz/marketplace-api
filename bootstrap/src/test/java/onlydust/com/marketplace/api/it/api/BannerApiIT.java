@@ -58,7 +58,7 @@ public class BannerApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_nothing_or_a_banner_if_no_visible_banner() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         bannerRepository.save(banners.get(1).visible(true));
 
         // When

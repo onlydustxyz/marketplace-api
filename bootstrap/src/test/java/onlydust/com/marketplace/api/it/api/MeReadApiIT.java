@@ -16,7 +16,7 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_recommenced_projects() {
         // Given
-        final var anthony = userAuthHelper.authenticateAnthony();
+        final var anthony = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -112,7 +112,7 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_caller_onboarding() {
         // Given
-        final var anthony = userAuthHelper.authenticateAnthony();
+        final var anthony = userAuthHelper.authenticateAntho();
 
         // When
         client.get()

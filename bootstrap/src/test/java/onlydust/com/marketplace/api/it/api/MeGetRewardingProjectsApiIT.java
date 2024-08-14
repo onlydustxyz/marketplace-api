@@ -13,7 +13,7 @@ public class MeGetRewardingProjectsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_all_my_rewarding_projects() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

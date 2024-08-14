@@ -67,7 +67,7 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @BeforeEach
     void setupAll() {
-        antho = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        antho = UserId.of(userAuthHelper.authenticateAntho().user().getId());
         camille = userAuthHelper.authenticateCamille();
     }
 

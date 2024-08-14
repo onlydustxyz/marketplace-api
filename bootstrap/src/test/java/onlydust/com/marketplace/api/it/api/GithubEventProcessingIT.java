@@ -40,7 +40,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     @Test
     void should_publish_github_issue_assigned_event() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var createdAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final var assignedAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final Long issueId = 1587664960L;
@@ -86,7 +86,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     @Test
     void should_publish_pull_request_created_event() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var createdAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final Long pullRequestId = faker.number().randomNumber();
 
@@ -116,7 +116,7 @@ public class GithubEventProcessingIT extends AbstractMarketplaceApiIT {
     @Test
     void should_publish_pull_request_merged_event() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var createdAt = faker.date().birthday().toInstant().atZone(ZoneOffset.UTC);
         final var mergedAt = createdAt.plusDays(2);
         final Long pullRequestId = faker.number().randomNumber();

@@ -22,7 +22,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_users_languages_stats() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony().user();
+        final var user = userAuthHelper.authenticateAntho().user();
 
         // When
         client.get()
@@ -235,7 +235,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     void should_return_users_ecosystems_stats() {
         // When
         client.get()
-                .uri(getApiURI(USER_ECOSYSTEMS.formatted(userAuthHelper.authenticateAnthony().user().getGithubUserId())))
+                .uri(getApiURI(USER_ECOSYSTEMS.formatted(userAuthHelper.authenticateAntho().user().getGithubUserId())))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -557,7 +557,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_user_profile() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony().user();
+        final var user = userAuthHelper.authenticateAntho().user();
 
         // When
         client.get()
@@ -715,7 +715,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_users_stats() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony().user();
+        final var user = userAuthHelper.authenticateAntho().user();
 
         // When
         client.get()
@@ -1362,7 +1362,7 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_filter_users_stats_per_ecosystem() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony().user();
+        final var user = userAuthHelper.authenticateAntho().user();
 
         // When
         client.get()

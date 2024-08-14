@@ -58,7 +58,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_project_contributors_and_suggest_external_contributors_from_github() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -69,7 +69,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_repos_contributors_and_suggest_external_contributors_from_github() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "493591124,498695724", "login", login)))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -81,7 +81,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_repos_contributors_even_without_login_search() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("repoIds", "498695724")))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -94,7 +94,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_project_contributors_even_without_login_search() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString())))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)
@@ -107,7 +107,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_fetch_external_contributors_when_externalSearchOnly_is_true() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, Map.of("projectId", projectId.toString(), "login", login,
                         "externalSearchOnly", "true")))
@@ -156,7 +156,7 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
 
     @Test
     void should_return_all_when_no_param_is_provided() {
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
         client.get()
                 .uri(getApiURI(USERS_SEARCH_CONTRIBUTORS, "maxInternalContributorCountToReturn", "5000"))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwt)

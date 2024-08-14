@@ -97,7 +97,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Order(1)
     void should_raise_missing_authentication_given_no_permissions() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -313,7 +313,7 @@ public class BackOfficeBannerApiIT extends AbstractMarketplaceBackOfficeApiIT {
         // Add some closedBy rows
         final var banner = bannerRepository.findById(bannerId).orElseThrow();
         banner.closedBy().addAll(Set.of(
-                new BannerClosedByEntity(bannerId, userAuthHelper.authenticateAnthony().user().getId()),
+                new BannerClosedByEntity(bannerId, userAuthHelper.authenticateAntho().user().getId()),
                 new BannerClosedByEntity(bannerId, userAuthHelper.authenticatePierre().user().getId()),
                 new BannerClosedByEntity(bannerId, userAuthHelper.authenticateOlivier().user().getId()),
                 new BannerClosedByEntity(bannerId, userAuthHelper.authenticateHayden().user().getId())

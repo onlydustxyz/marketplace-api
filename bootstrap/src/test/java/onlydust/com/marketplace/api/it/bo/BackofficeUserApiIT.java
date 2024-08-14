@@ -121,7 +121,7 @@ public class BackofficeUserApiIT extends onlydust.com.marketplace.api.it.bo.Abst
 
     @Test
     void should_return_user_details() {
-        final var anthony = userAuthHelper.authenticateAnthony();
+        final var anthony = userAuthHelper.authenticateAntho();
 
         // When
         client.get()

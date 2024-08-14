@@ -4,7 +4,6 @@ import onlydust.com.marketplace.api.suites.tags.TagUser;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.LanguageStorage;
 import onlydust.com.marketplace.project.domain.service.LanguageService;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_contributions_including_private_projects() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -182,7 +181,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_contributions_without_private_projects() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -338,7 +337,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_project_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -362,7 +361,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_ecosystem_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -387,7 +386,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_language_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -431,7 +430,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_repos_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -455,7 +454,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_type_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -480,7 +479,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_status_filter() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -505,7 +504,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_rewards_with_status_filter_and_includeing_private_projects() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -530,7 +529,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_list_rewards_associated_to_a_contribution() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -571,7 +570,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_project_repo_name() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -611,7 +610,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_last_update_date() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -647,7 +646,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_github_number_title() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()
@@ -687,7 +686,7 @@ public class UserContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_order_by_links_count() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
 
         // When
         client.get()

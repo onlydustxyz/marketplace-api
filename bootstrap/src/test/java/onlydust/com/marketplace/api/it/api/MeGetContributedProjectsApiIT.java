@@ -14,7 +14,7 @@ public class MeGetContributedProjectsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_all_my_contributed_projects() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -109,7 +109,7 @@ public class MeGetContributedProjectsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_my_contributed_projects_filtered_by_repo() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

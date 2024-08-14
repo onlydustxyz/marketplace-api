@@ -627,7 +627,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_allocate_budget_to_project_and_pay_rewards_on_ethereum() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var ofux = userAuthHelper.authenticateOlivier();
 
         final var accountId = client.post()
@@ -871,7 +871,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_allocate_budget_to_project_and_pay_rewards_on_starknet() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var ofux = userAuthHelper.authenticateOlivier();
 
         client
@@ -1128,7 +1128,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Test
     void should_allocate_budget_to_project_and_pay_rewards_on_aptos() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var ofux = userAuthHelper.authenticateOlivier();
 
         final var accountId = client.post()

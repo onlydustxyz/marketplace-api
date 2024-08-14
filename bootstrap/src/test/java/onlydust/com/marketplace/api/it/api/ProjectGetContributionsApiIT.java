@@ -18,7 +18,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_contributions() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -87,7 +87,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_contributions_filtered_by_date() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -114,7 +114,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_contributions_ordered_by_contributor_login() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -150,7 +150,7 @@ public class ProjectGetContributionsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_reject_as_bad_request_if_provided_date_is_ill_formed() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

@@ -97,7 +97,7 @@ public class InvoicesApiConcurrencyIT extends AbstractMarketplaceApiIT {
     void setUp() throws IOException, InterruptedException {
         restoreDB(false);
 
-        antho = userAuthHelper.authenticateAnthony();
+        antho = userAuthHelper.authenticateAntho();
         companyBillingProfileId = initBillingProfile(antho).value();
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));
     }

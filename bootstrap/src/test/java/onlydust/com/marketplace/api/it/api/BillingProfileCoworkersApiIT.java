@@ -4,8 +4,10 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
@@ -94,7 +97,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                                                
+                        
                         """);
 
     }
@@ -672,7 +675,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 false);
         final String jwt = authenticatedUser.jwt();
         final UserId userId = UserId.of(authenticatedUser.user().getId());
-        final var anthony = userAuthHelper.authenticateAnthony();
+        final var anthony = userAuthHelper.authenticateAntho();
 
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(userId, faker.rickAndMorty().character(), null);
 
@@ -1058,7 +1061,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var admin = userAuthHelper.signUpUser(
                 faker.number().randomNumber(10, true), "boss.armstrong", "https://www.plop.org", false);
-        final var coworker = userAuthHelper.authenticateAnthony();
+        final var coworker = userAuthHelper.authenticateAntho();
         final var adminId = UserId.of(admin.user().getId());
 
         final var companyBillingProfile = billingProfileService.createCompanyBillingProfile(adminId, faker.rickAndMorty().character(), null);
@@ -1440,4 +1443,24 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+    @Test
+    void should_be_able_to_update_payout_info_when_invitation_role_and_billing_profile_role_are_different() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        final CompanyBillingProfile companyBillingProfile = billingProfileService.createCompanyBillingProfile(UserId.of(pierre.user().getId()), "Role IT",
+                Set.of());
+        final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAntho();
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(antho.user().getGithubUserId()),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(antho.user().getGithubUserId()));
+        billingProfileService.updateCoworkerRole(companyBillingProfile.id(), UserId.of(pierre.user().getId()),
+                GithubUserId.of(antho.user().getGithubUserId()), BillingProfile.User.Role.ADMIN);
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO))
+                .header("Authorization", )
+
+        // Then
+    }
 }

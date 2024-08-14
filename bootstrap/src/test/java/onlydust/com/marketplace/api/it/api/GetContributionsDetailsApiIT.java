@@ -21,7 +21,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_404_when_not_found() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -38,7 +38,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_pull_request_review_state() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -57,7 +57,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_contribution_details_when_found() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var billingProfile = billingProfileReadRepository.findByUserId(antho.user().getId()).
                 stream().filter(bp -> bp.type() == BillingProfileType.INDIVIDUAL).findFirst().orElseThrow();
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(billingProfile.id()), VerificationStatus.VERIFIED);
@@ -361,7 +361,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_code_review_details() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -449,7 +449,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_draft_status() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -487,7 +487,7 @@ public class GetContributionsDetailsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_return_200_when_leader() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

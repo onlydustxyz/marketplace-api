@@ -20,7 +20,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
         // Given
         final ProjectCategory category1 = projectCategoryService.createCategory("category1", "category1", "icon", null);
         final ProjectCategory category2 = projectCategoryService.createCategory("category2", "category2", "icon", null);
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // Proves that the initial user profile is different from the updated one
         client.get()
