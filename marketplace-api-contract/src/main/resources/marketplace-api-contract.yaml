@@ -4857,6 +4857,14 @@ components:
           items:
             $ref: '#/components/schemas/Money'
 
+    Trend:
+      type: string
+      description: Trend since before
+      enum:
+        - UP
+        - DOWN
+        - STABLE
+
 
     # RESPONSES ==================================================================
     GithubUserResponse:
@@ -4879,8 +4887,6 @@ components:
           example: 'https://avatars.githubusercontent.com/u/595505?v=4'
 
     RegisteredUserResponse:
-      required:
-        - id
       allOf:
         - $ref: '#/components/schemas/GithubUserResponse'
         - type: object
@@ -5659,7 +5665,7 @@ components:
             programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProgramShortResponse'
+                $ref: '#/components/schemas/ProgramPageItemResponse'
 
     ProgramShortResponse:
       type: object
@@ -5673,6 +5679,32 @@ components:
           type: string
           description: Program name
           example: Starkware Exploration Team
+
+    ProgramPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramShortResponse'
+        - type: object
+          required:
+            - leads
+            - projectCount
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            projectCount:
+              type: integer
+              description: Number of projects in the program
+              example: 42
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
 
     ProgramResponse:
       allOf:

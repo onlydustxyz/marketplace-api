@@ -322,11 +322,6 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
-    public boolean isUserInvitedTo(BillingProfile.Id billingProfileId, GithubUserId githubUserId) {
-        return billingProfileUserInvitationRepository.existsByBillingProfileIdAndGithubUserIdAndAcceptedIsFalse(billingProfileId.value(), githubUserId.value());
-    }
-
-    @Override
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
         return userRepository.findById(ownerId.value()).map(UserEntity::toShortContributorView);
     }

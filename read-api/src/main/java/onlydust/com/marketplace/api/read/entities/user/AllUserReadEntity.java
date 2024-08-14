@@ -264,4 +264,12 @@ public class AllUserReadEntity {
                 .githubAvatarUrl(URI.create(avatarUrl))
                 .email(email);
     }
+
+    public RegisteredUserResponse toRegisteredUserResponse() {
+        return new RegisteredUserResponse()
+                .id(userId)
+                .githubUserId(githubUserId)
+                .login(login)
+                .avatarUrl(avatarUrl);
+    }
 }

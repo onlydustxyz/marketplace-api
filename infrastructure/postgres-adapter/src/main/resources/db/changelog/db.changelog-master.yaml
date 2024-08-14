@@ -457,5 +457,8 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000307_create_account_book_transactions.sql
   - include:
       file: db/changelog/changelogs/00000308_remove_sponsor_account_allowance_transactions.sql
+  - include:    
+      file: db/changelog/changelogs/00000309_create_program_stats_view.sql
   - include:
       file: db/changelog/changelogs/00000310_fix_all_billing_profile_users_view.sql
+

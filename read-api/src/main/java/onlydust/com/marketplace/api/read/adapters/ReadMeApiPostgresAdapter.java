@@ -188,7 +188,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
 
         final var response = new ProgramPageResponse()
-                .programs(page.getContent().stream().map(ProgramReadEntity::toShortResponse).toList())
+                .programs(page.getContent().stream().map(ProgramReadEntity::toPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())
