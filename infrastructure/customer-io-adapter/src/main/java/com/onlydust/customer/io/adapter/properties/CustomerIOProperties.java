@@ -33,4 +33,6 @@ public class CustomerIOProperties {
     Integer projectApplicationAcceptedEmailId;
     @NonNull
     String environment;
+    @NonNull
+    Integer kycIndividualVerificationEmailId;
 }

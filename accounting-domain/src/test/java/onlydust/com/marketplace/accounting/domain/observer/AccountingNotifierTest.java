@@ -12,8 +12,10 @@ import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVer
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingNotifier;
@@ -49,6 +51,7 @@ public class AccountingNotifierTest {
     InvoiceStoragePort invoiceStoragePort;
     AccountingRewardStoragePort accountingRewardStoragePort;
     NotificationPort notificationPort;
+    EmailStoragePort emailStoragePort;
     final Faker faker = new Faker();
 
     @BeforeEach
@@ -57,7 +60,9 @@ public class AccountingNotifierTest {
         accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
         invoiceStoragePort = mock(InvoiceStoragePort.class);
         notificationPort = mock(NotificationPort.class);
-        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort);
+        emailStoragePort = mock(EmailStoragePort.class);
+        accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort,
+                emailStoragePort);
     }
 
     @Nested
@@ -333,6 +338,25 @@ public class AccountingNotifierTest {
                     .billingProfileId(billingProfileId)
                     .verificationStatus(billingProfileVerificationUpdated.getVerificationStatus())
                     .build());
+        }
+    }
+
+    @Nested
+    class OnBillingProfileExternalVerificationRequested {
+
+        @Test
+        void should_send_email_to_external_user() {
+            // Given
+            final BillingProfileChildrenKycVerification billingProfileChildrenKycVerification =
+                    new BillingProfileChildrenKycVerification(new NotificationBillingProfile(UUID.randomUUID(), faker.name().name()),
+                            new IndividualKycIdentity(faker.internet().emailAddress(), faker.name().firstName(), faker.name().lastName()),
+                            faker.internet().url());
+
+            // When
+            accountingNotifier.onBillingProfileExternalVerificationRequested(billingProfileChildrenKycVerification);
+
+            // Then
+            verify(emailStoragePort).send(billingProfileChildrenKycVerification.individualKycIdentity().email(), billingProfileChildrenKycVerification);
         }
     }
 }

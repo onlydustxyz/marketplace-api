@@ -1,12 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.stubbing.Scenario;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubApiClientAdapter;
 import com.onlydust.api.sumsub.api.client.adapter.SumsubClientProperties;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.BillingProfileRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KybRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
@@ -47,8 +45,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     KybRepository kybRepository;
     @Autowired
-    BillingProfileRepository billingProfileRepository;
-    @Autowired
     CustomerIOProperties customerIOProperties;
 
     @Test
@@ -87,7 +83,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kycId.toString());
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_INDIVIDUAL_RESPONSE_JSON)));
@@ -273,28 +269,28 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
                 .inScenario("KYB")
                 .whenScenarioStateIs(Scenario.STARTED)
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted("65bcb9e271117f5b7d4ea23e")))
                 .willSetStateTo("UNDER_REVIEW_1"));
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
                 .inScenario("KYB")
                 .whenScenarioStateIs("UNDER_REVIEW_1")
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted("65bcb9e271117f5b7d4ea23e")))
                 .willSetStateTo("UNDER_REVIEW_2"));
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
                 .inScenario("KYB")
                 .whenScenarioStateIs("UNDER_REVIEW_2")
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted("65bcb9e271117f5b7d4ea23e")))
                 .willSetStateTo("VERIFIED"));
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
                 .inScenario("KYB")
                 .whenScenarioStateIs("VERIFIED")
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -305,7 +301,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
         final String sumsubApiChecksPath = String.format("/resources/checks/latest?type=COMPANY&applicantId=%s",
                 "65bcb9e271117f5b7d4ea23e");
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiChecksPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiChecksPath))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_CHECKS_RESPONSE_JSON)));
@@ -565,7 +561,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
         final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
                 kybId.toString());
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
 //                .inScenario("KYB")
 //                .whenScenarioStateIs(Scenario.STARTED)
                 .withHeader("Content-Type", equalTo("application/json"))
@@ -590,7 +586,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
         final String sumsubApiChecksPath = String.format("/resources/checks/latest?type=COMPANY&applicantId=%s",
                 applicantId);
-        sumsubWireMockServer.stubFor(WireMock.get(WireMock.urlEqualTo(sumsubApiChecksPath))
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiChecksPath))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_CHECKS_RESPONSE_JSON)));
@@ -827,6 +823,164 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("VERIFIED");
 
+    }
+
+    @Test
+    void should_send_kyc_verification_email_to_kyb_ubo() throws InterruptedException {
+        // Given
+        final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber() + faker.number().randomNumber();
+        final var login = faker.name().username();
+        final var avatarUrl = faker.internet().avatar();
+        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
+        final String applicantId = "kyc-" + faker.number().randomNumber();
+        MutableObject<UUID> billingProfileId = new MutableObject<>();
+
+        // When
+        client.post()
+                .uri(getApiURI(BILLING_PROFILES_POST))
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer " + jwt)
+                .bodyValue("""
+                        {
+                          "name": "company3",
+                          "type": "COMPANY"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.id").value(id -> billingProfileId.setValue(UUID.fromString(id)), String.class);
+
+        final UUID kybId = kybRepository.findByBillingProfileId(billingProfileId.getValue()).orElseThrow().id();
+
+        final String sumsubApiPath = String.format("/resources/applicants/-;externalUserId=%s/one",
+                kybId.toString());
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiPath))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_UNDER_REVIEW_RESPONSE_JSON.formatted("66b9b153689cf127e92d4e12"))));
+
+        final String sumsubApiChecksPath = String.format("/resources/checks/latest?type=COMPANY&applicantId=%s",
+                "66b9b153689cf127e92d4e12");
+        sumsubWireMockServer.stubFor(get(urlEqualTo(sumsubApiChecksPath))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_COMPANY_CHECKS_RESPONSE_JSON)));
+
+        final byte[] parentSumsubPayload = String.format("""
+                {
+                    "type": "applicantCreated",
+                    "@type": "SumsubWebhookEventDTO",
+                    "clientId": "onlydust",
+                    "levelName": "od-kyb-staging",
+                    "applicantId": "66b9b153689cf127e92d4e12",
+                    "createdAtMs": "2024-08-12 06:53:07.672",
+                    "sandboxMode": true,
+                    "inspectionId": "66b9b153689cf127e92d4e12",
+                    "reviewResult": null,
+                    "reviewStatus": "init",
+                    "applicantType": "company",
+                    "correlationId": "81690bd7a3c547e2e876802cd8ab64c6",
+                    "externalUserId": "%s",
+                    "applicantActionId": null,
+                    "applicantMemberOf": null,
+                    "previousLevelName": null,
+                    "videoIdentReviewStatus": null,
+                    "externalApplicantActionId": null
+                }""", kybId.toString()).getBytes(StandardCharsets.UTF_8);
+        final String parentSumsubDigest = SumsubSignatureVerifier.hmac(parentSumsubPayload, sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, parentSumsubDigest)
+                .bodyValue(parentSumsubPayload)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+
+        // Given
+        sumsubWireMockServer.stubFor(get(urlEqualTo("/resources/applicants/%s/one".formatted(applicantId)))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_GET_APPLICANT_BY_APPLICANT_ID_JSON))
+        );
+        sumsubWireMockServer.stubFor(post(urlEqualTo("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=7257600&applicantId=%s&lang=en"
+                .formatted(sumsubClientProperties.getKycLevel(), applicantId)))
+                .withHeader("Content-Type", equalTo("application/json"))
+                .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
+                .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_GET_KYC_SDK_LINK))
+        );
+
+
+        final byte[] sumsubPayload = String.format("""
+                {
+                     "type": "applicantCreated",
+                     "@type": "SumsubWebhookEventDTO",
+                     "clientId": "onlydust",
+                     "levelName": "od-kyc-staging",
+                     "applicantId": "%s",
+                     "createdAtMs": "2024-08-12 06:54:14.537",
+                     "sandboxMode": true,
+                     "inspectionId": "66b9b196689cf127e92d52e9",
+                     "reviewResult": null,
+                     "reviewStatus": "init",
+                     "applicantType": "individual",
+                     "correlationId": "70e28ade84e1fac76535e814b6de2777",
+                     "externalUserId": "beneficiary-random-73b1d9ad-cd47-4e0b-9e4c-b64b9b61da5e",
+                     "applicantActionId": null,
+                     "applicantMemberOf": [
+                       {
+                         "applicantId": "66b9b153689cf127e92d4e12"
+                       }
+                     ],
+                     "previousLevelName": null,
+                     "videoIdentReviewStatus": null,
+                     "externalApplicantActionId": null
+                 }""", applicantId).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigest = SumsubSignatureVerifier.hmac(sumsubPayload, sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigest)
+                .bodyValue(sumsubPayload)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+
+        billingProfileVerificationOutboxJob.run();
+        Thread.sleep(1000L);
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getKycIndividualVerificationEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                                              {
+                                                               "title" : "Company beneficiary",
+                                                                "description" : "We need to verify your beneficiary identity to validate your company's billing profile WAGMI",
+                                                                "username" : "Jean Michel",
+                                                                "button": {
+                                                                  "text": "Proceed to verification",
+                                                                  "link": "https://in.sumsub.com/websdk/p/sbx_MKsda5Lftfbug2Gg"
+                                                                },
+                                                               "hasMoreInformation": true
+                                                              }
+                                """, true, false)))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo("test@onlydust.xyz")))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Verified your identity to validate your company")))
+        );
     }
 
     private static final String SUMSUB_INDIVIDUAL_RESPONSE_JSON = """
@@ -1344,4 +1498,80 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                     }
                 ]
             }""";
+
+    private static final String SUMSUB_GET_APPLICANT_BY_APPLICANT_ID_JSON = """
+            {
+                "id": "66b9b196689cf127e92d52e9",
+                "createdAt": "2024-08-12 06:54:14",
+                "key": "CFLGUPVDEXFEAS",
+                "clientId": "onlydust",
+                "inspectionId": "66b9b196689cf127e92d52e9",
+                "externalUserId": "beneficiary-random-73b1d9ad-cd47-4e0b-9e4c-b64b9b61da5e",
+                "sourceKey": "staging",
+                "fixedInfo": {
+                    "firstName": "Jean",
+                    "firstNameEn": "Jean",
+                    "middleName": "",
+                    "lastName": "Michel",
+                    "lastNameEn": "Michel",
+                    "phone": "+33 6 11 22 33 44"
+                },
+                "email": "test@onlydust.xyz",
+                "applicantPlatform": "Web",
+                "requiredIdDocs": {
+                    "docSets": [
+                        {
+                            "idDocSetType": "IDENTITY",
+                            "types": [
+                                "DRIVERS",
+                                "ID_CARD",
+                                "RESIDENCE_PERMIT",
+                                "PASSPORT"
+                            ]
+                        },
+                        {
+                            "idDocSetType": "SELFIE",
+                            "types": [
+                                "SELFIE"
+                            ],
+                            "videoRequired": "passiveLiveness"
+                        },
+                        {
+                            "idDocSetType": "PROOF_OF_RESIDENCE",
+                            "types": [
+                                "UTILITY_BILL"
+                            ],
+                            "poaStepSettingsId": "65a64728ee76e62ddabf1a62"
+                        },
+                        {
+                            "idDocSetType": "QUESTIONNAIRE",
+                            "questionnaireDefId": "odKycUsPersonStaging"
+                        }
+                    ]
+                },
+                "review": {
+                    "reviewId": "dBwzQ",
+                    "attemptId": "jHOQU",
+                    "attemptCnt": 0,
+                    "levelName": "od-kyc-staging",
+                    "levelAutoCheckMode": null,
+                    "createDate": "2024-08-12 06:54:14+0000",
+                    "reviewStatus": "init",
+                    "priority": 0
+                },
+                "lang": "en",
+                "type": "individual",
+                "memberOf": [
+                    {
+                        "applicantId": "66b9b153689cf127e92d4e12"
+                    }
+                ]
+            }
+            """;
+
+    private static final String SUMSUB_GET_KYC_SDK_LINK = """
+            {
+                "url": "https://in.sumsub.com/websdk/p/sbx_MKsda5Lftfbug2Gg"
+            }
+            """;
 }

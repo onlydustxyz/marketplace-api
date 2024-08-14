@@ -41,6 +41,7 @@ infrastructure:
     secret-key: sumsub-fake-secret-key
     kyc-questionnaire-name: odKycUsPersonDevelop
     kyb-questionnaire-name: odKybFormDevelop
+    kyc-level: od-kyc-it
   slack:
     environment: develop
     token: fake-slack-token
@@ -67,6 +68,7 @@ infrastructure:
     new-committee-application-email-id: 22
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: 27
+    kyc-individual-verification-email-id: 30
 application:
   web:
     machine-to-machine:

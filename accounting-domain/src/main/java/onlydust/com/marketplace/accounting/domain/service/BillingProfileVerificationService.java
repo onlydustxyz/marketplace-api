@@ -2,9 +2,8 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -112,10 +111,13 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
     }
 
 
-    private BillingProfileVerificationUpdated processChildrenKYC(BillingProfileVerificationUpdated childrenBillingProfileUpdated) {
+    private BillingProfileVerificationUpdated processChildrenKYC(final BillingProfileVerificationUpdated childrenBillingProfileUpdated) {
         final Kyb parentKyb = billingProfileStoragePort.findKybByParentExternalId(childrenBillingProfileUpdated.getParentExternalApplicantId())
                 .orElseThrow(() -> new OutboxSkippingException("Parent Kyb not found for external parent external id %s"
                         .formatted(childrenBillingProfileUpdated.getParentExternalApplicantId())));
+        if (childrenBillingProfileUpdated.getVerificationStatus().equals(VerificationStatus.STARTED)) {
+            processStartedChildrenKyc(childrenBillingProfileUpdated, parentKyb);
+        }
         billingProfileStoragePort.saveChildrenKyc(childrenBillingProfileUpdated.getExternalApplicantId(),
                 childrenBillingProfileUpdated.getParentExternalApplicantId(), childrenBillingProfileUpdated.getVerificationStatus());
         final List<VerificationStatus> childrenKycStatus = billingProfileStoragePort.findAllChildrenKycStatuesFromParentKyb(parentKyb);
@@ -128,5 +130,19 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
                 .userId(parentKyb.getOwnerId())
                 .verificationId(parentKyb.getId())
                 .build();
+    }
+
+    private void processStartedChildrenKyc(final BillingProfileVerificationUpdated childrenBillingProfileUpdated, final Kyb parentKyb) {
+        final IndividualKycIdentity individualKycIdentity =
+                billingProfileVerificationProviderPort.getIndividualIdentityForKycId(childrenBillingProfileUpdated.getExternalApplicantId())
+                        .orElseThrow(() -> new OutboxSkippingException("Kyc identity not found for external applicant id %s"
+                                .formatted(childrenBillingProfileUpdated.getExternalApplicantId())));
+        final String externalVerificationLink =
+                billingProfileVerificationProviderPort.getExternalVerificationLink(childrenBillingProfileUpdated.getExternalApplicantId())
+                        .orElseThrow(() -> new OutboxSkippingException("External verification link not found for external applicant id %s"
+                                .formatted(childrenBillingProfileUpdated.getExternalApplicantId())));
+        billingProfileObserver.onBillingProfileExternalVerificationRequested(
+                new BillingProfileChildrenKycVerification(new NotificationBillingProfile(parentKyb.getBillingProfileId().value(), parentKyb.getName()),
+                        individualKycIdentity, externalVerificationLink));
     }
 }

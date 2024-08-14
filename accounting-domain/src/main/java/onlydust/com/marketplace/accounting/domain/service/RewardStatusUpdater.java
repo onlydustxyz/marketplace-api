@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificat
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 
@@ -98,5 +99,9 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
         final var updatedRewardIds = accountingRewardStoragePort.removeBillingProfile(billingProfileId);
         rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(updatedRewardIds);
+    }
+
+    @Override
+    public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
     }
 }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.configuration;
 import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +25,12 @@ public class CustomerIOConfiguration {
     @Bean
     public CustomerIOAdapter notificationInstantEmailSender(final CustomerIOProperties customerIOProperties,
                                                             final CustomerIOHttpClient customerIOHttpClient) {
+        return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
+    }
+
+    @Bean
+    public EmailStoragePort emailStoragePort(final CustomerIOProperties customerIOProperties,
+                                             final CustomerIOHttpClient customerIOHttpClient) {
         return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
     }
 }
