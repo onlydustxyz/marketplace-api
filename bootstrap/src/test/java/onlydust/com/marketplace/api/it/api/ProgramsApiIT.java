@@ -55,11 +55,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(program.id().toString())
                     .jsonPath("$.name").isEqualTo(program.name())
-                    .jsonPath("$.totalAvailable.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalAvailable.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalAvailable.totalPerCurrency").isEmpty()
-                    .jsonPath("$.totalGranted.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalGranted.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
-                    .jsonPath("$.totalRewarded.totalUsdEquivalent").doesNotExist()
+                    .jsonPath("$.totalRewarded.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
             ;
         }
