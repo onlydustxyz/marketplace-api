@@ -8,17 +8,17 @@ import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
+import onlydust.com.marketplace.api.read.entities.project.ProjectStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProjectStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +32,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -45,6 +46,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AccountingPermissionService accountingPermissionService;
     private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
+    private final ProjectStatsReadRepository projectStatsReadRepository;
 
     @Override
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
@@ -57,6 +59,27 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
 
         return ok(program.toResponse());
+    }
+
+    @Override
+    public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+        int index = sanitizePageIndex(pageIndex);
+        int size = sanitizePageSize(pageSize);
+
+        final var page = projectStatsReadRepository.findGrantedProject(programId, PageRequest.of(index, size));
+        final var response = new ProgramProjectsPageResponse()
+                .projects(page.getContent().stream().map(ProjectStatReadEntity::toProgramProjectPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
     }
 
     @Override
@@ -91,7 +114,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .totalItemNumber((int) page.getTotalElements())
                 .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
 
-        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+        return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
     }
 
     @Override
@@ -116,9 +139,9 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var response = new ProgramTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new ProgramTransactionStatResponse()
                                         .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                        .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalAvailable))
-                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalGranted))
-                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionStat::totalRewarded))
+                                        .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalAvailable))
+                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalGranted))
+                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalRewarded))
                                         .transactionCount(e.getValue().stream().mapToInt(ProgramTransactionMonthlyStatReadEntity::transactionCount).sum())
                                 )
                                 .sorted(comparing(ProgramTransactionStatResponse::getDate))
