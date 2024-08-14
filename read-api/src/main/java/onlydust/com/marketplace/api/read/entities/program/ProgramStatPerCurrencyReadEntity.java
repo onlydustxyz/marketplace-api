@@ -12,13 +12,13 @@ import java.util.UUID;
 
 @NoArgsConstructor(force = true)
 @Getter
-@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
 @Entity
-@Table(name = "program_stats_per_project", schema = "accounting")
-@IdClass(ProgramTransactionStatReadEntity.PrimaryKey.class)
-public class ProgramTransactionStatReadEntity implements ProgramTransactionStat {
+@Table(name = "program_stats_per_currency", schema = "bi")
+@IdClass(ProgramStatPerCurrencyReadEntity.PrimaryKey.class)
+public class ProgramStatPerCurrencyReadEntity implements ProgramTransactionStat {
     @Id
     @NonNull
     UUID programId;
@@ -26,6 +26,11 @@ public class ProgramTransactionStatReadEntity implements ProgramTransactionStat 
     @Id
     @NonNull
     UUID currencyId;
+
+    @NonNull
+    @ManyToOne
+    @JoinColumn(name = "programId", insertable = false, updatable = false)
+    ProgramReadEntity program;
 
     @NonNull
     @ManyToOne

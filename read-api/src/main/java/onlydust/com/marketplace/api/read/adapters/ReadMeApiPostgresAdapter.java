@@ -6,7 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
@@ -16,7 +16,6 @@ import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity.PrimaryKey;
 import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity;
-import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -67,7 +66,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final NotificationReadRepository notificationReadRepository;
     private final NotificationSettingsChannelReadRepository notificationSettingsChannelReadRepository;
     private final ProgramReadRepository programReadRepository;
-    private final ProgramTransactionStatsReadRepository programTransactionStatsReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -190,15 +188,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
 
         final var response = new ProgramPageResponse()
-                .programs(page.getContent().stream()
-                        .map(program -> {
-                            final var stats = programTransactionStatsReadRepository.findAll(program.id());
-                            return program.toPageItemResponse()
-                                    .totalAvailable(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalAvailable))
-                                    .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalGranted))
-                                    .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalRewarded));
-                        })
-                        .toList())
+                .programs(page.getContent().stream().map(ProgramReadEntity::toPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())

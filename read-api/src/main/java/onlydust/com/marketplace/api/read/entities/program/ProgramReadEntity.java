@@ -8,11 +8,12 @@ import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
-import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
 
 import java.util.List;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -41,12 +42,13 @@ public class ProgramReadEntity {
     @OrderBy("login")
     List<AllUserReadEntity> leads;
 
-    @Formula("""
-            (select count(distinct s.project_id)
-             from accounting.program_stats_per_project s
-             where s.program_id = id and s.total_granted > 0)
-            """)
-    Integer grantedProjectCount;
+    @OneToOne(optional = false, mappedBy = "program")
+    @NonNull
+    ProgramStatReadEntity stats;
+
+    @OneToMany(mappedBy = "program")
+    @NonNull
+    List<ProgramStatPerCurrencyReadEntity> statsPerCurrency;
 
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()
@@ -57,7 +59,10 @@ public class ProgramReadEntity {
     public ProgramResponse toResponse() {
         return new ProgramResponse()
                 .id(id)
-                .name(name);
+                .name(name)
+                .totalAvailable(map(statsPerCurrency, ProgramTransactionStat::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramTransactionStat::totalGranted))
+                .totalRewarded(map(statsPerCurrency, ProgramTransactionStat::totalRewarded));
     }
 
     public ProgramPageItemResponse toPageItemResponse() {
@@ -65,6 +70,9 @@ public class ProgramReadEntity {
                 .id(id)
                 .name(name)
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
-                .projectCount(grantedProjectCount == null ? 0 : grantedProjectCount);
+                .projectCount(stats.grantedProjectCount())
+                .totalAvailable(map(statsPerCurrency, ProgramTransactionStat::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramTransactionStat::totalGranted))
+                .totalRewarded(map(statsPerCurrency, ProgramTransactionStat::totalRewarded));
     }
 }

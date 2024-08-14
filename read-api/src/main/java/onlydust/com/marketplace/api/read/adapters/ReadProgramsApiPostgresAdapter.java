@@ -13,7 +13,6 @@ import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramTransactionStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
@@ -44,7 +43,6 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ProgramReadRepository programReadRepository;
     private final AccountingPermissionService accountingPermissionService;
-    private final ProgramTransactionStatsReadRepository programTransactionStatsReadRepository;
     private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
 
@@ -58,13 +56,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var program = programReadRepository.findById(programId)
                 .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
 
-        final var stats = programTransactionStatsReadRepository.findAll(programId);
-
-        return ok(program.toResponse()
-                .totalAvailable(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalAvailable))
-                .totalGranted(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalGranted))
-                .totalRewarded(DetailedTotalMoneyMapper.map(stats, ProgramTransactionStat::totalRewarded))
-        );
+        return ok(program.toResponse());
     }
 
     @Override
