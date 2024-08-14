@@ -21,7 +21,7 @@ public class ProjectHelper {
         return ProjectId.of(projectFacadePort.createProject(lead.user().getId(),
                         CreateProjectCommand.builder()
                                 .firstProjectLeaderId(lead.user().getId())
-                                .name(faker.funnyName().name())
+                                .name(faker.funnyName().name() + " " + faker.random().nextLong())
                                 .shortDescription(faker.lorem().sentence())
                                 .longDescription(faker.lorem().paragraph())
                                 .isLookingForContributors(faker.bool().bool())
