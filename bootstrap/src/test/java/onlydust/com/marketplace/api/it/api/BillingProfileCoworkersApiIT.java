@@ -1451,16 +1451,36 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 Set.of());
         final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAntho();
         billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(antho.user().getGithubUserId()),
+                BillingProfile.User.Role.ADMIN);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(5160414L),
                 BillingProfile.User.Role.MEMBER);
-        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(antho.user().getGithubUserId()));
-        billingProfileService.updateCoworkerRole(companyBillingProfile.id(), UserId.of(pierre.user().getId()),
-                GithubUserId.of(antho.user().getGithubUserId()), BillingProfile.User.Role.ADMIN);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(595505L),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(8642470L),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(4435377),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(21149076),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(141839618),
+                BillingProfile.User.Role.MEMBER);
+        billingProfileService.inviteCoworker(companyBillingProfile.id(), UserId.of(pierre.user().getId()), GithubUserId.of(595505),
+                BillingProfile.User.Role.MEMBER);
+
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(5160414L));
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(595505L));
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(8642470L));
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(4435377));
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(21149076));
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile.id(), GithubUserId.of(141839618));
 
         // When
         client.get()
-                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO))
-                .header("Authorization", )
-
-        // Then
+                .uri(getApiURI(BILLING_PROFILES_GET_PAYOUT_INFO.formatted(companyBillingProfile.id().value())))
+                .header("Authorization", "Bearer " + antho.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
     }
 }
