@@ -68,7 +68,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     void setUp() throws IOException {
         // Given
-        this.anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        this.anthony = UserId.of(userAuthHelper.authenticateAntho().user().getId());
         this.olivier = UserId.of(userAuthHelper.authenticateOlivier().user().getId());
         this.pierre = UserId.of(userAuthHelper.authenticatePierre().user().getId());
 
@@ -527,7 +527,7 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Order(3)
     void should_get_all_rewards_with_billing_profile_id() {
         // Given
-        anthony = UserId.of(userAuthHelper.authenticateAnthony().user().getId());
+        anthony = UserId.of(userAuthHelper.authenticateAntho().user().getId());
         final var billingProfile = billingProfileReadRepository.findByUserId(anthony.value()).stream()
                 .filter(b -> b.type() == SELF_EMPLOYED)
                 .findFirst().orElseThrow();

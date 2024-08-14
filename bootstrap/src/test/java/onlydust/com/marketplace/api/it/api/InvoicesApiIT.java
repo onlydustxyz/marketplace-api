@@ -71,7 +71,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        antho = userAuthHelper.authenticateAnthony();
+        antho = userAuthHelper.authenticateAntho();
         companyBillingProfileId = initBillingProfile(antho).value();
 
         payoutPreferenceFacadePort.setPayoutPreference(PROJECT_ID, BillingProfile.Id.of(companyBillingProfileId), UserId.of(antho.user().getId()));

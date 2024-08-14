@@ -117,7 +117,7 @@ public class UserAuthHelper {
     }
 
     @NonNull
-    public AuthenticatedUser authenticateAnthony() {
+    public AuthenticatedUser authenticateAntho() {
         return authenticateUser(43467246L);
     }
 

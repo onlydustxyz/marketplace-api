@@ -35,7 +35,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setup() {
-        user = userAuthHelper.authenticateAnthony();
+        user = userAuthHelper.authenticateAntho();
     }
 
     @Test

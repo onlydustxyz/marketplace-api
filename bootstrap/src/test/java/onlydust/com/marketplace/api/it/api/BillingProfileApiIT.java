@@ -650,7 +650,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     @Order(50)
     void should_delete_manually_associated_billing_profile() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
         final var firstAdminId = UserId.of(antho.user().getId());
 
@@ -685,7 +685,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
     @Order(60)
     void should_delete_automatically_associated_billing_profile() {
         // Given
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var kaaper = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
         final var firstAdminId = UserId.of(antho.user().getId());
 

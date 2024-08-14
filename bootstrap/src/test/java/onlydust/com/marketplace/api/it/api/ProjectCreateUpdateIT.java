@@ -582,7 +582,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
         // And When
         client.put()
                 .uri(getApiURI(format(PROJECTS_PUT, projectId)))
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateAnthony().jwt())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateAntho().jwt())
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {

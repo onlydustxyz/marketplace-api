@@ -24,7 +24,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_staled_contributions() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -170,7 +170,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_churned_contributors() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
@@ -287,7 +287,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_newcomers() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         try {
             patchPullRequestContributionsForNewcomer(498695724, List.of(1459L, 1497L, 1500L), ZonedDateTime.now().minusDays(1)); // A newcomer
@@ -340,7 +340,7 @@ public class ProjectGetInsightsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_project_most_active_contributors() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

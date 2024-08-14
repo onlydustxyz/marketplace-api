@@ -77,7 +77,7 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
     void should_not_vote_when_not_open_for_votes() {
         // Given
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
-        final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAnthony();
+        final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAntho();
 
         committee.projectQuestions().addAll(List.of(q1, q2));
         committee.juryIds().addAll(List.of(
@@ -439,7 +439,7 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(12)
     void should_not_mix_votes_of_different_juries() {
-        final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAnthony();
+        final UserAuthHelper.AuthenticatedUser antho = userAuthHelper.authenticateAntho();
 
         client.put()
                 .uri(getApiURI(ME_COMMITTEE_PROJECTS.formatted(committee.id(), bretzel)))

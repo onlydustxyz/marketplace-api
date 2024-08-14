@@ -33,7 +33,7 @@ public class ApplicationsApiIT extends AbstractMarketplaceApiIT {
     @Order(0)
     void setupOnce() {
         final var pierre = userAuthHelper.authenticatePierre();
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var olivier = userAuthHelper.authenticateOlivier();
 
         applicationRepository.saveAll(List.of(

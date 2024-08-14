@@ -62,7 +62,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_apply_to_project() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final Long issueId = 1974127467L;
         final var motivations = faker.lorem().paragraph();
         final var problemSolvingApproach = faker.lorem().paragraph();
@@ -159,7 +159,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_not_be_able_to_apply_twice() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final var issueId = 1736474921L;
         final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
 
@@ -199,7 +199,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_update_application() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final var applicationId = UUID.randomUUID();
 
         applicationRepository.save(new ApplicationEntity(
@@ -255,7 +255,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_delete_my_github_application() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final var applicationId = UUID.randomUUID();
 
         applicationRepository.save(new ApplicationEntity(
@@ -317,7 +317,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_delete_an_application_as_project_lead() {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final var projectLead = userAuthHelper.authenticateGregoire();
         final var applicationId = UUID.randomUUID();
 
@@ -349,7 +349,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     @Test
     void should_approve_an_application_as_project_lead() throws InterruptedException {
         // Given
-        final var user = userAuthHelper.authenticateAnthony();
+        final var user = userAuthHelper.authenticateAntho();
         final var projectLead = userAuthHelper.authenticateGregoire();
         final var applicationId = UUID.randomUUID();
 
@@ -461,7 +461,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var commentId = faker.number().randomNumber(10, true);
         final Long issueId = 1930092330L;
         final var repoId = 466482535L;
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var commentBody = faker.lorem().sentence();
 
         indexingEventRepository.saveEvent(OnGithubCommentCreated.builder()
@@ -580,7 +580,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var commentId = faker.number().randomNumber(10, true);
         final Long issueId = 1976463263L;
         final var repoId = 466482535L;
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var commentBody = faker.lorem().sentence();
 
         final var startDate = ZonedDateTime.now().minusDays(20); // <----- hackathon was in the past
@@ -722,7 +722,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         final var commentId = faker.number().randomNumber(10, true);
         final Long issueId = 1914185678L;
         final var repoId = 466482535L;
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var commentBody = faker.lorem().sentence();
 
         final var startDate = ZonedDateTime.now();
@@ -847,7 +847,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
     void should_delete_applications_when_github_issue_is_deleted() {
         // Given
         final var issueId = 1930092330L;
-        final var antho = userAuthHelper.authenticateAnthony();
+        final var antho = userAuthHelper.authenticateAntho();
         final var applicationId = UUID.randomUUID();
 
         applicationRepository.save(new ApplicationEntity(

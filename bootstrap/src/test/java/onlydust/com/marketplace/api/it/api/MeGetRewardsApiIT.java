@@ -23,7 +23,6 @@ import org.springframework.http.HttpStatus;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -952,7 +951,7 @@ public class MeGetRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_filter_by_projects() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()

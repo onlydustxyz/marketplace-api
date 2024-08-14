@@ -36,7 +36,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        antho = userAuthHelper.authenticateAnthony();
+        antho = userAuthHelper.authenticateAntho();
         final var pierre = userAuthHelper.authenticatePierre();
         final var ofux = userAuthHelper.authenticateOlivier();
 
@@ -1727,7 +1727,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         @Order(0)
         void setupOnce() {
             final var pierre = userAuthHelper.authenticatePierre();
-            final var antho = userAuthHelper.authenticateAnthony();
+            final var antho = userAuthHelper.authenticateAntho();
             final var olivier = userAuthHelper.authenticateOlivier();
 
             applicationRepository.saveAll(List.of(

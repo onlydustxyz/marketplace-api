@@ -175,7 +175,7 @@ public class UserProfileApiIT extends AbstractMarketplaceApiIT {
     @Test
     void should_get_private_user_profile() {
         // Given
-        final String jwt = userAuthHelper.authenticateAnthony().jwt();
+        final String jwt = userAuthHelper.authenticateAntho().jwt();
 
         // When
         client.get()
