@@ -14,15 +14,6 @@ public interface ProgramTransactionStat {
     @NonNull
     CurrencyReadEntity currency();
 
-    @NonNull
-    BigDecimal totalAvailable();
-
-    @NonNull
-    BigDecimal totalGranted();
-
-    @NonNull
-    BigDecimal totalRewarded();
-
     default Money toMoney(BigDecimal amount) {
         final var usdQuote = currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice();
 
