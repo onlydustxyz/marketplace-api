@@ -11,10 +11,10 @@ import java.util.UUID;
 
 public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUID> {
     @Query(value = """
-            SELECT s.*
-            FROM sponsors s
-            JOIN sponsors_users su ON s.id = su.sponsor_id AND su.user_id = :leadId
-            """, nativeQuery = true)
+            SELECT p
+            FROM ProgramReadEntity p
+            JOIN p.leads l WITH l.userId = :leadId
+            """)
     Page<ProgramReadEntity> findAllByLead(final UUID leadId, final Pageable pageable);
 
     Optional<ProgramReadEntity> findById(UUID programId);
