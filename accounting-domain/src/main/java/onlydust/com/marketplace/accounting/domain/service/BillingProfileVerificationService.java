@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -142,7 +141,7 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
                         .orElseThrow(() -> new OutboxSkippingException("External verification link not found for external user id %s"
                                 .formatted(childrenBillingProfileUpdated.getExternalUserId())));
         billingProfileObserver.onBillingProfileExternalVerificationRequested(
-                new BillingProfileChildrenKycVerification(new NotificationBillingProfile(parentKyb.getBillingProfileId().value(), parentKyb.getName()),
+                new BillingProfileChildrenKycVerification(parentKyb.getBillingProfileId(), parentKyb.getName(),
                         individualKycIdentity, externalVerificationLink));
     }
 }

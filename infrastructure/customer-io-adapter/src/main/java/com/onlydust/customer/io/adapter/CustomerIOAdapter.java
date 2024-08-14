@@ -40,6 +40,8 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
             sendEmail(MailDTO.from(customerIOProperties, notification, invoiceRejected));
         } else if (notification.data() instanceof ApplicationAccepted applicationAccepted) {
             sendEmail(MailDTO.from(customerIOProperties, notification, applicationAccepted));
+        } else if (notification.data() instanceof CompleteYourBillingProfile completeYourBillingProfile) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, completeYourBillingProfile));
         }
     }
 

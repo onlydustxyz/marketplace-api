@@ -552,7 +552,7 @@ public class BillingProfileVerificationServiceTest {
                     ArgumentCaptor.forClass(BillingProfileChildrenKycVerification.class);
             verify(billingProfileObserver).onBillingProfileExternalVerificationRequested(billingProfileChildrenKycVerificationArgumentCaptor.capture());
             assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().individualKycIdentity(), individualKycIdentity);
-            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().billingProfile().billingProfileName(),
+            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().billingProfileName(),
                     initialKyb.getName());
         }
 

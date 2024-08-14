@@ -79,10 +79,11 @@ public class AccountingConfiguration {
                                                              final @NonNull IndexerPort indexerPort,
                                                              final @NonNull AccountingObserverPort accountingObserver,
                                                              final @NonNull AccountingFacadePort accountingFacadePort,
-                                                             final @NonNull PayoutInfoValidator payoutInfoValidator
+                                                             final @NonNull PayoutInfoValidator payoutInfoValidator,
+                                                             final @NonNull NotificationPort notificationPort
     ) {
         return new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort, billingProfileObservers,
-                indexerPort, accountingObserver, accountingFacadePort, payoutInfoValidator);
+                indexerPort, accountingObserver, accountingFacadePort, payoutInfoValidator, notificationPort);
     }
 
     @Bean
