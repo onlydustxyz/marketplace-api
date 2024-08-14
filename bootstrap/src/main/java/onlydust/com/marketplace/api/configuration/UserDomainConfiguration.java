@@ -38,9 +38,9 @@ public class UserDomainConfiguration {
     }
 
     @Bean
-    public NotificationSender asyncNotificationEmailProcessor(final NotificationSender notificationSender,
+    public NotificationSender asyncNotificationEmailProcessor(final NotificationSender notificationInstantEmailSender,
                                                               final NotificationStoragePort notificationStoragePort) {
-        return new AsyncNotificationEmailProcessor(notificationSender, notificationStoragePort);
+        return new AsyncNotificationEmailProcessor(notificationInstantEmailSender, notificationStoragePort);
     }
 
     @Bean
