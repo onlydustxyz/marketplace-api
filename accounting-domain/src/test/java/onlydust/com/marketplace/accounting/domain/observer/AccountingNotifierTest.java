@@ -317,7 +317,8 @@ public class AccountingNotifierTest {
             final UUID kybId = UUID.randomUUID();
             final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
-                    VerificationType.KYC, VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+                    VerificationType.KYC, VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null,
+                    faker.rickAndMorty().location());
             final UUID userId = UUID.randomUUID();
             final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
                     faker.rickAndMorty().character(), faker.gameOfThrones().character(),

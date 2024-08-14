@@ -138,9 +138,9 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
                         .orElseThrow(() -> new OutboxSkippingException("Kyc identity not found for external applicant id %s"
                                 .formatted(childrenBillingProfileUpdated.getExternalApplicantId())));
         final String externalVerificationLink =
-                billingProfileVerificationProviderPort.getExternalVerificationLink(childrenBillingProfileUpdated.getExternalApplicantId())
-                        .orElseThrow(() -> new OutboxSkippingException("External verification link not found for external applicant id %s"
-                                .formatted(childrenBillingProfileUpdated.getExternalApplicantId())));
+                billingProfileVerificationProviderPort.getExternalVerificationLink(childrenBillingProfileUpdated.getExternalUserId())
+                        .orElseThrow(() -> new OutboxSkippingException("External verification link not found for external user id %s"
+                                .formatted(childrenBillingProfileUpdated.getExternalUserId())));
         billingProfileObserver.onBillingProfileExternalVerificationRequested(
                 new BillingProfileChildrenKycVerification(new NotificationBillingProfile(parentKyb.getBillingProfileId().value(), parentKyb.getName()),
                         individualKycIdentity, externalVerificationLink));

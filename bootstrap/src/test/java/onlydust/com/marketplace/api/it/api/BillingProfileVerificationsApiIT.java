@@ -910,8 +910,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_GET_APPLICANT_BY_APPLICANT_ID_JSON))
         );
-        sumsubWireMockServer.stubFor(post(urlEqualTo("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=7257600&applicantId=%s&lang=en"
-                .formatted(sumsubClientProperties.getKycLevel(), applicantId)))
+        sumsubWireMockServer.stubFor(post(urlEqualTo("/resources/sdkIntegrations/levels/%s/websdkLink?ttlInSecs=7257600&externalUserId=%s&lang=en"
+                .formatted(sumsubClientProperties.getKycLevel(), "beneficiary-random-73b1d9ad-cd47-4e0b-9e4c-b64b9b61da5e")))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader(SumsubApiClientAdapter.X_APP_TOKEN, equalTo(sumsubClientProperties.getAppToken()))
                 .willReturn(responseDefinition().withStatus(200).withBody(SUMSUB_GET_KYC_SDK_LINK))

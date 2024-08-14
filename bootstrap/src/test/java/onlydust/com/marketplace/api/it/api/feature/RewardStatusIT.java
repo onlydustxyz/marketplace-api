@@ -1576,7 +1576,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(individualBPId), VerificationStatus.VERIFIED);
         rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(kycId, BillingProfile.Id.of(individualBPId),
                 VerificationType.KYC, VerificationStatus.VERIFIED, null,
-                UserId.of(individualBPId), null, faker.rickAndMorty().character(), null));
+                UserId.of(individualBPId), null, faker.rickAndMorty().character(), null, faker.lorem().characters()));
 
         assertGetProjectRewardsStatusOnProject(
                 projectId1,
@@ -1766,7 +1766,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(individualIndiaBPId), VerificationStatus.VERIFIED);
         rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(indianKycId, BillingProfile.Id.of(individualIndiaBPId),
                 VerificationType.KYC, VerificationStatus.VERIFIED, null,
-                UserId.of(individualIndiaBPId), null, faker.rickAndMorty().character(), null));
+                UserId.of(individualIndiaBPId), null, faker.rickAndMorty().character(), null, faker.lorem().characters()));
 
         assertGetProjectRewardsStatusOnProject(
                 projectId1,
@@ -1955,7 +1955,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(companyBPId), VerificationStatus.VERIFIED);
         rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(companyKybId, BillingProfile.Id.of(companyBPId),
                 VerificationType.KYB, VerificationStatus.VERIFIED, null,
-                UserId.of(companyBPAdmin1Id), null, faker.rickAndMorty().character(), null));
+                UserId.of(companyBPAdmin1Id), null, faker.rickAndMorty().character(), null, faker.lorem().characters()));
         // Then
         assertGetProjectRewardsStatusOnProject(
                 projectId1,
@@ -2144,7 +2144,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         billingProfileStoragePort.updateBillingProfileStatus(BillingProfile.Id.of(selfEmployedBPId), VerificationStatus.VERIFIED);
         rewardStatusUpdater.onBillingProfileUpdated(new BillingProfileVerificationUpdated(selfEmployedKybId, BillingProfile.Id.of(selfEmployedBPId),
                 VerificationType.KYB, VerificationStatus.VERIFIED, null,
-                UserId.of(selfEmployedBPId), null, faker.rickAndMorty().character(), null));
+                UserId.of(selfEmployedBPId), null, faker.rickAndMorty().character(), null, faker.lorem().characters()));
 
         // Then
         assertGetProjectRewardsStatusOnProject(

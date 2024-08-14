@@ -58,6 +58,7 @@ public class SumsubMapper implements Function<Event, BillingProfileVerificationU
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
                 .parentExternalApplicantId(sumsubWebhookEventDTO.getApplicantMemberOf().get(0).getApplicationId())
                 .externalApplicantId(sumsubWebhookEventDTO.getApplicantId())
+                .externalUserId(sumsubWebhookEventDTO.getExternalUserId())
                 .build();
     }
 
@@ -71,6 +72,7 @@ public class SumsubMapper implements Function<Event, BillingProfileVerificationU
                 .reviewMessageForApplicant(reviewMessageForApplicantToDomain(sumsubWebhookEventDTO.getReviewResult()))
                 .rawReviewDetails(rawReviewToString(sumsubWebhookEventDTO.getReviewResult()))
                 .externalApplicantId(sumsubWebhookEventDTO.getApplicantId())
+                .externalUserId(sumsubWebhookEventDTO.getExternalUserId())
                 .build();
     }
 

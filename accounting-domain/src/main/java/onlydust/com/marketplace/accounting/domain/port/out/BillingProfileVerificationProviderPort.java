@@ -14,5 +14,5 @@ public interface BillingProfileVerificationProviderPort {
 
     Optional<IndividualKycIdentity> getIndividualIdentityForKycId(@NonNull String externalApplicantId);
 
-    Optional<String> getExternalVerificationLink(@NonNull String externalApplicantId);
+    Optional<String> getExternalVerificationLink(@NonNull String externalUserId);
 }
