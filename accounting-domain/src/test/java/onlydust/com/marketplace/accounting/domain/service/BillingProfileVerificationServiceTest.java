@@ -60,6 +60,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYC)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
 
@@ -89,6 +90,7 @@ public class BillingProfileVerificationServiceTest {
                     .type(VerificationType.KYC)
                     .externalApplicantId(faker.rickAndMorty().location())
                     .reviewMessageForApplicant(faker.gameOfThrones().character())
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final var billingProfileId = BillingProfile.Id.random();
@@ -140,6 +142,7 @@ public class BillingProfileVerificationServiceTest {
                     .verificationId(verificationId)
                     .type(VerificationType.KYB)
                     .externalApplicantId(faker.rickAndMorty().location())
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
 
@@ -169,6 +172,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .reviewMessageForApplicant(faker.gameOfThrones().character())
                     .type(VerificationType.KYB)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final var billingProfileId = BillingProfile.Id.random();
@@ -216,6 +220,7 @@ public class BillingProfileVerificationServiceTest {
                     .type(VerificationType.KYB)
                     .externalApplicantId(faker.rickAndMorty().location())
                     .reviewMessageForApplicant(faker.gameOfThrones().character())
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final var billingProfileId = BillingProfile.Id.random();
@@ -265,6 +270,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .parentExternalApplicantId(faker.rickAndMorty().character())
                     .type(VerificationType.KYC)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
 
@@ -293,6 +299,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .parentExternalApplicantId(faker.rickAndMorty().character())
                     .type(VerificationType.KYC)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -432,6 +439,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .parentExternalApplicantId(faker.rickAndMorty().character())
                     .type(VerificationType.KYC)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -471,6 +479,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .parentExternalApplicantId(faker.rickAndMorty().character())
                     .type(VerificationType.KYC)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -501,7 +510,7 @@ public class BillingProfileVerificationServiceTest {
 
             // Then
             assertTrue(exception instanceof OutboxSkippingException);
-            assertEquals("External verification link not found for external applicant id %s".formatted(billingProfileVerificationUpdated.getExternalApplicantId()),
+            assertEquals("External verification link not found for external user id %s".formatted(billingProfileVerificationUpdated.getExternalUserId()),
                     exception.getMessage());
         }
 
@@ -513,6 +522,7 @@ public class BillingProfileVerificationServiceTest {
                     .externalApplicantId(faker.rickAndMorty().location())
                     .parentExternalApplicantId(faker.rickAndMorty().character())
                     .type(VerificationType.KYC)
+                    .externalUserId(faker.lorem().word())
                     .build();
             final Event event = mock(Event.class);
             final Kyb initialKyb = Kyb.builder()
@@ -533,7 +543,7 @@ public class BillingProfileVerificationServiceTest {
                     .thenReturn(Optional.of(initialKyb));
             when(billingProfileVerificationProviderPort.getIndividualIdentityForKycId(billingProfileVerificationUpdated.getExternalApplicantId()))
                     .thenReturn(Optional.of(individualKycIdentity));
-            when(billingProfileVerificationProviderPort.getExternalVerificationLink(billingProfileVerificationUpdated.getExternalApplicantId()))
+            when(billingProfileVerificationProviderPort.getExternalVerificationLink(billingProfileVerificationUpdated.getExternalUserId()))
                     .thenReturn(Optional.of(externalVerificationLink));
             billingProfileVerificationService.process(event);
 

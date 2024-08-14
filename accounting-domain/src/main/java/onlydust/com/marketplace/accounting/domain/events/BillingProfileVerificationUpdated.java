@@ -33,6 +33,8 @@ public class BillingProfileVerificationUpdated extends Event {
     @NonNull
     String externalApplicantId;
     String parentExternalApplicantId;
+    @NonNull
+    String externalUserId;
 
     public boolean isAChildrenKYC() {
         if (nonNull(this.parentExternalApplicantId)) {

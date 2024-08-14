@@ -325,7 +325,8 @@ public class RewardStatusUpdaterTest {
             final UUID kycId = UUID.randomUUID();
             final var billingProfileId = BillingProfile.Id.random();
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kycId, billingProfileId,
-                    VerificationType.KYC, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+                    VerificationType.KYC, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null,
+                    faker.lordOfTheRings().location());
             final Kyc kyc =
                     Kyc.builder().id(kycId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
@@ -343,7 +344,8 @@ public class RewardStatusUpdaterTest {
             final UUID kybId = UUID.randomUUID();
             final var billingProfileId = BillingProfile.Id.random();
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
-                    VerificationType.KYB, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null);
+                    VerificationType.KYB, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(), null,
+                    faker.lordOfTheRings().location());
             final Kyb kyb =
                     Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
@@ -362,7 +364,7 @@ public class RewardStatusUpdaterTest {
             final var billingProfileId = BillingProfile.Id.random();
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
                     VerificationType.KYC, VerificationStatus.VERIFIED, null, UserId.random(), null, faker.rickAndMorty().character(),
-                    faker.gameOfThrones().character());
+                    faker.gameOfThrones().character(), faker.lordOfTheRings().location());
             final Kyb kyb =
                     Kyb.builder().id(kybId).billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
 
