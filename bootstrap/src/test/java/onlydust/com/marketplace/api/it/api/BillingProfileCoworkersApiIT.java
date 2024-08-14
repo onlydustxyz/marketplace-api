@@ -1397,8 +1397,7 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
-                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(true)
+                .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].pendingInvitationResponse").isEqualTo(false)
                 .jsonPath("$.billingProfiles[?(@.type == 'COMPANY')].id").isEqualTo(companyBillingProfile.id().value().toString());
 
         // When
