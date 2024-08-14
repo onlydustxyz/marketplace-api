@@ -60,9 +60,9 @@ public class ProgramReadEntity {
         return new ProgramResponse()
                 .id(id)
                 .name(name)
-                .totalAvailable(map(statsPerCurrency, ProgramTransactionStat::totalAvailable))
-                .totalGranted(map(statsPerCurrency, ProgramTransactionStat::totalGranted))
-                .totalRewarded(map(statsPerCurrency, ProgramTransactionStat::totalRewarded));
+                .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
     }
 
     public ProgramPageItemResponse toPageItemResponse() {
@@ -71,8 +71,8 @@ public class ProgramReadEntity {
                 .name(name)
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())
-                .totalAvailable(map(statsPerCurrency, ProgramTransactionStat::totalAvailable))
-                .totalGranted(map(statsPerCurrency, ProgramTransactionStat::totalGranted))
-                .totalRewarded(map(statsPerCurrency, ProgramTransactionStat::totalRewarded));
+                .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
     }
 }
