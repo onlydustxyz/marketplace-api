@@ -124,7 +124,9 @@ public class AccountBookTransactionReadEntity {
     }
 
     private ProgramTransactionPageItemResponseThirdParty thirdParty() {
-        return project == null ? sponsorAccount.sponsor().toLinkResponse() : project().toLinkResponse();
+        return project == null ?
+                new ProgramTransactionPageItemResponseThirdParty().sponsor(sponsorAccount.sponsor().toLinkResponse()) :
+                new ProgramTransactionPageItemResponseThirdParty().project(project().toLinkResponse());
     }
 
     private ProgramTransactionType transactionType() {

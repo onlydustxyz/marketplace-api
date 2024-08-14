@@ -8616,9 +8616,12 @@ components:
         type:
           $ref: '#/components/schemas/ProgramTransactionType'
         thirdParty:
-          oneOf:
-            - $ref: '#/components/schemas/ProjectLinkResponse'
-            - $ref: '#/components/schemas/SponsorLinkResponse'
+          type: object
+          properties:
+            project:
+              $ref: '#/components/schemas/ProjectLinkResponse'
+            sponsor:
+              $ref: '#/components/schemas/SponsorLinkResponse'
         amount:
           $ref: '#/components/schemas/Money'
 

@@ -901,11 +901,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                         .expectBody()
-                        .jsonPath("$.transactions[0].thirdParty.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[1].thirdParty.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[2].thirdParty.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[3].thirdParty.id").isEqualTo(project1.getId().toString())
-                        .jsonPath("$.transactions[4].thirdParty.id").isEqualTo(project1.getId().toString())
+                        .jsonPath("$.transactions[0].thirdParty.sponsor.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[1].thirdParty.sponsor.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[2].thirdParty.sponsor.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[3].thirdParty.project.id").isEqualTo(project1.getId().toString())
+                        .jsonPath("$.transactions[4].thirdParty.project.id").isEqualTo(project1.getId().toString())
                         .json("""
                                 {
                                   "totalPageNumber": 2,
@@ -1043,7 +1043,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .isOk()
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(3)
-                        .jsonPath("$.transactions[?(@.thirdParty.id != '%s')]".formatted(project1.getId())).doesNotExist();
+                        .jsonPath("$.transactions[?(@.thirdParty.project.id != '%s')]".formatted(project1.getId())).doesNotExist();
             }
 
             @ParameterizedTest
