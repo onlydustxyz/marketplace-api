@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
+import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -44,8 +45,7 @@ import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHel
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -1935,9 +1935,19 @@ class BillingProfileServiceTest {
         final ArgumentCaptor<UUID> userIdCaptor = ArgumentCaptor.forClass(UUID.class);
         final ArgumentCaptor<CompleteYourBillingProfile> completeYourBillingProfileCaptor = ArgumentCaptor.forClass(CompleteYourBillingProfile.class);
         verify(notificationPort, times(4)).push(userIdCaptor.capture(), completeYourBillingProfileCaptor.capture());
-        assertEquals(bpCompanyAdmin1.id().value(), userIdCaptor.getAllValues().get(0));
-        assertEquals(bpCompanyAdmin2.id().value(), userIdCaptor.getAllValues().get(1));
-        assertEquals(individualAdmin.id().value(), userIdCaptor.getAllValues().get(2));
-        assertEquals(selfEmployedAdmin.id().value(), userIdCaptor.getAllValues().get(3));
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin1.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin2.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(individualAdmin.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(selfEmployedAdmin.id().value()));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company1.id().value(), company1.name(), company1.status()))));
+        assertFalse(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company2.id().value(), company2.name(), company2.status()))));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(individualBillingProfile.id().value(),
+                        individualBillingProfile.name(), individualBillingProfile.status()))));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(selfEmployedBillingProfile.id().value(),
+                 selfEmployedBillingProfile.name(), selfEmployedBillingProfile.status()))));
     }
 }
