@@ -109,6 +109,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROJECTS_GET_BUDGETS = "/api/v1/projects/%s/budgets";
     protected static final String PROJECTS_POST = "/api/v1/projects";
     protected static final String PROJECTS_PUT = "/api/v1/projects/%s";
+    protected static final String PROJECT_STATS = "/api/v1/projects/%s/stats";
     protected static final String PROJECTS_IGNORED_CONTRIBUTIONS_PUT = "/api/v1/projects/%s/ignored-contributions";
     protected static final String PROJECT_CONTRIBUTION_UNASSIGN = "/api/v1/projects/%s/contributions/%s/unassign";
     protected static final String APPLICATIONS = "/api/v1/applications";
@@ -277,6 +278,8 @@ public class AbstractMarketplaceApiIT {
     EntityManagerFactory entityManagerFactory;
     @Autowired
     AppUserFacadePort appUserFacadePort;
+    @Autowired
+    GithubHelper githubHelper;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {

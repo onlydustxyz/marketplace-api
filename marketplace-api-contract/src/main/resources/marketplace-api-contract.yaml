@@ -2094,8 +2094,6 @@ paths:
 
   /api/v1/projects/{projectId}/stats:
     get:
-      security:
-        - bearerAuth: [ ]
       tags:
         - ReadProjects
       summary: Get project stats
