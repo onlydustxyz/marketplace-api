@@ -4925,6 +4925,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/GithubUserResponse'
         - type: object
+          required:
+            - id
           properties:
             id:
               $ref: '#/components/schemas/UserId'
