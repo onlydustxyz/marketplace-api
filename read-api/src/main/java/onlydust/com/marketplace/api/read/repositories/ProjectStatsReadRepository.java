@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface ProjectStatsReadRepository extends Repository<ProjectStatReadEntity, UUID> {
@@ -18,4 +19,6 @@ public interface ProjectStatsReadRepository extends Repository<ProjectStatReadEn
                 pspcp.program_id = :programId
             """, nativeQuery = true)
     Page<ProjectStatReadEntity> findGrantedProject(UUID programId, Pageable pageable);
+
+    Optional<ProjectStatReadEntity> findByProjectId(UUID projectId);
 }
