@@ -64,12 +64,13 @@ infrastructure:
     reward-canceled-email-id: 23
     new-reward-received-email-id: 30
     invoice-rejected-email-id: 25
-    verification-failed-email-id: 15
     new-committee-application-email-id: 22
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: 27
     kyc-individual-verification-email-id: 30
     complete-your-billing-profile-email-id: 40
+    verification-closed-email-id: 50
+    verification-rejected-email-id: 60
 application:
   web:
     machine-to-machine:

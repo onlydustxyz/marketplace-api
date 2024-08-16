@@ -11,10 +11,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationFailed;
-import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -128,19 +125,48 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated event) {
-        if (event.failed()) {
-            final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
-                    .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
-                            .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+        if (event.closed()) {
+            sendBillingProfileVerificationClosedNotification(event);
+        }
+        if (event.rejected() && !event.isAChildrenKYC()) {
+            sendBillingProfileRejectedNotification(event);
+        }
+    }
 
-            if (nonNull(owner.email())) {
-                notificationPort.push(owner.userId().value(), BillingProfileVerificationFailed.builder()
-                        .billingProfileId(event.getBillingProfileId())
-                        .verificationStatus(event.getVerificationStatus())
-                        .build());
-            } else {
-                LOGGER.warn("Unable to send billing profile verification failed mail to user %s".formatted(event.getUserId()));
-            }
+    private void sendBillingProfileRejectedNotification(BillingProfileVerificationUpdated event) {
+        final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
+                .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
+                        .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+
+        final BillingProfile billingProfile = billingProfileStoragePort.findById(event.getBillingProfileId())
+                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId().value())));
+
+        if (nonNull(owner.email())) {
+            notificationPort.push(owner.userId().value(), BillingProfileVerificationRejected.builder()
+                    .billingProfileId(event.getBillingProfileId())
+                    .billingProfileName(billingProfile.name())
+                    .rejectionReason(event.getReviewMessageForApplicant())
+                    .build());
+        } else {
+            LOGGER.warn("Unable to send billing profile verification rejected mail to user %s".formatted(event.getUserId()));
+        }
+    }
+
+    private void sendBillingProfileVerificationClosedNotification(BillingProfileVerificationUpdated event) {
+        final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
+                .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
+                        .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+
+        final BillingProfile billingProfile = billingProfileStoragePort.findById(event.getBillingProfileId())
+                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId().value())));
+
+        if (nonNull(owner.email())) {
+            notificationPort.push(owner.userId().value(), BillingProfileVerificationClosed.builder()
+                    .billingProfileId(event.getBillingProfileId())
+                    .billingProfileName(billingProfile.name())
+                    .build());
+        } else {
+            LOGGER.warn("Unable to send billing profile verification closed mail to user %s".formatted(event.getUserId()));
         }
     }
 
