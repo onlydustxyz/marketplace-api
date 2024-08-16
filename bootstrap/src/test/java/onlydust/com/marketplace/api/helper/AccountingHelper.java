@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
-import jakarta.persistence.EntityManagerFactory;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.*;
@@ -36,8 +35,6 @@ public class AccountingHelper {
     protected static final Faker faker = new Faker();
 
     @Autowired
-    EntityManagerFactory entityManagerFactory;
-    @Autowired
     RewardRepository rewardRepository;
     @Autowired
     RewardStatusRepository rewardStatusRepository;
@@ -45,8 +42,6 @@ public class AccountingHelper {
     InvoiceRewardRepository invoiceRewardRepository;
     @Autowired
     CurrencyRepository currencyRepository;
-    @Autowired
-    InvoiceRepository invoiceRepository;
     @Autowired
     BillingProfileRepository billingProfileRepository;
     @Autowired
