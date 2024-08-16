@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.infura.adapters;
 
 import com.swmansion.starknet.data.types.Felt;
-import com.swmansion.starknet.data.types.StarknetChainId;
 import com.swmansion.starknet.data.types.transactions.ProcessedInvokeTransactionReceipt;
 import com.swmansion.starknet.provider.Provider;
 import com.swmansion.starknet.provider.rpc.JsonRpcProvider;
@@ -18,7 +17,7 @@ public class StarknetInfuraTransactionStorageAdapter implements BlockchainTransa
     Provider provider;
 
     public StarknetInfuraTransactionStorageAdapter(final InfuraClient.Properties properties) {
-        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()), StarknetChainId.MAINNET);
+        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()));
     }
 
     @Override

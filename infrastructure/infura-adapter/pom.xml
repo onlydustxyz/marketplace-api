@@ -17,7 +17,6 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <web3j.version>4.10.3</web3j.version>
-        <starknet.version>0.8.2</starknet.version>
     </properties>
 
     <dependencies>
@@ -39,7 +38,7 @@
         <dependency>
             <groupId>com.swmansion.starknet</groupId>
             <artifactId>starknet</artifactId>
-            <version>${starknet.version}</version>
+            <version>0.10.1</version>
         </dependency>
     </dependencies>
 

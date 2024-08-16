@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.infura.adapters;
 
 import com.swmansion.starknet.data.types.Call;
 import com.swmansion.starknet.data.types.Felt;
-import com.swmansion.starknet.data.types.StarknetChainId;
 import com.swmansion.starknet.data.types.Uint256;
 import com.swmansion.starknet.provider.Provider;
 import com.swmansion.starknet.provider.rpc.JsonRpcProvider;
@@ -25,7 +24,7 @@ public class StarknetInfuraERC20ProviderAdapter implements ERC20Provider {
     Blockchain blockchain;
 
     public StarknetInfuraERC20ProviderAdapter(final InfuraClient.Properties properties) {
-        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()), StarknetChainId.MAINNET);
+        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()));
         blockchain = properties.getBlockchain();
         assert blockchain == Blockchain.STARKNET;
     }
