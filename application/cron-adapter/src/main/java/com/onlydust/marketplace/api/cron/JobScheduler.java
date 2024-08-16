@@ -3,6 +3,7 @@ package com.onlydust.marketplace.api.cron;
 import com.onlydust.marketplace.api.cron.properties.NodeGuardiansBoostProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
@@ -35,6 +36,7 @@ public class JobScheduler {
     private final OutboxConsumerJob nodeGuardiansOutboxJob;
     private final LanguageFacadePort languageFacadePort;
     private final ApplicationsCleaner applicationsCleaner;
+    private final BillingProfileFacadePort billingProfileFacadePort;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -126,4 +128,11 @@ public class JobScheduler {
         LOGGER.info("Cleanup obsolete applications");
         applicationsCleaner.cleanUp();
     }
+
+    @Scheduled(cron = "${application.cron.remind-users-to-complete-their-billing-profiles-cron-expression}")
+    public void remindUsersToCompleteTheirBillingProfiles() {
+        LOGGER.info("Reminding users to complete their billing profiles");
+        billingProfileFacadePort.remindUsersToCompleteTheirBillingProfiles();
+    }
+
 }

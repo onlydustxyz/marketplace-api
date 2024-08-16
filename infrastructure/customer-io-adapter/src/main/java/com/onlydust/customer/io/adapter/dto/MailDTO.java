@@ -129,6 +129,18 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
         );
     }
 
+    public static MailDTO<CompleteYourBillingProfileDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                              @NonNull SendableNotification notification,
+                                                              @NonNull CompleteYourBillingProfile completeYourBillingProfile) {
+        return new MailDTO<>(customerIOProperties.getCompleteYourBillingProfileEmailId().toString(),
+                mapIdentifiers(notification.recipient().email(), notification.recipientId()),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
+                "Complete your billing profile",
+                CompleteYourBillingProfileDTO.from(completeYourBillingProfile, notification.recipient().login(), customerIOProperties.getEnvironment())
+        );
+    }
+
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {
         return new IdentifiersDTO(isNull(id) ? null : id.toString(), isNull(id) ? email : null);
     }

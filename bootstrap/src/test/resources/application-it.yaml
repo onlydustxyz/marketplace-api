@@ -69,6 +69,7 @@ infrastructure:
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: 27
     kyc-individual-verification-email-id: 30
+    complete-your-billing-profile-email-id: 40
 application:
   web:
     machine-to-machine:

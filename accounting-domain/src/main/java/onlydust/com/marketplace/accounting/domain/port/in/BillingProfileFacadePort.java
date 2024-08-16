@@ -62,4 +62,6 @@ public interface BillingProfileFacadePort {
 
     // TODO: move to read-api
     List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId);
+
+    void remindUsersToCompleteTheirBillingProfiles();
 }

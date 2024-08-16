@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
 
 public interface BillingProfileRepository extends JpaRepository<BillingProfileEntity, UUID> {
@@ -42,4 +44,12 @@ public interface BillingProfileRepository extends JpaRepository<BillingProfileEn
             )
             """, nativeQuery = true)
     boolean individualBillingProfileExistsByUserId(UUID userId);
+
+    @Query(value = """
+            select distinct bpe
+            from BillingProfileEntity bpe
+            join fetch bpe.users
+            where date_trunc('day', cast(bpe.createdAt as timestamp)) = date_trunc('day', cast(:creationDate as timestamp ))
+            """)
+    List<BillingProfileEntity> findAllByCreationDate(ZonedDateTime creationDate);
 }
