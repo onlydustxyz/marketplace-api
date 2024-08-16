@@ -140,8 +140,10 @@ public class BillingProfileVerificationService implements BillingProfileVerifica
                 billingProfileVerificationProviderPort.getExternalVerificationLink(childrenBillingProfileUpdated.getExternalUserId())
                         .orElseThrow(() -> new OutboxSkippingException("External verification link not found for external user id %s"
                                 .formatted(childrenBillingProfileUpdated.getExternalUserId())));
+        final BillingProfile billingProfile = billingProfileStoragePort.findById(parentKyb.getBillingProfileId())
+                .orElseThrow(() -> new OutboxSkippingException(("Billing profile not found for id %s").formatted(parentKyb.getBillingProfileId())));
         billingProfileObserver.onBillingProfileExternalVerificationRequested(
-                new BillingProfileChildrenKycVerification(parentKyb.getBillingProfileId(), parentKyb.getName(),
+                new BillingProfileChildrenKycVerification(parentKyb.getBillingProfileId(), billingProfile.name(),
                         individualKycIdentity, externalVerificationLink));
     }
 }
