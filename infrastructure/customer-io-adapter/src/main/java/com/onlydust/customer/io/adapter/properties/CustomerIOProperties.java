@@ -35,4 +35,6 @@ public class CustomerIOProperties {
     String environment;
     @NonNull
     Integer kycIndividualVerificationEmailId;
+    @NonNull
+    Integer completeYourBillingProfileEmailId;
 }

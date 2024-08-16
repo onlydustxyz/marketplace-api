@@ -12,7 +12,6 @@ import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVer
 import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
 import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
-import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
@@ -349,7 +348,7 @@ public class AccountingNotifierTest {
         void should_send_email_to_external_user() {
             // Given
             final BillingProfileChildrenKycVerification billingProfileChildrenKycVerification =
-                    new BillingProfileChildrenKycVerification(new NotificationBillingProfile(UUID.randomUUID(), faker.name().name()),
+                    new BillingProfileChildrenKycVerification(BillingProfile.Id.of(UUID.randomUUID()), faker.name().name(),
                             new IndividualKycIdentity(faker.internet().emailAddress(), faker.name().firstName(), faker.name().lastName()),
                             faker.internet().url());
 

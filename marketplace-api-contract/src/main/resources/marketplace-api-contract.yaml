@@ -9548,6 +9548,8 @@ components:
               $ref: '#/components/schemas/NotificationContributorProjectApplicationAccepted'
             globalBillingProfileVerificationFailed:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationFailed'
+            globalBillingProfileReminder:
+              $ref: '#/components/schemas/NotificationGlobalBillingProfileReminder'
 
     NotificationCountResponse:
       type: object
@@ -9574,6 +9576,7 @@ components:
         - CONTRIBUTOR_REWARDS_PAID
         - CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED
         - GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED
+        - GLOBAL_BILLING_PROFILE_REMINDER
 
     NotificationMaintainerApplicationToReview:
       type: object
@@ -9710,3 +9713,17 @@ components:
       type: string
       description: Stellar account public key, base-32 encoded
       example: GBAIA5U6E3FSRUW55AXACIVGX2QR5JYAS74OWLED3S22EGXVYEHPLGPA
+
+    NotificationGlobalBillingProfileReminder:
+      type: object
+      required:
+        - billingProfileId
+        - billingProfileName
+        - verificationStatus
+      properties:
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+        billingProfileName:
+          type: string
+        verificationStatus:
+          $ref: '#/components/schemas/VerificationStatus'

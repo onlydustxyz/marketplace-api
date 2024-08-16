@@ -6,6 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
+import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
@@ -15,6 +17,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
@@ -22,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -37,6 +41,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private final @NonNull AccountingObserverPort accountingObserverPort;
     private final @NonNull AccountingFacadePort accountingFacadePort;
     private final @NonNull PayoutInfoValidator payoutInfoValidator;
+    private final @NonNull NotificationPort notificationPort;
 
 
     @Override
@@ -373,5 +378,38 @@ public class BillingProfileService implements BillingProfileFacadePort {
                         .formatted(userId.value(), billingProfileId.value())));
 
         return billingProfileStoragePort.findInvoiceableRewardsForBillingProfile(billingProfileId);
+    }
+
+    @Override
+    public void remindUsersToCompleteTheirBillingProfiles() {
+        Stream.of(ZonedDateTime.now().minusDays(1), ZonedDateTime.now().minusDays(7))
+                .map(creationDate -> billingProfileStoragePort.findAllByCreationDate(creationDate)
+                        .stream()
+                        .filter(billingProfile -> List.of(VerificationStatus.STARTED, VerificationStatus.NOT_STARTED, VerificationStatus.REJECTED)
+                                .contains(billingProfile.status()))
+                        .toList())
+                .forEach(this::notifyBillingProfileAdminsToCompleteTheirBillingProfiles);
+    }
+
+    private void notifyBillingProfileAdminsToCompleteTheirBillingProfiles(List<BillingProfile> billingProfilesToRemind) {
+        for (BillingProfile billingProfile : billingProfilesToRemind) {
+            if (billingProfile instanceof IndividualBillingProfile individualBillingProfile) {
+                notificationPort.push(individualBillingProfile.owner().id().value(),
+                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                                billingProfile.status())));
+            }
+            if (billingProfile instanceof CompanyBillingProfile companyBillingProfile) {
+                companyBillingProfile.members().stream()
+                        .filter(user -> user.role().equals(BillingProfile.User.Role.ADMIN))
+                        .forEach(user -> notificationPort.push(user.id().value(),
+                                new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                                        billingProfile.status()))));
+            }
+            if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile) {
+                notificationPort.push(selfEmployedBillingProfile.owner().id().value(),
+                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                                billingProfile.status())));
+            }
+        }
     }
 }

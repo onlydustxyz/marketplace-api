@@ -2,12 +2,13 @@ package onlydust.com.marketplace.api.it.api;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
 import net.minidev.json.JSONArray;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.IndividualBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.SelfEmployedBillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
@@ -31,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @TagAccounting
@@ -713,5 +714,289 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 // Then
                 .expectStatus()
                 .is2xxSuccessful();
+    }
+
+    @Autowired
+    CustomerIOProperties customerIOProperties;
+
+    @Test
+    void should_send_notifications_to_billing_profile_admins_to_remind_them_to_complete_their_billing_profiles() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser authenticatedUser1 = userAuthHelper.create();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser2 = userAuthHelper.create();
+        final IndividualBillingProfile individual1 = billingProfileService.createIndividualBillingProfile(UserId.of(authenticatedUser1.user().getId()),
+                "individual-bp-to-remind-1", Set.of());
+        final IndividualBillingProfile individual2 = billingProfileService.createIndividualBillingProfile(UserId.of(authenticatedUser2.user().getId()),
+                "individual-bp-to-remind-2", Set.of());
+        final CompanyBillingProfile companyBillingProfile1 = billingProfileService.createCompanyBillingProfile(UserId.of(authenticatedUser1.user().getId()),
+                "company-bp-to-remind-1", Set.of());
+        billingProfileService.inviteCoworker(companyBillingProfile1.id(), UserId.of(authenticatedUser1.user().getId()),
+                GithubUserId.of(authenticatedUser2.user().getGithubUserId()), BillingProfile.User.Role.ADMIN);
+        billingProfileService.acceptCoworkerInvitation(companyBillingProfile1.id(), GithubUserId.of(authenticatedUser2.user().getGithubUserId()));
+        updateBillingProfileCreationDate(individual1.id(), ZonedDateTime.now().minusDays(1));
+        updateBillingProfileCreationDate(companyBillingProfile1.id(), ZonedDateTime.now().minusDays(1));
+
+
+        // When
+        billingProfileService.remindUsersToCompleteTheirBillingProfiles();
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageSize", "10", "pageIndex", "0")))
+                .header("Authorization", "Bearer " + authenticatedUser1.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null,
+                                "globalBillingProfileReminder": {
+                                  "billingProfileName": "individual-bp-to-remind-1",
+                                  "verificationStatus": "NOT_STARTED"
+                                }
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null,
+                                "globalBillingProfileReminder": {
+                                  "billingProfileName": "company-bp-to-remind-1",
+                                  "verificationStatus": "NOT_STARTED"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                        """)
+                .jsonPath("$.notifications[0].data.globalBillingProfileReminder.billingProfileId").isNotEmpty()
+                .jsonPath("$.notifications[1].data.globalBillingProfileReminder.billingProfileId").isNotEmpty();
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getCompleteYourBillingProfileEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(authenticatedUser1.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(authenticatedUser1.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Complete your billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Resume my billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-app.onlydust.com/settings/billing/%s/general-information".formatted(individual1.id().value()))))
+                        .withRequestBody(matchingJsonPath("$.message_data.description",
+                                equalTo("You have started the creation of a billing profile individual-bp-to-remind-1, but we need additional information to " +
+                                        "validate it.")))
+
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser1.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
+        );
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getCompleteYourBillingProfileEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(authenticatedUser1.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(authenticatedUser1.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Complete your billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Resume my billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-app.onlydust.com/settings/billing/%s/general-information".formatted(companyBillingProfile1.id().value()))))
+                        .withRequestBody(matchingJsonPath("$.message_data.description",
+                                equalTo("You have started the creation of a billing profile company-bp-to-remind-1, but we need additional information to " +
+                                        "validate it.")))
+
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser1.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
+        );
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getCompleteYourBillingProfileEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(authenticatedUser2.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(authenticatedUser2.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Complete your billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Resume my billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-app.onlydust.com/settings/billing/%s/general-information".formatted(companyBillingProfile1.id().value()))))
+                        .withRequestBody(matchingJsonPath("$.message_data.description",
+                                equalTo("You have started the creation of a billing profile company-bp-to-remind-1, but we need additional information to " +
+                                        "validate it.")))
+
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser2.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
+        );
+
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageSize", "10", "pageIndex", "0")))
+                .header("Authorization", "Bearer " + authenticatedUser2.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 1,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null,
+                                "globalBillingProfileReminder": {
+                                  "billingProfileName": "company-bp-to-remind-1",
+                                  "verificationStatus": "NOT_STARTED"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                        """);
+
+        updateBillingProfileCreationDate(individual2.id(), ZonedDateTime.now().minusDays(7));
+        updateBillingProfileCreationDate(companyBillingProfile1.id(), ZonedDateTime.now().minusDays(2));
+        billingProfileService.remindUsersToCompleteTheirBillingProfiles();
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageSize", "10", "pageIndex", "0")))
+                .header("Authorization", "Bearer " + authenticatedUser2.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null,
+                                "globalBillingProfileReminder": {
+                                  "billingProfileName": "individual-bp-to-remind-2",
+                                  "verificationStatus": "NOT_STARTED"
+                                }
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "globalBillingProfileVerificationFailed": null,
+                                "globalBillingProfileReminder": {
+                                  "billingProfileName": "company-bp-to-remind-1",
+                                  "verificationStatus": "NOT_STARTED"
+                                }
+                              }
+                            }
+                          ]
+                        }
+                        """);
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getCompleteYourBillingProfileEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(authenticatedUser2.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(authenticatedUser2.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Complete your billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Resume my billing profile")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-app.onlydust.com/settings/billing/%s/general-information".formatted(individual2.id().value()))))
+                        .withRequestBody(matchingJsonPath("$.message_data.description",
+                                equalTo("You have started the creation of a billing profile individual-bp-to-remind-2, but we need additional information to " +
+                                        "validate it.")))
+
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser2.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
+        );
+    }
+
+
+    @Autowired
+    EntityManagerFactory entityManagerFactory;
+
+    private void updateBillingProfileCreationDate(final BillingProfile.Id billingProfileId, final ZonedDateTime creationDate) {
+        final EntityManager em = entityManagerFactory.createEntityManager();
+        em.getTransaction().begin();
+        em.createNativeQuery("update accounting.billing_profiles set tech_created_at = :creationDate where id = :billingProfileId")
+                .setParameter("creationDate", creationDate)
+                .setParameter("billingProfileId", billingProfileId.value())
+                .executeUpdate();
+        em.flush();
+        em.getTransaction().commit();
+        em.close();
     }
 }
