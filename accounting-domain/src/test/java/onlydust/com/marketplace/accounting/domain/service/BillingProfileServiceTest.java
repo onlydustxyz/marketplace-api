@@ -8,6 +8,8 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
+import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
@@ -22,6 +24,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocat
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -42,8 +45,7 @@ import static onlydust.com.marketplace.accounting.domain.stubs.BillingProfileHel
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BillingProfileServiceTest {
@@ -56,8 +58,9 @@ class BillingProfileServiceTest {
     final AccountingObserverPort accountingObserverPort = mock(AccountingObserverPort.class);
     final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
     final PayoutInfoValidator payoutInfoValidator = mock(PayoutInfoValidator.class);
+    final NotificationPort notificationPort = mock(NotificationPort.class);
     final BillingProfileService billingProfileService = new BillingProfileService(invoiceStoragePort, billingProfileStoragePort, pdfStoragePort,
-            billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator);
+            billingProfileObserver, indexerPort, accountingObserverPort, accountingFacadePort, payoutInfoValidator, notificationPort);
     UserId userId = UserId.random();
     final Currency ETH = Currencies.ETH;
     final Currency USD = Currencies.USD;
@@ -1875,5 +1878,76 @@ class BillingProfileServiceTest {
 
         // Then
         verify(billingProfileStoragePort).findInvoiceableRewardsForBillingProfile(billingProfileId);
+    }
+
+    @Test
+    void should_remind_billing_profile_admins_to_complete_their_billing_profiles() {
+        // Given
+        final BillingProfile.User bpCompanyAdmin1 = new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now());
+        final BillingProfile.User bpCompanyAdmin2 = new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now());
+        final BillingProfile.User bpCompanyMember1 = new BillingProfile.User(UserId.random(), BillingProfile.User.Role.MEMBER, ZonedDateTime.now());
+        final BillingProfile.Id companyId1 = BillingProfile.Id.random();
+        final CompanyBillingProfile company1 = CompanyBillingProfile.builder()
+                .name(faker.rickAndMorty().character())
+                .status(VerificationStatus.STARTED)
+                .members(Set.of(bpCompanyAdmin1, bpCompanyAdmin2, bpCompanyMember1))
+                .id(companyId1)
+                .enabled(true)
+                .kyb(Kyb.builder().ownerId(bpCompanyAdmin1.id()).id(UUID.randomUUID()).billingProfileId(companyId1).status(VerificationStatus.STARTED).build())
+                .build();
+        final BillingProfile.Id companyId2 = BillingProfile.Id.random();
+        final CompanyBillingProfile company2 = CompanyBillingProfile.builder()
+                .name(faker.rickAndMorty().character())
+                .status(VerificationStatus.UNDER_REVIEW)
+                .members(Set.of(bpCompanyAdmin2))
+                .id(companyId1)
+                .enabled(true)
+                .kyb(Kyb.builder().ownerId(bpCompanyAdmin2.id()).id(UUID.randomUUID()).billingProfileId(companyId2).status(VerificationStatus.STARTED).build())
+                .build();
+        final BillingProfile.Id individualBpId = BillingProfile.Id.random();
+        final BillingProfile.User individualAdmin = new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now());
+        final IndividualBillingProfile individualBillingProfile = IndividualBillingProfile.builder()
+                .id(individualBpId)
+                .name(faker.rickAndMorty().character())
+                .status(VerificationStatus.REJECTED)
+                .kyc(Kyc.builder().status(VerificationStatus.REJECTED).ownerId(individualAdmin.id()).billingProfileId(individualBpId).id(UUID.randomUUID()).build())
+                .enabled(true)
+                .owner(individualAdmin)
+                .build();
+        final BillingProfile.Id selfEmployedBpId = BillingProfile.Id.random();
+        final BillingProfile.User selfEmployedAdmin = new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now());
+        final SelfEmployedBillingProfile selfEmployedBillingProfile = SelfEmployedBillingProfile.builder()
+                .owner(selfEmployedAdmin)
+                .status(VerificationStatus.NOT_STARTED)
+                .enabled(true)
+                .id(selfEmployedBpId)
+                .kyb(Kyb.builder().id(UUID.randomUUID()).status(VerificationStatus.NOT_STARTED).billingProfileId(selfEmployedBpId).ownerId(selfEmployedAdmin.id()).build())
+                .name(faker.name().username())
+                .build();
+
+        // When
+        when(billingProfileStoragePort.findAllByCreationDate(any()))
+                .thenReturn(List.of(company1, company2), List.of(individualBillingProfile, selfEmployedBillingProfile));
+
+        billingProfileService.remindUsersToCompleteTheirBillingProfiles();
+
+        // Then
+        final ArgumentCaptor<UUID> userIdCaptor = ArgumentCaptor.forClass(UUID.class);
+        final ArgumentCaptor<CompleteYourBillingProfile> completeYourBillingProfileCaptor = ArgumentCaptor.forClass(CompleteYourBillingProfile.class);
+        verify(notificationPort, times(4)).push(userIdCaptor.capture(), completeYourBillingProfileCaptor.capture());
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin1.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin2.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(individualAdmin.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(selfEmployedAdmin.id().value()));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company1.id().value(), company1.name(), company1.status()))));
+        assertFalse(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company2.id().value(), company2.name(), company2.status()))));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(individualBillingProfile.id().value(),
+                        individualBillingProfile.name(), individualBillingProfile.status()))));
+        assertTrue(completeYourBillingProfileCaptor.getAllValues()
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(selfEmployedBillingProfile.id().value(),
+                 selfEmployedBillingProfile.name(), selfEmployedBillingProfile.status()))));
     }
 }

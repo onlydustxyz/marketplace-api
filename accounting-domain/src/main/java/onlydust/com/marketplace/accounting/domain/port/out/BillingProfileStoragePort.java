@@ -90,4 +90,6 @@ public interface BillingProfileStoragePort {
     Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId);
 
     Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId);
+
+    List<BillingProfile> findAllByCreationDate(ZonedDateTime creationDate);
 }

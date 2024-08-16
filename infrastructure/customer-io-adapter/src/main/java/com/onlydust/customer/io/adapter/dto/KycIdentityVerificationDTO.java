@@ -13,7 +13,7 @@ public record KycIdentityVerificationDTO(@NonNull String username, @NonNull Stri
                 billingProfileChildrenKycVerification.individualKycIdentity().firstName() + " " +
                 billingProfileChildrenKycVerification.individualKycIdentity().lastName(),
                 "Company beneficiary",
-                DESCRIPTION.formatted(billingProfileChildrenKycVerification.billingProfile().billingProfileName()),
+                DESCRIPTION.formatted(billingProfileChildrenKycVerification.billingProfileName()),
                 new ButtonDTO("Proceed to verification", billingProfileChildrenKycVerification.externalLinkForVerification()),
                 true
         );

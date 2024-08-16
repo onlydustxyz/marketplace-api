@@ -322,12 +322,22 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<ShortContributorView> getBillingProfileOwnerById(UserId ownerId) {
         return userRepository.findById(ownerId.value()).map(UserEntity::toShortContributorView);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId) {
         return payoutInfoRepository.findById(billingProfileId.value()).map(PayoutInfoEntity::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BillingProfile> findAllByCreationDate(ZonedDateTime creationDate) {
+        return billingProfileRepository.findAllByCreationDate(creationDate).stream()
+                .map(BillingProfileEntity::toDomain)
+                .toList();
     }
 }

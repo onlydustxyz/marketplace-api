@@ -31,6 +31,7 @@ application:
     refresh-reward-usd-equivalents-job-delay: 7200000 # 2 hours
     refresh-user-ranks: 300000 # 5 minutes
     historize-user-ranks-cron-expression: "0 0 0 * * *" # every day at midnight
+    remind-users-to-complete-their-billing-profiles-cron-expression: "0 0 1 * * *" # every day at 1:00am
     process-boosted-rewards-cron-expression: ${NODE_GUARDIANS_PROCESS_BOOSTED_REWARDS_CRON_EXPRESSION}
     update-projects-languages: 300000 # 5 minutes
     cleanup-obsolete-applications: 86400000 # 1 day
@@ -184,6 +185,7 @@ infrastructure:
     project-application-accepted-email-id: ${CUSTOMER_IO_APPLICATION_ACCEPTED_EMAIL_ID}
     environment: ${ENV}
     kyc-individual-verification-email-id: ${CUSTOMER_IO_KYC_INDIVIDUAL_VERIFICATION_EMAIL_ID}
+    complete-your-billing-profile-email-id: ${CUSTOMER_IO_COMPLETE_YOUR_BILLING_PROFILE_EMAIL_ID}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
