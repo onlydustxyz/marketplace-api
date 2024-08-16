@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.it.api;
 
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +54,12 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.grant(programId, projectId, 3, BTC);
             rewardHelper.create(projectId, projectLead, recipientId, 1, BTC);
         });
+    }
+
+    @AfterAll
+    @SneakyThrows
+    static void restore() {
+        restoreIndexerDump();
     }
 
     @Test
