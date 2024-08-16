@@ -49,17 +49,19 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected, customerIOProperties.getEnvironment()));
     }
 
-    public static MailDTO<VerificationFailedDTO> from(
+    public static MailDTO<VerificationClosedDTO> from(
             @NonNull CustomerIOProperties customerIOProperties,
             @NonNull SendableNotification notification,
-            @NonNull BillingProfileVerificationFailed billingProfileVerificationFailed
+            @NonNull BillingProfileVerificationClosed billingProfileVerificationClosed
     ) {
-        return new MailDTO<>(customerIOProperties.getVerificationFailedEmailId().toString(),
+        final VerificationClosedDTO verificationClosedDTO = VerificationClosedDTO.fromEvent(notification.recipient().login(),
+                billingProfileVerificationClosed, customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getVerificationClosedEmailId().toString(),
                 new IdentifiersDTO(notification.recipientId().toString(), null),
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
-                "Your verification failed with status %s".formatted(billingProfileVerificationFailed.verificationStatus().name()),
-                VerificationFailedDTO.fromEvent(notification.recipient().login(), billingProfileVerificationFailed));
+                verificationClosedDTO.title(),
+                verificationClosedDTO);
     }
 
     public static MailDTO<RewardCreatedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
@@ -124,7 +126,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 mapIdentifiers(billingProfileChildrenKycVerification.individualKycIdentity().email(), null),
                 customerIOProperties.getOnlyDustAdminEmail(),
                 billingProfileChildrenKycVerification.individualKycIdentity().email(),
-                "Verified your identity to validate your company",
+                "Verify your identity to validate your company",
                 KycIdentityVerificationDTO.from(billingProfileChildrenKycVerification)
         );
     }
@@ -140,6 +142,21 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 CompleteYourBillingProfileDTO.from(completeYourBillingProfile, notification.recipient().login(), customerIOProperties.getEnvironment())
         );
     }
+
+
+    public static MailDTO<VerificationRejectedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                        @NonNull SendableNotification notification,
+                                                        @NonNull BillingProfileVerificationRejected billingProfileVerificationRejected) {
+        final VerificationRejectedDTO verificationRejectedDTO = VerificationRejectedDTO.fromEvent(notification.recipient().login(),
+                billingProfileVerificationRejected, customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getVerificationRejectedEmailId().toString(),
+                mapIdentifiers(notification.recipient().email(), notification.recipientId()),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notification.recipient().email(),
+                verificationRejectedDTO.title(),
+                verificationRejectedDTO);
+    }
+
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {
         return new IdentifiersDTO(isNull(id) ? null : id.toString(), isNull(id) ? email : null);

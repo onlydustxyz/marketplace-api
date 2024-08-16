@@ -2,7 +2,6 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.NotificationPageResponse;
@@ -84,13 +83,14 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "bbb", "bBb"))
                 .build());
-        notificationService.push(hayden.user().getId(), BillingProfileVerificationFailed.builder()
+        notificationService.push(hayden.user().getId(), BillingProfileVerificationClosed.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("a805e770-104b-4010-b849-cbf90b93ccf4")))
-                .verificationStatus(VerificationStatus.CLOSED)
+                .billingProfileName("bpHaydenClosed")
                 .build());
-        notificationService.push(pierre.user().getId(), BillingProfileVerificationFailed.builder()
+        notificationService.push(pierre.user().getId(), BillingProfileVerificationRejected.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("9222c39d-7c85-4cc4-8089-c1830bc457b0")))
-                .verificationStatus(VerificationStatus.CLOSED)
+                .billingProfileName("bpPierreRejected")
+                .rejectionReason("rejectionReason1")
                 .build());
 
 
@@ -112,7 +112,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                           "notifications": [
                             {
                               "status": "UNREAD",
-                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED",
+                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED",
                               "data": {
                                 "maintainerApplicationToReview": null,
                                 "maintainerCommitteeApplicationCreated": null,
@@ -121,10 +121,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": {
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": {
                                   "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
-                                  "billingProfileName": null,
-                                  "verificationStatus": "CLOSED"
+                                  "billingProfileName": "bpHaydenClosed"
                                 }
                               }
                             },
@@ -144,7 +145,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueId": 1,
                                   "issueName": "title1"
                                 },
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -161,7 +164,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "totalAmountDollarsEquivalent": 49.0
                                 },
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -182,7 +187,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -201,7 +208,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -219,7 +228,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -240,7 +251,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -257,7 +270,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             }
                           ]
@@ -282,7 +297,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                           "notifications": [
                             {
                               "status": "UNREAD",
-                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED",
+                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED",
                               "data": {
                                 "maintainerApplicationToReview": null,
                                 "maintainerCommitteeApplicationCreated": null,
@@ -291,10 +306,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": {
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": {
                                   "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
-                                  "billingProfileName": null,
-                                  "verificationStatus": "CLOSED"
+                                  "billingProfileName": "bpHaydenClosed"
                                 }
                               }
                             },
@@ -314,7 +330,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueId": 1,
                                   "issueName": "title1"
                                 },
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -331,7 +349,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "totalAmountDollarsEquivalent": 49.0
                                 },
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -352,7 +372,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -371,7 +393,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -389,7 +413,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -410,7 +436,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -427,7 +455,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             }
                           ]

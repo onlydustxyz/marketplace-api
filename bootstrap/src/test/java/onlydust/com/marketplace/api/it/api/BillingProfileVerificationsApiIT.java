@@ -204,7 +204,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .consumeWith(System.out::println)
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("CLOSED")
                 .jsonPath("$.kyc.address").isEqualTo("25 AVENUE SAINT LOUIS, ETAGE 2 APT, ST MAUR DES FOSSES, France, 94210")
@@ -219,19 +218,32 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.kyc.usCitizen").isEqualTo(false);
         Mockito.verify(slackApiAdapter, times(2)).onBillingProfileUpdated(Mockito.any());
 
+        Thread.sleep(1000L);
+
+        final String title = "Billing profile individual verification closed";
         customerIOWireMockServer.verify(1,
                 postRequestedFor(urlEqualTo("/send/email"))
                         .withHeader("Content-Type", equalTo("application/json"))
                         .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                         .withRequestBody(matchingJsonPath("$.transactional_message_id",
-                                equalTo(customerIOProperties.getVerificationFailedEmailId().toString())))
+                                equalTo(customerIOProperties.getVerificationClosedEmailId().toString())))
                         .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(userId.toString())))
-                        .withRequestBody(matchingJsonPath("$.message_data.status", equalTo("CLOSED")))
+                        .withRequestBody(matchingJsonPath("$.message_data.title",
+                                equalTo(title)))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We regret to inform you that we cannot proceed with your " +
+                                                                                                "verification request " +
+                                                                                                "on your billing profile individual, as it has failed." +
+                                                                                                " If you require further information or assistance, please " +
+                                                                                                "do" +
+                                                                                                " not hesitate to contact us.")))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(login)))
-                        .withRequestBody(matchingJsonPath("$.message_data.billingProfileId", equalTo(billingProfileId.toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Contact us")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link", equalTo("https://develop-app.onlydust.com/" + ("settings/billing/%s" +
+                                                                                                                                       "/general-information"
+                        ).formatted(billingProfileId))))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getEmail())))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
-                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Your verification failed with status CLOSED")))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo(title)))
         );
     }
 
@@ -242,7 +254,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
         final var avatarUrl = faker.internet().avatar();
-        final String jwt = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false).jwt();
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.signUpUser(githubUserId, login, avatarUrl, false);
+        final String jwt = authenticatedUser.jwt();
         final String applicantId = "kyb-" + faker.number().randomNumber();
 
         MutableObject<UUID> billingProfileId = new MutableObject<>();
@@ -471,6 +484,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                   "externalUserId": "beneficiary-random-92a161bd-56b9-4043-9c3c-9d24b94691c6",
                   "type": "applicantReviewed",
                     "reviewResult": {
+                      "moderationComment": "%s",
                       "reviewAnswer": "RED",
                       "rejectLabels": [
                         "BAD_PROOF_OF_ADDRESS"
@@ -488,7 +502,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                   "createdAtMs": "2024-02-19 13:13:19.411",
                   "sourceKey": "production",
                   "clientId": "onlydust"
-                }""", applicantId).getBytes(StandardCharsets.UTF_8);
+                }""", applicantId, reviewMessage).getBytes(StandardCharsets.UTF_8);
         final String sumsubDigestChildrenKycRejection = SumsubSignatureVerifier.hmac(sumsubPayloadChildrenKycRejection,
                 sumsubWebhookProperties.getSecret());
 
@@ -527,6 +541,82 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.id").isNotEmpty()
                 .jsonPath("$.status").isEqualTo("REJECTED");
         Mockito.verify(slackApiAdapter, times(6)).onBillingProfileUpdated(Mockito.any());
+
+        final byte[] sumsubPayloadKybRejection = String.format("""
+                {
+                  "applicantId": "%s",
+                  "inspectionId": "65d34febc2b0cd19e02aa972",
+                  "applicantType": "company",
+                  "applicantMemberOf": null,
+                  "correlationId": "6a444c189bf5b6252e5dc486220f7bd8",
+                  "levelName": "od-kyb-production",
+                  "sandboxMode": false,
+                  "externalUserId": "%s",
+                  "type": "applicantReviewed",
+                    "reviewResult": {
+                      "moderationComment": "%s",
+                      "reviewAnswer": "RED",
+                      "rejectLabels": [
+                        "BAD_PROOF_OF_ADDRESS"
+                      ],
+                      "reviewRejectType": "RETRY",
+                      "buttonIds": [
+                        "proofOfAddress_issueDate",
+                        "proofOfAddress_listOfDocs",
+                        "proofOfAddress",
+                        "proofOfAddress_fullAddress"
+                      ]
+                    },
+                  "reviewStatus": "completed",
+                  "createdAt": "2024-02-19 13:13:19+0000",
+                  "createdAtMs": "2024-02-19 13:13:19.411",
+                  "sourceKey": "production",
+                  "clientId": "onlydust"
+                }""", "65bcb9e271117f5b7d4ea23e", kybId, reviewMessage).getBytes(StandardCharsets.UTF_8);
+        final String sumsubDigestKybRejection = SumsubSignatureVerifier.hmac(sumsubPayloadKybRejection,
+                sumsubWebhookProperties.getSecret());
+
+        // When
+        client.post()
+                .uri(getApiURI("/api/v1/sumsub/webhook"))
+                .header(X_OD_API, sumsubWebhookProperties.getOdApiHeader())
+                .header(X_SUMSUB_PAYLOAD_DIGEST, sumsubDigestKybRejection)
+                .bodyValue(sumsubPayloadKybRejection)
+                .exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful();
+        billingProfileVerificationOutboxJob.run();
+
+        final String title = "Billing profile company verification rejected";
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getVerificationRejectedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(authenticatedUser.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title",
+                                equalTo(title)))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We regret to inform you that your billing named " +
+                                                                                                "<b>\"company\"</b> has been rejected." +
+                                                                                                " We require additional actions from you t for verification " +
+                                                                                                "in order to complete the verification:")))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(login)))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Resume verification")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link", equalTo("https://develop-app.onlydust.com/" + ("settings/billing/%s" +
+                                                                                                                                       "/general-information"
+                        ).formatted(billingProfileId))))
+                        .withRequestBody(matchingJsonPath("$.message_data.reason", equalTo("""
+                                Enter your date of birth exactly as it is on your identity document.
+                                
+                                 - Tax number is incorrect. Provide a correct tax number.
+                                 - SSN is incorrect. Provide a correct SSN.""")))
+                        .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo(title)))
+        );
     }
 
     @Test
@@ -979,7 +1069,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                                 """, true, false)))
                         .withRequestBody(matchingJsonPath("$.to", equalTo("test@onlydust.xyz")))
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
-                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Verified your identity to validate your company")))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Verify your identity to validate your company")))
         );
     }
 

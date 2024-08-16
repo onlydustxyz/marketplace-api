@@ -8,10 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationFailed;
-import onlydust.com.marketplace.accounting.domain.notification.InvoiceRejected;
-import onlydust.com.marketplace.accounting.domain.notification.RewardCanceled;
-import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
+import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
@@ -311,7 +308,7 @@ public class AccountingNotifierTest {
     @Nested
     class OnBillingProfileUpdated {
         @Test
-        void should_notify_billing_profile_verification_failed() {
+        void should_notify_billing_profile_verification_closed() {
             // Given
             final UUID kybId = UUID.randomUUID();
             final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
@@ -325,20 +322,73 @@ public class AccountingNotifierTest {
             final Kyc kyc =
                     Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
                             .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+            final String billingProfileName = faker.rickAndMorty().character();
 
             // When
             when(billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId()))
                     .thenReturn(Optional.of(shortContributorView));
             when(billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId()))
                     .thenReturn(Optional.of(kyc));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(IndividualBillingProfile.builder()
+                            .kyc(kyc)
+                            .name(billingProfileName)
+                            .id(billingProfileId)
+                            .enabled(true)
+                            .status(VerificationStatus.CLOSED)
+                            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                            .build()));
             accountingNotifier.onBillingProfileUpdated(billingProfileVerificationUpdated);
 
             // Then
-            verify(notificationPort).push(userId, BillingProfileVerificationFailed.builder()
+            verify(notificationPort).push(userId, BillingProfileVerificationClosed.builder()
                     .billingProfileId(billingProfileId)
-                    .verificationStatus(billingProfileVerificationUpdated.getVerificationStatus())
+                    .billingProfileName(billingProfileName)
                     .build());
         }
+
+        @Test
+        void should_notify_billing_profile_verification_rejected() {
+            // Given
+            final UUID kybId = UUID.randomUUID();
+            final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+            final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
+                    VerificationType.KYC, VerificationStatus.REJECTED, faker.lorem().sentence(), UserId.random(), null, faker.rickAndMorty().character(), null,
+                    faker.rickAndMorty().location());
+            final UUID userId = UUID.randomUUID();
+            final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
+                    faker.rickAndMorty().character(), faker.gameOfThrones().character(),
+                    UserId.of(userId), faker.internet().emailAddress());
+            final Kyc kyc =
+                    Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
+                            .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
+            final String billingProfileName = faker.rickAndMorty().character();
+
+            // When
+            when(billingProfileStoragePort.getBillingProfileOwnerById(billingProfileVerificationUpdated.getUserId()))
+                    .thenReturn(Optional.of(shortContributorView));
+            when(billingProfileStoragePort.findKycById(billingProfileVerificationUpdated.getVerificationId()))
+                    .thenReturn(Optional.of(kyc));
+            when(billingProfileStoragePort.findById(billingProfileId))
+                    .thenReturn(Optional.of(IndividualBillingProfile.builder()
+                            .kyc(kyc)
+                            .name(billingProfileName)
+                            .id(billingProfileId)
+                            .enabled(true)
+                            .status(VerificationStatus.REJECTED)
+                            .owner(new BillingProfile.User(UserId.random(), BillingProfile.User.Role.ADMIN, ZonedDateTime.now()))
+                            .build()));
+            accountingNotifier.onBillingProfileUpdated(billingProfileVerificationUpdated);
+
+            // Then
+            verify(notificationPort).push(userId, BillingProfileVerificationRejected.builder()
+                    .billingProfileId(billingProfileId)
+                    .billingProfileName(billingProfileName)
+                    .rejectionReason(billingProfileVerificationUpdated.getReviewMessageForApplicant())
+                    .build());
+        }
+
+
     }
 
     @Nested
