@@ -765,11 +765,11 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null,
                                 "globalBillingProfileReminder": {
-                                  "billingProfileName": "individual-bp-to-remind-1",
-                                  "verificationStatus": "NOT_STARTED"
-                                }
+                                  "billingProfileName": "company-bp-to-remind-1"
+                                },
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             },
                             {
@@ -783,11 +783,11 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null,
                                 "globalBillingProfileReminder": {
-                                  "billingProfileName": "company-bp-to-remind-1",
-                                  "verificationStatus": "NOT_STARTED"
-                                }
+                                  "billingProfileName": "individual-bp-to-remind-1"
+                                },
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
                               }
                             }
                           ]
@@ -874,31 +874,31 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 1,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "notifications": [
-                            {
-                              "status": "UNREAD",
-                              "type": "GLOBAL_BILLING_PROFILE_REMINDER",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null,
-                                "globalBillingProfileReminder": {
-                                  "billingProfileName": "company-bp-to-remind-1",
-                                  "verificationStatus": "NOT_STARTED"
-                                }
-                              }
-                            }
-                          ]
-                        }
+                           "totalPageNumber": 1,
+                           "totalItemNumber": 1,
+                           "hasMore": false,
+                           "nextPageIndex": 0,
+                           "notifications": [
+                             {
+                               "status": "UNREAD",
+                               "type": "GLOBAL_BILLING_PROFILE_REMINDER",
+                               "data": {
+                                 "maintainerApplicationToReview": null,
+                                 "maintainerCommitteeApplicationCreated": null,
+                                 "contributorInvoiceRejected": null,
+                                 "contributorRewardCanceled": null,
+                                 "contributorRewardReceived": null,
+                                 "contributorRewardsPaid": null,
+                                 "contributorProjectApplicationAccepted": null,
+                                 "globalBillingProfileReminder": {
+                                   "billingProfileName": "company-bp-to-remind-1"
+                                 },
+                                 "globalBillingProfileVerificationRejected": null,
+                                 "globalBillingProfileVerificationClosed": null
+                               }
+                             }
+                           ]
+                         }
                         """);
 
         updateBillingProfileCreationDate(individual2.id(), ZonedDateTime.now().minusDays(7));
@@ -932,10 +932,10 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null,
+                                 "globalBillingProfileVerificationRejected": null,
+                                 "globalBillingProfileVerificationClosed": null,
                                 "globalBillingProfileReminder": {
-                                  "billingProfileName": "individual-bp-to-remind-2",
-                                  "verificationStatus": "NOT_STARTED"
+                                  "billingProfileName": "individual-bp-to-remind-2"
                                 }
                               }
                             },
@@ -950,10 +950,10 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardReceived": null,
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
-                                "globalBillingProfileVerificationFailed": null,
+                                 "globalBillingProfileVerificationRejected": null,
+                                 "globalBillingProfileVerificationClosed": null,
                                 "globalBillingProfileReminder": {
-                                  "billingProfileName": "company-bp-to-remind-1",
-                                  "verificationStatus": "NOT_STARTED"
+                                  "billingProfileName": "company-bp-to-remind-1"
                                 }
                               }
                             }

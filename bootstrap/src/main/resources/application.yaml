@@ -182,7 +182,8 @@ infrastructure:
     reward-canceled-email-id: ${CUSTOMER_IO_REWARD_CANCELED_EMAIL_ID}
     new-reward-received-email-id: ${CUSTOMER_IO_REWARD_RECEIVED_EMAIL_ID}
     invoice-rejected-email-id: ${CUSTOMER_IO_INVOICE_REJECTED_EMAIL_ID}
-    verification-failed-email-id: 15
+    verification-closed-email-id: ${CUSTOMER_IO_VERIFICATION_CLOSED_EMAIL_ID}
+    verification-rejected-email-id: ${CUSTOMER_IO_VERIFICATION_REJECTED_EMAIL_ID}
     new-committee-application-email-id: ${CUSTOMER_IO_COMMITTEE_APPLICATION_EMAIL_ID}
     project-applications-to-review-by-user-email-id: 16
     project-application-accepted-email-id: ${CUSTOMER_IO_APPLICATION_ACCEPTED_EMAIL_ID}

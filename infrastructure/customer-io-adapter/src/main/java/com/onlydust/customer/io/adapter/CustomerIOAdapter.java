@@ -26,8 +26,8 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
     @Override
     @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
     public void send(SendableNotification notification) {
-        if (notification.data() instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
-            sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationFailed));
+        if (notification.data() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationClosed));
         } else if (notification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
             sendEmail(MailDTO.from(customerIOProperties, notification, committeeApplicationCreated));
         } else if (notification.data() instanceof RewardReceived rewardReceived) {
@@ -42,6 +42,10 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
             sendEmail(MailDTO.from(customerIOProperties, notification, applicationAccepted));
         } else if (notification.data() instanceof CompleteYourBillingProfile completeYourBillingProfile) {
             sendEmail(MailDTO.from(customerIOProperties, notification, completeYourBillingProfile));
+        } else if (notification.data() instanceof BillingProfileVerificationRejected billingProfileVerificationRejected) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationRejected));
+        } else if (notification.data() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationClosed));
         }
     }
 

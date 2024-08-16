@@ -9546,10 +9546,12 @@ components:
               $ref: '#/components/schemas/NotificationContributorRewardsPaid'
             contributorProjectApplicationAccepted:
               $ref: '#/components/schemas/NotificationContributorProjectApplicationAccepted'
-            globalBillingProfileVerificationFailed:
-              $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationFailed'
             globalBillingProfileReminder:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileReminder'
+            globalBillingProfileVerificationRejected:
+              $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationRejected'
+            globalBillingProfileVerificationClosed:
+              $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationClosed'
 
     NotificationCountResponse:
       type: object
@@ -9575,8 +9577,9 @@ components:
         - CONTRIBUTOR_REWARD_RECEIVED
         - CONTRIBUTOR_REWARDS_PAID
         - CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED
-        - GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED
         - GLOBAL_BILLING_PROFILE_REMINDER
+        - GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED
+        - GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED
 
     NotificationMaintainerApplicationToReview:
       type: object
@@ -9695,20 +9698,6 @@ components:
         issueName:
           type: string
 
-    NotificationGlobalBillingProfileVerificationFailed:
-      type: object
-      required:
-        - billingProfileId
-        - billingProfileName
-        - verificationStatus
-      properties:
-        billingProfileId:
-          $ref: '#/components/schemas/BillingProfileId'
-        billingProfileName:
-          type: string
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
-
     StellarAccountId:
       type: string
       description: Stellar account public key, base-32 encoded
@@ -9719,11 +9708,33 @@ components:
       required:
         - billingProfileId
         - billingProfileName
-        - verificationStatus
       properties:
         billingProfileId:
           $ref: '#/components/schemas/BillingProfileId'
         billingProfileName:
           type: string
-        verificationStatus:
-          $ref: '#/components/schemas/VerificationStatus'
+
+    NotificationGlobalBillingProfileVerificationRejected:
+      type: object
+      required:
+        - billingProfileId
+        - billingProfileName
+        - reason
+      properties:
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+        billingProfileName:
+          type: string
+        reason:
+          type: string
+
+    NotificationGlobalBillingProfileVerificationClosed:
+      type: object
+      required:
+        - billingProfileId
+        - billingProfileName
+      properties:
+        billingProfileId:
+          $ref: '#/components/schemas/BillingProfileId'
+        billingProfileName:
+          type: string
