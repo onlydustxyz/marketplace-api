@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -535,6 +536,13 @@ public class BillingProfileVerificationServiceTest {
             final IndividualKycIdentity individualKycIdentity = new IndividualKycIdentity(faker.internet().emailAddress(), faker.name().firstName(),
                     faker.name().lastName());
             final String externalVerificationLink = faker.internet().url();
+            final CompanyBillingProfile companyBillingProfile = CompanyBillingProfile.builder()
+                    .kyb(initialKyb)
+                    .name(faker.rickAndMorty().character())
+                    .id(BillingProfile.Id.random())
+                    .status(VerificationStatus.UNDER_REVIEW)
+                    .enabled(true)
+                    .members(Set.of()).build();
 
             // When
             when(eventBillingProfileVerificationUpdatedFunction.apply(event))
@@ -545,6 +553,8 @@ public class BillingProfileVerificationServiceTest {
                     .thenReturn(Optional.of(individualKycIdentity));
             when(billingProfileVerificationProviderPort.getExternalVerificationLink(billingProfileVerificationUpdated.getExternalUserId()))
                     .thenReturn(Optional.of(externalVerificationLink));
+            when(billingProfileStoragePort.findById(initialKyb.getBillingProfileId()))
+                    .thenReturn(Optional.of(companyBillingProfile));
             billingProfileVerificationService.process(event);
 
             // Then
@@ -552,8 +562,7 @@ public class BillingProfileVerificationServiceTest {
                     ArgumentCaptor.forClass(BillingProfileChildrenKycVerification.class);
             verify(billingProfileObserver).onBillingProfileExternalVerificationRequested(billingProfileChildrenKycVerificationArgumentCaptor.capture());
             assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().individualKycIdentity(), individualKycIdentity);
-            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().billingProfileName(),
-                    initialKyb.getName());
+            assertEquals(billingProfileChildrenKycVerificationArgumentCaptor.getValue().billingProfileName(), companyBillingProfile.name());
         }
 
     }
