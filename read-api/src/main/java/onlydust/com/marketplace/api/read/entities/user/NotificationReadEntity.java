@@ -137,19 +137,24 @@ public class NotificationReadEntity {
                     applicationAccepted.getIssue().id(),
                     applicationAccepted.getIssue().title()
             ));
-        } else if (data.notification() instanceof BillingProfileVerificationFailed billingProfileVerificationFailed) {
-            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_FAILED;
-            notificationPageItemResponseData.setGlobalBillingProfileVerificationFailed(new NotificationGlobalBillingProfileVerificationFailed(
-                    billingProfileVerificationFailed.billingProfileId().value(),
-                    null,
-                    getVerificationStatus(billingProfileVerificationFailed.verificationStatus())
-            ));
+        } else if (data.notification() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
+            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED;
+            notificationPageItemResponseData.setGlobalBillingProfileVerificationClosed(new NotificationGlobalBillingProfileVerificationClosed(
+                    billingProfileVerificationClosed.billingProfileId().value(),
+                    billingProfileVerificationClosed.billingProfileName())
+            );
+        } else if (data.notification() instanceof BillingProfileVerificationRejected billingProfileVerificationRejected) {
+            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED;
+            notificationPageItemResponseData.setGlobalBillingProfileVerificationRejected(new NotificationGlobalBillingProfileVerificationRejected(
+                    billingProfileVerificationRejected.billingProfileId().value(),
+                    billingProfileVerificationRejected.billingProfileName(),
+                    billingProfileVerificationRejected.rejectionReason())
+            );
         } else if (data.notification() instanceof CompleteYourBillingProfile completeYourBillingProfile) {
             notificationType = NotificationType.GLOBAL_BILLING_PROFILE_REMINDER;
             notificationPageItemResponseData.setGlobalBillingProfileReminder(new NotificationGlobalBillingProfileReminder(
                     completeYourBillingProfile.billingProfile().billingProfileId(),
-                    completeYourBillingProfile.billingProfile().billingProfileName(),
-                    getVerificationStatus(completeYourBillingProfile.billingProfile().verificationStatus())
+                    completeYourBillingProfile.billingProfile().billingProfileName()
             ));
         } else {
             throw OnlyDustException.internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
@@ -163,14 +168,4 @@ public class NotificationReadEntity {
                 .data(notificationPageItemResponseData);
     }
 
-    private static VerificationStatus getVerificationStatus(onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus completeYourBillingProfile) {
-        return switch (completeYourBillingProfile) {
-            case CLOSED -> VerificationStatus.CLOSED;
-            case VERIFIED -> VerificationStatus.VERIFIED;
-            case UNDER_REVIEW -> VerificationStatus.UNDER_REVIEW;
-            case REJECTED -> VerificationStatus.REJECTED;
-            case STARTED -> VerificationStatus.STARTED;
-            case NOT_STARTED -> VerificationStatus.NOT_STARTED;
-        };
-    }
 }

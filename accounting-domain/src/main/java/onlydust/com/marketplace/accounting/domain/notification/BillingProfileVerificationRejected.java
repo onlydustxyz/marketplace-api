@@ -14,14 +14,16 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationType;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
-@NotificationType("BillingProfileVerificationFailed")
+@NotificationType("BillingProfileVerificationRejected")
 @Builder
 @NoArgsConstructor(force = true)
-public class BillingProfileVerificationFailed extends NotificationData {
+public class BillingProfileVerificationRejected extends NotificationData {
     @NonNull
     BillingProfile.Id billingProfileId;
     @NonNull
-    VerificationStatus verificationStatus;
+    String billingProfileName;
+    @NonNull
+    String rejectionReason;
 
     @Override
     public NotificationCategory category() {

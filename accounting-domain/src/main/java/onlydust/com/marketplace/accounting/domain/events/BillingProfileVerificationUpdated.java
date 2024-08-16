@@ -48,7 +48,11 @@ public class BillingProfileVerificationUpdated extends Event {
         return false;
     }
 
-    public boolean failed() {
-        return List.of(VerificationStatus.REJECTED, VerificationStatus.CLOSED).contains(this.verificationStatus);
+    public boolean rejected(){
+        return this.verificationStatus == VerificationStatus.REJECTED;
+    }
+
+    public boolean closed(){
+        return this.verificationStatus == VerificationStatus.CLOSED;
     }
 }
