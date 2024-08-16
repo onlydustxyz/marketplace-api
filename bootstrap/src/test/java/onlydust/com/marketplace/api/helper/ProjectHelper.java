@@ -9,12 +9,17 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class ProjectHelper {
     @Autowired
     private ProjectFacadePort projectFacadePort;
     @Autowired
     private ProjectStoragePort projectStoragePort;
+    @Autowired
+    private DatabaseHelper databaseHelper;
+
     private final Faker faker = new Faker();
 
     public ProjectId create(UserAuthHelper.AuthenticatedUser lead) {
@@ -32,5 +37,15 @@ public class ProjectHelper {
     public Project get(ProjectId projectId) {
         return projectStoragePort.getById(projectId.value())
                 .orElseThrow(() -> new RuntimeException("Project not found"));
+    }
+
+    public void addRepo(ProjectId projectId, Long repoId) {
+        databaseHelper.executeQuery("""
+                insert into project_github_repos(project_id, github_repo_id)
+                values (:projectId, :repoId);
+                """, Map.of(
+                "projectId", projectId.value(),
+                "repoId", repoId
+        ));
     }
 }

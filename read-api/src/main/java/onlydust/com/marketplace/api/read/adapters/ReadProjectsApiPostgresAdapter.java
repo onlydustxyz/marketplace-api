@@ -14,10 +14,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
-import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
-import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
-import onlydust.com.marketplace.api.read.mapper.UserMapper;
+import onlydust.com.marketplace.api.read.mapper.*;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -73,6 +70,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final BudgetStatsReadRepository budgetStatsReadRepository;
     private final ProjectContributorQueryRepository projectContributorQueryRepository;
+    private final ProjectStatsReadRepository projectStatsReadRepository;
+    private final ProjectCustomStatsReadRepository projectCustomStatsReadRepository;
 
     @Override
     public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex,
@@ -389,6 +388,23 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return rewardsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardsPageResponse) :
                 ResponseEntity.ok(rewardsPageResponse);
+    }
+
+    @Override
+    public ResponseEntity<ProjectStatsResponse> getProjectStats(UUID projectId, String fromDate, String toDate) {
+        final var customStats = projectCustomStatsReadRepository.findById(projectId,
+                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
+                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate));
+
+        final var stats = projectStatsReadRepository.findByProjectId(projectId);
+
+        return ok(new ProjectStatsResponse()
+                .activeContributorCount(customStats.map(ProjectCustomStatReadEntity::activeContributorCount).orElse(0))
+                .mergedPrCount(customStats.map(ProjectCustomStatReadEntity::mergedPrCount).orElse(0))
+                .rewardCount(customStats.map(ProjectCustomStatReadEntity::rewardCount).orElse(0))
+                .totalGranted(stats.map(stat -> DetailedTotalMoneyMapper.map(stat.statsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalGranted)).orElse(null))
+                .totalRewarded(stats.map(stat -> DetailedTotalMoneyMapper.map(stat.statsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalRewarded)).orElse(null))
+        );
     }
 
     @Override
