@@ -1058,7 +1058,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
                                                               {
                                                                "title" : "Company beneficiary",
-                                                                "description" : "We need to verify your beneficiary identity to validate your company's billing profile WAGMI",
+                                                                "description" : "We need to verify your beneficiary identity to validate your company's billing profile company3",
                                                                 "username" : "Jean Michel",
                                                                 "button": {
                                                                   "text": "Proceed to verification",
