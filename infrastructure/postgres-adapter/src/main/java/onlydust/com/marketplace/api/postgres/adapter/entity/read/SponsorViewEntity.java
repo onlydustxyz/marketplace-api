@@ -1,19 +1,25 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.SponsorMapper;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.UserShortView;
 import org.hibernate.annotations.Immutable;
 
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 
 @Entity
@@ -68,6 +74,15 @@ public class SponsorViewEntity {
                 name,
                 url,
                 logoUrl,
-                projects.stream().map(SponsorMapper::mapToSponsor).collect(toSet()));
+                projects.stream().map(SponsorMapper::mapToSponsor).collect(toSet()),
+                isNull(users) ? null : users.stream().map(userViewEntity -> UserShortView.builder()
+                        .id(userViewEntity.id())
+                        .email(userViewEntity.email())
+                        .githubUserId(userViewEntity.githubUserId())
+                        .avatarUrl(userViewEntity.avatarUrl())
+                        .login(userViewEntity.login())
+                        .lastSeenAt(userViewEntity.lastSeenAt())
+                        .signedUpAt(userViewEntity.createdAt().toInstant().atZone(ZoneId.systemDefault()))
+                        .build()).collect(toSet()));
     }
 }

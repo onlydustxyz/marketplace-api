@@ -20,13 +20,15 @@ public class BoSponsorView {
 
     @Getter(AccessLevel.NONE)
     Set<ProjectSponsorView> projects;
+    Set<UserShortView> leads;
 
-    public BoSponsorView(UUID id, String name, String url, String logoUrl, Set<ProjectSponsorView> projects) {
+    public BoSponsorView(UUID id, String name, String url, String logoUrl, Set<ProjectSponsorView> projects, Set<UserShortView> leads) {
         this.id = id;
         this.name = name;
         this.url = url;
         this.logoUrl = logoUrl;
         this.projects = projects;
+        this.leads = leads;
     }
 
     public Set<ProjectSponsorView> projectsWhereSponsorIsActive() {

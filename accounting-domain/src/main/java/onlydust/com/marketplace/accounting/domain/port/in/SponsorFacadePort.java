@@ -16,4 +16,6 @@ public interface SponsorFacadePort {
     Page<SponsorView> listSponsors(String search, int sanitizedPageIndex, int sanitizedPageSize);
 
     URL uploadLogo(InputStream imageInputStream);
+
+    void addLeadToSponsor(UserId leadId, SponsorId sponsorId);
 }

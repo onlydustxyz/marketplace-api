@@ -6,10 +6,11 @@ import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
-import onlydust.com.marketplace.project.domain.view.backoffice.*;
+import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
+import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
+import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

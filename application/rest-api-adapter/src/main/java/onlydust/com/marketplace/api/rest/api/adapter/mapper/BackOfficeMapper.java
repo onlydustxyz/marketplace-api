@@ -167,6 +167,12 @@ public interface BackOfficeMapper {
                         .values().stream()
                         .sorted(comparing(b -> b.getCurrency().getCode()))
                         .toList())
+                .leads(isNull(sponsor.leads()) ? null : sponsor.leads().stream().map(userShortView -> new UserLinkResponse()
+                        .userId(userShortView.id())
+                        .login(userShortView.login())
+                        .githubUserId(userShortView.githubUserId())
+                        .avatarUrl(userShortView.avatarUrl())
+                ).toList())
                 ;
     }
 

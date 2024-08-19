@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
@@ -29,6 +30,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMap
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
 @Tags(@Tag(name = "BackofficeSponsorManagement"))
@@ -111,5 +113,11 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
         final var response = new UploadImageResponse().url(imageUrl.toString());
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<Void> addLeadToSponsor(UUID sponsorId, UUID leadId) {
+        sponsorFacadePort.addLeadToSponsor(UserId.of(leadId), SponsorId.of(sponsorId));
+        return noContent().build();
     }
 }

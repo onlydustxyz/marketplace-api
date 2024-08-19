@@ -6,6 +6,8 @@ import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorViewRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.port.output.ProjectSponsorStoragePort;
@@ -19,6 +21,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PostgresSponsorAdapter implements SponsorStoragePort, ProjectSponsorStoragePort {
     private final SponsorViewRepository sponsorViewRepository;
+    private final SponsorUserRepository sponsorUserRepository;
 
     @Override
     @Transactional
@@ -50,5 +53,11 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, ProjectSponso
     @Transactional
     public boolean isUserSponsorAdmin(UUID id, UUID sponsorId) {
         return isAdmin(UserId.of(id), SponsorId.of(sponsorId));
+    }
+
+    @Override
+    @Transactional
+    public void addLeadToSponsor(UserId leadId, SponsorId sponsorId) {
+        sponsorUserRepository.save(new SponsorUserEntity(leadId.value(), sponsorId.value()));
     }
 }
