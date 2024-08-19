@@ -15,7 +15,8 @@ public interface ProjectStoragePort {
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                        ProjectVisibility visibility
-            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions);
+            , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
+                       boolean botNotifyExternalApplications);
 
     void updateProject(UUID id, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,

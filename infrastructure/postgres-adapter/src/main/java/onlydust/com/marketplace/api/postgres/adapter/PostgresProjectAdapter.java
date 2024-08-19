@@ -104,7 +104,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                               List<Long> githubRepoIds, UUID firstProjectLeaderId,
                               List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings,
-                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions) {
+                              List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
+                              boolean botNotifyExternalApplications) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
                         .id(projectId)
@@ -138,6 +139,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                         categorySuggestion, projectId)).collect(toSet())
                         )
                         .rank(0)
+                        .botNotifyExternalApplications(botNotifyExternalApplications)
                         .build();
 
         this.projectRepository.saveAndFlush(projectEntity);

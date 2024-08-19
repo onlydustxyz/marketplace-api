@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class Project {
     UUID id;
     String slug;
@@ -19,6 +19,7 @@ public class Project {
     Boolean hiring;
     ProjectVisibility visibility;
     List<Tag> tags;
+    Boolean botNotifyExternalApplications;
 
     public enum Tag {
         HOT_COMMUNITY,

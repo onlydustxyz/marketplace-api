@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.contract.model.CreateProjectResponse;
 import onlydust.com.marketplace.api.contract.model.OnlyDustError;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
@@ -38,6 +39,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     private SlackApiAdapter slackApiAdapter;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @BeforeEach
     public void setup() {
@@ -182,6 +186,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.categorySuggestions[0]").isEqualTo("finance");
 
         verify(slackApiAdapter).onProjectCategorySuggested("finance", user.user().getId());
+
+        final var entity = projectRepository.findById(projectId).orElseThrow();
+        assertThat(entity.isBotNotifyExternalApplications()).isTrue();
     }
 
     @SneakyThrows
@@ -327,6 +334,9 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         """))
         );
         verify(slackApiAdapter).onProjectCategorySuggested("defi", user.user().getId());
+
+        final var entity = projectRepository.findById(projectId).orElseThrow();
+        assertThat(entity.isBotNotifyExternalApplications()).isTrue();
     }
 
     private void runJobs() {

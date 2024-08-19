@@ -96,6 +96,7 @@ class GithubIssueCommenterTest {
                 .id(UUID.randomUUID())
                 .name(faker.lorem().word())
                 .slug(faker.internet().slug())
+                .botNotifyExternalApplications(true)
                 .build();
 
         final GithubUserIdentity applicant = GithubUserIdentity.builder()
@@ -184,6 +185,19 @@ class GithubIssueCommenterTest {
             // Given
             when(githubAppService.getInstallationTokenFor(issue.repoId())).thenReturn(Optional.of(new GithubAppAccessToken(faker.lorem().word(), Map.of(
                     "issues", "read"))));
+
+            // When
+            githubIssueCommenter.onApplicationCreated(application);
+
+            // Then
+            verifyNoInteractions(githubApiPort);
+        }
+
+        @Test
+        void should_not_comment_issue_if_lead_deactivated_notifications() {
+            // Given
+            when(projectStoragePort.getById(application.projectId()))
+                    .thenReturn(Optional.of(project.toBuilder().botNotifyExternalApplications(false).build()));
 
             // When
             githubIssueCommenter.onApplicationCreated(application);

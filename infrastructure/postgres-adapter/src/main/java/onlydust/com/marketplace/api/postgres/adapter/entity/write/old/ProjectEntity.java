@@ -65,6 +65,7 @@ public class ProjectEntity {
     Boolean ignoreCodeReviews;
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
+    boolean botNotifyExternalApplications;
 
     @EqualsAndHashCode.Exclude
     @CreationTimestamp
@@ -109,6 +110,7 @@ public class ProjectEntity {
                 .moreInfoUrl(isNull(moreInfos) ? null : moreInfos.stream().findFirst().map(ProjectMoreInfoEntity::getUrl).orElse(null))
                 .hiring(hiring)
                 .visibility(visibility)
+                .botNotifyExternalApplications(botNotifyExternalApplications)
                 .build();
     }
 

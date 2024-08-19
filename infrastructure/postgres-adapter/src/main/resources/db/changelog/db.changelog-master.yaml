@@ -463,3 +463,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000310_fix_all_billing_profile_users_view.sql
   - include:
       file: db/changelog/changelogs/00000311_create_project_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000312_add_projects_bot_notify_external_applications.sql
