@@ -15,7 +15,7 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface DetailedTotalMoneyMapper {
     static <T extends ProgramTransactionStat> DetailedTotalMoney map(Collection<T> stats, Function<T, BigDecimal> amountSupplier) {
-        return new DetailedTotalMoney()
+        return stats == null ? null : new DetailedTotalMoney()
                 .totalPerCurrency(stats.stream()
                         .map(s -> s.toMoney(amountSupplier.apply(s)))
                         .sorted(comparing(Money::getUsdEquivalent, nullsLast(naturalOrder())).reversed()).toList())

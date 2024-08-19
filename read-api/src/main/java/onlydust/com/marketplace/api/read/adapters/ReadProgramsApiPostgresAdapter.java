@@ -8,12 +8,11 @@ import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProjectStatsReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
@@ -46,7 +45,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AccountingPermissionService accountingPermissionService;
     private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
-    private final ProjectStatsReadRepository projectStatsReadRepository;
+    private final ProjectReadRepository projectReadRepository;
 
     @Override
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
@@ -71,9 +70,9 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         int index = sanitizePageIndex(pageIndex);
         int size = sanitizePageSize(pageSize);
 
-        final var page = projectStatsReadRepository.findGrantedProject(programId, PageRequest.of(index, size));
+        final var page = projectReadRepository.findGrantedProjects(programId, PageRequest.of(index, size));
         final var response = new ProgramProjectsPageResponse()
-                .projects(page.getContent().stream().map(ProjectStatReadEntity::toProgramProjectPageItemResponse).toList())
+                .projects(page.getContent().stream().map(p -> p.toProgramProjectPageItemResponse(programId)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())

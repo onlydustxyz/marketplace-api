@@ -1,10 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
@@ -12,19 +10,24 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewE
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramStatPerCurrencyPerProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.math.RoundingMode;
 import java.net.URI;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.math.BigDecimal.ZERO;
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
+import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 
 @Entity
@@ -33,6 +36,7 @@ import static java.util.Objects.nonNull;
 @Data
 @Table(name = "projects", schema = "public")
 @Immutable
+@Accessors(fluent = true)
 public class ProjectReadEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -119,11 +123,35 @@ public class ProjectReadEntity {
     @NonNull
     Set<ProjectCategorySuggestionReadEntity> categorySuggestions;
 
+    @OneToOne(mappedBy = "project")
+    @Getter(AccessLevel.NONE)
+    ProjectContributionStatReadEntity contributionStats;
+
+    public Optional<ProjectContributionStatReadEntity> contributionStats() {
+        return Optional.ofNullable(contributionStats);
+    }
+
+    @OneToOne(mappedBy = "project")
+    @Getter(AccessLevel.NONE)
+    ProjectRewardStatReadEntity rewardStats;
+
+    public Optional<ProjectRewardStatReadEntity> rewardStats() {
+        return Optional.ofNullable(rewardStats);
+    }
+
+    @OneToMany(mappedBy = "project")
+    @NonNull
+    Set<ProjectStatPerCurrencyReadEntity> globalStatsPerCurrency;
+
+    @OneToMany(mappedBy = "project")
+    @NonNull
+    Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
+
     public List<GithubOrganizationResponse> organizations(final boolean includeAllAvailableRepos) {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
-        getRepos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
+        repos().forEach(repo -> organizationEntities.put(repo.getOwner().id(), repo.getOwner()));
 
-        final var repoIdsIncludedInProject = getRepos().stream()
+        final var repoIdsIncludedInProject = repos().stream()
                 .filter(GithubRepoViewEntity::isPublic)
                 .map(GithubRepoViewEntity::getId)
                 .collect(Collectors.toSet());
@@ -191,5 +219,38 @@ public class ProjectReadEntity {
                 .shortDescription(shortDescription)
                 .visibility(visibility)
                 .languages(languages.stream().map(LanguageReadEntity::toDto).toList());
+    }
+
+    public ProgramProjectsPageItemResponse toProgramProjectPageItemResponse(UUID programId) {
+        final var statsPerCurrency = perProgramStatsPerCurrency.stream()
+                .filter(s -> s.programId().equals(programId))
+                .toList();
+        final var totalGranted = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalGranted);
+        final var totalRewarded = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalRewarded);
+
+        return new ProgramProjectsPageItemResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .logoUrl(logoUrl)
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
+                .totalAvailable(map(statsPerCurrency, s -> s.totalGranted().subtract(s.totalRewarded())))
+                .totalGranted(totalGranted)
+                .totalRewarded(totalRewarded)
+                .percentUsedBudget(totalGranted.getTotalUsdEquivalent().compareTo(ZERO) == 0 ? null :
+                        totalRewarded.getTotalUsdEquivalent().divide(totalGranted.getTotalUsdEquivalent(), 2, RoundingMode.HALF_EVEN))
+                .averageRewardUsdAmount(prettyUsd(rewardStats().map(ProjectRewardStatReadEntity::averageRewardUsdAmount).orElse(null)))
+                .mergedPrCount(createKpi(contributionStats().map(ProjectContributionStatReadEntity::currentPeriodMergedPrCount).orElse(0),
+                        contributionStats().map(ProjectContributionStatReadEntity::lastPeriodMergedPrCount).orElse(0)))
+                .newContributorsCount(createKpi(contributionStats().map(ProjectContributionStatReadEntity::currentPeriodNewContributorCount).orElse(0),
+                        contributionStats().map(ProjectContributionStatReadEntity::lastPeriodActiveContributorCount).orElse(0)))
+                .activeContributorsCount(createKpi(contributionStats().map(ProjectContributionStatReadEntity::currentPeriodActiveContributorCount).orElse(0),
+                        contributionStats().map(ProjectContributionStatReadEntity::lastPeriodActiveContributorCount).orElse(0)));
+    }
+
+    private NumberKpi createKpi(int current, int last) {
+        return new NumberKpi()
+                .value(current)
+                .trend(current < last ? Trend.DOWN : current > last ? Trend.UP : Trend.STABLE);
     }
 }
