@@ -20,12 +20,11 @@ import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Contributor;
-import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,6 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort {
 
-    private final CustomUserRepository customUserRepository;
     private final CustomContributorRepository customContributorRepository;
     private final UserRepository userRepository;
     private final UserViewRepository userViewRepository;
@@ -55,6 +53,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     private final RewardViewRepository rewardViewRepository;
     private final CurrencyRepository currencyRepository;
     private final BillingProfileUserRepository billingProfileUserRepository;
+    private final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -106,40 +105,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public UserProfileView getProfileById(UUID userId) {
-        return customUserRepository.findProfileById(userId)
-                .map(this::addProjectsStats)
-                .orElseThrow(() -> notFound(format("User profile %s not found", userId)));
-    }
-
-    @Override
     public Optional<UserProfile> findProfileById(UUID userId) {
         return userProfileInfoRepository.findById(userId).map(UserProfileInfoEntity::toDomain);
-    }
-
-    private UserProfileView addProjectsStats(UserProfileView userProfileView) {
-        final var projectsStats = customUserRepository.getProjectsStatsForUser(userProfileView.getGithubId());
-        for (ProjectStatsForUserQueryEntity stats : projectsStats) {
-            userProfileView.addProjectStats(UserProfileView.ProjectStats.builder()
-                    .id(stats.getId())
-                    .slug(stats.getSlug())
-                    .name(stats.getName())
-                    .contributorCount(stats.getContributorsCount())
-                    .isProjectLead(stats.getIsLead())
-                    .projectLeadSince(stats.getLeadSince())
-                    .totalGranted(stats.getTotalGranted())
-                    .userContributionCount(stats.getUserContributionsCount())
-                    .userLastContributedAt(stats.getLastContributionDate())
-                    .userFirstContributedAt(stats.getFirstContributionDate())
-                    .logoUrl(stats.getLogoUrl())
-                    .visibility(switch (stats.getVisibility()) {
-                        case PUBLIC -> ProjectVisibility.PUBLIC;
-                        case PRIVATE -> ProjectVisibility.PRIVATE;
-                    })
-                    .build());
-        }
-        return userProfileView;
     }
 
     @Override
@@ -313,5 +280,12 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     @Override
     public Optional<NotificationRecipient> findById(NotificationRecipient.Id userId) {
         return userRepository.findById(userId.value()).map(UserEntity::toNotificationRecipient);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId) {
+        return githubUserWithTelegramQueryRepository.findByUserId(userId)
+                .map(GithubUserWithTelegramQueryEntity::toDomain);
     }
 }

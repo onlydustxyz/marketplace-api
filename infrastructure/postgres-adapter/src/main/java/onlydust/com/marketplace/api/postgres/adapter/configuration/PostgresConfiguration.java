@@ -138,13 +138,7 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public CustomUserRepository customUserRepository(final EntityManager entityManager) {
-        return new CustomUserRepository(entityManager);
-    }
-
-    @Bean
-    public PostgresUserAdapter postgresUserAdapter(final CustomUserRepository customUserRepository,
-                                                   final CustomContributorRepository customContributorRepository,
+    public PostgresUserAdapter postgresUserAdapter(final CustomContributorRepository customContributorRepository,
                                                    final UserRepository userRepository,
                                                    final UserViewRepository userViewRepository,
                                                    final AllUserViewRepository allUserViewRepository,
@@ -156,9 +150,9 @@ public class PostgresConfiguration {
                                                    final ProjectLedIdRepository projectLedIdRepository,
                                                    final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
-                                                   final BillingProfileUserRepository billingProfileUserRepository) {
+                                                   final BillingProfileUserRepository billingProfileUserRepository,
+                                                   final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository) {
         return new PostgresUserAdapter(
-                customUserRepository,
                 customContributorRepository,
                 userRepository,
                 userViewRepository,
@@ -171,7 +165,8 @@ public class PostgresConfiguration {
                 projectLedIdRepository,
                 rewardViewRepository,
                 currencyRepository,
-                billingProfileUserRepository);
+                billingProfileUserRepository,
+                githubUserWithTelegramQueryRepository);
     }
 
     @Bean

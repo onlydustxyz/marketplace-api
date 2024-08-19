@@ -13,13 +13,14 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
+import onlydust.com.marketplace.project.domain.model.UserProfile;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
+import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 
 import java.util.Set;
 import java.util.UUID;
@@ -36,12 +37,13 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
-        final UserProfileView userProfileView = userStoragePort.getProfileById(userId);
+        final GithubUserWithTelegramView githubUserWithTelegramView = userStoragePort.findGithubUserWithTelegram(userId)
+                .orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
 
         final Hackathon hackathon = hackathonStoragePort.findById(hackathonId).orElseThrow(() -> OnlyDustException.internalServerError(
                 "Hackathon %s not found".formatted(hackathonId.value())));
         slackApiClient.sendNotification(slackProperties.getDevRelChannel(), "New user registration on hackathon",
-                UserRegisteredOnHackathonEventMapper.mapToSlackBlock(userProfileView, hackathon, slackProperties.getEnvironment()));
+                UserRegisteredOnHackathonEventMapper.mapToSlackBlock(userId, githubUserWithTelegramView, hackathon, slackProperties.getEnvironment()));
     }
 
     @Override

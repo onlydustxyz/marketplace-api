@@ -5,9 +5,9 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.view.ChurnedContributorView;
 import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
+import onlydust.com.marketplace.project.domain.view.ContributorActivityView.ProfileStats.ContributionStats;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.NewcomerView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView.ProfileStats.ContributionStats;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.WeekFields;

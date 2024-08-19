@@ -6,15 +6,14 @@ import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 
 import java.time.ZonedDateTime;
 import java.util.*;
 
 public interface UserStoragePort {
-    UserProfileView getProfileById(UUID userId);
 
     Optional<UserProfile> findProfileById(UUID userId);
 
@@ -51,4 +50,6 @@ public interface UserStoragePort {
     void refreshUserRanksAndStats();
 
     void historizeUserRanks();
+
+    Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId);
 }

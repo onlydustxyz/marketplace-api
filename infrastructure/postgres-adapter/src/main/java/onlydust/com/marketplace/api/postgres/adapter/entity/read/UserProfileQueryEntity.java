@@ -7,8 +7,8 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.project.domain.view.ContributorActivityView;
 import onlydust.com.marketplace.project.domain.view.Money;
-import onlydust.com.marketplace.project.domain.view.UserProfileView;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -102,8 +102,8 @@ public class UserProfileQueryEntity {
         @JsonProperty("year")
         Integer year;
 
-        public UserProfileView.ProfileStats.ContributionStats toDomain() {
-            return UserProfileView.ProfileStats.ContributionStats.builder()
+        public ContributorActivityView.ProfileStats.ContributionStats toDomain() {
+            return ContributorActivityView.ProfileStats.ContributionStats.builder()
                     .codeReviewCount(codeReviewCount)
                     .issueCount(issueCount)
                     .pullRequestCount(pullRequestCount)
