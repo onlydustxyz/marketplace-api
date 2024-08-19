@@ -2,26 +2,29 @@ package onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationType;
+import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileVerificationRejectionReasonFacadePort;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 @Slf4j
+@AllArgsConstructor
 public class SumsubMapper implements Function<Event, BillingProfileVerificationUpdated> {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final BillingProfileVerificationRejectionReasonFacadePort billingProfileVerificationRejectionReasonFacadePort;
 
     /*
     *   Unstarted - user hasn't started process
@@ -44,7 +47,7 @@ public class SumsubMapper implements Function<Event, BillingProfileVerificationU
                 }
             }
         } catch (Exception exception) {
-            LOGGER.warn("Failed to map Sumsub event to DTO",exception);
+            LOGGER.warn("Failed to map Sumsub event to DTO", exception);
         }
         throw new OutboxSkippingException(String.format("Invalid sumsub event format %s", event));
     }
@@ -85,11 +88,39 @@ public class SumsubMapper implements Function<Event, BillingProfileVerificationU
         };
     }
 
+    private static final String DEFAULT_REJECTION_REASON = "Something went wrong during the verification process, please contact admin@onlydust.xyz";
+
     private String reviewMessageForApplicantToDomain(final SumsubWebhookEventDTO.ReviewResultDTO reviewResult) {
-        if (nonNull(reviewResult) && nonNull(reviewResult.getModerationComment())) {
-            return reviewResult.getModerationComment();
+        if (nonNull(reviewResult)) {
+            if (nonNull(reviewResult.getModerationComment())) {
+                return reviewResult.getModerationComment();
+            } else if (nonNull(reviewResult.getButtonIds()) && nonNull(reviewResult.getRejectLabels())) {
+                final Set<String> rejectionReasons = new LinkedHashSet<>();
+                for (String rejectLabel : reviewResult.getRejectLabels()) {
+                    for (String groupIdButtonId : reviewResult.getButtonIds()) {
+                        String groupId;
+                        String buttonId;
+                        if (groupIdButtonId.contains("_")) {
+                            groupId = groupIdButtonId.split("_")[0];
+                            buttonId = groupIdButtonId.split("_")[1];
+
+                        } else {
+                            buttonId = groupIdButtonId;
+                            groupId = null;
+                        }
+                        billingProfileVerificationRejectionReasonFacadePort.findExternalRejectionReason(groupId, buttonId, rejectLabel).ifPresent(rejectionReasons::add);
+                    }
+                }
+                if (rejectionReasons.isEmpty()) {
+                    LOGGER.warn("Rejection reason(s) not found for buttonIds %s and rejectLabels %s"
+                            .formatted(reviewResult.getButtonIds(), reviewResult.getRejectLabels()));
+                    return DEFAULT_REJECTION_REASON;
+                } else {
+                    return String.join("\n", rejectionReasons);
+                }
+            }
         }
-        return null;
+        return DEFAULT_REJECTION_REASON;
     }
 
     private VerificationStatus typeAndReviewResultToDomain(final String reviewStatus,

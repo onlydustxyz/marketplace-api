@@ -465,3 +465,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000311_create_project_stats_view.sql
   - include:
       file: db/changelog/changelogs/00000312_add_projects_bot_notify_external_applications.sql
+  - include:
+      file: db/changelog/changelogs/00000313_add_sumsub_rejection_reasons_table.sql

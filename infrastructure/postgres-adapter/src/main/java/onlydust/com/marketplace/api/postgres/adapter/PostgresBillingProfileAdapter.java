@@ -44,6 +44,7 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
     private final @NonNull RewardViewRepository rewardViewRepository;
     private final @NonNull RewardRepository rewardRepository;
     private final @NonNull UserRepository userRepository;
+    private final @NonNull SumsubRejectionReasonRepository sumsubRejectionReasonRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -339,5 +340,13 @@ public class PostgresBillingProfileAdapter implements BillingProfileStoragePort 
         return billingProfileRepository.findAllByCreationDate(creationDate).stream()
                 .map(BillingProfileEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> findExternalRejectionReason(String groupId, String buttonId, String label) {
+        return sumsubRejectionReasonRepository
+                .findByGroupIdAndButtonIdAndAssociatedRejectionLabel(groupId, buttonId, label)
+                .map(SumsubRejectionReasonEntity::getDescription);
     }
 }
