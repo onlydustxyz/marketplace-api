@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.it.bo;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 import static onlydust.com.marketplace.api.it.bo.BackOfficeAccountingApiIT.BRETZEL;
@@ -1115,5 +1116,58 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.url").isEqualTo("https://s3.amazon.com/logo.jpeg");
+    }
+
+    @Test
+    void should_add_and_get_sponsor_leads() {
+        // Given
+        final UUID readBull = UUID.fromString("0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa");
+        final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
+        final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+
+        // When
+        client.put()
+                .uri(getApiURI(SPONSORS_LEADS.formatted(readBull, olivierId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.put()
+                .uri(getApiURI(SPONSORS_LEADS.formatted(readBull, anthoId)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted(readBull)))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "leads": [
+                            {
+                              "githubUserId": 595505,
+                              "userId": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                              "login": "ofux",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                            },
+                            {
+                              "githubUserId": 43467246,
+                              "userId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                              "login": "AnthonyBuisset",
+                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                            }
+                          ]
+                        }""");
     }
 }

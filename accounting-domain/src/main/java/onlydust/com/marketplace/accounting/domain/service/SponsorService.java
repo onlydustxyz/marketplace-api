@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.UUID;
 
 @AllArgsConstructor
 public class SponsorService implements SponsorFacadePort {
@@ -35,5 +36,10 @@ public class SponsorService implements SponsorFacadePort {
     @Override
     public URL uploadLogo(InputStream imageInputStream) {
         return imageStoragePort.storeImage(imageInputStream);
+    }
+
+    @Override
+    public void addLeadToSponsor(UserId leadId, SponsorId sponsorId) {
+        sponsorStoragePort.addLeadToSponsor(leadId, sponsorId);
     }
 }

@@ -13,4 +13,6 @@ public interface SponsorStoragePort {
     Optional<SponsorView> get(SponsorId sponsorId);
 
     boolean isAdmin(UserId userId, SponsorId sponsorId);
+
+    void addLeadToSponsor(UserId leadId, SponsorId sponsorId);
 }

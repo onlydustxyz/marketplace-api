@@ -1189,6 +1189,38 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+  /bo/v1/sponsors/{sponsorId}/leads/{leadId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeSponsorManagement
+      summary: Add lead to sponsor
+      operationId: addLeadToSponsor
+      description: Add lead to sponsor
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: path
+          name: leadId
+          required: true
+          schema:
+            $ref: '#/components/schemas/UserId'
+      responses:
+        "204":
+          description: 'Lead added to sponsor'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/ecosystems:
     get:
       security:
@@ -2928,6 +2960,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProjectWithBudgetResponse'
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserLinkResponse'
 
     EcosystemPage:
       type: object
