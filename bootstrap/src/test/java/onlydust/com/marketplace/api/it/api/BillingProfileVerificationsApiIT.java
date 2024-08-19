@@ -11,16 +11,17 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubSignatureVerifier;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookProperties;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.dto.SumsubWebhookEventDTO;
+import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
+import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.responseDefinition;
@@ -28,6 +29,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_OD_API;
 import static onlydust.com.marketplace.api.sumsub.webhook.adapter.SumsubWebhookApiAdapter.X_SUMSUB_PAYLOAD_DIGEST;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 
 @TagAccounting
@@ -1071,6 +1073,565 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Verify your identity to validate your company")))
         );
+    }
+
+    @Autowired
+    SumsubMapper sumsubMapper;
+
+    @Test
+    void should_map_every_rejection_reasons() {
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(null, null)).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(null, List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_expiredId"), null)).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "additionalPages_anotherSide"), List.of(
+                "DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_copyOfIdDoc"), List.of("BAD_PROOF_OF_IDENTITY"
+        ))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_damagedId"), List.of("DOCUMENT_DAMAGED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_digitalId"), List.of("DIGITAL_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_expiredId"), List.of("EXPIRATION_DATE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_invalidId"), List.of("ID_INVALID"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_notFullNameOrDob"), List.of(
+                "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_withoutFace"), List.of("BAD_PROOF_OF_IDENTITY"
+        ))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_wrongType"),
+                List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument_notFullDob", "badDocument"),
+                List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_blackAndWhite"), List.of("BLACK_AND_WHITE",
+        "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_dataNotVisible"), List.of("UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR",
+        "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor"), List.of("GRAPHIC_EDITOR",
+        "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_screenshot"), List.of("SCREENSHOTS",
+                "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("company", "company_moreDocs"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("company", "company_notDeteminedBeneficiaries"), List.of(
+                "COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("dataMismatch", "dataMismatch_fullName"), List.of(
+                "PROBLEMATIC_APPLICANT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("dataMismatch_dateOfBirth", "dataMismatch"), List.of(
+                "PROBLEMATIC_APPLICANT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybArticlesOfAssociation"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybLegalBond"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybLegalExistence"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybOfficialPosition"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybIncorrectOwnershipStructure",
+        "kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybOther", "kybOther_kybSoleEntrepreneur"), List.of("DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybOther", "kybOther_kybSoleEntrepreneur"), List.of("DOCUMENT_MISSING",
+        "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument", "kybUnsuitableDocument_kybIncompleteDocument"),
+         List.of("INCOMPLETE_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"),
+         List.of("UNFILLED_ID"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"),
+         List.of("UNSUITABLE_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybExpirationDate", "kybUnsuitableDocument"),
+         List.of("EXPIRATION_DATE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullAddress"), List.of(
+                "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullName"), List.of(
+                "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress"), List.of(
+                "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress"), List.of(
+                "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie", "selfie_selfieLiveness"), List.of("BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "selfie"), List.of("BAD_FACE_MATCHING",
+"BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument", "badDocument_expiredId", "badDocument_wrongType"),
+         List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badDocument_notFullDob", "badDocument", "badDocument_expiredId"),
+         List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor", "badPhoto_screenshot"), List.of(
+                "SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor", "badPhoto_screenshot"), List.of(
+                "GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_screenshot", "badPhoto_dataNotVisible"), List.of(
+                "SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_screenshot", "badPhoto_dataNotVisible"), List.of(
+                "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_screenshot", "badPhoto_editedPoa"), List.of(
+                "SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "GRAPHIC_EDITOR"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto_sticker", "badPhoto", "badPhoto_screenshot"), List.of(
+                "GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybCertificateOfGoodStanding", "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"
+        ))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybCertificateOfGoodStanding"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybLegalExistence"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of(
+                "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybAdditionalDocuments_kybLegalExistence"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument",
+        "kybUnsuitableDocument_kybIncompleteDocument"), List.of("INCOMPLETE_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybIncorrectOwnershipStructure",
+        "company", "kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_DEFINED_OWNERSHIP_STRUCTURE", "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs", "company",
+"kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybControlAndOwnershipStructure_kybIncorrectOwnershipStructure", "kybControlAndOwnershipStructure"), List.of("COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybOther", "kybOther_kybSoleEntrepreneur",
+        "kybOther_kybIncorrectRegistrationNumber"), List.of("COMPANY_INCORRECT_DATA", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument", "company", "company_moreDocs"), List.of(
+                "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybExpirationDate", "kybUnsuitableDocument",
+        "company"), List.of("EXPIRATION_DATE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullName",
+         "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullName", "regulationsViolations"),
+         List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress", "proofOfAddress_fullAddress"
+        ), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress", "proofOfAddress_fullName"),
+         List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs",
+         "proofOfAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "fraudulentPatterns", "proofOfAddress"),
+         List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress",
+        "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "proofOfAddress_fullName")
+        , List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate",
+         "proofOfAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "selfie", "selfie_selfieLiveness"), List.of(
+                "BAD_FACE_MATCHING", "BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "additionalPages_anotherSide", "ekycRetry",
+        "ekycRetry_checkUnavailable"), List.of("CHECK_UNAVAILABLE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "badPhoto", "additionalPages_anotherSide",
+        "badPhoto_dataNotVisible"), List.of("UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "badPhoto", "additionalPages_anotherSide",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress", "additionalPages_anotherSide",
+        "proofOfAddress_fullName"), List.of("DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress", "proofOfAddress_fullAddress",
+        "additionalPages_mainPageId"), List.of("DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress_issueDate", "proofOfAddress",
+        "additionalPages_anotherSide"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "additionalPages_anotherSide"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "additionalPages_anotherSide"), List.of("DOCUMENT_PAGE_MISSING", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badDocument_expiredId",
+        "badPhoto_dataNotVisible"), List.of("UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badDocument_withoutFace",
+        "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_dataNotVisible",
+        "badDocument_notFullNameOrDob"), List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_dataNotVisible",
+        "badDocument_notFullNameOrDob"), List.of("UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_imageEditor",
+        "badDocument_withoutFace"), List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_screenshot",
+        "badDocument_notFullNameOrDob"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_screenshot",
+         "badDocument_wrongType"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor", "badPhoto_screenshot",
+        "badPhoto_dataNotVisible"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor", "proofOfAddress",
+        "proofOfAddress_fullName"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badPhoto_imageEditor", "selfie", "selfie_selfieLiveness"),
+         List.of("BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_imageEditor",
+        "proofOfAddress_fullAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_imageEditor",
+        "proofOfAddress_fullName"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_screenshot",
+        "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullAddress",
+        "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullAddress",
+        "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullName",
+        "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullName",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "badPhoto_imageEditor",
+        "proofOfAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress",
+        "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "badPhoto_imageEditor",
+        "proofOfAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "badPhoto_screenshot"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto_sticker", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto_sticker", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybCertificateOfGoodStanding", "kybAdditionalDocuments_kybLegalExistence"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybAdditionalDocuments_kybLegalExistence"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybOther", "kybAdditionalDocuments_kybLegalExistence"), List.of("ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybNoDate", "kybUnsuitableDocument"), List.of("INCOMPLETE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybGraphicsEditingSoftware"), List.of(
+                "GRAPHIC_EDITOR", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"), List.of("UNFILLED_ID"
+, "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+                "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"), List.of(
+                "UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument"), List.of("EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybPersonalDocument",
+        "kybUnsuitableDocument", "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "NOT_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress", "kybControlAndOwnershipStructure"), List.of("ADDITIONAL_DOCUMENT_REQUIRED",
+        "COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybAdditionalDocuments", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybControlAndOwnershipStructure"), List.of(
+                "ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument", "kybControlAndOwnershipStructure"), List.of("UNFILLED_ID",
+        "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybOther", "company", "company_moreDocs",
+        "kybOther_kybIncorrectRegistrationNumber"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_INCORRECT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybOther_kybIncorrectCompanyName", "kybOther", "company",
+"company_moreDocs"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_INCORRECT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument", "company", "company_moreDocs",
+        "kybUnsuitableDocument_kybUnsignedDocument"), List.of("UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybExpirationDate", "kybOther",
+"kybUnsuitableDocument", "kybOther_kybSoleEntrepreneur"), List.of("EXPIRATION_DATE", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybExpirationDate", "kybUnsuitableDocument",
+        "company", "company_moreDocs"), List.of("EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullName", "dataMismatch",
+        "dataMismatch_fullName"), List.of("BAD_PROOF_OF_ADDRESS", "PROBLEMATIC_APPLICANT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "proofOfAddress_fullName", "dataMismatch_fullName",
+        "dataMismatch"), List.of("BAD_PROOF_OF_ADDRESS", "PROBLEMATIC_APPLICANT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "regulationsViolations", "proofOfAddress_fullAddress",
+        "regulationsViolations_age"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress", "selfie", "proofOfAddress_fullAddress",
+        "selfie_selfieLiveness"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "additionalPages", "proofOfAddress",
+        "additionalPages_anotherSide"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "additionalPages", "proofOfAddress",
+        "additionalPages_anotherSide"), List.of("DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress", "proofOfAddress_fullName",
+        "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "proofOfAddress"
+        , "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "proofOfAddress"
+        , "proofOfAddress_fullName"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badDocument", "proofOfAddress",
+        "badDocument_invalidId"), List.of("BAD_PROOF_OF_ADDRESS", "ID_INVALID"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+                "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+                "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "dataMismatch",
+        "dataMismatch_fullName"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "proofOfAddress_fullName",
+         "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "selfie",
+        "selfie_selfieLiveness"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "proofOfAddress"
+        , "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "proofOfAddress"
+        , "proofOfAddress_fullName"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "badDocument", "badDocument_withoutFace",
+        "selfie"), List.of("BAD_FACE_MATCHING", "BAD_SELFIE", "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "badDocument", "badDocument_withoutFace",
+        "selfie"), List.of("BAD_PROOF_OF_IDENTITY", "BAD_FACE_MATCHING", "BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress", "selfie",
+        "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_issueDate", "proofOfAddress",
+         "selfie"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_listOfDocs", "proofOfAddress"
+        , "selfie"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress_listOfDocs", "proofOfAddress_issueDate"
+        , "proofOfAddress", "additionalPages_anotherSide"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "proofOfAddress_listOfDocs", "proofOfAddress_issueDate"
+        , "proofOfAddress", "additionalPages_anotherSide"), List.of("DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badDocument_expiredId", "badPhoto_screenshot"
+        , "badDocument_notFullNameOrDob"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_screenshot", "badDocument_wrongType"
+        , "badDocument_notFullNameOrDob"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_screenshot", "badDocument_wrongType"
+        , "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "badDocument", "badPhoto_screenshot", "badDocument_wrongType"
+        , "badPhoto_dataNotVisible"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_imageEditor",
+        "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_screenshot",
+        "proofOfAddress_fullAddress", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullName",
+        "badPhoto_screenshot", "badPhoto_dataNotVisible"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress",
+        "badPhoto_imageEditor", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress_listOfDocs",
+        "proofOfAddress", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "badPhoto_imageEditor",
+        "proofOfAddress", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "badPhoto_imageEditor",
+        "proofOfAddress", "proofOfAddress_fullName"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "proofOfAddress_fullAddress", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "proofOfAddress_fullName", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybLowQuality"), List.of("LOW_QUALITY",
+        "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybExpirationDate", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument"), List.of(
+                "EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybExpirationDate", "kybUnsuitableDocument", "kybAdditionalDocuments_kybCertificateOfGoodStanding"), List.of("EXPIRATION_DATE"
+        , "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybAdditionalDocuments_kybCertificateOfGoodStanding",
+        "kybUnsuitableDocument_kybUnsignedDocument"), List.of("UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybAdditionalDocuments_kybLegalExistence",
+        "kybUnsuitableDocument_kybUnsignedDocument"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "UNSUITABLE_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybOther",
+ "kybAdditionalDocuments_kybCertificateOfGoodStanding", "kybAdditionalDocuments_kybLegalExistence", "kybOther_kybIncorrectRegistrationNumber"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_INCORRECT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybOther",
+                "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybOther_kybSoleEntrepreneur", "kybAdditionalDocuments_kybLegalExistence"), List.of(
+                "ADDITIONAL_DOCUMENT_REQUIRED", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybAdditionalDocuments_kybLegalExistence"), List.of(
+                "EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybIncompleteDocument"), List.of(
+                "EXPIRATION_DATE", "INCOMPLETE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybLowQuality"), List.of("EXPIRATION_DATE",
+         "LOW_QUALITY", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"), List.of(
+                "EXPIRATION_DATE", "UNFILLED_ID", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument"), List.of(
+                "EXPIRATION_DATE", "UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress", "kybAdditionalDocuments_kybCertificateOfIncorporation",
+        "kybControlAndOwnershipStructure"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybControlAndOwnershipStructure_kybIncorrectOwnershipStructure", "kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybControlAndOwnershipStructure"), List.of("ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_NOT_DEFINED_OWNERSHIP_STRUCTURE",
+        "COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor", "proofOfAddress_fullAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_incomplete", "badPhoto_editedPoa"), List.of("INCOMPLETE_DOCUMENT", "UNSATISFACTORY_PHOTOS", "GRAPHIC_EDITOR"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot", "badPhoto_incomplete"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "INCOMPLETE_DOCUMENT"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+        "proofOfAddress_fullName", "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "additionalPages"
+        , "proofOfAddress", "additionalPages_anotherSide"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "additionalPages"
+        , "proofOfAddress", "additionalPages_anotherSide"), List.of("DOCUMENT_PAGE_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress", "badPhoto_imageEditor"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress", "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor", "proofOfAddress_fullAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor", "proofOfAddress_fullName"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "fraudulentPatterns", "proofOfAddress",
+        "fraudulentPatterns_selfieMismatch", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "proofOfAddress_fullName",
+         "dataMismatch_fullName", "dataMismatch"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "proofOfAddress_fullName",
+         "dataMismatch_fullName", "dataMismatch"), List.of("BAD_PROOF_OF_ADDRESS", "PROBLEMATIC_APPLICANT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress", "regulationsViolations",
+        "proofOfAddress_fullAddress", "regulationsViolations_age"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress", "badPhoto_imageEditor"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress", "badPhoto_imageEditor"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+ "proofOfAddress", "badPhoto_screenshot"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "proofOfAddress"
+        , "ekycRetry", "ekycRetry_checkUnavailable"), List.of("BAD_PROOF_OF_ADDRESS", "CHECK_UNAVAILABLE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "proofOfAddress"
+                , "proofOfAddress_fullName", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "badDocument", "badDocument_withoutFace",
+                "selfie", "selfie_selfieLiveness"), List.of("BAD_PROOF_OF_IDENTITY", "BAD_FACE_MATCHING", "BAD_SELFIE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_issueDate", "proofOfAddress",
+                "selfie", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_listOfDocs", "proofOfAddress"
+        , "selfie", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "proofOfAddress_fullName",
+                "badPhoto_screenshot", "dataMismatch_fullName", "dataMismatch"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress",
+        "badPhoto_screenshot", "proofOfAddress_fullAddress", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress_listOfDocs",
+        "proofOfAddress", "badPhoto_imageEditor", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_issueDate", "proofOfAddress_listOfDocs",
+        "proofOfAddress", "proofOfAddress_fullName", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress",
+        "badPhoto_screenshot", "proofOfAddress_fullAddress", "badPhoto_dataNotVisible"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "proofOfAddress_issueDate",
+        "proofOfAddress", "proofOfAddress_fullName", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto_sticker", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress", "selfie", "selfie_selfieLiveness"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybOther", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybOther_kybSoleEntrepreneur", "kybAdditionalDocuments_kybLegalExistence"),
+         List.of("ADDITIONAL_DOCUMENT_REQUIRED", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+                "kybUnsuitableDocument_kybPersonalDocument", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+        "kybAdditionalDocuments_kybLegalExistence"), List.of("UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybOther_kybIncorrectCompanyName",
+        "kybUnsuitableDocument_kybExpirationDate", "kybOther", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument"), List.of(
+                "EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_INCORRECT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybControlAndOwnershipStructure_kybMissingKYCForDirectors",
+                "kybControlAndOwnershipStructure"), List.of("EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybOther", "kybUnsuitableDocument", "kybOther_kybSoleEntrepreneur", "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of(
+                "EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybNotADocument",
+        "kybUnsuitableDocument_kybNoDate", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+        "kybUnsuitableDocument_kybUnsignedDocument"), List.of("INCOMPLETE_DOCUMENT", "UNFILLED_ID", "NOT_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybAdditionalDocuments", "kybControlAndOwnershipStructure_kybMissingKYCForDirectors", "kybControlAndOwnershipStructure_kybIncorrectControlStructure"
+        , "kybControlAndOwnershipStructure", "kybAdditionalDocuments_kybOfficialPosition"), List.of("ADDITIONAL_DOCUMENT_REQUIRED",
+        "COMPANY_NOT_DEFINED_STRUCTURE", "COMPANY_NOT_VALIDATED_BENEFICIAL_OWNERS", "COMPANY_NOT_VALIDATED_DIRECTORS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybMissingTranslation", "kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybCompanyRegisterExcerpt", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument"), List.of("EXPIRATION_DATE", "UNSUITABLE_DOCUMENT",
+"ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+ "badPhoto_imageEditor", "proofOfAddress_fullAddress", "badPhoto_incomplete"), List.of("INCOMPLETE_DOCUMENT", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress",
+ "proofOfAddress_fullName", "proofOfAddress_fullAddress", "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress", "badPhoto_imageEditor", "badPhoto_screenshot"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS", "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "badPhoto",
+"proofOfAddress", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "badPhoto",
+        "proofOfAddress", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress",
+        "badPhoto_imageEditor", "selfie", "selfie_selfieLiveness"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "badPhoto", "proofOfAddress_issueDate",
+        "proofOfAddress", "badPhoto_imageEditor", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badDocument",
+ "proofOfAddress", "proofOfAddress_fullName", "badDocument_invalidId"), List.of("ID_INVALID"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress", "proofOfAddress_fullName", "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "badPhoto", "badDocument",
+ "badPhoto_imageEditor", "badDocument_withoutFace", "selfie"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_listOfDocs",
+        "proofOfAddress_issueDate", "proofOfAddress", "selfie", "proofOfAddress_fullAddress"), List.of("BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress", "badPhoto_imageEditor",
+        "proofOfAddress_fullName", "badPhoto_screenshot", "dataMismatch_fullName", "dataMismatch"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS",
+        "SCREENSHOTS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("badPhoto", "proofOfAddress_listOfDocs", "badDocument", "proofOfAddress",
+         "badPhoto_screenshot", "badDocument_wrongType", "badPhoto_dataNotVisible"), List.of("BAD_PROOF_OF_ADDRESS", "SCREENSHOTS", "UNSATISFACTORY_PHOTOS",
+         "BAD_PROOF_OF_IDENTITY"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybExpirationDate", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+                "kybAdditionalDocuments_kybLegalExistence", "kybUnsuitableDocument_kybUnsignedDocument"), List.of("EXPIRATION_DATE", "UNSUITABLE_DOCUMENT",
+                "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybExpirationDate", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+ "kybUnsuitableDocument_kybUnsignedDocument", "kybAdditionalDocuments_kybOfficialPosition"), List.of("EXPIRATION_DATE", "UNFILLED_ID",
+        "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybOther_kybIncorrectCompanyName",
+        "kybUnsuitableDocument_kybExpirationDate", "kybOther", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+        "kybAdditionalDocuments_kybOfficialPosition"), List.of("EXPIRATION_DATE", "ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_INCORRECT_DATA"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybUnsuitableDocument_kybUnsignedDocument",
+        "kybAdditionalDocuments_kybCertificateOfIncorporation", "kybUnsuitableDocument_kybScreenshot"), List.of("EXPIRATION_DATE", "UNSUITABLE_DOCUMENT",
+        "SCREENSHOTS", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybControlAndOwnershipStructure_kybMissingKYCForUBOs",
+        "kybAdditionalDocuments", "kybUnsuitableDocument_kybExpirationDate", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument"
+        , "kybUnsuitableDocument_kybUnsignedDocument", "kybControlAndOwnershipStructure"), List.of("EXPIRATION_DATE", "UNFILLED_ID",
+        "ADDITIONAL_DOCUMENT_REQUIRED", "COMPANY_NOT_DEFINED_STRUCTURE"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "badPhoto", "proofOfAddress_listOfDocs",
+        "proofOfAddress", "proofOfAddress_fullName", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS", "UNSATISFACTORY_PHOTOS",
+        "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_issueDate", "proofOfAddress_listOfDocs", "additionalPages"
+        , "badPhoto", "proofOfAddress", "additionalPages_anotherSide", "badPhoto_editedPoa"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("proofOfAddress_listOfDocs", "proofOfAddress_issueDate", "badPhoto",
+        "proofOfAddress", "badPhoto_imageEditor", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("GRAPHIC_EDITOR", "UNSATISFACTORY_PHOTOS",
+        "SCREENSHOTS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("additionalPages", "badPhoto", "proofOfAddress_listOfDocs", "badDocument"
+        , "proofOfAddress", "additionalPages_anotherSide", "badPhoto_screenshot", "badDocument_notFullNameOrDob"), List.of("BAD_PROOF_OF_IDENTITY",
+        "DOCUMENT_PAGE_MISSING", "BAD_PROOF_OF_ADDRESS", "SCREENSHOTS", "UNSATISFACTORY_PHOTOS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybPersonalDocument", "kybOther", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+        "kybOther_kybSoleEntrepreneur", "kybAdditionalDocuments_kybLegalExistence"), List.of("NOT_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED",
+                "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybUnsuitableDocument_kybNotADocument", "kybAdditionalDocuments",
+        "kybAdditionalDocuments_kybProofOfAddress", "kybAdditionalDocuments_kybCompanyRegisterExcerpt",
+        "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument", "kybAdditionalDocuments_kybLegalExistence",
+        "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of("NOT_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("selfie_badFaceComparison", "proofOfAddress_listOfDocs",
+        "proofOfAddress_issueDate", "badPhoto", "proofOfAddress", "selfie", "badPhoto_screenshot", "proofOfAddress_fullAddress"), List.of("SCREENSHOTS",
+        "UNSATISFACTORY_PHOTOS", "BAD_PROOF_OF_ADDRESS"))).getReviewMessageForApplicant());
+        assertNotNull(sumsubMapper.apply(stubSumsubEventWithRejectionLabels(List.of("kybAdditionalDocuments", "kybAdditionalDocuments_kybProofOfAddress",
+        "kybUnsuitableDocument_kybPersonalDocument", "kybOther", "kybAdditionalDocuments_kybRegisterOfShareholdersOrUBOs", "kybUnsuitableDocument",
+        "kybOther_kybSoleEntrepreneur", "kybAdditionalDocuments_kybLegalExistence", "kybAdditionalDocuments_kybCertificateOfIncorporation"), List.of(
+                "UNSUITABLE_DOCUMENT", "ADDITIONAL_DOCUMENT_REQUIRED", "DOCUMENT_MISSING"))).getReviewMessageForApplicant());
+    }
+
+    private SumsubWebhookEventDTO stubSumsubEventWithRejectionLabels(final List<String> buttonIds, final List<String> rejectLabels) {
+        final SumsubWebhookEventDTO sumsubWebhookEventDTO = new SumsubWebhookEventDTO();
+        sumsubWebhookEventDTO.setApplicantType("individual");
+        sumsubWebhookEventDTO.setExternalUserId(UUID.randomUUID().toString());
+        sumsubWebhookEventDTO.setReviewStatus("completed");
+        sumsubWebhookEventDTO.setApplicantId(faker.lorem().word());
+        final SumsubWebhookEventDTO.ReviewResultDTO reviewResultDTO = new SumsubWebhookEventDTO.ReviewResultDTO();
+        reviewResultDTO.setRejectLabels(rejectLabels);
+        reviewResultDTO.setButtonIds(buttonIds);
+        reviewResultDTO.setReviewRejectType("RETRY");
+        reviewResultDTO.setReviewAnswer("RED");
+        sumsubWebhookEventDTO.setReviewResult(reviewResultDTO);
+        return sumsubWebhookEventDTO;
     }
 
     private static final String SUMSUB_INDIVIDUAL_RESPONSE_JSON = """

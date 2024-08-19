@@ -92,4 +92,6 @@ public interface BillingProfileStoragePort {
     Optional<PayoutInfo> getPayoutInfo(BillingProfile.Id billingProfileId);
 
     List<BillingProfile> findAllByCreationDate(ZonedDateTime creationDate);
+
+    Optional<String> findExternalRejectionReason(String groupId, String buttonId, String label);
 }

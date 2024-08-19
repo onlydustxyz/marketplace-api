@@ -130,8 +130,9 @@ public class AccountingConfiguration {
     public BillingProfileVerificationFacadePort billingProfileVerificationFacadePort(final OutboxPort billingProfileVerificationOutbox,
                                                                                      final BillingProfileStoragePort billingProfileStoragePort,
                                                                                      final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                                     final BillingProfileObserverPort billingProfileObservers) {
-        return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
+                                                                                     final BillingProfileObserverPort billingProfileObservers,
+                                                                                     final SumsubMapper sumsubMapper) {
+        return new BillingProfileVerificationService(billingProfileVerificationOutbox, sumsubMapper, billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
                 billingProfileObservers);
     }
@@ -140,10 +141,19 @@ public class AccountingConfiguration {
     public OutboxConsumer billingProfileVerificationOutboxConsumer(final OutboxPort billingProfileVerificationOutbox,
                                                                    final BillingProfileStoragePort billingProfileStoragePort,
                                                                    final BillingProfileVerificationProviderPort billingProfileVerificationProviderPort,
-                                                                   final BillingProfileObserverPort billingProfileObservers) {
-        return new BillingProfileVerificationService(billingProfileVerificationOutbox, new SumsubMapper(), billingProfileStoragePort,
+                                                                   final BillingProfileObserverPort billingProfileObservers,
+                                                                   final SumsubMapper sumsubMapper
+    ) {
+        return new BillingProfileVerificationService(billingProfileVerificationOutbox,
+                sumsubMapper,
+                billingProfileStoragePort,
                 billingProfileVerificationProviderPort,
                 billingProfileObservers);
+    }
+
+    @Bean
+    public SumsubMapper sumsubMapper(final BillingProfileVerificationRejectionReasonFacadePort billingProfileVerificationRejectionReasonFacadePort) {
+        return new SumsubMapper(billingProfileVerificationRejectionReasonFacadePort);
     }
 
     @Bean
@@ -160,5 +170,10 @@ public class AccountingConfiguration {
     @Bean
     public AccountingPermissionService accountingPermissionService(final @NonNull SponsorStoragePort sponsorStoragePort) {
         return new AccountingPermissionService(sponsorStoragePort);
+    }
+
+    @Bean
+    public BillingProfileVerificationRejectionReasonFacadePort billingProfileVerificationRejectionReasonFacadePort(final BillingProfileStoragePort billingProfileStoragePort) {
+        return new BillingProfileVerificationRejectionReasonService(billingProfileStoragePort);
     }
 }
