@@ -7,9 +7,9 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccountValidatorAdapter;
-import onlydust.com.marketplace.api.infura.adapters.EthInfuraEnsValidatorAdapter;
-import onlydust.com.marketplace.api.infura.adapters.InfuraEvmAccountAddressValidatorAdapter;
+import onlydust.com.marketplace.api.infura.adapters.EthWeb3EnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
+import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidatorAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
@@ -87,9 +87,9 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public PayoutInfoValidator payoutInfoValidator(final @NonNull EthInfuraEnsValidatorAdapter ethereumEnsValidatorAdapter,
+    public PayoutInfoValidator payoutInfoValidator(final @NonNull EthWeb3EnsValidatorAdapter ethereumEnsValidatorAdapter,
                                                    final @NonNull StarknetAccountValidatorAdapter starknetEnsValidatorAdapter,
-                                                   final @NonNull InfuraEvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter,
+                                                   final @NonNull Web3EvmAccountAddressValidatorAdapter infuraEvmAccountAddressValidatorAdapter,
                                                    final @NonNull AptosAccountValidatorAdapter aptosAccountValidatorAdapter,
                                                    final @NonNull StellarAccountIdValidator stellarAccountIdValidator) {
         return new PayoutInfoValidator(ethereumEnsValidatorAdapter, starknetEnsValidatorAdapter, infuraEvmAccountAddressValidatorAdapter,

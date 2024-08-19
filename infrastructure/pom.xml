@@ -22,7 +22,7 @@
         <module>indexer-api-client-adapter</module>
         <module>aws-s3-adapter</module>
         <module>auth0-api-client-adapter</module>
-        <module>infura-adapter</module>
+        <module>json-rpc-adapter</module>
         <module>coinmarketcap-adapter</module>
         <module>posthog-api-client-adapter</module>
         <module>sumsub-api-client-adapter</module>

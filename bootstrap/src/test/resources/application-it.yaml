@@ -33,7 +33,6 @@ infrastructure:
     api-key: INFURA_API_KEY
   starknet:
     private-key: 0xcc6a05adc43ec626fd374dc325ed7d95bd13d35758997931a70cbdc26cc129fe
-    api-key: INFURA_API_KEY
   coinmarketcap:
     api-key: CMC_API_KEY
   sumsub:

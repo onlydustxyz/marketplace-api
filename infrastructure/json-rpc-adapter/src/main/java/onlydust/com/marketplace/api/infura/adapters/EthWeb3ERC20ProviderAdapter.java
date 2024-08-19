@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.infura.adapters;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
-import onlydust.com.marketplace.api.infura.InfuraClient;
+import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import org.web3j.abi.TypeReference;
@@ -23,8 +23,8 @@ import java.util.concurrent.ExecutionException;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-public class EthInfuraERC20ProviderAdapter extends InfuraClient implements ERC20Provider {
-    public EthInfuraERC20ProviderAdapter(final Properties properties) {
+public class EthWeb3ERC20ProviderAdapter extends Web3Client implements ERC20Provider {
+    public EthWeb3ERC20ProviderAdapter(final Properties properties) {
         super(properties);
     }
 

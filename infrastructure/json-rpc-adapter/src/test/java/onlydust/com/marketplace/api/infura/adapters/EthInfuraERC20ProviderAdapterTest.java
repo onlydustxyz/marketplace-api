@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.infura.adapters;
 
-import onlydust.com.marketplace.api.infura.InfuraClient;
+import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
@@ -10,9 +10,9 @@ import java.math.BigInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class EthInfuraERC20ProviderAdapterTest {
-    final InfuraClient.Properties properties =
-            new InfuraClient.Properties("https://mainnet.infura.io/v3", "<API_KEY>", "<PRIVATE_KEY>", Blockchain.ETHEREUM); // https://key.tokenpocket.pro/#/?network=ETH
-    final EthInfuraERC20ProviderAdapter adapter = new EthInfuraERC20ProviderAdapter(properties);
+    final Web3Client.Properties properties =
+            new Web3Client.Properties("https://mainnet.infura.io/v3", "<API_KEY>", "<PRIVATE_KEY>", Blockchain.ETHEREUM); // https://key.tokenpocket.pro/#/?network=ETH
+    final EthWeb3ERC20ProviderAdapter adapter = new EthWeb3ERC20ProviderAdapter(properties);
     final EvmContractAddress USDC = Ethereum.contractAddress("0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB49");
 
     //    @Test

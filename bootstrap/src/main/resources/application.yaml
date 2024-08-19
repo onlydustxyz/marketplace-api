@@ -148,8 +148,7 @@ infrastructure:
     blockchain: optimism
     private-key: ${ETHEREUM_PRIVATE_KEY}
   starknet:
-    base-uri: https://starknet-mainnet.infura.io/v3
-    api-key: ${INFURA_API_KEY}
+    base-uri: https://starknet.blockpi.network/v1/rpc/public
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
   stellar:
