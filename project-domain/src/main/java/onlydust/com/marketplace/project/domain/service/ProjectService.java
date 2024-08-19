@@ -75,7 +75,8 @@ public class ProjectService implements ProjectFacadePort {
                 ProjectRewardSettings.defaultSettings(dateProvider.now()),
                 command.getEcosystemIds(),
                 command.getCategoryIds(),
-                command.getCategorySuggestions()
+                command.getCategorySuggestions(),
+                true
         );
 
         projectObserverPort.onProjectCreated(projectId, projectLeadId);
