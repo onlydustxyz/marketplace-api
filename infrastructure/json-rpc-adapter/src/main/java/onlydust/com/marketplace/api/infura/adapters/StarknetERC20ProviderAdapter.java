@@ -24,7 +24,7 @@ public class StarknetERC20ProviderAdapter implements ERC20Provider {
     Blockchain blockchain;
 
     public StarknetERC20ProviderAdapter(final Web3Client.Properties properties) {
-        provider = new JsonRpcProvider(properties.uri());
+        provider = new JsonRpcProvider(properties.getBaseUri());
         blockchain = properties.getBlockchain();
         assert blockchain == Blockchain.STARKNET;
     }

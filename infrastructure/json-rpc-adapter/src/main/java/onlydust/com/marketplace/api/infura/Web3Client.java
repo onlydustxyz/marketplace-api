@@ -23,7 +23,7 @@ public class Web3Client {
 
     public Web3Client(Properties properties) {
         this.web3j = switch (properties.blockchain) {
-            case ETHEREUM, OPTIMISM -> Web3j.build(new HttpService(properties.uri()));
+            case ETHEREUM, OPTIMISM -> Web3j.build(new HttpService(properties.getBaseUri()));
             default -> throw new IllegalArgumentException("Unsupported blockchain: %s".formatted(properties.blockchain));
         };
         this.gasPriceProvider = new DefaultGasProvider();
@@ -56,12 +56,7 @@ public class Web3Client {
     @NoArgsConstructor
     public static class Properties {
         String baseUri;
-        String apiKey;
         String privateKey;
         Blockchain blockchain;
-
-        public String uri() {
-            return apiKey == null ? baseUri : "%s/%s".formatted(baseUri, apiKey);
-        }
     }
 }

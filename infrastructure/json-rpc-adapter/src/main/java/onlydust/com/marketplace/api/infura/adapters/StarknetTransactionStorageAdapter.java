@@ -16,7 +16,7 @@ public class StarknetTransactionStorageAdapter implements BlockchainTransactionS
     Provider provider;
 
     public StarknetTransactionStorageAdapter(final Web3Client.Properties properties) {
-        provider = new JsonRpcProvider(properties.uri());
+        provider = new JsonRpcProvider(properties.getBaseUri());
     }
 
     @Override

@@ -1,6 +1,6 @@
 {
     "request": {
-        "url": "/INFURA_API_KEY",
+        "url": "/",
         "method": "POST",
         "bodyPatterns": [
             {
