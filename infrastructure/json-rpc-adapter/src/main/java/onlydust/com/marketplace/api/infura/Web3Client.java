@@ -15,15 +15,15 @@ import java.io.IOException;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
-public class InfuraClient {
+public class Web3Client {
     protected final Web3j web3j;
     protected final DefaultGasProvider gasPriceProvider;
     protected final Credentials credentials;
     private final Properties properties;
 
-    public InfuraClient(Properties properties) {
+    public Web3Client(Properties properties) {
         this.web3j = switch (properties.blockchain) {
-            case ETHEREUM, OPTIMISM -> Web3j.build(new HttpService("%s/%s".formatted(properties.baseUri, properties.apiKey)));
+            case ETHEREUM, OPTIMISM -> Web3j.build(new HttpService(properties.getBaseUri()));
             default -> throw new IllegalArgumentException("Unsupported blockchain: %s".formatted(properties.blockchain));
         };
         this.gasPriceProvider = new DefaultGasProvider();
@@ -56,7 +56,6 @@ public class InfuraClient {
     @NoArgsConstructor
     public static class Properties {
         String baseUri;
-        String apiKey;
         String privateKey;
         Blockchain blockchain;
     }

@@ -789,7 +789,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                              "transactionReferenceLink": "https://etherscan.io/tx/0x14"
                            }
                          }
-                         """
+                        """
                 );
 
         client.get()
@@ -1002,7 +1002,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
-                         
                         {
                            "amount": {
                              "amount": 30,
@@ -1046,7 +1045,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                              "transactionReferenceLink": "https://starkscan.co/tx/0x016096a49c236dfdbc5808c31a1d6eee90a082ca5717366a73b03a2eb80cd252"
                            }
                          }
-                         """
+                        """
                 );
 
         client.get()
@@ -1242,7 +1241,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .is2xxSuccessful()
                 .expectBody()
                 .json("""
-                         
+                        
                         {
                            "amount": {
                              "amount": 30,
@@ -1259,7 +1258,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                              "transactionReferenceLink": "https://aptoscan.com/transaction/0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f"
                            }
                          }
-                         """
+                        """
                 );
 
         client.get()

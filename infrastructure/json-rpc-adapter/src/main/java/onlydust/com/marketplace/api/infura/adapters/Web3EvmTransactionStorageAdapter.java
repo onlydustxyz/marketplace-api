@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.infura.adapters;
 
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
-import onlydust.com.marketplace.api.infura.InfuraClient;
+import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
 
@@ -11,8 +11,8 @@ import java.time.ZoneOffset;
 import java.util.Optional;
 
 @Slf4j
-public class InfuraEvmTransactionStorageAdapter extends InfuraClient implements BlockchainTransactionStoragePort<EvmTransaction, EvmTransaction.Hash> {
-    public InfuraEvmTransactionStorageAdapter(Properties properties) {
+public class Web3EvmTransactionStorageAdapter extends Web3Client implements BlockchainTransactionStoragePort<EvmTransaction, EvmTransaction.Hash> {
+    public Web3EvmTransactionStorageAdapter(Properties properties) {
         super(properties);
     }
 

@@ -11,8 +11,8 @@ import onlydust.com.marketplace.accounting.domain.service.CurrencyService;
 import onlydust.com.marketplace.api.infrastructure.accounting.AccountingServiceAdapter;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosTransactionStorageAdapter;
 import onlydust.com.marketplace.api.infrastructure.langchain.adapters.LangchainLLMAdapter;
-import onlydust.com.marketplace.api.infura.adapters.InfuraEvmTransactionStorageAdapter;
-import onlydust.com.marketplace.api.infura.adapters.StarknetInfuraTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infura.adapters.StarknetTransactionStorageAdapter;
+import onlydust.com.marketplace.api.infura.adapters.Web3EvmTransactionStorageAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileVerificationEventEntity;
 import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
@@ -346,9 +346,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public BlockchainFacadePort blockchainFacadePort(final InfuraEvmTransactionStorageAdapter ethereumTransactionStorageAdapter,
-                                                     final InfuraEvmTransactionStorageAdapter optimismTransactionStorageAdapter,
-                                                     final StarknetInfuraTransactionStorageAdapter starknetTransactionStoragePort,
+    public BlockchainFacadePort blockchainFacadePort(final Web3EvmTransactionStorageAdapter ethereumTransactionStorageAdapter,
+                                                     final Web3EvmTransactionStorageAdapter optimismTransactionStorageAdapter,
+                                                     final StarknetTransactionStorageAdapter starknetTransactionStoragePort,
                                                      final AptosTransactionStorageAdapter aptosTransactionStorageAdapter,
                                                      final StellarTransactionStorageAdapter stellarTransactionStorageAdapter) {
         return new BlockchainService(ethereumTransactionStorageAdapter, optimismTransactionStorageAdapter, aptosTransactionStorageAdapter,

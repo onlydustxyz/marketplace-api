@@ -2,17 +2,23 @@
     "jsonrpc": "2.0",
     "id": {{jsonPath request.body '$.id'}},
     "result": {
+        "status": "ACCEPTED_ON_L1",
         "block_hash": "0x29369230c32633ec9950456a363d8d919c8e4bc5d6b783ba89772051c7b4366",
+        "parent_hash": "0x4f9b9a58eb6cf3663c5e0930657de461392cde3af823d297afc71501e1ca2eb",
         "block_number": 635185,
+        "new_root": "0x2be25c37fa4d0c08ee641a304f9acfa334f19077ddd2b8ee838dcb6699077bd",
+        "timestamp": 1713898290,
+        "sequencer_address": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
         "l1_gas_price": {
+            "price_in_fri": "0x23d5c9d9e1e6",
             "price_in_wei": "0x3cb359a03"
         },
-        "new_root": "0x2be25c37fa4d0c08ee641a304f9acfa334f19077ddd2b8ee838dcb6699077bd",
-        "parent_hash": "0x4f9b9a58eb6cf3663c5e0930657de461392cde3af823d297afc71501e1ca2eb",
-        "sequencer_address": "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
+        "l1_data_gas_price": {
+            "price_in_fri": "0x972",
+            "price_in_wei": "0x1"
+        },
+        "l1_da_mode": "BLOB",
         "starknet_version": "0.13.1.1",
-        "status": "ACCEPTED_ON_L2",
-        "timestamp": 1713898290,
         "transactions": [
             "0x210b9a1edd9ef203b0cf1c37c76b69489bde0352935ffdd6463e06672e7dc3",
             "0x223c05961fd1c9d5be339f16c1377e2b508aad05a76a6120b53af2b3d43fa4b",

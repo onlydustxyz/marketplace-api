@@ -99,7 +99,7 @@
         </dependency>
         <dependency>
             <groupId>com.onlydust.marketplace.api</groupId>
-            <artifactId>infura-adapter</artifactId>
+            <artifactId>json-rpc-adapter</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>

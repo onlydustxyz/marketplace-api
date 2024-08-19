@@ -137,18 +137,15 @@ infrastructure:
     base-uri: https://pro-api.coinmarketcap.com
     api-key: ${COINMARKETCAP_API_KEY}
   ethereum:
-    base-uri: https://mainnet.infura.io/v3
-    api-key: ${INFURA_API_KEY}
+    base-uri: https://mainnet.infura.io/v3/${INFURA_API_KEY}
     blockchain: ethereum
     private-key: ${ETHEREUM_PRIVATE_KEY}
   optimism:
-    base-uri: https://optimism-mainnet.infura.io/v3
-    api-key: ${INFURA_API_KEY}
+    base-uri: https://optimism-mainnet.infura.io/v3/${INFURA_API_KEY}
     blockchain: optimism
     private-key: ${ETHEREUM_PRIVATE_KEY}
   starknet:
-    base-uri: https://starknet-mainnet.infura.io/v3
-    api-key: ${INFURA_API_KEY}
+    base-uri: https://starknet.blockpi.network/v1/rpc/public
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
   stellar:

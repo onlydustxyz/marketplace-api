@@ -2,14 +2,13 @@ package onlydust.com.marketplace.api.infura.adapters;
 
 import com.swmansion.starknet.data.types.Call;
 import com.swmansion.starknet.data.types.Felt;
-import com.swmansion.starknet.data.types.StarknetChainId;
 import com.swmansion.starknet.data.types.Uint256;
 import com.swmansion.starknet.provider.Provider;
 import com.swmansion.starknet.provider.rpc.JsonRpcProvider;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
-import onlydust.com.marketplace.api.infura.InfuraClient;
+import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
@@ -20,12 +19,12 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-public class StarknetInfuraERC20ProviderAdapter implements ERC20Provider {
+public class StarknetERC20ProviderAdapter implements ERC20Provider {
     Provider provider;
     Blockchain blockchain;
 
-    public StarknetInfuraERC20ProviderAdapter(final InfuraClient.Properties properties) {
-        provider = new JsonRpcProvider("%s/%s".formatted(properties.getBaseUri(), properties.getApiKey()), StarknetChainId.MAINNET);
+    public StarknetERC20ProviderAdapter(final Web3Client.Properties properties) {
+        provider = new JsonRpcProvider(properties.getBaseUri());
         blockchain = properties.getBlockchain();
         assert blockchain == Blockchain.STARKNET;
     }
