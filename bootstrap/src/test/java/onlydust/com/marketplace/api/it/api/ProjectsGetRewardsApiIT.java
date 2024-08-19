@@ -152,7 +152,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewards": [],
                           "remainingBudget": {
-                            "totalUsdEquivalent": 5345940.00,
+                            "totalUsdEquivalent": 5345951.96,
                             "totalPerCurrency": [
                               {
                                 "amount": 3000,
@@ -164,7 +164,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 5345940.00,
+                                "usdEquivalent": 5345951.96,
                                 "usdConversionRate": null
                               }
                             ]
@@ -221,7 +221,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.rewardedUser.login == 'gregcha')]").exists()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
-                .jsonPath("$.remainingBudget.totalUsdEquivalent").isEqualTo(5566182)
+                .jsonPath("$.remainingBudget.totalUsdEquivalent").isEqualTo(5566730)
                 .jsonPath("$.spentAmount.amount").doesNotExist()
                 .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.totalUsdEquivalent").isEqualTo(9060)
@@ -259,7 +259,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.rewards[?(@.requestedAt > '2023-09-26')]").doesNotExist()
                 .jsonPath("$.remainingBudget.amount").doesNotExist()
                 .jsonPath("$.remainingBudget.currency").doesNotExist()
-                .jsonPath("$.remainingBudget.totalUsdEquivalent").isEqualTo(5566182)
+                .jsonPath("$.remainingBudget.totalUsdEquivalent").isEqualTo(5566730)
                 .jsonPath("$.spentAmount.amount").doesNotExist()
                 .jsonPath("$.spentAmount.currency").doesNotExist()
                 .jsonPath("$.spentAmount.totalUsdEquivalent").isEqualTo(2020)
@@ -295,7 +295,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewards": [],
                           "remainingBudget": {
-                            "totalUsdEquivalent": 5345940.00,
+                            "totalUsdEquivalent": 5345951.96,
                             "totalPerCurrency": [
                               {
                                 "amount": 3000,
@@ -307,7 +307,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 5345940.00,
+                                "usdEquivalent": 5345951.96,
                                 "usdConversionRate": null
                               }
                             ]
@@ -427,7 +427,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "rewards": [],
                           "remainingBudget": {
-                            "totalUsdEquivalent": 100242.5000,
+                            "totalUsdEquivalent": 100242.60,
                             "totalPerCurrency": [
                               {
                                 "amount": 99250.00,
@@ -439,7 +439,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": 100242.5000,
+                                "usdEquivalent": 100242.60,
                                 "usdConversionRate": null
                               }
                             ]
@@ -464,11 +464,7 @@ public class ProjectsGetRewardsApiIT extends AbstractMarketplaceApiIT {
                           },
                           "sentRewardsCount": 0,
                           "rewardedContributionsCount": 0,
-                          "rewardedContributorsCount": 0,
-                          "hasMore": false,
-                          "totalPageNumber": 0,
-                          "totalItemNumber": 0,
-                          "nextPageIndex": 0
+                          "rewardedContributorsCount": 0
                         }
                         """)
         ;

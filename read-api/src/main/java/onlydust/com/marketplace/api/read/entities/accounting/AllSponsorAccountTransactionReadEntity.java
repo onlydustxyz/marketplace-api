@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+
 @Entity
 @NoArgsConstructor(force = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
@@ -88,6 +90,6 @@ public class AllSponsorAccountTransactionReadEntity {
                         .amount(amount)
                         .currency(sponsorAccount.currency().toBoShortResponse())
                         .conversionRate(usdQuote)
-                        .dollarsEquivalent(usdQuote == null ? null : usdQuote.multiply(amount)));
+                        .dollarsEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount))));
     }
 }

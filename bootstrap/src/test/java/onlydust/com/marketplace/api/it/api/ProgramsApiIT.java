@@ -189,8 +189,21 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .json("""
                                 {
                                   "totalAvailable": {
-                                    "totalUsdEquivalent": 13483.86,
+                                    "totalUsdEquivalent": 13483.89,
                                     "totalPerCurrency": [
+                                      {
+                                        "amount": 7,
+                                        "prettyAmount": 7,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 12473.89,
+                                        "usdConversionRate": 1781.983987
+                                      },
                                       {
                                         "amount": 1000,
                                         "prettyAmount": 1000,
@@ -202,11 +215,16 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 1010.00,
-                                        "usdConversionRate": 1.01
-                                      },
+                                        "usdConversionRate": 1.010001
+                                      }
+                                    ]
+                                  },
+                                  "totalGranted": {
+                                    "totalUsdEquivalent": 9414.92,
+                                    "totalPerCurrency": [
                                       {
-                                        "amount": 7,
-                                        "prettyAmount": 7,
+                                        "amount": 5,
+                                        "prettyAmount": 5,
                                         "currency": {
                                           "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                           "code": "ETH",
@@ -214,14 +232,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 12473.86,
-                                        "usdConversionRate": 1781.98
-                                      }
-                                    ]
-                                  },
-                                  "totalGranted": {
-                                    "totalUsdEquivalent": 9414.9,
-                                    "totalPerCurrency": [
+                                        "usdEquivalent": 8909.92,
+                                        "usdConversionRate": 1781.983987
+                                      },
                                       {
                                         "amount": 500,
                                         "prettyAmount": 500,
@@ -233,11 +246,16 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 505.00,
-                                        "usdConversionRate": 1.01
-                                      },
+                                        "usdConversionRate": 1.010001
+                                      }
+                                    ]
+                                  },
+                                  "totalRewarded": {
+                                    "totalUsdEquivalent": 5749.95,
+                                    "totalPerCurrency": [
                                       {
-                                        "amount": 5,
-                                        "prettyAmount": 5,
+                                        "amount": 3,
+                                        "prettyAmount": 3,
                                         "currency": {
                                           "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                           "code": "ETH",
@@ -245,14 +263,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 8909.90,
-                                        "usdConversionRate": 1781.98
-                                      }
-                                    ]
-                                  },
-                                  "totalRewarded": {
-                                    "totalUsdEquivalent": 5749.94,
-                                    "totalPerCurrency": [
+                                        "usdEquivalent": 5345.95,
+                                        "usdConversionRate": 1781.983987
+                                      },
                                       {
                                         "amount": 400,
                                         "prettyAmount": 400,
@@ -264,20 +277,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 404.00,
-                                        "usdConversionRate": 1.01
-                                      },
-                                      {
-                                        "amount": 3,
-                                        "prettyAmount": 3,
-                                        "currency": {
-                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                          "code": "ETH",
-                                          "name": "Ether",
-                                          "logoUrl": null,
-                                          "decimals": 18
-                                        },
-                                        "usdEquivalent": 5345.94,
-                                        "usdConversionRate": 1781.98
+                                        "usdConversionRate": 1.010001
                                       }
                                     ]
                                   }
@@ -316,7 +316,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 1515.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -334,7 +334,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -352,7 +352,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -361,7 +361,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "date": "2024-02-01",
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": 21383.76,
+                                        "totalUsdEquivalent": 21383.81,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 12,
@@ -373,8 +373,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 21383.76,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 21383.81,
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -392,7 +392,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -410,7 +410,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -419,7 +419,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "date": "2024-04-01",
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": 18627.80,
+                                        "totalUsdEquivalent": 18627.84,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 10,
@@ -431,8 +431,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 17819.80,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 17819.84,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 800,
@@ -445,12 +445,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 808.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
                                       "totalGranted": {
-                                        "totalUsdEquivalent": 4270.96,
+                                        "totalUsdEquivalent": 4270.97,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 2,
@@ -462,8 +462,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 3563.96,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 3563.97,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 700,
@@ -476,7 +476,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 707.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -494,7 +494,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           },
                                           {
                                             "amount": 0,
@@ -507,7 +507,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -516,7 +516,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "date": "2024-05-01",
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": 12473.86,
+                                        "totalUsdEquivalent": 12473.89,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 7,
@@ -528,13 +528,13 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 12473.86,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 12473.89,
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
                                       "totalGranted": {
-                                        "totalUsdEquivalent": 5345.94,
+                                        "totalUsdEquivalent": 5345.95,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 3,
@@ -546,8 +546,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 5345.94,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 5345.95,
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -565,7 +565,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -587,7 +587,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 1010.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -605,7 +605,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": -202.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -623,7 +623,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -632,7 +632,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "date": "2024-07-01",
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": 13483.86,
+                                        "totalUsdEquivalent": 13483.89,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 7,
@@ -644,8 +644,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 12473.86,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 12473.89,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 1000,
@@ -658,7 +658,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 1010.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -676,7 +676,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           },
                                           {
                                             "amount": 0,
@@ -689,7 +689,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
@@ -707,7 +707,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 1781.98,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 300,
@@ -720,7 +720,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 303.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -729,7 +729,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "date": "2024-08-01",
                                       "totalAvailable": {
-                                        "totalUsdEquivalent": 13483.86,
+                                        "totalUsdEquivalent": 13483.89,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 7,
@@ -741,8 +741,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 12473.86,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 12473.89,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 1000,
@@ -755,7 +755,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 1010.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -773,7 +773,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           },
                                           {
                                             "amount": 0,
@@ -786,12 +786,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           }
                                         ]
                                       },
                                       "totalRewarded": {
-                                        "totalUsdEquivalent": 3664.96,
+                                        "totalUsdEquivalent": 3664.97,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 2,
@@ -803,8 +803,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 3563.96,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 3563.97,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 100,
@@ -817,7 +817,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 101.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -949,7 +949,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 2222.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     },
                                     {
@@ -966,7 +966,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 707.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     },
                                     {
@@ -982,8 +982,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 21383.76,
-                                        "usdConversionRate": 1781.98
+                                        "usdEquivalent": 21383.81,
+                                        "usdConversionRate": 1781.983987
                                       }
                                     },
                                     {
@@ -1000,7 +1000,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 505.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     },
                                     {
@@ -1016,8 +1016,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 3563.96,
-                                        "usdConversionRate": 1781.98
+                                        "usdEquivalent": 3563.97,
+                                        "usdConversionRate": 1781.983987
                                       }
                                     }
                                   ]
@@ -1126,7 +1126,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 1781.98,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 500,
@@ -1139,12 +1139,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 505.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
                                       "totalGranted": {
-                                        "totalUsdEquivalent": 5951.94,
+                                        "totalUsdEquivalent": 5951.95,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 3,
@@ -1156,8 +1156,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 5345.94,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 5345.95,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 600,
@@ -1170,12 +1170,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 606.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
                                       "totalRewarded": {
-                                        "totalUsdEquivalent": 3664.96,
+                                        "totalUsdEquivalent": 3664.97,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 2,
@@ -1187,8 +1187,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 3563.96,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 3563.97,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 100,
@@ -1201,7 +1201,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 101.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -1248,7 +1248,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 1781.98,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 400,
@@ -1261,12 +1261,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 404.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
                                       "totalGranted": {
-                                        "totalUsdEquivalent": 4371.96,
+                                        "totalUsdEquivalent": 4371.97,
                                         "totalPerCurrency": [
                                           {
                                             "amount": 1,
@@ -1291,8 +1291,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": null,
                                               "decimals": 18
                                             },
-                                            "usdEquivalent": 3563.96,
-                                            "usdConversionRate": 1781.98
+                                            "usdEquivalent": 3563.97,
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 800,
@@ -1305,7 +1305,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 808.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
@@ -1336,7 +1336,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 18
                                             },
                                             "usdEquivalent": 1781.98,
-                                            "usdConversionRate": 1781.98
+                                            "usdConversionRate": 1781.983987
                                           },
                                           {
                                             "amount": 400,
@@ -1349,12 +1349,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "decimals": 6
                                             },
                                             "usdEquivalent": 404.00,
-                                            "usdConversionRate": 1.01
+                                            "usdConversionRate": 1.010001
                                           }
                                         ]
                                       },
                                       "percentUsedBudget": 0.50,
-                                      "averageRewardUsdAmount": 1092.9900000000000000,
+                                      "averageRewardUsdAmount": 1092.99,
                                       "mergedPrCount": {
                                         "value": 0,
                                         "trend": "STABLE"

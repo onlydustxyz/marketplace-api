@@ -80,7 +80,7 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                           "mergedPrCount": 2,
                           "rewardCount": 2,
                           "totalGranted": {
-                            "totalUsdEquivalent": 4573.96,
+                            "totalUsdEquivalent": 4573.97,
                             "totalPerCurrency": [
                               {
                                 "amount": 3,
@@ -105,8 +105,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 3563.96,
-                                "usdConversionRate": 1781.98
+                                "usdEquivalent": 3563.97,
+                                "usdConversionRate": 1781.983987
                               },
                               {
                                 "amount": 1000,
@@ -119,12 +119,12 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 6
                                 },
                                 "usdEquivalent": 1010.00,
-                                "usdConversionRate": 1.01
+                                "usdConversionRate": 1.010001
                               }
                             ]
                           },
                           "totalRewarded": {
-                            "totalUsdEquivalent": 3866.96,
+                            "totalUsdEquivalent": 3866.97,
                             "totalPerCurrency": [
                               {
                                 "amount": 1,
@@ -149,8 +149,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 3563.96,
-                                "usdConversionRate": 1781.98
+                                "usdEquivalent": 3563.97,
+                                "usdConversionRate": 1781.983987
                               },
                               {
                                 "amount": 300,
@@ -163,7 +163,7 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 6
                                 },
                                 "usdEquivalent": 303.00,
-                                "usdConversionRate": 1.01
+                                "usdConversionRate": 1.010001
                               }
                             ]
                           }

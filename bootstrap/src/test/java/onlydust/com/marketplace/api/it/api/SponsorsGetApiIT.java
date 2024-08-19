@@ -72,8 +72,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                         {
                           "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
                           "name": "Coca Cola",
-                          "url": null,
                           "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                          "url": null,
                           "availableBudgets": [
                             {
                               "amount": 0,
@@ -86,7 +86,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "decimals": 8
                               },
                               "usdEquivalent": 0.00,
-                              "usdConversionRate": 0.30
+                              "usdConversionRate": 0.30134
                             },
                             {
                               "amount": 0,
@@ -99,7 +99,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "decimals": 18
                               },
                               "usdEquivalent": 0.00,
-                              "usdConversionRate": 1781.98
+                              "usdConversionRate": 1781.983987
                             },
                             {
                               "amount": 0,
@@ -137,17 +137,39 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                 "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                 "decimals": 6
                               },
-                              "usdEquivalent": 9090.12,
-                              "usdConversionRate": 1.01
+                              "usdEquivalent": 9090.13,
+                              "usdConversionRate": 1.010001
                             }
                           ],
                           "projects": [
+                            {
+                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
+                              "slug": "aiolia-du-lion",
+                              "name": "Aiolia du Lion",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
+                              "totalUsdBudget": 20025355.48,
+                              "remainingBudgets": [
+                                {
+                                  "amount": 19827065,
+                                  "prettyAmount": 19827065,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
+                                  },
+                                  "usdEquivalent": 20025355.48,
+                                  "usdConversionRate": 1.010001
+                                }
+                              ]
+                            },
                             {
                               "id": "7d04163c-4187-4313-8066-61504d34fc56",
                               "slug": "bretzel",
                               "name": "Bretzel",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "totalUsdBudget": 5566182.50,
+                              "totalUsdBudget": 5566730.56,
                               "remainingBudgets": [
                                 {
                                   "amount": 400000,
@@ -159,8 +181,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 8
                                   },
-                                  "usdEquivalent": 120000.00,
-                                  "usdConversionRate": 0.30
+                                  "usdEquivalent": 120536.00,
+                                  "usdConversionRate": 0.30134
                                 },
                                 {
                                   "amount": 3000,
@@ -172,8 +194,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": null,
                                     "decimals": 18
                                   },
-                                  "usdEquivalent": 5345940.00,
-                                  "usdConversionRate": 1781.98
+                                  "usdEquivalent": 5345951.96,
+                                  "usdConversionRate": 1781.983987
                                 },
                                 {
                                   "amount": 17000,
@@ -198,30 +220,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                     "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                     "decimals": 6
                                   },
-                                  "usdEquivalent": 100242.50,
-                                  "usdConversionRate": 1.01
-                                }
-                              ]
-                            },
-                            {
-                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
-                              "slug": "aiolia-du-lion",
-                              "name": "Aiolia du Lion",
-                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
-                              "totalUsdBudget": 20025335.65,
-                              "remainingBudgets": [
-                                {
-                                  "amount": 19827065,
-                                  "prettyAmount": 19827065,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "usdEquivalent": 20025335.65,
-                                  "usdConversionRate": 1.01
+                                  "usdEquivalent": 100242.60,
+                                  "usdConversionRate": 1.010001
                                 }
                               ]
                             }
@@ -280,8 +280,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                   "decimals": 6
                                 },
-                                "usdEquivalent": 20132774.40,
-                                "usdConversionRate": 1.01
+                                "usdEquivalent": 20132794.33,
+                                "usdConversionRate": 1.010001
                               }
                             },
                             {
@@ -298,8 +298,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": 5345940.00,
-                                "usdConversionRate": 1781.98
+                                "usdEquivalent": 5345951.96,
+                                "usdConversionRate": 1781.983987
                               }
                             },
                             {
@@ -334,8 +334,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": 120000.00,
-                                "usdConversionRate": 0.30
+                                "usdEquivalent": 120536.00,
+                                "usdConversionRate": 0.30134
                               }
                             },
                             {
