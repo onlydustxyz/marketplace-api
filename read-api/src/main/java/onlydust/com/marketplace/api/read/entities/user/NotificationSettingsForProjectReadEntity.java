@@ -38,19 +38,19 @@ public class NotificationSettingsForProjectReadEntity {
 
     public NotificationSettingsForProjectResponse toDto() {
         return new NotificationSettingsForProjectResponse()
-                .id(project.getId())
-                .slug(project.getSlug())
-                .name(project.getName())
-                .logoUrl(project.getLogoUrl())
+                .id(project.id())
+                .slug(project.slug())
+                .name(project.name())
+                .logoUrl(project.logoUrl())
                 .onGoodFirstIssueAdded(onGoodFirstIssueAdded);
     }
 
     public static NotificationSettingsForProjectResponse defaultDto(ProjectReadEntity project) {
         return new NotificationSettingsForProjectResponse()
-                .id(project.getId())
-                .slug(project.getSlug())
-                .name(project.getName())
-                .logoUrl(project.getLogoUrl())
+                .id(project.id())
+                .slug(project.slug())
+                .name(project.name())
+                .logoUrl(project.logoUrl())
                 .onGoodFirstIssueAdded(false);
     }
 

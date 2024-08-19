@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
+import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
@@ -49,6 +50,16 @@ public class ProgramReadEntity {
     @OneToMany(mappedBy = "program")
     @NonNull
     List<ProgramStatPerCurrencyReadEntity> statsPerCurrency;
+
+    @ManyToMany
+    @NonNull
+    @JoinTable(
+            name = "program_stats_per_currency_per_project",
+            schema = "bi",
+            joinColumns = @JoinColumn(name = "programId"),
+            inverseJoinColumns = @JoinColumn(name = "projectId")
+    )
+    List<ProjectReadEntity> grantedProjects;
 
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()

@@ -1,11 +1,11 @@
-package onlydust.com.marketplace.api.read.entities.project;
+package onlydust.com.marketplace.api.read.entities.program;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
+import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
@@ -17,21 +17,25 @@ import java.util.UUID;
 @Immutable
 @Accessors(fluent = true)
 @Entity
-@Table(name = "project_stats_per_currency", schema = "bi")
-@IdClass(ProjectStatPerCurrencyReadEntity.PrimaryKey.class)
-public class ProjectStatPerCurrencyReadEntity implements ProgramTransactionStat {
+@Table(name = "program_stats_per_currency_per_project", schema = "bi")
+@IdClass(ProgramStatPerCurrencyPerProjectReadEntity.PrimaryKey.class)
+public class ProgramStatPerCurrencyPerProjectReadEntity implements ProgramTransactionStat {
     @Id
     @NonNull
-    UUID projectId;
+    UUID programId;
 
     @Id
     @NonNull
     UUID currencyId;
 
+    @Id
+    @NonNull
+    UUID projectId;
+
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    ProjectReadEntity project;
+    @JoinColumn(name = "programId", insertable = false, updatable = false)
+    ProgramReadEntity program;
 
     @NonNull
     @ManyToOne
@@ -39,24 +43,20 @@ public class ProjectStatPerCurrencyReadEntity implements ProgramTransactionStat 
     CurrencyReadEntity currency;
 
     @NonNull
+    @ManyToOne
+    @JoinColumn(name = "projectId", insertable = false, updatable = false)
+    ProjectReadEntity project;
+
+    @NonNull
     BigDecimal totalGranted;
 
     @NonNull
     BigDecimal totalRewarded;
 
-    @Override
-    public String toString() {
-        return "ProjectStatPerCurrencyReadEntity{" +
-               "projectId=" + projectId +
-               ", currencyId=" + currencyId +
-               ", totalGranted=" + totalGranted +
-               ", totalRewarded=" + totalRewarded +
-               '}';
-    }
-
     @EqualsAndHashCode
     public static class PrimaryKey {
-        UUID projectId;
+        UUID programId;
         UUID currencyId;
+        UUID projectId;
     }
 }

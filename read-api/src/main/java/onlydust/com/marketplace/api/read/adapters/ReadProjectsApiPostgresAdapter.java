@@ -70,7 +70,6 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final BudgetStatsReadRepository budgetStatsReadRepository;
     private final ProjectContributorQueryRepository projectContributorQueryRepository;
-    private final ProjectStatsReadRepository projectStatsReadRepository;
     private final ProjectCustomStatsReadRepository projectCustomStatsReadRepository;
 
     @Override
@@ -247,12 +246,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     private ProjectResponse getProjectDetails(ProjectReadEntity project, AuthenticatedUser caller, final Boolean includeAllAvailableRepos) {
-        final var topContributors = customContributorRepository.findProjectTopContributors(project.getId(), TOP_CONTRIBUTOR_COUNT);
-        final var contributorCount = customContributorRepository.getProjectContributorCount(project.getId(), null);
-        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(project.getId());
-        final var ecosystems = customProjectRepository.getProjectEcosystems(project.getId());
-        final var hasRemainingBudget = customProjectRepository.hasRemainingBudget(project.getId());
-        final var reposIndexedTimes = project.getRepos().stream()
+        final var topContributors = customContributorRepository.findProjectTopContributors(project.id(), TOP_CONTRIBUTOR_COUNT);
+        final var contributorCount = customContributorRepository.getProjectContributorCount(project.id(), null);
+        final var leaders = projectLeadViewRepository.findProjectLeadersAndInvitedLeaders(project.id());
+        final var ecosystems = customProjectRepository.getProjectEcosystems(project.id());
+        final var hasRemainingBudget = customProjectRepository.hasRemainingBudget(project.id());
+        final var reposIndexedTimes = project.repos().stream()
                 .map(GithubRepoViewEntity::getStats)
                 .filter(Objects::nonNull)
                 .map(GithubRepoStatsViewEntity::getLastIndexedAt).toList();
@@ -265,30 +264,30 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var me = isNull(caller) ? null : new Me(
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.githubUserId()) && l.getHasAcceptedInvitation()),
                 leaders.stream().anyMatch(l -> l.getGithubId().equals(caller.githubUserId()) && !l.getHasAcceptedInvitation()),
-                contributionViewEntityRepository.countBy(caller.githubUserId(), project.getId()) > 0
+                contributionViewEntityRepository.countBy(caller.githubUserId(), project.id()) > 0
         );
 
         return new ProjectResponse()
-                .id(project.getId())
-                .slug(project.getSlug())
-                .name(project.getName())
-                .createdAt(DateMapper.ofNullable(project.getCreatedAt()))
-                .shortDescription(project.getShortDescription())
-                .longDescription(project.getLongDescription())
-                .logoUrl(project.getLogoUrl())
-                .moreInfos(isNull(project.getMoreInfos()) ? null : project.getMoreInfos().stream()
+                .id(project.id())
+                .slug(project.slug())
+                .name(project.name())
+                .createdAt(DateMapper.ofNullable(project.createdAt()))
+                .shortDescription(project.shortDescription())
+                .longDescription(project.longDescription())
+                .logoUrl(project.logoUrl())
+                .moreInfos(isNull(project.moreInfos()) ? null : project.moreInfos().stream()
                         .sorted(Comparator.comparing(ProjectMoreInfoViewEntity::getRank))
                         .map(moreInfo -> new SimpleLink().url(moreInfo.getUrl()).value(moreInfo.getName()))
                         .collect(Collectors.toList()))
-                .hiring(project.getHiring())
-                .visibility(project.getVisibility())
+                .hiring(project.hiring())
+                .visibility(project.visibility())
                 .contributorCount(contributorCount)
                 .hasRemainingBudget(hasRemainingBudget)
                 .rewardSettings(mapRewardSettings(new ProjectRewardSettings(
-                        project.getIgnorePullRequests(),
-                        project.getIgnoreIssues(),
-                        project.getIgnoreCodeReviews(),
-                        project.getIgnoreContributionsBefore()
+                        project.ignorePullRequests(),
+                        project.ignoreIssues(),
+                        project.ignoreCodeReviews(),
+                        project.ignoreContributionsBefore()
                 )))
                 .topContributors(topContributors.stream().map(u -> new GithubUserResponse()
                         .githubUserId(u.getGithubUserId())
@@ -305,7 +304,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .map(UserMapper::map)
                         .sorted(comparing(RegisteredUserResponse::getGithubUserId))
                         .collect(Collectors.toList()))
-                .tags(project.getTags().stream()
+                .tags(project.tags().stream()
                         .map(t -> switch (t.getTag()) {
                             case HOT_COMMUNITY -> ProjectTag.HOT_COMMUNITY;
                             case NEWBIES_WELCOME -> ProjectTag.NEWBIES_WELCOME;
@@ -328,7 +327,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(EcosystemResponse::getName))
                         .toList())
-                .categories(project.getCategories().stream()
+                .categories(project.categories().stream()
                         .map(c -> new ProjectCategoryResponse()
                                 .id(c.id())
                                 .name(c.name())
@@ -336,11 +335,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         )
                         .sorted(comparing(ProjectCategoryResponse::getName))
                         .toList())
-                .categorySuggestions(project.getCategorySuggestions().stream()
+                .categorySuggestions(project.categorySuggestions().stream()
                         .map(ProjectCategorySuggestionReadEntity::name)
                         .sorted()
                         .toList())
-                .sponsors(project.getSponsors().stream()
+                .sponsors(project.sponsors().stream()
                         .filter(SponsorMapper::isActive)
                         .map(ProjectSponsorViewEntity::sponsor)
                         .map(s -> new SponsorResponse()
@@ -352,7 +351,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .sorted(comparing(SponsorResponse::getName))
                         .toList())
                 .organizations(project.organizations(Boolean.TRUE.equals(includeAllAvailableRepos)))
-                .languages(project.getLanguages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())
+                .languages(project.languages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())
                 .indexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull))
                 .indexedAt(reposIndexedTimes.stream().filter(Objects::nonNull).min(Comparator.naturalOrder()).orElse(null))
                 .me(me == null ? null : new ProjectMeResponse()
@@ -360,7 +359,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .isProjectLead(me.isLeader())
                         .isInvitedAsProjectLead(me.isInvitedAsProjectLead())
                         .isContributor(me.isContributor()))
-                .goodFirstIssueCount(project.getGoodFirstIssues().size());
+                .goodFirstIssueCount(project.goodFirstIssues().size());
     }
 
     @Override
@@ -396,14 +395,15 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate));
 
-        final var stats = projectStatsReadRepository.findByProjectId(projectId);
+        final var project = projectReadRepository.findStatsById(projectId)
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
         return ok(new ProjectStatsResponse()
                 .activeContributorCount(customStats.map(ProjectCustomStatReadEntity::activeContributorCount).orElse(0))
                 .mergedPrCount(customStats.map(ProjectCustomStatReadEntity::mergedPrCount).orElse(0))
                 .rewardCount(customStats.map(ProjectCustomStatReadEntity::rewardCount).orElse(0))
-                .totalGranted(stats.map(stat -> DetailedTotalMoneyMapper.map(stat.statsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalGranted)).orElse(null))
-                .totalRewarded(stats.map(stat -> DetailedTotalMoneyMapper.map(stat.statsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalRewarded)).orElse(null))
+                .totalGranted(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalRewarded))
         );
     }
 

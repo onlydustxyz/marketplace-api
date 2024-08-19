@@ -77,7 +77,7 @@ public class RecentPublicActivityReadEntity {
             case PROJECT_CREATED:
                 dto.setProjectCreated(new PublicActivityPageItemResponseProjectCreated()
                         .project(project.toLinkResponse())
-                        .createdBy(project.getLeads().stream().findFirst().map(l -> l.toGithubUserResponse()).orElse(null)));
+                        .createdBy(project.leads().stream().findFirst().map(AllUserReadEntity::toGithubUserResponse).orElse(null)));
                 break;
         }
         return dto;

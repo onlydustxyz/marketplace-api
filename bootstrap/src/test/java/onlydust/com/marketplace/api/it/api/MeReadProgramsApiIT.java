@@ -62,7 +62,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @BeforeEach
         void setUp() {
-            programs = LongStream.range(0, 13).mapToObj(i -> {
+            programs = LongStream.range(1, 14).mapToObj(i -> {
                 final var program = programHelper.create(caller);
                 accountingHelper.createSponsorAccount(SponsorId.of(program.id()), i * 100, USDC);
                 accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 3 * i, ETH);
