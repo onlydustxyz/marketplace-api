@@ -15,12 +15,11 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.stream.Collectors.toSet;
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
+import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TagMe
@@ -63,7 +62,13 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @BeforeEach
         void setUp() {
-            programs = IntStream.range(0, 13).mapToObj(i -> programHelper.create(caller)).collect(toSet());
+            programs = LongStream.range(0, 13).mapToObj(i -> {
+                final var program = programHelper.create(caller);
+                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), i * 100, USDC);
+                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 3 * i, ETH);
+                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), i, BTC);
+                return program;
+            }).collect(toSet());
         }
 
         @Test
@@ -77,7 +82,6 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                     .expectBody(ProgramPageResponse.class)
-                    .consumeWith(System.out::println)
                     .returnResult().getResponseBody();
 
             assertThat(response).isNotNull();
@@ -90,7 +94,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getPrograms()).allMatch(p -> programs.stream().anyMatch(p1 -> p1.id().equals(p.getId()) && p1.name().equals(p.getName())));
             assertThat(response.getPrograms()).extracting("leads", List.class).allMatch(leads -> leads.size() == 1);
             assertThat(response.getPrograms()).extracting("projectCount", Integer.class).allMatch(count -> count == 0);
-            assertThat(response.getPrograms()).extracting("totalAvailable", DetailedTotalMoney.class).allMatch(t -> t.getTotalUsdEquivalent().compareTo(ZERO) == 0);
+            assertThat(response.getPrograms()).extracting("totalAvailable", DetailedTotalMoney.class).allMatch(t -> t.getTotalUsdEquivalent().compareTo(ZERO) > 0);
             assertThat(response.getPrograms()).extracting("totalGranted", DetailedTotalMoney.class).allMatch(t -> t.getTotalUsdEquivalent().compareTo(ZERO) == 0);
             assertThat(response.getPrograms()).extracting("totalRewarded", DetailedTotalMoney.class).allMatch(t -> t.getTotalUsdEquivalent().compareTo(ZERO) == 0);
         }

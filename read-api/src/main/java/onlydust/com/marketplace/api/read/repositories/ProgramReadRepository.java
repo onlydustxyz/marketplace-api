@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUID> {
     @Query(value = """
-            SELECT p
+            SELECT distinct p
             FROM ProgramReadEntity p
             LEFT JOIN FETCH p.statsPerCurrency spc
             LEFT JOIN FETCH spc.currency c
