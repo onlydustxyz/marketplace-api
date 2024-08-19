@@ -159,7 +159,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "projectCount": 2,
                                   "totalAvailable": {
-                                    "totalUsdEquivalent": 13483.86,
+                                    "totalUsdEquivalent": 13483.89,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 7,
@@ -171,8 +171,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 12473.86,
-                                        "usdConversionRate": 1781.98
+                                        "usdEquivalent": 12473.89,
+                                        "usdConversionRate": 1781.983987
                                       },
                                       {
                                         "amount": 1000,
@@ -185,12 +185,12 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 1010.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     ]
                                   },
                                   "totalGranted": {
-                                    "totalUsdEquivalent": 9414.90,
+                                    "totalUsdEquivalent": 9414.92,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 5,
@@ -202,8 +202,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 8909.90,
-                                        "usdConversionRate": 1781.98
+                                        "usdEquivalent": 8909.92,
+                                        "usdConversionRate": 1781.983987
                                       },
                                       {
                                         "amount": 500,
@@ -216,12 +216,12 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 505.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     ]
                                   },
                                   "totalRewarded": {
-                                    "totalUsdEquivalent": 3866.96,
+                                    "totalUsdEquivalent": 3866.97,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 2,
@@ -233,8 +233,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 3563.96,
-                                        "usdConversionRate": 1781.98
+                                        "usdEquivalent": 3563.97,
+                                        "usdConversionRate": 1781.983987
                                       },
                                       {
                                         "amount": 300,
@@ -247,7 +247,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 303.00,
-                                        "usdConversionRate": 1.01
+                                        "usdConversionRate": 1.010001
                                       }
                                     ]
                                   }

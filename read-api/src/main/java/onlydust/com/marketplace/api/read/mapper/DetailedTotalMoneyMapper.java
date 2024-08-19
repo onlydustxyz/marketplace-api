@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import static java.math.BigDecimal.ZERO;
 import static java.util.Comparator.*;
+import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface DetailedTotalMoneyMapper {
     static <T extends ProgramTransactionStat> DetailedTotalMoney map(Collection<T> stats, Function<T, BigDecimal> amountSupplier) {
@@ -18,6 +19,10 @@ public interface DetailedTotalMoneyMapper {
                 .totalPerCurrency(stats.stream()
                         .map(s -> s.toMoney(amountSupplier.apply(s)))
                         .sorted(comparing(Money::getUsdEquivalent, nullsLast(naturalOrder())).reversed()).toList())
-                .totalUsdEquivalent(stats.stream().map(s -> s.usdAmount(amountSupplier.apply(s))).filter(Objects::nonNull).reduce(BigDecimal::add).orElse(ZERO));
+                .totalUsdEquivalent(prettyUsd(stats.stream()
+                        .map(s -> s.usdAmount(amountSupplier.apply(s)))
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal::add)
+                        .orElse(ZERO)));
     }
 }

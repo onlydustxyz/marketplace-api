@@ -842,7 +842,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.01
+                                "conversionRate": 1.010001
                               }
                             },
                             {
@@ -860,7 +860,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.01
+                                "conversionRate": 1.010001
                               }
                             }
                           ]
@@ -1098,7 +1098,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.01
+                                "conversionRate": 1.010001
                               }
                             },
                             {
@@ -1116,7 +1116,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                                   "decimals": 6
                                 },
                                 "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.01
+                                "conversionRate": 1.010001
                               }
                             }
                           ]
