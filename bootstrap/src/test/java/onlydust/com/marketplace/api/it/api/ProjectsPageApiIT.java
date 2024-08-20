@@ -6,7 +6,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategor
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectTagRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -3096,8 +3099,6 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
     @Autowired
-    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
-    @Autowired
     ProjectCategoryRepository projectCategoryRepository;
     @Autowired
     ProjectRepository projectRepository;
@@ -3646,7 +3647,7 @@ public class ProjectsPageApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 0,
                           "nextPageIndex": 0
                         }
-                                                
+                        
                         """);
 
         client.get().uri(getApiURI(PROJECTS_GET, Map.of("pageIndex", "0", "pageSize", "100", "tags", "FAST_AND_FURIOUS"))).exchange()
