@@ -3,6 +3,8 @@ package com.onlydust.customer.io.adapter.dto;
 import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyApplicationsFromEnvironment;
+
 public record ProjectApplicationAcceptedDTO(@NonNull String username,
                                             @NonNull String title,
                                             @NonNull String description,
@@ -21,7 +23,7 @@ public record ProjectApplicationAcceptedDTO(@NonNull String username,
                         event.getIssue().title(),
                         event.getIssue().description(),
                         event.getIssue().repoName(),
-                        UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) + "applications"
+                        getMarketplaceMyApplicationsFromEnvironment(environment)
                 ));
     }
 }

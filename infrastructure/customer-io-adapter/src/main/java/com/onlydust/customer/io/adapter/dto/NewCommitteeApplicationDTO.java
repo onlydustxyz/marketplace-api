@@ -6,7 +6,7 @@ import onlydust.com.marketplace.project.domain.model.notification.CommitteeAppli
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
-import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceCommitteeApplicationUrlFromEnvironment;
 
 public record NewCommitteeApplicationDTO(@NonNull String title,
                                          @NonNull String username,
@@ -25,6 +25,6 @@ public record NewCommitteeApplicationDTO(@NonNull String title,
         return new NewCommitteeApplicationDTO("Committee application", recipientLogin, DESCRIPTION.formatted(event.getProjectName(), event.getCommitteeName(),
                 applicationEndDate),
                 new ButtonDTO("Review my answer",
-                        getMarketplaceFrontendUrlFromEnvironment(environment) + "c/%s/applicant?p=%s".formatted(event.getCommitteeId(), event.getProjectId())));
+                        getMarketplaceCommitteeApplicationUrlFromEnvironment(environment, event.getCommitteeId(), event.getProjectId())));
     }
 }

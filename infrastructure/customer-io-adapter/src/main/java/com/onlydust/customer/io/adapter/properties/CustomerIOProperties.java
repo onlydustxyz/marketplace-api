@@ -39,4 +39,6 @@ public class CustomerIOProperties {
     Integer kycIndividualVerificationEmailId;
     @NonNull
     Integer completeYourBillingProfileEmailId;
+    @NonNull
+    Integer weeklyNotificationsEmailId;
 }

@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationRejected;
 
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceBillingProfileUrlFromEnvironment;
+
 @Builder
 public record VerificationRejectedDTO(@NonNull String title,
                                       @NonNull String description,
@@ -23,8 +25,8 @@ public record VerificationRejectedDTO(@NonNull String title,
                 .username(recipientLogin)
                 .title("Billing profile %s verification rejected".formatted(billingProfileVerificationRejected.billingProfileName()))
                 .description(DESCRIPTION.formatted(billingProfileVerificationRejected.billingProfileName()))
-                .button(new ButtonDTO("Resume verification", UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) +
-                                                             "settings/billing/%s/general-information".formatted(billingProfileVerificationRejected.billingProfileId())))
+                .button(new ButtonDTO("Resume verification", getMarketplaceBillingProfileUrlFromEnvironment(environment,
+                        billingProfileVerificationRejected.billingProfileId().value())))
                 .hasMoreInformation(true)
                 .reason(billingProfileVerificationRejected.rejectionReason())
                 .build();

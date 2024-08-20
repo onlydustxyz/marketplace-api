@@ -10,6 +10,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyRewardsUrlFromEnvironment;
 
 @Builder
 public record InvoiceRejectedDTO(@NonNull String title,
@@ -30,7 +31,7 @@ public record InvoiceRejectedDTO(@NonNull String title,
                 invoiceRejected.rewards().stream()
                         .map(RewardDTO::from)
                         .toList(),
-                new ButtonDTO("Upload another invoice", getMarketplaceFrontendUrlFromEnvironment(environment) + "rewards")
+                new ButtonDTO("Upload another invoice", getMarketplaceMyRewardsUrlFromEnvironment(environment))
         );
     }
 

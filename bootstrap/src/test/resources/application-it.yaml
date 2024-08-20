@@ -68,6 +68,7 @@ infrastructure:
     complete-your-billing-profile-email-id: 40
     verification-closed-email-id: 50
     verification-rejected-email-id: 60
+    weekly-notifications-email-id: 70
 application:
   web:
     machine-to-machine:
