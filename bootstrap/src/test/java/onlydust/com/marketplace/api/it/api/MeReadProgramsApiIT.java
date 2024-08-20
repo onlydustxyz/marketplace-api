@@ -176,7 +176,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 18
                                         },
                                         "usdEquivalent": 12473.89,
-                                        "usdConversionRate": 1781.983987
+                                        "usdConversionRate": 1781.983987,
+                                        "ratio": 0.93
                                       },
                                       {
                                         "amount": 1000,
@@ -189,7 +190,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 1010.00,
-                                        "usdConversionRate": 1.010001
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": 0.07
                                       }
                                     ]
                                   },
@@ -207,7 +209,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 18
                                         },
                                         "usdEquivalent": 8909.92,
-                                        "usdConversionRate": 1781.983987
+                                        "usdConversionRate": 1781.983987,
+                                        "ratio": 0.95
                                       },
                                       {
                                         "amount": 500,
@@ -220,7 +223,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 505.00,
-                                        "usdConversionRate": 1.010001
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": 0.05
                                       }
                                     ]
                                   },
@@ -238,7 +242,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 18
                                         },
                                         "usdEquivalent": 3563.97,
-                                        "usdConversionRate": 1781.983987
+                                        "usdConversionRate": 1781.983987,
+                                        "ratio": 0.92
                                       },
                                       {
                                         "amount": 300,
@@ -251,7 +256,8 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "decimals": 6
                                         },
                                         "usdEquivalent": 303.00,
-                                        "usdConversionRate": 1.010001
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": 0.08
                                       }
                                     ]
                                   }

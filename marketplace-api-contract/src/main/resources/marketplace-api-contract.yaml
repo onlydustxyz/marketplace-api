@@ -4887,7 +4887,14 @@ components:
           type: array
           description: Total amount by currency
           items:
-            $ref: '#/components/schemas/Money'
+            allOf:
+              - $ref: '#/components/schemas/Money'
+              - type: object
+                properties:
+                  ratio:
+                    type: number
+                    description: Ratio of the total amount
+                    example: 0.5
 
     Trend:
       type: string
