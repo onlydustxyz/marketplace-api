@@ -643,7 +643,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
         notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())
                 .committeeId(UUID.fromString("8be639e3-86e1-4a8f-a790-e8fef6a78f74"))
-                .projectId(UUID.randomUUID())
+                .projectId(UUID.fromString("dd227344-b2ab-471f-88be-ad9c3a4dd72b"))
                 .projectName("committeeProject2")
                 .committeeName("committee2")
                 .build());
