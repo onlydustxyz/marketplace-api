@@ -40,18 +40,4 @@ public interface ProjectMapper {
                 .slug(projectLink.slug())
                 .name(projectLink.name());
     }
-
-    enum SortBy {
-        CONTRIBUTORS_COUNT, REPOS_COUNT, RANK, NAME;
-    }
-
-    static SortBy mapSortByParameter(final String sort) {
-        return sort == null ? null : switch (sort) {
-            case "RANK" -> SortBy.RANK;
-            case "NAME" -> SortBy.NAME;
-            case "REPO_COUNT" -> SortBy.REPOS_COUNT;
-            case "CONTRIBUTOR_COUNT" -> SortBy.CONTRIBUTORS_COUNT;
-            default -> null;
-        };
-    }
 }

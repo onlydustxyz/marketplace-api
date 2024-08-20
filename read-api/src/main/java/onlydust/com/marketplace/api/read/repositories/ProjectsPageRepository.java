@@ -91,9 +91,10 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
               order by case
                            when cast(:orderBy as text) = 'NAME' then (upper(p.name), 0)
-                           when cast(:orderBy as text) = 'REPOS_COUNT' then (-r_count.repo_count, upper(p.name))
-                           when cast(:orderBy as text) = 'CONTRIBUTORS_COUNT' then (-pc_count.contributors_count, upper(p.name))
+                           when cast(:orderBy as text) = 'REPO_COUNT' then (-r_count.repo_count, upper(p.name))
+                           when cast(:orderBy as text) = 'CONTRIBUTOR_COUNT' then (-pc_count.contributors_count, upper(p.name))
                            when cast(:orderBy as text) = 'RANK' then (-p.rank, upper(p.name))
+                           when cast(:orderBy as text) = 'RECOMMENDATION' then (-p.rank, upper(p.name))
                        end
               offset :offset limit :limit
             """, nativeQuery = true)
@@ -192,6 +193,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                     left join (select pgfi.project_id, count(*) > 0 exist
                                         from projects_good_first_issues pgfi
                                         group by pgfi.project_id) has_good_first_issues on has_good_first_issues.project_id = p.id
+                    left join project_recommendations pr on pr.project_id = p.id and pr.user_id = :userId
             where r_count.repo_count > 0
               and (p.visibility = 'PUBLIC' 
                        or (p.visibility = 'PRIVATE' 
@@ -212,9 +214,10 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
               and (coalesce(:hasGoodFirstIssues) is null or has_good_first_issues.exist = :hasGoodFirstIssues)
             order by case
                          when cast(:orderBy as text) = 'NAME' then (not coalesce(is_pending_pl.is_p_pl, false), upper(p.name), 0)
-                         when cast(:orderBy as text) = 'REPOS_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false),-r_count.repo_count,upper(p.name))
-                         when cast(:orderBy as text) = 'CONTRIBUTORS_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false), -pc_count.contributors_count, upper(p.name))
+                         when cast(:orderBy as text) = 'REPO_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false),-r_count.repo_count,upper(p.name))
+                         when cast(:orderBy as text) = 'CONTRIBUTOR_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false), -pc_count.contributors_count, upper(p.name))
                          when cast(:orderBy as text) = 'RANK' then (not coalesce(is_pending_pl.is_p_pl, false), -p.rank, upper(p.name))
+                         when cast(:orderBy as text) = 'RECOMMENDATION' then (coalesce(-pr.score, 0), upper(p.name))
                      end
                      offset :offset limit :limit
             """, nativeQuery = true)

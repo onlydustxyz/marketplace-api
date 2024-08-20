@@ -1581,12 +1581,7 @@ paths:
           name: sort
           description: Sort order
           schema:
-            type: string
-            enum:
-              - RANK
-              - NAME
-              - REPO_COUNT
-              - CONTRIBUTOR_COUNT
+            $ref: "#/components/schemas/ProjectListSort"
         - in: query
           name: pageIndex
           required: true
@@ -9368,6 +9363,15 @@ components:
         - CREATED_AT
         - CLOSED_AT
       default: CREATED_AT
+
+    ProjectListSort:
+      type: string
+      enum:
+        - RANK
+        - NAME
+        - REPO_COUNT
+        - CONTRIBUTOR_COUNT
+        - RECOMMENDATION
 
     BannerResponse:
       type: object

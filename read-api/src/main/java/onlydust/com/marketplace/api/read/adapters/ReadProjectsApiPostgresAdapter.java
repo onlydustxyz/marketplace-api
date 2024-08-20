@@ -14,7 +14,10 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRep
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
-import onlydust.com.marketplace.api.read.mapper.*;
+import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
+import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
+import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
+import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -43,7 +46,6 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
-import static onlydust.com.marketplace.api.read.mapper.ProjectMapper.mapSortByParameter;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -82,19 +84,18 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                            final List<String> languageSlugs,
                                                            final List<String> categorySlugs,
                                                            final Boolean hasGoodFirstIssues,
-                                                           final String sort
+                                                           final ProjectListSort sort
     ) {
         final var user = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final ProjectMapper.SortBy sortBy = mapSortByParameter(sort);
 
         final String ecosystemsJsonPath = getEcosystemsJsonPath(ecosystemSlugs);
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.id(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
-                        categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy))
+                        categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
                 .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs, hasGoodFirstIssues,
-                        sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sortBy)));
+                        sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort)));
     }
 
     private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
@@ -102,7 +103,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                 String search,
                                                                 String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
                                                                 List<String> categorySlugs, Boolean hasGoodFirstIssues,
-                                                                Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
+                                                                Integer pageIndex, Integer pageSize, ProjectListSort sortBy) {
         final Long count = projectsPageRepository.countProjectsForUserId(userId, mine,
                 search,
                 tagsJsonPath,
@@ -117,7 +118,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 languagesJsonPath,
                 categorySlugs,
                 hasGoodFirstIssues,
-                isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
+                isNull(sortBy) ? ProjectListSort.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
         final var filters = projectsPageFiltersRepository.findFiltersForUser(userId, mine);
@@ -129,7 +130,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private ProjectPageResponse getProjectsForAnonymousUser(String search,
                                                             String ecosystemsJsonPath, String tagsJsonPath, String languagesJsonPath,
                                                             List<String> categorySlugs, Boolean hasGoodFirstIssues,
-                                                            Integer pageIndex, Integer pageSize, ProjectMapper.SortBy sortBy) {
+                                                            Integer pageIndex, Integer pageSize, ProjectListSort sortBy) {
         final Long count = projectsPageRepository.countProjectsForAnonymousUser(
                 search,
                 tagsJsonPath,
@@ -144,7 +145,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 languagesJsonPath,
                 categorySlugs,
                 hasGoodFirstIssues,
-                isNull(sortBy) ? ProjectMapper.SortBy.NAME.name() : sortBy.name(),
+                isNull(sortBy) ? ProjectListSort.NAME.name() : sortBy.name(),
                 PaginationMapper.getPostgresOffsetFromPagination(pageSize, pageIndex),
                 pageSize);
         final var filters = projectsPageFiltersRepository.findFiltersForAnonymousUser();

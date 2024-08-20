@@ -125,6 +125,12 @@ public class JobScheduler {
         languageFacadePort.updateProjectsLanguages();
     }
 
+    @Scheduled(cron = "${application.cron.refresh-project-recommendations-cron-expression}")
+    public void refreshProjectRecommendations() {
+        LOGGER.info("Refresh project recommendations");
+        projectFacadePort.refreshRecommendations();
+    }
+
     @Scheduled(fixedDelayString = "${application.cron.cleanup-obsolete-applications}")
     public void cleanUpObsoleteApplications() {
         LOGGER.info("Cleanup obsolete applications");

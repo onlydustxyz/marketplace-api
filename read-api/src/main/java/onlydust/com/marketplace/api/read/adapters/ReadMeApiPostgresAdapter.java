@@ -112,10 +112,12 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     public ResponseEntity<RecommendedProjectsPageResponse> getRecommendedProjects(Integer pageIndex, Integer pageSize) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
+        final var pageRequest = PageRequest.of(sanitizePageIndex, sanitizePageSize);
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var page = publicProjectReadRepository.findAllRecommendedForUser(authenticatedUser.githubUserId(),
-                PageRequest.of(sanitizePageIndex, sanitizePageSize));
+        final var page = Optional.of(publicProjectReadRepository.findTopRecommendedForUser(authenticatedUser.githubUserId(), pageRequest))
+                .filter(p -> p.getTotalElements() > sanitizePageSize) // if there are enough top recommendations, return them
+                .orElseGet(() -> publicProjectReadRepository.findAllRecommendedForUser(authenticatedUser.githubUserId(), pageRequest));
 
         final var response = new RecommendedProjectsPageResponse()
                 .projects(page.getContent().stream().map(PublicProjectReadEntity::toProjectLinkWithDescription).toList())

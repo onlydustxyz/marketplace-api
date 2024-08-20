@@ -14,7 +14,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 @TagMe
 public class MeReadApiIT extends AbstractMarketplaceApiIT {
     @Test
-    void should_get_recommenced_projects() {
+    void should_get_recommended_projects() {
         // Given
         final var anthony = userAuthHelper.authenticateAntho();
 
@@ -30,17 +30,10 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 8,
-                          "totalItemNumber": 75,
+                          "totalItemNumber": 74,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "projects": [
-                            {
-                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                              "slug": "taco-tuesday",
-                              "name": "Taco Tuesday",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
-                              "shortDescription": "A projects for the midweek lovers"
-                            },
                             {
                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
                               "slug": "calcom",
@@ -49,11 +42,18 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "shortDescription": "Scheduling infrastructure for everyone."
                             },
                             {
-                              "id": "61076487-6ec5-4751-ab0d-3b876c832239",
-                              "slug": "toto",
-                              "name": "toto",
-                              "logoUrl": null,
-                              "shortDescription": "to"
+                              "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
+                              "slug": "zero-title-5",
+                              "name": "Zero title 5",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
+                              "shortDescription": "Missing short description"
+                            },
+                            {
+                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                              "slug": "taco-tuesday",
+                              "name": "Taco Tuesday",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
+                              "shortDescription": "A projects for the midweek lovers"
                             },
                             {
                               "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
@@ -70,27 +70,6 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "shortDescription": "A special project for Paco"
                             },
                             {
-                              "id": "b58b40b8-1521-41cf-972c-9c08d58eaff8",
-                              "slug": "pineapple",
-                              "name": "Pineapple",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/3930283280174221329.jpg",
-                              "shortDescription": "A project for people who love fruits"
-                            },
-                            {
-                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                              "slug": "bretzel",
-                              "name": "Bretzel",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "shortDescription": "A project for people who love fruits"
-                            },
-                            {
-                              "id": "e41f44a2-464c-4c96-817f-81acb06b2523",
-                              "slug": "zero-title-5",
-                              "name": "Zero title 5",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
-                              "shortDescription": "Missing short description"
-                            },
-                            {
                               "id": "98873240-31df-431a-81dc-7d6fe01143a0",
                               "slug": "aiolia-du-lion",
                               "name": "Aiolia du Lion",
@@ -98,11 +77,32 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "shortDescription": "An interactive tutorial to get you up and running with Starknet"
                             },
                             {
-                              "id": "f992349c-e30c-4156-8b55-0a9dbc20b873",
-                              "slug": "gregs-project",
-                              "name": "Greg's project",
-                              "logoUrl": "https://dl.airtable.com/.attachments/75bca1dce6735d434b19631814ec84b0/2a9cad0b/aeZxLjpJQre2uXBQDoQf",
-                              "shortDescription": "A short lead by an older version of Greg. Clearly not a promising topic, don't go there you'll get bored"
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "slug": "aldbaran-du-taureau",
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
+                              "shortDescription": "An interactive tutorial to get you up and running with Starknet"
+                            },
+                            {
+                              "id": "97f6b849-1545-4064-83f1-bc5ded33a8b3",
+                              "slug": "anthology-project",
+                              "name": "Anthology project",
+                              "logoUrl": "https://cdn.filestackcontent.com/pgjvFWS8Teq2Yns89IKg",
+                              "shortDescription": "A very cool project lead by Antho"
+                            },
+                            {
+                              "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
+                              "slug": "apibara",
+                              "name": "Apibara",
+                              "logoUrl": null,
+                              "shortDescription": "Listen to starknet events using gRPC and build your own node"
+                            },
+                            {
+                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                              "slug": "bretzel",
+                              "name": "Bretzel",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
+                              "shortDescription": "A project for people who love fruits"
                             }
                           ]
                         }

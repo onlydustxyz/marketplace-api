@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -30,4 +31,10 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, J
             where u.id = :userId
             """)
     List<UUID> getProjectContributedOnIdsForUser(UUID userId);
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            REFRESH MATERIALIZED VIEW CONCURRENTLY top_project_recommendations;
+            """)
+    void refreshRecommendations();
 }

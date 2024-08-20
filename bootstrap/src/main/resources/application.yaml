@@ -37,6 +37,7 @@ application:
     cleanup-obsolete-applications: 86400000 # 1 day
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
     send-summary-notifications-emails-cron-expression: "0 0 8 * * MON"
+    refresh-project-recommendations-cron-expression: "0 0 0 * * *" # every day at 1:00am
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
