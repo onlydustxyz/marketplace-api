@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.AllocateRequest;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -107,6 +109,25 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        void should_get_program_transactions_in_csv() {
+            // When
+            final var csv = client.get()
+                    .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.ACCEPT, "text/csv")
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+
+            final var lines = new String(csv).split("\\R");
+            assertThat(lines.length).isEqualTo(1);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
+        }
+
+        @Test
         void should_get_program_projects() {
             // When
             client.get()
@@ -131,13 +152,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
         @Nested
         class GivenSomeTransactions {
             Project project1;
+            ProjectId project2Id;
 
             @BeforeEach
             void setUp() {
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead);
                 project1 = projectHelper.get(project1Id);
-                final var project2Id = projectHelper.create(projectLead);
+                project2Id = projectHelper.create(projectLead);
                 final var anotherProgram = programHelper.create();
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
@@ -1025,6 +1047,48 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                   ]
                                 }
                                 """);
+            }
+
+            @Test
+            void should_get_program_transactions_in_csv() {
+                // When
+                final var csv = client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .header(HttpHeaders.ACCEPT, "text/csv")
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody(String.class)
+                        .returnResult().getResponseBody();
+
+                final var lines = csv.split("\\R");
+                assertThat(lines.length).isEqualTo(9);
+                assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
+                assertThat(lines).allMatch(line -> line.split(",").length == 8);
+            }
+
+
+            @Test
+            void should_download_program_transactions_in_csv() {
+                // When
+                final var csv = client.get()
+                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .header(HttpHeaders.ACCEPT, "application/octet-stream")
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectHeader()
+                        .contentDisposition(ContentDisposition.attachment().filename("transactions.csv").build())
+                        .expectBody().returnResult().getResponseBody();
+
+                final var lines = new String(csv).split("\\R");
+                assertThat(lines.length).isEqualTo(9);
+                assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
+                assertThat(lines).allMatch(line -> line.split(",").length == 8);
             }
 
             @Test
