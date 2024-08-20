@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.api.contract.model.AllocateRequest;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static java.math.BigDecimal.ZERO;
@@ -1333,6 +1335,45 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                 }
                                 """);
             }
+
+            @Test
+            void should_grant_a_project() {
+                // When
+                client.post()
+                        .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .bodyValue(new AllocateRequest()
+                                .projectId(project1.getId())
+                                .amount(BigDecimal.ONE)
+                                .currencyId(ETH.value()))
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isNoContent();
+
+                client.get()
+                        .uri(getApiURI(PROGRAM_BY_ID.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount").isEqualTo(6)
+                ;
+
+                client.get()
+                        .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.projects[?(@.id == '%s')].totalAvailable.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(project1.getId())).isEqualTo(2)
+                        .jsonPath("$.projects[?(@.id == '%s')].totalGranted.totalPerCurrency[?(@.currency.code == 'ETH')].amount".formatted(project1.getId())).isEqualTo(3)
+                ;
+            }
         }
     }
 
@@ -1387,6 +1428,25 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             client.get()
                     .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isUnauthorized();
+        }
+
+        @Test
+        void should_be_unauthorized_to_grant_project() {
+            // Given
+            final var projectId = projectHelper.create(caller);
+
+            // When
+            client.post()
+                    .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .bodyValue(new AllocateRequest()
+                            .projectId(projectId.value())
+                            .amount(BigDecimal.TEN)
+                            .currencyId(ETH.value()))
                     .exchange()
                     // Then
                     .expectStatus()
