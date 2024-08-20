@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.notification.*;
@@ -10,12 +11,17 @@ import onlydust.com.marketplace.api.contract.model.NotificationStatus;
 import onlydust.com.marketplace.api.contract.model.NotificationsPatchRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
+import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
+import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
+import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.service.NotificationService;
 import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
 import org.junit.jupiter.api.MethodOrderer;
@@ -27,9 +33,12 @@ import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 @TagMe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -540,6 +549,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .currencyCode(currencyCode)
                 .dollarsEquivalent(BigDecimal.valueOf(val))
                 .projectName("project-%s-%s".formatted(val, currencyCode))
+                .sentByGithubLogin("sender-%s-%s".formatted(val, currencyCode))
                 .build();
     }
 
@@ -613,5 +623,198 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                           ]
                         }
                         """);
+    }
+
+    @Autowired
+    NotificationSummaryEmailJob notificationSummaryEmailJob;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
+
+    @Test
+    @Order(3)
+    void should_send_summary_emails() throws InterruptedException {
+        // Given
+        final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+
+        notificationSettingsService.updateNotificationSettings(NotificationRecipient.Id.of(pierre.user().getId()), inAppAndSummaryEmailSettings());
+        notificationSettingsService.updateNotificationSettings(NotificationRecipient.Id.of(hayden.user().getId()), inAppAndSummaryEmailSettings());
+
+        notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
+                .applicationEndDate(ZonedDateTime.now())
+                .committeeId(UUID.fromString("8be639e3-86e1-4a8f-a790-e8fef6a78f74"))
+                .projectId(UUID.fromString("dd227344-b2ab-471f-88be-ad9c3a4dd72b"))
+                .projectName("committeeProject2")
+                .committeeName("committee2")
+                .build());
+        notificationService.push(hayden.user().getId(), ApplicationToReview.builder()
+                .issue(new NotificationIssue(1L, faker.internet().url(), "issue2", faker.rickAndMorty().location(),
+                        faker.lorem().characters()))
+                .project(new NotificationProject(bretzel, "ccc", "CCC"))
+                .user(new NotificationUser(hayden.user().getId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
+                .build());
+        notificationService.push(hayden.user().getId(), InvoiceRejected.builder()
+                .billingProfileId(UUID.fromString("3161998c-fd33-4e5d-9c67-0e7c7da0b942"))
+                .invoiceName("invoice2")
+                .rejectionReason("rejectionReason2")
+                .rewards(List.of(shortRewardStub(45, "ETH"), shortRewardStub(765, "OP")))
+                .build());
+        notificationService.push(hayden.user().getId(), RewardCanceled.builder()
+                .shortReward(shortRewardStub(33.44, "WLD"))
+                .build());
+        notificationService.push(pierre.user().getId(), RewardReceived.builder()
+                .contributionCount(4)
+                .sentByGithubLogin("projectLead2")
+                .shortReward(shortRewardStub(22.2, "BTC"))
+                .build());
+        notificationService.push(pierre.user().getId(), RewardsPaid.builder()
+                .shortRewards(List.of(shortRewardStub(11123.3, "USD"), shortRewardStub(45.3, "STRK")))
+                .build());
+        notificationService.push(hayden.user().getId(), ApplicationAccepted.builder()
+                .issue(new NotificationIssue(2L, faker.internet().url(), "title2", faker.rickAndMorty().location(),
+                        faker.lorem().characters()))
+                .project(new NotificationProject(bretzel, "ddd", "DDD"))
+                .build());
+        notificationService.push(hayden.user().getId(), BillingProfileVerificationClosed.builder()
+                .billingProfileId(BillingProfile.Id.of(UUID.fromString("6230df7a-f6c9-4cc4-930c-b310d83c0703")))
+                .billingProfileName("bpHaydenClosed2")
+                .build());
+        notificationService.push(pierre.user().getId(), BillingProfileVerificationRejected.builder()
+                .billingProfileId(BillingProfile.Id.of(UUID.fromString("069632d9-6fa2-46d9-80e8-608661309e64")))
+                .billingProfileName("bpPierreRejected2")
+                .rejectionReason("rejectionReason3")
+                .build());
+
+        // When
+        notificationSummaryEmailJob.run();
+        Thread.sleep(1000L);
+
+        // Then
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(equalToJson("""
+                                {
+                                   "transactional_message_id": "70",
+                                   "identifiers": {
+                                     "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                                     "email": "pierre.oucif@gadz.org"
+                                   },
+                                   "from": "Camille from OnlyDust <admin@onlydust.xyz>",
+                                   "to": "pierre.oucif@gadz.org",
+                                   "subject": "Weekly notifications",
+                                   "message_data": {
+                                     "title": "Weekly notifications",
+                                     "username": "PierreOucif",
+                                     "description": "Here is a summary of your notifications from last week. Please review them at your convenience.",
+                                     "notifications": [
+                                       {
+                                         "title": "You have received a new reward",
+                                         "description": "sender-22.2-BTC sent you a new reward of 22.200 BTC on project project-22.2-BTC",
+                                         "button": {
+                                           "text": "See details",
+                                           "link": "https://develop-app.onlydust.com/rewards"
+                                         }
+                                       },
+                                       {
+                                         "title": "Your rewards has been paid",
+                                         "description": "2 reward(s) has been paid for a total of 11168.600 USD",
+                                         "button": {
+                                           "text": "See details",
+                                           "link": "https://develop-app.onlydust.com/rewards"
+                                         }
+                                       },
+                                       {
+                                         "title": "Your billing profile has been rejected",
+                                         "description": "Your billing profile bpPierreRejected2 has been rejected because of : rejectionReason3",
+                                         "button": {
+                                           "text": "Resume verification",
+                                           "link": "https://develop-app.onlydust.com/settings/billing/069632d9-6fa2-46d9-80e8-608661309e64/general-information"
+                                         }
+                                       }
+                                     ]
+                                   }
+                                 }
+                                """, true, false)));
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(equalToJson("""
+                                {
+                                    "transactional_message_id": "70",
+                                    "identifiers": {
+                                      "id": "eaa1ddf3-fea5-4cef-825b-336f8e775e05",
+                                      "email": "haydenclearymusic@gmail.com"
+                                    },
+                                    "from": "Camille from OnlyDust <admin@onlydust.xyz>",
+                                    "to": "haydenclearymusic@gmail.com",
+                                    "subject": "Weekly notifications",
+                                    "message_data": {
+                                      "title": "Weekly notifications",
+                                      "username": "haydencleary",
+                                      "description": "Here is a summary of your notifications from last week. Please review them at your convenience.",
+                                      "notifications": [
+                                        {
+                                          "title": "New committee application",
+                                          "description": "You have applied to committee2 committee.",
+                                          "button": {
+                                            "text": "Review my answer",
+                                            "link": "https://develop-app.onlydust.com/c/8be639e3-86e1-4a8f-a790-e8fef6a78f74/applicant?p=dd227344-b2ab-471f-88be-ad9c3a4dd72b"
+                                          }
+                                        },
+                                        {
+                                          "title": "New contributor application",
+                                          "description": "We wanted to inform you that a contributor named haydencleary has applied to work on your issue issue2 on project CCC",
+                                          "button": {
+                                            "text": "Review",
+                                            "link": "https://develop-app.onlydust.com/p/ccc/applications"
+                                          }
+                                        },
+                                        {
+                                          "title": "Your invoice has been rejected",
+                                          "description": "Your invoice invoice2 has been rejected because of : rejectionReason2",
+                                          "button": {
+                                            "text": "Upload another invoice",
+                                            "link": "https://develop-app.onlydust.com/rewards"
+                                          }
+                                        },
+                                        {
+                                          "title": "Your reward has been canceled",
+                                          "description": "Your reward of 33.440 WLD has been canceled for the project project-33.44-WLD",
+                                          "button": null
+                                        },
+                                        {
+                                          "title": "Your application has been accepted",
+                                          "description": "Your application for title2 has been accepted",
+                                          "button": {
+                                            "text": "See my applications",
+                                            "link": "https://develop-app.onlydust.com/applications"
+                                          }
+                                        },
+                                        {
+                                          "title": "Your billing profile has been closed",
+                                          "description": "Your billing profile bpHaydenClosed2 has been closed, please contact support for more information",
+                                          "button": {
+                                            "text": "Contact us",
+                                            "link": "https://develop-app.onlydust.com/settings/billing/6230df7a-f6c9-4cc4-930c-b310d83c0703/general-information"
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                """, true, false)));
+    }
+
+    public static NotificationSettings inAppAndSummaryEmailSettings() {
+        final Map<NotificationCategory, List<NotificationChannel>> channelsPerCategory = new HashMap<>();
+        for (var notificationCategory : NotificationCategory.values()) {
+            channelsPerCategory.put(notificationCategory, List.of(NotificationChannel.IN_APP, NotificationChannel.SUMMARY_EMAIL));
+        }
+        return NotificationSettings.builder()
+                .channelsPerCategory(channelsPerCategory)
+                .build();
     }
 }

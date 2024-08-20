@@ -11,6 +11,7 @@ import onlydust.com.marketplace.project.domain.model.notification.CommitteeAppli
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
+import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
@@ -32,6 +33,18 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
         this.to = to;
         this.subject = subject;
         this.messageData = messageData;
+    }
+
+    public static MailDTO<SummaryNotificationsDTO> from(CustomerIOProperties customerIOProperties, NotificationRecipient notificationRecipient,
+                                                        List<SendableNotification> sendableNotifications) {
+        final SummaryNotificationsDTO summaryNotificationsDTO = SummaryNotificationsDTO.from(notificationRecipient, sendableNotifications,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getWeeklyNotificationsEmailId().toString(),
+                mapIdentifiers(notificationRecipient),
+                customerIOProperties.getOnlyDustAdminEmail(),
+                notificationRecipient.email(),
+                summaryNotificationsDTO.title(),
+                summaryNotificationsDTO);
     }
 
     public record IdentifiersDTO(String id, String email) {

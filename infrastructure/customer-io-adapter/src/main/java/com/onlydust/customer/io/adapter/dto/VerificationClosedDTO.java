@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.BillingProfileVerificationClosed;
 
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceBillingProfileUrlFromEnvironment;
+
 @Builder
 public record VerificationClosedDTO(@NonNull String title,
                                     @NonNull String description,
@@ -20,8 +22,8 @@ public record VerificationClosedDTO(@NonNull String title,
                 .username(recipientLogin)
                 .title("Billing profile %s verification closed".formatted(billingProfileVerificationClosed.billingProfileName()))
                 .description(DESCRIPTION.formatted(billingProfileVerificationClosed.billingProfileName()))
-                .button(new ButtonDTO("Contact us", UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) +
-                                                    "settings/billing/%s/general-information".formatted(billingProfileVerificationClosed.billingProfileId())))
+                .button(new ButtonDTO("Contact us", getMarketplaceBillingProfileUrlFromEnvironment(environment,
+                        billingProfileVerificationClosed.billingProfileId().value())))
                 .build();
     }
 }

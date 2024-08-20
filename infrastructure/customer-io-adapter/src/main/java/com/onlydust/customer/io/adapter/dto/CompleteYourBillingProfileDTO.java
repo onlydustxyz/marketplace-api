@@ -3,6 +3,8 @@ package com.onlydust.customer.io.adapter.dto;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
 
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceBillingProfileUrlFromEnvironment;
+
 public record CompleteYourBillingProfileDTO(@NonNull String title,
                                             @NonNull String description,
                                             @NonNull String username,
@@ -16,8 +18,7 @@ public record CompleteYourBillingProfileDTO(@NonNull String title,
         return new CompleteYourBillingProfileDTO("Complete your billing profile",
                 DESCRIPTION.formatted(completeYourBillingProfile.billingProfile().billingProfileName()),
                 username, new ButtonDTO("Resume my billing profile",
-                UrlMapper.getMarketplaceFrontendUrlFromEnvironment(environment) +
-                "settings/billing/%s/general-information".formatted(completeYourBillingProfile.billingProfile().billingProfileId())),
+                getMarketplaceBillingProfileUrlFromEnvironment(environment, completeYourBillingProfile.billingProfile().billingProfileId())),
                 true
         );
     }

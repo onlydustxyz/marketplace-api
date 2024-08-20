@@ -3,7 +3,7 @@ package com.onlydust.customer.io.adapter.dto;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.RewardReceived;
 
-import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyRewardsUrlFromEnvironment;
 
 public record RewardCreatedDTO(@NonNull String title,
                                @NonNull String description,
@@ -16,6 +16,6 @@ public record RewardCreatedDTO(@NonNull String title,
     public static RewardCreatedDTO fromEvent(String recipientLogin, RewardReceived rewardReceived, String environment) {
         return new RewardCreatedDTO("Reward received", DESCRIPTION.formatted(rewardReceived.shortReward().getProjectName()), recipientLogin,
                 RewardDTO.from(rewardReceived.shortReward()),
-                new ButtonDTO("See details", getMarketplaceFrontendUrlFromEnvironment(environment) + "rewards"));
+                new ButtonDTO("See details", getMarketplaceMyRewardsUrlFromEnvironment(environment)));
     }
 }

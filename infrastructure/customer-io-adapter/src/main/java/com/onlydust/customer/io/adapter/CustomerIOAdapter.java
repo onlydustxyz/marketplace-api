@@ -12,10 +12,13 @@ import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
+import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Slf4j
@@ -47,6 +50,12 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
         } else if (notification.data() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
             sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationClosed));
         }
+    }
+
+    @Override
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
+    public void sendAllForRecipient(NotificationRecipient notificationRecipient, List<SendableNotification> sendableNotifications) {
+        sendEmail(MailDTO.from(customerIOProperties, notificationRecipient, sendableNotifications));
     }
 
     private <MessageData> void sendEmail(MailDTO<MessageData> mail) {

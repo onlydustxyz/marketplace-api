@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.user.domain.job.IndexerApiUserOutboxConsumer;
+import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
 import onlydust.com.marketplace.user.domain.observer.UserObserverComposite;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
@@ -69,5 +70,11 @@ public class UserDomainConfiguration {
     public UserObserverPort userObservers(final OutboxUserService outboxUserService,
                                           final UserObserverPort notificationSettingsService) {
         return new UserObserverComposite(outboxUserService, notificationSettingsService);
+    }
+
+    @Bean
+    public NotificationSummaryEmailJob notificationSummaryEmailJob(final NotificationStoragePort notificationStoragePort,
+                                                                   final NotificationSender asyncNotificationEmailProcessor) {
+        return new NotificationSummaryEmailJob(notificationStoragePort, asyncNotificationEmailProcessor);
     }
 }

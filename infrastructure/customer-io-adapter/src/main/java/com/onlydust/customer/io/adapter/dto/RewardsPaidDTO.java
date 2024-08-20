@@ -6,6 +6,7 @@ import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import java.util.List;
 
 import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
+import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyRewardsUrlFromEnvironment;
 
 public record RewardsPaidDTO(@NonNull String title,
                              @NonNull String description,
@@ -17,6 +18,6 @@ public record RewardsPaidDTO(@NonNull String title,
 
     public static RewardsPaidDTO fromEvent(String recipientLogin, RewardsPaid rewardsPaid, String environment) {
         return new RewardsPaidDTO("Reward(s) processed", DESCRIPTION, recipientLogin, rewardsPaid.shortRewards().stream().map(RewardDTO::from).toList(),
-                new ButtonDTO("See details", getMarketplaceFrontendUrlFromEnvironment(environment) + "rewards"));
+                new ButtonDTO("See details", getMarketplaceMyRewardsUrlFromEnvironment(environment)));
     }
 }

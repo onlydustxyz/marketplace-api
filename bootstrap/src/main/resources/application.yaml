@@ -36,7 +36,7 @@ application:
     update-projects-languages: 300000 # 5 minutes
     cleanup-obsolete-applications: 86400000 # 1 day
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
-    send-application-mail-cron-expression: "0 0 12 * * ?" # every day at noon
+    send-summary-notifications-emails-cron-expression: "0 0 8 * * MON"
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
@@ -187,6 +187,7 @@ infrastructure:
     environment: ${ENV}
     kyc-individual-verification-email-id: ${CUSTOMER_IO_KYC_INDIVIDUAL_VERIFICATION_EMAIL_ID}
     complete-your-billing-profile-email-id: ${CUSTOMER_IO_COMPLETE_YOUR_BILLING_PROFILE_EMAIL_ID}
+    weekly-notifications-email-id: ${CUSTOMER_IO_WEEKLY_NOTIFICATIONS_EMAIL_ID}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
