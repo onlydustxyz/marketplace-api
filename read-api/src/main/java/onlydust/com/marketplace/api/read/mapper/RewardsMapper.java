@@ -2,10 +2,9 @@ package onlydust.com.marketplace.api.read.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.BudgetStatsReadEntity;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper;
 import onlydust.com.marketplace.api.read.entities.reward.RewardDetailsReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.UserRewardStatsReadEntity;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.data.domain.Page;
@@ -17,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toDetailedTotalMoneyTotalPerCurrencyInner;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface RewardsMapper {
@@ -27,22 +27,24 @@ public interface RewardsMapper {
                                                               final AuthenticatedUser authenticatedUser) {
 
 
+        final var totalRemainingUsdEquivalent = totalRemainingUsdEquivalent(budgetStatsReadEntities);
+        final var totalSpentUsdEquivalent = totalSpentUsdEquivalent(budgetStatsReadEntities);
         final RewardsPageResponse rewardsPageResponse = new RewardsPageResponse()
                 .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .nextPageIndex(PaginationHelper.nextPageIndex(pageIndex, page.getTotalPages()))
                 .remainingBudget(new DetailedTotalMoney()
-                        .totalUsdEquivalent(totalRemainingUsdEquivalent(budgetStatsReadEntities))
+                        .totalUsdEquivalent(totalRemainingUsdEquivalent)
                         .totalPerCurrency(budgetStatsReadEntities.stream()
                                 .map(BudgetStatsReadEntity::toRemainingMoney)
-                                .map(MoneyMapper::toMoney)
+                                .map(m -> toDetailedTotalMoneyTotalPerCurrencyInner(m, totalRemainingUsdEquivalent))
                                 .toList()))
                 .spentAmount(new DetailedTotalMoney()
-                        .totalUsdEquivalent(totalSpentUsdEquivalent(budgetStatsReadEntities))
+                        .totalUsdEquivalent(totalSpentUsdEquivalent)
                         .totalPerCurrency(budgetStatsReadEntities.stream()
                                 .map(BudgetStatsReadEntity::toSpentMoney)
-                                .map(MoneyMapper::toMoney)
+                                .map(m -> toDetailedTotalMoneyTotalPerCurrencyInner(m, totalSpentUsdEquivalent))
                                 .toList()))
                 .sentRewardsCount(budgetStatsReadEntities.stream()
                         .map(BudgetStatsReadEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
@@ -91,6 +93,8 @@ public interface RewardsMapper {
                                                         final Page<RewardDetailsReadEntity> page,
                                                         final List<UserRewardStatsReadEntity> userRewardStatsReadEntities,
                                                         final AuthenticatedUser authenticatedUser) {
+        final var totalPendingAmountUsdEquivalent = totalPendingAmountUsdEquivalent(userRewardStatsReadEntities);
+        final var totalRewardedAmountUsdEquivalent = totalRewardedAmountUsdEquivalent(userRewardStatsReadEntities);
         return new MyRewardsPageResponse()
                 .hasMore(PaginationHelper.hasMore(pageIndex, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
@@ -101,13 +105,13 @@ public interface RewardsMapper {
                         .totalUsdEquivalent(totalPendingAmountUsdEquivalent(userRewardStatsReadEntities))
                         .totalPerCurrency(userRewardStatsReadEntities.stream()
                                 .map(UserRewardStatsReadEntity::toPendingMoney)
-                                .map(MoneyMapper::toMoney)
+                                .map(m -> toDetailedTotalMoneyTotalPerCurrencyInner(m, totalPendingAmountUsdEquivalent))
                                 .toList()))
                 .rewardedAmount(new DetailedTotalMoney()
-                        .totalUsdEquivalent(totalRewardedAmountUsdEquivalent(userRewardStatsReadEntities))
+                        .totalUsdEquivalent(totalRewardedAmountUsdEquivalent)
                         .totalPerCurrency(userRewardStatsReadEntities.stream()
                                 .map(UserRewardStatsReadEntity::toRewardedMoney)
-                                .map(MoneyMapper::toMoney)
+                                .map(m -> toDetailedTotalMoneyTotalPerCurrencyInner(m, totalRewardedAmountUsdEquivalent))
                                 .toList()))
                 .receivedRewardsCount(userRewardStatsReadEntities.stream().map(UserRewardStatsReadEntity::getRewardIds).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())
                 .rewardedContributionsCount(userRewardStatsReadEntities.stream().map(UserRewardStatsReadEntity::getRewardItemIds).flatMap(Collection::stream).flatMap(Collection::stream).collect(Collectors.toUnmodifiableSet()).size())

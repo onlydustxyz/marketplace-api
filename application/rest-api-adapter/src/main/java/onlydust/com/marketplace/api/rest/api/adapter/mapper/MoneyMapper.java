@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.api.contract.model.BaseMoney;
 import onlydust.com.marketplace.api.contract.model.ConvertibleMoney;
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoneyTotalPerCurrencyInner;
 import onlydust.com.marketplace.api.contract.model.Money;
 
 import java.math.BigDecimal;
@@ -14,6 +15,20 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 public interface MoneyMapper {
+    static DetailedTotalMoneyTotalPerCurrencyInner toDetailedTotalMoneyTotalPerCurrencyInner(onlydust.com.marketplace.project.domain.view.Money money,
+                                                                                             BigDecimal usdTotal) {
+        final var ratio = (usdTotal == null || money.dollarsEquivalent().isEmpty() || usdTotal.compareTo(BigDecimal.ZERO) == 0) ? null :
+                money.dollarsEquivalent().get().divide(usdTotal, 2, RoundingMode.HALF_EVEN);
+
+        return new DetailedTotalMoneyTotalPerCurrencyInner()
+                .amount(money.amount())
+                .prettyAmount(money.prettyAmount())
+                .currency(mapCurrency(money.currency()))
+                .usdEquivalent(prettyUsd(money.dollarsEquivalent().orElse(null)))
+                .usdConversionRate(money.usdConversionRate().orElse(null))
+                .ratio(ratio);
+    }
+
     static Money toMoney(onlydust.com.marketplace.project.domain.view.Money money) {
         return new Money()
                 .amount(money.amount())
