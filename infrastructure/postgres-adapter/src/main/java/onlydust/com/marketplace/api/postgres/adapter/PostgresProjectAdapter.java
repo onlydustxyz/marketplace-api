@@ -444,4 +444,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                 .map(ProjectCategorySuggestionEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    @Transactional
+    public void refreshRecommendations() {
+        projectRepository.refreshRecommendations();
+    }
 }

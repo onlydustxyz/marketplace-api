@@ -357,4 +357,9 @@ public class ProjectService implements ProjectFacadePort {
         final Date now = new Date();
         projectStoragePort.updateProjectsTags(now);
     }
+
+    @Override
+    public void refreshRecommendations() {
+        projectStoragePort.refreshRecommendations();
+    }
 }

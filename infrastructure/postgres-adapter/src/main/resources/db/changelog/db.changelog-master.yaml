@@ -469,3 +469,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000313_add_sumsub_rejection_reasons_table.sql
   - include:
       file: db/changelog/changelogs/00000314_split_project_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000315_create_project_recommendations.sql

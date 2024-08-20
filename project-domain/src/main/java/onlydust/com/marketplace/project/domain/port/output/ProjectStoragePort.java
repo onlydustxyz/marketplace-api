@@ -77,4 +77,6 @@ public interface ProjectStoragePort {
     List<UUID> findProjectIdsByRepoId(Long repoId);
 
     List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId);
+
+    void refreshRecommendations();
 }
