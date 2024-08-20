@@ -9,10 +9,12 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
+import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.ZoneOffset;
 import java.util.Date;
@@ -134,5 +136,18 @@ public class AccountBookTransactionReadEntity {
             case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
             case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
         };
+    }
+
+    public void toCsv(CSVPrinter csv) throws IOException {
+        final var amount = toMoney(this.amount);
+        csv.printRecord(id,
+                timestamp,
+                transactionType().name(),
+                thirdParty().getProject() == null ? null : thirdParty().getProject().getId(),
+                thirdParty().getSponsor() == null ? null : thirdParty().getSponsor().getId(),
+                amount.getAmount(),
+                amount.getCurrency().getCode(),
+                amount.getUsdEquivalent()
+        );
     }
 }

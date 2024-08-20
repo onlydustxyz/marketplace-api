@@ -15,22 +15,32 @@ import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyS
 import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -89,22 +99,10 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                           String toDate,
                                                                           List<ProgramTransactionType> types,
                                                                           String search) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
-            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
-
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = accountBookTransactionReadRepository.findAllForProgram(
-                programId,
-                DateMapper.parseNullable(fromDate),
-                DateMapper.parseNullable(toDate),
-                search,
-                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
-                PageRequest.of(index, size, Sort.by("timestamp"))
-        );
+        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
 
         final var response = new TransactionPageResponse()
                 .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toProgramTransactionPageItemResponse).toList())
@@ -114,6 +112,84 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
 
         return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @GetMapping(
+            value = "/api/v1/programs/{programId}/transactions",
+            produces = "text/csv"
+    )
+    public ResponseEntity<String> exportProgramTransactions(@PathVariable UUID programId,
+                                                            @RequestParam(required = false) Integer pageIndex,
+                                                            @RequestParam(required = false) Integer pageSize,
+                                                            @RequestParam(required = false) String fromDate,
+                                                            @RequestParam(required = false) String toDate,
+                                                            @RequestParam(required = false) List<ProgramTransactionType> types,
+                                                            @RequestParam(required = false) String search) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
+        final var csv = toCsv(page);
+
+        return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
+                .body(csv);
+    }
+
+    private String toCsv(Page<AccountBookTransactionReadEntity> page) {
+        final var format = CSVFormat.DEFAULT.builder().build();
+        final var sw = new StringWriter();
+
+        try (final var printer = new CSVPrinter(sw, format)) {
+            printer.printRecord("id", "timestamp", "transaction_type", "project_id", "sponsor_id", "amount", "currency", "usd_amount");
+            for (final var transaction : page.getContent())
+                transaction.toCsv(printer);
+        } catch (final IOException e) {
+            throw internalServerError("Error while exporting transactions to CSV", e);
+        }
+
+        return sw.toString();
+    }
+
+
+    @GetMapping(
+            value = "/api/v1/programs/{programId}/transactions",
+            produces = "application/octet-stream"
+    )
+    public ResponseEntity<Resource> downloadProgramTransactions(@PathVariable UUID programId,
+                                                                @RequestParam(required = false) Integer pageIndex,
+                                                                @RequestParam(required = false) Integer pageSize,
+                                                                @RequestParam(required = false) String fromDate,
+                                                                @RequestParam(required = false) String toDate,
+                                                                @RequestParam(required = false) List<ProgramTransactionType> types,
+                                                                @RequestParam(required = false) String search) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize, 1_000_000);
+
+        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
+        final var csv = toCsv(page);
+
+        return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
+                .header("Content-Disposition", "attachment; filename=transactions.csv")
+                .body(new ByteArrayResource(csv.getBytes()));
+    }
+
+    private Page<AccountBookTransactionReadEntity> findAccountBookTransactions(UUID programId, String fromDate, String toDate,
+                                                                               List<ProgramTransactionType> types, String search, int index, int size) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+
+        final var page = accountBookTransactionReadRepository.findAllForProgram(
+                programId,
+                DateMapper.parseNullable(fromDate),
+                DateMapper.parseNullable(toDate),
+                search,
+                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
+                PageRequest.of(index, size, Sort.by("timestamp"))
+        );
+        return page;
     }
 
     @Override
