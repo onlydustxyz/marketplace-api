@@ -8708,7 +8708,10 @@ components:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
+            - shortDescription
             - leads
+            - languages
+            - categories
             - totalAvailable
             - totalGranted
             - totalRewarded
@@ -8718,10 +8721,20 @@ components:
             - newContributors
             - contributors
           properties:
+            shortDescription:
+              type: string
             leads:
               type: array
               items:
                 $ref: '#/components/schemas/RegisteredUserResponse'
+            languages:
+              type: array
+              items:
+                $ref: '#/components/schemas/LanguageResponse'
+            categories:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectCategoryResponse'
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
