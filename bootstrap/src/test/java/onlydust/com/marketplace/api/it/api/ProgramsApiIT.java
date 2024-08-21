@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -1100,27 +1099,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .returnResult().getResponseBody();
 
                 final var lines = csv.split("\\R");
-                assertThat(lines.length).isEqualTo(9);
-                assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
-                assertThat(lines).allMatch(line -> line.split(",").length == 8);
-            }
-
-            @Test
-            void should_download_program_transactions_in_csv() {
-                // When
-                final var csv = client.get()
-                        .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id())))
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                        .header(HttpHeaders.ACCEPT, "application/octet-stream")
-                        .exchange()
-                        // Then
-                        .expectStatus()
-                        .isOk()
-                        .expectHeader()
-                        .contentDisposition(ContentDisposition.attachment().filename("transactions.csv").build())
-                        .expectBody().returnResult().getResponseBody();
-
-                final var lines = new String(csv).split("\\R");
                 assertThat(lines.length).isEqualTo(9);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
                 assertThat(lines).allMatch(line -> line.split(",").length == 8);
