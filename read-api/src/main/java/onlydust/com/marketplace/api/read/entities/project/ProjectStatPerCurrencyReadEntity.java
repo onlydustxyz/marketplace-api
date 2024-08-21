@@ -29,12 +29,12 @@ public class ProjectStatPerCurrencyReadEntity implements ProgramTransactionStat 
     UUID currencyId;
 
     @NonNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
     ProjectReadEntity project;
 
     @NonNull
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
     CurrencyReadEntity currency;
 

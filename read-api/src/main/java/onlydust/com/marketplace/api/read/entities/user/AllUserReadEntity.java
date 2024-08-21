@@ -14,6 +14,7 @@ import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfile
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -70,7 +71,7 @@ public class AllUserReadEntity {
         return ofNullable(profile);
     }
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_leads",
             schema = "public",
@@ -78,9 +79,9 @@ public class AllUserReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
     @NonNull
-    Set<ProjectReadEntity> projectsLed;
+    Set<ProjectLinkReadEntity> projectsLed;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "pending_project_leader_invitations",
             schema = "public",
@@ -88,9 +89,9 @@ public class AllUserReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
     @NonNull
-    Set<ProjectReadEntity> pendingProjectsLed;
+    Set<ProjectLinkReadEntity> pendingProjectsLed;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "sponsors_users",
             schema = "public",
@@ -100,16 +101,12 @@ public class AllUserReadEntity {
     @NonNull
     Set<SponsorReadEntity> sponsors;
 
-    @OneToMany(mappedBy = "applicant")
-    @NonNull
-    Set<ApplicationReadEntity> applications;
-
-    @OneToMany(mappedBy = "applicant")
+    @OneToMany(mappedBy = "applicant",fetch = FetchType.LAZY)
     @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
     @NonNull
     Set<ApplicationReadEntity> pendingApplications;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "billing_profiles_users",
             schema = "accounting",
@@ -120,7 +117,7 @@ public class AllUserReadEntity {
     @NonNull
     List<BillingProfileReadEntity> billingProfiles;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     @Getter(AccessLevel.NONE)
@@ -130,7 +127,7 @@ public class AllUserReadEntity {
         return globalUsersRanks.stream().findFirst();
     }
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipientId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     @Getter(AccessLevel.NONE)
@@ -181,7 +178,7 @@ public class AllUserReadEntity {
                 .leadedProjectCount(globalUsersRanks().map(GlobalUsersRanksReadEntity::leadedProjectCount).orElse(0L).intValue())
                 .totalEarnedUsd(receivedRewardStats().map(ReceivedRewardStatsPerUserReadEntity::usdTotal).orElse(ZERO))
                 .billingProfiles(ofNullable(billingProfiles).orElse(List.of()).stream().map(BillingProfileReadEntity::toBoShortResponse).toList())
-                .leadedProjects(ofNullable(projectsLed).orElse(Set.of()).stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .leadedProjects(ofNullable(projectsLed).orElse(Set.of()).stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
                 ;
     }
 

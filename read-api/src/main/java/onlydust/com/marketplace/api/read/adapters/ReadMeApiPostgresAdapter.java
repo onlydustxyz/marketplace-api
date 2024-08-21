@@ -7,10 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSe
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
@@ -85,8 +82,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .hasAcceptedLatestTermsAndConditions(user.onboarding() != null && user.onboarding().isHasAcceptedTermsAndConditions())
                 .hasCompletedVerificationInformation(user.onboardingCompletion() != null && user.onboardingCompletion().verificationInformationProvided())
                 .isAuthorizedToApplyOnGithubIssues(userAuthorizedToApplyOnGithubIssues)
-                .projectsLed(user.projectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
-                .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectReadEntity::toLinkResponse).toList())
+                .projectsLed(user.projectsLed().stream().map(ProjectLinkReadEntity::toLinkResponse).toList())
+                .pendingProjectsLed(user.pendingProjectsLed().stream().map(ProjectLinkReadEntity::toLinkResponse).toList())
                 .pendingApplications(user.pendingApplications().stream().map(ApplicationReadEntity::toShortResponse).toList())
                 .isAdmin(Arrays.stream(user.registered().roles()).anyMatch(r -> r == AuthenticatedUser.Role.ADMIN))
                 .createdAt(toZoneDateTime(user.registered().createdAt()))
