@@ -3931,6 +3931,42 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/programs/{programId}/projects/{projectId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadPrograms
+      summary: Get program project by projectId
+      operationId: getProgramProject
+      description: |
+        Get program project by projectId.
+        Only program leaders can access this information.
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Program project'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramProjectResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+
   /api/v1/programs/{programId}/stats/transactions:
     get:
       security:
@@ -8754,6 +8790,22 @@ components:
               $ref: '#/components/schemas/NumberKpi'
             activeContributorsCount:
               $ref: '#/components/schemas/NumberKpi'
+
+    ProgramProjectResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
 
     NumberKpi:
       type: object

@@ -190,6 +190,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROGRAM_STATS_TRANSACTIONS = "/api/v1/programs/%s/stats/transactions";
     protected static final String PROGRAM_TRANSACTIONS = "/api/v1/programs/%s/transactions";
     protected static final String PROGRAM_PROJECTS = "/api/v1/programs/%s/projects";
+    protected static final String PROGRAM_PROJECT = "/api/v1/programs/%s/projects/%s";
     protected static final String PROGRAM_GRANT = "/api/v1/programs/%s/grant";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")

@@ -92,6 +92,20 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     @Override
+    public ResponseEntity<ProgramProjectResponse> getProgramProject(UUID programId, UUID projectId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+            throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+        final ProgramProjectResponse programProjectResponse = projectReadRepository.findStatsById(projectId)
+                .map(p -> p.toProgramProjectResponse(programId))
+                .orElseThrow(() -> notFound("Project %s not found for program %s".formatted(projectId, programId)));
+
+        return ResponseEntity.ok(programProjectResponse);
+    }
+
+    @Override
     public ResponseEntity<TransactionPageResponse> getProgramTransactions(UUID programId,
                                                                           Integer pageIndex,
                                                                           Integer pageSize,

@@ -251,6 +251,25 @@ public class ProjectReadEntity {
                         contributionStats().map(ProjectContributionStatReadEntity::lastPeriodActiveContributorCount).orElse(0)));
     }
 
+    public ProgramProjectResponse toProgramProjectResponse(final UUID programId) {
+        final var statsPerCurrency = perProgramStatsPerCurrency.stream()
+                .filter(s -> s.programId().equals(programId))
+                .toList();
+        final var totalGranted = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalGranted);
+        final var totalRewarded = map(statsPerCurrency, ProgramStatPerCurrencyPerProjectReadEntity::totalRewarded);
+        final DetailedTotalMoney totalAvailable = map(statsPerCurrency, s -> s.totalGranted().subtract(s.totalRewarded()));
+        return new ProgramProjectResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .logoUrl(logoUrl)
+                .totalAvailable(totalAvailable)
+                .totalGranted(totalGranted)
+                .totalRewarded(totalRewarded);
+
+
+    }
+
     private NumberKpi createKpi(int current, int last) {
         return new NumberKpi()
                 .value(current)

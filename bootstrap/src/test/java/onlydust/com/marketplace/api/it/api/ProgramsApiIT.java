@@ -3,10 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.AllocateRequest;
-import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -1452,6 +1449,131 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                   ]
                                 }
                                 """);
+
+                final ProgramProjectsPageResponse programProjectsPageResponse = client.get()
+                        .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody(ProgramProjectsPageResponse.class)
+                        .returnResult().getResponseBody();
+
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_PROJECT.formatted(program.id(), programProjectsPageResponse.getProjects().get(0).getId())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .json("""
+                                     {
+                                      "totalAvailable": {
+                                        "totalUsdEquivalent": 1882.98,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": 1,
+                                            "prettyAmount": 1,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 1781.98,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 0.95
+                                          },
+                                          {
+                                            "amount": 100,
+                                            "prettyAmount": 100,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 101.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 0.05
+                                          }
+                                        ]
+                                      },
+                                      "totalGranted": {
+                                        "totalUsdEquivalent": 5547.95,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": 3,
+                                            "prettyAmount": 3,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 5345.95,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 0.96
+                                          },
+                                          {
+                                            "amount": 200,
+                                            "prettyAmount": 200,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 202.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 0.04
+                                          }
+                                        ]
+                                      },
+                                      "totalRewarded": {
+                                        "totalUsdEquivalent": 3664.97,
+                                        "totalPerCurrency": [
+                                          {
+                                            "amount": 2,
+                                            "prettyAmount": 2,
+                                            "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 3563.97,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": 0.97
+                                          },
+                                          {
+                                            "amount": 100,
+                                            "prettyAmount": 100,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 101.00,
+                                            "usdConversionRate": 1.010001,
+                                            "ratio": 0.03
+                                          }
+                                        ]
+                                      }
+                                    }""");
             }
 
             @Test
