@@ -17,12 +17,12 @@ public class CmcQuoteServiceAdapter implements QuoteService {
     private final @NonNull CmcClient client;
 
     @Override
-    public List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> bases) {
-        final var response = client.quotes(currencies, bases);
+    public List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> targets) {
+        final var response = client.quotes(currencies, targets);
         final var quotes = new ArrayList<Quote>();
 
         for (Currency currency : currencies) {
-            for (Currency base : bases) {
+            for (Currency base : targets) {
                 Optional.ofNullable(response.get(currency.cmcId()))
                         .flatMap(q -> Optional.ofNullable(q.quote().get(base.cmcId())))
                         .filter(p -> p.price() != null)

@@ -89,6 +89,27 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     @Test
     @Order(1)
+    void should_add_usd_support_when_no_currency() {
+        client
+                .post()
+                .uri(getApiURI(CURRENCIES))
+                .contentType(APPLICATION_JSON)
+                .header("Authorization", "Bearer " + camille.jwt())
+                .bodyValue("""
+                        {
+                            "type": "FIAT",
+                            "code": "USD",
+                            "decimals": 2
+                        }
+                        """)
+                .exchange()
+                .expectStatus()
+                .isOk()
+        ;
+    }
+
+    @Test
+    @Order(2)
     void should_add_erc20_support_on_ethereum() {
         client
                 .post()
@@ -395,11 +416,11 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
         assertThat(historicalQuotes).allMatch(q -> q.getPrice().compareTo(BigDecimal.ZERO) > 0);
 
         final var latestQuotes = latestQuoteRepository.findAll();
-        assertThat(latestQuotes).hasSize(9);
+        assertThat(latestQuotes).hasSize(4);
         assertThat(latestQuotes).allMatch(q -> q.price().compareTo(BigDecimal.ZERO) > 0);
 
         final var oldestQuotes = oldestQuoteRepository.findAll();
-        assertThat(oldestQuotes).hasSize(9);
+        assertThat(oldestQuotes).hasSize(4);
         assertThat(oldestQuotes).allMatch(q -> q.price().compareTo(BigDecimal.ZERO) > 0);
     }
 
@@ -442,7 +463,23 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                 "SEPA"
                               ],
                               "description": "Euro is the official currency of the European Union",
-                              "countryRestrictions": ["BRA", "USA"]
+                              "countryRestrictions": [
+                                "BRA",
+                                "USA"
+                              ]
+                            },
+                            {
+                              "code": "USD",
+                              "name": "US Dollar",
+                              "logoUrl": null,
+                              "decimals": 2,
+                              "type": "FIAT",
+                              "tokens": [],
+                              "supportedOn": [
+                                "SEPA"
+                              ],
+                              "description": null,
+                              "countryRestrictions": []
                             },
                             {
                               "code": "USDC",
@@ -473,26 +510,26 @@ public class BackOfficeCurrencyApiIT extends AbstractMarketplaceBackOfficeApiIT 
                                   "name": "USD Coin"
                                 },
                                 {
-                                  "blockchain": "OPTIMISM",
-                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                                  "blockchain": "ETHEREUM",
+                                  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"
                                 },
                                 {
-                                  "blockchain": "ETHEREUM",
-                                  "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                                  "blockchain": "OPTIMISM",
+                                  "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
                                   "decimals": 6,
                                   "symbol": "USDC",
                                   "name": "USD Coin"
                                 }
                               ],
                               "supportedOn": [
+                                "STARKNET",
+                                "STELLAR",
                                 "APTOS",
                                 "ETHEREUM",
-                                "OPTIMISM",
-                                "STARKNET",
-                                "STELLAR"
+                                "OPTIMISM"
                               ],
                               "description": "USDC (USDC) is a cryptocurrency and operates on the Ethereum platform.",
                               "countryRestrictions": []

@@ -87,8 +87,7 @@ public class CurrencyServiceTest {
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
         verify(quoteStorage).save(quotes.capture());
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -151,8 +150,7 @@ public class CurrencyServiceTest {
         verify(quoteStorage).save(quotes.capture());
 
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -184,8 +182,7 @@ public class CurrencyServiceTest {
         verify(quoteStorage).save(quotes.capture());
 
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -244,7 +241,7 @@ public class CurrencyServiceTest {
         verify(currencyStorage).save(currency);
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
         verify(quoteStorage).save(quotes.capture());
-        assertThat(quotes.getValue()).containsExactlyInAnyOrder(USDC_USDC, USDC_USD);
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(USDC_USD);
     }
 
     @Test
@@ -270,7 +267,7 @@ public class CurrencyServiceTest {
         final var currencies = Set.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK, Currencies.USD);
 
         when(currencyStorage.all()).thenReturn(currencies);
-        when(quoteService.currentPrice(currencies, currencies))
+        when(quoteService.currentPrice(currencies, Set.of(Currencies.USD)))
                 .thenReturn(List.of(USDC_USD, LORDS_USD));
 
         // When
