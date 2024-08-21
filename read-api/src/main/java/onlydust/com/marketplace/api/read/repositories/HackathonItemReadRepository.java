@@ -23,18 +23,23 @@ public interface HackathonItemReadRepository extends Repository<HackathonItemRea
                    h.github_labels,
                    hic.issue_count,
                    hic.open_issue_count,
-                   (select count(hr.user_id)
-                    from hackathon_registrations hr
-                    where hr.hackathon_id = h.id) registrations_count,
-                   (select jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name, 'slug', p.slug, 'logoUrl', p.logo_url))
-                    from hackathon_projects hp
-                             join projects p on p.id = hp.project_id
-                    where hp.hackathon_id = h.id) projects
+                   coalesce(r.count, 0) registrations_count,
+                   hp.p    projects
             from hackathons h
                      left join hackathon_issue_counts hic on hic.hackathon_id = h.id
+                     left join (select hr.hackathon_id, count(hr.user_id) count
+                                from hackathon_registrations hr
+                                group by hr.hackathon_id) r on r.hackathon_id = h.id
+                     left join (select hp.hackathon_id,
+                                       jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name, 'slug', p.slug, 'logoUrl',
+                                                                    p.logo_url)) p
+                                from hackathon_projects hp
+                                         join projects p on p.id = hp.project_id
+                                group by hp.hackathon_id) hp on hp.hackathon_id = h.id
             where h.status = 'PUBLISHED'
             """, nativeQuery = true)
     Page<HackathonItemReadEntity> findAllPublished(Pageable pageable);
+
     @Query(value = """
             select h.id,
                    h.slug,
@@ -48,15 +53,19 @@ public interface HackathonItemReadRepository extends Repository<HackathonItemRea
                    h.github_labels,
                    hic.issue_count,
                    hic.open_issue_count,
-                   (select count(hr.user_id)
-                    from hackathon_registrations hr
-                    where hr.hackathon_id = h.id) registrations_count,
-                   (select jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name, 'slug', p.slug, 'logoUrl', p.logo_url))
-                    from hackathon_projects hp
-                             join projects p on p.id = hp.project_id
-                    where hp.hackathon_id = h.id) projects
+                   coalesce(r.count, 0) registrations_count,
+                   hp.p    projects
             from hackathons h
                      left join hackathon_issue_counts hic on hic.hackathon_id = h.id
+                     left join (select hr.hackathon_id, count(hr.user_id) count
+                                from hackathon_registrations hr
+                                group by hr.hackathon_id) r on r.hackathon_id = h.id
+                     left join (select hp.hackathon_id,
+                                       jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name, 'slug', p.slug, 'logoUrl',
+                                                                    p.logo_url)) p
+                                from hackathon_projects hp
+                                         join projects p on p.id = hp.project_id
+                                group by hp.hackathon_id) hp on hp.hackathon_id = h.id
             """, nativeQuery = true)
     Page<HackathonItemReadEntity> findAll(Pageable pageable);
 }
