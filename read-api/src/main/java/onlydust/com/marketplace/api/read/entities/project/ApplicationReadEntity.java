@@ -37,7 +37,7 @@ public class ApplicationReadEntity {
     @NonNull
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
     UUID projectId;
 
     @NonNull
