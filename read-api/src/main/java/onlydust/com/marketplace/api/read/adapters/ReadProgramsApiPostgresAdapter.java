@@ -80,7 +80,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         int index = sanitizePageIndex(pageIndex);
         int size = sanitizePageSize(pageSize);
 
-        final var page = projectReadRepository.findGrantedProjects(programId, PageRequest.of(index, size));
+        final var page = projectReadRepository.findGrantedProjects(programId, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
         final var response = new ProgramProjectsPageResponse()
                 .projects(page.getContent().stream().map(p -> p.toProgramProjectPageItemResponse(programId)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))

@@ -34,6 +34,19 @@ public class ProjectHelper {
                 .getLeft());
     }
 
+    public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name) {
+        return ProjectId.of(projectFacadePort.createProject(lead.user().getId(),
+                        CreateProjectCommand.builder()
+                                .firstProjectLeaderId(lead.user().getId())
+                                .name(name + " " + faker.random().nextLong())
+                                .shortDescription(faker.lorem().sentence())
+                                .longDescription(faker.lorem().paragraph())
+                                .isLookingForContributors(faker.bool().bool())
+                                .build())
+                .getLeft());
+    }
+
+
     public Project get(ProjectId projectId) {
         return projectStoragePort.getById(projectId.value())
                 .orElseThrow(() -> new RuntimeException("Project not found"));

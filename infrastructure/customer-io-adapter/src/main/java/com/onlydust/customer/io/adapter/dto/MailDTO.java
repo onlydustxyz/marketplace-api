@@ -97,7 +97,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "Reward %s got canceled".formatted(rewardCanceled.shortReward().getId().pretty()),
-                RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled));
+                RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled, customerIOProperties.getEnvironment()));
     }
 
     public static MailDTO<RewardsPaidDTO> from(@NonNull CustomerIOProperties customerIOProperties,
