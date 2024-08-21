@@ -5,8 +5,10 @@ import onlydust.com.backoffice.api.contract.BackofficeHackathonsReadApi;
 import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.backoffice.api.contract.model.UserPage;
+import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
+import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -33,6 +35,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
 
     private UserReadRepository userReadRepository;
     private HackathonReadRepository hackathonReadRepository;
+    private HackathonItemReadRepository hackathonItemReadRepository;
 
     @Override
     public ResponseEntity<UserPage> getRegisteredUserPage(UUID hackathonId, Integer pageIndex, Integer pageSize, String login) {
@@ -60,8 +63,8 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
     public ResponseEntity<HackathonsPageResponse> getHackathons(Integer pageIndex, Integer pageSize) {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final var page = hackathonReadRepository.findAll(PageRequest.of(sanitizePageIndex, sanitizePageSize,
-                Sort.by(Sort.Direction.DESC, "startDate")));
+        final var page = hackathonItemReadRepository.findAll(PageRequest.of(sanitizePageIndex, sanitizePageSize,
+                Sort.by(Sort.Direction.DESC, "start_date")));
 
         final HackathonsPageResponse hackathonsPageResponse = new HackathonsPageResponse();
         hackathonsPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizePageIndex, page.getTotalPages()));
@@ -69,7 +72,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
         hackathonsPageResponse.setTotalPageNumber(page.getTotalPages());
         hackathonsPageResponse.setTotalItemNumber((int) page.getTotalElements());
         page.stream()
-                .map(HackathonReadEntity::toHackathonsPageItemResponse)
+                .map(HackathonItemReadEntity::toHackathonsPageItemResponse)
                 .forEach(hackathonsPageResponse::addHackathonsItem);
 
         return hackathonsPageResponse.getHasMore() ?

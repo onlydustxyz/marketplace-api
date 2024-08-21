@@ -32,13 +32,4 @@ public interface HackathonReadRepository extends Repository<HackathonReadEntity,
                 select count(*) > 0 from hackathon_registrations where user_id = :userId and hackathon_id = :hackathonId
             """)
     Boolean isRegisteredToHackathon(UUID userId, UUID hackathonId);
-
-    @Query("""
-            select h from HackathonReadEntity h
-                left join fetch h.issueCounts
-            where h.status = 'PUBLISHED'
-            """)
-    Page<HackathonReadEntity> findAllPublished(Pageable pageable);
-
-    Page<HackathonReadEntity> findAll(Pageable pageable);
 }

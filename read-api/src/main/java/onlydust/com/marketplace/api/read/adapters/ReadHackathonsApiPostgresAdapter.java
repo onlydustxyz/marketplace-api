@@ -9,8 +9,10 @@ import onlydust.com.marketplace.api.contract.model.HackathonProjectsIssuesRespon
 import onlydust.com.marketplace.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
+import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.LanguageReadRepository;
@@ -41,6 +43,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     private final HackathonReadRepository hackathonReadRepository;
     private final HackathonProjectIssuesReadRepository hackathonProjectIssuesReadRepository;
     private final LanguageReadRepository languageReadRepository;
+    private final HackathonItemReadRepository hackathonItemReadRepository;
 
     @Override
     public ResponseEntity<HackathonsDetailsResponse> getHackathonBySlug(String hackathonSlug) {
@@ -56,9 +59,9 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
     @Override
     public ResponseEntity<HackathonsListResponse> getHackathons() {
         final var hackathonsListResponse = new HackathonsListResponse();
-        hackathonReadRepository.findAllPublished(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "startDate")))
+        hackathonItemReadRepository.findAllPublished(PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "start_date")))
                 .stream()
-                .map(HackathonReadEntity::toHackathonsListItemResponse)
+                .map(HackathonItemReadEntity::toHackathonsListItemResponse)
                 .forEach(hackathonsListResponse::addHackathonsItem);
         return ok(hackathonsListResponse);
     }

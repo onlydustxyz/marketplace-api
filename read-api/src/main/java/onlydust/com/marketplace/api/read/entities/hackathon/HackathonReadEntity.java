@@ -1,22 +1,19 @@
 package onlydust.com.marketplace.api.read.entities.hackathon;
 
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
+import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
-import onlydust.com.backoffice.api.contract.model.HackathonsPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
-import org.hibernate.annotations.Immutable;
-import org.hibernate.annotations.JdbcType;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.*;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
@@ -182,33 +179,5 @@ public class HackathonReadEntity {
                                 .thenComparing(HackathonsEvent::getEndDate)
                                 .thenComparing(HackathonsEvent::getName))
                         .toList());
-    }
-
-    public HackathonsListItemResponse toHackathonsListItemResponse() {
-        return new HackathonsListItemResponse()
-                .id(id)
-                .slug(slug)
-                .index(index)
-                .title(title)
-                .githubLabels(isNull(this.githubLabels) ? List.of() : Arrays.asList(this.githubLabels))
-                .location(location)
-                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC))
-                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .projects(projects.stream().map(ProjectReadEntity::toLinkResponse).toList())
-                .subscriberCount(this.registrations.size())
-                .issueCount(isNull(issueCounts) ? 0 : issueCounts.issueCount())
-                .openIssueCount(isNull(issueCounts) ? 0 : issueCounts.openIssueCount());
-    }
-
-    public HackathonsPageItemResponse toHackathonsPageItemResponse() {
-        return new HackathonsPageItemResponse()
-                .id(id)
-                .slug(slug)
-                .status(HackathonStatus.valueOf(status.name()))
-                .title(title)
-                .githubLabels(isNull(this.githubLabels) ? List.of() : Arrays.asList(this.githubLabels))
-                .subscriberCount(this.registrations.size())
-                .startDate(ZonedDateTime.ofInstant(startDate.toInstant(), ZoneOffset.UTC))
-                .endDate(ZonedDateTime.ofInstant(endDate.toInstant(), ZoneOffset.UTC));
     }
 }
