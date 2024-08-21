@@ -35,19 +35,19 @@ public class ApplicationReadEntity {
     ZonedDateTime receivedAt;
 
     @NonNull
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
     ProjectReadEntity project;
     UUID projectId;
 
     @NonNull
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "issueId", insertable = false, updatable = false)
     GithubIssueReadEntity issue;
     Long issueId;
 
     @NonNull
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "applicantId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     AllUserReadEntity applicant;
     Long applicantId;

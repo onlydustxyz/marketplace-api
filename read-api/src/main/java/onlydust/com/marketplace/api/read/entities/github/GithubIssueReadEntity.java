@@ -75,7 +75,7 @@ public class GithubIssueReadEntity {
     @NonNull
     String authorAvatarUrl;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "indexer_exp",
             name = "github_issues_labels",
@@ -86,7 +86,7 @@ public class GithubIssueReadEntity {
     @NonNull
     List<GithubLabelReadEntity> labels;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "indexer_exp",
             name = "github_issues_assignees",
@@ -96,7 +96,7 @@ public class GithubIssueReadEntity {
     @NonNull
     List<AllUserReadEntity> assignees;
 
-    @OneToMany(mappedBy = "issue")
+    @OneToMany(mappedBy = "issue", fetch = FetchType.LAZY)
     @NonNull
     Set<ApplicationReadEntity> applications;
 

@@ -25,7 +25,7 @@ public class ProjectRewardStatReadEntity {
     UUID projectId;
 
     @NonNull
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
     ProjectReadEntity project;
 

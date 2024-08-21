@@ -139,11 +139,11 @@ public class ProjectReadEntity {
         return Optional.ofNullable(rewardStats);
     }
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     @NonNull
     Set<ProjectStatPerCurrencyReadEntity> globalStatsPerCurrency;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     @NonNull
     Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
 
