@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
 import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -67,17 +67,23 @@ public interface GithubIssueReadRepository extends Repository<GithubIssueReadEnt
     @Query("""
             SELECT i
             FROM GithubIssueReadEntity i
-            JOIN FETCH i.repo r
+            JOIN i.hackathons h WITH h.id = :hackathonId
+            JOIN FETCH i.repo
+            JOIN FETCH i.repo.projects
             JOIN FETCH i.author
-            JOIN r.projects p
-            WHERE p.id = :projectId AND
-            (coalesce(:status, null) IS NULL OR i.status = :status) AND
-            (:isAssigned IS NULL OR (:isAssigned = TRUE AND size(i.assignees) > 0) OR (:isAssigned = FALSE AND size(i.assignees) = 0)) AND
-            (:isApplied IS NULL OR (:isApplied = TRUE AND exists(from ApplicationReadEntity a where a.issueId = i.id and a.projectId = p.id)) OR (:isApplied = FALSE AND not exists(from ApplicationReadEntity a where a.issueId = i.id and a.projectId = p.id)))
+            LEFT JOIN FETCH i.assignees
+            LEFT JOIN FETCH i.applications
+            WHERE
+                (:search IS NULL OR i.title ILIKE '%' || CAST(:search AS String) || '%')
+                AND (:projectIds IS NULL OR element(i.repo.projects).id IN :projectIds)
+                AND (:isAssigned IS NULL OR
+                    (:isAssigned = TRUE AND i.assignees IS NOT EMPTY) OR
+                    (:isAssigned = FALSE AND i.assignees IS EMPTY)
+                )
             """)
-    Page<GithubIssueReadEntity> findAllOf(UUID projectId,
-                                          GithubIssueStatus status,
-                                          Boolean isAssigned,
-                                          Boolean isApplied,
-                                          Pageable pageable);
+    Page<GithubIssueReadEntity> findHackathonIssues(UUID hackathonId,
+                                                    String search,
+                                                    List<UUID> projectIds,
+                                                    Boolean isAssigned,
+                                                    Pageable pageable);
 }

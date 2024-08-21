@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.IssuePageItem;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
@@ -54,8 +57,19 @@ public class GithubIssueReadEntity {
     ZonedDateTime closedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", referencedColumnName = "githubUserId")
     @NonNull
-    GithubAccountReadEntity author;
+    AllUserReadEntity author;
+
+    @ManyToMany
+    @JoinTable(
+            schema = "public",
+            name = "hackathon_issues",
+            joinColumns = @JoinColumn(name = "issue_id"),
+            inverseJoinColumns = @JoinColumn(name = "hackathon_id")
+    )
+    @NonNull
+    Set<HackathonReadEntity> hackathons;
 
     @NonNull
     String htmlUrl;
@@ -190,5 +204,24 @@ public class GithubIssueReadEntity {
             case MISSING_PERMISSIONS -> GithubOrganizationInstallationStatus.MISSING_PERMISSIONS;
             case COMPLETE -> GithubOrganizationInstallationStatus.COMPLETE;
         };
+    }
+
+    public IssuePageItem toPageItem() {
+        return new IssuePageItem()
+                .id(id)
+                .number(number)
+                .status(switch (status) {
+                    case OPEN -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.OPEN;
+                    case COMPLETED -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.COMPLETED;
+                    case CANCELLED -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.CANCELLED;
+                })
+                .title(title)
+                .repo(repo.toBoShortResponse())
+                .projects(repo.projects().stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .author(author.toBoLinkResponse())
+                .labels(labels.stream().map(GithubLabelReadEntity::getName).toList())
+                .assignees(assignees.stream().map(AllUserReadEntity::toBoLinkResponse).toList())
+                .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toBoLinkResponse).toList())
+                ;
     }
 }
