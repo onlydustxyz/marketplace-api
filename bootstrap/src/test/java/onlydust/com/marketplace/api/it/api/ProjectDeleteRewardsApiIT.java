@@ -164,6 +164,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.reward.contributionsNumber", equalTo("1")))
                         .withRequestBody(matchingJsonPath("$.message_data.reward.sentBy", equalTo("PierreOucif")))
                         .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Reward canceled")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("See my rewards")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link", equalTo("https://develop-app.onlydust.com/rewards")))
                         .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We're very sorry but reward of project QA new contributions got canceled.<br " +
                                                                                                 "/>" +
                                                                                                 "Please reach out to project lead(s) for more explanation or " +

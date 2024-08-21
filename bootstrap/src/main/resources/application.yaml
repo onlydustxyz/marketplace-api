@@ -36,8 +36,7 @@ application:
     update-projects-languages: 300000 # 5 minutes
     cleanup-obsolete-applications: 86400000 # 1 day
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
-    send-summary-notifications-emails-cron-expression: "0 */5 * * * *"
-#    send-summary-notifications-emails-cron-expression: "0 0 8 * * MON"
+    send-summary-notifications-emails-cron-expression: "0 0 8 * * MON"
     refresh-project-recommendations-cron-expression: "0 0 0 * * *" # every day at 1:00am
   sumsub:
     webhook:
