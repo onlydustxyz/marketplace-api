@@ -21,7 +21,18 @@ public class AopLoggerConfiguration {
     @Around(
             "(execution(* onlydust.com.marketplace.api.rest.api.adapter.*.*(..)))"
     )
-    public Object around(ProceedingJoinPoint point) throws Throwable {
+    public Object aroundWriteApi(ProceedingJoinPoint point) throws Throwable {
+        return log(point);
+    }
+
+    @Around(
+            "(execution(* onlydust.com.marketplace.api.read.adapters.*.*(..)))"
+    )
+    public Object aroundReadApi(ProceedingJoinPoint point) throws Throwable {
+        return log(point);
+    }
+
+    private Object log(ProceedingJoinPoint point) throws Throwable {
         final StopWatch stopWatch = new StopWatch("aop-stopwatch");
         stopWatch.start();
         Object result = point.proceed();
@@ -36,4 +47,6 @@ public class AopLoggerConfiguration {
                 stopWatch.getTotalTimeSeconds());
         return result;
     }
+
+
 }
