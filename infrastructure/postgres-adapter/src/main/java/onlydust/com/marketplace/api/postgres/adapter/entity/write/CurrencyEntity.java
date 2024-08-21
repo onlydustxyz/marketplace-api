@@ -26,11 +26,9 @@ import static java.util.stream.Collectors.toUnmodifiableSet;
 @Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@ToString
 public class CurrencyEntity {
     @Id
     @EqualsAndHashCode.Include
@@ -47,6 +45,7 @@ public class CurrencyEntity {
     @JdbcTypeCode(SqlTypes.ARRAY)
     @NonNull
     String[] countryRestrictions;
+    int cmcId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
@@ -66,6 +65,7 @@ public class CurrencyEntity {
                 .description(currency.description().orElse(null))
                 .erc20(currency.erc20().stream().map(erc20 -> ERC20Entity.of(currency.id(), erc20)).collect(toUnmodifiableSet()))
                 .countryRestrictions(currency.countryRestrictions().stream().map(Country::iso3Code).toArray(String[]::new))
+                .cmcId(currency.cmcId())
                 .build();
     }
 
@@ -75,7 +75,7 @@ public class CurrencyEntity {
                 .type(type)
                 .name(name)
                 .code(Currency.Code.of(code))
-                .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
+                .metadata(new Currency.Metadata(cmcId, name, description, logoUrl == null ? null : URI.create(logoUrl)))
                 .decimals(decimals)
                 .erc20(erc20.stream().map(ERC20Entity::toDomain).collect(toUnmodifiableSet()))
                 .latestUsdQuote(latestUsdQuote == null ? null : latestUsdQuote.getPrice())

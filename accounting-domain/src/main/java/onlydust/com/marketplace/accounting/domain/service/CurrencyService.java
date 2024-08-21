@@ -77,6 +77,7 @@ public class CurrencyService implements CurrencyFacadePort {
         }
 
         currency = currency.withMetadata(new Currency.Metadata(
+                currencyMetadataService.fiatId(code),
                 currency.name(),
                 Optional.ofNullable(description).or(currency::description).orElse(null),
                 Optional.ofNullable(savedLogoUrl).or(currency::logoUri).orElse(null)
@@ -99,21 +100,31 @@ public class CurrencyService implements CurrencyFacadePort {
     }
 
     @Override
-    public Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals, List<String> countryRestrictions) {
+    public Currency updateCurrency(Currency.Id id,
+                                   String name,
+                                   String description,
+                                   URI logoUrl,
+                                   Integer decimals,
+                                   List<String> countryRestrictions,
+                                   Integer cmcId) {
         var currency = currencyStorage.get(id).orElseThrow(() -> notFound("Currency %s not found".formatted(id)));
 
         if (name != null)
             currency = currency.withName(name);
         if (description != null)
-            currency = currency.withMetadata(new Currency.Metadata(currency.name(), description, currency.logoUri().orElse(null)));
+            currency = currency.withMetadata(new Currency.Metadata(currency.cmcId(), currency.name(), description, currency.logoUri().orElse(null)));
         if (logoUrl != null) {
             final var savedLogoUrl = imageStoragePort.storeImage(logoUrl);
-            currency = currency.withMetadata(new Currency.Metadata(currency.name(), currency.description().orElse(null), URI.create(savedLogoUrl.toString())));
+            currency = currency.withMetadata(new Currency.Metadata(currency.cmcId(), currency.name(), currency.description().orElse(null),
+                    URI.create(savedLogoUrl.toString())));
         }
         if (decimals != null)
             currency = currency.withDecimals(decimals);
         if (countryRestrictions != null)
             currency = currency.withCountryRestrictions(countryRestrictions);
+        if (cmcId != null)
+            currency = currency.withMetadata(new Currency.Metadata(cmcId, currency.name(), currency.description().orElse(null),
+                    currency.logoUri().orElse(null)));
 
         currencyStorage.save(currency);
 

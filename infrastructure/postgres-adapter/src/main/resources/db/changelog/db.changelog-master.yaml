@@ -473,3 +473,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000315_create_project_recommendations.sql
   - include:
       file: db/changelog/changelogs/00000316_update_project_recommendations.sql
+  - include:
+      file: db/changelog/changelogs/00000316_add_currency_cmc_id.sql

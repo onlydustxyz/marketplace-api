@@ -39,16 +39,13 @@ public class PostgresQuoteAdapterIT extends AbstractPostgresIT {
         currencyRepository.saveAllAndFlush(List.of(
                 new CurrencyEntity(currencyId1.value(),
                         Currency.Type.CRYPTO,
-                        "USD Coin", "USDC", "logo", 4, "foo", new String[]{}, null, Set.of()),
+                        "USD Coin", "USDC", "logo", 4, "foo", new String[]{}, 3408, null, Set.of()),
                 new CurrencyEntity(currencyId2.value(),
-                        Currency.Type.CRYPTO,
-                        "Starknet", "STRK", "logo", 4, "foo", new String[]{}, null, Set.of()),
+                        Currency.Type.CRYPTO, "Starknet", "STRK", "logo", 4, "foo", new String[]{}, 22691, null, Set.of()),
                 new CurrencyEntity(baseId1.value(),
-                        Currency.Type.FIAT,
-                        "US Dollar", "USD", "logo", 4, "foo", new String[]{}, null, Set.of()),
+                        Currency.Type.FIAT, "US Dollar", "USD", "logo", 4, "foo", new String[]{}, 2781, null, Set.of()),
                 new CurrencyEntity(baseId2.value(),
-                        Currency.Type.FIAT,
-                        "Euro", "EUR", "logo", 4, "foo", new String[]{}, null, Set.of())
+                        Currency.Type.FIAT, "Euro", "EUR", "logo", 4, "foo", new String[]{}, 2790, null, Set.of())
         ));
         postgresQuoteAdapter.save(List.of(
                 new Quote(baseId1, currencyId1, BigDecimal.valueOf(1L), ZonedDateTime.of(2024, 1, 1, 11, 0, 0, 0, ZoneOffset.UTC).toInstant()),

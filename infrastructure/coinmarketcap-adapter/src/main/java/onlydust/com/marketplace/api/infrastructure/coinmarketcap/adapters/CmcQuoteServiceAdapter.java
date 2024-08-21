@@ -22,18 +22,9 @@ public class CmcQuoteServiceAdapter implements QuoteService {
         final var quotes = new ArrayList<Quote>();
 
         for (Currency currency : currencies) {
-            final var currencyId = client.internalId(currency);
-            if (currencyId.isEmpty()) {
-                continue;
-            }
-
             for (Currency base : bases) {
-                final var baseId = client.internalId(base);
-                if (baseId.isEmpty())
-                    continue;
-
-                Optional.ofNullable(response.get(currencyId.get()))
-                        .flatMap(q -> Optional.ofNullable(q.quote().get(baseId.get())))
+                Optional.ofNullable(response.get(currency.cmcId()))
+                        .flatMap(q -> Optional.ofNullable(q.quote().get(base.cmcId())))
                         .filter(p -> p.price() != null)
                         .ifPresent(p -> quotes.add(new Quote(currency.id(), base.id(), p.price(), p.lastUpdated().toInstant())));
             }

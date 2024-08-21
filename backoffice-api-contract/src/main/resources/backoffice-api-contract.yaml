@@ -4358,6 +4358,8 @@ components:
           items:
             type: string
             format: iso-country-code
+        cmcId:
+          type: integer
 
     CurrencyListResponse:
       type: object

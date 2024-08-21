@@ -8,6 +8,7 @@ import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
@@ -21,6 +22,7 @@ import java.net.http.HttpRequest;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Slf4j
@@ -91,29 +93,10 @@ public class CmcClient extends HttpClient {
 
     private String currencyToIdList(Set<Currency> from) {
         return from.stream()
-                .map(this::internalId)
-                .filter(Optional::isPresent)
-                .map(id -> id.get().toString())
+                .map(Currency::cmcId)
                 .sorted()
-                .collect(Collectors.joining(","));
-    }
-
-    public synchronized Optional<Integer> internalId(Currency currency) {
-        final var id = INTERNAL_IDS.computeIfAbsent(currency.id(), i -> switch (currency.type()) {
-                    case CRYPTO -> currency.erc20()
-                            .stream().map(this::metadata)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .findFirst()
-                            .or(() -> metadata(currency.code()))
-                            .map(MetadataResponse::id)
-                            .orElse(null);
-
-                    case FIAT -> Optional.ofNullable(fiatCurrencies().get(currency.code())).map(MapResponse::id).orElse(null);
-                }
-        );
-
-        return Optional.ofNullable(id);
+                .map(Object::toString)
+                .collect(joining(","));
     }
 
     private <T> Optional<T> get(String path, TypeReference<Response<T>> typeRef) {
@@ -123,6 +106,12 @@ public class CmcClient extends HttpClient {
                         throw OnlyDustException.internalServerError("Unable to fetch quotes [%d] %s".formatted(r.status.errorCode, r.status.errorMessage));
                     return r.data;
                 });
+    }
+
+    public int fiatId(Currency.@NonNull Code code) {
+        return Optional.ofNullable(fiatCurrencies().get(code))
+                .map(MapResponse::id)
+                .orElseThrow(() -> internalServerError("Could not find fiat currency %s".formatted(code)));
     }
 
     @NoArgsConstructor
