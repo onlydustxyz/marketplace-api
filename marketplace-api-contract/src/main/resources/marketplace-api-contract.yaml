@@ -9423,7 +9423,6 @@ components:
         - NAME
         - REPO_COUNT
         - CONTRIBUTOR_COUNT
-        - RECOMMENDATION
 
     BannerResponse:
       type: object

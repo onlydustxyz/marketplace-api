@@ -35,6 +35,13 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                           "nextPageIndex": 1,
                           "projects": [
                             {
+                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
+                              "slug": "taco-tuesday",
+                              "name": "Taco Tuesday",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
+                              "shortDescription": "A projects for the midweek lovers"
+                            },
+                            {
                               "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
                               "slug": "calcom",
                               "name": "Cal.com",
@@ -47,13 +54,6 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "name": "Zero title 5",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/1458710211645943860.png",
                               "shortDescription": "Missing short description"
-                            },
-                            {
-                              "id": "3c22af5d-2cf8-48a1-afa0-c3441df7fb3b",
-                              "slug": "taco-tuesday",
-                              "name": "Taco Tuesday",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/6987338668519888809.jpg",
-                              "shortDescription": "A projects for the midweek lovers"
                             },
                             {
                               "id": "467cb27c-9726-4f94-818e-6aa49bbf5e75",
