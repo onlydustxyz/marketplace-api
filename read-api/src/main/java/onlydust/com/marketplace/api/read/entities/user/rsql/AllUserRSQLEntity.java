@@ -6,7 +6,7 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.UserSearchPageItemResponse;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.UserReadEntity;
 import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Immutable;
@@ -51,7 +51,7 @@ public class AllUserRSQLEntity {
             joinColumns = @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId"),
             inverseJoinColumns = @JoinColumn(name = "projectId", referencedColumnName = "id")
     )
-    Set<ProjectReadEntity> contributedProjects;
+    Set<ProjectLinkReadEntity> contributedProjects;
 
     @ManyToMany
     @JoinTable(

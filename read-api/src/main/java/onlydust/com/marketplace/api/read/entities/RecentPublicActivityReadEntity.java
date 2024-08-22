@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.api.read.mapper.MoneyMapper;
@@ -42,7 +42,7 @@ public class RecentPublicActivityReadEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    private ProjectReadEntity project;
+    private ProjectLinkReadEntity project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rewardId", insertable = false, updatable = false)

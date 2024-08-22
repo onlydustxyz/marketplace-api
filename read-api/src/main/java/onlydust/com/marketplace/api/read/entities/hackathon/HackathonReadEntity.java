@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.read.entities.hackathon;
 
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
-import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -11,10 +10,12 @@ import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 

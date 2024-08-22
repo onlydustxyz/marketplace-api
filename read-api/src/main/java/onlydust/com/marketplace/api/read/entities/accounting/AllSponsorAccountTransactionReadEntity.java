@@ -8,7 +8,7 @@ import onlydust.com.backoffice.api.contract.model.HistoricalTransactionType;
 import onlydust.com.backoffice.api.contract.model.MoneyWithUsdEquivalentResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionHistoryPageItemResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.mapper.NetworkMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -53,7 +53,7 @@ public class AllSponsorAccountTransactionReadEntity {
 
     @ManyToOne
     @JoinColumn(name = "projectId")
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)

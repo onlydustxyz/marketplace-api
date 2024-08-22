@@ -5,7 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.NotificationSettingsForProjectResponse;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -34,7 +34,7 @@ public class NotificationSettingsForProjectReadEntity {
     @ManyToOne
     @JoinColumn(name = "projectId", referencedColumnName = "id", insertable = false, updatable = false)
     @NonNull
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
 
     public NotificationSettingsForProjectResponse toDto() {
         return new NotificationSettingsForProjectResponse()
@@ -45,7 +45,7 @@ public class NotificationSettingsForProjectReadEntity {
                 .onGoodFirstIssueAdded(onGoodFirstIssueAdded);
     }
 
-    public static NotificationSettingsForProjectResponse defaultDto(ProjectReadEntity project) {
+    public static NotificationSettingsForProjectResponse defaultDto(ProjectLinkReadEntity project) {
         return new NotificationSettingsForProjectResponse()
                 .id(project.id())
                 .slug(project.slug())

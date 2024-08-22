@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
@@ -52,7 +52,7 @@ public class AccountBookTransactionReadEntity {
 
     @ManyToOne
     @JoinColumn(name = "projectId")
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
 
     @ManyToOne
     @JoinColumn(name = "rewardId")
