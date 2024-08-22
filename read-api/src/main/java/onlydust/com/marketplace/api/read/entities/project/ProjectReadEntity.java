@@ -19,6 +19,7 @@ import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
 import java.time.Instant;
@@ -230,7 +231,9 @@ public class ProjectReadEntity {
                 .totalGranted(totalGranted)
                 .totalRewarded(totalRewarded)
                 .percentUsedBudget(totalGranted.getTotalUsdEquivalent().compareTo(ZERO) == 0 ? null :
-                        totalRewarded.getTotalUsdEquivalent().divide(totalGranted.getTotalUsdEquivalent(), 2, RoundingMode.HALF_EVEN))
+                        totalRewarded.getTotalUsdEquivalent()
+                                .multiply(BigDecimal.valueOf(100))
+                                .divide(totalGranted.getTotalUsdEquivalent(), 0, RoundingMode.HALF_EVEN))
                 .averageRewardUsdAmount(prettyUsd(rewardStats().map(ProjectRewardStatReadEntity::averageRewardUsdAmount).orElse(null)))
                 .mergedPrCount(createKpi(contributionStats().map(ProjectContributionStatReadEntity::currentPeriodMergedPrCount).orElse(0),
                         contributionStats().map(ProjectContributionStatReadEntity::lastPeriodMergedPrCount).orElse(0)))

@@ -223,7 +223,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 12473.89,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.93
+                                        "ratio": 93
                                       },
                                       {
                                         "amount": 1000,
@@ -237,7 +237,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 1010.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.07
+                                        "ratio": 7
                                       }
                                     ]
                                   },
@@ -256,7 +256,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 8909.92,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.95
+                                        "ratio": 95
                                       },
                                       {
                                         "amount": 500,
@@ -270,7 +270,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 505.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.05
+                                        "ratio": 5
                                       }
                                     ]
                                   },
@@ -289,7 +289,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 5345.95,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.93
+                                        "ratio": 93
                                       },
                                       {
                                         "amount": 400,
@@ -303,7 +303,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 404.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.07
+                                        "ratio": 7
                                       }
                                     ]
                                   }
@@ -343,7 +343,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 1515.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -404,7 +404,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 21383.81,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -465,7 +465,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 17819.84,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.96
+                                            "ratio": 96
                                           },
                                           {
                                             "amount": 800,
@@ -479,7 +479,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 808.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.04
+                                            "ratio": 4
                                           }
                                         ]
                                       },
@@ -498,7 +498,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 3563.97,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.83
+                                            "ratio": 83
                                           },
                                           {
                                             "amount": 700,
@@ -512,7 +512,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 707.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.17
+                                            "ratio": 17
                                           }
                                         ]
                                       },
@@ -568,7 +568,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 12473.89,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -587,7 +587,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 5345.95,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -629,7 +629,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 1010.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -648,7 +648,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": -202.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 1.00
+                                            "ratio": 100
                                           }
                                         ]
                                       },
@@ -690,7 +690,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 12473.89,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.93
+                                            "ratio": 93
                                           },
                                           {
                                             "amount": 1000,
@@ -704,7 +704,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 1010.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.07
+                                            "ratio": 7
                                           }
                                         ]
                                       },
@@ -756,7 +756,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 1781.98,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.85
+                                            "ratio": 85
                                           },
                                           {
                                             "amount": 300,
@@ -770,7 +770,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 303.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.15
+                                            "ratio": 15
                                           }
                                         ]
                                       },
@@ -793,7 +793,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 12473.89,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.93
+                                            "ratio": 93
                                           },
                                           {
                                             "amount": 1000,
@@ -807,7 +807,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 1010.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.07
+                                            "ratio": 7
                                           }
                                         ]
                                       },
@@ -859,7 +859,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 3563.97,
                                             "usdConversionRate": 1781.983987,
-                                            "ratio": 0.97
+                                            "ratio": 97
                                           },
                                           {
                                             "amount": 100,
@@ -873,7 +873,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 101.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 0.03
+                                            "ratio": 3
                                           }
                                         ]
                                       },
@@ -1206,7 +1206,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 1781.98,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 0.95
+                                             "ratio": 95
                                            },
                                            {
                                              "amount": 100,
@@ -1220,7 +1220,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 101.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.05
+                                             "ratio": 5
                                            }
                                          ]
                                        },
@@ -1239,7 +1239,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 5345.95,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 0.96
+                                             "ratio": 96
                                            },
                                            {
                                              "amount": 200,
@@ -1253,7 +1253,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 202.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.04
+                                             "ratio": 4
                                            }
                                          ]
                                        },
@@ -1272,7 +1272,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 3563.97,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 0.97
+                                             "ratio": 97
                                            },
                                            {
                                              "amount": 100,
@@ -1286,11 +1286,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 101.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.03
+                                             "ratio": 3
                                            }
                                          ]
                                        },
-                                       "percentUsedBudget": 0.66,
+                                       "percentUsedBudget": 66,
                                        "averageRewardUsdAmount": 1832.48,
                                        "mergedPrCount": {
                                          "value": 0,
@@ -1321,7 +1321,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 1781.98,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 1.00
+                                             "ratio": 100
                                            },
                                            {
                                              "amount": 0,
@@ -1335,7 +1335,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 0.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.00
+                                             "ratio": 0
                                            }
                                          ]
                                        },
@@ -1354,7 +1354,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 3563.97,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 0.92
+                                             "ratio": 92
                                            },
                                            {
                                              "amount": 300,
@@ -1368,7 +1368,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 303.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.08
+                                             "ratio": 8
                                            }
                                          ]
                                        },
@@ -1387,7 +1387,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 1781.98,
                                              "usdConversionRate": 1781.983987,
-                                             "ratio": 0.85
+                                             "ratio": 85
                                            },
                                            {
                                              "amount": 300,
@@ -1401,11 +1401,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                              },
                                              "usdEquivalent": 303.00,
                                              "usdConversionRate": 1.010001,
-                                             "ratio": 0.15
+                                             "ratio": 15
                                            }
                                          ]
                                        },
-                                       "percentUsedBudget": 0.54,
+                                       "percentUsedBudget": 54,
                                        "averageRewardUsdAmount": 1092.99,
                                        "mergedPrCount": {
                                          "value": 0,
@@ -1463,7 +1463,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 1781.98,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.95
+                                        "ratio": 95
                                       },
                                       {
                                         "amount": 100,
@@ -1477,7 +1477,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 101.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.05
+                                        "ratio": 5
                                       }
                                     ]
                                   },
@@ -1496,7 +1496,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 5345.95,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.96
+                                        "ratio": 96
                                       },
                                       {
                                         "amount": 200,
@@ -1510,7 +1510,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 202.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.04
+                                        "ratio": 4
                                       }
                                     ]
                                   },
@@ -1529,7 +1529,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 3563.97,
                                         "usdConversionRate": 1781.983987,
-                                        "ratio": 0.97
+                                        "ratio": 97
                                       },
                                       {
                                         "amount": 100,
@@ -1543,7 +1543,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 101.00,
                                         "usdConversionRate": 1.010001,
-                                        "ratio": 0.03
+                                        "ratio": 3
                                       }
                                     ]
                                   }
