@@ -463,6 +463,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
                         case SPONSOR_ACCOUNT -> "lightcoral";
                         case REWARD -> "palegreen";
                         case PROJECT -> "mediumpurple1";
+                        case PROGRAM -> "beige";
                         case PAYMENT -> "salmon1";
                     });
         }
