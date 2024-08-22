@@ -8,7 +8,7 @@ import onlydust.com.backoffice.api.contract.model.GithubRepoLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.SQLOrder;
@@ -60,7 +60,7 @@ public class GithubRepoReadEntity {
             schema = "public",
             joinColumns = @JoinColumn(name = "github_repo_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
-    Set<ProjectReadEntity> projects;
+    Set<ProjectLinkReadEntity> projects;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)

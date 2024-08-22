@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadIssuesApi;
 import onlydust.com.marketplace.api.contract.model.GithubIssueResponse;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.repositories.GithubIssueReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -29,7 +30,7 @@ public class ReadIssuesApiPostgresAdapter implements ReadIssuesApi {
         final var issue = githubIssueReadRepository.findById(issueId)
                 .orElseThrow(() -> notFound("Issue %s not found".formatted(issueId)));
 
-        final var issueProjectIds = issue.repo().projects().stream().map(ProjectReadEntity::id).toList();
+        final var issueProjectIds = issue.repo().projects().stream().map(ProjectLinkReadEntity::id).toList();
         final var projectLedIds = authenticatedAppUserService.tryGetAuthenticatedUser()
                 .map(user -> user.projectsLed().stream().toList())
                 .orElse(List.of());

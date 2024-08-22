@@ -10,7 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposit
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
@@ -217,7 +217,7 @@ public class GithubIssueReadEntity {
                 })
                 .title(title)
                 .repo(repo.toBoShortResponse())
-                .projects(repo.projects().stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .projects(repo.projects().stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
                 .author(author.toBoLinkResponse())
                 .labels(labels.stream().map(GithubLabelReadEntity::getName).toList())
                 .assignees(assignees.stream().map(AllUserReadEntity::toBoLinkResponse).toList())
