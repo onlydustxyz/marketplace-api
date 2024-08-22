@@ -10,6 +10,7 @@ import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
@@ -84,7 +85,7 @@ public class HackathonReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
     @NonNull
-    Set<ProjectReadEntity> projects;
+    Set<ProjectLinkReadEntity> projects;
 
     @OneToMany(mappedBy = "hackathonId", fetch = FetchType.LAZY)
     @NonNull
@@ -132,7 +133,7 @@ public class HackathonReadEntity {
                         .sorted(Comparator.comparing(SponsorResponse::getName))
                         .toList())
                 .projects(projects.stream()
-                        .map(ProjectReadEntity::toShortResponse)
+                        .map(ProjectLinkReadEntity::toShortResponse)
                         .sorted(Comparator.comparing(ProjectShortResponse::getName))
                         .toList())
                 .events(events.stream()
@@ -172,7 +173,7 @@ public class HackathonReadEntity {
                         .url(sponsor.getUrl())
                         .logoUrl(sponsor.getLogoUrl())
                 ).toList())
-                .projects(projects.stream().map(ProjectReadEntity::toBoLinkResponse).toList())
+                .projects(projects.stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
                 .events(events.stream()
                         .map(HackathonEventReadEntity::toBoDto)
                         .sorted(Comparator.comparing(HackathonsEvent::getStartDate)
