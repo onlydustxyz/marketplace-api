@@ -22,7 +22,8 @@ class PostgresSponsorAccountStorageAdapterIT extends AbstractPostgresIT {
     @Autowired
     private SponsorRepository sponsorRepository;
 
-    static final Currency currency = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
+    static final Currency currency = Currency.crypto("Ether", Currency.Code.of("ETH"), 18)
+            .withMetadata(new Currency.Metadata(1027, "ETH", null, null));
 
     @BeforeEach
     void setUp() {
