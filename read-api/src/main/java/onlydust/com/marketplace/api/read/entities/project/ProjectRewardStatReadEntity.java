@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,11 +25,6 @@ public class ProjectRewardStatReadEntity {
     @Id
     @NonNull
     UUID projectId;
-
-    @NonNull
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    ProjectReadEntity project;
 
     @NonNull
     BigDecimal averageRewardUsdAmount;
