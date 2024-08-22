@@ -4,10 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.GithubRepoLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ShortGithubRepoResponse;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.SQLOrder;
@@ -59,7 +60,7 @@ public class GithubRepoReadEntity {
             schema = "public",
             joinColumns = @JoinColumn(name = "github_repo_id"),
             inverseJoinColumns = @JoinColumn(name = "project_id"))
-    Set<ProjectViewEntity> projects;
+    Set<ProjectReadEntity> projects;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -75,6 +76,14 @@ public class GithubRepoReadEntity {
                 .id(id)
                 .name(name)
                 .description(description)
+                .owner(ownerLogin)
+                .htmlUrl(htmlUrl);
+    }
+
+    public GithubRepoLinkResponse toBoShortResponse() {
+        return new GithubRepoLinkResponse()
+                .id(id)
+                .name(name)
                 .owner(ownerLogin)
                 .htmlUrl(htmlUrl);
     }

@@ -2459,6 +2459,61 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/hackathons/{hackathonId}/issues:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeHackathonsRead
+      summary: Get hackathon issues
+      operationId: getHackathonIssues
+      description: |
+        Get hackathon issues
+      parameters:
+        - in: path
+          name: hackathonId
+          required: true
+          schema:
+            $ref: '#/components/schemas/HackathonId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: projectIds
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: isAssigned
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: 'User page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssuePage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   # BackofficeDebug ===============================================================
   /bo/v1/debug/accounting/check-events:
     get:
@@ -2851,27 +2906,16 @@ components:
         - BO_READER
 
     OldSponsorPage:
-      type: object
-      required:
-        - sponsors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/OldSponsorPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - sponsors
+          properties:
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/OldSponsorPageItemResponse'
 
     OldSponsorPageItemResponse:
       type: object
@@ -2892,27 +2936,16 @@ components:
             format: uuid
 
     SponsorPage:
-      type: object
-      required:
-        - sponsors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        sponsors:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - sponsors
+          properties:
+            sponsors:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorPageItemResponse'
 
     SponsorResponse:
       type: object
@@ -2966,27 +2999,16 @@ components:
                 $ref: '#/components/schemas/UserLinkResponse'
 
     EcosystemPage:
-      type: object
-      required:
-        - ecosystems
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        ecosystems:
-          type: array
-          items:
-            $ref: '#/components/schemas/EcosystemPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - ecosystems
+          properties:
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemPageItemResponse'
 
     EcosystemPageItemResponse:
       type: object
@@ -3247,6 +3269,25 @@ components:
       type: string
       format: uuid
 
+    GithubRepoId:
+      type: integer
+      format: int64
+
+    GithubIssueId:
+      type: integer
+      format: int64
+
+    GithubIssueNumber:
+      type: integer
+      format: int64
+
+    GithubIssueStatus:
+      type: string
+      enum:
+        - OPEN
+        - COMPLETED
+        - CANCELLED
+
     HackathonId:
       type: string
       format: uuid
@@ -3310,44 +3351,31 @@ components:
         Rust: 91283
         Go: 12388
         Java: 1233
-    GithubRepositoryResponse:
+
+    GithubRepoLinkResponse:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
+          $ref: '#/components/schemas/GithubRepoId'
         owner:
           type: string
         name:
           type: string
-        technologies:
-          $ref: '#/components/schemas/Technologies'
-        projectId:
+        htmlUrl:
           type: string
-          format: uuid
 
     ProjectLeadInvitationPage:
-      type: object
-      required:
-        - contributors
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        project_lead_invitations:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProjectLeadInvitationResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - project_lead_invitations
+          properties:
+            project_lead_invitations:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectLeadInvitationResponse'
+
     ProjectLeadInvitationResponse:
       type: object
       properties:
@@ -3360,29 +3388,17 @@ components:
         githubUserId:
           $ref: '#/components/schemas/GithubUserId'
 
-
     UserPage:
-      type: object
-      required:
-        - users
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - users
+          properties:
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserPageItemResponse'
 
     UserPageItemResponse:
       type: object
@@ -3420,27 +3436,16 @@ components:
           format: date-time
 
     UserSearchPage:
-      type: object
-      required:
-        - users
-        - totalPageNumber
-        - totalItemNumber
-        - nextPageIndex
-        - hasMore
-      properties:
-        totalPageNumber:
-          type: integer
-        totalItemNumber:
-          type: integer
-        hasMore:
-          type: boolean
-        nextPageIndex:
-          description: if there is no next page, it will be equals to the last page
-          type: integer
-        users:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserSearchPageItemResponse'
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - users
+          properties:
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserSearchPageItemResponse'
 
     UserSearchPageItemResponse:
       type: object
@@ -3497,6 +3502,52 @@ components:
           items:
             $ref: '#/components/schemas/UserSearchBillingProfile'
 
+    IssuePage:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - issues
+          properties:
+            users:
+              type: array
+              items:
+                $ref: '#/components/schemas/IssuePageItem'
+
+    IssuePageItem:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/GithubIssueId'
+        number:
+          $ref: '#/components/schemas/GithubIssueNumber'
+        title:
+          type: string
+        status:
+          $ref: '#/components/schemas/GithubIssueStatus'
+        repo:
+          $ref: '#/components/schemas/GithubRepoLinkResponse'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+        author:
+          $ref: '#/components/schemas/UserLinkResponse'
+        labels:
+          type: array
+          items:
+            type: string
+        assignees:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
+        applicants:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
+    
     UserSearchLanguage:
       type: object
       required:

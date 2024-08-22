@@ -2,13 +2,13 @@ package onlydust.com.marketplace.api.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRegistrationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 import java.util.UUID;
@@ -24,9 +24,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     final static MutableObject<String> hackathonId2 = new MutableObject<>();
 
     UserAuthHelper.AuthenticatedBackofficeUser emilie;
-
-    @Autowired
-    HackathonRegistrationRepository hackathonRegistrationRepository;
 
     @BeforeEach
     void login() {
@@ -248,7 +245,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "totalBudget": "$1.000.000",
                           "startDate": "2024-04-19T11:00:00Z",
                           "endDate": "2024-04-22T13:00:00Z",
-                          "githubLabels": ["label2", "label3"],
+                          "githubLabels": ["label2", "good first issue"],
                           "communityLinks": [
                             {
                               "url": "https://a.bc",
@@ -270,8 +267,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             "85435c9b-da7f-4670-bf65-02b84c5da7f0"
                           ],
                           "projectIds": [
-                            "8156fc5f-cec5-4f70-a0de-c368772edcd4",
-                            "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"
+                            "00490be6-2c03-4720-993b-aea3e07edd81",
+                            "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e"
                           ],
                           "events": [
                             {
@@ -314,6 +311,234 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
 
     @Test
     @Order(11)
+    void should_get_hackathon_issues() {
+        // When
+        client.get()
+                .uri(getApiURI(HACKATHONS_BY_ID_ISSUES.formatted(hackathonId1.getValue()), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "projectIds", "00490be6-2c03-4720-993b-aea3e07edd81",
+                        "search", "Exercise"
+                )))
+                .header("Authorization", "Bearer " + emilie.jwt())
+                .exchange()
+                // Then
+                .expectStatus()
+                .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 3,
+                          "totalItemNumber": 11,
+                          "hasMore": true,
+                          "nextPageIndex": 1,
+                          "users": [
+                            {
+                              "id": 1270688337,
+                              "number": 196,
+                              "title": "Exercise on the ec_op builtin",
+                              "status": "OPEN",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "author": {
+                                "githubUserId": 98529704,
+                                "userId": null,
+                                "login": "tekkac",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                              },
+                              "labels": [
+                                "Context: isolated",
+                                "Difficulty: hard",
+                                "Duration: few days",
+                                "State: open",
+                                "Techno: cairo",
+                                "Type: feature",
+                                "good first issue"
+                              ],
+                              "assignees": [],
+                              "applicants": []
+                            },
+                            {
+                              "id": 1270667749,
+                              "number": 195,
+                              "title": "Exercise on the range_check builtin",
+                              "status": "OPEN",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "author": {
+                                "githubUserId": 98529704,
+                                "userId": null,
+                                "login": "tekkac",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                              },
+                              "labels": [
+                                "Context: isolated",
+                                "Difficulty: intermediate",
+                                "Duration: few days",
+                                "State: open",
+                                "Techno: cairo",
+                                "Type: feature",
+                                "good first issue"
+                              ],
+                              "assignees": [
+                                {
+                                  "githubUserId": 98529704,
+                                  "userId": null,
+                                  "login": "tekkac",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                                }
+                              ],
+                              "applicants": []
+                            },
+                            {
+                              "id": 1270661065,
+                              "number": 194,
+                              "title": "Exercise on the output builtin",
+                              "status": "OPEN",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "author": {
+                                "githubUserId": 98529704,
+                                "userId": null,
+                                "login": "tekkac",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/98529704?v=4"
+                              },
+                              "labels": [
+                                "Context: isolated",
+                                "Difficulty: intermediate",
+                                "Duration: few days",
+                                "State: open",
+                                "Techno: cairo",
+                                "Type: feature",
+                                "good first issue"
+                              ],
+                              "assignees": [],
+                              "applicants": []
+                            },
+                            {
+                              "id": 1269383720,
+                              "number": 191,
+                              "title": "Fix end of exercises message",
+                              "status": "COMPLETED",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "author": {
+                                "githubUserId": 4435377,
+                                "userId": "6115f024-159a-4b1f-b713-1e2ad5c6063e",
+                                "login": "Bernardstanislas",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
+                              },
+                              "labels": [
+                                "Context: coupled",
+                                "Difficulty: easy",
+                                "Duration: under a day",
+                                "State: open",
+                                "Techno: python",
+                                "Type: bug",
+                                "good first issue"
+                              ],
+                              "assignees": [],
+                              "applicants": []
+                            },
+                            {
+                              "id": 1263404890,
+                              "number": 183,
+                              "title": "Put the Id struct in the exercise storage02",
+                              "status": "COMPLETED",
+                              "repo": {
+                                "id": 480776993,
+                                "owner": "onlydustxyz",
+                                "name": "starklings",
+                                "htmlUrl": "https://github.com/onlydustxyz/starklings"
+                              },
+                              "projects": [
+                                {
+                                  "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                                  "slug": "zama",
+                                  "name": "Zama",
+                                  "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
+                                }
+                              ],
+                              "author": {
+                                "githubUserId": 4435377,
+                                "userId": "6115f024-159a-4b1f-b713-1e2ad5c6063e",
+                                "login": "Bernardstanislas",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/4435377?v=4"
+                              },
+                              "labels": [
+                                "Context: isolated",
+                                "Difficulty: easy",
+                                "Duration: under a day",
+                                "State: open",
+                                "Techno: cairo",
+                                "Type: refactor",
+                                "good first issue"
+                              ],
+                              "assignees": [
+                                {
+                                  "githubUserId": 34384633,
+                                  "userId": null,
+                                  "login": "tdelabro",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/34384633?v=4"
+                                }
+                              ],
+                              "applicants": []
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    @Order(11)
     void should_get_updated_hackathon() {
         hackathonStoragePort.registerUser(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
 
@@ -333,8 +558,8 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "status": "PUBLISHED",
                           "title": "Hackathon 2021 updated",
                           "githubLabels": [
-                            "label2",
-                            "label3"
+                            "good first issue",
+                            "label2"
                           ],
                           "subscriberCount": 1,
                           "startDate": "2024-04-19T11:00:00Z",
@@ -360,30 +585,30 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           ],
                           "sponsors": [
                             {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "url": null,
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                            },
-                            {
                               "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
                               "name": "Red Bull",
                               "url": "https://www.redbull.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
+                            },
+                            {
+                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
+                              "name": "AS Nancy Lorraine",
+                              "url": null,
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                             }
                           ],
                           "projects": [
                             {
-                              "id": "7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54",
-                              "slug": "cairo-streams",
-                              "name": "Cairo streams",
-                              "logoUrl": null
+                              "id": "00490be6-2c03-4720-993b-aea3e07edd81",
+                              "slug": "zama",
+                              "name": "Zama",
+                              "logoUrl": "https://dl.airtable.com/.attachments/f776b6ea66adbe46d86adaea58626118/610d50f6/15TqNyRwTMGoVeAX2u1M"
                             },
                             {
-                              "id": "8156fc5f-cec5-4f70-a0de-c368772edcd4",
-                              "slug": "cairo-foundry",
-                              "name": "Cairo foundry",
-                              "logoUrl": null
+                              "id": "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e",
+                              "slug": "calcom",
+                              "name": "Cal.com",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5271998260751715005.png"
                             }
                           ],
                           "events": [

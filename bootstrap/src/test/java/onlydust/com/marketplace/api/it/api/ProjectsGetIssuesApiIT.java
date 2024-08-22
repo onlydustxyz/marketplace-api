@@ -86,7 +86,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 8642470,
                                 "login": "gregcha",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
                                 "isRegistered": true
                               },
                               "createdAt": "2023-01-31T11:26:54Z",
@@ -113,7 +113,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
                               "createdAt": "2023-03-27T12:56:04Z",
@@ -146,7 +146,7 @@ public class ProjectsGetIssuesApiIT extends AbstractMarketplaceApiIT {
                               "author": {
                                 "githubUserId": 43467246,
                                 "login": "AnthonyBuisset",
-                                "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
+                                "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
                                 "isRegistered": true
                               },
                               "createdAt": "2023-03-27T12:56:32Z",

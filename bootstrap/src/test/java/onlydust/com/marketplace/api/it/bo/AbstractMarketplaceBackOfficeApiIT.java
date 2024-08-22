@@ -199,6 +199,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String HACKATHONS = "/bo/v1/hackathons";
     protected static final String HACKATHONS_BY_ID = "/bo/v1/hackathons/%s";
     protected static final String HACKATHONS_BY_ID_USERS = "/bo/v1/hackathons/%s/users";
+    protected static final String HACKATHONS_BY_ID_ISSUES = "/bo/v1/hackathons/%s/issues";
     protected static final String BANNERS = "/bo/v1/banners";
     protected static final String BANNER = "/bo/v1/banners/%s";
     protected static final String BANNER_VISIBLE = "/bo/v1/banners/%s/visible";

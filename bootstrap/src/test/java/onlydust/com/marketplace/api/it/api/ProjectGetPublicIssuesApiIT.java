@@ -1769,15 +1769,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "number": 1,
                                   "title": "testing",
                                   "status": "OPEN",
-                                  "createdAt": "2023-01-31T11:26:54Z",
-                                  "closedAt": null,
                                   "htmlUrl": "https://github.com/gregcha/crew-app/issues/1",
-                                  "author": {
-                                    "githubUserId": 8642470,
-                                    "login": "gregcha",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/8642470?v=4",
-                                    "isRegistered": true
-                                  },
                                   "repo": {
                                     "id": 302082426,
                                     "owner": "gregcha",
@@ -1785,23 +1777,26 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                     "description": null,
                                     "htmlUrl": "https://github.com/gregcha/crew-app"
                                   },
+                                  "author": {
+                                    "githubUserId": 8642470,
+                                    "login": "gregcha",
+                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168934086343666513.webp",
+                                    "isRegistered": true
+                                  },
+                                  "createdAt": "2023-01-31T11:26:54Z",
+                                  "closedAt": null,
+                                  "body": "testing issues",
+                                  "labels": [],
                                   "applicants": [],
-                                  "assignees": []
+                                  "assignees": [],
+                                  "currentUserApplication": null
                                 },
                                 {
                                   "id": 1642022365,
                                   "number": 6,
                                   "title": "This is a new issue",
                                   "status": "COMPLETED",
-                                  "createdAt": "2023-03-27T12:56:04Z",
-                                  "closedAt": "2023-08-30T09:20:48Z",
                                   "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/6",
-                                  "author": {
-                                    "githubUserId": 43467246,
-                                    "login": "AnthonyBuisset",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                    "isRegistered": true
-                                  },
                                   "repo": {
                                     "id": 602953043,
                                     "owner": "od-mocks",
@@ -1809,6 +1804,16 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                     "description": "This is repo A for our e2e tests",
                                     "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
                                   },
+                                  "author": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                    "isRegistered": true
+                                  },
+                                  "createdAt": "2023-03-27T12:56:04Z",
+                                  "closedAt": "2023-08-30T09:20:48Z",
+                                  "body": null,
+                                  "labels": [],
                                   "applicants": [],
                                   "assignees": [
                                     {
@@ -1816,22 +1821,15 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                       "login": "AnthonyBuisset",
                                       "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                     }
-                                  ]
+                                  ],
+                                  "currentUserApplication": null
                                 },
                                 {
                                   "id": 1642022454,
                                   "number": 7,
                                   "title": "This one has been cancelled",
                                   "status": "CANCELLED",
-                                  "createdAt": "2023-03-27T12:56:32Z",
-                                  "closedAt": "2023-03-27T12:57:25Z",
                                   "htmlUrl": "https://github.com/od-mocks/cool-repo-A/issues/7",
-                                  "author": {
-                                    "githubUserId": 43467246,
-                                    "login": "AnthonyBuisset",
-                                    "avatarUrl": "https://avatars.githubusercontent.com/u/43467246?v=4",
-                                    "isRegistered": true
-                                  },
                                   "repo": {
                                     "id": 602953043,
                                     "owner": "od-mocks",
@@ -1839,8 +1837,19 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                     "description": "This is repo A for our e2e tests",
                                     "htmlUrl": "https://github.com/od-mocks/cool-repo-A"
                                   },
+                                  "author": {
+                                    "githubUserId": 43467246,
+                                    "login": "AnthonyBuisset",
+                                    "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
+                                    "isRegistered": true
+                                  },
+                                  "createdAt": "2023-03-27T12:56:32Z",
+                                  "closedAt": "2023-03-27T12:57:25Z",
+                                  "body": null,
+                                  "labels": [],
                                   "applicants": [],
-                                  "assignees": []
+                                  "assignees": [],
+                                  "currentUserApplication": null
                                 }
                               ]
                             }

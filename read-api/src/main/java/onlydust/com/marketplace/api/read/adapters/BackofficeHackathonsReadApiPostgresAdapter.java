@@ -4,10 +4,13 @@ import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeHackathonsReadApi;
 import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
+import onlydust.com.backoffice.api.contract.model.IssuePage;
 import onlydust.com.backoffice.api.contract.model.UserPage;
+import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
+import onlydust.com.marketplace.api.read.repositories.GithubIssueReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
 import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
@@ -17,15 +20,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageIndex;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -36,6 +42,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
     private UserReadRepository userReadRepository;
     private HackathonReadRepository hackathonReadRepository;
     private HackathonItemReadRepository hackathonItemReadRepository;
+    private GithubIssueReadRepository githubIssueReadRepository;
 
     @Override
     public ResponseEntity<UserPage> getRegisteredUserPage(UUID hackathonId, Integer pageIndex, Integer pageSize, String login) {
@@ -46,7 +53,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
         final var response = UserMapper.pageToResponse(usersPage, sanitizedPageIndex);
 
         return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
+                status(PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
     }
 
@@ -57,6 +64,27 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
                         .orElseThrow(() -> OnlyDustException.notFound("Hackathon %s not found".formatted(hackathonId)))
                         .toBoResponse()
         );
+    }
+
+    @Override
+    public ResponseEntity<IssuePage> getHackathonIssues(UUID hackathonId,
+                                                        Integer pageIndex,
+                                                        Integer pageSize,
+                                                        String search,
+                                                        List<UUID> projectIds,
+                                                        Boolean isAssigned) {
+        final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
+        final int sanitizePageSize = sanitizePageSize(pageSize);
+        final var page = githubIssueReadRepository.findHackathonIssues(hackathonId, search, projectIds, isAssigned,
+                PageRequest.of(sanitizedPageIndex, sanitizePageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
+
+        final var response = new IssuePage()
+                .nextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, page.getTotalPages()))
+                .hasMore(PaginationHelper.hasMore(sanitizedPageIndex, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements()).users(page.stream().map(GithubIssueReadEntity::toPageItem).toList());
+
+        return status(response.getHasMore() ? PARTIAL_CONTENT : OK).body(response);
     }
 
     @Override
@@ -76,7 +104,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
                 .forEach(hackathonsPageResponse::addHackathonsItem);
 
         return hackathonsPageResponse.getHasMore() ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(hackathonsPageResponse) :
+                status(PARTIAL_CONTENT).body(hackathonsPageResponse) :
                 ResponseEntity.ok(hackathonsPageResponse);
     }
 }
