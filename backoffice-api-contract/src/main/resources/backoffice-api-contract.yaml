@@ -1040,7 +1040,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorResponse'
+                $ref: '#/components/schemas/SponsorCreateResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":
@@ -1175,12 +1175,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SponsorRequest'
       responses:
-        "200":
+        "204":
           description: 'Sponsor updated'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SponsorResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":
@@ -1189,6 +1185,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/sponsors/{sponsorId}/leads/{leadId}:
     put:
       security:
@@ -2947,6 +2944,14 @@ components:
               items:
                 $ref: '#/components/schemas/SponsorPageItemResponse'
 
+    SponsorCreateResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/SponsorId'
+
     SponsorResponse:
       type: object
       required:
@@ -2956,8 +2961,7 @@ components:
         - logoUrl
       properties:
         id:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/SponsorId'
         name:
           type: string
         url:
