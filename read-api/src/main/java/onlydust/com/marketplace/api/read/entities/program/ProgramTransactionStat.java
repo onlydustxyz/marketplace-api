@@ -20,7 +20,7 @@ public interface ProgramTransactionStat {
         final var usdQuote = currency().latestUsdQuote() == null ? null : currency().latestUsdQuote().getPrice();
         final var usdAmount = usdAmount(amount);
         final var ratio = (usdTotal == null || usdAmount == null || usdTotal.compareTo(ZERO) == 0) ? null :
-                usdAmount.divide(usdTotal, 2, RoundingMode.HALF_EVEN);
+                usdAmount.multiply(BigDecimal.valueOf(100)).divide(usdTotal, 0, RoundingMode.HALF_EVEN);
 
         return new DetailedTotalMoneyTotalPerCurrencyInner()
                 .amount(amount)

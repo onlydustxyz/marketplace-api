@@ -18,7 +18,7 @@ public interface MoneyMapper {
     static DetailedTotalMoneyTotalPerCurrencyInner toDetailedTotalMoneyTotalPerCurrencyInner(onlydust.com.marketplace.project.domain.view.Money money,
                                                                                              BigDecimal usdTotal) {
         final var ratio = (usdTotal == null || money.dollarsEquivalent().isEmpty() || usdTotal.compareTo(BigDecimal.ZERO) == 0) ? null :
-                money.dollarsEquivalent().get().divide(usdTotal, 2, RoundingMode.HALF_EVEN);
+                money.dollarsEquivalent().get().multiply(BigDecimal.valueOf(100)).divide(usdTotal, 0, RoundingMode.HALF_EVEN);
 
         return new DetailedTotalMoneyTotalPerCurrencyInner()
                 .amount(money.amount())
