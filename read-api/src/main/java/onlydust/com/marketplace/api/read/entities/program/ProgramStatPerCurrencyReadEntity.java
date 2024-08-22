@@ -29,11 +29,6 @@ public class ProgramStatPerCurrencyReadEntity implements ProgramTransactionStat 
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "programId", insertable = false, updatable = false)
-    ProgramReadEntity program;
-
-    @NonNull
-    @ManyToOne
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
     CurrencyReadEntity currency;
 

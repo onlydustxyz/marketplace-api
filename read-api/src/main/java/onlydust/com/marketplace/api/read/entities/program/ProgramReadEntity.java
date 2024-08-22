@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.read.entities.program;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
@@ -18,7 +21,6 @@ import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.
 
 @Entity
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "sponsors", schema = "public") //  TODO change to programs after migration
@@ -26,7 +28,6 @@ import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.
 @Accessors(fluent = true)
 public class ProgramReadEntity {
     @Id
-    @EqualsAndHashCode.Include
     @NonNull
     UUID id;
 
@@ -47,7 +48,7 @@ public class ProgramReadEntity {
     @NonNull
     ProgramStatReadEntity stats;
 
-    @OneToMany(mappedBy = "program")
+    @OneToMany(mappedBy = "programId")
     @NonNull
     List<ProgramStatPerCurrencyReadEntity> statsPerCurrency;
 

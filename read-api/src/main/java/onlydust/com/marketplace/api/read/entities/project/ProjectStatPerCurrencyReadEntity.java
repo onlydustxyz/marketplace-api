@@ -30,11 +30,6 @@ public class ProjectStatPerCurrencyReadEntity implements ProgramTransactionStat 
 
     @NonNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    ProjectReadEntity project;
-
-    @NonNull
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
     CurrencyReadEntity currency;
 
@@ -43,16 +38,6 @@ public class ProjectStatPerCurrencyReadEntity implements ProgramTransactionStat 
 
     @NonNull
     BigDecimal totalRewarded;
-
-    @Override
-    public String toString() {
-        return "ProjectStatPerCurrencyReadEntity{" +
-               "projectId=" + projectId +
-               ", currencyId=" + currencyId +
-               ", totalGranted=" + totalGranted +
-               ", totalRewarded=" + totalRewarded +
-               '}';
-    }
 
     @EqualsAndHashCode
     public static class PrimaryKey {

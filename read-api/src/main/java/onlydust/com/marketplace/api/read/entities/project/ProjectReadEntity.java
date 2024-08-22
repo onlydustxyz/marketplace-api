@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.read.entities.project;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
@@ -32,14 +35,12 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
 @Table(name = "projects", schema = "public")
 @Immutable
 @Accessors(fluent = true)
+@Getter
 public class ProjectReadEntity {
     @Id
-    @EqualsAndHashCode.Include
     @Column(name = "id", nullable = false)
     UUID id;
     @Column(name = "name")
@@ -99,6 +100,7 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectCategoryId")
     )
     Set<ProjectCategoryReadEntity> categories;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "public",
@@ -107,6 +109,7 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "language_id")
     )
     Set<LanguageReadEntity> languages;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "public",
@@ -123,27 +126,29 @@ public class ProjectReadEntity {
     @NonNull
     Set<ProjectCategorySuggestionReadEntity> categorySuggestions;
 
-    @OneToOne(mappedBy = "project")
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
+    @NonNull
     @Getter(AccessLevel.NONE)
-    ProjectContributionStatReadEntity contributionStats;
+    Set<ProjectContributionStatReadEntity> contributionStats;
 
     public Optional<ProjectContributionStatReadEntity> contributionStats() {
-        return Optional.ofNullable(contributionStats);
+        return contributionStats.stream().findFirst();
     }
 
-    @OneToOne(mappedBy = "project")
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
+    @NonNull
     @Getter(AccessLevel.NONE)
-    ProjectRewardStatReadEntity rewardStats;
+    Set<ProjectRewardStatReadEntity> rewardStats;
 
     public Optional<ProjectRewardStatReadEntity> rewardStats() {
-        return Optional.ofNullable(rewardStats);
+        return rewardStats.stream().findFirst();
     }
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
     @NonNull
     Set<ProjectStatPerCurrencyReadEntity> globalStatsPerCurrency;
 
-    @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
     @NonNull
     Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
 
