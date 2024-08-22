@@ -84,6 +84,8 @@ public class RewardService implements AccountingRewardPort {
                                             .projectName(rewardDetailsView.project().name())
                                             .currencyCode(rewardDetailsView.money().currency().code().toString())
                                             .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                                            .sentByGithubLogin(rewardDetailsView.requester().login())
+                                            .contributionsCount(rewardDetailsView.githubUrls().size())
                                             .build()).toList()
                             ).build()
             );

@@ -75,6 +75,8 @@ public class RewardServiceTest {
                         .projectName(rewardDetailsView.project().name())
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                        .sentByGithubLogin(rewardDetailsView.requester().login())
+                        .contributionsCount(rewardDetailsView.githubUrls().size())
                         .build()).toList()).build());
         verify(notificationPort).push(recipient2.userId().value(), RewardsPaid.builder().shortRewards(
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
@@ -83,6 +85,8 @@ public class RewardServiceTest {
                         .projectName(rewardDetailsView.project().name())
                         .currencyCode(rewardDetailsView.money().currency().code().toString())
                         .dollarsEquivalent(rewardDetailsView.money().getDollarsEquivalentValue())
+                        .sentByGithubLogin(rewardDetailsView.requester().login())
+                        .contributionsCount(rewardDetailsView.githubUrls().size())
                         .build()).toList()).build());
         verify(accountingRewardStoragePort).markRewardsAsPaymentNotified(rewardViews.stream().map(RewardDetailsView::id).toList());
     }
