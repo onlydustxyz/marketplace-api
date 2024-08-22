@@ -18,8 +18,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -143,13 +141,6 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var size = sanitizePageSize(pageSize);
 
         final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
-        final var csv = toCsv(page);
-
-        return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
-                .body(csv);
-    }
-
-    private String toCsv(Page<AccountBookTransactionReadEntity> page) {
         final var format = CSVFormat.DEFAULT.builder().build();
         final var sw = new StringWriter();
 
@@ -161,30 +152,10 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
             throw internalServerError("Error while exporting transactions to CSV", e);
         }
 
-        return sw.toString();
-    }
-
-
-    @GetMapping(
-            value = "/api/v1/programs/{programId}/transactions",
-            produces = "application/octet-stream"
-    )
-    public ResponseEntity<Resource> downloadProgramTransactions(@PathVariable UUID programId,
-                                                                @RequestParam(required = false) Integer pageIndex,
-                                                                @RequestParam(required = false) Integer pageSize,
-                                                                @RequestParam(required = false) String fromDate,
-                                                                @RequestParam(required = false) String toDate,
-                                                                @RequestParam(required = false) List<ProgramTransactionType> types,
-                                                                @RequestParam(required = false) String search) {
-        final var index = sanitizePageIndex(pageIndex);
-        final var size = sanitizePageSize(pageSize, 1_000_000);
-
-        final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
-        final var csv = toCsv(page);
+        final var csv = sw.toString();
 
         return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
-                .header("Content-Disposition", "attachment; filename=transactions.csv")
-                .body(new ByteArrayResource(csv.getBytes()));
+                .body(csv);
     }
 
     private Page<AccountBookTransactionReadEntity> findAccountBookTransactions(UUID programId, String fromDate, String toDate,
