@@ -194,22 +194,6 @@ public class ProjectReadEntity {
                 .toList();
     }
 
-    public ProjectLinkResponse toLinkResponse() {
-        return new ProjectLinkResponse()
-                .id(id)
-                .name(name)
-                .logoUrl(logoUrl)
-                .slug(slug);
-    }
-
-    public onlydust.com.backoffice.api.contract.model.ProjectLinkResponse toBoLinkResponse() {
-        return new onlydust.com.backoffice.api.contract.model.ProjectLinkResponse()
-                .id(id)
-                .name(name)
-                .logoUrl(logoUrl)
-                .slug(slug);
-    }
-
     public ProjectShortResponse toShortResponse() {
         return new ProjectShortResponse()
                 .id(id)

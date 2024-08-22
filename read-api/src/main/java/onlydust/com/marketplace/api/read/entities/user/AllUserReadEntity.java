@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistratio
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.SQLRestriction;

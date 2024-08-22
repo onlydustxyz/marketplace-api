@@ -13,7 +13,7 @@ import onlydust.com.backoffice.api.contract.model.ShortRewardResponse;
 import onlydust.com.backoffice.api.contract.model.TotalMoneyWithUsdEquivalentResponse;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import org.hibernate.annotations.Immutable;
@@ -64,7 +64,7 @@ public class RewardReadEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "projectId")
     @NonNull
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id", referencedColumnName = "reward_id")

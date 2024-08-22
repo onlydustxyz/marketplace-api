@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.PayoutPreferencesItemResponse;
-import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.io.Serializable;
@@ -29,7 +29,7 @@ public class PayoutPreferenceReadEntity {
 
     @ManyToOne
     @JoinColumn(name = "projectId", insertable = false, updatable = false)
-    ProjectReadEntity project;
+    ProjectLinkReadEntity project;
 
     @ManyToOne
     @JoinColumn(name = "billingProfileId", insertable = false, updatable = false)

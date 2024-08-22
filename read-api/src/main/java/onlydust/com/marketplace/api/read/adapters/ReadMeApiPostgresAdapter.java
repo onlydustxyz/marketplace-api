@@ -57,7 +57,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort;
     private final PayoutPreferenceReadRepository payoutPreferenceReadRepository;
     private final NotificationSettingsForProjectReadRepository notificationSettingsForProjectReadRepository;
-    private final ProjectReadRepository projectReadRepository;
+    private final ProjectLinkReadRepository projectLinkReadRepository;
     private final ProjectCategoryReadRepository projectCategoryReadRepository;
     private final LanguageReadRepository languageReadRepository;
     private final NotificationReadRepository notificationReadRepository;
@@ -201,7 +201,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var dto = notificationSettingsForProjectReadRepository.findById(new PrimaryKey(authenticatedUser.id(), projectId))
                 .map(NotificationSettingsForProjectReadEntity::toDto)
-                .orElseGet(() -> projectReadRepository.findById(projectId)
+                .orElseGet(() -> projectLinkReadRepository.findById(projectId)
                         .map(NotificationSettingsForProjectReadEntity::defaultDto)
                         .orElseThrow(() -> notFound("Project %s not found".formatted(projectId))));
         return ok(dto);
