@@ -354,6 +354,18 @@ public class BillingProfileCoworkersApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        // Given
+        final UserAuthHelper.AuthenticatedUser member = userAuthHelper.authenticateUser(595505L);
+
+        // When
+        client.get()
+                .uri(getApiURI(BILLING_PROFILES_GET_BY_ID.formatted(companyBillingProfile.id().value().toString())))
+                .header("Authorization", "Bearer " + member.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
         client.get()
                 .uri(getApiURI(ME_BILLING_PROFILES))
                 .header("Authorization", "Bearer " + userAuthHelper.authenticateOlivier().jwt())

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -76,7 +77,7 @@ public class ReadBillingProfilesApiPostgresAdapter implements ReadBillingProfile
     }
 
     private BillingProfileCoworkerRole map(BillingProfile.User.Role role) {
-        return switch (role) {
+        return isNull(role) ? null : switch (role) {
             case ADMIN -> BillingProfileCoworkerRole.ADMIN;
             case MEMBER -> BillingProfileCoworkerRole.MEMBER;
         };
