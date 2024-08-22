@@ -99,7 +99,7 @@ public class PostgresAccountBookEventAdapterIT extends AbstractPostgresIT {
     @NotNull
     private Currency newCurrency(String code) {
         if (!postgresCurrencyAdapter.exists(Currency.Code.of(code)))
-            postgresCurrencyAdapter.save(Currency.crypto(code, Currency.Code.of(code), 18));
+            postgresCurrencyAdapter.save(Currency.crypto(code, Currency.Code.of(code), 18).withMetadata(new Currency.Metadata(1, code, null, null)));
         return postgresCurrencyAdapter.findByCode(Currency.Code.of(code)).get();
     }
 }

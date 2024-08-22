@@ -2,7 +2,10 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
@@ -16,11 +19,9 @@ import java.util.UUID;
 @Entity
 @Table(name = "currencies", schema = "public")
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-@ToString
 @Immutable
 public class CurrencyViewEntity {
     @Id
@@ -35,6 +36,7 @@ public class CurrencyViewEntity {
     private String logoUrl;
     private @NonNull Integer decimals;
     private String description;
+    private int cmcId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", referencedColumnName = "currency_id", insertable = false, updatable = false)
@@ -46,7 +48,7 @@ public class CurrencyViewEntity {
                 .type(type)
                 .name(name)
                 .code(Currency.Code.of(code))
-                .metadata(new Currency.Metadata(name, description, logoUrl == null ? null : URI.create(logoUrl)))
+                .metadata(new Currency.Metadata(cmcId, name, description, logoUrl == null ? null : URI.create(logoUrl)))
                 .decimals(decimals)
                 .latestUsdQuote(latestUsdQuote == null ? null : latestUsdQuote.getPrice())
                 .build();

@@ -18,8 +18,10 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CmcQuoteServiceAdapterTest {
-    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2);
-    private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18);
+    private static final Currency USD = Currency.fiat("US Dollar", Currency.Code.of("USD"), 2)
+            .withMetadata(new Currency.Metadata(2781, "US Dollar", null, null));
+    private static final Currency ETH = Currency.crypto("Ether", Currency.Code.of("ETH"), 18)
+            .withMetadata(new Currency.Metadata(1027, "Ether", null, null));
 
     private CmcClient.Properties properties;
 
@@ -50,7 +52,7 @@ class CmcQuoteServiceAdapterTest {
     @Test
     void should_handle_bad_request() {
         // Given
-        final var currency = Currency.of(USDC_ERC20_STARKNET).withERC20(USDC_ERC20_ETH);
+        final var currency = Currency.of(USDC_ERC20_STARKNET).withERC20(USDC_ERC20_ETH).withMetadata(new Currency.Metadata(3408, "USDC", null, null));
 
         wireMockServer.stubFor(get(urlEqualTo("/v2/cryptocurrency/info?aux=logo,description&address=%s".formatted(USDC_ERC20_STARKNET.getAddress())))
                 .willReturn(aResponse().withStatus(400).withBody("""

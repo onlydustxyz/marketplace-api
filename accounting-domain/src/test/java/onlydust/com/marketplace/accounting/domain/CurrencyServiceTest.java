@@ -64,7 +64,8 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_ethereum() {
         //Given
         when(ethereumERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
-        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata(17445, "LORDS", "Realms token",
+                URI.create("https://realms.io"))));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
         when(quoteService.currentPrice(anySet(), anySet()))
                 .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
@@ -73,7 +74,7 @@ public class CurrencyServiceTest {
         final var currency = currencyService.addERC20Support(ETHEREUM, LORDS.getAddress());
 
         // Then
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
 
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("Lords");
@@ -84,10 +85,9 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).contains(LORDS);
 
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
-        verify(quoteStorage, times(1)).save(quotes.capture());
+        verify(quoteStorage).save(quotes.capture());
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -110,7 +110,7 @@ public class CurrencyServiceTest {
         final var currency = currencyService.addERC20Support(OPTIMISM, OP.getAddress());
 
         // Then
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
 
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("Optimism");
@@ -126,7 +126,8 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_starknet() {
         //Given
         when(starknetERC20Provider.get(LORDS.getAddress())).thenReturn(Optional.of(LORDS));
-        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata("LORDS", "Realms token", URI.create("https://realms.io"))));
+        when(currencyMetadataService.get(LORDS)).thenReturn(Optional.of(new Currency.Metadata(17445, "LORDS", "Realms token",
+                URI.create("https://realms.io"))));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
         when(quoteService.currentPrice(anySet(), anySet()))
                 .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
@@ -135,7 +136,7 @@ public class CurrencyServiceTest {
         final var currency = currencyService.addERC20Support(STARKNET, LORDS.getAddress());
 
         // Then
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
 
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("Lords");
@@ -146,11 +147,10 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).contains(LORDS);
 
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
-        verify(quoteStorage, times(1)).save(quotes.capture());
+        verify(quoteStorage).save(quotes.capture());
 
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -158,7 +158,8 @@ public class CurrencyServiceTest {
     void should_add_erc20_support_on_aptos() {
         //Given
         when(aptosERC20Provider.get(APT.getAddress())).thenReturn(Optional.of(APT));
-        when(currencyMetadataService.get(APT)).thenReturn(Optional.of(new Currency.Metadata("Aptos Coin", "Aptos token", URI.create("https://aptos.com"))));
+        when(currencyMetadataService.get(APT)).thenReturn(Optional.of(new Currency.Metadata(21794, "Aptos Coin", "Aptos token", URI.create("https://aptos" +
+                                                                                                                                           ".com"))));
         when(currencyStorage.all()).thenReturn(Set.of(Currencies.USD));
         when(quoteService.currentPrice(anySet(), anySet()))
                 .then(i -> createQuotesFromInvocation(i, BigDecimal.valueOf(0.35)));
@@ -167,7 +168,7 @@ public class CurrencyServiceTest {
         final var currency = currencyService.addERC20Support(APTOS, APT.getAddress());
 
         // Then
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
 
         assertThat(currency.id()).isNotNull();
         assertThat(currency.name()).isEqualTo("Aptos Coin");
@@ -178,11 +179,10 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).contains(APT);
 
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
-        verify(quoteStorage, times(1)).save(quotes.capture());
+        verify(quoteStorage).save(quotes.capture());
 
         assertThat(quotes.getValue()).containsExactlyInAnyOrder(
-                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP),
-                new Quote(currency.id(), currency.id(), BigDecimal.ONE, TIMESTAMP)
+                new Quote(currency.id(), Currencies.USD.id(), BigDecimal.valueOf(0.35), TIMESTAMP)
         );
     }
 
@@ -218,7 +218,7 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.erc20()).contains(LORDS);
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
         verify(quoteStorage, never()).save(any());
     }
 
@@ -238,10 +238,10 @@ public class CurrencyServiceTest {
         // Then
         assertThat(currency).isEqualTo(Currencies.USDC);
         assertThat(currency.erc20()).containsExactlyInAnyOrder(ETH_USDC, OP_USDC);
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
         final ArgumentCaptor<List<Quote>> quotes = ArgumentCaptor.forClass(List.class);
-        verify(quoteStorage, times(1)).save(quotes.capture());
-        assertThat(quotes.getValue()).containsExactlyInAnyOrder(USDC_USDC, USDC_USD);
+        verify(quoteStorage).save(quotes.capture());
+        assertThat(quotes.getValue()).containsExactlyInAnyOrder(USDC_USD);
     }
 
     @Test
@@ -267,20 +267,20 @@ public class CurrencyServiceTest {
         final var currencies = Set.of(Currencies.USDC, Currencies.LORDS, Currencies.STRK, Currencies.USD);
 
         when(currencyStorage.all()).thenReturn(currencies);
-        when(quoteService.currentPrice(currencies, currencies))
+        when(quoteService.currentPrice(currencies, Set.of(Currencies.USD)))
                 .thenReturn(List.of(USDC_USD, LORDS_USD));
 
         // When
         currencyService.refreshQuotes();
 
         // Then
-        verify(quoteStorage, times(1)).save(List.of(USDC_USD, LORDS_USD));
+        verify(quoteStorage).save(List.of(USDC_USD, LORDS_USD));
     }
 
     @Test
     void should_add_native_cryptocurrency_support() {
         // Given
-        when(currencyMetadataService.get(Currencies.ETH.code())).thenReturn(Optional.of(new Currency.Metadata(Currencies.ETH.name(),
+        when(currencyMetadataService.get(Currencies.ETH.code())).thenReturn(Optional.of(new Currency.Metadata(1027, Currencies.ETH.name(),
                 Currencies.ETH.description().orElseThrow(), Currencies.ETH.logoUri().orElseThrow())));
 
         // When
@@ -295,7 +295,7 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(18);
         assertThat(currency.erc20()).isEmpty();
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
     @Test
@@ -317,7 +317,7 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(Currency.Type.FIAT);
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
 
@@ -352,7 +352,7 @@ public class CurrencyServiceTest {
         when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", logoUrl, 3, List.of("USA", "FRA"));
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", "US currency", logoUrl, 3, List.of("USA", "FRA"), 12);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -364,8 +364,9 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).isEmpty();
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
         assertThat(currency.countryRestrictions()).containsExactlyInAnyOrder(Country.fromIso3("USA"), Country.fromIso3("FRA"));
+        assertThat(currency.cmcId()).isEqualTo(12);
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
     @Test
@@ -375,7 +376,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(any())).thenReturn(Optional.empty());
 
         // When
-        assertThatThrownBy(() -> currencyService.updateCurrency(currencyId, "Some name", "Some descritpion", URI.create("https://usd.io"), 3, null))
+        assertThatThrownBy(() -> currencyService.updateCurrency(currencyId, "Some name", "Some descritpion", URI.create("https://usd.io"), 3, null, null))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("Currency %s not found".formatted(currencyId));
@@ -390,7 +391,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", null, null, null, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), "United States Dollar", null, null, null, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -401,8 +402,9 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.cmcId()).isEqualTo(initialCurrency.cmcId());
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
 
@@ -413,7 +415,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, "US currency", null, null, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, "US currency", null, null, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -424,8 +426,33 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.cmcId()).isEqualTo(initialCurrency.cmcId());
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
+    }
+
+
+    @Test
+    void should_allow_partial_update_of_cmc_id() {
+        // Given
+        final var initialCurrency = Currencies.USD;
+        when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
+
+        // When
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, null, 12);
+
+        // Then
+        assertThat(currency.id()).isEqualTo(initialCurrency.id());
+        assertThat(currency.name()).isEqualTo(initialCurrency.name());
+        assertThat(currency.code()).isEqualTo(initialCurrency.code());
+        assertThat(currency.description()).isEqualTo(initialCurrency.description());
+        assertThat(currency.logoUri()).isEqualTo(initialCurrency.logoUri());
+        assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
+        assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
+        assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.cmcId()).isEqualTo(12);
+
+        verify(currencyStorage).save(currency);
     }
 
 
@@ -439,7 +466,7 @@ public class CurrencyServiceTest {
         when(imageStoragePort.storeImage(logoUrl)).thenReturn(new URL("https://s3.usd.io"));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, logoUrl, null, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, logoUrl, null, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -450,8 +477,9 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(initialCurrency.decimals());
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.cmcId()).isEqualTo(initialCurrency.cmcId());
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
 
@@ -462,7 +490,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, 3, null);
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, 3, null, null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -473,8 +501,9 @@ public class CurrencyServiceTest {
         assertThat(currency.decimals()).isEqualTo(3);
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
+        assertThat(currency.cmcId()).isEqualTo(initialCurrency.cmcId());
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
 
@@ -485,7 +514,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("USA", "FRA"));
+        final var currency = currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("USA", "FRA"), null);
 
         // Then
         assertThat(currency.id()).isEqualTo(initialCurrency.id());
@@ -497,8 +526,9 @@ public class CurrencyServiceTest {
         assertThat(currency.erc20()).isEqualTo(initialCurrency.erc20());
         assertThat(currency.type()).isEqualTo(initialCurrency.type());
         assertThat(currency.countryRestrictions()).containsExactlyInAnyOrder(Country.fromIso3("USA"), Country.fromIso3("FRA"));
+        assertThat(currency.cmcId()).isEqualTo(initialCurrency.cmcId());
 
-        verify(currencyStorage, times(1)).save(currency);
+        verify(currencyStorage).save(currency);
     }
 
     @Test
@@ -508,7 +538,7 @@ public class CurrencyServiceTest {
         when(currencyStorage.get(initialCurrency.id())).thenReturn(Optional.of(initialCurrency));
 
         // When
-        assertThatThrownBy(() -> currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("FR")))
+        assertThatThrownBy(() -> currencyService.updateCurrency(initialCurrency.id(), null, null, null, null, List.of("FR"), null))
                 // Then
                 .isInstanceOf(OnlyDustException.class)
                 .hasMessage("FR is not a valid ISO3 country code");

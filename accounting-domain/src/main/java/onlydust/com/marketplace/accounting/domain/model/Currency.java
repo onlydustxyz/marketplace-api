@@ -103,6 +103,12 @@ public class Currency implements Cloneable {
         return Optional.ofNullable(metadata).map(Metadata::description);
     }
 
+    public Integer cmcId() {
+        return Optional.ofNullable(metadata)
+                .map(Metadata::cmcId)
+                .orElse(null);
+    }
+
     public Optional<URI> logoUri() {
         return Optional.ofNullable(metadata).map(Metadata::logoUri);
     }
@@ -149,7 +155,7 @@ public class Currency implements Cloneable {
             return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), Standard.ISO4217, Network.SEPA, null);
 
         if (network.equals(nativeNetwork()))
-            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, nativeNetwork(), null);
+            return new PayableCurrency(id, code(), name(), logoUri().orElse(null), type(), null, network, null);
 
         final var erc20 = erc20().stream().filter(e -> e.getBlockchain().equals(network.blockchain().orElse(null)))
                 .findFirst().orElseThrow(() -> OnlyDustException.internalServerError("Currency %s is not supported on network %s".formatted(code, network)));
@@ -252,7 +258,7 @@ public class Currency implements Cloneable {
         }
     }
 
-    public record Metadata(String name, String description, URI logoUri) {
+    public record Metadata(int cmcId, String name, String description, URI logoUri) {
     }
 
     public enum Type {FIAT, CRYPTO}

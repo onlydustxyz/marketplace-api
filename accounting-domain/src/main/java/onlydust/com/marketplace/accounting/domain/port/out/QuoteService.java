@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Set;
 
 public interface QuoteService {
-    List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> bases);
+    List<Quote> currentPrice(Set<Currency> currencies, Set<Currency> targets);
 }

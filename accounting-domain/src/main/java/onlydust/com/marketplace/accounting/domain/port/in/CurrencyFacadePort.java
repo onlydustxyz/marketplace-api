@@ -21,7 +21,7 @@ public interface CurrencyFacadePort {
 
     void refreshQuotes();
 
-    Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals, List<String> countryRestrictions);
+    Currency updateCurrency(Currency.Id id, String name, String description, URI logoUrl, Integer decimals, List<String> countryRestrictions, Integer cmcId);
 
     URL uploadLogo(InputStream imageInputStream);
 
