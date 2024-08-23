@@ -12,6 +12,8 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
+import onlydust.com.marketplace.api.helper.AccountingHelper;
+import onlydust.com.marketplace.api.helper.ProgramHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.helper.WireMockInitializer;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
@@ -101,6 +103,10 @@ public class AbstractMarketplaceBackOfficeApiIT {
     ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
     @Autowired
     CustomerIOProperties customerIOProperties;
+    @Autowired
+    ProgramHelper programHelper;
+    @Autowired
+    AccountingHelper accountingHelper;
 
     @Autowired
     UserRepository userRepository;
@@ -168,8 +174,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String PATCH_SPONSOR_ACCOUNTS = "/bo/v1/sponsor-accounts/%s";
     protected static final String POST_SPONSOR_ACCOUNTS_RECEIPTS = "/bo/v1/sponsor-accounts/%s/receipts";
     protected static final String DELETE_SPONSOR_ACCOUNTS_RECEIPTS = "/bo/v1/sponsor-accounts/%s/receipts/%s";
-    protected static final String POST_PROJECTS_BUDGETS_ALLOCATE = "/bo/v1/projects/%s/budgets/allocate";
-    protected static final String POST_PROJECTS_BUDGETS_UNALLOCATE = "/bo/v1/projects/%s/budgets/unallocate";
+    protected static final String SPONSORS_BY_ID_ALLOCATE = "/bo/v1/sponsors/%s/allocate";
+    protected static final String SPONSORS_BY_ID_UNALLOCATE = "/bo/v1/sponsors/%s/unallocate";
     protected static final String POST_REWARDS_PAY = "/bo/v1/rewards/%s/pay";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_USERS = "/bo/v1/users";

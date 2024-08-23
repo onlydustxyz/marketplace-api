@@ -112,11 +112,11 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
 
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
-        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
     }
 

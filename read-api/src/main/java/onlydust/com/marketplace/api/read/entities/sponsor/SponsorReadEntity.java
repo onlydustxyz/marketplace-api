@@ -7,12 +7,17 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
+import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorResponse;
+import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.util.Set;
 import java.util.UUID;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -38,6 +43,20 @@ public class SponsorReadEntity {
     @NonNull
     Set<SponsorStatPerCurrencyPerProgramReadEntity> perProgramStatsPerCurrency;
 
+    @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
+    @NonNull
+    Set<SponsorStatPerCurrencyReadEntity> statsPerCurrency;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "sponsor_leads",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "sponsorId"),
+            inverseJoinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId")
+    )
+    @NonNull
+    Set<AllUserReadEntity> leads;
+
     public SponsorResponse toResponse() {
         return new SponsorResponse()
                 .id(id)
@@ -51,5 +70,31 @@ public class SponsorReadEntity {
                 .id(id)
                 .name(name)
                 .logoUrl(logoUrl);
+    }
+
+    public SponsorDetailsResponse toBoResponse() {
+        return new SponsorDetailsResponse()
+                .id(id)
+                .name(name)
+                .url(url)
+                .logoUrl(logoUrl)
+                .availableBudgets(statsPerCurrency.stream()
+                        .map(SponsorStatPerCurrencyReadEntity::toSponsorBudgetResponse)
+                        .toList())
+                .programs(perProgramStatsPerCurrency.stream()
+                        .collect(groupingBy(SponsorStatPerCurrencyPerProgramReadEntity::program))
+                        .entrySet().stream()
+                        .map(e -> new ProgramWithBudgetResponse()
+                                .id(e.getKey().id())
+                                .name(e.getKey().name())
+                                .logoUrl(e.getKey().logoUrl())
+                                .remainingBudgets(e.getValue().stream()
+                                        .map(stat -> stat.toBoMoneyResponse(s -> s.totalAllocated().subtract(s.totalGranted())))
+                                        .toList()))
+                        .toList())
+                .leads(leads.stream()
+                        .map(AllUserReadEntity::toBoLinkResponse)
+                        .toList())
+                ;
     }
 }

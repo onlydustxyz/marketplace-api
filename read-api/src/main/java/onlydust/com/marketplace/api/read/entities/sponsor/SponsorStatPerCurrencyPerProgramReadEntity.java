@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.MoneyResponse;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionStat;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.function.Function;
 
 @NoArgsConstructor(force = true)
 @Getter
@@ -34,6 +37,11 @@ public class SponsorStatPerCurrencyPerProgramReadEntity implements ProgramTransa
 
     @NonNull
     @ManyToOne
+    @JoinColumn(name = "programId", insertable = false, updatable = false)
+    ProgramReadEntity program;
+
+    @NonNull
+    @ManyToOne
     @JoinColumn(name = "currencyId", insertable = false, updatable = false)
     CurrencyReadEntity currency;
 
@@ -42,6 +50,12 @@ public class SponsorStatPerCurrencyPerProgramReadEntity implements ProgramTransa
 
     @NonNull
     BigDecimal totalGranted;
+
+    public MoneyResponse toBoMoneyResponse(Function<SponsorStatPerCurrencyPerProgramReadEntity, BigDecimal> amount) {
+        return new MoneyResponse()
+                .amount(amount.apply(this))
+                .currency(currency().toBoShortResponse());
+    }
 
     @EqualsAndHashCode
     public static class PrimaryKey {

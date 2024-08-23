@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ProgramHelper {
@@ -30,14 +31,28 @@ public class ProgramHelper {
         addLead(program.id(), lead);
         return program;
     }
+    
+    public Program create(UserAuthHelper.AuthenticatedBackofficeUser lead) {
+        final var program = create();
+        addLead(program.id(), lead);
+        return program;
+    }
 
     public void addLead(ProgramId programId, UserAuthHelper.AuthenticatedUser lead) {
+        addLead(programId, lead.user().getId());
+    }
+
+    public void addLead(ProgramId programId, UserAuthHelper.AuthenticatedBackofficeUser lead) {
+        addLead(programId, lead.user().getId());
+    }
+
+    private void addLead(ProgramId programId, UUID leadId) {
         databaseHelper.executeQuery("""
                 INSERT INTO program_leads
                 VALUES (:programId, :userId)
                 ON CONFLICT DO NOTHING
                 """, Map.of(
-                "userId", lead.user().getId(),
+                "userId", leadId,
                 "programId", programId.value()
         ));
     }

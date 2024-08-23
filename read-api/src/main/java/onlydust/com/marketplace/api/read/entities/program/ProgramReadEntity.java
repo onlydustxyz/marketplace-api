@@ -34,6 +34,8 @@ public class ProgramReadEntity {
     @NonNull
     String name;
 
+    String logoUrl;
+
     @ManyToMany
     @JoinTable(
             name = "program_leads",
@@ -87,4 +89,5 @@ public class ProgramReadEntity {
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
     }
+
 }

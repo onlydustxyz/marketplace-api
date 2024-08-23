@@ -367,7 +367,7 @@ public class AbstractMarketplaceApiIT {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
-                        INSERT INTO sponsors_users
+                        INSERT INTO sponsor_leads
                         VALUES (:sponsorId, :userId)
                         ON CONFLICT DO NOTHING
                         """)
@@ -383,7 +383,7 @@ public class AbstractMarketplaceApiIT {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
-                        DELETE FROM sponsors_users
+                        DELETE FROM sponsor_leads
                         WHERE user_id = :userId AND sponsor_id = :sponsorId
                         """)
                 .setParameter("userId", user.user().getId())

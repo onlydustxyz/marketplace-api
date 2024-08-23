@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
@@ -20,6 +19,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
@@ -27,6 +27,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.project.domain.model.Program;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -61,7 +62,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     static final ProjectId BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
     static final ProjectId KAAPER = ProjectId.of("298a547f-ecb6-4ab2-8975-68f4e9bf7b39");
 
-
     @Autowired
     private SponsorAccountRepository sponsorAccountRepository;
     @Autowired
@@ -89,6 +89,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     @Autowired
     RewardStatusStorage rewardStatusStorage;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
+    Program program;
 
     @BeforeEach
     void setup() {
@@ -98,6 +99,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
         camille = userAuthHelper.authenticateCamille();
+        program = programHelper.create(camille);
     }
 
     @Test
@@ -122,7 +124,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .getResponseBody();
 
         final var accountId = response.getId();
-        assertThat(accountId).isNotNull();
+        assertThat(response.getId()).isNotNull();
         assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
         assertThat(response.getCurrency().getId()).isEqualTo(STRK.value());
         assertThat(response.getInitialAllowance()).isEqualTo(BigDecimal.valueOf(100));
@@ -163,24 +165,26 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // When
         client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(BRETZEL)))
+                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(COCA_COLAX)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorAccountId": "%s",
-                            "amount": 90
+                            "programId": "%s",
+                            "amount": 90,
+                            "currencyId": "%s"
                         }
-                        """.formatted(accountId))
+                        """.formatted(BRETZEL, STRK))
                 // Then
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
+        accountingHelper.grant(program.id(), BRETZEL, 90, STRK);
 
         // When
         client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_UNALLOCATE.formatted(BRETZEL)))
+                .uri(getApiURI(SPONSORS_BY_ID_UNALLOCATE.formatted(BRETZEL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -630,7 +634,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var antho = userAuthHelper.authenticateAntho();
         final var ofux = userAuthHelper.authenticateOlivier();
 
-        final var accountId = client.post()
+        client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
@@ -655,18 +659,21 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // Given
         client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorAccountId": "%s",
-                            "amount": 100
+                            "projectId": "%s",
+                            "amount": 100,
+                            "currencyId": "%s"
                         }
-                        """.formatted(accountId))
+                        """.formatted(program.id(), USDC))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+        accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
@@ -916,18 +923,21 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // Given
         client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorAccountId": "%s",
-                            "amount": 100
+                            "programId": "%s",
+                            "amount": 100,
+                            "currencyId": "%s"
                         }
-                        """.formatted(accountId))
+                        """.formatted(program.id(), USDC))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+        accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
@@ -1130,7 +1140,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var antho = userAuthHelper.authenticateAntho();
         final var ofux = userAuthHelper.authenticateOlivier();
 
-        final var accountId = client.post()
+        client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
@@ -1148,25 +1158,25 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                         """.formatted(APT))
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult()
-                .getResponseBody().getId();
+                .isOk();
 
         // Given
         client.post()
-                .uri(getApiURI(POST_PROJECTS_BUDGETS_ALLOCATE.formatted(KAAPER)))
+                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorAccountId": "%s",
-                            "amount": 100
+                            "programId": "%s",
+                            "amount": 100,
+                            "currencyId": "%s"
                         }
-                        """.formatted(accountId))
+                        """.formatted(program.id(), APT))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+        accountingHelper.grant(program.id(), KAAPER, 100, APT);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))

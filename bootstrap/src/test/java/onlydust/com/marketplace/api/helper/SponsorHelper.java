@@ -34,7 +34,7 @@ public class SponsorHelper {
 
     public void addLead(SponsorId sponsorId, UserAuthHelper.AuthenticatedUser lead) {
         databaseHelper.executeQuery("""
-                INSERT INTO sponsors_leads
+                INSERT INTO sponsor_leads
                 VALUES (:sponsorId, :userId)
                 ON CONFLICT DO NOTHING
                 """, Map.of(

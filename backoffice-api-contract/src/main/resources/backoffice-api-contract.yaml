@@ -2920,17 +2920,30 @@ components:
         logoUrl:
           type: string
 
+    ProgramLinkResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+        name:
+          type: string
+        logoUrl:
+          type: string
+
     SponsorPageItemResponse:
       allOf:
         - $ref: '#/components/schemas/SponsorResponse'
         - type: object
           required:
-            - projects
+            - programs
           properties:
-            projects:
+            programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLinkResponse'
+                $ref: '#/components/schemas/ProgramLinkResponse'
 
     SponsorDetailsResponse:
       allOf:
@@ -2938,16 +2951,16 @@ components:
         - type: object
           required:
             - availableBudgets
-            - projects
+            - programs
           properties:
             availableBudgets:
               type: array
               items:
                 $ref: '#/components/schemas/SponsorBudgetResponse'
-            projects:
+            programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectWithBudgetResponse'
+                $ref: '#/components/schemas/ProgramWithBudgetResponse'
             leads:
               type: array
               items:
@@ -4663,9 +4676,9 @@ components:
         logoUrl:
           type: string
 
-    ProjectWithBudgetResponse:
+    ProgramWithBudgetResponse:
       allOf:
-        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - remainingBudgets
