@@ -365,8 +365,9 @@ public class PostgresConfiguration {
 
 
     @Bean
-    PostgresProgramAdapter postgresProgramAdapter(final ProgramLeadRepository programLeadRepository) {
-        return new PostgresProgramAdapter(programLeadRepository);
+    PostgresProgramAdapter postgresProgramAdapter(final ProgramRepository programRepository,
+                                                  final ProgramLeadRepository programLeadRepository) {
+        return new PostgresProgramAdapter(programRepository, programLeadRepository);
     }
 
 

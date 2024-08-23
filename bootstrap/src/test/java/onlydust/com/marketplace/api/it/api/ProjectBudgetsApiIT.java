@@ -107,6 +107,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         accountingFacadePort.allocate(sponsorId, programId, PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
 
         accountingFacadePort.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
+        accountingFacadePort.grant(programId, ProjectId.of(projectId), PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
 
         // When
         client.get()

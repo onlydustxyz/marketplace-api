@@ -10,7 +10,7 @@ import java.net.URI;
 public record Program(@NonNull ProgramId id,
                       @NonNull String name,
                       @NonNull URI logoUrl) {
-    public static Program create(@NonNull String name, URI url, @NonNull URI logoUrl) {
+    public static Program create(@NonNull String name, @NonNull URI logoUrl) {
         return Program.builder()
                 .id(ProgramId.random())
                 .name(name)

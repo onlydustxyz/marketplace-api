@@ -422,4 +422,16 @@ public class ProjectConfiguration {
                                                                final ProjectCurrencyStoragePort projectCurrencyStoragePort) {
         return new AutomatedRewardService(githubSearchPort, projectFacadePort, rewardFacadePort, projectStoragePort, projectCurrencyStoragePort);
     }
+
+
+    @Bean
+    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort, final ImageStoragePort imageStoragePort) {
+        return new SponsorService(sponsorStoragePort, imageStoragePort);
+    }
+
+
+    @Bean
+    public ProgramFacadePort programFacadePort(final ProgramStoragePort programStoragePort) {
+        return new ProgramService(programStoragePort);
+    }
 }

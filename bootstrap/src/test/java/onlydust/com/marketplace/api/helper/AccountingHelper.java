@@ -207,6 +207,11 @@ public class AccountingHelper {
         accountingFacadePort.allocate(sponsorId, programId, PositiveAmount.of(amount), currencyId);
     }
 
+    public void unallocate(ProgramId programId, SponsorId sponsorId, long amount, Currency.Id currencyId) {
+        accountingFacadePort.unallocate(programId, sponsorId, PositiveAmount.of(amount), currencyId);
+    }
+
+
     public void grant(ProgramId programId, ProjectId projectId, long amount, Currency.Id currencyId) {
         accountingFacadePort.grant(programId, projectId, PositiveAmount.of(amount), currencyId);
     }
@@ -217,9 +222,5 @@ public class AccountingHelper {
 
     public void refund(ProjectId projectId, ProgramId programId, long amount, Currency.Id currencyId) {
         accountingFacadePort.ungrant(projectId, programId, PositiveAmount.of(amount), currencyId);
-    }
-
-    public void increaseAllowance(SponsorAccount.Id accountId, long amount) {
-        accountingFacadePort.increaseAllowance(accountId, Amount.of(amount));
     }
 }

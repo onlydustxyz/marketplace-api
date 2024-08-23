@@ -13,10 +13,10 @@ import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidat
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
-import onlydust.com.marketplace.kernel.port.output.*;
-import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
-import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
-import onlydust.com.marketplace.project.domain.service.SponsorService;
+import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
+import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -157,11 +157,6 @@ public class AccountingConfiguration {
     @Bean
     public SumsubMapper sumsubMapper(final BillingProfileVerificationRejectionReasonFacadePort billingProfileVerificationRejectionReasonFacadePort) {
         return new SumsubMapper(billingProfileVerificationRejectionReasonFacadePort);
-    }
-
-    @Bean
-    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort, final ImageStoragePort imageStoragePort) {
-        return new SponsorService(sponsorStoragePort, imageStoragePort);
     }
 
     @Bean
