@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import org.apache.commons.csv.CSVPrinter;
@@ -49,6 +50,10 @@ public class AccountBookTransactionReadEntity {
     @ManyToOne
     @JoinColumn(name = "sponsorAccountId")
     SponsorAccountReadEntity sponsorAccount;
+
+    @ManyToOne
+    @JoinColumn(name = "programId")
+    ProgramReadEntity program;
 
     @ManyToOne
     @JoinColumn(name = "projectId")

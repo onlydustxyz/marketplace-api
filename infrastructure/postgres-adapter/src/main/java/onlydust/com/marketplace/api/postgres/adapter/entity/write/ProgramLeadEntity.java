@@ -29,6 +29,7 @@ public class ProgramLeadEntity {
 
     @EqualsAndHashCode
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID userId;
         UUID programId;

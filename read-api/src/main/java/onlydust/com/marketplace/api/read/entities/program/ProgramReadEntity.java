@@ -23,7 +23,7 @@ import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.
 @NoArgsConstructor(force = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Table(name = "sponsors", schema = "public") //  TODO change to programs after migration
+@Table(name = "programs", schema = "public")
 @Immutable
 @Accessors(fluent = true)
 public class ProgramReadEntity {
@@ -36,8 +36,8 @@ public class ProgramReadEntity {
 
     @ManyToMany
     @JoinTable(
-            name = "sponsors_users",
-            joinColumns = @JoinColumn(name = "sponsor_id"),
+            name = "program_leads",
+            joinColumns = @JoinColumn(name = "program_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId")
     )
     @NonNull
