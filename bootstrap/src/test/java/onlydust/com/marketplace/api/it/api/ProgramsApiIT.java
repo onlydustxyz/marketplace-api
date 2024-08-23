@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
+import onlydust.com.marketplace.api.contract.model.GrantRequest;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -1443,22 +1446,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                  }
                                 """);
 
-                final ProgramProjectsPageResponse programProjectsPageResponse = client.get()
-                        .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id()), Map.of(
-                                "pageIndex", "0",
-                                "pageSize", "5"
-                        )))
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                        .exchange()
-                        // Then
-                        .expectStatus()
-                        .isOk()
-                        .expectBody(ProgramProjectsPageResponse.class)
-                        .returnResult().getResponseBody();
-
                 // When
                 client.get()
-                        .uri(getApiURI(PROGRAM_PROJECT.formatted(program.id(), programProjectsPageResponse.getProjects().get(0).getId())))
+                        .uri(getApiURI(PROGRAM_PROJECT.formatted(program.id(), project2Id)))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                         .exchange()
                         // Then
