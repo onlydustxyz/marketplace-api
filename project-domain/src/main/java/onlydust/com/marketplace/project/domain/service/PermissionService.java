@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.project.domain.model.Program;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -38,10 +38,10 @@ public class PermissionService {
     }
 
     public boolean isUserSponsorLead(UUID userId, UUID sponsorId) {
-        return sponsorStoragePort.isAdmin(userId, Sponsor.Id.of(sponsorId));
+        return sponsorStoragePort.isAdmin(userId, SponsorId.of(sponsorId));
     }
 
-    public boolean isUserProgramLead(UUID userId, Program.Id programId) {
+    public boolean isUserProgramLead(UUID userId, ProgramId programId) {
         return programStoragePort.isAdmin(userId, programId);
     }
 }

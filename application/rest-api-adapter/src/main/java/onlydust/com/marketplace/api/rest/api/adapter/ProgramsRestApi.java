@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProgramId;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.ProgramsApi;
 import onlydust.com.marketplace.api.contract.model.GrantRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.project.domain.model.Program;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +36,7 @@ public class ProgramsRestApi implements ProgramsApi {
     public ResponseEntity<Void> grantBudgetToProject(UUID programId, GrantRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         accountingFacadePort.grant(

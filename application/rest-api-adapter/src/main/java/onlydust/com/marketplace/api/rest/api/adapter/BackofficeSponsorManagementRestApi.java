@@ -7,7 +7,7 @@ import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.SponsorCreateResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.backoffice.api.contract.model.UploadImageResponse;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -41,7 +41,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
 
     @Override
     public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
-        sponsorFacadePort.updateSponsor(Sponsor.Id.of(sponsorId),
+        sponsorFacadePort.updateSponsor(SponsorId.of(sponsorId),
                 sponsorRequest.getName(),
                 sponsorRequest.getUrl(),
                 sponsorRequest.getLogoUrl());
@@ -65,7 +65,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
 
     @Override
     public ResponseEntity<Void> addLeadToSponsor(UUID sponsorId, UUID leadId) {
-        sponsorFacadePort.addLeadToSponsor(leadId, Sponsor.Id.of(sponsorId));
+        sponsorFacadePort.addLeadToSponsor(leadId, SponsorId.of(sponsorId));
         return noContent().build();
     }
 }

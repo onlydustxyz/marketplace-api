@@ -4,8 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.net.URI;
@@ -29,7 +29,7 @@ public class SponsorEntity {
 
     public Sponsor toDomain() {
         return Sponsor.builder()
-                .id(Sponsor.Id.of(id))
+                .id(SponsorId.of(id))
                 .name(name)
                 .logoUrl(URI.create(logoUrl))
                 .url(url == null ? null : URI.create(url))

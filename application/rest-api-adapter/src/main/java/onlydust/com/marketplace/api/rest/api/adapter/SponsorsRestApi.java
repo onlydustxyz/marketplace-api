@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProgramId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.SponsorsApi;
 import onlydust.com.marketplace.api.contract.model.AllocateRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +35,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> allocateBudgetToProgram(UUID sponsorId, AllocateRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), Sponsor.Id.of(sponsorId))
+        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), SponsorId.of(sponsorId))
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
         accountingFacadePort.allocate(
@@ -52,7 +51,7 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> unallocateBudgetFromProgram(UUID sponsorId, AllocateRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), Sponsor.Id.of(sponsorId))
+        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), SponsorId.of(sponsorId))
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
         accountingFacadePort.unallocate(

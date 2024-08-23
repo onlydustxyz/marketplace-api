@@ -2,7 +2,10 @@ package onlydust.com.marketplace.api.it.api.feature;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.github_api.GithubHttpClient;
@@ -22,6 +25,9 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoR
 import onlydust.com.marketplace.api.read.entities.reward.RewardDetailsReadEntity;
 import onlydust.com.marketplace.api.read.repositories.RewardDetailsReadRepository;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import org.junit.jupiter.api.Test;

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
@@ -20,7 +21,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class SponsorService implements SponsorFacadePort {
     private final SponsorStoragePort sponsorStoragePort;
     private final ImageStoragePort imageStoragePort;
-    
+
     @Override
     public Sponsor createSponsor(@NonNull String name, URI url, @NonNull URI logoUrl) {
         final var sponsor = Sponsor.create(name, url, logoUrl);
@@ -29,7 +30,7 @@ public class SponsorService implements SponsorFacadePort {
     }
 
     @Override
-    public void updateSponsor(@NonNull Sponsor.Id sponsorId, @NonNull String name, URI url, @NonNull URI logoUrl) {
+    public void updateSponsor(@NonNull SponsorId sponsorId, @NonNull String name, URI url, @NonNull URI logoUrl) {
         final var sponsor = sponsorStoragePort.get(sponsorId)
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
@@ -46,12 +47,12 @@ public class SponsorService implements SponsorFacadePort {
     }
 
     @Override
-    public void addLeadToSponsor(UUID leadId, Sponsor.Id sponsorId) {
+    public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
         sponsorStoragePort.addLeadToSponsor(leadId, sponsorId);
     }
 
     @Override
-    public Optional<Sponsor> findById(UUID leadId, Sponsor.Id sponsorId) {
+    public Optional<Sponsor> findById(UUID leadId, SponsorId sponsorId) {
         if (!sponsorStoragePort.isAdmin(leadId, sponsorId))
             throw forbidden("User %s is not allowed to access sponsor %s".formatted(leadId, sponsorId));
 

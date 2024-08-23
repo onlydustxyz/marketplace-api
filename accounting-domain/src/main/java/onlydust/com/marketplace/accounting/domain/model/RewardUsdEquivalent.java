@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -15,13 +16,17 @@ import java.util.Optional;
 @Accessors(fluent = true)
 @AllArgsConstructor
 public class RewardUsdEquivalent {
-    @NonNull RewardId rewardId;
-    @NonNull ZonedDateTime rewardCreatedAt;
-    @NonNull Currency.Id rewardCurrencyId;
+    @NonNull
+    RewardId rewardId;
+    @NonNull
+    ZonedDateTime rewardCreatedAt;
+    @NonNull
+    Currency.Id rewardCurrencyId;
     ZonedDateTime kycbVerifiedAt;
     ZonedDateTime currencyQuoteAvailableAt;
     ZonedDateTime unlockDate;
-    @NonNull BigDecimal rewardAmount;
+    @NonNull
+    BigDecimal rewardAmount;
 
     public Optional<ZonedDateTime> equivalenceSealingDate() {
         if (kycbNotVerified() || notLiquid() || locked()) return Optional.empty();

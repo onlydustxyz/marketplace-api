@@ -10,6 +10,10 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAcco
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;

@@ -3,7 +3,12 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 
 import java.time.ZonedDateTime;
 import java.util.List;

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.accounting.domain.notification.dto;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Builder;
 import lombok.Data;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.math.BigDecimal;
 

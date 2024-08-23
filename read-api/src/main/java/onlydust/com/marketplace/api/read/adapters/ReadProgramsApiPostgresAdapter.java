@@ -12,7 +12,7 @@ import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyS
 import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
-import onlydust.com.marketplace.project.domain.model.Program;
+import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -58,7 +58,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var program = programReadRepository.findById(programId)
@@ -71,7 +71,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         int index = sanitizePageIndex(pageIndex);
@@ -92,7 +92,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramProjectResponse> getProgramProject(UUID programId, UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final ProgramProjectResponse programProjectResponse = projectReadRepository.findStatsById(projectId)
@@ -161,7 +161,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                List<ProgramTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
 
@@ -184,7 +184,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                           String search) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), Program.Id.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var stats = programTransactionMonthlyStatsReadRepository.findAll(

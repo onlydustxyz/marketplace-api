@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;

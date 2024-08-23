@@ -7,9 +7,9 @@ import onlydust.com.backoffice.api.contract.model.PostBatchPaymentRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
@@ -747,88 +747,88 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                 .withRequestBody(equalToJson("""
-                {
-                  "transactional_message_id": "24",
-                  "identifiers": {
-                    "id": "fc92397c-3431-4a84-8054-845376b630a0",
-                    "email": null
-                  },
-                  "from": "Camille from OnlyDust <admin@onlydust.xyz>",
-                  "to": "pierre.oucif@gadz.org",
-                  "subject": "Your rewards are processed! 🥳",
-                  "message_data": {
-                    "title": "Reward(s) processed",
-                    "description": "Good news! We just processed all your pending rewards on OnlyDust. Please find details below",
-                    "username": "PierreOucif",
-                    "rewards": [
-                      {
-                        "id": "#8FE07",
-                        "projectName": "QA new contributions",
-                        "currency": "USDC",
-                        "amount": "1000.000",
-                        "contributionsNumber": "25",
-                        "sentBy": "PierreOucif"
-                      }
-                    ],
-                    "button": {
-                      "text": "See details",
-                      "link": "https://develop-app.onlydust.com/rewards"
-                    }
-                  }
-                }
-                """)));
+                        {
+                          "transactional_message_id": "24",
+                          "identifiers": {
+                            "id": "fc92397c-3431-4a84-8054-845376b630a0",
+                            "email": null
+                          },
+                          "from": "Camille from OnlyDust <admin@onlydust.xyz>",
+                          "to": "pierre.oucif@gadz.org",
+                          "subject": "Your rewards are processed! 🥳",
+                          "message_data": {
+                            "title": "Reward(s) processed",
+                            "description": "Good news! We just processed all your pending rewards on OnlyDust. Please find details below",
+                            "username": "PierreOucif",
+                            "rewards": [
+                              {
+                                "id": "#8FE07",
+                                "projectName": "QA new contributions",
+                                "currency": "USDC",
+                                "amount": "1000.000",
+                                "contributionsNumber": "25",
+                                "sentBy": "PierreOucif"
+                              }
+                            ],
+                            "button": {
+                              "text": "See details",
+                              "link": "https://develop-app.onlydust.com/rewards"
+                            }
+                          }
+                        }
+                        """)));
 
         customerIOWireMockServer.verify(1, postRequestedFor(urlEqualTo("/send/email"))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
                 .withRequestBody(equalToJson("""
-                
-                        {
-                  "transactional_message_id": "24",
-                  "identifiers": {
-                    "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
-                    "email": null
-                  },
-                  "from": "Camille from OnlyDust <admin@onlydust.xyz>",
-                  "to": "abuisset@gmail.com",
-                  "subject": "Your rewards are processed! 🥳",
-                  "message_data": {
-                    "title": "Reward(s) processed",
-                    "description": "Good news! We just processed all your pending rewards on OnlyDust. Please find details below",
-                    "username": "AnthonyBuisset",
-                    "rewards": [
-                      {
-                        "id": "#79209",
-                        "projectName": "kaaper",
-                        "currency": "USDC",
-                        "amount": "1000.000",
-                        "contributionsNumber": "1",
-                        "sentBy": "AnthonyBuisset"
-                      },
-                      {
-                        "id": "#E33EA",
-                        "projectName": "kaaper",
-                        "currency": "USDC",
-                        "amount": "1000.000",
-                        "contributionsNumber": "85",
-                        "sentBy": "AnthonyBuisset"
-                      },
-                      {
-                        "id": "#D22F7",
-                        "projectName": "kaaper",
-                        "currency": "USDC",
-                        "amount": "1000.000",
-                        "contributionsNumber": "79",
-                        "sentBy": "AnthonyBuisset"
-                      }
-                    ],
-                    "button": {
-                      "text": "See details",
-                      "link": "https://develop-app.onlydust.com/rewards"
-                    }
-                  }
-                }
-                """)));
+                        
+                                {
+                          "transactional_message_id": "24",
+                          "identifiers": {
+                            "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
+                            "email": null
+                          },
+                          "from": "Camille from OnlyDust <admin@onlydust.xyz>",
+                          "to": "abuisset@gmail.com",
+                          "subject": "Your rewards are processed! 🥳",
+                          "message_data": {
+                            "title": "Reward(s) processed",
+                            "description": "Good news! We just processed all your pending rewards on OnlyDust. Please find details below",
+                            "username": "AnthonyBuisset",
+                            "rewards": [
+                              {
+                                "id": "#79209",
+                                "projectName": "kaaper",
+                                "currency": "USDC",
+                                "amount": "1000.000",
+                                "contributionsNumber": "1",
+                                "sentBy": "AnthonyBuisset"
+                              },
+                              {
+                                "id": "#E33EA",
+                                "projectName": "kaaper",
+                                "currency": "USDC",
+                                "amount": "1000.000",
+                                "contributionsNumber": "85",
+                                "sentBy": "AnthonyBuisset"
+                              },
+                              {
+                                "id": "#D22F7",
+                                "projectName": "kaaper",
+                                "currency": "USDC",
+                                "amount": "1000.000",
+                                "contributionsNumber": "79",
+                                "sentBy": "AnthonyBuisset"
+                              }
+                            ],
+                            "button": {
+                              "text": "See details",
+                              "link": "https://develop-app.onlydust.com/rewards"
+                            }
+                          }
+                        }
+                        """)));
 
 
     }

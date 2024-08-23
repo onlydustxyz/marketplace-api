@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.util.UUID;
 
@@ -26,7 +26,7 @@ public class SponsorLedgerEntity {
     @NonNull
     UUID sponsorId;
 
-    public static SponsorLedgerEntity of(SponsorAccountEntity ledger, Sponsor.Id sponsorId) {
+    public static SponsorLedgerEntity of(SponsorAccountEntity ledger, SponsorId sponsorId) {
         return new SponsorLedgerEntity(ledger.id, ledger, sponsorId.value());
     }
 }
