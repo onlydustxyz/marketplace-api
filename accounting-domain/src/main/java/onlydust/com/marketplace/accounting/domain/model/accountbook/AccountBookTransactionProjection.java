@@ -15,6 +15,7 @@ public class AccountBookTransactionProjection {
     private @NonNull AccountBookAggregate.Id accountBookId;
     private @NonNull AccountBook.Transaction.Type type;
     private SponsorAccount.Id sponsorAccountId;
+    private ProgramId programId;
     private ProjectId projectId;
     private RewardId rewardId;
     private Payment.Id paymentId;
@@ -37,6 +38,9 @@ public class AccountBookTransactionProjection {
             switch (accountId.type()) {
                 case SPONSOR_ACCOUNT:
                     sponsorAccountId(accountId.sponsorAccountId());
+                    break;
+                case PROGRAM:
+                    programId(accountId.programId());
                     break;
                 case PROJECT:
                     projectId(accountId.projectId());
