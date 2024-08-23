@@ -14,6 +14,9 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
+import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
+import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
+import onlydust.com.marketplace.project.domain.service.SponsorService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -165,11 +168,6 @@ public class AccountingConfiguration {
     public AccountingTrackingNotifier accountingTrackingNotifier(final OutboxPort trackingOutbox,
                                                                  final AccountingRewardStoragePort accountingRewardStoragePort) {
         return new AccountingTrackingNotifier(trackingOutbox, accountingRewardStoragePort);
-    }
-
-    @Bean
-    public AccountingPermissionService accountingPermissionService(final @NonNull SponsorStoragePort sponsorStoragePort) {
-        return new AccountingPermissionService(sponsorStoragePort);
     }
 
     @Bean

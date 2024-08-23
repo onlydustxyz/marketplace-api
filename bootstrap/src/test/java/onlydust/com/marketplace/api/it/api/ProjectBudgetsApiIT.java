@@ -75,6 +75,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var programId = ProgramId.random();
 
         final var usd = currencyRepository.findByCode("USD").orElseThrow();
         final var eth = currencyRepository.findByCode("ETH").orElseThrow();
@@ -84,7 +85,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.saveQuote(new Quote(Currency.Id.of(eth.id()), Currency.Id.of(usd.id()), BigDecimal.valueOf(1.10), Instant.EPOCH));
         accountingHelper.saveQuote(new Quote(Currency.Id.of(usdc.id()), Currency.Id.of(usd.id()), BigDecimal.valueOf(1.27), Instant.EPOCH));
 
-        final var sponsorId = SponsorId.of(UUID.randomUUID());
+        final var sponsorId = SponsorId.random();
         sponsorRepository.save(SponsorEntity.builder()
                 .id(sponsorId.value())
                 .name("Sponsor")
@@ -92,13 +93,15 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                 .url("https://sponsor.com")
                 .build());
 
-        final var accountEth = accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(eth.id()), null,
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(eth.id()), null,
                 PositiveAmount.of(1000L));
-        final var accountUsdc = accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(usdc.id()), null,
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, Currency.Id.of(usdc.id()), null,
                 PositiveAmount.of(20000L));
 
-        accountingFacadePort.allocate(accountEth.account().id(), ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
-        accountingFacadePort.allocate(accountUsdc.account().id(), ProjectId.of(projectId), PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
+        accountingFacadePort.allocate(sponsorId, programId, PositiveAmount.of(100L), Currency.Id.of(eth.id()));
+        accountingFacadePort.allocate(sponsorId, programId, PositiveAmount.of(200L), Currency.Id.of(usdc.id()));
+
+        accountingFacadePort.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100L), Currency.Id.of(eth.id()));
 
         // When
         client.get()
@@ -132,7 +135,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
                             }
                           ]
                         }
-                                                
+                        
                         """);
     }
 }

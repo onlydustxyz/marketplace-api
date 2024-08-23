@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.ProgramId;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenMyProgram {
-        Sponsor program;
+        Program program;
 
         @BeforeEach
         void setUp() {
@@ -152,30 +153,45 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             @BeforeEach
             void setUp() {
+                final var programId = ProgramId.of(program.id().value());
+                final var sponsor = sponsorHelper.create();
+                final var sponsorId = SponsorId.of(sponsor.id().value());
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
                 final var anotherProgram = programHelper.create();
+                final var anotherProgramId = ProgramId.of(anotherProgram.id().value());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
-                final var accountId = at("2024-01-01T00:00:00Z",
-                        () -> accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 2_200, USDC));
-                at("2024-01-15T00:00:00Z", () -> accountingHelper.increaseAllowance(accountId, -700));
-                at("2024-02-03T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 12, ETH));
+                at("2024-01-01T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsorId, 2_200, USDC);
+                    accountingHelper.allocate(sponsorId, programId, 1_500, USDC);
+                });
+                at("2024-02-03T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsorId, 12, ETH);
+                    accountingHelper.allocate(sponsorId, programId, 12, ETH);
+                });
 
-                at("2024-02-03T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 2_000, USDC));
-                at("2024-03-12T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 1, BTC));
+                at("2024-02-03T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsorId, 2_000, USDC);
+                    accountingHelper.allocate(sponsorId, anotherProgramId, 1_500, USDC);
+                });
 
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 500, USDC));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 2, ETH));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 200, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 3, ETH));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 500, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 1, BTC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project2Id, 400, USDC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1Id, SponsorId.of(program.id()), 200, USDC));
+                at("2024-03-12T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsorId, 1, BTC);
+                    accountingHelper.allocate(sponsorId, anotherProgramId, 1, BTC);
+                });
+
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(programId, project1Id, 500, USDC));
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(programId, project1Id, 2, ETH));
+                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(programId, project2Id, 200, USDC));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(programId, project2Id, 3, ETH));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(anotherProgramId, project1Id, 500, USDC));
+                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(anotherProgramId, project1Id, 1, BTC));
+                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(anotherProgramId, project2Id, 400, USDC));
+                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1Id, programId, 200, USDC));
 
                 final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 400, USDC));
                 final var reward2 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH));
@@ -1556,7 +1572,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 client.post()
                         .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                        .bodyValue(new AllocateRequest()
+                        .bodyValue(new GrantRequest()
                                 .projectId(project1.getId())
                                 .amount(BigDecimal.ONE)
                                 .currencyId(ETH.value()))
@@ -1593,7 +1609,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMyProgram {
-        Sponsor program;
+        Program program;
 
         @BeforeEach
         void setUp() {
@@ -1657,7 +1673,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             client.post()
                     .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                    .bodyValue(new AllocateRequest()
+                    .bodyValue(new GrantRequest()
                             .projectId(projectId.value())
                             .amount(BigDecimal.TEN)
                             .currencyId(ETH.value()))

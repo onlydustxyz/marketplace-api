@@ -9,7 +9,6 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
@@ -43,6 +42,7 @@ import org.testcontainers.utility.MountableFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -244,6 +244,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected ProgramHelper programHelper;
     @Autowired
+    protected SponsorHelper sponsorHelper;
+    @Autowired
     protected ProjectHelper projectHelper;
     @Autowired
     RewardHelper rewardHelper;
@@ -361,7 +363,7 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
-    protected void addSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+    protected void addSponsorFor(UserAuthHelper.AuthenticatedUser user, UUID sponsorId) {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
@@ -370,14 +372,14 @@ public class AbstractMarketplaceApiIT {
                         ON CONFLICT DO NOTHING
                         """)
                 .setParameter("userId", user.user().getId())
-                .setParameter("sponsorId", sponsorId.value())
+                .setParameter("sponsorId", sponsorId)
                 .executeUpdate();
         em.flush();
         em.getTransaction().commit();
         em.close();
     }
 
-    protected void removeSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+    protected void removeSponsorFor(UserAuthHelper.AuthenticatedUser user, UUID sponsorId) {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
@@ -385,7 +387,7 @@ public class AbstractMarketplaceApiIT {
                         WHERE user_id = :userId AND sponsor_id = :sponsorId
                         """)
                 .setParameter("userId", user.user().getId())
-                .setParameter("sponsorId", sponsorId.value())
+                .setParameter("sponsorId", sponsorId)
                 .executeUpdate();
         em.flush();
         em.getTransaction().commit();

@@ -150,14 +150,18 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenAnUnknownCurrency {
-        final Currency.Id currencyId = Currency.Id.random();
-        final SponsorAccount.Id sponsorId = SponsorAccount.Id.random();
-        final ProjectId projectId = ProjectId.random();
+        final Currency currency = Currencies.USDC;
+        final Currency.Id currencyId = currency.id();
+        final SponsorId sponsorId = SponsorId.random();
+        final SponsorAccount.Id sponsorAccountId = SponsorAccount.Id.random();
+        final SponsorAccount sponsorAccount = new SponsorAccount(sponsorAccountId, sponsorId, currency, null);
+        final ProgramId programId = ProgramId.random();
 
         @BeforeEach
         void setup() {
             setupAccountingService();
             when(currencyStorage.get(currencyId)).thenReturn(Optional.empty());
+            when(sponsorAccountStorage.find(sponsorId, currencyId)).thenReturn(List.of(sponsorAccount));
         }
 
         /*
@@ -168,7 +172,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_allocation() {
             // When
-            assertThatThrownBy(() -> accountingService.allocate(sponsorId, projectId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.allocate(sponsorId, programId, PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -183,7 +187,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation() {
             // When
-            assertThatThrownBy(() -> accountingService.unallocate(projectId, sponsorId, PositiveAmount.of(10L), currencyId))
+            assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(10L), currencyId))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessage("Currency %s not found".formatted(currencyId));
 
@@ -195,6 +199,7 @@ public class AccountingServiceTest {
     class GivenNoSponsorAccount {
         final Currency currency = Currencies.USDC;
         final SponsorId sponsorId = SponsorId.random();
+        final ProgramId programId = ProgramId.random();
         final ProjectId projectId = ProjectId.random();
 
         @BeforeEach
@@ -303,7 +308,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_no_sponsor_account_found() {
             // When
-            assertThatThrownBy(() -> accountingService.unallocate(projectId, SponsorAccount.Id.random(), PositiveAmount.of(10L), currency.id()))
+            assertThatThrownBy(() -> accountingService.unallocate(programId, SponsorId.random(), PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessageContaining("Cannot refund");
@@ -335,6 +340,7 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
+        final ProgramId programId = ProgramId.random();
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
@@ -347,6 +353,7 @@ public class AccountingServiceTest {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             when(currencyStorage.all()).thenReturn(Set.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null, PositiveAmount.of(100L)).account();
+            when(sponsorAccountStorage.find(sponsorId, currency.id())).thenReturn(List.of(sponsorAccount));
             reset(accountBookObserver);
         }
 
@@ -407,8 +414,8 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
-            accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
+            accountingService.allocate(sponsorId, programId, amount, currency.id());
+            accountingService.unallocate(programId, sponsorId, amount, currency.id());
 
             // Then
             final var events = List.of(
@@ -434,7 +441,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.unallocate(projectId1, sponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
+            assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund");
         }
@@ -447,7 +454,7 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // When
-            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(10L), currency.id());
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
             assertOnRewardCreated(rewardId1, false, null, Set.of());
 
@@ -520,7 +527,8 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
             verify(accountingObserver, times(3)).onSponsorAccountBalanceChanged(any());
 
-            accountingService.allocate(sponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId2, true, null, Set.of(network));
 
@@ -560,7 +568,8 @@ public class AccountingServiceTest {
             // When
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(50L)));
 
-            accountingService.allocate(sponsorAccount.id(), projectId2, PositiveAmount.of(80L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(80L), currency.id());
+            accountingService.grant(programId, projectId2, PositiveAmount.of(80L), currency.id());
             accountingService.createReward(projectId2, rewardId1, PositiveAmount.of(40L), currency.id());
             assertOnRewardCreated(rewardId1, true, null, Set.of(network));
 
@@ -610,7 +619,8 @@ public class AccountingServiceTest {
         @Test
         void should_cancel_a_reward() {
             // Given
-            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId1, PositiveAmount.of(100L), currency.id());
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
             verify(projectAccountingObserver).onAllowanceUpdated(projectId1, currency.id(), PositiveAmount.of(60L), PositiveAmount.of(100L));
             reset(projectAccountingObserver);
@@ -645,7 +655,8 @@ public class AccountingServiceTest {
         void should_prevent_a_reward_from_being_payable_if_already_paid() {
             // Given
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(100L)));
-            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId1, PositiveAmount.of(100L), currency.id());
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(40L), currency.id());
             when(currencyStorage.all()).thenReturn(Set.of(currency));
 
@@ -678,6 +689,7 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final Network network = Network.ETHEREUM;
         final SponsorId sponsorId = SponsorId.random();
+        final ProgramId programId = ProgramId.random();
         final ProjectId projectId1 = ProjectId.random();
         final ProjectId projectId2 = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
@@ -691,6 +703,7 @@ public class AccountingServiceTest {
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             sponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate, PositiveAmount.of(300L))
                     .account();
+            when(sponsorAccountStorage.find(sponsorId, currency.id())).thenReturn(List.of(sponsorAccount));
             reset(accountBookObserver);
         }
 
@@ -734,8 +747,9 @@ public class AccountingServiceTest {
             final var amount = PositiveAmount.of(faker.number().numberBetween(1L, 100L));
 
             // When
-            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
-            accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
+            accountingService.allocate(sponsorId, programId, amount, currency.id());
+            accountingService.grant(programId, projectId1, amount, currency.id());
+            accountingService.ungrant(projectId1, programId, amount, currency.id());
 
             // Then
             final var events = List.of(
@@ -760,7 +774,7 @@ public class AccountingServiceTest {
         @Test
         void should_reject_unallocation_when_not_enough_allocated() {
             // When
-            assertThatThrownBy(() -> accountingService.unallocate(projectId1, sponsorAccount.id(), PositiveAmount.of(400L), currency.id()))
+            assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class).hasMessageContaining("Cannot refund");
         }
@@ -773,7 +787,8 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // When
-            accountingService.allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(10L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(10L), currency.id());
+            accountingService.grant(programId, projectId1, PositiveAmount.of(10L), currency.id());
             accountingService.createReward(projectId1, rewardId1, PositiveAmount.of(10L), currency.id());
             assertOnRewardCreated(rewardId1, false, unlockDate, Set.of());
 
@@ -798,7 +813,8 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(30L)));
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, PositiveAmount.of(40L)));
 
-            accountingService.allocate(sponsorAccount.id(), projectId2, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId2, PositiveAmount.of(100L), currency.id());
             accountingService.createReward(projectId2, rewardId2, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId2, true, unlockDate, Set.of(network));
 
@@ -836,7 +852,8 @@ public class AccountingServiceTest {
             accountingService.fund(sponsorAccount.id(), fakeTransaction(network, amount));
             accountingService.increaseAllowance(sponsorAccount.id(), amount);
 
-            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+            accountingService.allocate(sponsorId, programId, amount, currency.id());
+            accountingService.grant(programId, projectId1, amount, currency.id());
             accountingService.createReward(projectId1, rewardId1, amount, currency.id());
             assertOnRewardCreated(rewardId1, true, unlockDate, Set.of(network));
 
@@ -869,8 +886,11 @@ public class AccountingServiceTest {
 
     @Nested
     class GivenSeveralSponsorAccounts {
-        final SponsorId sponsorId = SponsorId.random();
+        final SponsorId unlockedSponsorId1 = SponsorId.random();
+        final SponsorId unlockedSponsorId2 = SponsorId.random();
+        final SponsorId lockedSponsorId = SponsorId.random();
         final ZonedDateTime unlockDate = ZonedDateTime.now().plusDays(1);
+        final ProgramId programId = ProgramId.random();
         final ProjectId projectId = ProjectId.random();
         final RewardId rewardId = RewardId.random();
         final RewardId rewardId2 = RewardId.random();
@@ -887,12 +907,15 @@ public class AccountingServiceTest {
 
             when(currencyStorage.get(currency.id())).thenReturn(Optional.of(currency));
             when(currencyStorage.all()).thenReturn(Set.of(currency));
-            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
+            unlockedSponsorSponsorAccount1 = accountingService.createSponsorAccountWithInitialAllowance(unlockedSponsorId1, currency.id(), null,
                     PositiveAmount.of(100L)).account();
-            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), null,
+            unlockedSponsorSponsorAccount2 = accountingService.createSponsorAccountWithInitialAllowance(unlockedSponsorId2, currency.id(), null,
                     PositiveAmount.of(100L)).account();
-            lockedSponsorSponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, currency.id(), unlockDate,
+            lockedSponsorSponsorAccount = accountingService.createSponsorAccountWithInitialAllowance(lockedSponsorId, currency.id(), unlockDate,
                     PositiveAmount.of(100L)).account();
+            when(sponsorAccountStorage.find(unlockedSponsorId1, currency.id())).thenReturn(List.of(unlockedSponsorSponsorAccount1));
+            when(sponsorAccountStorage.find(unlockedSponsorId2, currency.id())).thenReturn(List.of(unlockedSponsorSponsorAccount2));
+            when(sponsorAccountStorage.find(lockedSponsorId, currency.id())).thenReturn(List.of(lockedSponsorSponsorAccount));
             reset(accountBookObserver);
         }
 
@@ -904,8 +927,9 @@ public class AccountingServiceTest {
         @Test
         void should_prevent_contributor_from_withdrawing_if_source_is_not_funded() {
             // Given
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId2, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
             assertOnRewardCreated(rewardId, false, null, Set.of());
 
@@ -928,8 +952,9 @@ public class AccountingServiceTest {
         @Test
         void should_allow_contributor_to_withdraw_only_what_is_funded() {
             // Given
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId2, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(100L), currency.id());
             assertOnRewardCreated(rewardId, false, null, Set.of());
 
@@ -971,8 +996,9 @@ public class AccountingServiceTest {
             accountingService.fund(unlockedSponsorSponsorAccount1.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
             accountingService.fund(lockedSponsorSponsorAccount.id(), fakeTransaction(Network.ETHEREUM, PositiveAmount.of(100L)));
 
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(100L), currency.id());
-            accountingService.allocate(lockedSponsorSponsorAccount.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(lockedSponsorId, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
             assertOnRewardCreated(rewardId, true, unlockDate, Set.of(Network.ETHEREUM));
 
@@ -997,8 +1023,9 @@ public class AccountingServiceTest {
 
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
-            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(200L), currency.id());
+            accountingService.allocate(unlockedSponsorId2, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(300L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(300L), currency.id());
             assertOnRewardCreated(rewardId, true, null, Set.of(Network.ETHEREUM, Network.OPTIMISM));
 
@@ -1029,8 +1056,9 @@ public class AccountingServiceTest {
 
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
-            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(200L), currency.id());
+            accountingService.allocate(unlockedSponsorId2, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(300L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(300L), currency.id());
             assertOnRewardCreated(rewardId, true, null, Set.of(Network.ETHEREUM));
 
@@ -1062,11 +1090,13 @@ public class AccountingServiceTest {
             // Given
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount2.id(), PositiveAmount.of(100L));
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(200L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(200L), PositiveAmount.of(200L));
             reset(projectAccountingObserver);
 
-            accountingService.allocate(unlockedSponsorSponsorAccount2.id(), projectId, PositiveAmount.of(100L), currency.id());
+            accountingService.allocate(unlockedSponsorId2, programId, PositiveAmount.of(100L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(100L), currency.id());
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(300L), PositiveAmount.of(300L));
             reset(projectAccountingObserver);
 
@@ -1082,9 +1112,9 @@ public class AccountingServiceTest {
             // Then
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, currency.id(), PositiveAmount.of(300L), PositiveAmount.of(300L));
             final var events = List.of(
-                    IdentifiedAccountBookEvent.of(6, new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                    IdentifiedAccountBookEvent.of(6, new TransferEvent(AccountId.of(unlockedSponsorId1), AccountId.of(projectId),
                             PositiveAmount.of(200L))),
-                    IdentifiedAccountBookEvent.of(7, new TransferEvent(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
+                    IdentifiedAccountBookEvent.of(7, new TransferEvent(AccountId.of(unlockedSponsorId2), AccountId.of(projectId),
                             PositiveAmount.of(100L))),
                     IdentifiedAccountBookEvent.of(8, new TransferEvent(AccountId.of(projectId), AccountId.of(rewardId), PositiveAmount.of(250L))),
                     IdentifiedAccountBookEvent.of(9, new FullRefundEvent(AccountId.of(rewardId)))
@@ -1094,25 +1124,25 @@ public class AccountingServiceTest {
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
             final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
-                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id())), PositiveAmount.of(200L)),
-                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id())), PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId)),
+                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorId1)), PositiveAmount.of(200L)),
+                    new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorId2)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId)),
                             PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId)),
                             PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId2), AccountId.of(projectId)),
                             PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(unlockedSponsorId2), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(50L)),
-                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorId1), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(100L)),
-                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorSponsorAccount2.id()), AccountId.of(projectId),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(unlockedSponsorId2), AccountId.of(projectId),
                             AccountId.of(rewardId)), PositiveAmount.of(50L))
             );
             verify(rewardStatusFacadePort).delete(rewardId);
@@ -1123,7 +1153,8 @@ public class AccountingServiceTest {
         void should_forbid_cancelling_a_reward_linked_to_an_active_invoice(Invoice.Status status) {
             // Given
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(200L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
             when(invoiceStoragePort.invoiceOf(rewardId)).thenReturn(Optional.of(invoice.status(status)));
             when(invoiceStoragePort.invoiceViewOf(rewardId)).thenReturn(Optional.of(invoiceView.toBuilder().status(status).build()));
@@ -1143,7 +1174,8 @@ public class AccountingServiceTest {
         void should_forbid_cancelling_a_reward_linked_to_an_inactive_invoice(Invoice.Status status) {
             // Given
             accountingService.increaseAllowance(unlockedSponsorSponsorAccount1.id(), PositiveAmount.of(200L));
-            accountingService.allocate(unlockedSponsorSponsorAccount1.id(), projectId, PositiveAmount.of(200L), currency.id());
+            accountingService.allocate(unlockedSponsorId1, programId, PositiveAmount.of(200L), currency.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(200L), currency.id());
             accountingService.createReward(projectId, rewardId, PositiveAmount.of(200L), currency.id());
             when(invoiceStoragePort.invoiceOf(rewardId)).thenReturn(Optional.of(invoice.status(status)));
             when(invoiceStoragePort.invoiceViewOf(rewardId)).thenReturn(Optional.of(invoiceView.toBuilder().status(status).build()));
@@ -1161,6 +1193,7 @@ public class AccountingServiceTest {
         final Currency usdc = Currency.of(ERC20Tokens.ETH_USDC); // build a copy of USDC currency to avoid side effects
         final Currency op = Currencies.OP;
         final SponsorId sponsorId = SponsorId.random();
+        final ProgramId programId = ProgramId.random();
         final ProjectId projectId = ProjectId.random();
         final RewardId rewardId1 = RewardId.random();
         final RewardId rewardId2 = RewardId.random();
@@ -1192,10 +1225,13 @@ public class AccountingServiceTest {
             lockedSponsorAccountUsdc =
                     accountingService.createSponsorAccountWithInitialAllowance(sponsorId, usdc.id(), lockDate, PositiveAmount.of(100L)).account();
 
-            accountingService.allocate(unlockedSponsorAccountUsdc1.id(), projectId, PositiveAmount.of(200L), usdc.id());
-            accountingService.allocate(unlockedSponsorAccountUsdc2.id(), projectId, PositiveAmount.of(100L), usdc.id());
-            accountingService.allocate(unlockedSponsorAccountOp.id(), projectId, PositiveAmount.of(100L), op.id());
-            accountingService.allocate(lockedSponsorAccountUsdc.id(), projectId, PositiveAmount.of(100L), usdc.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(200L), usdc.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), usdc.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), op.id());
+            accountingService.allocate(sponsorId, programId, PositiveAmount.of(100L), usdc.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(400L), usdc.id());
+            accountingService.grant(programId, projectId, PositiveAmount.of(100L), op.id());
+
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, usdc.id(), PositiveAmount.of(400L), PositiveAmount.of(400L));
             verify(projectAccountingObserver).onAllowanceUpdated(projectId, op.id(), PositiveAmount.of(100L), PositiveAmount.of(100L));
 
@@ -1532,6 +1568,7 @@ public class AccountingServiceTest {
         // Given
         final var sponsor1 = SponsorId.random();
         final var sponsor2 = SponsorId.random();
+        final var programId = ProgramId.random();
         final var projectId1 = ProjectId.random();
         final var projectId2 = ProjectId.random();
         final var rewardId1 = RewardId.random();
@@ -1561,13 +1598,15 @@ public class AccountingServiceTest {
         assertAccount(sponsor2Account2, 20_000L, 50_000L, 0L);
 
         // When
-        accountingService.allocate(sponsor1Account1, projectId1, PositiveAmount.of(8_000L), currency.id());
-        accountingService.allocate(sponsor2Account1, projectId1, PositiveAmount.of(15_000L), currency.id());
+        accountingService.allocate(sponsor1, programId, PositiveAmount.of(8_000L), currency.id());
+        accountingService.allocate(sponsor2, programId, PositiveAmount.of(15_000L), currency.id());
+        accountingService.grant(programId, projectId1, PositiveAmount.of(23_000L), currency.id());
 
-        accountingService.allocate(sponsor1Account1, projectId2, PositiveAmount.of(1_000L), currency.id());
-        accountingService.allocate(sponsor2Account1, projectId2, PositiveAmount.of(2_000L), currency.id());
-        accountingService.allocate(sponsor2Account1, projectId2, PositiveAmount.of(3_000L), currency.id());
-        accountingService.allocate(sponsor2Account2, projectId2, PositiveAmount.of(5_000L), currency.id());
+        accountingService.allocate(sponsor1, programId, PositiveAmount.of(1_000L), currency.id());
+        accountingService.allocate(sponsor2, programId, PositiveAmount.of(2_000L), currency.id());
+        accountingService.allocate(sponsor2, programId, PositiveAmount.of(3_000L), currency.id());
+        accountingService.allocate(sponsor2, programId, PositiveAmount.of(5_000L), currency.id());
+        accountingService.grant(programId, projectId2, PositiveAmount.of(11_000L), currency.id());
 
         // Then
         assertAccount(sponsor1Account1, 1_000L, 10_000L, 10_000L);

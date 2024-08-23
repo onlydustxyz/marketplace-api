@@ -4,17 +4,17 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 
+import java.net.URI;
 import java.util.UUID;
-
-import static onlydust.com.marketplace.accounting.domain.model.SponsorId.of;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Getter
 @Builder(toBuilder = true)
 @Table(name = "sponsors", schema = "public")
 public class SponsorEntity {
@@ -29,18 +29,28 @@ public class SponsorEntity {
 
     public Sponsor toDomain() {
         return Sponsor.builder()
-                .id(id)
+                .id(Sponsor.Id.of(id))
                 .name(name)
-                .logoUrl(logoUrl)
-                .url(url)
+                .logoUrl(URI.create(logoUrl))
+                .url(url == null ? null : URI.create(url))
                 .build();
     }
 
-    public onlydust.com.marketplace.accounting.domain.view.Sponsor toAccountingDomain() {
-        return onlydust.com.marketplace.accounting.domain.view.Sponsor.builder()
-                .id(of(id))
+    public static SponsorEntity of(Sponsor sponsor) {
+        return SponsorEntity.builder()
+                .id(sponsor.id().value())
+                .name(sponsor.name())
+                .logoUrl(sponsor.logoUrl().toString())
+                .url(sponsor.url() == null ? null : sponsor.url().toString())
+                .build();
+    }
+
+    public SponsorView toView() {
+        return SponsorView.builder()
+                .id(SponsorId.of(id))
                 .name(name)
-                .logoUrl(logoUrl)
+                .logoUrl(URI.create(logoUrl))
+                .url(url == null ? null : URI.create(url))
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.accounting.domain.model.ProgramId;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
@@ -21,17 +22,23 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
+        final var sponsor = sponsorHelper.create();
+        final var sponsorId = SponsorId.of(sponsor.id().value());
         final var program = programHelper.create(userAuthHelper.create());
-        final var programId = SponsorId.of(program.id());
+        final var programId = ProgramId.of(program.id().value());
 
         final var projectLead = userAuthHelper.create();
         projectId = projectHelper.create(projectLead);
         final var recipient = userAuthHelper.create();
         final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
-        accountingHelper.createSponsorAccount(programId, 1_000, USDC);
-        accountingHelper.createSponsorAccount(programId, 2, ETH);
-        accountingHelper.createSponsorAccount(programId, 3, BTC);
+        accountingHelper.createSponsorAccount(sponsorId, 1_000, USDC);
+        accountingHelper.createSponsorAccount(sponsorId, 2, ETH);
+        accountingHelper.createSponsorAccount(sponsorId, 3, BTC);
+
+        accountingHelper.allocate(sponsorId, programId, 1_000, USDC);
+        accountingHelper.allocate(sponsorId, programId, 2, ETH);
+        accountingHelper.allocate(sponsorId, programId, 3, BTC);
 
         at("2024-06-15T00:00:00Z", () -> {
             accountingHelper.grant(programId, projectId, 1_000, USDC);

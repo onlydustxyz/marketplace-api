@@ -280,7 +280,7 @@ public interface BackOfficeMapper {
                         .map(shortSponsorView -> new SponsorLinkResponse()
                                 .id(shortSponsorView.id().value())
                                 .name(shortSponsorView.name())
-                                .avatarUrl(shortSponsorView.logoUrl()))
+                                .avatarUrl(shortSponsorView.logoUrl().toString()))
                         .toList())
                 .billingProfile(mapToLinkResponse(view.billingProfile()))
                 .invoiceId(view.invoice() == null ? null : view.invoice().id().value())

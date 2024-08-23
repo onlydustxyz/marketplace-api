@@ -12,7 +12,7 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
@@ -32,7 +32,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final AccountingFacadePort accountingFacadePort;
-    private final SponsorStoragePort sponsorStoragePort;
+    private final AccountingSponsorStoragePort accountingSponsorStoragePort;
     private final NotificationPort notificationPort;
 
     @Override
@@ -101,7 +101,7 @@ public class RewardService implements AccountingRewardPort {
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
 
         final var sponsors = accountingFacadePort.transferredAmountPerOrigin(reward.id(), reward.money().currency().id()).keySet().stream()
-                .map(sponsorAccount -> sponsorStoragePort.get(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
+                .map(sponsorAccount -> accountingSponsorStoragePort.get(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
                 .toList();
 
         final Map<Network, PositiveAmount> pendingPayments = reward.invoice() == null ? new HashMap<>() :

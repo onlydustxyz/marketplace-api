@@ -7,11 +7,8 @@ import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
 import onlydust.com.backoffice.api.contract.model.SponsorCreateResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.backoffice.api.contract.model.UploadImageResponse;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
-import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -31,23 +28,20 @@ import static org.springframework.http.ResponseEntity.noContent;
 @Profile("bo")
 public class BackofficeSponsorManagementRestApi implements BackofficeSponsorManagementApi {
 
-    final static Integer MAX_PAGE_SIZE = Integer.MAX_VALUE;
-    private final BackofficeFacadePort backofficeFacadePort;
     private final SponsorFacadePort sponsorFacadePort;
-    private final AccountingFacadePort accountingFacadePort;
 
     @Override
     public ResponseEntity<SponsorCreateResponse> createSponsor(SponsorRequest sponsorRequest) {
-        final var sponsor = backofficeFacadePort.createSponsor(sponsorRequest.getName(),
+        final var sponsor = sponsorFacadePort.createSponsor(sponsorRequest.getName(),
                 sponsorRequest.getUrl(),
                 sponsorRequest.getLogoUrl());
         return ResponseEntity.ok(new SponsorCreateResponse()
-                .id(sponsor.id()));
+                .id(sponsor.id().value()));
     }
 
     @Override
     public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
-        backofficeFacadePort.updateSponsor(sponsorId,
+        sponsorFacadePort.updateSponsor(Sponsor.Id.of(sponsorId),
                 sponsorRequest.getName(),
                 sponsorRequest.getUrl(),
                 sponsorRequest.getLogoUrl());
@@ -71,7 +65,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
 
     @Override
     public ResponseEntity<Void> addLeadToSponsor(UUID sponsorId, UUID leadId) {
-        sponsorFacadePort.addLeadToSponsor(UserId.of(leadId), SponsorId.of(sponsorId));
+        sponsorFacadePort.addLeadToSponsor(leadId, Sponsor.Id.of(sponsorId));
         return noContent().build();
     }
 }

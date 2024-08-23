@@ -4,7 +4,13 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
+import java.net.URI;
 
 @Builder
-public record Sponsor(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl) {
+public record SponsorView(
+        @NonNull SponsorId id,
+        @NonNull String name,
+        URI url,
+        @NonNull URI logoUrl
+) {
 }

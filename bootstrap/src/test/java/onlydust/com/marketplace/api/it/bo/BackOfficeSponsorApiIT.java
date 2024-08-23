@@ -3,8 +3,6 @@ package onlydust.com.marketplace.api.it.bo;
 import onlydust.com.backoffice.api.contract.model.AccountResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectSponsorRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -16,8 +14,6 @@ import org.springframework.http.MediaType;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,9 +28,6 @@ import static org.springframework.web.reactive.function.BodyInserters.fromResour
 @TagBO
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
-
-    @Autowired
-    ProjectSponsorRepository projectSponsorRepository;
 
     @Autowired
     private ImageStoragePort imageStoragePort;
@@ -569,8 +562,8 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """.formatted(sponsor.getId()));
 
         // And when
-        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
-                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+//        projectSponsorRepository.save(new ProjectSponsorEntity(BRETZEL.value(), sponsorAccount.getSponsorId(),
+//                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
 
 
         client.get()

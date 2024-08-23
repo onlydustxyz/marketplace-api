@@ -498,28 +498,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/budgets/allocate:
+  /bo/v1/sponsors/{sponsorId}/allocate:
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Allocate a budget to a project
-      operationId: allocateBudgetToProject
-      description: Allocate a budget to a project
+      summary: Allocate a budget to a program
+      operationId: allocateBudgetToProgram
+      description: Allocate a budget to a program
       parameters:
         - in: path
-          name: projectId
+          name: sponsorId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            $ref: '#/components/schemas/SponsorId'
       requestBody:
         description: Budget to allocate
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
+              $ref: '#/components/schemas/AllocationRequest'
       responses:
         "204":
           description: 'The funds have been allocated'
@@ -528,28 +528,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/budgets/unallocate:
+  /bo/v1/projects/{sponsorId}/unallocate:
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Refund a sponsor by unallocating funds from a project
-      operationId: unallocateBudgetFromProject
+      summary: Refund a sponsor by unallocating funds from a program
+      operationId: unallocateBudgetFromProgram
       description: Refund a sponsor
       parameters:
         - in: path
-          name: projectId
+          name: sponsorId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            $ref: '#/components/schemas/SponsorId'
       requestBody:
         description: Budget to unallocate
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
+              $ref: '#/components/schemas/AllocationRequest'
       responses:
         "204":
           description: 'The funds have been unallocated'
@@ -3224,6 +3224,10 @@ components:
       type: string
       format: uuid
 
+    ProgramId:
+      type: string
+      format: uuid
+
     GithubRepoId:
       type: integer
       format: int64
@@ -3274,16 +3278,19 @@ components:
       type: string
       format: uuid
 
-    ProjectBudgetAllocationRequest:
+    AllocationRequest:
       type: object
       required:
-        - sponsorAccountId
+        - programId
         - amount
+        - currencyId
       properties:
-        sponsorAccountId:
-          $ref: '#/components/schemas/SponsorAccountId'
+        programId:
+          $ref: '#/components/schemas/ProgramId'
         amount:
           type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
 
     PayRewardRequest:
       type: object

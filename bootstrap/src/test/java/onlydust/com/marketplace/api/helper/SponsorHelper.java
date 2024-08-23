@@ -4,38 +4,39 @@ import com.github.javafaker.Faker;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
-import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
+import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+
 @Service
-public class ProgramHelper {
+public class SponsorHelper {
     @Autowired
     private EntityManagerFactory entityManagerFactory;
     @Autowired
-    private BackofficeFacadePort backofficeFacadePort;
+    private SponsorFacadePort sponsorFacadePort;
     @Autowired
     private AccountingFacadePort accountingFacadePort;
 
     private final Faker faker = new Faker();
 
-    public Program create() {
-//        final var sponsor = backofficeFacadePort.createSponsor(
-//                faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
-//                URI.create(faker.internet().url()),
-//                URI.create(faker.internet().url()));
-        return Program.builder()
-//                .id(sponsor.id())
-//                .name(sponsor.name())
+    public Sponsor create() {
+        final var sponsor = sponsorFacadePort.createSponsor(
+                faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
+                URI.create(faker.internet().url()),
+                URI.create(faker.internet().url()));
+        return Sponsor.builder()
+                .id(sponsor.id())
+                .name(sponsor.name())
                 .build();
     }
 
-    public Program create(UserAuthHelper.AuthenticatedUser lead) {
-        final var program = create();
-//        addLead(Sponsor.Id.of(sponsor.id()), lead);
-        return program;
+    public Sponsor create(UserAuthHelper.AuthenticatedUser lead) {
+        final var sponsor = create();
+        addLead(sponsor.id(), lead);
+        return sponsor;
     }
 
     public void addLead(Sponsor.Id sponsorId, UserAuthHelper.AuthenticatedUser lead) {

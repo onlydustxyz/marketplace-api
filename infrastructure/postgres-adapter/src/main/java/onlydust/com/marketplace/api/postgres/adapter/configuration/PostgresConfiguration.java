@@ -332,9 +332,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
-                                                                                      final ProjectSponsorRepository projectSponsorRepository) {
-        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository, projectSponsorRepository);
+    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository) {
+        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository);
     }
 
     @Bean
@@ -363,6 +362,13 @@ public class PostgresConfiguration {
                                                   final SponsorUserRepository sponsorUserRepository) {
         return new PostgresSponsorAdapter(sponsorRepository, sponsorUserRepository);
     }
+
+
+    @Bean
+    PostgresProgramAdapter postgresProgramAdapter(final ProgramLeadRepository programLeadRepository) {
+        return new PostgresProgramAdapter(programLeadRepository);
+    }
+
 
     @Bean
     public PostgresHackathonAdapter postgresHackathonAdapter(final HackathonRepository hackathonRepository,

@@ -19,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toMap;
@@ -27,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
-    private final static SponsorId sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
+    private final static UUID sponsorId = UUID.fromString("0980c5ab-befc-4314-acab-777fbf970cbb");
     private UserAuthHelper.AuthenticatedUser user;
 
     @Autowired
@@ -59,8 +60,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         addSponsorFor(user, sponsorId);
 
         // create multiple sponsor accounts on the same currency to assert that they are well aggregated in available budgets
-        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null, PositiveAmount.of(1000L));
-        accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, CurrencyHelper.USDC, null,
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(SponsorId.of(sponsorId), CurrencyHelper.USDC, null, PositiveAmount.of(1000L));
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(SponsorId.of(sponsorId), CurrencyHelper.USDC, null,
                 PositiveAmount.of(BigDecimal.valueOf(8000.123456789D)));
 
         // When
@@ -493,7 +494,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
+    private WebTestClient.ResponseSpec getSponsor(UUID id) {
         return client.get()
                 .uri(SPONSOR.formatted(id))
                 .header("Authorization", "Bearer " + user.jwt())
@@ -501,12 +502,12 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec getSponsorTransactions(SponsorId id, Integer pageIndex, Integer pageSize) {
+    private WebTestClient.ResponseSpec getSponsorTransactions(UUID id, Integer pageIndex, Integer pageSize) {
         return getSponsorTransactions(id, pageIndex, pageSize, Map.of());
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec getSponsorTransactions(SponsorId id, Integer pageIndex, Integer pageSize, Map<String, String> otherParams) {
+    private WebTestClient.ResponseSpec getSponsorTransactions(UUID id, Integer pageIndex, Integer pageSize, Map<String, String> otherParams) {
         final var params = Streams.concat(
                 Map.of("pageIndex", pageIndex.toString(), "pageSize", pageSize.toString()).entrySet().stream(),
                 otherParams.entrySet().stream()

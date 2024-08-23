@@ -10,7 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.Sponsor;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -19,6 +19,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -106,11 +107,11 @@ public class BoRewardQueryEntity {
         String name;
         String logoUrl;
 
-        public Sponsor toDomain() {
-            return Sponsor.builder()
+        public SponsorView toAccountingView() {
+            return SponsorView.builder()
                     .id(SponsorId.of(id))
-                    .logoUrl(this.logoUrl)
-                    .name(this.name)
+                    .logoUrl(URI.create(logoUrl))
+                    .name(name)
                     .build();
         }
     }
@@ -134,8 +135,8 @@ public class BoRewardQueryEntity {
                 .recipient(recipient.toDomain())
                 .requester(requester.toDomain())
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
-                        .map(SponsorLinkView::toDomain)
-                        .sorted(comparing(Sponsor::name))
+                        .map(SponsorLinkView::toAccountingView)
+                        .sorted(comparing(SponsorView::name))
                         .toList())
                 .money(new MoneyView(this.amount, this.currency.toDomain(), this.statusData.usdConversionRate(), this.statusData.amountUsdEquivalent()))
                 .invoice(isNull(this.invoice) ? null : invoice.toView())

@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectSponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
@@ -14,8 +13,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -575,7 +572,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     void setUp() {
         final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "AI is cool", "brain", Set.of());
         projectCategoryRepository.saveAll(List.of(
-                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is important", "lock", Set.of()),
+                new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is important", "lock",
+                        Set.of()),
                 categoryAI
         ));
         final var project = projectRepository.findById(UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c")).get();
@@ -796,18 +794,15 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(BRETZEL_OVERVIEW_WITH_TAGS_JSON);
     }
 
-    @Autowired
-    ProjectSponsorRepository projectSponsorRepository;
-
     @Test
     @Order(15)
     public void should_get_a_project_by_slug_with_active_sponsors_only() {
         // Given
         final String slug = "bretzel";
-        projectSponsorRepository.save(new ProjectSponsorEntity(
-                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
-                UUID.fromString("0980c5ab-befc-4314-acab-777fbf970cbb"),
-                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
+//        projectSponsorRepository.save(new ProjectSponsorEntity(
+//                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+//                UUID.fromString("0980c5ab-befc-4314-acab-777fbf970cbb"),
+//                Date.from(ZonedDateTime.now().minusMonths(6).minusDays(1).toInstant())));
 
         // When
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()

@@ -4188,9 +4188,9 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Sponsors
-      summary: Allocate a budget to a project
-      operationId: allocateBudgetToProject
-      description: Allocate a budget to a project
+      summary: Allocate a budget to a program
+      operationId: allocateBudgetToProgram
+      description: Allocate a budget to a program
       parameters:
         - in: path
           name: sponsorId
@@ -4233,7 +4233,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AllocateRequest'
+              $ref: '#/components/schemas/GrantRequest'
       responses:
         "204":
           description: 'The funds have been allocated'
@@ -4248,9 +4248,9 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Sponsors
-      summary: Allocate a budget to a project
-      operationId: unallocateBudgetFromProject
-      description: Unallocate some budget from a project
+      summary: Unallocate budget from a program
+      operationId: unallocateBudgetFromProgram
+      description: Unallocate some budget from a program
       parameters:
         - in: path
           name: sponsorId
@@ -8844,6 +8844,20 @@ components:
         - PROJECT
 
     AllocateRequest:
+      type: object
+      required:
+        - programId
+        - amount
+        - currencyId
+      properties:
+        programId:
+          $ref: '#/components/schemas/ProgramId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
+    GrantRequest:
       type: object
       required:
         - projectId

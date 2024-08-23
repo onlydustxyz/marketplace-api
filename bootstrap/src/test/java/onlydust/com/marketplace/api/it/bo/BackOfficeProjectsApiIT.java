@@ -49,8 +49,10 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L),
-                Currency.Id.of(CurrencyHelper.STRK.value()));
+        final var programId = ProgramId.random();
+
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), CurrencyHelper.STRK);
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), CurrencyHelper.STRK);
     }
 
     @Autowired

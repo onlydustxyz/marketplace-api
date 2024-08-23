@@ -4,11 +4,11 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
-import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.github_api.GithubHttpClient;
 import onlydust.com.marketplace.api.node.guardians.NodeGuardiansApiProperties;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BoostNodeGuardiansRewardsEventEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EventEntity;
@@ -88,28 +88,30 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
     public void addBudgetToProject(final UUID projectId) {
         final UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
-        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        final var programId = ProgramId.random();
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        final SponsorAccountStatement ethSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(CurrencyHelper.ETH.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        final SponsorAccountStatement usdSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(CurrencyHelper.USD.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L),
-                Currency.Id.of(CurrencyHelper.STRK.value()));
-        accountingService.allocate(ethSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L),
-                Currency.Id.of(CurrencyHelper.ETH.value()));
-        accountingService.allocate(usdSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L),
-                Currency.Id.of(CurrencyHelper.USD.value()));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
+
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
     }
 
     @Autowired
@@ -306,7 +308,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
               "performed_via_github_app": null,
               "state_reason": "completed"
             }
-                        
+            
             """;
     private static final String CREATE_ISSUE_RESPONSE_JSON = """
             {

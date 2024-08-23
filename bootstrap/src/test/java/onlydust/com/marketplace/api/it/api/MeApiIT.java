@@ -376,13 +376,15 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // When user has a not-verified BP and some reward
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
         final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+        final var programId = ProgramId.random();
         final var usdc = currencyRepository.findByCode("USDC").orElseThrow().id();
-        final var usdcSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(usdc), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(usdcSponsorAccount.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
         client.get()
                 .uri(ME)
@@ -504,9 +506,9 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
-        addSponsorFor(authenticatedUser, SponsorId.of("58a0a05c-c81e-447c-910f-629817a987b8"));
-        addSponsorFor(authenticatedUser, SponsorId.of("85435c9b-da7f-4670-bf65-02b84c5da7f0"));
-        addSponsorFor(authenticatedUser, SponsorId.of("4202fd03-f316-458f-a642-421c7b3c7026"));
+        addSponsorFor(authenticatedUser, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+        addSponsorFor(authenticatedUser, UUID.fromString("85435c9b-da7f-4670-bf65-02b84c5da7f0"));
+        addSponsorFor(authenticatedUser, UUID.fromString("4202fd03-f316-458f-a642-421c7b3c7026"));
 
         // When user no sponsors
         client.get()

@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.backoffice.BoEcosystemQueryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.EcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
@@ -57,23 +55,5 @@ public class PostgresBackofficeAdapter implements BackofficeStoragePort {
     @Transactional
     public Ecosystem createEcosystem(Ecosystem ecosystem) {
         return ecosystemRepository.saveAndFlush(EcosystemEntity.fromDomain(ecosystem)).toDomain();
-    }
-
-    @Override
-    @Transactional
-    public void saveSponsor(Sponsor sponsor) {
-        final var entity = sponsorRepository.findById(sponsor.id())
-                .map(e -> e.toBuilder()
-                        .name(sponsor.name())
-                        .url(sponsor.url())
-                        .logoUrl(sponsor.logoUrl())
-                        .build())
-                .orElse(SponsorEntity.builder()
-                        .id(sponsor.id())
-                        .name(sponsor.name())
-                        .url(sponsor.url())
-                        .logoUrl(sponsor.logoUrl())
-                        .build());
-        sponsorRepository.saveAndFlush(entity);
     }
 }

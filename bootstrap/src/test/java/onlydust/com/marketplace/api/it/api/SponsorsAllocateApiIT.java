@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.it.api;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -13,7 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
-    private final static SponsorId sponsorId = SponsorId.of("58a0a05c-c81e-447c-910f-629817a987b8");
+    private final static Sponsor.Id sponsorId = Sponsor.Id.of("58a0a05c-c81e-447c-910f-629817a987b8");
     private final static ProjectId projectId = ProjectId.of("45ca43d6-130e-4bf7-9776-2b1eb1dcb782");
     private final static Currency.Id currencyId = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
     private UserAuthHelper.AuthenticatedUser user;
@@ -35,7 +35,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_not_allocate_if_no_budget() {
         // Given
-        addSponsorFor(user, sponsorId);
+        addSponsorFor(user, sponsorId.value());
 
         // When
         allocateTo(sponsorId, projectId, currencyId, 100)
@@ -80,7 +80,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_allocate() {
         // Given
-        addSponsorFor(user, sponsorId);
+        addSponsorFor(user, sponsorId.value());
 
         // When
         allocateTo(sponsorId, projectId, currencyId, 1000)
@@ -104,7 +104,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_not_unallocate_if_no_budget() {
         // Given
-        addSponsorFor(user, sponsorId);
+        addSponsorFor(user, sponsorId.value());
 
         // When
         unallocateFrom(sponsorId, projectId, currencyId, 5000)
@@ -113,7 +113,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
+    private WebTestClient.ResponseSpec getSponsor(Sponsor.Id id) {
         return client.get()
                 .uri(SPONSOR.formatted(id))
                 .header("Authorization", "Bearer " + user.jwt())
@@ -121,7 +121,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec allocateTo(SponsorId sponsorId, ProjectId projectId, Currency.Id currencyId, long amount) {
+    private WebTestClient.ResponseSpec allocateTo(Sponsor.Id sponsorId, ProjectId projectId, Currency.Id currencyId, long amount) {
         return client.post()
                 .uri(SPONSOR_ALLOCATE.formatted(sponsorId))
                 .header("Authorization", "Bearer " + user.jwt())
@@ -137,7 +137,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec unallocateFrom(SponsorId sponsorId, ProjectId projectId, Currency.Id currencyId, long amount) {
+    private WebTestClient.ResponseSpec unallocateFrom(Sponsor.Id sponsorId, ProjectId projectId, Currency.Id currencyId, long amount) {
         return client.post()
                 .uri(SPONSOR_UNALLOCATE.formatted(sponsorId))
                 .header("Authorization", "Bearer " + user.jwt())

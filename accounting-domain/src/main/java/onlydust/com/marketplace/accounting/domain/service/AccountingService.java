@@ -64,16 +64,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var accountBookState = transfer(from, to, amount, currencyId);
-
-        onAllowanceUpdated(to, currencyId, accountBookState);
-        projectAccountingObserver.onBudgetAllocatedToProject(sponsorAccountStorage.get(from).orElseThrow(() -> notFound("Sponsor account %s not found".formatted(from))).sponsorId(), to);
-    }
-
-    @Override
-    @Transactional
-    public void allocate(SponsorId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+    public void allocate(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency).state();
 
@@ -81,23 +72,31 @@ public class AccountingService implements AccountingFacadePort {
                 .filter(account -> accountBook.balanceOf(AccountId.of(account.id())).isGreaterThanOrEqual(amount)).findFirst()
                 .orElseThrow(() -> badRequest("Sponsor account with enough funds for sponsor %s and currency %s not found".formatted(from, currencyId)));
 
-        allocate(sponsorAccount.id(), to, amount, currencyId);
+        SponsorAccount.Id from1 = sponsorAccount.id();
+        transfer(from1, to, amount, currencyId);
     }
 
     @Override
     @Transactional
-    public void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId) {
-        final var accountBookState = refund(from, to, amount, currencyId);
-        onAllowanceUpdated(from, currencyId, accountBookState);
-    }
-
-    @Override
-    @Transactional
-    public void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
+    public void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
         final var sponsorAccount = sponsorAccountStorage.find(to, currencyId).stream().findFirst()
                 .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
 
-        unallocate(from, sponsorAccount.id(), amount, currencyId);
+        SponsorAccount.Id to1 = sponsorAccount.id();
+        refund(from, to1, amount, currencyId);
+    }
+
+    @Override
+    public void grant(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
+        final var accountBookState = transfer(from, to, amount, currencyId);
+
+        onAllowanceUpdated(to, currencyId, accountBookState);
+    }
+
+    @Override
+    public void ungrant(ProjectId from, ProgramId to, @NonNull PositiveAmount amount, Currency.Id currencyId) {
+        final var accountBookState = refund(from, to, amount, currencyId);
+        onAllowanceUpdated(from, currencyId, accountBookState);
     }
 
     @Override
@@ -256,17 +255,6 @@ public class AccountingService implements AccountingFacadePort {
     public boolean isPayable(RewardId rewardId, Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         return new PayableRewardAggregator(sponsorAccountStorage, currency).isPayable(rewardId);
-    }
-
-    @Override
-    public Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId) {
-        return sponsorAccountStorage.get(sponsorAccountId);
-    }
-
-    @Override
-    public List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId) {
-        return sponsorAccountStorage.getSponsorAccounts(sponsorId).stream().map(sponsorAccount -> sponsorAccountStatement(sponsorAccount,
-                getAccountBook(sponsorAccount.currency()).state())).toList();
     }
 
     @Override

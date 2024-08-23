@@ -42,6 +42,7 @@ public class AccountingServiceConcurrencyTest {
     SponsorAccount sponsorAccount;
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
+    final ProgramId programId = ProgramId.random();
     final ProjectId projectId1 = ProjectId.random();
     final Faker faker = new Faker();
     final Invoice invoice = Invoice.of(IndividualBillingProfile.builder()
@@ -101,6 +102,7 @@ public class AccountingServiceConcurrencyTest {
                     null,
                     PositiveAmount.of(1_000_000L)
             ).account();
+            sponsorAccountStorage.save(sponsorAccount);
         }
 
         @Test
@@ -120,9 +122,12 @@ public class AccountingServiceConcurrencyTest {
                     try {
                         System.out.println("Thread " + Thread.currentThread().getName() + " started");
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
-                            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
-                            accountingService.unallocate(projectId1, sponsorAccount.id(), amount, currency.id());
-                            accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                            accountingService.allocate(sponsorId, programId, amount, currency.id());
+                            accountingService.unallocate(programId, sponsorId, amount, currency.id());
+                            accountingService.allocate(sponsorId, programId, amount, currency.id());
+                            accountingService.grant(programId, projectId1, amount, currency.id());
+                            accountingService.ungrant(projectId1, programId, amount, currency.id());
+                            accountingService.grant(programId, projectId1, amount, currency.id());
                         }
                         latch.countDown();
                         System.out.println("Thread " + Thread.currentThread().getName() + " ended");
@@ -203,7 +208,8 @@ public class AccountingServiceConcurrencyTest {
                         final var accountingService = accountingServices.get(threadId);
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
                             try {
-                                accountingService.allocate(sponsorAccount.id(), projectId1, amount, currency.id());
+                                accountingService.allocate(sponsorId, programId, amount, currency.id());
+                                accountingService.grant(programId, projectId1, amount, currency.id());
                             } catch (Exception e) {
                                 thrown.add(e);
                             }
@@ -241,7 +247,8 @@ public class AccountingServiceConcurrencyTest {
             final var thrown = new ConcurrentLinkedQueue<Throwable>();
 
             // Given
-            accountingServices.get(0).allocate(sponsorAccount.id(), projectId1, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
+            accountingServices.get(0).allocate(sponsorId, programId, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
+            accountingServices.get(0).grant(programId, projectId1, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
             final var amount = PositiveAmount.of(1L);
 
             // When

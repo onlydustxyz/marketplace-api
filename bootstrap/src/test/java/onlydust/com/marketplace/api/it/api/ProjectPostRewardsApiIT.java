@@ -173,14 +173,17 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
     void should_create_reward() {
         // Given
         final UUID strkId = currencyRepository.findByCode("ETH").orElseThrow().id();
+        final var sponsorId = SponsorId.of(UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d"));
         final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(
-                SponsorId.of(UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d")),
+                sponsorId,
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        final var programId = ProgramId.random();
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(strkId));
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
         final RewardRequest rewardRequest = new RewardRequest()

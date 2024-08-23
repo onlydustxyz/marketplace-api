@@ -157,8 +157,9 @@ public class ProjectConfiguration {
     @Bean
     PermissionService permissionService(final ProjectStoragePort projectStoragePort,
                                         final ContributionStoragePort contributionStoragePort,
-                                        final ProjectSponsorStoragePort sponsorStoragePort) {
-        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort);
+                                        final SponsorStoragePort sponsorStoragePort,
+                                        final ProgramStoragePort programStoragePort) {
+        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort, programStoragePort);
     }
 
     @Bean

@@ -42,7 +42,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserSponsorAdmin(authenticatedUser.id(), sponsorId))
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
             throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sponsor = sponsorReadRepository.findById(sponsorId)
@@ -65,7 +65,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                                                        SortDirection direction) {
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserSponsorAdmin(authenticatedUser.id(), sponsorId))
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
             throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sortBy = switch (Optional.ofNullable(sort).orElse(SponsorAccountTransactionSort.DATE)) {

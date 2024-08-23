@@ -11,15 +11,13 @@ import java.net.URI;
 import java.util.UUID;
 
 @Builder(toBuilder = true)
-public record Sponsor(@NonNull Id id,
+public record Program(@NonNull Id id,
                       @NonNull String name,
-                      URI url,
                       @NonNull URI logoUrl) {
-    public static Sponsor create(@NonNull String name, URI url, @NonNull URI logoUrl) {
-        return Sponsor.builder()
+    public static Program create(@NonNull String name, URI url, @NonNull URI logoUrl) {
+        return Program.builder()
                 .id(Id.random())
                 .name(name)
-                .url(url)
                 .logoUrl(logoUrl)
                 .build();
     }

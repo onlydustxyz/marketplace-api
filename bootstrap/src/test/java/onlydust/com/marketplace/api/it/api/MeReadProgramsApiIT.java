@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.ProgramId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
 import onlydust.com.marketplace.api.contract.model.ProgramPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
-import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.model.Program;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -58,15 +59,23 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenMyPrograms {
-        Set<Sponsor> programs;
+        Set<Program> programs;
 
         @BeforeEach
         void setUp() {
+            final var sponsor = sponsorHelper.create();
+            final var sponsorId = SponsorId.of(sponsor.id().value());
+
             programs = LongStream.range(1, 14).mapToObj(i -> {
                 final var program = programHelper.create(caller);
-                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), i * 100, USDC);
-                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 3 * i, ETH);
-                accountingHelper.createSponsorAccount(SponsorId.of(program.id()), i, BTC);
+                final var programId = ProgramId.of(program.id().value());
+
+                accountingHelper.createSponsorAccount(sponsorId, i * 100, USDC);
+                accountingHelper.allocate(sponsorId, programId, i * 100, USDC);
+                accountingHelper.createSponsorAccount(sponsorId, 3 * i, ETH);
+                accountingHelper.allocate(sponsorId, programId, 3 * i, ETH);
+                accountingHelper.createSponsorAccount(sponsorId, i, BTC);
+                accountingHelper.allocate(sponsorId, programId, i, BTC);
                 return program;
             }).collect(toSet());
         }
@@ -102,11 +111,15 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenOneProgramWithTransactions {
-        Sponsor program;
+        Program program;
 
         @BeforeEach
         void setUp() {
+            final var sponsor = sponsorHelper.create();
+            final var sponsorId = SponsorId.of(sponsor.id().value());
+
             program = programHelper.create(caller);
+            final var programId = ProgramId.of(program.id().value());
 
             final var projectLead = userAuthHelper.create();
             final var project1Id = projectHelper.create(projectLead);
@@ -115,19 +128,21 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             final var recipient = userAuthHelper.create();
             final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
-            final var accountId = accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 2_200, USDC);
-            accountingHelper.increaseAllowance(accountId, -700);
-            accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 12, ETH);
+            accountingHelper.createSponsorAccount(sponsorId, 2_200, USDC);
+            accountingHelper.allocate(sponsorId, programId, 1500, USDC);
 
-            accountingHelper.grant(SponsorId.of(program.id()), project1Id, 500, USDC);
-            accountingHelper.refund(project1Id, SponsorId.of(program.id()), 200, USDC);
-            accountingHelper.grant(SponsorId.of(program.id()), project1Id, 2, ETH);
+            accountingHelper.createSponsorAccount(sponsorId, 12, ETH);
+            accountingHelper.allocate(sponsorId, programId, 12, ETH);
 
-            accountingHelper.grant(SponsorId.of(program.id()), project2Id, 200, USDC);
-            accountingHelper.grant(SponsorId.of(program.id()), project2Id, 3, ETH);
+            accountingHelper.grant(programId, project1Id, 500, USDC);
+            accountingHelper.refund(project1Id, programId, 200, USDC);
+            accountingHelper.grant(programId, project1Id, 2, ETH);
 
-            accountingHelper.grant(SponsorId.of(program.id()), project3Id, 3, ETH);
-            accountingHelper.refund(project3Id, SponsorId.of(program.id()), 3, ETH);
+            accountingHelper.grant(programId, project2Id, 200, USDC);
+            accountingHelper.grant(programId, project2Id, 3, ETH);
+
+            accountingHelper.grant(programId, project3Id, 3, ETH);
+            accountingHelper.refund(project3Id, programId, 3, ETH);
 
             final var reward1 = rewardHelper.create(project1Id, projectLead, recipientId, 200, USDC);
             final var reward2 = rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH);

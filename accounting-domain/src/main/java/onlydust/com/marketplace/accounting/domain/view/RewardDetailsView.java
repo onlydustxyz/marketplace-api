@@ -19,7 +19,7 @@ public record RewardDetailsView(
         ZonedDateTime processedAt,
         @NonNull List<String> githubUrls,
         @NonNull ProjectShortView project,
-        @NonNull List<Sponsor> sponsors,
+        @NonNull List<SponsorView> sponsors,
         @NonNull MoneyView money,
         BillingProfile billingProfile,
         ShortContributorView recipient,

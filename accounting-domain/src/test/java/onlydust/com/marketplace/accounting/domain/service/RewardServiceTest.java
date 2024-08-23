@@ -10,7 +10,7 @@ import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.view.*;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -32,7 +32,7 @@ public class RewardServiceTest {
     private final Faker faker = new Faker();
     private final AccountingRewardStoragePort accountingRewardStoragePort = mock(AccountingRewardStoragePort.class);
     private final AccountingFacadePort accountingFacadePort = mock(AccountingFacadePort.class);
-    private final SponsorStoragePort sponsorStoragePort = mock(SponsorStoragePort.class);
+    private final AccountingSponsorStoragePort sponsorStoragePort = mock(AccountingSponsorStoragePort.class);
     private final NotificationPort notificationPort = mock(NotificationPort.class);
     private final RewardService rewardService = new RewardService(accountingRewardStoragePort, accountingFacadePort, sponsorStoragePort, notificationPort);
 

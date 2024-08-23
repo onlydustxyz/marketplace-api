@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.PostgresSponsorAccountStora
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,18 @@ class PostgresSponsorAccountStorageAdapterIT extends AbstractPostgresIT {
     @Test
     void should_return_sponsor_ledger_when_found() {
         // Given
-        final var sponsorId = SponsorId.random();
+        final var sponsorId = Sponsor.Id.random();
         final SponsorEntity sponsor = new SponsorEntity(sponsorId.value(), "sponsor", "", "");
         sponsorRepository.save(sponsor);
-        final var ledger = new SponsorAccount(SponsorId.of(sponsor.getId()), currency);
+        final var sponsorAccount = new SponsorAccount(SponsorId.of(sponsor.getId()), currency);
 
         // When
-        adapter.save(ledger);
+        adapter.save(sponsorAccount);
 
         // Then
-        final var savedLedger = adapter.get(ledger.id());
+        final var savedLedger = adapter.get(sponsorAccount.id());
         assertThat(savedLedger).isPresent();
-        assertThat(savedLedger.get().id()).isEqualTo(ledger.id());
+        assertThat(savedLedger.get().id()).isEqualTo(sponsorAccount.id());
         assertThat(savedLedger.get().sponsorId()).isEqualTo(sponsorId);
         assertThat(savedLedger.get().currency()).isEqualTo(currency);
     }

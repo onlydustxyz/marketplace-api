@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.project.domain.model.Program;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectSponsorStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 
 import java.util.UUID;
 
@@ -11,7 +14,8 @@ import java.util.UUID;
 public class PermissionService {
     private final ProjectStoragePort projectStoragePort;
     private final ContributionStoragePort contributionStoragePort;
-    private final ProjectSponsorStoragePort sponsorStoragePort;
+    private final SponsorStoragePort sponsorStoragePort;
+    private final ProgramStoragePort programStoragePort;
 
     public boolean isUserProjectLead(UUID projectId, UUID projectLeadId) {
         return projectStoragePort.getProjectLeadIds(projectId).contains(projectLeadId);
@@ -33,7 +37,11 @@ public class PermissionService {
         return projectStoragePort.hasUserAccessToProject(projectSlug, userId);
     }
 
-    public boolean isUserSponsorAdmin(UUID userId, UUID sponsorId) {
-        return sponsorStoragePort.isUserSponsorAdmin(userId, sponsorId);
+    public boolean isUserSponsorLead(UUID userId, UUID sponsorId) {
+        return sponsorStoragePort.isAdmin(userId, Sponsor.Id.of(sponsorId));
+    }
+
+    public boolean isUserProgramLead(UUID userId, Program.Id programId) {
+        return programStoragePort.isAdmin(userId, programId);
     }
 }

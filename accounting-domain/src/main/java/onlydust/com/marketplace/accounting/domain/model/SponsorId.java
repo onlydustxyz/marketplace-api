@@ -19,4 +19,8 @@ public class SponsorId extends UuidWrapper {
     public static SponsorId of(@NonNull final String uuid) {
         return SponsorId.of(UUID.fromString(uuid));
     }
+
+    public String pretty() {
+        return "#" + this.value().toString().substring(0, 5).toUpperCase();
+    }
 }
