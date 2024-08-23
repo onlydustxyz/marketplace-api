@@ -67,9 +67,6 @@ public class ProjectViewEntity {
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_github_repos",
@@ -146,8 +143,8 @@ public class ProjectViewEntity {
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                        entity.installation().getAuthorizedRepos().stream()
-                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                entity.installation().getAuthorizedRepos().stream()
+                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();

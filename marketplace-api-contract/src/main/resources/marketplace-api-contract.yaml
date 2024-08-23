@@ -4083,7 +4083,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Sponsors
+        - ReadSponsors
       summary: Get sponsor data
       operationId: getSponsor
       description: |
@@ -4100,7 +4100,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorDetailsResponse'
+                $ref: '#/components/schemas/SponsorResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -5828,7 +5828,7 @@ components:
           description: Number of transactions for this month
           example: 42
 
-    SponsorShortResponse:
+    SponsorLinkResponse:
       type: object
       required:
         - id
@@ -5849,7 +5849,7 @@ components:
 
     SponsorResponse:
       allOf:
-        - $ref: '#/components/schemas/SponsorShortResponse'
+        - $ref: '#/components/schemas/SponsorLinkResponse'
         - type: object
           required:
             - url
@@ -5859,27 +5859,6 @@ components:
               format: url
               description: URL of sponsor's website
               example: 'https://ethereum.org'
-
-    SponsorLinkResponse:
-      allOf:
-        - $ref: '#/components/schemas/SponsorShortResponse'
-
-    SponsorDetailsResponse:
-      allOf:
-        - $ref: '#/components/schemas/SponsorResponse'
-        - type: object
-          required:
-            - availableBudgets
-            - projects
-          properties:
-            availableBudgets:
-              type: array
-              items:
-                $ref: '#/components/schemas/Money'
-            projects:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProjectWithBudgetResponse'
 
     EcosystemResponse:
       type: object
@@ -8644,9 +8623,23 @@ components:
         hasAcceptedInvoiceMandate:
           type: boolean
 
-    ProjectWithBudgetResponse:
+    ProgramLinkResponse:
+      type: object
+      required:
+        - id
+        - name
+        - logoUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+        name:
+          type: string
+        logoUrl:
+          type: string
+
+    ProgramWithBudgetResponse:
       allOf:
-        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - totalUsdBudget

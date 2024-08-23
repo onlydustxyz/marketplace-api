@@ -23,8 +23,6 @@ import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
-import onlydust.com.marketplace.project.domain.view.ProjectSponsorView;
-import onlydust.com.marketplace.project.domain.view.backoffice.BoSponsorView;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 
@@ -33,12 +31,8 @@ import java.net.URI;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
-import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.reducing;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.ETHEREUM;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -77,25 +71,6 @@ public interface BackOfficeMapper {
                 .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
     }
 
-    static SponsorBudgetResponse mapSponsorBudgetResponse(final SponsorAccountStatement accountStatement) {
-        final var balance = mapAccountBalance(accountStatement);
-        final var account = accountStatement.account();
-        return new SponsorBudgetResponse()
-                .currency(balance.getCurrency())
-                .initialBalance(balance.getInitialBalance())
-                .currentBalance(balance.getCurrentBalance())
-                .initialAllowance(balance.getInitialAllowance())
-                .currentAllowance(balance.getCurrentAllowance())
-                .debt(balance.getDebt())
-                .awaitingPaymentAmount(balance.getAwaitingPaymentAmount())
-                .lockedAmounts(Stream.of(new SponsorBudgetResponseAllOfLockedAmounts()
-                                .amount(accountStatement.allowance().getValue())
-                                .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                        ).filter(l -> l.getLockedUntil() != null)
-                        .toList())
-                ;
-    }
-
     static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
         return new TransactionReceipt()
                 .id(transaction.id().value())
@@ -118,90 +93,6 @@ public interface BackOfficeMapper {
                 PositiveAmount.of(negativeAmount ? transaction.getAmount().negate() : transaction.getAmount()),
                 transaction.getThirdPartyName(),
                 transaction.getThirdPartyAccountNumber());
-    }
-
-    static OldSponsorPage mapSponsorPageToContract(final Page<BoSponsorView> sponsorPage, int pageIndex) {
-        return new OldSponsorPage()
-                .sponsors(sponsorPage.getContent().stream().map(sponsor -> new OldSponsorPageItemResponse()
-                        .id(sponsor.id())
-                        .name(sponsor.name())
-                        .url(sponsor.url())
-                        .logoUrl(sponsor.logoUrl())
-                        .projectIds(sponsor.projectsWhereSponsorIsActive().stream().map(ProjectSponsorView::projectId).toList())
-                ).toList())
-                .totalPageNumber(sponsorPage.getTotalPageNumber())
-                .totalItemNumber(sponsorPage.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, sponsorPage.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, sponsorPage.getTotalPageNumber()));
-    }
-
-    static SponsorResponse mapSponsorToResponse(final BoSponsorView sponsor) {
-        return new SponsorResponse()
-                .id(sponsor.id())
-                .name(sponsor.name())
-                .url(sponsor.url())
-                .logoUrl(sponsor.logoUrl());
-    }
-
-    static SponsorDetailsResponse mapSponsorToDetailsResponse(final BoSponsorView sponsor, List<SponsorAccountStatement> accountStatements) {
-        final var emptyBudget = new SponsorBudgetResponse()
-                .initialBalance(BigDecimal.ZERO)
-                .currentBalance(BigDecimal.ZERO)
-                .initialAllowance(BigDecimal.ZERO)
-                .currentAllowance(BigDecimal.ZERO)
-                .debt(BigDecimal.ZERO)
-                .awaitingPaymentAmount(BigDecimal.ZERO)
-                .lockedAmounts(List.of());
-
-        return new SponsorDetailsResponse()
-                .id(sponsor.id())
-                .name(sponsor.name())
-                .url(sponsor.url())
-                .logoUrl(sponsor.logoUrl())
-                .projects(sponsor.projectsWhereSponsorIsActive().stream().map(p -> mapToProjectWithBudget(p, accountStatements))
-                        .sorted(comparing(ProjectWithBudgetResponse::getName))
-                        .toList())
-                .availableBudgets(accountStatements.stream()
-                        .map(BackOfficeMapper::mapSponsorBudgetResponse)
-                        .collect(groupingBy(SponsorBudgetResponse::getCurrency, reducing(emptyBudget, BackOfficeMapper::merge)))
-                        .values().stream()
-                        .sorted(comparing(b -> b.getCurrency().getCode()))
-                        .toList())
-                .leads(isNull(sponsor.leads()) ? null : sponsor.leads().stream().map(userShortView -> new UserLinkResponse()
-                        .userId(userShortView.id())
-                        .login(userShortView.login())
-                        .githubUserId(userShortView.githubUserId())
-                        .avatarUrl(userShortView.avatarUrl())
-                ).toList())
-                ;
-    }
-
-    static SponsorBudgetResponse merge(SponsorBudgetResponse balance1, SponsorBudgetResponse balance2) {
-        return new SponsorBudgetResponse()
-                .currency(balance2.getCurrency())
-                .initialBalance(balance1.getInitialBalance().add(balance2.getInitialBalance()))
-                .currentBalance(balance1.getCurrentBalance().add(balance2.getCurrentBalance()))
-                .initialAllowance(balance1.getInitialAllowance().add(balance2.getInitialAllowance()))
-                .currentAllowance(balance1.getCurrentAllowance().add(balance2.getCurrentAllowance()))
-                .debt(balance1.getDebt().add(balance2.getDebt()))
-                .awaitingPaymentAmount(balance1.getAwaitingPaymentAmount().add(balance2.getAwaitingPaymentAmount()))
-                .lockedAmounts(Stream.concat(balance1.getLockedAmounts().stream(), balance2.getLockedAmounts().stream()).toList())
-                ;
-    }
-
-    static ProjectWithBudgetResponse mapToProjectWithBudget(final ProjectSponsorView projectSponsorView, List<SponsorAccountStatement> accountStatements) {
-        return new ProjectWithBudgetResponse()
-                .id(projectSponsorView.project().getId())
-                .slug(projectSponsorView.project().getSlug())
-                .name(projectSponsorView.project().getName())
-                .logoUrl(projectSponsorView.project().getLogoUrl())
-                .remainingBudgets(accountStatements.stream().map(statement -> new MoneyResponse()
-                                .amount(statement.unspentBalanceSentTo(ProjectId.of(projectSponsorView.projectId())).getValue())
-                                .currency(toShortCurrency(statement.account().currency()))
-                        )
-                        .filter(money -> money.getAmount().compareTo(BigDecimal.ZERO) > 0)
-                        .toList())
-                ;
     }
 
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {

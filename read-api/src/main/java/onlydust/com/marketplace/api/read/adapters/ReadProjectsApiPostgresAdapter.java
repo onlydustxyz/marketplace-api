@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProjectsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoStatsViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper;
@@ -16,7 +15,6 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
-import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -340,17 +338,18 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .map(ProjectCategorySuggestionReadEntity::name)
                         .sorted()
                         .toList())
-                .sponsors(project.sponsors().stream()
-                        .filter(SponsorMapper::isActive)
-                        .map(ProjectSponsorViewEntity::sponsor)
-                        .map(s -> new SponsorResponse()
-                                .id(s.getId())
-                                .name(s.getName())
-                                .logoUrl(s.getLogoUrl())
-                                .url(s.getUrl())
-                        )
-                        .sorted(comparing(SponsorResponse::getName))
-                        .toList())
+                // TODO: replace by programs
+//                .sponsors(project.sponsors().stream()
+//                        .filter(SponsorMapper::isActive)
+//                        .map(ProjectSponsorViewEntity::sponsor)
+//                        .map(s -> new SponsorResponse()
+//                                .id(s.getId())
+//                                .name(s.getName())
+//                                .logoUrl(s.getLogoUrl())
+//                                .url(s.getUrl())
+//                        )
+//                        .sorted(comparing(SponsorResponse::getName))
+//                        .toList())
                 .organizations(project.organizations(Boolean.TRUE.equals(includeAllAvailableRepos)))
                 .languages(project.languages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())
                 .indexingComplete(reposIndexedTimes.stream().noneMatch(Objects::isNull))

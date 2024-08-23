@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.api.read.entities.committee;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import org.hibernate.annotations.Immutable;
 
@@ -17,8 +17,7 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Data
+@Getter
 @Table(name = "committees", schema = "public")
 @Immutable
 @Accessors(fluent = true)
@@ -27,9 +26,12 @@ public class CommitteeReadEntity {
     @EqualsAndHashCode.Include
     @NonNull
     UUID id;
-    @NonNull Date applicationStartDate;
-    @NonNull Date applicationEndDate;
-    @NonNull String name;
+    @NonNull
+    Date applicationStartDate;
+    @NonNull
+    Date applicationEndDate;
+    @NonNull
+    String name;
 
     @Enumerated(EnumType.STRING)
     @NonNull
@@ -40,7 +42,7 @@ public class CommitteeReadEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sponsorId", insertable = false, updatable = false)
-    SponsorViewEntity sponsor;
+    SponsorReadEntity sponsor;
     Integer votePerJury;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY)

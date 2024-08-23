@@ -5,33 +5,19 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
-import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.pagination.Page;
+import onlydust.com.marketplace.accounting.domain.view.Sponsor;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.UUID;
+import java.util.Optional;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 
 @AllArgsConstructor
 public class SponsorService implements SponsorFacadePort {
     private final SponsorStoragePort sponsorStoragePort;
     private final ImageStoragePort imageStoragePort;
-
-    @Override
-    public SponsorView getSponsor(UserId userId, SponsorId sponsorId) {
-        if (!sponsorStoragePort.isAdmin(userId, sponsorId))
-            throw OnlyDustException.forbidden("User %s is not admin of sponsor %s".formatted(userId, sponsorId));
-
-        return sponsorStoragePort.get(sponsorId)
-                .orElseThrow(() -> OnlyDustException.notFound("Sponsor %s not found".formatted(sponsorId)));
-    }
-
-    @Override
-    public Page<SponsorView> listSponsors(String search, int pageIndex, int pageSize) {
-        return sponsorStoragePort.findSponsors(search, pageIndex, pageSize);
-    }
 
     @Override
     public URL uploadLogo(InputStream imageInputStream) {
@@ -41,5 +27,13 @@ public class SponsorService implements SponsorFacadePort {
     @Override
     public void addLeadToSponsor(UserId leadId, SponsorId sponsorId) {
         sponsorStoragePort.addLeadToSponsor(leadId, sponsorId);
+    }
+
+    @Override
+    public Optional<Sponsor> findById(UserId leadId, SponsorId sponsorId) {
+        if (!sponsorStoragePort.isAdmin(leadId, sponsorId))
+            throw forbidden("User %s is not allowed to access sponsor %s".formatted(leadId, sponsorId));
+
+        return sponsorStoragePort.get(sponsorId);
     }
 }

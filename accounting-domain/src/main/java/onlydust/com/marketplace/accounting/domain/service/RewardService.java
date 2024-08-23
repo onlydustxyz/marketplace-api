@@ -16,7 +16,6 @@ import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
-import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
@@ -103,7 +102,6 @@ public class RewardService implements AccountingRewardPort {
 
         final var sponsors = accountingFacadePort.transferredAmountPerOrigin(reward.id(), reward.money().currency().id()).keySet().stream()
                 .map(sponsorAccount -> sponsorStoragePort.get(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
-                .map(SponsorView::toShortView)
                 .toList();
 
         final Map<Network, PositiveAmount> pendingPayments = reward.invoice() == null ? new HashMap<>() :

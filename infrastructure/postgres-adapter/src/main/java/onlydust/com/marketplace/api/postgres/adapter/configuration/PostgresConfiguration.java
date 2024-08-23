@@ -214,11 +214,10 @@ public class PostgresConfiguration {
 
     @Bean
     public PostgresBackofficeAdapter postgresBackofficeAdapter(final SponsorRepository sponsorRepository,
-                                                               final SponsorViewRepository sponsorViewRepository,
                                                                final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(sponsorRepository, sponsorViewRepository, boEcosystemRepository, ecosystemRepository,
+        return new PostgresBackofficeAdapter(sponsorRepository, boEcosystemRepository, ecosystemRepository,
                 projectRepository);
     }
 
@@ -360,8 +359,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorViewRepository sponsorViewRepository, final SponsorUserRepository sponsorUserRepository) {
-        return new PostgresSponsorAdapter(sponsorViewRepository, sponsorUserRepository);
+    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository,
+                                                  final SponsorUserRepository sponsorUserRepository) {
+        return new PostgresSponsorAdapter(sponsorRepository, sponsorUserRepository);
     }
 
     @Bean

@@ -13,14 +13,14 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.SponsorFacadePort;
 import onlydust.com.marketplace.api.contract.SponsorsApi;
 import onlydust.com.marketplace.api.contract.model.AllocateRequest;
-import onlydust.com.marketplace.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.SponsorMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
 @RestController
 @Tags(@Tag(name = "Sponsors"))
@@ -33,18 +33,10 @@ public class SponsorsRestApi implements SponsorsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
 
     @Override
-    public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
-        final var sponsorAccountStatements = accountingFacadePort.getSponsorAccounts(SponsorId.of(sponsorId));
-        return ResponseEntity.ok(SponsorMapper.mapToSponsorDetailsResponse(sponsor, sponsorAccountStatements));
-
-    }
-
-    @Override
     public ResponseEntity<Void> allocateBudgetToProject(UUID sponsorId, AllocateRequest allocateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
+        final var sponsor = sponsorFacadePort.findById(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId))
+                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
         accountingFacadePort.allocate(
                 sponsor.id(),
@@ -59,7 +51,8 @@ public class SponsorsRestApi implements SponsorsApi {
     @Override
     public ResponseEntity<Void> unallocateBudgetFromProject(UUID sponsorId, AllocateRequest allocateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var sponsor = sponsorFacadePort.getSponsor(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId));
+        final var sponsor = sponsorFacadePort.findById(UserId.of(authenticatedUser.id()), SponsorId.of(sponsorId))
+                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
         accountingFacadePort.unallocate(
                 ProjectId.of(allocateRequest.getProjectId()),

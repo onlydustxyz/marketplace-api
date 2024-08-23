@@ -10,7 +10,7 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.view.MoneyView;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
+import onlydust.com.marketplace.accounting.domain.view.Sponsor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
@@ -106,8 +106,8 @@ public class BoRewardQueryEntity {
         String name;
         String logoUrl;
 
-        public ShortSponsorView toDomain() {
-            return ShortSponsorView.builder()
+        public Sponsor toDomain() {
+            return Sponsor.builder()
                     .id(SponsorId.of(id))
                     .logoUrl(this.logoUrl)
                     .name(this.name)
@@ -135,7 +135,7 @@ public class BoRewardQueryEntity {
                 .requester(requester.toDomain())
                 .sponsors(isNull(this.sponsors) ? List.of() : this.sponsors.stream()
                         .map(SponsorLinkView::toDomain)
-                        .sorted(comparing(ShortSponsorView::name))
+                        .sorted(comparing(Sponsor::name))
                         .toList())
                 .money(new MoneyView(this.amount, this.currency.toDomain(), this.statusData.usdConversionRate(), this.statusData.amountUsdEquivalent()))
                 .invoice(isNull(this.invoice) ? null : invoice.toView())

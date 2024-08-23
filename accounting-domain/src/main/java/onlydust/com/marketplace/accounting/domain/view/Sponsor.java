@@ -6,5 +6,5 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 
 
 @Builder
-public record ShortSponsorView(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl) {
+public record Sponsor(@NonNull SponsorId id, @NonNull String name, @NonNull String logoUrl) {
 }

@@ -969,55 +969,6 @@ paths:
 
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - BackofficeSponsorManagement
-      summary: Get sponsor page
-      operationId: getOldSponsorPage
-      description: |
-        Get sponsor page
-      parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: projectIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-        - in: query
-          name: sponsorIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-      responses:
-        "200":
-          description: 'Sponsor page'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OldSponsorPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
     post:
       security:
         - bearerAuth: [ ]
@@ -1093,7 +1044,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeSponsorManagement
+        - BackofficeSponsorRead
       summary: Get sponsor page
       operationId: getSponsorPage
       description: |
@@ -1130,7 +1081,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeSponsorManagement
+        - BackofficeSponsorRead
       summary: Get sponsor data
       operationId: getSponsor
       description: |

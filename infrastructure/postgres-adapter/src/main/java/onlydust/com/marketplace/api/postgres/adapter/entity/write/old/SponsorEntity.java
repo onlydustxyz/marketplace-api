@@ -8,6 +8,8 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.accounting.domain.model.SponsorId.of;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,6 +33,14 @@ public class SponsorEntity {
                 .name(name)
                 .logoUrl(logoUrl)
                 .url(url)
+                .build();
+    }
+
+    public onlydust.com.marketplace.accounting.domain.view.Sponsor toAccountingDomain() {
+        return onlydust.com.marketplace.accounting.domain.view.Sponsor.builder()
+                .id(of(id))
+                .name(name)
+                .logoUrl(logoUrl)
                 .build();
     }
 }

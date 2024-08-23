@@ -8,7 +8,6 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
@@ -74,9 +73,6 @@ public class ProjectReadEntity {
     Boolean ignoreCodeReviews;
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
