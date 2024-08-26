@@ -84,13 +84,13 @@ public class AccountBookTransactionReadEntity {
         };
     }
 
-    public TransactionHistoryPageItemResponse toPageItemResponse() {
+    public SponsorTransactionPageItemResponse toPageItemResponse() {
         final var usdQuote = accountBook.currency().latestUsdQuote() == null ? null : accountBook.currency().latestUsdQuote().getPrice();
-        return new TransactionHistoryPageItemResponse()
+        return new SponsorTransactionPageItemResponse()
                 .id(id)
                 .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
                 .type(map(type))
-                .project(project == null ? null : project.toLinkResponse())
+                .program(program == null ? null : program.toLinkResponse())
                 .amount(new Money()
                         .amount(amount)
                         .prettyAmount(pretty(amount, accountBook.currency().decimals(), usdQuote))

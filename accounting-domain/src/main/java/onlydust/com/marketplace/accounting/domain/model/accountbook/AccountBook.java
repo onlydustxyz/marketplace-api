@@ -5,10 +5,10 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.util.List;
 import java.util.UUID;
@@ -140,14 +140,9 @@ public interface AccountBook {
             this(type, List.of(from, to), amount);
         }
 
-        public AccountId from() {
+        public AccountId origin() {
             assert !path().isEmpty();
             return path.get(0);
-        }
-
-        public AccountId to() {
-            assert !path().isEmpty();
-            return path.get(path().size() - 1);
         }
 
         public enum Type {MINT, BURN, TRANSFER, REFUND}

@@ -19,9 +19,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.math.BigDecimal.ZERO;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
@@ -38,9 +40,29 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Nested
-    class GivenASponsorLead {
+    class GivenNoProgram {
         @Test
-        void should_create_program() {
+        void should_not_be_able_to_create_program_when_not_sponsor_lead() {
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Awesome program"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus()
+                    .isUnauthorized();
+        }
+
+        @Test
+        void should_create_program_with_required_fields_only() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+
+            // When
             client.post()
                     .uri(getApiURI(PROGRAMS))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
@@ -55,6 +77,47 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody()
                     .jsonPath("$.id").isNotEmpty();
+        }
+
+        @Test
+        void should_create_program_with_optional_fields() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+            final var programLead = userAuthHelper.create();
+            final var programId = new MutableObject<String>();
+
+            // When
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Foo program",
+                              "url": "https://foo.bar",
+                              "logoUrl": "https://foo.bar/logo.png",
+                              "programLeadId": "%s"
+                            }
+                            """.formatted(programLead.user().getId()))
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").value(programId::setValue);
+
+            // Then
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(programId.getValue())
+                    .jsonPath("$.name").isEqualTo("Foo program")
+                    .jsonPath("$.url").isEqualTo("https://foo.bar")
+                    .jsonPath("$.logoUrl").isEqualTo("https://foo.bar/logo.png");
         }
     }
 

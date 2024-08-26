@@ -53,16 +53,16 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     }
 
     @Override
-    public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId,
-                                                                                       Integer pageIndex,
-                                                                                       Integer pageSize,
-                                                                                       String fromDate,
-                                                                                       String toDate,
-                                                                                       List<UUID> currencies,
-                                                                                       List<UUID> projects,
-                                                                                       List<SponsorAccountTransactionType> types,
-                                                                                       SponsorAccountTransactionSort sort,
-                                                                                       SortDirection direction) {
+    public ResponseEntity<SponsorTransactionPageResponse> getSponsorTransactions(UUID sponsorId,
+                                                                                 Integer pageIndex,
+                                                                                 Integer pageSize,
+                                                                                 String fromDate,
+                                                                                 String toDate,
+                                                                                 List<UUID> currencies,
+                                                                                 List<UUID> programs,
+                                                                                 List<SponsorAccountTransactionType> types,
+                                                                                 SponsorAccountTransactionSort sort,
+                                                                                 SortDirection direction) {
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
@@ -72,20 +72,20 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
             case DATE -> "timestamp";
             case TYPE -> "type";
             case AMOUNT -> "amount";
-            case PROJECT -> "p.name";
+            case PROGRAM -> "p.name";
         };
 
         final var page = accountBookTransactionReadRepository.findAllFromSponsor(
                 sponsorId,
                 types == null ? null : types.stream().map(AccountBookTransactionReadEntity::map).toList(),
                 currencies,
-                projects,
+                programs,
                 DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate),
                 PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy))
         );
 
-        final var response = new TransactionHistoryPageResponse()
+        final var response = new SponsorTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toPageItemResponse).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())

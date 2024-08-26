@@ -144,7 +144,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     public synchronized @NonNull Map<AccountId, PositiveAmount> transferredAmountPerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(Transaction.Type.TRANSFER, source(v).accountId, to, incomingEdgeOf(v).amount))
-                .collect(Collectors.groupingBy(Transaction::from,
+                .collect(Collectors.groupingBy(Transaction::origin,
                         Collectors.mapping(Transaction::amount,
                                 Collectors.mapping(PositiveAmount::of,
                                         Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
@@ -155,7 +155,7 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
     public synchronized @NonNull Map<AccountId, PositiveAmount> balancePerOrigin(@NonNull AccountId to) {
         return accountVertices(to).stream()
                 .map(v -> new Transaction(Transaction.Type.TRANSFER, source(v).accountId, to, balanceOf(v)))
-                .collect(Collectors.groupingBy(Transaction::from,
+                .collect(Collectors.groupingBy(Transaction::origin,
                         Collectors.mapping(Transaction::amount,
                                 Collectors.mapping(PositiveAmount::of,
                                         Collectors.reducing(PositiveAmount.ZERO, PositiveAmount::add))
@@ -231,12 +231,12 @@ public class AccountBookState implements AccountBook, ReadOnlyAccountBookState, 
                 break;
             }
             remainingAmount = PositiveAmount.of(remainingAmount.subtract(unspentVertex.balance()));
+            transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
+
             if (graph.outgoingEdgesOf(unspentVertex.vertex()).isEmpty()) {
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), unspentVertex.balance()));
                 removeEdge(unspentVertex.vertex());
             } else {
                 incomingEdgeOf(unspentVertex.vertex()).decreaseAmount(unspentVertex.balance());
-                transactions.add(createTransaction(Transaction.Type.REFUND, unspentVertex.vertex(), remainingAmount));
             }
         }
 

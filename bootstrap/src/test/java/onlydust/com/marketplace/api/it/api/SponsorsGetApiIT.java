@@ -5,7 +5,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.model.SponsorAccountTransactionType;
-import onlydust.com.marketplace.api.contract.model.TransactionHistoryPageResponse;
+import onlydust.com.marketplace.api.contract.model.SponsorTransactionPageResponse;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -74,159 +74,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                           "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
                           "name": "Coca Cola",
                           "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                          "url": null,
-                          "availableBudgets": [
-                            {
-                              "amount": 0,
-                              "prettyAmount": 0,
-                              "currency": {
-                                "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                "code": "APT",
-                                "name": "Aptos Coin",
-                                "logoUrl": null,
-                                "decimals": 8
-                              },
-                              "usdEquivalent": 0.00,
-                              "usdConversionRate": 0.30134
-                            },
-                            {
-                              "amount": 0,
-                              "prettyAmount": 0,
-                              "currency": {
-                                "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                "code": "ETH",
-                                "name": "Ether",
-                                "logoUrl": null,
-                                "decimals": 18
-                              },
-                              "usdEquivalent": 0.00,
-                              "usdConversionRate": 1781.983987
-                            },
-                            {
-                              "amount": 0,
-                              "prettyAmount": 0,
-                              "currency": {
-                                "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                                "code": "OP",
-                                "name": "Optimism",
-                                "logoUrl": null,
-                                "decimals": 18
-                              },
-                              "usdEquivalent": null,
-                              "usdConversionRate": null
-                            },
-                            {
-                              "amount": 0,
-                              "prettyAmount": 0,
-                              "currency": {
-                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                "code": "USD",
-                                "name": "US Dollar",
-                                "logoUrl": null,
-                                "decimals": 2
-                              },
-                              "usdEquivalent": 0,
-                              "usdConversionRate": 1
-                            },
-                            {
-                              "amount": 9000.123456789,
-                              "prettyAmount": 9000.12,
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "usdEquivalent": 9090.13,
-                              "usdConversionRate": 1.010001
-                            }
-                          ],
-                          "projects": [
-                            {
-                              "id": "98873240-31df-431a-81dc-7d6fe01143a0",
-                              "slug": "aiolia-du-lion",
-                              "name": "Aiolia du Lion",
-                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aiolia_lion.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=11e0e551affa5a88cc8c6de7f352449c",
-                              "totalUsdBudget": 20025355.48,
-                              "remainingBudgets": [
-                                {
-                                  "amount": 19827065,
-                                  "prettyAmount": 19827065,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "usdEquivalent": 20025355.48,
-                                  "usdConversionRate": 1.010001
-                                }
-                              ]
-                            },
-                            {
-                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                              "slug": "bretzel",
-                              "name": "Bretzel",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "totalUsdBudget": 5566730.56,
-                              "remainingBudgets": [
-                                {
-                                  "amount": 400000,
-                                  "prettyAmount": 400000,
-                                  "currency": {
-                                    "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                    "code": "APT",
-                                    "name": "Aptos Coin",
-                                    "logoUrl": null,
-                                    "decimals": 8
-                                  },
-                                  "usdEquivalent": 120536.00,
-                                  "usdConversionRate": 0.30134
-                                },
-                                {
-                                  "amount": 3000,
-                                  "prettyAmount": 3000,
-                                  "currency": {
-                                    "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                    "code": "ETH",
-                                    "name": "Ether",
-                                    "logoUrl": null,
-                                    "decimals": 18
-                                  },
-                                  "usdEquivalent": 5345951.96,
-                                  "usdConversionRate": 1781.983987
-                                },
-                                {
-                                  "amount": 17000,
-                                  "prettyAmount": 17000,
-                                  "currency": {
-                                    "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                                    "code": "OP",
-                                    "name": "Optimism",
-                                    "logoUrl": null,
-                                    "decimals": 18
-                                  },
-                                  "usdEquivalent": null,
-                                  "usdConversionRate": null
-                                },
-                                {
-                                  "amount": 99250.00,
-                                  "prettyAmount": 99250.00,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  },
-                                  "usdEquivalent": 100242.60,
-                                  "usdConversionRate": 1.010001
-                                }
-                              ]
-                            }
-                          ]
+                          "url": null
                         }
                         """);
     }
@@ -245,14 +93,36 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 3,
-                          "totalItemNumber": 13,
+                          "totalItemNumber": 18,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "transactions": [
                             {
                               "date": "2023-02-21T09:15:10.603693Z",
                               "type": "DEPOSIT",
-                              "project": null,
+                              "program": null,
+                              "amount": {
+                                "amount": 3000,
+                                "prettyAmount": 3000,
+                                "currency": {
+                                  "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                  "code": "USD",
+                                  "name": "US Dollar",
+                                  "logoUrl": null,
+                                  "decimals": 2
+                                },
+                                "usdEquivalent": 3000,
+                                "usdConversionRate": 1
+                              }
+                            },
+                            {
+                              "date": "2023-02-21T09:15:11.603693Z",
+                              "type": "ALLOCATION",
+                              "program": {
+                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
+                                "name": "Coca Cola",
+                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                              },
                               "amount": {
                                 "amount": 3000,
                                 "prettyAmount": 3000,
@@ -270,7 +140,29 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             {
                               "date": "2023-02-22T12:23:03.403824Z",
                               "type": "DEPOSIT",
-                              "project": null,
+                              "program": null,
+                              "amount": {
+                                "amount": 19933440,
+                                "prettyAmount": 19933440,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 20132794.33,
+                                "usdConversionRate": 1.010001
+                              }
+                            },
+                            {
+                              "date": "2023-02-22T12:23:04.403824Z",
+                              "type": "ALLOCATION",
+                              "program": {
+                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
+                                "name": "Coca Cola",
+                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                              },
                               "amount": {
                                 "amount": 19933440,
                                 "prettyAmount": 19933440,
@@ -288,7 +180,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             {
                               "date": "2023-09-28T14:20:35.595046Z",
                               "type": "DEPOSIT",
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 3000,
                                 "prettyAmount": 3000,
@@ -304,62 +196,25 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               }
                             },
                             {
-                              "date": "2023-09-28T14:33:13.489288Z",
-                              "type": "DEPOSIT",
-                              "project": null,
-                              "amount": {
-                                "amount": 17000,
-                                "prettyAmount": 17000,
-                                "currency": {
-                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                                  "code": "OP",
-                                  "name": "Optimism",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "usdEquivalent": null,
-                                "usdConversionRate": null
-                              }
-                            },
-                            {
-                              "date": "2023-09-28T14:34:37.110547Z",
-                              "type": "DEPOSIT",
-                              "project": null,
-                              "amount": {
-                                "amount": 400000,
-                                "prettyAmount": 400000,
-                                "currency": {
-                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                  "code": "APT",
-                                  "name": "Aptos Coin",
-                                  "logoUrl": null,
-                                  "decimals": 8
-                                },
-                                "usdEquivalent": 120536.00,
-                                "usdConversionRate": 0.30134
-                              }
-                            },
-                            {
-                              "date": "2024-03-13T14:13:21.135944Z",
+                              "date": "2023-09-28T14:20:36.595046Z",
                               "type": "ALLOCATION",
-                              "project": {
-                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                                "slug": "bretzel",
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              "program": {
+                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
+                                "name": "Coca Cola",
+                                "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                               },
                               "amount": {
-                                "amount": 17000,
-                                "prettyAmount": 17000,
+                                "amount": 3000,
+                                "prettyAmount": 3000,
                                 "currency": {
-                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
-                                  "code": "OP",
-                                  "name": "Optimism",
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
                                   "logoUrl": null,
                                   "decimals": 18
                                 },
-                                "usdEquivalent": null,
-                                "usdConversionRate": null
+                                "usdEquivalent": 5345951.96,
+                                "usdConversionRate": 1781.983987
                               }
                             }
                           ]
@@ -378,7 +233,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         final var transactions = getSponsorTransactions(sponsorId, 0, 3, Map.of("types", type.toString()))
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(TransactionHistoryPageResponse.class)
+                .expectBody(SponsorTransactionPageResponse.class)
                 .returnResult()
                 .getResponseBody().getTransactions();
 
@@ -420,22 +275,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.transactions[?(@.amount.currency.code != 'ETH')]").doesNotExist();
     }
 
-    @Test
-    @Order(10)
-    void should_filter_sponsor_transactions_by_projects() {
-        // Given
-        addSponsorFor(user, sponsorId);
-
-        // When
-        getSponsorTransactions(sponsorId, 0, 100, Map.of("projects", "7d04163c-4187-4313-8066-61504d34fc56"))
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                // we have at least one correct date
-                .jsonPath("$.transactions[?(@.project.name == 'Bretzel')]").exists()
-                .jsonPath("$.transactions[?(@.project.name != 'Bretzel')]").doesNotExist();
-    }
-
     @ParameterizedTest
     @CsvSource({
             "DATE, DESC",
@@ -444,8 +283,8 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
             "TYPE, ASC",
             "AMOUNT, DESC",
             "AMOUNT, ASC",
-            "PROJECT, DESC",
-            "PROJECT, ASC"
+            "PROGRAM, DESC",
+            "PROGRAM, ASC"
     })
     @Order(10)
     void should_order_sponsor_transactions(String sort, String direction) {
@@ -456,7 +295,7 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
         final var transactions = getSponsorTransactions(sponsorId, 0, 100, Map.of("sort", sort, "direction", direction))
                 .expectStatus()
                 .is2xxSuccessful()
-                .expectBody(TransactionHistoryPageResponse.class)
+                .expectBody(SponsorTransactionPageResponse.class)
                 .returnResult()
                 .getResponseBody().getTransactions();
 
@@ -482,13 +321,13 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                             assertThat(firstAmount).isLessThanOrEqualTo(lastAmount);
                         });
                 break;
-            case "PROJECT":
-                final var transactionsWithProjects = transactions.stream().filter(t -> t.getProject() != null).toList();
+            case "PROGRAM":
+                final var transactionsWithProjects = transactions.stream().filter(t -> t.getProgram() != null).toList();
                 final var firstWithProject = direction.equals("ASC") ? transactionsWithProjects.get(0) :
                         transactionsWithProjects.get(transactionsWithProjects.size() - 1);
                 final var lastWithProject = direction.equals("ASC") ? transactionsWithProjects.get(transactionsWithProjects.size() - 1) :
                         transactionsWithProjects.get(0);
-                assertThat(firstWithProject.getProject().getName().compareTo(lastWithProject.getProject().getName())).isLessThanOrEqualTo(0);
+                assertThat(firstWithProject.getProgram().getName().compareTo(lastWithProject.getProgram().getName())).isLessThanOrEqualTo(0);
                 break;
         }
     }

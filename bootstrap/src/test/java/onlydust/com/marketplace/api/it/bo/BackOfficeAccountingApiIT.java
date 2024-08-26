@@ -99,7 +99,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
         camille = userAuthHelper.authenticateCamille();
-        program = programHelper.create(camille);
+        program = programHelper.create();
     }
 
     @Test
@@ -174,25 +174,26 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                             "amount": 90,
                             "currencyId": "%s"
                         }
-                        """.formatted(BRETZEL, STRK))
+                        """.formatted(program.id(), STRK))
                 // Then
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
-        accountingHelper.grant(program.id(), BRETZEL, 90, STRK);
+        accountingHelper.grant(program.id(), BRETZEL, 40, STRK);
 
         // When
         client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_UNALLOCATE.formatted(BRETZEL)))
+                .uri(getApiURI(SPONSORS_BY_ID_UNALLOCATE.formatted(COCA_COLAX)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "sponsorAccountId": "%s",
-                            "amount": 50
+                            "programId": "%s",
+                            "amount": 50,
+                            "currencyId": "%s"
                         }
-                        """.formatted(accountId))
+                        """.formatted(program.id(), STRK))
                 // Then
                 .exchange()
                 .expectStatus()
@@ -288,6 +289,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
+                .jsonPath("$.transactions[?(@.type == 'REFUND' && @.amount.amount == 50)].program.id").isEqualTo(program.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -299,7 +302,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "REFUND",
                               "network": null,
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 40,
                                 "currency": {
@@ -317,7 +320,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "WITHDRAWAL",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 30,
                                 "currency": {
@@ -335,7 +338,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "WITHDRAWAL",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 30,
                                 "currency": {
@@ -353,10 +356,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "REFUND",
                               "network": null,
                               "lockedUntil": null,
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
                               "amount": {
                                 "amount": 50,
                                 "currency": {
@@ -374,10 +373,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "TRANSFER",
                               "network": null,
                               "lockedUntil": null,
-                              "project": {
-                                "name": "Bretzel",
-                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
-                              },
                               "amount": {
                                 "amount": 90,
                                 "currency": {
@@ -395,7 +390,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "DEPOSIT",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 100,
                                 "currency": {
@@ -664,7 +659,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
                         {
-                            "projectId": "%s",
+                            "programId": "%s",
                             "amount": 100,
                             "currencyId": "%s"
                         }
@@ -824,6 +819,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -835,10 +831,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "TRANSFER",
                               "network": null,
                               "lockedUntil": null,
-                              "project": {
-                                "name": "kaaper",
-                                "logoUrl": null
-                              },
                               "amount": {
                                 "amount": 100,
                                 "currency": {
@@ -856,7 +848,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "DEPOSIT",
                               "network": "ETHEREUM",
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 100,
                                 "currency": {
@@ -1083,6 +1075,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -1094,10 +1087,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "TRANSFER",
                               "network": null,
                               "lockedUntil": null,
-                              "project": {
-                                "name": "kaaper",
-                                "logoUrl": null
-                              },
                               "amount": {
                                 "amount": 100,
                                 "currency": {
@@ -1115,7 +1104,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "DEPOSIT",
                               "network": "STARKNET",
                               "lockedUntil": null,
-                              "project": null,
+                              "program": null,
                               "amount": {
                                 "amount": 100,
                                 "currency": {
@@ -1296,6 +1285,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk()
                 .expectBody()
+                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
@@ -1307,25 +1297,35 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                               "type": "TRANSFER",
                               "network": null,
                               "lockedUntil": null,
-                              "project": {
-                                "name": "kaaper",
-                                "logoUrl": null
-                              },
                               "amount": {
                                 "amount": 100,
                                 "currency": {
-                                  "code": "APT"
-                                }
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "dollarsEquivalent": 30.13,
+                                "conversionRate": 0.30134
                               }
                             },
                             {
                               "type": "DEPOSIT",
                               "network": "APTOS",
+                              "lockedUntil": null,
+                              "program": null,
                               "amount": {
                                 "amount": 100,
                                 "currency": {
-                                  "code": "APT"
-                                }
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "dollarsEquivalent": 30.13,
+                                "conversionRate": 0.30134
                               }
                             }
                           ]

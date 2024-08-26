@@ -528,7 +528,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{sponsorId}/unallocate:
+  /bo/v1/sponsors/{sponsorId}/unallocate:
     post:
       security:
         - bearerAuth: [ ]
@@ -4570,8 +4570,8 @@ components:
         lockedUntil:
           type: string
           format: date-time
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
           $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
 

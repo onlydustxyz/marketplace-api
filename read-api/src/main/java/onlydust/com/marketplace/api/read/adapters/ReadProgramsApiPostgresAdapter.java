@@ -103,19 +103,19 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     @Override
-    public ResponseEntity<TransactionPageResponse> getProgramTransactions(UUID programId,
-                                                                          Integer pageIndex,
-                                                                          Integer pageSize,
-                                                                          String fromDate,
-                                                                          String toDate,
-                                                                          List<ProgramTransactionType> types,
-                                                                          String search) {
+    public ResponseEntity<ProgramTransactionPageResponse> getProgramTransactions(UUID programId,
+                                                                                 Integer pageIndex,
+                                                                                 Integer pageSize,
+                                                                                 String fromDate,
+                                                                                 String toDate,
+                                                                                 List<ProgramTransactionType> types,
+                                                                                 String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
         final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
 
-        final var response = new TransactionPageResponse()
+        final var response = new ProgramTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toProgramTransactionPageItemResponse).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())

@@ -15,7 +15,9 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
@@ -35,6 +37,7 @@ public class ProgramReadEntity {
     @NonNull
     String name;
 
+    String url;
     String logoUrl;
 
     @ManyToMany
@@ -68,13 +71,16 @@ public class ProgramReadEntity {
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()
                 .id(id)
-                .name(name);
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
     }
 
     public ProgramResponse toResponse() {
         return new ProgramResponse()
                 .id(id)
                 .name(name)
+                .url(Optional.ofNullable(url).map(URI::create).orElse(null))
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
@@ -84,6 +90,7 @@ public class ProgramReadEntity {
         return new ProgramPageItemResponse()
                 .id(id)
                 .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
@@ -96,5 +103,12 @@ public class ProgramReadEntity {
                 .id(id)
                 .name(name)
                 .logoUrl(logoUrl);
+    }
+
+    public onlydust.com.marketplace.api.contract.model.ProgramLinkResponse toLinkResponse() {
+        return new onlydust.com.marketplace.api.contract.model.ProgramLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
     }
 }

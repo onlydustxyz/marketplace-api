@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
@@ -61,7 +62,8 @@ public class ProgramsRestApi implements ProgramsApi {
         if (!permissionService.isUserSponsorLead(authenticatedUser.id()))
             throw unauthorized("User %s is not authorized to create program".formatted(authenticatedUser.id()));
 
-        final var program = programFacadePort.create(request.getName(), request.getUrl(), request.getLogoUrl(), UserId.of(request.getProgramLeadId()));
+        final var program = programFacadePort.create(request.getName(), request.getUrl(), request.getLogoUrl(),
+                Optional.ofNullable(request.getProgramLeadId()).map(UserId::of).orElse(null));
 
         return ok(new CreateProgramResponse().id(program.id().value()));
     }

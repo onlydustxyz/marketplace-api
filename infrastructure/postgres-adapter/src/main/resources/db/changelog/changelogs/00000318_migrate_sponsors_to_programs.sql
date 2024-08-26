@@ -298,8 +298,8 @@ create view programs_projects as
 with allocations as (select abt.account_book_id,
                             abt.program_id,
                             abt.project_id,
-                            sum(abt.amount) filter ( where abt.type = 'TRANSFER' )
-                                - sum(abt.amount) filter ( where abt.type = 'REFUND' ) as amount
+                            coalesce(sum(abt.amount) filter ( where abt.type = 'TRANSFER' ), 0)
+                                - coalesce(sum(abt.amount) filter ( where abt.type = 'REFUND' ), 0) as amount
                      from accounting.account_book_transactions abt
                      where abt.project_id is not null
                        and abt.reward_id is null
@@ -313,5 +313,4 @@ select distinct sa.sponsor_id  as sponsor_id,
                 abt.program_id as program_id
 from accounting.account_book_transactions abt
          join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
-where program_id is not null
-group by sa.sponsor_id, abt.program_id;
+where program_id is not null;

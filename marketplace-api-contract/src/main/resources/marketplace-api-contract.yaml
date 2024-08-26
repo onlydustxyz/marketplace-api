@@ -4139,7 +4139,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionPageResponse'
+                $ref: '#/components/schemas/ProgramTransactionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4180,7 +4180,7 @@ paths:
       tags:
         - ReadSponsors
       summary: Get the list of all transactions related to this sponsor
-      operationId: getSponsorTransactionHistory
+      operationId: getSponsorTransactions
       parameters:
         - in: path
           name: sponsorId
@@ -4243,7 +4243,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionHistoryPageResponse'
+                $ref: '#/components/schemas/SponsorTransactionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -5845,6 +5845,10 @@ components:
           type: string
           description: Program name
           example: Starkware Exploration Team
+        logoUrl:
+          type: string
+          format: uri
+          description: Program's logo URL
 
     ProgramPageItemResponse:
       allOf:
@@ -5881,6 +5885,10 @@ components:
             - totalGranted
             - totalRewarded
           properties:
+            url:
+              type: string
+              format: uri
+              description: Program's website URL
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
@@ -6336,10 +6344,10 @@ components:
           type: array
           items:
             type: string
-        sponsors:
+        programs:
           type: array
           items:
-            $ref: '#/components/schemas/SponsorResponse'
+            $ref: '#/components/schemas/ProgramLinkResponse'
         languages:
           type: array
           items:
@@ -8730,6 +8738,7 @@ components:
           type: string
         logoUrl:
           type: string
+          format: uri
 
     ProgramWithBudgetResponse:
       allOf:
@@ -8746,7 +8755,7 @@ components:
               items:
                 $ref: '#/components/schemas/Money'
 
-    TransactionHistoryPageResponse:
+    SponsorTransactionPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -8756,9 +8765,9 @@ components:
             transactions:
               type: array
               items:
-                $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
+                $ref: '#/components/schemas/SponsorTransactionPageItemResponse'
 
-    TransactionHistoryPageItemResponse:
+    SponsorTransactionPageItemResponse:
       type: object
       required:
         - date
@@ -8773,12 +8782,12 @@ components:
           format: date-time
         type:
           $ref: '#/components/schemas/SponsorAccountTransactionType'
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
           $ref: '#/components/schemas/Money'
 
-    TransactionPageResponse:
+    ProgramTransactionPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -8935,7 +8944,7 @@ components:
         - DATE
         - TYPE
         - AMOUNT
-        - PROJECT
+        - PROGRAM
 
     AllocateRequest:
       type: object
