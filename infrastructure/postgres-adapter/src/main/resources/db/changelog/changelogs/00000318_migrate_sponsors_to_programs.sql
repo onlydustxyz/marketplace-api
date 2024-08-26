@@ -70,7 +70,7 @@ select insert_account_books_event(
                        '@type', 'Transfer',
                        'from', jsonb_build_object('id', m.sponsor_account_id, 'type', 'SPONSOR_ACCOUNT'),
                        'to', jsonb_build_object('id', p.id, 'type', 'PROGRAM'),
-                       'amount', m.payload #> '{event,amount}')),
+                       'amount', m.payload #> '{event, amount}')),
                m.timestamp + interval '1 second')
 from temp.mints m
          join accounting.sponsor_accounts sa on sa.id = m.sponsor_account_id
@@ -192,7 +192,7 @@ with virtual_stats as (select sa.sponsor_id                                     
                               sum(abt.amount) filter (where abt.type = 'REFUND' and abt.program_id is not null and abt.project_id is null)   as unallocated,
                               sum(abt.amount) filter (where abt.type = 'TRANSFER' and abt.reward_id is not null and abt.payment_id is null)  as rewarded,
                               sum(abt.amount) filter (where abt.type = 'REFUND' and abt.reward_id is not null and abt.payment_id is null)    as canceled,
-                              sum(abt.amount) filter (where abt.type = 'BURN' and abt.payment_id is not null)                                as paid
+                              sum(abt.amount) filter (where abt.type = 'BURN' and abt.reward_id is not null)                                 as paid
                        from accounting.account_book_transactions abt
                                 join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
                        group by sa.sponsor_id,
