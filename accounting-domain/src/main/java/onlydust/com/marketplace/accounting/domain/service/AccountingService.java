@@ -76,18 +76,16 @@ public class AccountingService implements AccountingFacadePort {
                 .filter(account -> accountBook.balanceOf(AccountId.of(account.id())).isGreaterThanOrEqual(amount)).findFirst()
                 .orElseThrow(() -> badRequest("Sponsor account with enough funds for sponsor %s and currency %s not found".formatted(from, currencyId)));
 
-        SponsorAccount.Id from1 = sponsorAccount.id();
-        transfer(from1, to, amount, currencyId);
+        transfer(sponsorAccount.id(), to, amount, currencyId);
     }
 
     @Override
     @Transactional
     public void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
         final var sponsorAccount = sponsorAccountStorage.find(to, currencyId).stream().findFirst()
-                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(from, currencyId)));
+                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(to, currencyId)));
 
-        SponsorAccount.Id to1 = sponsorAccount.id();
-        refund(from, to1, amount, currencyId);
+        refund(from, sponsorAccount.id(), amount, currencyId);
     }
 
     @Override
