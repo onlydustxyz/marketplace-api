@@ -213,12 +213,10 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBackofficeAdapter postgresBackofficeAdapter(final SponsorRepository sponsorRepository,
-                                                               final BoEcosystemRepository boEcosystemRepository,
+    public PostgresBackofficeAdapter postgresBackofficeAdapter(final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(sponsorRepository, boEcosystemRepository, ecosystemRepository,
-                projectRepository);
+        return new PostgresBackofficeAdapter(boEcosystemRepository, ecosystemRepository, projectRepository);
     }
 
     @Bean
@@ -230,7 +228,6 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<TrackingEventEntity> trackingOutbox(final TrackingEventRepository trackingEventRepository) {
         return new PostgresOutboxAdapter<>(trackingEventRepository);
     }
-
 
     @Bean
     public PostgresOutboxAdapter<IndexingEventEntity> indexingEventsOutbox(final IndexingEventRepository indexingEventRepository) {
@@ -246,7 +243,6 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<BoostNodeGuardiansRewardsEventEntity> boostNodeGuardiansRewardsOutbox(final BoostNodeGuardiansRewardsRepository boostNodeGuardiansRewardsRepository) {
         return new PostgresOutboxAdapter<>(boostNodeGuardiansRewardsRepository);
     }
-
 
     @Bean
     public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager) {

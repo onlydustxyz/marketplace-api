@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectEnt
 import onlydust.com.marketplace.api.postgres.adapter.repository.EcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.port.output.BackofficeStoragePort;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @AllArgsConstructor
 public class PostgresBackofficeAdapter implements BackofficeStoragePort {
-
-    private final SponsorRepository sponsorRepository;
     private final BoEcosystemRepository boEcosystemRepository;
     private final EcosystemRepository ecosystemRepository;
     private final ProjectRepository projectRepository;
