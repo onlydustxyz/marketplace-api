@@ -3866,6 +3866,73 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/programs:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Programs
+      summary: Create a program
+      operationId: createProgram
+      description: Create a program
+      requestBody:
+        description: Program
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProgramRequest'
+      responses:
+        "200":
+          description: 'New program'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProgramResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/logos:
+    post:
+      security:
+        - { }
+      tags:
+        - Programs
+      summary: Upload a program logo
+      operationId: uploadProgramLogo
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/programs/{programId}:
     get:
       security:
@@ -5726,6 +5793,33 @@ components:
           $ref: '#/components/schemas/ProjectLinkResponse'
         issueCount:
           type: integer
+
+    CreateProgramRequest:
+      type: object
+      required:
+        - name
+        - programLead
+      properties:
+        name:
+          type: string
+          description: Program name
+          example: Starkware Exploration Team
+        url:
+          type: string
+          format: uri
+          description: Program's website URL
+        logoUrl:
+          type: string
+          format: uri
+          description: Program's logo URL
+        programLeadId:
+          $ref: '#/components/schemas/UserId'
+
+    CreateProgramResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
 
     ProgramPageResponse:
       allOf:

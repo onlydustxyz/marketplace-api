@@ -3,7 +3,8 @@ create table programs
 (
     id              uuid primary key,
     name            text      not null,
-    logo_url        text      not null,
+    url             text,
+    logo_url        text,
     tech_created_at timestamp not null default now(),
     tech_updated_at timestamp not null default now()
 );
@@ -14,8 +15,8 @@ create trigger programs_set_tech_updated_at
     for each row
 execute function set_tech_updated_at();
 
-insert into programs (id, name, logo_url)
-select gen_random_uuid(), name, logo_url
+insert into programs (id, name, logo_url, url)
+select gen_random_uuid(), name, logo_url, url
 from sponsors;
 
 -- Migrate program leads from sponsors_users
@@ -258,11 +259,11 @@ group by abt.program_id,
          ab.currency_id;
 
 create view bi.program_stats as
-select program_id,
-       count(distinct project_id) as granted_project_count
-from bi.program_stats_per_currency_per_project
-where total_granted > 0
-group by program_id;
+select p.id                                      as program_id,
+       coalesce(count(distinct s.project_id), 0) as granted_project_count
+from programs p
+         left join bi.program_stats_per_currency_per_project s on p.id = s.program_id and s.total_granted > 0
+group by p.id;
 
 create view bi.project_stats_per_currency as
 select abt.project_id                                                                            as project_id,
@@ -293,7 +294,7 @@ drop view bi.weekly_rewards_creation_stats_per_sponsor;
 
 drop table projects_sponsors;
 
-create view project_programs as
+create view programs_projects as
 with allocations as (select abt.account_book_id,
                             abt.program_id,
                             abt.project_id,
@@ -307,3 +308,10 @@ select distinct program_id, project_id
 from allocations
 where amount > 0;
 
+create view sponsors_programs as
+select distinct sa.sponsor_id  as sponsor_id,
+                abt.program_id as program_id
+from accounting.account_book_transactions abt
+         join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
+where program_id is not null
+group by sa.sponsor_id, abt.program_id;

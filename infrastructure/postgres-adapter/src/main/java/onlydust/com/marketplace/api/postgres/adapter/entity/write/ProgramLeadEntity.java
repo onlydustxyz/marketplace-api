@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -26,6 +28,10 @@ public class ProgramLeadEntity {
 
     @Id
     UUID programId;
+
+    public static ProgramLeadEntity of(ProgramId programId, UserId leadId) {
+        return new ProgramLeadEntity(leadId.value(), programId.value());
+    }
 
     @EqualsAndHashCode
     @AllArgsConstructor

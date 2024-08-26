@@ -41,6 +41,10 @@ public class PermissionService {
         return sponsorStoragePort.isAdmin(userId, SponsorId.of(sponsorId));
     }
 
+    public boolean isUserSponsorLead(UUID userId) {
+        return sponsorStoragePort.isAdminOfAnySponsor(userId);
+    }
+
     public boolean isUserProgramLead(UUID userId, ProgramId programId) {
         return programStoragePort.isAdmin(userId, programId);
     }

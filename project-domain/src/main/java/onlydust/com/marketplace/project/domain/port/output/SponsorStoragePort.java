@@ -14,4 +14,6 @@ public interface SponsorStoragePort {
     Optional<Sponsor> get(SponsorId sponsorId);
 
     void save(Sponsor sponsor);
+
+    boolean isAdminOfAnySponsor(UUID userId);
 }

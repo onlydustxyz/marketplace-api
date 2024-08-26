@@ -9,11 +9,14 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
+import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorResponse;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -57,6 +60,17 @@ public class SponsorReadEntity {
     @NonNull
     Set<AllUserReadEntity> leads;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "sponsors_programs",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "sponsorId"),
+            inverseJoinColumns = @JoinColumn(name = "programId")
+    )
+    @NonNull
+    @OrderBy("name")
+    List<ProgramReadEntity> programs;
+
     public SponsorResponse toResponse() {
         return new SponsorResponse()
                 .id(id)
@@ -96,5 +110,14 @@ public class SponsorReadEntity {
                         .map(AllUserReadEntity::toBoLinkResponse)
                         .toList())
                 ;
+    }
+
+    public SponsorPageItemResponse toBoPageItemResponse() {
+        return new SponsorPageItemResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .url(url)
+                .programs(programs.stream().map(ProgramReadEntity::toBoLinkResponse).toList());
     }
 }

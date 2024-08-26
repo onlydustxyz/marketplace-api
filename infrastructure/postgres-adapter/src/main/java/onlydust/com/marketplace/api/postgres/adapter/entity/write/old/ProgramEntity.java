@@ -6,6 +6,8 @@ import jakarta.persistence.Table;
 import lombok.*;
 import onlydust.com.marketplace.project.domain.model.Program;
 
+import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -20,14 +22,16 @@ public class ProgramEntity {
     UUID id;
     @NonNull
     String name;
-    @NonNull
+
+    String url;
     String logoUrl;
 
     public static ProgramEntity of(Program program) {
         return ProgramEntity.builder()
                 .id(program.id().value())
                 .name(program.name())
-                .logoUrl(program.logoUrl().toString())
+                .url(Optional.ofNullable(program.url()).map(URI::toString).orElse(null))
+                .logoUrl(Optional.ofNullable(program.logoUrl()).map(URI::toString).orElse(null))
                 .build();
     }
 }

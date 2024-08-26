@@ -359,8 +359,8 @@ public class PostgresConfiguration {
 
     @Bean
     PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository,
-                                                  final SponsorUserRepository sponsorUserRepository) {
-        return new PostgresSponsorAdapter(sponsorRepository, sponsorUserRepository);
+                                                  final SponsorLeadRepository sponsorLeadRepository) {
+        return new PostgresSponsorAdapter(sponsorRepository, sponsorLeadRepository);
     }
 
 

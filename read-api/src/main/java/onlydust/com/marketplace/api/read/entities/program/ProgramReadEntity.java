@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
@@ -90,4 +91,10 @@ public class ProgramReadEntity {
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
     }
 
+    public ProgramLinkResponse toBoLinkResponse() {
+        return new ProgramLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl);
+    }
 }

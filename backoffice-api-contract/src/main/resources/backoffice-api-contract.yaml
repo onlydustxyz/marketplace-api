@@ -1046,7 +1046,7 @@ paths:
       tags:
         - BackofficeSponsorRead
       summary: Get sponsor page
-      operationId: getSponsorPage
+      operationId: getSponsors
       description: |
         Get sponsor page
       parameters:

@@ -2,19 +2,17 @@ package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.port.input.ProgramFacadePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
 public class ProgramHelper {
-    @Autowired
-    private DatabaseHelper databaseHelper;
     @Autowired
     private ProgramFacadePort programFacadePort;
 
@@ -23,7 +21,9 @@ public class ProgramHelper {
     public Program create() {
         return programFacadePort.create(
                 faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
-                URI.create(faker.internet().url()));
+                URI.create(faker.internet().url()),
+                URI.create(faker.internet().url()),
+                null);
     }
 
     public Program create(UserAuthHelper.AuthenticatedUser lead) {
@@ -31,7 +31,7 @@ public class ProgramHelper {
         addLead(program.id(), lead);
         return program;
     }
-    
+
     public Program create(UserAuthHelper.AuthenticatedBackofficeUser lead) {
         final var program = create();
         addLead(program.id(), lead);
@@ -47,13 +47,6 @@ public class ProgramHelper {
     }
 
     private void addLead(ProgramId programId, UUID leadId) {
-        databaseHelper.executeQuery("""
-                INSERT INTO program_leads
-                VALUES (:programId, :userId)
-                ON CONFLICT DO NOTHING
-                """, Map.of(
-                "userId", leadId,
-                "programId", programId.value()
-        ));
+        programFacadePort.addLead(programId, UserId.of(leadId));
     }
 }

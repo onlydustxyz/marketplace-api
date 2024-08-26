@@ -160,7 +160,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
 
     protected static final String GET_ME = "/bo/v1/me";
     protected static final String GET_GITHUB_REPOS = "/bo/v1/repositories";
-    protected static final String OLD_GET_SPONSORS = "/bo/v1/sponsors";
     protected static final String GET_SPONSORS = "/bo/v2/sponsors";
     protected static final String GET_SPONSOR = "/bo/v1/sponsors/%s";
     protected static final String POST_SPONSORS = "/bo/v1/sponsors";

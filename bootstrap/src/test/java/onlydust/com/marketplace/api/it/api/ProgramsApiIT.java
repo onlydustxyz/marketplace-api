@@ -18,6 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -34,6 +35,27 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setUp() {
         caller = userAuthHelper.create();
+    }
+
+    @Nested
+    class GivenASponsorLead {
+        @Test
+        void should_create_program() {
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Awesome program"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty();
+        }
     }
 
     @Nested

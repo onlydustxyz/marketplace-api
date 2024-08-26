@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProgramEnt
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProgramLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProgramRepository;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 
@@ -25,5 +26,10 @@ public class PostgresProgramAdapter implements ProgramStoragePort {
     @Override
     public void save(Program program) {
         programRepository.save(ProgramEntity.of(program));
+    }
+
+    @Override
+    public void saveProgramLead(ProgramId programId, UserId leadId) {
+        programLeadRepository.save(ProgramLeadEntity.of(programId, leadId));
     }
 }

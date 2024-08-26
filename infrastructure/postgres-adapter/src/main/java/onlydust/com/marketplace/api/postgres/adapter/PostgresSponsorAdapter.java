@@ -3,9 +3,9 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorUserEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorUserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -18,19 +18,25 @@ import java.util.UUID;
 @AllArgsConstructor
 public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSponsorStoragePort {
     private final SponsorRepository sponsorRepository;
-    private final SponsorUserRepository sponsorUserRepository;
+    private final SponsorLeadRepository sponsorLeadRepository;
 
     @Override
     @Transactional
     public boolean isAdmin(UUID userId, SponsorId sponsorId) {
-        return sponsorUserRepository.findById(new SponsorUserEntity.PrimaryKey(userId, sponsorId.value()))
+        return sponsorLeadRepository.findById(new SponsorLeadEntity.PrimaryKey(userId, sponsorId.value()))
                 .isPresent();
     }
 
     @Override
     @Transactional
+    public boolean isAdminOfAnySponsor(UUID userId) {
+        return sponsorLeadRepository.findByUserId(userId).isPresent();
+    }
+
+    @Override
+    @Transactional
     public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
-        sponsorUserRepository.save(new SponsorUserEntity(leadId, sponsorId.value()));
+        sponsorLeadRepository.save(new SponsorLeadEntity(leadId, sponsorId.value()));
     }
 
     @Override
