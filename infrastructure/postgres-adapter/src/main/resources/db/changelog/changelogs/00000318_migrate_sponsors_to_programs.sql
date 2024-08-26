@@ -47,41 +47,53 @@ truncate table sponsors_users;
 alter table sponsors_users
     rename to sponsor_leads;
 
--- Migrate account book events: Transfers to projects
+
+-- Migrate account book events:
+
+-- Mint on sponsor accounts -> transfer all to program
 create schema temp;
 
-create materialized view temp.transfers as
+create materialized view temp.mints as
 select id,
        account_book_id,
        timestamp,
-       (payload #>> '{event,from,id}')::uuid as sponsor_account_id,
-       (payload #>> '{event,to,id}')::uuid   as project_id,
+       (payload #>> '{event, account, id}')::uuid as sponsor_account_id,
        payload
 from accounting.account_books_events abe
-where payload #>> '{event, @type}' = 'Transfer'
-  and payload #>> '{event,from,type}' = 'SPONSOR_ACCOUNT';
+where payload #>> '{event, @type}' = 'Mint'
+  and payload #>> '{event, account, type}' = 'SPONSOR_ACCOUNT';
 
 select insert_account_books_event(
-               t.id + 1,
-               t.account_book_id,
-               jsonb_set(
-                       jsonb_set(t.payload, '{event,from,id}', to_jsonb(p.id), false),
-                       '{event,from,type}', '"PROGRAM"', false),
-               t.timestamp + interval '1 second'
-       )
-from temp.transfers t
-         join accounting.sponsor_accounts sa on sa.id = t.sponsor_account_id
+               m.id + 1,
+               m.account_book_id,
+               jsonb_build_object('event', jsonb_build_object(
+                       '@type', 'Transfer',
+                       'from', jsonb_build_object('id', m.sponsor_account_id, 'type', 'SPONSOR_ACCOUNT'),
+                       'to', jsonb_build_object('id', p.id, 'type', 'PROGRAM'),
+                       'amount', m.payload #> '{event,amount}')),
+               m.timestamp + interval '1 second')
+from temp.mints m
+         join accounting.sponsor_accounts sa on sa.id = m.sponsor_account_id
          join sponsors s on sa.sponsor_id = s.id
          join programs p on p.name = s.name
-order by t.id desc;
+order by m.id desc;
 
-refresh materialized view temp.transfers;
+drop schema temp cascade;
 
+-- Transfer to projects -> update origin to program
+with transfers as (select id,
+                          account_book_id,
+                          (payload #>> '{event, from, id}')::uuid as sponsor_account_id,
+                          payload
+                   from accounting.account_books_events abe
+                   where payload #>> '{event, @type}' = 'Transfer'
+                     and payload #>> '{event, from, type}' = 'SPONSOR_ACCOUNT'
+                     and payload #>> '{event, to, type}' = 'PROJECT')
 update accounting.account_books_events
 set payload = jsonb_set(
-        jsonb_set(t.payload, '{event,to,id}', to_jsonb(p.id), false),
-        '{event,to,type}', '"PROGRAM"', false)
-from temp.transfers t
+        jsonb_set(t.payload, '{event, from, id}', to_jsonb(p.id), false),
+        '{event, from, type}', '"PROGRAM"', false)
+from transfers t
          join accounting.sponsor_accounts sa on sa.id = t.sponsor_account_id
          join sponsors s on sa.sponsor_id = s.id
          join programs p on p.name = s.name
@@ -89,45 +101,23 @@ where account_books_events.account_book_id = t.account_book_id
   and account_books_events.id = t.id;
 
 -- account book events: Refunds from projects
-create materialized view temp.refunds as
-select id,
-       account_book_id,
-       timestamp,
-       (payload #>> '{event,to,id}')::uuid   as sponsor_account_id,
-       (payload #>> '{event,from,id}')::uuid as project_id,
-       payload
-from accounting.account_books_events abe
-where payload #>> '{event, @type}' = 'Refund'
-  and payload #>> '{event,to,type}' = 'SPONSOR_ACCOUNT';
-
-select insert_account_books_event(
-               r.id + 1,
-               r.account_book_id,
-               jsonb_set(
-                       jsonb_set(r.payload, '{event,from,id}', to_jsonb(p.id), false),
-                       '{event,from,type}', '"PROGRAM"', false),
-               r.timestamp + interval '1 second'
-       )
-from temp.refunds r
-         join accounting.sponsor_accounts sa on sa.id = r.sponsor_account_id
-         join sponsors s on sa.sponsor_id = s.id
-         join programs p on p.name = s.name
-order by r.id desc;
-
-refresh materialized view temp.refunds;
-
+with refunds as (select id,
+                        account_book_id,
+                        (payload #>> '{event, to, id}')::uuid as sponsor_account_id,
+                        payload
+                 from accounting.account_books_events abe
+                 where payload #>> '{event, @type}' = 'Refund'
+                   and payload #>> '{event, to, type}' = 'SPONSOR_ACCOUNT')
 update accounting.account_books_events
 set payload = jsonb_set(
-        jsonb_set(r.payload, '{event,to,id}', to_jsonb(p.id), false),
-        '{event,to,type}', '"PROGRAM"', false)
-from temp.refunds r
+        jsonb_set(r.payload, '{event, to, id}', to_jsonb(p.id), false),
+        '{event, to, type}', '"PROGRAM"', false)
+from refunds r
          join accounting.sponsor_accounts sa on sa.id = r.sponsor_account_id
          join sponsors s on sa.sponsor_id = s.id
          join programs p on p.name = s.name
 where account_books_events.account_book_id = r.account_book_id
   and account_books_events.id = r.id;
-
-drop schema temp cascade;
 
 -- re-create account_book_transactions table
 drop view accounting.all_sponsor_account_transactions;
