@@ -61,9 +61,10 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @Order(3)
     void should_unallocate() {
         // Given
+        accountingHelper.createSponsorAccount(sponsorId, 1000, currencyId);
         allocateTo(sponsorId, programId, currencyId, 1000)
                 .expectStatus()
-                .isBadRequest();
+                .isNoContent();
 
         // When
         unallocateFrom(sponsorId, programId, currencyId, 1000)
@@ -89,6 +90,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     void should_allocate() {
         // Given
         addSponsorFor(user, sponsorId.value());
+        accountingHelper.createSponsorAccount(sponsorId, 1000, currencyId);
 
         // When
         allocateTo(sponsorId, programId, currencyId, 1000)

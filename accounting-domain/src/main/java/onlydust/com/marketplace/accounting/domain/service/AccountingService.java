@@ -77,8 +77,11 @@ public class AccountingService implements AccountingFacadePort {
         while (remainingAmount.isStrictlyPositive() && sponsorAccounts.hasNext()) {
             final var sponsorAccount = sponsorAccounts.next();
             final var allocatedAmount = PositiveAmount.min(remainingAmount, accountBook.balanceOf(AccountId.of(sponsorAccount.id())));
-            transfer(sponsorAccount.id(), to, allocatedAmount, currencyId);
-            remainingAmount = PositiveAmount.of(remainingAmount.subtract(allocatedAmount));
+
+            if (allocatedAmount.isStrictlyPositive()) {
+                transfer(sponsorAccount.id(), to, allocatedAmount, currencyId);
+                remainingAmount = PositiveAmount.of(remainingAmount.subtract(allocatedAmount));
+            }
         }
         if (remainingAmount.isStrictlyPositive()) {
             throw badRequest("Not enough funds to allocate %s to program %s".formatted(amount, to));

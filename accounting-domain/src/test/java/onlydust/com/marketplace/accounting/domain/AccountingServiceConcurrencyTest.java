@@ -43,7 +43,6 @@ public class AccountingServiceConcurrencyTest {
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
     final ProgramId programId = ProgramId.random();
-    final ProjectId projectId1 = ProjectId.random();
     final Faker faker = new Faker();
     final Invoice invoice = Invoice.of(IndividualBillingProfile.builder()
                             .id(BillingProfile.Id.random())
@@ -125,9 +124,6 @@ public class AccountingServiceConcurrencyTest {
                             accountingService.allocate(sponsorId, programId, amount, currency.id());
                             accountingService.unallocate(programId, sponsorId, amount, currency.id());
                             accountingService.allocate(sponsorId, programId, amount, currency.id());
-                            accountingService.grant(programId, projectId1, amount, currency.id());
-                            accountingService.ungrant(projectId1, programId, amount, currency.id());
-                            accountingService.grant(programId, projectId1, amount, currency.id());
                         }
                         latch.countDown();
                         System.out.println("Thread " + Thread.currentThread().getName() + " ended");
@@ -140,7 +136,7 @@ public class AccountingServiceConcurrencyTest {
 
             // Then
             assertThat(cachedAccountBookProvider.get(currency).state()
-                    .balanceOf(AccountBook.AccountId.of(projectId1)))
+                    .balanceOf(AccountBook.AccountId.of(programId)))
                     .isEqualTo(PositiveAmount.of((long) (numberOfThreads * numberOfIterationPerThread)));
         }
     }
@@ -189,7 +185,7 @@ public class AccountingServiceConcurrencyTest {
         }
 
         @Test
-        public void should_register_allocations_to_project() throws InterruptedException {
+        public void should_register_allocations_to_program() throws InterruptedException {
             final int numberOfThreads = INSTANCE_COUNT;
             final int numberOfIterationPerThread = 50;
             final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
@@ -209,7 +205,6 @@ public class AccountingServiceConcurrencyTest {
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
                             try {
                                 accountingService.allocate(sponsorId, programId, amount, currency.id());
-                                accountingService.grant(programId, projectId1, amount, currency.id());
                             } catch (Exception e) {
                                 thrown.add(e);
                             }
@@ -233,7 +228,7 @@ public class AccountingServiceConcurrencyTest {
                     PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE))));
             for (int i = 1; i <= SPONSOR_INITIAL_ALLOWANCE; i++) {
                 expectedEvents.add(IdentifiedAccountBookEvent.of(i + 1, new AccountBookAggregate.TransferEvent(AccountBook.AccountId.of(sponsorAccount.id()),
-                        AccountBook.AccountId.of(projectId1), PositiveAmount.of(1L))));
+                        AccountBook.AccountId.of(programId), PositiveAmount.of(1L))));
             }
             assertThat(accountBookEventStorage.getAll(currency)).containsExactlyElementsOf(expectedEvents);
         }
@@ -245,10 +240,11 @@ public class AccountingServiceConcurrencyTest {
             final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
             final CountDownLatch latch = new CountDownLatch(numberOfThreads);
             final var thrown = new ConcurrentLinkedQueue<Throwable>();
+            final var projectId = ProjectId.random();
 
             // Given
             accountingServices.get(0).allocate(sponsorId, programId, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
-            accountingServices.get(0).grant(programId, projectId1, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
+            accountingServices.get(0).grant(programId, projectId, PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE), currency.id());
             final var amount = PositiveAmount.of(1L);
 
             // When
@@ -260,7 +256,7 @@ public class AccountingServiceConcurrencyTest {
                         final var accountingService = accountingServices.get(threadId);
                         for (int i = 0; i < numberOfIterationPerThread; i++) {
                             try {
-                                accountingService.createReward(projectId1, RewardId.random(), amount, currency.id());
+                                accountingService.createReward(projectId, RewardId.random(), amount, currency.id());
                             } catch (Exception e) {
                                 thrown.add(e);
                             }
@@ -279,22 +275,25 @@ public class AccountingServiceConcurrencyTest {
                     .balanceOf(AccountBook.AccountId.of(sponsorAccount.id())))
                     .isEqualTo(PositiveAmount.of(0L));
             assertThat(accountBookProviders.get(0).get(currency).state()
-                    .balanceOf(AccountBook.AccountId.of(projectId1)))
+                    .balanceOf(AccountBook.AccountId.of(projectId)))
                     .isEqualTo(PositiveAmount.of(0L));
 
             final var events = accountBookEventStorage.getAll(currency);
-            assertThat(events).hasSize((int) (SPONSOR_INITIAL_ALLOWANCE + 2));
+            assertThat(events).hasSize((int) (SPONSOR_INITIAL_ALLOWANCE + 3));
             assertThat(events.get(0)).isEqualTo(IdentifiedAccountBookEvent.of(1,
                     new AccountBookAggregate.MintEvent(AccountBook.AccountId.of(sponsorAccount.id()),
                             PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE))));
             assertThat(events.get(1)).isEqualTo(IdentifiedAccountBookEvent.of(2,
                     new AccountBookAggregate.TransferEvent(AccountBook.AccountId.of(sponsorAccount.id()),
-                            AccountBook.AccountId.of(projectId1), PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE))));
-            for (int i = 1; i <= SPONSOR_INITIAL_ALLOWANCE; i++) {
+                            AccountBook.AccountId.of(programId), PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE))));
+            assertThat(events.get(2)).isEqualTo(IdentifiedAccountBookEvent.of(3,
+                    new AccountBookAggregate.TransferEvent(AccountBook.AccountId.of(programId),
+                            AccountBook.AccountId.of(projectId), PositiveAmount.of(SPONSOR_INITIAL_ALLOWANCE))));
+            for (int i = 2; i <= SPONSOR_INITIAL_ALLOWANCE + 1; i++) {
                 assertThat(events.get(i + 1).id()).isEqualTo(i + 2);
                 assertThat(events.get(i + 1).data()).isInstanceOf(AccountBookAggregate.TransferEvent.class);
                 final var event = (AccountBookAggregate.TransferEvent) events.get(i + 1).data();
-                assertThat(event.from()).isEqualTo(AccountBook.AccountId.of(projectId1));
+                assertThat(event.from()).isEqualTo(AccountBook.AccountId.of(projectId));
                 assertThat(event.to()).isNotNull();
                 assertThat(event.amount()).isEqualTo(PositiveAmount.of(1L));
 
