@@ -6,14 +6,11 @@ import onlydust.com.backoffice.api.contract.model.HackathonsDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.backoffice.api.contract.model.IssuePage;
 import onlydust.com.backoffice.api.contract.model.UserPage;
-import onlydust.com.marketplace.api.read.entities.github.GithubIssueReadEntity;
+import onlydust.com.marketplace.api.read.entities.github.HackathonGithubIssueItemReadEntity;
+import onlydust.com.marketplace.api.read.entities.github.ProjectGithubIssueItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
-import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
-import onlydust.com.marketplace.api.read.repositories.GithubIssueReadRepository;
-import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
-import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
-import onlydust.com.marketplace.api.read.repositories.UserReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import org.springframework.context.annotation.Profile;
@@ -42,7 +39,7 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
     private UserReadRepository userReadRepository;
     private HackathonReadRepository hackathonReadRepository;
     private HackathonItemReadRepository hackathonItemReadRepository;
-    private GithubIssueReadRepository githubIssueReadRepository;
+    private HackathonGithubIssueItemReadRepository hackathonGithubIssueItemReadRepository;
 
     @Override
     public ResponseEntity<UserPage> getRegisteredUserPage(UUID hackathonId, Integer pageIndex, Integer pageSize, String login) {
@@ -75,14 +72,14 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
                                                         Boolean isAssigned) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final var page = githubIssueReadRepository.findHackathonIssues(hackathonId, search, projectIds, isAssigned,
+        final var page = hackathonGithubIssueItemReadRepository.findHackathonIssues(hackathonId, search, projectIds, isAssigned,
                 PageRequest.of(sanitizedPageIndex, sanitizePageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
 
         final var response = new IssuePage()
                 .nextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, page.getTotalPages()))
                 .hasMore(PaginationHelper.hasMore(sanitizedPageIndex, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements()).users(page.stream().map(GithubIssueReadEntity::toPageItem).toList());
+                .totalItemNumber((int) page.getTotalElements()).users(page.stream().map(HackathonGithubIssueItemReadEntity::toPageItem).toList());
 
         return status(response.getHasMore() ? PARTIAL_CONTENT : OK).body(response);
     }
