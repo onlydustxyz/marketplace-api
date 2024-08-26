@@ -259,7 +259,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     accountingHelper.unallocate(program.id(), sponsor.id(), 700, USDC);
                 });
 
-
                 at("2024-02-03T00:00:00Z", () -> {
                     accountingHelper.createSponsorAccount(sponsor.id(), 12, ETH);
                     accountingHelper.allocate(sponsor.id(), program.id(), 12, ETH);
@@ -275,14 +274,23 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     accountingHelper.allocate(sponsor.id(), anotherProgram.id(), 1, BTC);
                 });
 
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(program.id(), project1Id, 500, USDC));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(program.id(), project1Id, 2, ETH));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(program.id(), project2Id, 200, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(program.id(), project2Id, 3, ETH));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(anotherProgram.id(), project1Id, 500, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(anotherProgram.id(), project1Id, 1, BTC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(anotherProgram.id(), project2Id, 400, USDC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1Id, program.id(), 200, USDC));
+                at("2024-04-23T00:00:00Z", () -> {
+                    accountingHelper.grant(program.id(), project1Id, 500, USDC);
+                    accountingHelper.grant(program.id(), project1Id, 2, ETH);
+                });
+
+                at("2024-04-24T00:00:00Z", () -> accountingHelper.grant(program.id(), project2Id, 200, USDC));
+
+                at("2024-05-23T00:00:00Z", () -> {
+                    accountingHelper.grant(program.id(), project2Id, 3, ETH);
+                    accountingHelper.grant(anotherProgram.id(), project1Id, 500, USDC);
+                    accountingHelper.grant(anotherProgram.id(), project1Id, 1, BTC);
+                });
+
+                at("2024-06-23T00:00:00Z", () -> {
+                    accountingHelper.grant(anotherProgram.id(), project2Id, 400, USDC);
+                    accountingHelper.refund(project1Id, program.id(), 200, USDC);
+                });
 
                 final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 400, USDC));
                 final var reward2 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH));

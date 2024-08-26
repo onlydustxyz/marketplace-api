@@ -339,7 +339,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg",
                               "programs": [
                                 {
-                                  "id": "f0fb667e-0e68-4fd3-a383-a82acfba3e52",
                                   "name": "Captain America",
                                   "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg"
                                 }
@@ -359,7 +358,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
                               "programs": [
                                 {
-                                  "id": "42a669c3-497a-4d18-912a-5a438ef2a41f",
                                   "name": "Coca Cola",
                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                                 }
@@ -386,7 +384,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://www.foobaaaar.com/logo.png",
                               "programs": [
                                 {
-                                  "id": "c827654f-cd8b-4ff6-b546-836aac778514",
                                   "name": "AS Nancy Lorraine",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                                 }
@@ -405,7 +402,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp",
                               "programs": [
                                 {
-                                  "id": "e41f3953-76f9-488e-9a4c-d22c311cf5cd",
                                   "name": "No Sponsor",
                                   "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
                                 }
@@ -418,7 +414,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png",
                               "programs": [
                                 {
-                                  "id": "a914522a-28ed-4690-bb96-2255ddc6e792",
                                   "name": "OGC Nissa Ineos",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
                                 }
@@ -431,7 +426,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png",
                               "programs": [
                                 {
-                                  "id": "b42d7ad0-cc39-4ce2-bdca-5c3090272e59",
                                   "name": "PSG",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
                                 }
@@ -458,33 +452,28 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           "nextPageIndex": 1,
                           "sponsors": [
                             {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
                               "name": "Red Bull",
                               "url": "https://www.redbull.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg",
                               "programs": [
                                 {
-                                  "id": "db3dd43e-f442-4a3a-ba28-41a8a2f2fb08",
                                   "name": "Red Bull",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                                 }
                               ]
                             },
                             {
-                              "id": "eb04a5de-4802-4071-be7b-9007b563d48d",
                               "name": "Starknet Foundation",
                               "url": "https://starknet.io",
                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png",
                               "programs": []
                             },
                             {
-                              "id": "2639563e-4437-4bde-a4f4-654977c0cb39",
                               "name": "Theodo",
                               "url": null,
                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
                               "programs": [
                                 {
-                                  "id": "455eb108-9f9e-428d-969f-592641af73bf",
                                   "name": "Theodo",
                                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
                                 }
@@ -500,7 +489,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             },
                             {
-                              "id": "9181a1b6-d4a4-4a23-9c5c-1d1386828bc1",
                               "name": "We are super sponsors!",
                               "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",

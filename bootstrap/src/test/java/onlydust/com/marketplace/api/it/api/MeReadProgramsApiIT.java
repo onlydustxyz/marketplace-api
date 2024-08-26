@@ -100,7 +100,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             assertThat(response.getNextPageIndex()).isEqualTo(1);
             assertThat(response.getPrograms()).hasSize(5);
             assertThat(response.getPrograms().get(0).getName().compareTo(response.getPrograms().get(4).getName())).isLessThan(0);
-            assertThat(response.getPrograms()).allMatch(p -> programs.stream().anyMatch(p1 -> p1.id().equals(p.getId()) && p1.name().equals(p.getName())));
+            assertThat(response.getPrograms()).allMatch(p -> programs.stream().anyMatch(p1 -> p1.id().value().equals(p.getId()) && p1.name().equals(p.getName())));
             assertThat(response.getPrograms()).extracting("leads", List.class).allMatch(leads -> leads.size() == 1);
             assertThat(response.getPrograms()).extracting("projectCount", Integer.class).allMatch(count -> count == 0);
             assertThat(response.getPrograms()).extracting("totalAvailable", DetailedTotalMoney.class).allMatch(t -> t.getTotalUsdEquivalent().compareTo(ZERO) > 0);

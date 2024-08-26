@@ -119,7 +119,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "date": "2023-02-21T09:15:11.603693Z",
                               "type": "ALLOCATION",
                               "program": {
-                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
                                 "name": "Coca Cola",
                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                               },
@@ -159,7 +158,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "date": "2023-02-22T12:23:04.403824Z",
                               "type": "ALLOCATION",
                               "program": {
-                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
                                 "name": "Coca Cola",
                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                               },
@@ -199,7 +197,6 @@ public class SponsorsGetApiIT extends AbstractMarketplaceApiIT {
                               "date": "2023-09-28T14:20:36.595046Z",
                               "type": "ALLOCATION",
                               "program": {
-                                "id": "735816e0-5150-4f0c-a728-b501c45523ec",
                                 "name": "Coca Cola",
                                 "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                               },

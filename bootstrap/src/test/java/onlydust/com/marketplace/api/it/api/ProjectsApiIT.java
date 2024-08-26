@@ -174,7 +174,14 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 }
               ],
               "categories": [],
-              "programs": [],
+              "categorySuggestions": [],
+              "programs": [
+                {
+                  "id": "451e5b61-c340-4f85-905c-da4332c968ed",
+                  "name": "Coca Cola",
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                }
+              ],
               "languages": [
                 {
                   "id": "75ce6b37-8610-4600-8d2d-753b50aeda1e",
@@ -197,6 +204,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               "goodFirstIssueCount": 0
             }
             """;
+
     private static final String BRETZEL_OVERVIEW_WITH_TAGS_JSON = """
             {
               "id": "7d04163c-4187-4313-8066-61504d34fc56",
@@ -352,7 +360,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 }
               ],
               "categories": [],
-              "programs": [],
+              "programs": [
+                {
+                  "id": "451e5b61-c340-4f85-905c-da4332c968ed",
+                  "name": "Coca Cola",
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                }
+              ],
               "hasRemainingBudget": true,
               "rewardSettings": {
                 "ignorePullRequests": false,
@@ -501,7 +515,13 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
               ],
               "categories": [],
               "categorySuggestions": [],
-              "programs": [],
+              "programs": [
+                {
+                  "id": "6d13685b-2853-438e-bf78-b7d4a37adc70",
+                  "name": "No Sponsor",
+                  "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                }
+              ],
               "languages": [],
               "hasRemainingBudget": true,
               "rewardSettings": {
@@ -775,7 +795,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus().is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.programs").isArray()
-                .jsonPath("$.programs.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].id").isEqualTo(program.id().toString());
+                .jsonPath("$.programs.length()").isEqualTo(2)
+                .jsonPath("$.programs[?(@.id == '%s')].id".formatted(program.id())).isNotEmpty();
     }
 }
