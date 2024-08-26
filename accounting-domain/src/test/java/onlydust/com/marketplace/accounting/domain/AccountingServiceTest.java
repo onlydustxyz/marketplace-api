@@ -359,7 +359,7 @@ public class AccountingServiceTest {
         }
 
         @Test
-        void should_register_allocations_to_program() {
+        void should_register_allocation_from_a_single_account_to_program() {
             // Given
             final var amount = PositiveAmount.of(20L);
 
@@ -374,13 +374,55 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
 
-//            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
-//            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-//            final var transactions = transactionsCaptor.getAllValues();
-//            assertThat(transactions).containsExactly(
-//                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount),
-//                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(projectId1)), amount)
-//            );
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), amount),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), amount)
+            );
+        }
+
+        @Test
+        void should_register_allocation_from_multiple_accounts_to_program() {
+            // Given
+            final var amount = PositiveAmount.of(250L);
+
+            // When
+            accountingService.allocate(sponsorId, programId, amount, currency.id());
+            accountingService.unallocate(programId, sponsorId, amount, currency.id());
+
+            // Then
+            final var events = List.of(
+                    IdentifiedAccountBookEvent.of(4, new TransferEvent(AccountId.of(sponsorAccount1.id()), AccountId.of(programId), PositiveAmount.of(100L))),
+                    IdentifiedAccountBookEvent.of(5, new TransferEvent(AccountId.of(sponsorAccount2.id()), AccountId.of(programId), PositiveAmount.of(100L))),
+                    IdentifiedAccountBookEvent.of(6, new TransferEvent(AccountId.of(sponsorAccount3.id()), AccountId.of(programId), PositiveAmount.of(50L))),
+                    IdentifiedAccountBookEvent.of(7, new RefundEvent(AccountId.of(programId), AccountId.of(sponsorAccount3.id()), PositiveAmount.of(50L))),
+                    IdentifiedAccountBookEvent.of(8, new RefundEvent(AccountId.of(programId), AccountId.of(sponsorAccount2.id()), PositiveAmount.of(100L))),
+                    IdentifiedAccountBookEvent.of(9, new RefundEvent(AccountId.of(programId), AccountId.of(sponsorAccount1.id()), PositiveAmount.of(100L)))
+            );
+            assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
+
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
+            verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
+            final var transactions = transactionsCaptor.getAllValues();
+            assertThat(transactions).containsExactly(
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount2.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount3.id()), AccountId.of(programId)), PositiveAmount.of(50L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount3.id()), AccountId.of(programId)), PositiveAmount.of(50L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount2.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
+                    new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), PositiveAmount.of(100L))
+            );
+        }
+
+        @Test
+        void should_not_register_allocation_from_multiple_accounts_to_program_when_not_enough_funds() {
+            // Given
+            final var amount = PositiveAmount.of(350L);
+
+            // When
+            assertThatThrownBy(() -> accountingService.allocate(sponsorId, programId, amount, currency.id())).isInstanceOf(OnlyDustException.class);
         }
     }
 

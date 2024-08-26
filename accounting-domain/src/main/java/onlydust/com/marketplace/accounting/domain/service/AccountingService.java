@@ -68,24 +68,50 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void allocate(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+    public void allocate(final SponsorId from, final ProgramId to, final PositiveAmount amount, final Currency.Id currencyId) {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency).state();
 
-        final var sponsorAccount = sponsorAccountStorage.find(from, currencyId).stream()
-                .filter(account -> accountBook.balanceOf(AccountId.of(account.id())).isGreaterThanOrEqual(amount)).findFirst()
-                .orElseThrow(() -> badRequest("Sponsor account with enough funds for sponsor %s and currency %s not found".formatted(from, currencyId)));
-
-        transfer(sponsorAccount.id(), to, amount, currencyId);
+        final var sponsorAccounts = sponsorAccountStorage.find(from, currencyId).iterator();
+        var remainingAmount = amount;
+        while (remainingAmount.isStrictlyPositive() && sponsorAccounts.hasNext()) {
+            final var sponsorAccount = sponsorAccounts.next();
+            final var allocatedAmount = PositiveAmount.min(remainingAmount, accountBook.balanceOf(AccountId.of(sponsorAccount.id())));
+            transfer(sponsorAccount.id(), to, allocatedAmount, currencyId);
+            remainingAmount = PositiveAmount.of(remainingAmount.subtract(allocatedAmount));
+        }
+        if (remainingAmount.isStrictlyPositive()) {
+            throw badRequest("Not enough funds to allocate %s to program %s".formatted(amount, to));
+        }
     }
 
     @Override
     @Transactional
     public void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var sponsorAccount = sponsorAccountStorage.find(to, currencyId).stream().findFirst()
-                .orElseThrow(() -> notFound("Sponsor account for sponsor %s and currency %s not found".formatted(to, currencyId)));
+        final var currency = getCurrency(currencyId);
+        final var accountBook = getAccountBook(currency).state();
+        final var transferredAmount = accountBook.transferredAmountPerOrigin(AccountId.of(from));
 
-        refund(from, sponsorAccount.id(), amount, currencyId);
+        final var sponsorAccounts = reversed(sponsorAccountStorage.find(to, currencyId)).iterator();
+        var remainingAmount = amount;
+        while (remainingAmount.isStrictlyPositive() && sponsorAccounts.hasNext()) {
+            final var sponsorAccount = sponsorAccounts.next();
+            final var unallocatedAmount = PositiveAmount.min(remainingAmount, transferredAmount.getOrDefault(AccountId.of(sponsorAccount.id()),
+                    PositiveAmount.ZERO));
+            if (unallocatedAmount.isStrictlyPositive()) {
+                refund(from, sponsorAccount.id(), unallocatedAmount, currencyId);
+                remainingAmount = PositiveAmount.of(remainingAmount.subtract(unallocatedAmount));
+            }
+        }
+        if (remainingAmount.isStrictlyPositive()) {
+            throw badRequest("Not enough funds to unallocate %s from program %s".formatted(amount, from));
+        }
+    }
+
+    private static <T> List<T> reversed(List<T> list) {
+        List<T> reversed = new ArrayList<>(list);
+        Collections.reverse(reversed);
+        return reversed;
     }
 
     @Override
