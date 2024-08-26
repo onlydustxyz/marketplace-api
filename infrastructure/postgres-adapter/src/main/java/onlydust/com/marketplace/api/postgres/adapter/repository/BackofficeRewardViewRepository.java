@@ -75,7 +75,7 @@ public interface BackofficeRewardViewRepository extends JpaRepository<BoRewardQu
                                             left join indexer_exp.github_accounts creator_ga on creator_ga.id = creator.github_user_id
                                             ) creator on creator.id = i.created_by
             
-                                 left join (select abt.reward_id, jsonb_agg(json_build_object('id', s.id, 'name', s.name, 'logoUrl', s.logo_url)) s_list
+                                 left join (select abt.reward_id, jsonb_agg(distinct jsonb_build_object('id', s.id, 'name', s.name, 'logoUrl', s.logo_url)) s_list
                                             from sponsors s
                                                join accounting.sponsor_accounts sa on sa.sponsor_id = s.id
                                                join accounting.account_book_transactions abt on abt.sponsor_account_id = sa.id

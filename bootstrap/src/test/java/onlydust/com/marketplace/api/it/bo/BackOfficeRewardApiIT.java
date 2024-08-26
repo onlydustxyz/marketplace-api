@@ -5,9 +5,7 @@ import onlydust.com.backoffice.api.contract.model.PayRewardRequest;
 import onlydust.com.backoffice.api.contract.model.RewardPageResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.accounting.domain.service.PayoutPreferenceService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
@@ -17,6 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -687,14 +687,14 @@ public class BackOfficeRewardApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
         assertThat(csv).isEqualToIgnoringWhitespace("""
                 Project,Invoice Creator Github,Invoice Creator email,Invoice Creator name,Recipient name,Amount,Currency,Contributions,Status,Requested at,Processed at,Transaction Hash,Payout information,Pretty ID,Sponsors,Recipient email,Verification status,Account type,Invoice number,Invoice id,Budget,Conversion rate,Dollar Amount
-                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834Z,2023-09-26T21:08:01.957Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823Z,2023-09-26T21:08:01.735Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1C56D","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971Z,2023-09-26T21:08:01.601Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#4CCF3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433Z,2023-09-26T21:25:50.605Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#CF65A","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.0000
-                Bretzel,,,,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-app/issues/1],COMPLETE,2023-08-10T14:25:38.310Z,2023-09-26T21:25:49.941Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1CCB3","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
-                Bretzel,,,,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034Z,2023-09-26T21:25:48.826Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#B69D6","[Coca Cola, OGC Nissa Ineos]",,,,,Bretzel - USDC,1.0100000000000000,1010.00
+                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T15:57:29.834Z,2023-09-26T21:08:01.957Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#736E0",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-26T08:43:36.823Z,2023-09-26T21:08:01.735Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1C56D",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:12:26.971Z,2023-09-26T21:08:01.601Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#4CCF3",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,gregcha,1000.00,USDC,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-09-25T13:01:35.433Z,2023-09-26T21:25:50.605Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#CF65A",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.0000
+                Bretzel,,,,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-app/issues/1],COMPLETE,2023-08-10T14:25:38.310Z,2023-09-26T21:25:49.941Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#1CCB3",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.00
+                Bretzel,,,,gregcha,1000,USDC,[https://github.com/gregcha/bretzel-site/issues/1],COMPLETE,2023-07-26T10:06:57.034Z,2023-09-26T21:25:48.826Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#B69D6",[Coca Cola],,,,,Bretzel - USDC,1.0100000000000000,1010.00
                 Taco Tuesday,,,,gregcha,1000,USD,[https://github.com/MaximeBeasse/KeyDecoder/pull/1],COMPLETE,2023-07-23T08:34:56.803Z,2023-09-26T21:28:32.053Z,[OK cool],[FR7640618802650004034616528],"#0D951",[Red Bull],,,,,Taco Tuesday - USD,1.00000000000000000000,1000
-                Mooooooonlight,,,,oscarwroche,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425Z,2023-09-26T20:22:12.865Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#AB855","[Starknet Foundation, Theodo]",,,,,Mooooooonlight - USDC,1.0100000000000000,1010.00
+                Mooooooonlight,,,,oscarwroche,1000,USDC,[https://github.com/onlydustxyz/marketplace-frontend/pull/743],COMPLETE,2023-03-01T12:48:51.425Z,2023-09-26T20:22:12.865Z,[0x61b205c29984b5b2eaec5025e6b24ace49691f458fe0dcb9cbaeeb97186507db],[0x657dd41d9bbfe65cbe9f6224d48405b7cad283ea],"#AB855",[Theodo],,,,,Mooooooonlight - USDC,1.0100000000000000,1010.00
                 Marketplace 2,,,,ofux,438,USD,[https://github.com/onlydustxyz/marketplace-frontend/pull/642],COMPLETE,2023-02-02T15:20:35.665Z,2023-09-26T20:24:00.439Z,[Coucou les filles],[GB33BUKB20201555555555],"#C5AE2",[No Sponsor],,,,,Marketplace 2 - USD,1.00000000000000000000,438
                 """);
     }
