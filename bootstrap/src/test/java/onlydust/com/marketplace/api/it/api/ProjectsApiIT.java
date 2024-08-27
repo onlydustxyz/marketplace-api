@@ -815,7 +815,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var slug = "bretzel";
         final var sponsor = sponsorHelper.create();
-        final var program = programHelper.create();
+        final var program = programHelper.create(sponsor.id());
         final var projectId = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
 
         accountingHelper.createSponsorAccount(sponsor.id(), 100, STRK);

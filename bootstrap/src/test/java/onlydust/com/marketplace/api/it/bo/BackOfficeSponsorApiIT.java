@@ -1,12 +1,8 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.backoffice.api.contract.model.AllocationRequest;
-import onlydust.com.backoffice.api.contract.model.CreateAccountRequest;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
-import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
-import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
@@ -16,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -24,10 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 @TagBO
@@ -292,102 +285,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
-    }
-
-    @Test
-    @Order(5)
-    void should_link_sponsor_to_program_upon_allocation() {
-        final var jwt = pierre.jwt();
-        final var program = programHelper.create();
-        final var BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
-
-        // Given
-        final var sponsor = client.post()
-                .uri(getApiURI(POST_SPONSORS))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "name": "Virgin sponsor",
-                          "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png",
-                          "leads": []
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(SponsorResponse.class)
-                .returnResult().getResponseBody();
-
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(new CreateAccountRequest()
-                        .currencyId(STRK.value())
-                        .allowance(BigDecimal.valueOf(1000)))
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        // And when
-        client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(new AllocationRequest()
-                        .amount(BigDecimal.valueOf(400))
-                        .currencyId(STRK.value())
-                        .programId(program.id().value()))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.availableBudgets.length()").isEqualTo(1)
-                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(600)
-                .jsonPath("$.availableBudgets[0].debt").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
-                .jsonPath("$.programs.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.programs[0].remainingBudgets[0].amount").isEqualTo(400);
-
-        // And when
-        accountingHelper.grant(program.id(), BRETZEL, 400L, STRK);
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.availableBudgets.length()").isEqualTo(1)
-                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(600)
-                .jsonPath("$.availableBudgets[0].debt").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
-                .jsonPath("$.programs.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.programs[0].remainingBudgets[0].amount").isEqualTo(0);
     }
 
     @Test

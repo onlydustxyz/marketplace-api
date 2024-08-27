@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
@@ -39,6 +40,11 @@ public class ProgramReadEntity {
 
     String url;
     String logoUrl;
+
+    @ManyToOne
+    @NonNull
+    @JoinColumn(name = "sponsorId")
+    SponsorReadEntity sponsor;
 
     @ManyToMany
     @JoinTable(
