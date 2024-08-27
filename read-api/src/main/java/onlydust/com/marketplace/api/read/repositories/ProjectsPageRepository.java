@@ -215,7 +215,7 @@ public interface ProjectsPageRepository extends JpaRepository<ProjectPageItemQue
                          when cast(:orderBy as text) = 'NAME' then (not coalesce(is_pending_pl.is_p_pl, false), upper(p.name), 0)
                          when cast(:orderBy as text) = 'REPO_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false),-r_count.repo_count,upper(p.name))
                          when cast(:orderBy as text) = 'CONTRIBUTOR_COUNT' then (not coalesce(is_pending_pl.is_p_pl, false), -pc_count.contributors_count, upper(p.name))
-                         when cast(:orderBy as text) = 'RANK' then (not coalesce(is_pending_pl.is_p_pl, false), coalesce(-pr.score, 0), upper(p.name))
+                         when cast(:orderBy as text) = 'RANK' then (not coalesce(is_pending_pl.is_p_pl, false), coalesce(-pr.score, -p.rank), upper(p.name))
                      end
                      offset :offset limit :limit
             """, nativeQuery = true)
