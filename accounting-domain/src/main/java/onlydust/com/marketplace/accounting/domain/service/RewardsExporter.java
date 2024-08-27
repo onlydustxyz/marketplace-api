@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
-import onlydust.com.marketplace.accounting.domain.view.ShortSponsorView;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -62,7 +62,7 @@ public class RewardsExporter {
                         reward.transactionReferences(),
                         reward.paidToAccountNumbers(),
                         reward.id().pretty(),
-                        reward.sponsors().stream().map(ShortSponsorView::name).toList(),
+                        reward.sponsors().stream().map(SponsorView::name).toList(),
                         isNull(reward.billingProfile()) ? null : reward.billingProfile().status(),
                         isNull(reward.billingProfile()) ? null : reward.billingProfile().type(),
                         isNull(reward.invoice()) ? null : reward.invoice().number(),

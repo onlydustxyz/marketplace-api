@@ -16,7 +16,7 @@ public interface AllSponsorAccountTransactionReadRepository extends Repository<A
             SELECT t
             FROM AllSponsorAccountTransactionReadEntity t
             JOIN FETCH t.sponsorAccount sa
-            LEFT JOIN FETCH t.project
+            LEFT JOIN FETCH t.program
             JOIN FETCH sa.currency c
             LEFT JOIN FETCH c.latestUsdQuote
             WHERE sa.sponsorId = :sponsorId AND

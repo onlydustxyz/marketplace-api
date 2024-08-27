@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 @SuperBuilder

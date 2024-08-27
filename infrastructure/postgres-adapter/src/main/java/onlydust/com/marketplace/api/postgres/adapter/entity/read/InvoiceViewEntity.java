@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
 import onlydust.com.marketplace.accounting.domain.model.Money;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.json.InvoiceInnerData;
 import org.hibernate.annotations.Immutable;

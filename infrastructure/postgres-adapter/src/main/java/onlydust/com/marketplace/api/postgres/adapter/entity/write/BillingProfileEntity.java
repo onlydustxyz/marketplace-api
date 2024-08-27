@@ -1,20 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.BillingProfileStatsViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardViewEntity;
-import org.hibernate.annotations.*;
+import onlydust.com.marketplace.kernel.model.UserId;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Formula;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,19 +44,19 @@ public class BillingProfileEntity {
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "billingProfileId")
     Set<BillingProfileUserEntity> users;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToOne(mappedBy = "billingProfile")
     KycEntity kyc;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToOne(mappedBy = "billingProfile")
     KybEntity kyb;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToOne(mappedBy = "billingProfile")
     BankAccountEntity bankAccount;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "billingProfile")
     Set<WalletEntity> wallets;
 
-    @OneToOne(fetch = FetchType.LAZY, mappedBy = "billingProfile")
+    @OneToOne(mappedBy = "billingProfile")
     PayoutInfoEntity payoutInfo;
     Boolean enabled;
 
@@ -72,23 +70,6 @@ public class BillingProfileEntity {
     @UpdateTimestamp
     @Column(name = "tech_updated_at", nullable = false)
     private Date updatedAt;
-
-    // TODO remove this when GET single BP is moved to read-api
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "id", referencedColumnName = "billingProfileId", insertable = false, updatable = false)
-    BillingProfileStatsViewEntity stats;
-
-    // TODO remove this when GET single BP is moved to read-api
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "billingProfileId", referencedColumnName = "id", insertable = false, updatable = false)
-    @SQLRestriction("""
-            id in (
-                select rsd.reward_id
-                from accounting.reward_status_data rsd
-                where date_trunc('month', rsd.paid_at)::date = date_trunc('month', CURRENT_DATE)::date
-            )
-            """)
-    List<RewardViewEntity> currentMonthRewards;
 
     public static BillingProfileEntity fromDomain(final IndividualBillingProfile billingProfile) {
         return BillingProfileEntity.builder()

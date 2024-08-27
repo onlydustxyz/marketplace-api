@@ -3,10 +3,8 @@ package onlydust.com.marketplace.api.rest.api.adapter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.api.contract.MeApi;
@@ -18,6 +16,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.api.contract.model.NotificationChannel.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -331,7 +330,7 @@ public class MeRestApi implements MeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationSettingsPort.patchNotificationSettingsForProject(
                 NotificationRecipient.Id.of(authenticatedUser.id()),
-                new NotificationSettings.Project(onlydust.com.marketplace.user.domain.model.ProjectId.of(projectId),
+                new NotificationSettings.Project(ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();
     }

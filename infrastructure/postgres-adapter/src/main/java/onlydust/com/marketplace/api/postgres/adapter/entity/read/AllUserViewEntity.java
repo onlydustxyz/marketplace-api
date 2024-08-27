@@ -6,7 +6,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;

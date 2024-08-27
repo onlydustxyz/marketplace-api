@@ -3,8 +3,7 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
@@ -12,11 +11,11 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
-import onlydust.com.marketplace.accounting.domain.view.SponsorView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
@@ -33,7 +32,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 public class RewardService implements AccountingRewardPort {
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final AccountingFacadePort accountingFacadePort;
-    private final SponsorStoragePort sponsorStoragePort;
+    private final AccountingSponsorStoragePort accountingSponsorStoragePort;
     private final NotificationPort notificationPort;
 
     @Override
@@ -102,8 +101,7 @@ public class RewardService implements AccountingRewardPort {
                 .orElseThrow(() -> badRequest("Reward %s not found".formatted(id)));
 
         final var sponsors = accountingFacadePort.transferredAmountPerOrigin(reward.id(), reward.money().currency().id()).keySet().stream()
-                .map(sponsorAccount -> sponsorStoragePort.get(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
-                .map(SponsorView::toShortView)
+                .map(sponsorAccount -> accountingSponsorStoragePort.getView(sponsorAccount.sponsorId()).orElseThrow(() -> notFound("Sponsor %s not found".formatted(id))))
                 .toList();
 
         final Map<Network, PositiveAmount> pendingPayments = reward.invoice() == null ? new HashMap<>() :

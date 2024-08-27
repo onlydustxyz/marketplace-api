@@ -4,10 +4,12 @@ import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.Builder;
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.contract.model.RewardItemRequest;
@@ -18,6 +20,10 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -83,12 +89,14 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
         final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
         final var usdc = currencyRepository.findByCode("USDC").orElseThrow().id();
-        final var usdcSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(usdc), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(usdcSponsorAccount.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        final var programId = ProgramId.random();
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())

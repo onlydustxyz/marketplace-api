@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import onlydust.com.marketplace.kernel.model.RewardId;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

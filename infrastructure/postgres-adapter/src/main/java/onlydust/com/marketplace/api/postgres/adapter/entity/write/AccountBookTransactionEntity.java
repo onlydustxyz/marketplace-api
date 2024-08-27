@@ -1,7 +1,10 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookTransactionProjection;
@@ -14,14 +17,12 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "account_book_transactions", schema = "accounting")
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Getter
 @Accessors(fluent = true)
 public class AccountBookTransactionEntity {
     @Id
-    @EqualsAndHashCode.Include
     UUID id;
 
     @NonNull
@@ -37,6 +38,8 @@ public class AccountBookTransactionEntity {
     AccountBook.Transaction.Type type;
 
     UUID sponsorAccountId;
+
+    UUID programId;
 
     UUID projectId;
 
@@ -54,6 +57,7 @@ public class AccountBookTransactionEntity {
                 projection.accountBookId().value(),
                 projection.type(),
                 projection.sponsorAccountId() == null ? null : projection.sponsorAccountId().value(),
+                projection.programId() == null ? null : projection.programId().value(),
                 projection.projectId() == null ? null : projection.projectId().value(),
                 projection.rewardId() == null ? null : projection.rewardId().value(),
                 projection.paymentId() == null ? null : projection.paymentId().value(),

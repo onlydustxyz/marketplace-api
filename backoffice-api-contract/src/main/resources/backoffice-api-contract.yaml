@@ -498,28 +498,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/budgets/allocate:
+  /bo/v1/sponsors/{sponsorId}/allocate:
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Allocate a budget to a project
-      operationId: allocateBudgetToProject
-      description: Allocate a budget to a project
+      summary: Allocate a budget to a program
+      operationId: allocateBudgetToProgram
+      description: Allocate a budget to a program
       parameters:
         - in: path
-          name: projectId
+          name: sponsorId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            $ref: '#/components/schemas/SponsorId'
       requestBody:
         description: Budget to allocate
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
+              $ref: '#/components/schemas/AllocationRequest'
       responses:
         "204":
           description: 'The funds have been allocated'
@@ -528,28 +528,28 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/projects/{projectId}/budgets/unallocate:
+  /bo/v1/sponsors/{sponsorId}/unallocate:
     post:
       security:
         - bearerAuth: [ ]
       tags:
         - BackofficeAccountingManagement
-      summary: Refund a sponsor by unallocating funds from a project
-      operationId: unallocateBudgetFromProject
+      summary: Refund a sponsor by unallocating funds from a program
+      operationId: unallocateBudgetFromProgram
       description: Refund a sponsor
       parameters:
         - in: path
-          name: projectId
+          name: sponsorId
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            $ref: '#/components/schemas/SponsorId'
       requestBody:
         description: Budget to unallocate
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectBudgetAllocationRequest'
+              $ref: '#/components/schemas/AllocationRequest'
       responses:
         "204":
           description: 'The funds have been unallocated'
@@ -969,55 +969,6 @@ paths:
 
   # BackofficeSponsorManagement ===============================================================
   /bo/v1/sponsors:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - BackofficeSponsorManagement
-      summary: Get sponsor page
-      operationId: getOldSponsorPage
-      description: |
-        Get sponsor page
-      parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: projectIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-        - in: query
-          name: sponsorIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-      responses:
-        "200":
-          description: 'Sponsor page'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OldSponsorPage'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
     post:
       security:
         - bearerAuth: [ ]
@@ -1040,7 +991,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorResponse'
+                $ref: '#/components/schemas/SponsorCreateResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":
@@ -1093,9 +1044,9 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeSponsorManagement
+        - BackofficeSponsorRead
       summary: Get sponsor page
-      operationId: getSponsorPage
+      operationId: getSponsors
       description: |
         Get sponsor page
       parameters:
@@ -1130,7 +1081,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - BackofficeSponsorManagement
+        - BackofficeSponsorRead
       summary: Get sponsor data
       operationId: getSponsor
       description: |
@@ -1175,12 +1126,8 @@ paths:
             schema:
               $ref: '#/components/schemas/SponsorRequest'
       responses:
-        "200":
+        "204":
           description: 'Sponsor updated'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SponsorResponse'
         "400":
           $ref: '#/components/responses/BadRequestError'
         "401":
@@ -1189,6 +1136,7 @@ paths:
           $ref: '#/components/responses/NotFoundError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/sponsors/{sponsorId}/leads/{leadId}:
     put:
       security:
@@ -2947,6 +2895,14 @@ components:
               items:
                 $ref: '#/components/schemas/SponsorPageItemResponse'
 
+    SponsorCreateResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/SponsorId'
+
     SponsorResponse:
       type: object
       required:
@@ -2956,11 +2912,23 @@ components:
         - logoUrl
       properties:
         id:
-          type: string
-          format: uuid
+          $ref: '#/components/schemas/SponsorId'
         name:
           type: string
         url:
+          type: string
+        logoUrl:
+          type: string
+
+    ProgramLinkResponse:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+        name:
           type: string
         logoUrl:
           type: string
@@ -2970,12 +2938,12 @@ components:
         - $ref: '#/components/schemas/SponsorResponse'
         - type: object
           required:
-            - projects
+            - programs
           properties:
-            projects:
+            programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectLinkResponse'
+                $ref: '#/components/schemas/ProgramLinkResponse'
 
     SponsorDetailsResponse:
       allOf:
@@ -2983,16 +2951,16 @@ components:
         - type: object
           required:
             - availableBudgets
-            - projects
+            - programs
           properties:
             availableBudgets:
               type: array
               items:
                 $ref: '#/components/schemas/SponsorBudgetResponse'
-            projects:
+            programs:
               type: array
               items:
-                $ref: '#/components/schemas/ProjectWithBudgetResponse'
+                $ref: '#/components/schemas/ProgramWithBudgetResponse'
             leads:
               type: array
               items:
@@ -3269,6 +3237,10 @@ components:
       type: string
       format: uuid
 
+    ProgramId:
+      type: string
+      format: uuid
+
     GithubRepoId:
       type: integer
       format: int64
@@ -3319,16 +3291,19 @@ components:
       type: string
       format: uuid
 
-    ProjectBudgetAllocationRequest:
+    AllocationRequest:
       type: object
       required:
-        - sponsorAccountId
+        - programId
         - amount
+        - currencyId
       properties:
-        sponsorAccountId:
-          $ref: '#/components/schemas/SponsorAccountId'
+        programId:
+          $ref: '#/components/schemas/ProgramId'
         amount:
           type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
 
     PayRewardRequest:
       type: object
@@ -4595,8 +4570,8 @@ components:
         lockedUntil:
           type: string
           format: date-time
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
           $ref: '#/components/schemas/MoneyWithUsdEquivalentResponse'
 
@@ -4701,9 +4676,9 @@ components:
         logoUrl:
           type: string
 
-    ProjectWithBudgetResponse:
+    ProgramWithBudgetResponse:
       allOf:
-        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - remainingBudgets

@@ -479,3 +479,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000318_improve_project_recommendations.sql
   - include:
       file: db/changelog/changelogs/00000319_improve_project_recommendations.sql
+  - include:
+      file: db/changelog/changelogs/00000318_migrate_sponsors_to_programs.sql

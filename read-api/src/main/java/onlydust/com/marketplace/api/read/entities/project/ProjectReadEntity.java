@@ -8,11 +8,11 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectSponsorViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramStatPerCurrencyPerProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
@@ -75,9 +75,6 @@ public class ProjectReadEntity {
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
-
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "project_github_repos",
@@ -119,6 +116,16 @@ public class ProjectReadEntity {
             inverseJoinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId")
     )
     Set<AllUserReadEntity> leads;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            schema = "public",
+            name = "programs_projects",
+            joinColumns = @JoinColumn(name = "projectId"),
+            inverseJoinColumns = @JoinColumn(name = "programId")
+    )
+    Set<ProgramReadEntity> programs;
+
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     Set<ProjectsGoodFirstIssuesReadEntity> goodFirstIssues;

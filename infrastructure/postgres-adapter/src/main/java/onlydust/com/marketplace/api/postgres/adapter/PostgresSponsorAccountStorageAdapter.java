@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorAccountEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorAccountRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;

@@ -3,7 +3,12 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -15,6 +20,7 @@ public class AccountBookTransactionProjection {
     private @NonNull AccountBookAggregate.Id accountBookId;
     private @NonNull AccountBook.Transaction.Type type;
     private SponsorAccount.Id sponsorAccountId;
+    private ProgramId programId;
     private ProjectId projectId;
     private RewardId rewardId;
     private Payment.Id paymentId;
@@ -37,6 +43,9 @@ public class AccountBookTransactionProjection {
             switch (accountId.type()) {
                 case SPONSOR_ACCOUNT:
                     sponsorAccountId(accountId.sponsorAccountId());
+                    break;
+                case PROGRAM:
+                    programId(accountId.programId());
                     break;
                 case PROJECT:
                     projectId(accountId.projectId());

@@ -1,11 +1,14 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.DetailedTotalMoney;
+import onlydust.com.marketplace.api.contract.model.GrantRequest;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
+import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,9 +18,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.math.BigDecimal.ZERO;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
@@ -34,8 +40,90 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Nested
+    class GivenNoProgram {
+        @Test
+        void should_not_be_able_to_create_program_when_not_sponsor_lead() {
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Awesome program"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus()
+                    .isUnauthorized();
+        }
+
+        @Test
+        void should_create_program_with_required_fields_only() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+
+            // When
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Awesome program"
+                            }
+                            """)
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty();
+        }
+
+        @Test
+        void should_create_program_with_optional_fields() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+            final var programLead = userAuthHelper.create();
+            final var programId = new MutableObject<String>();
+
+            // When
+            client.post()
+                    .uri(getApiURI(PROGRAMS))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Foo program",
+                              "url": "https://foo.bar",
+                              "logoUrl": "https://foo.bar/logo.png",
+                              "programLeadId": "%s"
+                            }
+                            """.formatted(programLead.user().getId()))
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").value(programId::setValue);
+
+            // Then
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(programId.getValue())
+                    .jsonPath("$.name").isEqualTo("Foo program")
+                    .jsonPath("$.url").isEqualTo("https://foo.bar")
+                    .jsonPath("$.logoUrl").isEqualTo("https://foo.bar/logo.png");
+        }
+    }
+
+    @Nested
     class GivenMyProgram {
-        Sponsor program;
+        Program program;
 
         @BeforeEach
         void setUp() {
@@ -147,11 +235,13 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @Nested
         class GivenSomeTransactions {
+            Sponsor sponsor;
             Project project1;
             ProjectId project2Id;
 
             @BeforeEach
             void setUp() {
+                sponsor = sponsorHelper.create();
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
@@ -160,22 +250,47 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
-                final var accountId = at("2024-01-01T00:00:00Z",
-                        () -> accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 2_200, USDC));
-                at("2024-01-15T00:00:00Z", () -> accountingHelper.increaseAllowance(accountId, -700));
-                at("2024-02-03T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(program.id()), 12, ETH));
+                at("2024-01-01T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsor.id(), 2_200, USDC);
+                    accountingHelper.allocate(sponsor.id(), program.id(), 2_200, USDC);
+                });
 
-                at("2024-02-03T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 2_000, USDC));
-                at("2024-03-12T00:00:00Z", () -> accountingHelper.createSponsorAccount(SponsorId.of(anotherProgram.id()), 1, BTC));
+                at("2024-01-15T00:00:00Z", () -> {
+                    accountingHelper.unallocate(program.id(), sponsor.id(), 700, USDC);
+                });
 
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 500, USDC));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project1Id, 2, ETH));
-                at("2024-04-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 200, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(program.id()), project2Id, 3, ETH));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 500, USDC));
-                at("2024-05-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project1Id, 1, BTC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.grant(SponsorId.of(anotherProgram.id()), project2Id, 400, USDC));
-                at("2024-06-23T00:00:00Z", () -> accountingHelper.refund(project1Id, SponsorId.of(program.id()), 200, USDC));
+                at("2024-02-03T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsor.id(), 12, ETH);
+                    accountingHelper.allocate(sponsor.id(), program.id(), 12, ETH);
+                });
+
+                at("2024-02-03T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsor.id(), 2_000, USDC);
+                    accountingHelper.allocate(sponsor.id(), anotherProgram.id(), 1_500, USDC);
+                });
+
+                at("2024-03-12T00:00:00Z", () -> {
+                    accountingHelper.createSponsorAccount(sponsor.id(), 1, BTC);
+                    accountingHelper.allocate(sponsor.id(), anotherProgram.id(), 1, BTC);
+                });
+
+                at("2024-04-23T00:00:00Z", () -> {
+                    accountingHelper.grant(program.id(), project1Id, 500, USDC);
+                    accountingHelper.grant(program.id(), project1Id, 2, ETH);
+                });
+
+                at("2024-04-24T00:00:00Z", () -> accountingHelper.grant(program.id(), project2Id, 200, USDC));
+
+                at("2024-05-23T00:00:00Z", () -> {
+                    accountingHelper.grant(program.id(), project2Id, 3, ETH);
+                    accountingHelper.grant(anotherProgram.id(), project1Id, 500, USDC);
+                    accountingHelper.grant(anotherProgram.id(), project1Id, 1, BTC);
+                });
+
+                at("2024-06-23T00:00:00Z", () -> {
+                    accountingHelper.grant(anotherProgram.id(), project2Id, 400, USDC);
+                    accountingHelper.refund(project1Id, program.id(), 200, USDC);
+                });
 
                 final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 400, USDC));
                 final var reward2 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH));
@@ -979,9 +1094,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                         .expectBody()
-                        .jsonPath("$.transactions[0].thirdParty.sponsor.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[1].thirdParty.sponsor.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[2].thirdParty.sponsor.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[0].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
+                        .jsonPath("$.transactions[1].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
+                        .jsonPath("$.transactions[2].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
                         .jsonPath("$.transactions[3].thirdParty.project.id").isEqualTo(project1.getId().toString())
                         .jsonPath("$.transactions[4].thirdParty.project.id").isEqualTo(project1.getId().toString())
                         .json("""
@@ -1424,22 +1539,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                  }
                                 """);
 
-                final ProgramProjectsPageResponse programProjectsPageResponse = client.get()
-                        .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id()), Map.of(
-                                "pageIndex", "0",
-                                "pageSize", "5"
-                        )))
-                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                        .exchange()
-                        // Then
-                        .expectStatus()
-                        .isOk()
-                        .expectBody(ProgramProjectsPageResponse.class)
-                        .returnResult().getResponseBody();
-
                 // When
                 client.get()
-                        .uri(getApiURI(PROGRAM_PROJECT.formatted(program.id(), programProjectsPageResponse.getProjects().get(0).getId())))
+                        .uri(getApiURI(PROGRAM_PROJECT.formatted(program.id(), project2Id)))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                         .exchange()
                         // Then
@@ -1576,7 +1678,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 client.post()
                         .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                        .bodyValue(new AllocateRequest()
+                        .bodyValue(new GrantRequest()
                                 .projectId(project1.getId())
                                 .amount(BigDecimal.ONE)
                                 .currencyId(ETH.value()))
@@ -1613,7 +1715,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMyProgram {
-        Sponsor program;
+        Program program;
 
         @BeforeEach
         void setUp() {
@@ -1677,7 +1779,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             client.post()
                     .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
-                    .bodyValue(new AllocateRequest()
+                    .bodyValue(new GrantRequest()
                             .projectId(projectId.value())
                             .amount(BigDecimal.TEN)
                             .currencyId(ETH.value()))

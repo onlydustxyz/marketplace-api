@@ -5,11 +5,11 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSe
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsForProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSettingsChannelRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSettingsForProjectRepository;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
-import onlydust.com.marketplace.user.domain.model.ProjectId;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 

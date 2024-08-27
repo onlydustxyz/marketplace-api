@@ -8,12 +8,19 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.port.in.*;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BatchPaymentMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +34,7 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -37,7 +45,6 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final AccountingFacadePort accountingFacadePort;
     private final AccountingRewardPort accountingRewardPort;
     private final PaymentPort paymentPort;
-    private final BillingProfileFacadePort billingProfileFacadePort;
     private final AuthenticatedBackofficeUserService authenticatedBackofficeUserService;
     private final BlockchainFacadePort blockchainFacadePort;
 
@@ -93,29 +100,23 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
-    public ResponseEntity<Void> allocateBudgetToProject(UUID projectId, ProjectBudgetAllocationRequest request) {
-        final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
-                .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
-
-        accountingFacadePort.allocate(SponsorAccount.Id.of(request.getSponsorAccountId()),
-                ProjectId.of(projectId),
+    public ResponseEntity<Void> allocateBudgetToProgram(UUID sponsorId, AllocationRequest request) {
+        accountingFacadePort.allocate(SponsorId.of(sponsorId),
+                ProgramId.of(request.getProgramId()),
                 PositiveAmount.of(request.getAmount()),
-                sponsorAccount.currency().id());
+                Currency.Id.of(request.getCurrencyId()));
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
-    public ResponseEntity<Void> unallocateBudgetFromProject(UUID projectId, ProjectBudgetAllocationRequest request) {
-        final var sponsorAccount = accountingFacadePort.getSponsorAccount(SponsorAccount.Id.of(request.getSponsorAccountId()))
-                .orElseThrow(() -> badRequest("Sponsor account %s not found".formatted(request.getSponsorAccountId())));
-
-        accountingFacadePort.unallocate(ProjectId.of(projectId),
-                SponsorAccount.Id.of(request.getSponsorAccountId()),
+    public ResponseEntity<Void> unallocateBudgetFromProgram(UUID sponsorId, AllocationRequest request) {
+        accountingFacadePort.unallocate(ProgramId.of(request.getProgramId()),
+                SponsorId.of(sponsorId),
                 PositiveAmount.of(request.getAmount()),
-                sponsorAccount.currency().id());
+                Currency.Id.of(request.getCurrencyId()));
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -131,7 +132,7 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
                 network,
                 payRewardRequest.getReference());
 
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
@@ -171,13 +172,13 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     @Override
     public ResponseEntity<Void> updateBatchPayment(UUID batchPaymentId, BatchPaymentRequest batchPaymentRequest) {
         paymentPort.markPaymentAsPaid(Payment.Id.of(batchPaymentId), batchPaymentRequest.getTransactionHash());
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> deleteBatchPayment(UUID batchPaymentId) {
         paymentPort.deletePaymentById(Payment.Id.of(batchPaymentId));
-        return ResponseEntity.noContent().build();
+        return noContent().build();
     }
 
     @Override

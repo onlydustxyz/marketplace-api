@@ -1,19 +1,23 @@
 package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Value;
-import lombok.experimental.Accessors;
+import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
-import java.util.UUID;
+import java.net.URI;
 
-@Value
-@Builder
-@EqualsAndHashCode
-@Accessors(fluent = true)
-public class Sponsor {
-    UUID id;
-    String name;
-    String url;
-    String logoUrl;
+@Builder(toBuilder = true)
+public record Sponsor(@NonNull SponsorId id,
+                      @NonNull String name,
+                      URI url,
+                      @NonNull URI logoUrl) {
+    public static Sponsor create(@NonNull String name, URI url, @NonNull URI logoUrl) {
+        return Sponsor.builder()
+                .id(SponsorId.random())
+                .name(name)
+                .url(url)
+                .logoUrl(logoUrl)
+                .build();
+    }
+
 }

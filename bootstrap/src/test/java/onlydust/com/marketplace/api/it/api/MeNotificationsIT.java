@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;

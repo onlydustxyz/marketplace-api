@@ -2,8 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -12,10 +12,10 @@ import java.util.UUID;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-@Table(name = "sponsors_users", schema = "public")
-@IdClass(SponsorUserEntity.PrimaryKey.class)
-public class SponsorUserEntity {
+@Getter
+@Table(name = "sponsor_leads", schema = "public")
+@IdClass(SponsorLeadEntity.PrimaryKey.class)
+public class SponsorLeadEntity {
 
     @Id
     @Column(nullable = false, updatable = false)

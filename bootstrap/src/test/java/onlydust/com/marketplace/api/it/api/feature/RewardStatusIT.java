@@ -13,9 +13,7 @@ import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
-import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.contract.model.*;
@@ -30,11 +28,11 @@ import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfile
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.project.domain.port.input.UserFacadePort;
 import onlydust.com.marketplace.project.domain.service.RewardService;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.jetbrains.annotations.NotNull;
@@ -241,15 +239,19 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         projectId2 = response2.getProjectId();
 
+        final var programId = ProgramId.random();
 
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
-        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(200000L), Currency.Id.of(strkId));
+
+        accountingService.grant(programId, ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.grant(programId, ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
         final UUID usdId = currencyRepository.findByCode("USD").orElseThrow().id();
         final SponsorAccountStatement usdSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
@@ -257,7 +259,9 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
                         PositiveAmount.of(100000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(usdSponsorAccount.account().id(), ProjectId.of(projectId1), PositiveAmount.of(50000L), Currency.Id.of(usdId));
+
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(50000L), Currency.Id.of(usdId));
+        accountingService.grant(programId, ProjectId.of(projectId1), PositiveAmount.of(50000L), Currency.Id.of(usdId));
 
         final var em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
@@ -4766,11 +4770,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     @Autowired
-    CurrencyFacadePort currencyFacadePort;
-    @Autowired
-    UserFacadePort userFacadePort;
-    @Autowired
-    SponsorStoragePort sponsorStoragePort;
+    AccountingSponsorStoragePort accountingSponsorStoragePort;
     @Autowired
     AccountingRewardStoragePort accountingRewardStoragePort;
     @Autowired
@@ -4782,9 +4782,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         return new BackofficeAccountingManagementRestApi(
                 accountingService,
                 new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingService,
-                        sponsorStoragePort, notificationPort),
+                        accountingSponsorStoragePort, notificationPort),
                 new PaymentService(accountingRewardStoragePort, invoiceStoragePort, accountingService, blockchainFacadePort),
-                billingProfileService,
                 authenticatedBackofficeUserService,
                 blockchainFacadePort);
     }
@@ -5513,7 +5512,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "mmaderic_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/39437117?v=4"
               },
-                        
+            
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",
@@ -5549,7 +5548,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5572,7 +5571,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 200
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5585,7 +5584,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "jannesblobel_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/72493222?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5608,7 +5607,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 30
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5621,7 +5620,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5644,7 +5643,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 300
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5657,7 +5656,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "nickdbush_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/10998201?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5680,7 +5679,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 50
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5693,7 +5692,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5716,7 +5715,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 55
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5729,7 +5728,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-1",
                  "name": "Super Project 1",
@@ -5752,7 +5751,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  },
                  "amount": 500
                },
-                        
+            
                "unlockDate": null,
                "from": {
                  "githubUserId": 16590657,
@@ -5765,7 +5764,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                  "login": "yanns_test",
                  "avatarUrl": "https://avatars.githubusercontent.com/u/51669?v=4"
                },
-                        
+            
                "project": {
                  "slug": "super-project-2",
                  "name": "Super Project 2",
@@ -5789,7 +5788,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 },
                 "amount": 40
               },
-                        
+            
               "unlockDate": null,
               "from": {
                 "githubUserId": 16590657,
@@ -5802,7 +5801,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-                        
+            
               "project": {
                 "slug": "super-project-1",
                 "name": "Super Project 1",
@@ -5837,7 +5836,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 "login": "acomminos_test",
                 "avatarUrl": "https://avatars.githubusercontent.com/u/628035?v=4"
               },
-                        
+            
               "project": {
                 "slug": "super-project-2",
                 "name": "Super Project 2",

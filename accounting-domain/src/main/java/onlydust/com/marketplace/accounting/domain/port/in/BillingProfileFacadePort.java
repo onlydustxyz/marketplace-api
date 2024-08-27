@@ -1,12 +1,16 @@
 package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerView;
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 

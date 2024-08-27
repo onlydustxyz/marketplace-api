@@ -4,8 +4,9 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.view.TotalMoneyView;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 

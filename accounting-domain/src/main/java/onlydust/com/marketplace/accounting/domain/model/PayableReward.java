@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 public record PayableReward(
@@ -15,7 +16,8 @@ public record PayableReward(
         return ImmutablePair.of(id, currency);
     }
 
-    public static PayableReward of(@NonNull RewardId id, @NonNull PayableCurrency currency, @NonNull PositiveAmount amount, @NonNull Invoice.BillingProfileSnapshot billingProfileSnapshot) {
+    public static PayableReward of(@NonNull RewardId id, @NonNull PayableCurrency currency, @NonNull PositiveAmount amount,
+                                   @NonNull Invoice.BillingProfileSnapshot billingProfileSnapshot) {
         return new PayableReward(id, currency, amount,
                 billingProfileSnapshot.wallet(currency.network()).orElseThrow(),
                 billingProfileSnapshot.subject());

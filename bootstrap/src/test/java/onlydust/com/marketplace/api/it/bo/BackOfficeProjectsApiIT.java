@@ -11,6 +11,9 @@ import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeProjectRestApi;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,8 +52,10 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
-        accountingService.allocate(strkSponsorAccount.account().id(), ProjectId.of(projectId), PositiveAmount.of(100000L),
-                Currency.Id.of(CurrencyHelper.STRK.value()));
+        final var programId = ProgramId.random();
+
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), CurrencyHelper.STRK);
+        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), CurrencyHelper.STRK);
     }
 
     @Autowired

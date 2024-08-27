@@ -2,7 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.out;
 
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.util.List;
 

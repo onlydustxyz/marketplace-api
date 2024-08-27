@@ -2,6 +2,10 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -39,20 +43,15 @@ public interface AccountingFacadePort {
 
     SponsorAccountStatement delete(SponsorAccount.Id sponsorAccountId, SponsorAccount.Transaction.Id receiptId);
 
-    void allocate(SponsorId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
+    void allocate(SponsorId from, ProgramId programId, PositiveAmount amount, Currency.Id currencyId);
 
-    void allocate(SponsorAccount.Id from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
+    void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId);
 
-    void unallocate(ProjectId from, SponsorAccount.Id to, PositiveAmount amount, Currency.Id currencyId);
+    void grant(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId);
 
-    void unallocate(ProjectId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId);
-
-    Optional<SponsorAccount> getSponsorAccount(SponsorAccount.Id sponsorAccountId);
+    void ungrant(ProjectId projectId, ProgramId programId, @NonNull PositiveAmount amount, Currency.Id currencyId);
 
     Optional<SponsorAccountStatement> getSponsorAccountStatement(SponsorAccount.Id sponsorAccountId);
-
-    // TODO: move to read-api
-    List<SponsorAccountStatement> getSponsorAccounts(SponsorId sponsorId);
 
     SponsorAccountStatement updateSponsorAccount(final @NonNull SponsorAccount.Id sponsorAccountId, ZonedDateTime lockedUntil);
 

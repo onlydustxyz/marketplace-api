@@ -5,7 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyb;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Kyc;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
