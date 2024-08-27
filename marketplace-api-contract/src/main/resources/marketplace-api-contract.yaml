@@ -3986,6 +3986,11 @@ paths:
           name: pageSize
           schema:
             type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by project name
       responses:
         "200":
           description: 'Program projects page'
