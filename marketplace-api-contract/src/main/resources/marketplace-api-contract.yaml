@@ -4212,6 +4212,57 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/sponsors/{sponsorId}/stats/transactions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadSponsors
+      summary: Get sponsor transactions stats
+      operationId: getSponsorTransactionsStats
+      description: |
+        Get sponsor transactions stats grouped by month. 
+        Only sponsor leaders can access this information.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: fromDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: toDate
+          schema:
+            type: string
+            pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+        - in: query
+          name: types
+          description: Transaction types filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SponsorTransactionType'
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by program name
+      responses:
+        "200":
+          description: 'Sponsor transactions stats grouped by month'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorTransactionStatListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/sponsors/{sponsorId}/transactions:
     get:
       security:
@@ -5965,6 +6016,43 @@ components:
           format: date
           description: Date of the transactions
         totalAvailable:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalGranted:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalRewarded:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        transactionCount:
+          type: integer
+          description: Number of transactions for this month
+          example: 42
+
+    SponsorTransactionStatListResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/SponsorTransactionStatResponse'
+
+    SponsorTransactionStatResponse:
+      type: object
+      required:
+        - date
+        - totalAvailable
+        - totalAllocated
+        - totalGranted
+        - totalRewarded
+        - transactionCount
+      properties:
+        date:
+          type: string
+          format: date
+          description: Date of the transactions
+        totalAvailable:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        totalAllocated:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'
@@ -8988,6 +9076,13 @@ components:
       enum:
         - GRANTED
         - RECEIVED
+        - RETURNED
+
+    SponsorTransactionType:
+      type: string
+      enum:
+        - DEPOSITED
+        - ALLOCATED
         - RETURNED
 
     SponsorAccountTransactionType:
