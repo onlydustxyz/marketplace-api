@@ -5854,10 +5854,14 @@ components:
           type: string
           format: uri
           description: Program's logo URL
+        url:
+          type: string
+          format: uri
+          description: Program's website URL
 
     ProgramPageItemResponse:
       allOf:
-        - $ref: '#/components/schemas/ProgramShortResponse'
+        - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - leads
@@ -5890,10 +5894,6 @@ components:
             - totalGranted
             - totalRewarded
           properties:
-            url:
-              type: string
-              format: uri
-              description: Program's website URL
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
@@ -6363,7 +6363,7 @@ components:
         programs:
           type: array
           items:
-            $ref: '#/components/schemas/ProgramLinkResponse'
+            $ref: '#/components/schemas/ProgramShortResponse'
         languages:
           type: array
           items:

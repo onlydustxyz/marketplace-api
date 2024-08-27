@@ -340,7 +340,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                         .toList())
                 .programs(project.programs().stream()
                         .sorted(comparing(ProgramReadEntity::name))
-                        .map(ProgramReadEntity::toLinkResponse)
+                        .map(ProgramReadEntity::toShortResponse)
                         .toList())
                 .organizations(project.organizations(Boolean.TRUE.equals(includeAllAvailableRepos)))
                 .languages(project.languages().stream().map(LanguageReadEntity::toDto).sorted(comparing(LanguageResponse::getName)).toList())

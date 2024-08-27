@@ -72,7 +72,8 @@ public class ProgramReadEntity {
         return new ProgramShortResponse()
                 .id(id)
                 .name(name)
-                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
+                .url(Optional.ofNullable(url).map(URI::create).orElse(null));
     }
 
     public ProgramResponse toResponse() {
