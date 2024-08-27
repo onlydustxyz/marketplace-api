@@ -12,6 +12,7 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -110,15 +111,16 @@ public class ProjectGithubIssueItemReadEntity {
                 .createdAt(createdAt)
                 .closedAt(closedAt)
                 .body(body)
-                .labels(labels)
-                .applicants(isNull(applications) ? null :
+                .labels(isNull(labels) ? List.of() : labels.stream().sorted(Comparator.comparing(GithubLabel::getName)).toList())
+                .applicants(isNull(applications) ? List.of() :
                         applications.stream().map(ProjectApplicationShortResponse::getApplicant)
                                 .map(contributorResponse -> new GithubUserResponse(
                                         contributorResponse.getGithubUserId(),
                                         contributorResponse.getLogin(),
                                         contributorResponse.getAvatarUrl()))
+                                .sorted(Comparator.comparing(GithubUserResponse::getLogin))
                                 .toList())
-                .assignees(assignees)
+                .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(GithubUserResponse::getLogin)).toList())
                 .currentUserApplication(currentUserApplication.orElse(null))
                 ;
     }
