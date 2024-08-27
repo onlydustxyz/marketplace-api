@@ -5,7 +5,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategor
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectTagEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectTagRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -182,7 +185,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "451e5b61-c340-4f85-905c-da4332c968ed",
                   "name": "Coca Cola",
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                  "url": null
                 }
               ],
               "languages": [
@@ -367,7 +371,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "451e5b61-c340-4f85-905c-da4332c968ed",
                   "name": "Coca Cola",
-                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                  "url": null
                 }
               ],
               "hasRemainingBudget": true,
@@ -522,7 +527,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 {
                   "id": "6d13685b-2853-438e-bf78-b7d4a37adc70",
                   "name": "No Sponsor",
-                  "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
+                  "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp",
+                  "url": null
                 }
               ],
               "languages": [],
@@ -544,8 +550,6 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     ProjectViewRepository projectViewRepository;
     @Autowired
     ProjectLeaderInvitationRepository projectLeaderInvitationRepository;
-    @Autowired
-    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
     @Autowired
     ProjectCategoryRepository projectCategoryRepository;
     @Autowired
@@ -829,6 +833,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.programs").isArray()
                 .jsonPath("$.programs.length()").isEqualTo(2)
-                .jsonPath("$.programs[?(@.id == '%s')].id".formatted(program.id())).isNotEmpty();
+                .jsonPath("$.programs[?(@.id == '%s')].id".formatted(program.id())).isNotEmpty()
+                .jsonPath("$.programs[?(@.url == '%s')].id".formatted(program.url())).isNotEmpty();
     }
 }
