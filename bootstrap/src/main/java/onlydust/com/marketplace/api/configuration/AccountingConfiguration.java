@@ -45,8 +45,9 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountBookProjector accountBookProjector(final @NonNull AccountBookStorage accountBookStorage) {
-        return new AccountBookProjector(accountBookStorage);
+    public AccountBookProjector accountBookProjector(final @NonNull AccountBookStorage accountBookStorage,
+                                                     final @NonNull SponsorAccountStorage sponsorAccountStorage) {
+        return new AccountBookProjector(accountBookStorage, sponsorAccountStorage);
     }
 
     @Bean

@@ -12,8 +12,8 @@ import java.util.UUID;
 public interface SponsorTransactionMonthlyStatsReadRepository extends Repository<SponsorTransactionMonthlyStatReadEntity,
         ProgramTransactionMonthlyStatReadEntity.PrimaryKey> {
     @Query(value = """
-            with stats as (select sa.sponsor_id                                                                                                     as sponsor_id,
-                                  sa.currency_id                                                                                                    as currency_id,
+            with stats as (select abt.sponsor_id                                                                                                    as sponsor_id,
+                                  abt.currency_id                                                                                                   as currency_id,
                                   date_trunc('month', abt.timestamp)                                                                                as date,
             
                                   coalesce(sum(amount) filter ( where type = 'MINT' and program_id is null ), 0)
@@ -30,9 +30,8 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
             
                                   count(*)                                                                                                          as transaction_count
                            from accounting.account_book_transactions abt
-                                    join accounting.sponsor_accounts sa on abt.sponsor_account_id = sa.id
                                     left join programs pgm on pgm.id = abt.program_id
-                           where sa.sponsor_id = :sponsorId
+                           where abt.sponsor_id = :sponsorId
                              and (cast(:fromDate as text) is null or abt.timestamp >= :fromDate)
                              and (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate)
                              and (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
@@ -41,8 +40,8 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                                ('ALLOCATED' in (:types) and abt.type = 'TRANSFER' and abt.program_id is not null and project_id is null) or
                                ('RETURNED'  in (:types) and abt.type = 'REFUND' and abt.program_id is not null and project_id is null)
                                ))
-                           group by sa.sponsor_id,
-                                    sa.currency_id,
+                           group by abt.sponsor_id,
+                                    abt.currency_id,
                                     date_trunc('month', abt.timestamp))
             select s.sponsor_id                                                    as sponsor_id,
                    s.currency_id                                                   as currency_id,

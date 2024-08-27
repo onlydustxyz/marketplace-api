@@ -12,7 +12,7 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
         ProgramTransactionMonthlyStatReadEntity.PrimaryKey> {
     @Query(value = """
             with stats as (select abt.program_id                                                                                                                              as program_id,
-                                  ab.currency_id                                                                                                                              as currency_id,
+                                  abt.currency_id                                                                                                                              as currency_id,
                                   date_trunc('month', abt.timestamp)                                                                                                          as date,
             
                                   coalesce(sum(amount) filter ( where type in ('MINT', 'TRANSFER') and project_id is null ), 0)
@@ -26,7 +26,6 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
             
                                   count(*)                                                                                                                                    as transaction_count
                            from accounting.account_book_transactions abt
-                                    join accounting.account_books ab on ab.id = abt.account_book_id
                                     left join projects p on p.id = abt.project_id
                                     join programs pgm on pgm.id = abt.program_id
                            where abt.program_id = :programId
@@ -39,7 +38,7 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                                ('RETURNED' in (:types) and abt.type = 'REFUND' and abt.project_id is null)
                                ))
                            group by abt.program_id,
-                                    ab.currency_id,
+                                    abt.currency_id,
                                     date_trunc('month', abt.timestamp))
             select s.program_id                                                    as program_id,
                    s.currency_id                                                   as currency_id,

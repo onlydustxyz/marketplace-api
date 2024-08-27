@@ -17,17 +17,17 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
     @Query(value = """
             SELECT t
             FROM AccountBookTransactionReadEntity t
-            JOIN FETCH t.sponsorAccount sa
+            JOIN FETCH t.sponsor s
+            JOIN FETCH t.currency c
             LEFT JOIN FETCH t.program p
-            JOIN FETCH sa.currency c
             LEFT JOIN FETCH c.latestUsdQuote
-            WHERE sa.sponsorId = :sponsorId AND
-                    t.reward IS NULL AND
-                    (:types IS NULL OR t.type IN :types) AND
-                    (:currencies IS NULL OR c.id IN :currencies) AND
-                    (:programs IS NULL OR p.id IN :programs) AND
-                    (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
-                    (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate)
+            WHERE s.id = :sponsorId AND
+                  t.reward IS NULL AND
+                  (:types IS NULL OR t.type IN :types) AND
+                  (:currencies IS NULL OR c.id IN :currencies) AND
+                  (:programs IS NULL OR p.id IN :programs) AND
+                  (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
+                  (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate)
             """)
     Page<AccountBookTransactionReadEntity> findAllFromSponsor(@NonNull UUID sponsorId,
                                                               List<AccountBook.Transaction.Type> types,
@@ -40,9 +40,8 @@ public interface AccountBookTransactionReadRepository extends Repository<Account
     @Query(value = """
             SELECT t
             FROM AccountBookTransactionReadEntity t
-            JOIN FETCH t.sponsorAccount sa
-            JOIN FETCH sa.currency
-            JOIN FETCH sa.sponsor
+            JOIN FETCH t.sponsor
+            JOIN FETCH t.currency
             LEFT JOIN FETCH t.project p
             WHERE
                 t.program.id = :programId AND

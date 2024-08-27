@@ -29,7 +29,7 @@ public class AccountBookTransactionEntity {
     ZonedDateTime timestamp;
 
     @NonNull
-    UUID accountBookId;
+    UUID currencyId;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -37,7 +37,7 @@ public class AccountBookTransactionEntity {
     @NonNull
     AccountBook.Transaction.Type type;
 
-    UUID sponsorAccountId;
+    UUID sponsorId;
 
     UUID programId;
 
@@ -54,9 +54,9 @@ public class AccountBookTransactionEntity {
         return new AccountBookTransactionEntity(
                 UUID.randomUUID(),
                 projection.timestamp(),
-                projection.accountBookId().value(),
+                projection.currencyId().value(),
                 projection.type(),
-                projection.sponsorAccountId() == null ? null : projection.sponsorAccountId().value(),
+                projection.sponsorId().value(),
                 projection.programId() == null ? null : projection.programId().value(),
                 projection.projectId() == null ? null : projection.projectId().value(),
                 projection.rewardId() == null ? null : projection.rewardId().value(),
