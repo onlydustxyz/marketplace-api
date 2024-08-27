@@ -171,30 +171,28 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
         final var userId = caller == null ? null : caller.id();
-        if (!permissionService.hasUserAccessToProject(projectId, userId)) {
+
+        if (!permissionService.hasUserAccessToProject(projectId, userId))
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
-        }
 
-        final var projectEntity = projectReadRepository.findById(projectId)
+        final var project = projectReadRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
-        final var projectResponse = getProjectDetails(projectEntity, caller, includeAllAvailableRepos);
 
-        return ok(projectResponse);
+        return ok(getProjectDetails(project, caller, includeAllAvailableRepos));
     }
 
     @Override
     public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
         final var userId = caller == null ? null : caller.id();
-        if (!permissionService.hasUserAccessToProject(slug, userId)) {
+
+        if (!permissionService.hasUserAccessToProject(slug, userId))
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug, userId));
-        }
 
-        final var projectEntity = projectReadRepository.findBySlug(slug)
+        final var project = projectReadRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
-        final var projectResponse = getProjectDetails(projectEntity, caller, includeAllAvailableRepos);
 
-        return ok(projectResponse);
+        return ok(getProjectDetails(project, caller, includeAllAvailableRepos));
     }
 
     @Override
