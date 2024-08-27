@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
@@ -99,6 +100,16 @@ public class AllUserReadEntity {
     )
     @NonNull
     Set<SponsorReadEntity> sponsors;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "program_leads",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "programId")
+    )
+    @NonNull
+    Set<ProgramReadEntity> programs;
 
     @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
