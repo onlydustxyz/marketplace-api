@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -64,6 +65,10 @@ public class ProgramHelper {
         final var program = programReadRepository.findById(programId.value()).orElseThrow();
         final var leadIds = new ArrayList<>(program.leads().stream().map(AllUserReadEntity::userId).map(UserId::of).toList());
         leadIds.add(UserId.of(leadId));
-        programFacadePort.update(programId.value(), program.name(), URI.create(program.url()), URI.create(program.logoUrl()), leadIds);
+        programFacadePort.update(programId.value(),
+                program.name(),
+                Optional.ofNullable(program.url()).map(URI::create).orElse(null),
+                Optional.ofNullable(program.logoUrl()).map(URI::create).orElse(null),
+                leadIds);
     }
 }
