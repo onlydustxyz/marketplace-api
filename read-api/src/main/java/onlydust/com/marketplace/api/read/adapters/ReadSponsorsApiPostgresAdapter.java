@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionRead
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +42,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
             throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sponsor = sponsorReadRepository.findById(sponsorId)
@@ -63,7 +64,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                                                  SortDirection direction) {
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
             throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sortBy = switch (Optional.ofNullable(sort).orElse(SponsorAccountTransactionSort.DATE)) {

@@ -1,12 +1,8 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.backoffice.api.contract.model.AllocationRequest;
-import onlydust.com.backoffice.api.contract.model.CreateAccountRequest;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
-import onlydust.com.backoffice.api.contract.model.SponsorResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
-import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
@@ -16,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -24,10 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 @TagBO
@@ -295,102 +288,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
-    @Order(5)
-    void should_link_sponsor_to_program_upon_allocation() {
-        final var jwt = pierre.jwt();
-        final var program = programHelper.create();
-        final var BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
-
-        // Given
-        final var sponsor = client.post()
-                .uri(getApiURI(POST_SPONSORS))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                          "name": "Virgin sponsor",
-                          "url": "https://www.foobar.com",
-                          "logoUrl": "https://www.foobar.com/logo.png",
-                          "leads": []
-                        }
-                        """)
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody(SponsorResponse.class)
-                .returnResult().getResponseBody();
-
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(new CreateAccountRequest()
-                        .currencyId(STRK.value())
-                        .allowance(BigDecimal.valueOf(1000)))
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        // And when
-        client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(new AllocationRequest()
-                        .amount(BigDecimal.valueOf(400))
-                        .currencyId(STRK.value())
-                        .programId(program.id().value()))
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.availableBudgets.length()").isEqualTo(1)
-                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(600)
-                .jsonPath("$.availableBudgets[0].debt").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
-                .jsonPath("$.programs.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.programs[0].remainingBudgets[0].amount").isEqualTo(400);
-
-        // And when
-        accountingHelper.grant(program.id(), BRETZEL, 400L, STRK);
-
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(sponsor.getId())))
-                .header("Authorization", "Bearer " + jwt)
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .jsonPath("$.availableBudgets.length()").isEqualTo(1)
-                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(0)
-                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(600)
-                .jsonPath("$.availableBudgets[0].debt").isEqualTo(1000)
-                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
-                .jsonPath("$.programs.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets.length()").isEqualTo(1)
-                .jsonPath("$.programs[0].remainingBudgets[0].currency.id").isEqualTo(STRK.value().toString())
-                .jsonPath("$.programs[0].remainingBudgets[0].amount").isEqualTo(0);
-    }
-
-    @Test
     @Order(6)
     void should_get_sponsors() {
         final String jwt = pierre.jwt();
@@ -407,17 +304,17 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 15,
+                          "totalItemNumber": 14,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "sponsors": [
                             {
-                              "id": "58a0a05c-c81e-447c-910f-629817a987b8",
                               "name": "Captain America",
                               "url": "https://www.marvel.com/characters/captain-america-steve-rogers",
                               "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg",
                               "programs": [
                                 {
+                                  "id": "e919b1ff-c666-4dd9-99bc-522ceb5fde7a",
                                   "name": "Captain America",
                                   "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg"
                                 }
@@ -425,20 +322,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "leads": []
                             },
                             {
-                              "id": "4202fd03-f316-458f-a642-421c7b3c7026",
                               "name": "ChatGPT",
                               "url": "https://chat.openai.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
-                              "programs": [],
+                              "programs": [
+                                {
+                                  "id": "04315017-a917-4f60-93c5-3b9f0dbe3af4",
+                                  "name": "ChatGPT",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
+                                }
+                              ],
                               "leads": []
                             },
                             {
-                              "id": "0980c5ab-befc-4314-acab-777fbf970cbb",
                               "name": "Coca Cola",
                               "url": null,
                               "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
                               "programs": [
                                 {
+                                  "id": "451e5b61-c340-4f85-905c-da4332c968ed",
                                   "name": "Coca Cola",
                                   "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
                                 }
@@ -446,28 +348,38 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "leads": []
                             },
                             {
-                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
                               "name": "Coca Colax",
                               "url": "https://www.coca-cola-france.fr/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg",
-                              "programs": [],
+                              "programs": [
+                                {
+                                  "id": "a0d5edba-0d1d-4bd2-8bca-2656b86a03f6",
+                                  "name": "Coca Colax",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                                }
+                              ],
                               "leads": []
                             },
                             {
-                              "id": "6511500c-e6f2-41a4-9f8f-f15289969d09",
                               "name": "Creepy sponsor",
                               "url": "https://bretzel.club/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg",
-                              "programs": [],
+                              "programs": [
+                                {
+                                  "id": "e92a5a4e-8730-4a30-adfb-aa78fd04471e",
+                                  "name": "Creepy sponsor",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg"
+                                }
+                              ],
                               "leads": []
                             },
                             {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                               "name": "Foobaaaar",
                               "url": "https://www.foobaaaar.com",
                               "logoUrl": "https://www.foobaaaar.com/logo.png",
                               "programs": [
                                 {
+                                  "id": "4b1cbc61-045c-4229-8378-8ad50c2aca78",
                                   "name": "AS Nancy Lorraine",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                                 }
@@ -496,12 +408,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               ]
                             },
                             {
-                              "id": "01bc5c57-9b7c-4521-b7be-8a12861ae5f4",
                               "name": "No Sponsor",
                               "url": null,
                               "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp",
                               "programs": [
                                 {
+                                  "id": "6d13685b-2853-438e-bf78-b7d4a37adc70",
                                   "name": "No Sponsor",
                                   "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
                                 }
@@ -509,12 +421,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "leads": []
                             },
                             {
-                              "id": "c8dfb479-ee9d-4c16-b4b3-0ba39c2fdd6f",
                               "name": "OGC Nissa Ineos",
                               "url": "https://www.ogcnice.com/fr/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png",
                               "programs": [
                                 {
+                                  "id": "a572bf50-3b2f-4008-8a98-f62de1acd4eb",
                                   "name": "OGC Nissa Ineos",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
                                 }
@@ -522,12 +434,12 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "leads": []
                             },
                             {
-                              "id": "1774fd34-a8b6-43b0-b376-f2c2b256d478",
                               "name": "PSG",
                               "url": "https://www.psg.fr/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png",
                               "programs": [
                                 {
+                                  "id": "a606447e-89a7-4e76-92e8-a5b020f83420",
                                   "name": "PSG",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
                                 }
@@ -550,7 +462,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 15,
+                          "totalItemNumber": 14,
                           "hasMore": false,
                           "nextPageIndex": 1,
                           "sponsors": [
@@ -560,16 +472,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg",
                               "programs": [
                                 {
+                                  "id": "4ffb631f-e850-46ef-9171-894f5b0f5f2c",
                                   "name": "Red Bull",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                                 }
-                              ]
+                              ],
+                              "leads": []
                             },
                             {
                               "name": "Starknet Foundation",
                               "url": "https://starknet.io",
                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png",
-                              "programs": []
+                              "programs": [
+                                {
+                                  "id": "54a7604d-e7c8-4d4b-a186-9ad7fd31e4a6",
+                                  "name": "Starknet Foundation",
+                                  "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
+                                }
+                              ],
+                              "leads": []
                             },
                             {
                               "name": "Theodo",
@@ -577,25 +498,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
                               "programs": [
                                 {
+                                  "id": "05ad97ac-11c4-40fa-9a35-7564120e2706",
                                   "name": "Theodo",
                                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
                                 }
-                              ]
-                            },
-                            {
-                              "name": "Virgin sponsor",
-                              "url": "https://www.foobar.com",
-                              "logoUrl": "https://www.foobar.com/logo.png",
-                              "programs": [
-                                {
-                                }
-                              ]
+                              ],
+                              "leads": []
                             },
                             {
                               "name": "We are super sponsors!",
                               "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
-                              "programs": []
+                              "programs": [
+                                {
+                                  "id": "9f9a8397-802a-4f60-8db9-34264b64d747",
+                                  "name": "We are super sponsors!",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
+                                }
+                              ],
+                              "leads": []
                             }
                           ]
                         }
@@ -618,6 +539,10 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .json("""
                         {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
                           "sponsors": [
                             {
                               "name": "Coca Cola",
@@ -636,7 +561,13 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                               "name": "Coca Colax",
                               "url": "https://www.coca-cola-france.fr/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg",
-                              "programs": [],
+                              "programs": [
+                                {
+                                  "id": "a0d5edba-0d1d-4bd2-8bca-2656b86a03f6",
+                                  "name": "Coca Colax",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                                }
+                              ],
                               "leads": []
                             }
                           ]

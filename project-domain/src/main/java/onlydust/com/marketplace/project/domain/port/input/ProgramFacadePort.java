@@ -1,14 +1,16 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Program;
 
 import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 public interface ProgramFacadePort {
-    Program create(@NonNull String name, URI url, URI logoUrl, UserId leadId);
+    Program create(@NonNull String name, @NonNull SponsorId sponsorId, URI url, URI logoUrl, @NonNull List<UserId> leadIds);
 
-    void addLead(@NonNull ProgramId programId, @NonNull UserId leadId);
+    void update(@NonNull UUID programId, @NonNull String name, URI url, URI logoUrl, @NonNull List<UserId> leadIds);
 }

@@ -40,12 +40,12 @@ public class PermissionService {
                || programStoragePort.isAdmin(userId, projectSlug);
     }
 
-    public boolean isUserSponsorLead(UUID userId, UUID sponsorId) {
-        return sponsorStoragePort.isAdmin(userId, SponsorId.of(sponsorId));
+    public boolean isUserSponsorLead(UUID userId, SponsorId sponsorId) {
+        return sponsorStoragePort.isAdmin(userId, sponsorId);
     }
 
-    public boolean isUserSponsorLead(UUID userId) {
-        return sponsorStoragePort.isAdminOfAnySponsor(userId);
+    public boolean isUserSponsorLeadOfProgram(UUID userId, ProgramId programId) {
+        return sponsorStoragePort.isAdminOfProgramSponsor(userId, programId);
     }
 
     public boolean isUserProgramLead(UUID userId, ProgramId programId) {
