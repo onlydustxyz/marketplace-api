@@ -2944,6 +2944,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProgramLinkResponse'
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserLinkResponse'
 
     SponsorDetailsResponse:
       allOf:
@@ -3059,6 +3063,10 @@ components:
         logoUrl:
           type: string
           format: uri
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
 
     CreateAccountRequest:
       type: object

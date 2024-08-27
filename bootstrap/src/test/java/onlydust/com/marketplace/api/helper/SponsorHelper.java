@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -23,7 +24,8 @@ public class SponsorHelper {
         return sponsorFacadePort.createSponsor(
                 faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
                 URI.create(faker.internet().url()),
-                URI.create(faker.internet().url()));
+                URI.create(faker.internet().url()),
+                List.of());
     }
 
     public Sponsor create(UserAuthHelper.AuthenticatedUser lead) {

@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.SponsorCreateResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.backoffice.api.contract.model.UploadImageResponse;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
@@ -31,20 +32,22 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     private final SponsorFacadePort sponsorFacadePort;
 
     @Override
-    public ResponseEntity<SponsorCreateResponse> createSponsor(SponsorRequest sponsorRequest) {
-        final var sponsor = sponsorFacadePort.createSponsor(sponsorRequest.getName(),
-                sponsorRequest.getUrl(),
-                sponsorRequest.getLogoUrl());
+    public ResponseEntity<SponsorCreateResponse> createSponsor(SponsorRequest request) {
+        final var sponsor = sponsorFacadePort.createSponsor(request.getName(),
+                request.getUrl(),
+                request.getLogoUrl(),
+                request.getLeads().stream().map(UserId::of).toList());
         return ResponseEntity.ok(new SponsorCreateResponse()
                 .id(sponsor.id().value()));
     }
 
     @Override
-    public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest sponsorRequest) {
+    public ResponseEntity<Void> updateSponsor(UUID sponsorId, SponsorRequest request) {
         sponsorFacadePort.updateSponsor(SponsorId.of(sponsorId),
-                sponsorRequest.getName(),
-                sponsorRequest.getUrl(),
-                sponsorRequest.getLogoUrl());
+                request.getName(),
+                request.getUrl(),
+                request.getLogoUrl(),
+                request.getLeads().stream().map(UserId::of).toList());
         return noContent().build();
     }
 
