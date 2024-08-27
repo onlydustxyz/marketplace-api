@@ -531,19 +531,16 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "58a0a05c-c81e-447c-910f-629817a987b8",
                               "name": "Captain America",
-                              "url": "https://www.marvel.com/characters/captain-america-steve-rogers",
                               "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg"
                             },
                             {
                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                               "name": "AS Nancy Lorraine",
-                              "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                             },
                             {
                               "id": "4202fd03-f316-458f-a642-421c7b3c7026",
                               "name": "ChatGPT",
-                              "url": "https://chat.openai.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
                             }
                           ]
