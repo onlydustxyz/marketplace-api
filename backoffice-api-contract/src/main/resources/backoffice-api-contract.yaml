@@ -2853,36 +2853,6 @@ components:
         - BO_ADMIN
         - BO_READER
 
-    OldSponsorPage:
-      allOf:
-        - $ref: '#/components/schemas/PageResponse'
-        - type: object
-          required:
-            - sponsors
-          properties:
-            sponsors:
-              type: array
-              items:
-                $ref: '#/components/schemas/OldSponsorPageItemResponse'
-
-    OldSponsorPageItemResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        url:
-          type: string
-        logoUrl:
-          type: string
-        projectIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-
     SponsorPage:
       allOf:
         - $ref: '#/components/schemas/PageResponse'

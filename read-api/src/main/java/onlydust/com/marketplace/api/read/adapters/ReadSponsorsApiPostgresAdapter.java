@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
-import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -22,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static org.springframework.http.ResponseEntity.ok;
@@ -43,13 +42,12 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
-            throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+            throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var sponsor = sponsorReadRepository.findById(sponsorId)
-                .map(SponsorReadEntity::toResponse)
-                .orElseThrow(() -> forbidden("Sponsor %s not found".formatted(sponsorId)));
+                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
-        return ok(sponsor);
+        return ok(sponsor.toResponse());
     }
 
     @Override

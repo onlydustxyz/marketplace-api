@@ -485,3 +485,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000320_add_missing_refund_events.sql
   - include:
       file: db/changelog/changelogs/00000321_fix_quotes_in_json.sql
+  - include:
+      file: db/changelog/changelogs/00000322_update_sponsor_stats_view.sql
