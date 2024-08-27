@@ -317,7 +317,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .uri(getApiURI(HACKATHONS_BY_ID_ISSUES.formatted(hackathonId1.getValue()), Map.of(
                         "pageIndex", "0",
                         "pageSize", "5",
-                        "projectIds", "00490be6-2c03-4720-993b-aea3e07edd81",
+                        "projectIds", "00490be6-2c03-4720-993b-aea3e07edd81,52cadf17-5a89-45b4-ad2a-884b4741e557",
                         "search", "Exercise"
                 )))
                 .header("Authorization", "Bearer " + emilie.jwt())

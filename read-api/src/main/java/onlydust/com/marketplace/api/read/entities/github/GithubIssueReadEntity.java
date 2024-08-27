@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.backoffice.api.contract.model.IssuePageItem;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.GithubIssueLinkResponse;
+import onlydust.com.marketplace.api.contract.model.GithubIssueResponse;
+import onlydust.com.marketplace.api.contract.model.GithubIssueStatus;
+import onlydust.com.marketplace.api.contract.model.GithubOrganizationInstallationStatus;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAppInstallationViewEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.hibernate.annotations.Immutable;
@@ -21,7 +22,6 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -114,33 +114,6 @@ public class GithubIssueReadEntity {
     @NonNull
     Set<ApplicationReadEntity> applications;
 
-    public GithubIssuePageItemResponse toPageItemResponse(@NonNull UUID projectId, Long githubUserId) {
-        final var projectApplications = applications.stream()
-                .filter(application -> application.projectId().equals(projectId))
-                .toList();
-
-        final var currentUserApplication = projectApplications.stream()
-                .filter(application -> application.applicantId().equals(githubUserId))
-                .findFirst();
-
-        return new GithubIssuePageItemResponse()
-                .id(id)
-                .number(number)
-                .title(title)
-                .status(status)
-                .htmlUrl(htmlUrl)
-                .repo(repo.toShortResponse())
-                .author(author.toContributorResponse())
-                .createdAt(createdAt)
-                .closedAt(closedAt)
-                .body(body)
-                .labels(labels.stream().map(GithubLabelReadEntity::toDto).toList())
-                .applicants(projectApplications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toGithubUserResponse).toList())
-                .assignees(assignees.stream().map(AllUserReadEntity::toGithubUserResponse).toList())
-                .currentUserApplication(currentUserApplication.map(ApplicationReadEntity::toShortResponse).orElse(null))
-                ;
-    }
-
     public GithubIssueLinkResponse toLinkDto() {
         return new GithubIssueLinkResponse()
                 .id(id)
@@ -206,22 +179,4 @@ public class GithubIssueReadEntity {
         };
     }
 
-    public IssuePageItem toPageItem() {
-        return new IssuePageItem()
-                .id(id)
-                .number(number)
-                .status(switch (status) {
-                    case OPEN -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.OPEN;
-                    case COMPLETED -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.COMPLETED;
-                    case CANCELLED -> onlydust.com.backoffice.api.contract.model.GithubIssueStatus.CANCELLED;
-                })
-                .title(title)
-                .repo(repo.toBoShortResponse())
-                .projects(repo.projects().stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
-                .author(author.toBoLinkResponse())
-                .labels(labels.stream().map(GithubLabelReadEntity::getName).toList())
-                .assignees(assignees.stream().map(AllUserReadEntity::toBoLinkResponse).toList())
-                .applicants(applications.stream().map(ApplicationReadEntity::applicant).map(AllUserReadEntity::toBoLinkResponse).toList())
-                ;
-    }
 }

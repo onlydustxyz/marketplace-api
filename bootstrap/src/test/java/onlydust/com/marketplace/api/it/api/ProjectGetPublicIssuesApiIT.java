@@ -189,7 +189,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "5",
                         "statuses", "OPEN",
                         "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
-                        "isApplied", "true"
+                        "isApplied", "true",
+                        "direction", "DESC"
                 )))
                 // Then
                 .exchange()
@@ -211,6 +212,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12239",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -222,6 +224,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-06T06:54:13Z",
+                              "closedAt": null,
                               "body": "![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/64b12d24-13be-46e8-9024-085f4e96d1ef/040f427b-599f-4682-a371-e46d5044ba7d?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy82NGIxMmQyNC0xM2JlLTQ2ZTgtOTAyNC0wODVmNGU5NmQxZWYvMDQwZjQyN2ItNTk5Zi00NjgyLWEzNzEtZTQ2ZDUwNDRiYTdkIiwiaWF0IjoxNjk5MjUzNjYwLCJleHAiOjE2OTkzNDAwNjB9.NaDiPp6DzOKCgMXR_DUMbEyrfJrLwrn7ZKjVIb1hPqw)\\n\\nHow to reproduce ?\\n\\n1. Go to insights page\\n2. Select User Filter in filters and select any one user\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2676](https://linear.app/calcom/issue/CAL-2676/average-event-duration-in-insights)</sub>",
                               "labels": [
                                 {
@@ -246,6 +249,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                }
+                              ],
+                              "assignees": [
+                                {
+                                  "githubUserId": 53316345,
+                                  "login": "Udit-takkar",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
                                 }
                               ],
                               "currentUserApplication": null
@@ -310,6 +320,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12239",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -321,6 +332,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-06T06:54:13Z",
+                              "closedAt": null,
                               "body": "![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/64b12d24-13be-46e8-9024-085f4e96d1ef/040f427b-599f-4682-a371-e46d5044ba7d?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy82NGIxMmQyNC0xM2JlLTQ2ZTgtOTAyNC0wODVmNGU5NmQxZWYvMDQwZjQyN2ItNTk5Zi00NjgyLWEzNzEtZTQ2ZDUwNDRiYTdkIiwiaWF0IjoxNjk5MjUzNjYwLCJleHAiOjE2OTkzNDAwNjB9.NaDiPp6DzOKCgMXR_DUMbEyrfJrLwrn7ZKjVIb1hPqw)\\n\\nHow to reproduce ?\\n\\n1. Go to insights page\\n2. Select User Filter in filters and select any one user\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2676](https://linear.app/calcom/issue/CAL-2676/average-event-duration-in-insights)</sub>",
                               "labels": [
                                 {
@@ -345,6 +357,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
+                                }
+                              ],
+                              "assignees": [
+                                {
+                                  "githubUserId": 53316345,
+                                  "login": "Udit-takkar",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
                                 }
                               ],
                               "currentUserApplication": {
@@ -549,7 +568,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         "pageSize", "5",
                         "statuses", "OPEN",
                         "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
-                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,c83881b3-5aef-4819-9596-fdbbbedf2b0b"
+                        "languageIds", "ca600cac-0f45-44e9-a6e8-25e21b0c6887,c83881b3-5aef-4819-9596-fdbbbedf2b0b",
+                        "direction", "DESC"
                 )))
                 // Then
                 .exchange()
@@ -571,6 +591,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12239",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -582,6 +603,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-06T06:54:13Z",
+                              "closedAt": null,
                               "body": "![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/64b12d24-13be-46e8-9024-085f4e96d1ef/040f427b-599f-4682-a371-e46d5044ba7d?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy82NGIxMmQyNC0xM2JlLTQ2ZTgtOTAyNC0wODVmNGU5NmQxZWYvMDQwZjQyN2ItNTk5Zi00NjgyLWEzNzEtZTQ2ZDUwNDRiYTdkIiwiaWF0IjoxNjk5MjUzNjYwLCJleHAiOjE2OTkzNDAwNjB9.NaDiPp6DzOKCgMXR_DUMbEyrfJrLwrn7ZKjVIb1hPqw)\\n\\nHow to reproduce ?\\n\\n1. Go to insights page\\n2. Select User Filter in filters and select any one user\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2676](https://linear.app/calcom/issue/CAL-2676/average-event-duration-in-insights)</sub>",
                               "labels": [
                                 {
@@ -608,6 +630,13 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                 }
                               ],
+                              "assignees": [
+                                {
+                                  "githubUserId": 53316345,
+                                  "login": "Udit-takkar",
+                                  "avatarUrl": "https://avatars.githubusercontent.com/u/53316345?v=4"
+                                }
+                              ],
                               "currentUserApplication": null
                             },
                             {
@@ -618,6 +647,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12215",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -629,6 +659,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-03T06:12:34Z",
+                              "closedAt": null,
                               "body": "Individual insights page has insights from from \\"most booked\\" and \\"least booked\\" members. It should just be data that pretains to them:\\n\\n![](https://uploads.linear.app/e86bf957-d82f-465e-b205-135559f4b623/e74bdb02-5e26-41e8-87be-8dda7e382fd4/f48ddf61-24ba-4a09-b94c-ed1aa2b50df4?signature=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXRoIjoiL2U4NmJmOTU3LWQ4MmYtNDY1ZS1iMjA1LTEzNTU1OWY0YjYyMy9lNzRiZGIwMi01ZTI2LTQxZTgtODdiZS04ZGRhN2UzODJmZDQvZjQ4ZGRmNjEtMjRiYS00YTA5LWI5NGMtZWQxYWEyYjUwZGY0IiwiaWF0IjoxNjk4OTkxOTYyLCJleHAiOjE2OTkwNzgzNjJ9.dSRqQBHSC2TupIr9T7wnYSh8Vm3x1KlTsSEo1NIejwI)\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2671](https://linear.app/calcom/issue/CAL-2671/individual-insights-page-has-team-insights)</sub>",
                               "labels": [
                                 {
@@ -649,6 +680,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -659,6 +691,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/10746",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -670,6 +703,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-08-14T15:10:16Z",
+                              "closedAt": null,
                               "body": "ideally we also have a table view with all bookings from teams and orgs.\\r\\n\\r\\nonly owners and admins should see this\\n\\n<sub>[CAL-2346](https://linear.app/calcom/issue/CAL-2346/insights-show-all-booking-data-of-teams-and-orgs)</sub>",
                               "labels": [
                                 {
@@ -694,6 +728,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -704,6 +739,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/9911",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -715,6 +751,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-07-04T09:38:55Z",
+                              "closedAt": null,
                               "body": "not sure if this would live inside /insights or in /event-types/ID but it would be dope to see a table of previous attendees",
                               "labels": [
                                 {
@@ -739,6 +776,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             }
                           ]
@@ -1096,7 +1134,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                         "pageIndex", "0",
                         "pageSize", "5",
                         "isAssigned", "true",
-                        "search", "CAL-1713"
+                        "search", "CAL-1713",
+                        "direction", "DESC"
                 )))
                 // Then
                 .exchange()
@@ -1253,7 +1292,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted(CAL_DOT_COM), Map.of(
                         "pageIndex", "0",
-                        "pageSize", "5"
+                        "pageSize", "5",
+                        "direction", "DESC"
                 )))
                 // Then
                 .exchange()
@@ -1275,6 +1315,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12255",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1286,6 +1327,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-07T09:40:41Z",
+                              "closedAt": null,
                               "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
                               "labels": [
                                 {
@@ -1303,11 +1345,6 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [
                                 {
-                                  "githubUserId": 595505,
-                                  "login": "ofux",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                                },
-                                {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
@@ -1316,8 +1353,14 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                },
+                                {
+                                  "githubUserId": 595505,
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
                                 }
                               ],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1328,6 +1371,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12253",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1339,6 +1383,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-07T07:36:17Z",
+                              "closedAt": null,
                               "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
                               "labels": [
                                 {
@@ -1351,6 +1396,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1361,6 +1407,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12244",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1372,6 +1419,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-06T15:01:09Z",
+                              "closedAt": null,
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
                               "labels": [
                                 {
@@ -1388,6 +1436,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1398,6 +1447,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1409,6 +1459,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-10-15T05:42:44Z",
+                              "closedAt": null,
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
                               "labels": [
                                 {
@@ -1429,6 +1480,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1439,6 +1491,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/11732",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1450,6 +1503,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-10-06T12:10:09Z",
+                              "closedAt": null,
                               "body": "## Issue Summary\\r\\n### this is my organization members page\\r\\n![Screenshot from 2023-10-06 17-17-07](https://github.com/calcom/cal.com/assets/32706411/d1f1aad3-2947-4467-be21-e726430874a1)\\r\\n* as you can see i have temp1 as admin and somay and somay2  as owners\\r\\n### this is one the teams under my organizations\\r\\n![Screenshot from 2023-10-06 17-22-20](https://github.com/calcom/cal.com/assets/32706411/ac148a94-56c7-405b-977c-02fa3b495c5b)\\r\\n* as you can see all of them are joined as members but temp1, somay and somay2 all have the admin access to these teams i.e. they can add and remove members from teams so they should show owner/admin instead of member\\r\\n\\r\\nPS: this is just a suggestion however, I may be wrong here.",
                               "labels": [
                                 {
@@ -1466,6 +1520,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             }
                           ]
@@ -1479,7 +1534,8 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
         client.get()
                 .uri(getApiURI(PROJECT_GOOD_FIRST_ISSUES.formatted(CAL_DOT_COM), Map.of(
                         "pageIndex", "0",
-                        "pageSize", "5"
+                        "pageSize", "5",
+                        "direction", "DESC"
                 )))
                 .header("Authorization", "Bearer " + antho.jwt())
                 // Then
@@ -1502,6 +1558,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12255",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1513,6 +1570,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-07T09:40:41Z",
+                              "closedAt": null,
                               "body": "> Nice find. Unit testable (could be follow up)?\\n\\n\\\\*Originally posted by @keithwillcode in \\\\*[*https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626*](https://github.com/calcom/cal.com/pull/12194#discussion_r1380012626)\\n\\nWrite unit/integration tests for defaultResponder and defaultHandler that can ensure that it doesn't add the header again if already added.\\n\\n<sub>From [SyncLinear.com](https://synclinear.com) | [CAL-2679](https://linear.app/calcom/issue/CAL-2679/nice-find-unit-testable-could-be-follow-up)</sub>",
                               "labels": [
                                 {
@@ -1530,11 +1588,6 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               ],
                               "applicants": [
                                 {
-                                  "githubUserId": 595505,
-                                  "login": "ofux",
-                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                                },
-                                {
                                   "githubUserId": 43467246,
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
@@ -1543,8 +1596,14 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                   "githubUserId": 16590657,
                                   "login": "PierreOucif",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
+                                },
+                                {
+                                  "githubUserId": 595505,
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
                                 }
                               ],
+                              "assignees": [],
                               "currentUserApplication": {
                                 "id": "bf6a909e-243d-4698-aa9f-5f40e3fb4826",
                                 "applicant": {
@@ -1571,6 +1630,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12253",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1582,6 +1642,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-07T07:36:17Z",
+                              "closedAt": null,
                               "body": "https://www.loom.com/share/f934ebd75f0343928715860d7ec39787\\n\\n<sub>[CAL-2678](https://linear.app/calcom/issue/CAL-2678/no-loader-on-clicking-install-button-from-apps-listing-page)</sub>",
                               "labels": [
                                 {
@@ -1594,6 +1655,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1604,6 +1666,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/12244",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1615,6 +1678,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-11-06T15:01:09Z",
+                              "closedAt": null,
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWhen connecting packed calendars, there can be little room for availability. Being able to distinguish events that can be marked with a different color or events with optional rsvp to be skippable, may help users with little availability to better accommodate new meetings through Cal.\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAs mentioned, having the chance to read rsvp from events to calculate availability can help free up more slots for new meetings.\\r\\n",
                               "labels": [
                                 {
@@ -1631,6 +1695,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1641,6 +1706,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/11900",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1652,6 +1718,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-10-15T05:42:44Z",
+                              "closedAt": null,
                               "body": "### Is your proposal related to a problem?\\r\\n\\r\\nWe would like to have the ability to ask \\"follow-up questions\\" based on the answers to previous questions in the booking request.  For example, we could have a mandatory question that asks \\"how did you hear about us?\\" with possible answers \\"web\\", \\"print\\", \\"social media\\", \\"personal reference\\" - and If they choose \\"web\\", we'd like to ask \\"source web site\\" (a text field), or if they choose \\"social media\\", we'd like to ask \\"social media site\\" (a drop down with entries for X/tweeter, Mastodon, Facebook, other).\\r\\n\\r\\n### Describe the solution you'd like\\r\\n\\r\\nAdd an option question type, which in addition to the existing question template, asks for the parent question identifier, and a value (or a list of values) that would make this question appear below the parent question.\\r\\n\\r\\n### Describe alternatives you've considered\\r\\n\\r\\nWe haven't come up with an alternative we liked.\\r\\n\\r\\n### Additional context\\r\\n\\r\\nDid not find this already suggested in either \\"Issues\\" or \\"Pull Requests\\"\\r\\n\\r\\n### Requirement/Document\\r\\n\\r\\nWe haven't written one up.\\r\\n",
                               "labels": [
                                 {
@@ -1672,6 +1739,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             },
                             {
@@ -1682,6 +1750,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                               "htmlUrl": "https://github.com/calcom/cal.com/issues/11732",
                               "repo": {
                                 "id": 350360184,
+                                "owner": "calcom",
                                 "name": "cal.com",
                                 "description": "Scheduling infrastructure for absolutely everyone.",
                                 "htmlUrl": "https://github.com/calcom/cal.com"
@@ -1693,6 +1762,7 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": false
                               },
                               "createdAt": "2023-10-06T12:10:09Z",
+                              "closedAt": null,
                               "body": "## Issue Summary\\r\\n### this is my organization members page\\r\\n![Screenshot from 2023-10-06 17-17-07](https://github.com/calcom/cal.com/assets/32706411/d1f1aad3-2947-4467-be21-e726430874a1)\\r\\n* as you can see i have temp1 as admin and somay and somay2  as owners\\r\\n### this is one the teams under my organizations\\r\\n![Screenshot from 2023-10-06 17-22-20](https://github.com/calcom/cal.com/assets/32706411/ac148a94-56c7-405b-977c-02fa3b495c5b)\\r\\n* as you can see all of them are joined as members but temp1, somay and somay2 all have the admin access to these teams i.e. they can add and remove members from teams so they should show owner/admin instead of member\\r\\n\\r\\nPS: this is just a suggestion however, I may be wrong here.",
                               "labels": [
                                 {
@@ -1709,10 +1779,12 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
                                 }
                               ],
                               "applicants": [],
+                              "assignees": [],
                               "currentUserApplication": null
                             }
                           ]
                         }
+                        
                         """);
     }
 

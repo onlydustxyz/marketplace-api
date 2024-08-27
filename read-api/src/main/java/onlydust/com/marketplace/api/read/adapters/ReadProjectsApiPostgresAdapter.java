@@ -25,6 +25,7 @@ import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -61,7 +62,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final PermissionService permissionService;
-    private final GithubIssueReadRepository githubIssueReadRepository;
+    private final ProjectGithubIssueItemReadRepository projectGithubIssueItemReadRepository;
     private final ProjectReadRepository projectReadRepository;
     private final CustomProjectRepository customProjectRepository;
     private final CustomContributorRepository customContributorRepository;
@@ -200,10 +201,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = githubIssueReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, false,
-                null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("created_at").descending()));
+        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, false,
+                null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
         return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
+                .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
@@ -222,10 +223,10 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           Boolean isGoodFirstIssue,
                                                                           Boolean isIncludedInAnyHackathon,
                                                                           String search,
-                                                                          ProjectIssuesSort sort,
+                                                                          @NotNull ProjectIssuesSort sort,
                                                                           SortDirection direction) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = githubIssueReadRepository.findIssuesOf(projectId,
+        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId,
                 isNull(statuses) ? null : statuses.stream().distinct().map(Enum::name).toArray(String[]::new),
                 isAssigned,
                 isApplied,
@@ -235,11 +236,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search,
                 PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, switch (sort) {
-                    case CREATED_AT -> "created_at";
-                    case CLOSED_AT -> "closed_at";
+                    case CREATED_AT -> "i.created_at";
+                    case CLOSED_AT -> "i.closed_at";
                 })));
         return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(projectId, caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
+                .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
