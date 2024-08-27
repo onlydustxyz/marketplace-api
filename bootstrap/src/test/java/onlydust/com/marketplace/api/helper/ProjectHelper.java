@@ -4,6 +4,7 @@ import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +61,13 @@ public class ProjectHelper {
                 "projectId", projectId.value(),
                 "repoId", repoId
         ));
+    }
+
+    public void updateVisibility(ProjectId projectId, ProjectVisibility projectVisibility) {
+        databaseHelper.executeQuery("""
+                        update projects
+                        set visibility = cast(:visibility as project_visibility)
+                        where id = :projectId
+                """, Map.of("projectId", projectId.value(), "visibility", projectVisibility.name()));
     }
 }
