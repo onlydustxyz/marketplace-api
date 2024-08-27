@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Project;
 import org.junit.jupiter.api.*;
@@ -25,6 +26,8 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
     private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
+
+    private final static ProjectId B_CONSEIL = ProjectId.of("27ca7e18-9e71-468f-8825-c64fe6b79d66");
 
     private static final String BRETZEL_OVERVIEW_JSON = """
             {
@@ -680,21 +683,34 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
                 .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When a program lead gets the project
+        final var programLead = userAuthHelper.create();
+        programHelper.addLead(ProgramId.of("6d13685b-2853-438e-bf78-b7d4a37adc70"), programLead);
+
+        client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead.jwt()).exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(false)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
+                .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
     @Test
     @Order(9)
     public void should_get_a_private_project_by_id() {
-        // Given
-        final String id = "27ca7e18-9e71-468f-8825-c64fe6b79d66";
-
         // When
-        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).exchange()
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + B_CONSEIL)).exchange()
                 // Then
                 .expectStatus().isForbidden();
 
         // When a contributor gets the project
-        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id))
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + B_CONSEIL))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateOlivier().jwt())
                 .exchange()
                 // Then
@@ -708,7 +724,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When a lead gets the project
-        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION,
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + B_CONSEIL)).header(HttpHeaders.AUTHORIZATION,
                         "Bearer " + userAuthHelper.authenticateUser(134486697L).jwt())
                 .exchange()
                 // Then
@@ -721,7 +737,8 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .json(B_CONSEIL_OVERVIEW_JSON);
 
         // When an invited lead gets the project
-        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + id)).header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.authenticateHayden().jwt())
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + B_CONSEIL)).header(HttpHeaders.AUTHORIZATION,
+                        "Bearer " + userAuthHelper.authenticateHayden().jwt())
                 .exchange()
                 // Then
                 .expectStatus()
@@ -731,6 +748,22 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.me.isContributor").isEqualTo(false)
                 .jsonPath("$.me.isProjectLead").isEqualTo(false)
                 .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(true)
+                .json(B_CONSEIL_OVERVIEW_JSON);
+
+        // When a program lead gets the project
+        final var programLead = userAuthHelper.create();
+        programHelper.addLead(ProgramId.of("6d13685b-2853-438e-bf78-b7d4a37adc70"), programLead);
+
+        client.get().uri(getApiURI(PROJECTS_GET_BY_ID + "/" + B_CONSEIL))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead.jwt()).exchange()
+                // Then
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.me.isMember").isEqualTo(false)
+                .jsonPath("$.me.isContributor").isEqualTo(false)
+                .jsonPath("$.me.isProjectLead").isEqualTo(false)
+                .jsonPath("$.me.isInvitedAsProjectLead").isEqualTo(false)
                 .json(B_CONSEIL_OVERVIEW_JSON);
     }
 
