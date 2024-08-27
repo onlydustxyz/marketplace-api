@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
@@ -11,6 +12,7 @@ import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,14 +25,15 @@ public class SponsorService implements SponsorFacadePort {
     private final ImageStoragePort imageStoragePort;
 
     @Override
-    public Sponsor createSponsor(@NonNull String name, URI url, @NonNull URI logoUrl) {
+    public Sponsor createSponsor(@NonNull String name, URI url, @NonNull URI logoUrl, @NonNull List<UserId> leads) {
         final var sponsor = Sponsor.create(name, url, logoUrl);
         sponsorStoragePort.save(sponsor);
+        leads.forEach(leadId -> sponsorStoragePort.addLeadToSponsor(leadId.value(), sponsor.id()));
         return sponsor;
     }
 
     @Override
-    public void updateSponsor(@NonNull SponsorId sponsorId, @NonNull String name, URI url, @NonNull URI logoUrl) {
+    public void updateSponsor(@NonNull SponsorId sponsorId, @NonNull String name, URI url, @NonNull URI logoUrl, @NonNull List<UserId> leads) {
         final var sponsor = sponsorStoragePort.get(sponsorId)
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
@@ -39,6 +42,8 @@ public class SponsorService implements SponsorFacadePort {
                 .url(url)
                 .logoUrl(logoUrl)
                 .build());
+        
+        leads.forEach(leadId -> sponsorStoragePort.addLeadToSponsor(leadId.value(), sponsor.id()));
     }
 
     @Override
