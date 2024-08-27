@@ -7221,6 +7221,10 @@ components:
               type: string
             lastName:
               type: string
+            programs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProgramLinkResponse'
             sponsors:
               type: array
               items:

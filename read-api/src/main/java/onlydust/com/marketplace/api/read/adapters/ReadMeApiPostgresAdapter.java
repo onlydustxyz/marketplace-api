@@ -94,6 +94,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .firstName(user.profile().map(UserProfileInfoReadEntity::firstName).orElse(null))
                 .lastName(user.profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
                 .missingPayoutPreference(hasMissingPayoutPreferences)
+                .programs(user.programs().stream().map(ProgramReadEntity::toLinkResponse).toList())
                 .sponsors(user.sponsors().stream().map(SponsorReadEntity::toLinkResponse).toList());
 
         return ok(response);
