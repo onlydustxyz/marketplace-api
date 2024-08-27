@@ -17,7 +17,13 @@ public interface HackathonGithubIssueItemReadRepository extends Repository<Hacka
                    applicants.users                                                                                  applicants,
                    jsonb_build_object('id', gr.id, 'owner', gr.owner_login, 'name', gr.name, 'htmlUrl', gr.html_url) repo,
                    labels.strings                                                                                    labels,
-                   hackathon_issues.projects
+                   hackathon_issues.projects,
+                   jsonb_build_object(
+                                       'userId', u.id,
+                                       'githubUserId', author_account.id,
+                                       'login', author_account.login,
+                                       'avatarUrl', user_avatar_url(author_account.id, author_account.avatar_url)
+                                    ) author
             from indexer_exp.github_issues gi
                      join (select hi.issue_id,
                                   hi.hackathon_id,
@@ -34,6 +40,8 @@ public interface HackathonGithubIssueItemReadRepository extends Repository<Hacka
                                     left join projects p on p.id = any (hi.project_ids)
                            group by hi.issue_id, hi.hackathon_id) hackathon_issues on hackathon_issues.issue_id = gi.id
                      join indexer_exp.github_repos gr on gr.id = gi.repo_id
+                     JOIN indexer_exp.github_accounts author_account on gi.author_id = author_account.id
+                     left join iam.users u on u.github_user_id = author_account.id
                      LEFT JOIN (select gia.issue_id,
                                        jsonb_agg(
                                                jsonb_build_object(
@@ -63,7 +71,7 @@ public interface HackathonGithubIssueItemReadRepository extends Repository<Hacka
             where hackathon_issues.hackathon_id = :hackathonId
             and
                 (:search IS NULL OR gi.title ILIKE '%' || CAST(:search as text) || '%')
-                AND (:projectIds IS NULL OR hackathon_issues.project_ids && :projectIds)
+                AND (:projectIds IS NULL OR hackathon_issues.project_ids && cast(:projectIds as uuid[]))
                 AND (:isAssigned IS NULL OR
                     (:isAssigned = TRUE AND assignees.users IS NOT NULL) OR
                     (:isAssigned = FALSE AND assignees.users IS NULL)
@@ -71,7 +79,7 @@ public interface HackathonGithubIssueItemReadRepository extends Repository<Hacka
             """, nativeQuery = true)
     Page<HackathonGithubIssueItemReadEntity> findHackathonIssues(UUID hackathonId,
                                                                  String search,
-                                                                 List<UUID> projectIds,
+                                                                 UUID[] projectIds,
                                                                  Boolean isAssigned,
                                                                  Pageable pageable);
 }

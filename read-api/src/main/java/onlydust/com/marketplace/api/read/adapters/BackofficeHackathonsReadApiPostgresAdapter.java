@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -72,8 +73,8 @@ public class BackofficeHackathonsReadApiPostgresAdapter implements BackofficeHac
                                                         Boolean isAssigned) {
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
-        final var page = hackathonGithubIssueItemReadRepository.findHackathonIssues(hackathonId, search, projectIds, isAssigned,
-                PageRequest.of(sanitizedPageIndex, sanitizePageSize, Sort.by(Sort.Direction.DESC, "createdAt")));
+        final var page = hackathonGithubIssueItemReadRepository.findHackathonIssues(hackathonId, search, projectIds.toArray(UUID[]::new), isAssigned,
+                PageRequest.of(sanitizedPageIndex, sanitizePageSize, Sort.by(Sort.Direction.DESC, "created_at")));
 
         final var response = new IssuePage()
                 .nextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, page.getTotalPages()))

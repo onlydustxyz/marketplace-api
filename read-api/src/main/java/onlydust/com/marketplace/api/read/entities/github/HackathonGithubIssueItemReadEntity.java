@@ -12,7 +12,10 @@ import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Objects.isNull;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -74,10 +77,10 @@ public class HackathonGithubIssueItemReadEntity {
                 })
                 .title(title)
                 .repo(repo)
-                .projects(projects)
+                .projects(isNull(projects) ? List.of() : projects.stream().sorted(Comparator.comparing(ProjectLinkResponse::getName)).toList())
                 .author(author)
-                .labels(labels)
-                .assignees(assignees)
-                .applicants(applicants);
+                .labels(isNull(labels) ? List.of() : labels.stream().sorted(String::compareTo).toList())
+                .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(UserLinkResponse::getLogin)).toList())
+                .applicants(isNull(applicants) ? List.of() : applicants.stream().sorted(Comparator.comparing(UserLinkResponse::getLogin)).toList());
     }
 }
