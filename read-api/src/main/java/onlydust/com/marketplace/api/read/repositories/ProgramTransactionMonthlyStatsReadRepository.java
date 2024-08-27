@@ -13,7 +13,7 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
     @Query(value = """
             with stats as (
                 select
-                    sa.sponsor_id                                                                                                                               as program_id,
+                    abt.program_id                                                                                                                              as program_id,
                     ab.currency_id                                                                                                                              as currency_id,
                     date_trunc('month', abt.timestamp)                                                                                                          as date,
             
@@ -30,22 +30,21 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                     count(*)                                                                                                                                    as transaction_count
                 from
                     accounting.account_book_transactions abt
-                join accounting.sponsor_accounts sa on sa.id = abt.sponsor_account_id
                 join accounting.account_books ab on ab.id = abt.account_book_id
-                join sponsors s on s.id = sa.sponsor_id
                 left join projects p on p.id = abt.project_id
+                join programs pgm on pgm.id = abt.program_id
                 where
-                    sa.sponsor_id = :programId and
+                    abt.program_id = :programId and
                     (cast(:fromDate as text) is null or abt.timestamp >= :fromDate) and
                     (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate) and
-                    (cast(:search as text) is null or p.name ilike '%' || :search || '%' or s.name ilike '%' || :search || '%') and
+                    (cast(:search as text) is null or p.name ilike '%' || :search || '%' or pgm.name ilike '%' || :search || '%') and
                     (coalesce(:types) is null or (
                         'GRANTED' in (:types) and abt.type in ('TRANSFER', 'REFUND') and abt.project_id is not null and abt.reward_id is null or
                         'RECEIVED' in (:types) and abt.type in ('MINT', 'TRANSFER') and abt.project_id is null or
                         'RETURNED' in (:types) and abt.type in ('REFUND', 'BURN') and abt.project_id is null
                     ))
                 group by
-                    sa.sponsor_id,
+                    abt.program_id,
                     ab.currency_id,
                     date_trunc('month', abt.timestamp)
             )

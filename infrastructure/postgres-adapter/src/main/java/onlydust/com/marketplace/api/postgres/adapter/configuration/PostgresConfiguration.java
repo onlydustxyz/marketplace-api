@@ -213,13 +213,10 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBackofficeAdapter postgresBackofficeAdapter(final SponsorRepository sponsorRepository,
-                                                               final SponsorViewRepository sponsorViewRepository,
-                                                               final BoEcosystemRepository boEcosystemRepository,
+    public PostgresBackofficeAdapter postgresBackofficeAdapter(final BoEcosystemRepository boEcosystemRepository,
                                                                final EcosystemRepository ecosystemRepository,
                                                                final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(sponsorRepository, sponsorViewRepository, boEcosystemRepository, ecosystemRepository,
-                projectRepository);
+        return new PostgresBackofficeAdapter(boEcosystemRepository, ecosystemRepository, projectRepository);
     }
 
     @Bean
@@ -231,7 +228,6 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<TrackingEventEntity> trackingOutbox(final TrackingEventRepository trackingEventRepository) {
         return new PostgresOutboxAdapter<>(trackingEventRepository);
     }
-
 
     @Bean
     public PostgresOutboxAdapter<IndexingEventEntity> indexingEventsOutbox(final IndexingEventRepository indexingEventRepository) {
@@ -247,7 +243,6 @@ public class PostgresConfiguration {
     public PostgresOutboxAdapter<BoostNodeGuardiansRewardsEventEntity> boostNodeGuardiansRewardsOutbox(final BoostNodeGuardiansRewardsRepository boostNodeGuardiansRewardsRepository) {
         return new PostgresOutboxAdapter<>(boostNodeGuardiansRewardsRepository);
     }
-
 
     @Bean
     public CustomProjectRankingRepository customProjectRankingRepository(final EntityManager entityManager) {
@@ -333,9 +328,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository,
-                                                                                      final ProjectSponsorRepository projectSponsorRepository) {
-        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository, projectSponsorRepository);
+    PostgresProjectAccountingObserverAdapter postgresProjectAccountingObserverAdapter(final ProjectAllowanceRepository projectAllowanceRepository) {
+        return new PostgresProjectAccountingObserverAdapter(projectAllowanceRepository);
     }
 
     @Bean
@@ -360,9 +354,18 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorViewRepository sponsorViewRepository, final SponsorUserRepository sponsorUserRepository) {
-        return new PostgresSponsorAdapter(sponsorViewRepository, sponsorUserRepository);
+    PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository,
+                                                  final SponsorLeadRepository sponsorLeadRepository) {
+        return new PostgresSponsorAdapter(sponsorRepository, sponsorLeadRepository);
     }
+
+
+    @Bean
+    PostgresProgramAdapter postgresProgramAdapter(final ProgramRepository programRepository,
+                                                  final ProgramLeadRepository programLeadRepository) {
+        return new PostgresProgramAdapter(programRepository, programLeadRepository);
+    }
+
 
     @Bean
     public PostgresHackathonAdapter postgresHackathonAdapter(final HackathonRepository hackathonRepository,

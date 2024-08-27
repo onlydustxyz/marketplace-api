@@ -1,63 +1,58 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.SponsorView;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorUserEntity;
-import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorUserRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorViewRepository;
-import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.port.output.ProjectSponsorStoragePort;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorLeadEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
+import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorLeadRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class PostgresSponsorAdapter implements SponsorStoragePort, ProjectSponsorStoragePort {
-    private final SponsorViewRepository sponsorViewRepository;
-    private final SponsorUserRepository sponsorUserRepository;
+public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSponsorStoragePort {
+    private final SponsorRepository sponsorRepository;
+    private final SponsorLeadRepository sponsorLeadRepository;
 
     @Override
     @Transactional
-    public Page<SponsorView> findSponsors(String search, int pageIndex, int pageSize) {
-        final var page = sponsorViewRepository.findAllByNameContainingIgnoreCase(search == null ? "" : search,
-                PageRequest.of(pageIndex, pageSize, Sort.by("name")));
-        return Page.<SponsorView>builder()
-                .content(page.getContent().stream().map(SponsorViewEntity::toView).toList())
-                .totalItemNumber((int) page.getTotalElements())
-                .totalPageNumber(page.getTotalPages())
-                .build();
+    public boolean isAdmin(UUID userId, SponsorId sponsorId) {
+        return sponsorLeadRepository.findById(new SponsorLeadEntity.PrimaryKey(userId, sponsorId.value()))
+                .isPresent();
     }
 
     @Override
     @Transactional
-    public Optional<SponsorView> get(SponsorId sponsorId) {
-        return sponsorViewRepository.findById(sponsorId.value()).map(SponsorViewEntity::toView);
+    public boolean isAdminOfAnySponsor(UUID userId) {
+        return sponsorLeadRepository.findByUserId(userId).isPresent();
     }
 
     @Override
     @Transactional
-    public boolean isAdmin(UserId userId, SponsorId sponsorId) {
-        return sponsorViewRepository.findById(sponsorId.value())
-                .map(s -> s.getUsers().stream().anyMatch(u -> u.id().equals(userId.value())))
-                .orElse(false);
+    public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
+        sponsorLeadRepository.save(new SponsorLeadEntity(leadId, sponsorId.value()));
     }
 
     @Override
-    @Transactional
-    public boolean isUserSponsorAdmin(UUID id, UUID sponsorId) {
-        return isAdmin(UserId.of(id), SponsorId.of(sponsorId));
+    public Optional<Sponsor> get(SponsorId sponsorId) {
+        return sponsorRepository.findById(sponsorId.value())
+                .map(SponsorEntity::toDomain);
     }
 
     @Override
-    @Transactional
-    public void addLeadToSponsor(UserId leadId, SponsorId sponsorId) {
-        sponsorUserRepository.save(new SponsorUserEntity(leadId.value(), sponsorId.value()));
+    public void save(Sponsor sponsor) {
+        sponsorRepository.save(SponsorEntity.of(sponsor));
+    }
+
+    @Override
+    public Optional<SponsorView> getView(SponsorId sponsorId) {
+        return sponsorRepository.findById(sponsorId.value())
+                .map(SponsorEntity::toView);
     }
 }

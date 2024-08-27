@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.time.ZonedDateTime;
@@ -19,7 +20,7 @@ public record RewardDetailsView(
         ZonedDateTime processedAt,
         @NonNull List<String> githubUrls,
         @NonNull ProjectShortView project,
-        @NonNull List<ShortSponsorView> sponsors,
+        @NonNull List<SponsorView> sponsors,
         @NonNull MoneyView money,
         BillingProfile billingProfile,
         ShortContributorView recipient,

@@ -1,9 +1,6 @@
 package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
-import onlydust.com.marketplace.accounting.domain.service.AccountingPermissionService;
 import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
@@ -15,6 +12,8 @@ import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyS
 import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.context.annotation.Profile;
@@ -50,7 +49,7 @@ import static org.springframework.http.ResponseEntity.status;
 public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ProgramReadRepository programReadRepository;
-    private final AccountingPermissionService accountingPermissionService;
+    private final PermissionService permissionService;
     private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
     private final ProjectReadRepository projectReadRepository;
@@ -59,7 +58,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var program = programReadRepository.findById(programId)
@@ -72,7 +71,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         int index = sanitizePageIndex(pageIndex);
@@ -93,7 +92,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramProjectResponse> getProgramProject(UUID programId, UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final ProgramProjectResponse programProjectResponse = projectReadRepository.findStatsById(projectId)
@@ -104,19 +103,19 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     @Override
-    public ResponseEntity<TransactionPageResponse> getProgramTransactions(UUID programId,
-                                                                          Integer pageIndex,
-                                                                          Integer pageSize,
-                                                                          String fromDate,
-                                                                          String toDate,
-                                                                          List<ProgramTransactionType> types,
-                                                                          String search) {
+    public ResponseEntity<ProgramTransactionPageResponse> getProgramTransactions(UUID programId,
+                                                                                 Integer pageIndex,
+                                                                                 Integer pageSize,
+                                                                                 String fromDate,
+                                                                                 String toDate,
+                                                                                 List<ProgramTransactionType> types,
+                                                                                 String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
         final var page = findAccountBookTransactions(programId, fromDate, toDate, types, search, index, size);
 
-        final var response = new TransactionPageResponse()
+        final var response = new ProgramTransactionPageResponse()
                 .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toProgramTransactionPageItemResponse).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
@@ -162,7 +161,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                List<ProgramTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
 
@@ -185,7 +184,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                           String search) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
+        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var stats = programTransactionMonthlyStatsReadRepository.findAll(

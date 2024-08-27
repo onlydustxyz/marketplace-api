@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.RewardUsdEquivalent;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardUsdEquivalentStorage;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.RewardUsdEquivalentDataViewEntity;

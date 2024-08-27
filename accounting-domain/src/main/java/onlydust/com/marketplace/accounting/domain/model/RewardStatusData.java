@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.time.ZonedDateTime;
 import java.util.HashSet;
@@ -15,7 +16,8 @@ public class RewardStatusData {
     @NonNull
     final RewardId rewardId;
 
-    @NonNull Boolean sponsorHasEnoughFund = false;
+    @NonNull
+    Boolean sponsorHasEnoughFund = false;
     ZonedDateTime unlockDate;
     ZonedDateTime invoiceReceivedAt;
     ZonedDateTime paidAt;

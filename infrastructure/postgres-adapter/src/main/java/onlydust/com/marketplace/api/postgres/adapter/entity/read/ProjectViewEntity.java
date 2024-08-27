@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
@@ -66,9 +66,6 @@ public class ProjectViewEntity {
     Boolean ignoreCodeReviews;
     @Column(name = "reward_ignore_contributions_before_date_by_default")
     Date ignoreContributionsBefore;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "projectId")
-    Set<ProjectSponsorViewEntity> sponsors = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -146,8 +143,8 @@ public class ProjectViewEntity {
                         .map(repo -> RepoMapper.mapToDomain(repo,
                                 repoIdsIncludedInProject.contains(repo.getId()),
                                 entity.installation() != null &&
-                                        entity.installation().getAuthorizedRepos().stream()
-                                                .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
+                                entity.installation().getAuthorizedRepos().stream()
+                                        .anyMatch(installedRepo -> installedRepo.getId().getRepoId().equals(repo.getId())))
                         )
                         .collect(Collectors.toSet()))
                 .build()).toList();

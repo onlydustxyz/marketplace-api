@@ -7,7 +7,10 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSe
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.*;
+import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
@@ -91,7 +94,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .firstName(user.profile().map(UserProfileInfoReadEntity::firstName).orElse(null))
                 .lastName(user.profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
                 .missingPayoutPreference(hasMissingPayoutPreferences)
-                .sponsors(user.sponsors().stream().map(SponsorReadEntity::toDto).toList());
+                .sponsors(user.sponsors().stream().map(SponsorReadEntity::toResponse).toList());
 
         return ok(response);
     }

@@ -2,7 +2,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.util.UUID;
 

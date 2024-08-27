@@ -3,7 +3,12 @@ package onlydust.com.marketplace.accounting.domain.model.accountbook;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,7 +32,7 @@ public interface AccountBook {
     class AccountId {
         public static final AccountId ROOT = new AccountId(null, null);
 
-        enum Type {SPONSOR_ACCOUNT, REWARD, PROJECT, PAYMENT}
+        enum Type {SPONSOR_ACCOUNT, PROGRAM, PROJECT, REWARD, PAYMENT}
 
         @Getter
         private Type type;
@@ -35,6 +40,10 @@ public interface AccountBook {
 
         public static AccountId of(SponsorAccount.Id id) {
             return new AccountId(Type.SPONSOR_ACCOUNT, id.value());
+        }
+
+        public static AccountId of(ProgramId id) {
+            return new AccountId(Type.PROGRAM, id.value());
         }
 
         public static AccountId of(ProjectId id) {
@@ -52,6 +61,8 @@ public interface AccountBook {
         public static <T> AccountId of(T id) {
             if (id instanceof SponsorAccount.Id sponsorAccountId) {
                 return of(sponsorAccountId);
+            } else if (id instanceof ProgramId programId) {
+                return of(programId);
             } else if (id instanceof ProjectId projectId) {
                 return of(projectId);
             } else if (id instanceof RewardId rewardId) {
@@ -69,6 +80,14 @@ public interface AccountBook {
 
             return SponsorAccount.Id.of(id);
         }
+
+        public ProgramId programId() {
+            if (!isProgram())
+                throw new IllegalArgumentException("Only programs can be converted to program id");
+
+            return ProgramId.of(id);
+        }
+
 
         public ProjectId projectId() {
             if (!isProject())
@@ -95,6 +114,10 @@ public interface AccountBook {
             return type == Type.REWARD;
         }
 
+        public boolean isProgram() {
+            return type == Type.PROGRAM;
+        }
+
         public boolean isProject() {
             return type == Type.PROJECT;
         }
@@ -117,14 +140,9 @@ public interface AccountBook {
             this(type, List.of(from, to), amount);
         }
 
-        public AccountId from() {
+        public AccountId origin() {
             assert !path().isEmpty();
             return path.get(0);
-        }
-
-        public AccountId to() {
-            assert !path().isEmpty();
-            return path.get(path().size() - 1);
         }
 
         public enum Type {MINT, BURN, TRANSFER, REFUND}

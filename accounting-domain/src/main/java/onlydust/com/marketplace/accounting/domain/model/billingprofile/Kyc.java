@@ -2,7 +2,7 @@ package onlydust.com.marketplace.accounting.domain.model.billingprofile;
 
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.util.Date;
 import java.util.Optional;

@@ -5,8 +5,8 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingRewardPort;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.AccountingSponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.SponsorStoragePort;
 import onlydust.com.marketplace.accounting.domain.service.PaymentService;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeDebugRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeProjectRestApi;
@@ -29,9 +29,9 @@ public class BackofficeConfiguration {
     public AccountingRewardPort accountingRewardPort(final AccountingRewardStoragePort accountingRewardStoragePort,
                                                      final NotificationPort notificationPort,
                                                      final AccountingFacadePort accountingFacadePort,
-                                                     final SponsorStoragePort sponsorStoragePort) {
+                                                     final AccountingSponsorStoragePort accountingSponsorStoragePort) {
         return new onlydust.com.marketplace.accounting.domain.service.RewardService(accountingRewardStoragePort, accountingFacadePort,
-                sponsorStoragePort, notificationPort);
+                accountingSponsorStoragePort, notificationPort);
     }
 
     @Bean
