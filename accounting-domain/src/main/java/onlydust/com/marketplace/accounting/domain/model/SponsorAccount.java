@@ -3,6 +3,7 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.Instant;

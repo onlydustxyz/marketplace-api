@@ -27,6 +27,10 @@
             <artifactId>project-domain</artifactId>
         </dependency>
         <dependency>
+            <groupId>onlydust.com.marketplace.kernel</groupId>
+            <artifactId>marketplace-kernel</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.slack.api</groupId>
             <artifactId>slack-api-client</artifactId>
         </dependency>

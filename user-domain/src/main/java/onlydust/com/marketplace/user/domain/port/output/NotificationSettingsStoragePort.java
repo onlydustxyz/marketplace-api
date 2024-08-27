@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.user.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
-import onlydust.com.marketplace.user.domain.model.ProjectId;
 
 import java.util.List;
 import java.util.Optional;

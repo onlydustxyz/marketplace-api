@@ -92,7 +92,7 @@ public class AllUserReadEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "sponsors_users",
+            name = "sponsor_leads",
             schema = "public",
             joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
             inverseJoinColumns = @JoinColumn(name = "sponsorId")
@@ -100,7 +100,7 @@ public class AllUserReadEntity {
     @NonNull
     Set<SponsorReadEntity> sponsors;
 
-    @OneToMany(mappedBy = "applicant",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "applicant", fetch = FetchType.LAZY)
     @SQLRestriction("origin = 'GITHUB' and not exists(select 1 from indexer_exp.github_issues_assignees gia where gia.issue_id = issue_id)")
     @NonNull
     Set<ApplicationReadEntity> pendingApplications;

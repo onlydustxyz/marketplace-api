@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
@@ -166,7 +166,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Reward canceled")))
                         .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("See my rewards")))
                         .withRequestBody(matchingJsonPath("$.message_data.button.link", equalTo("https://develop-app.onlydust.com/rewards")))
-                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We're very sorry but reward of project QA new contributions got canceled.<br " +
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo("We're very sorry but reward of project QA new contributions " +
+                                                                                                "got canceled.<br " +
                                                                                                 "/>" +
                                                                                                 "Please reach out to project lead(s) for more explanation or " +
                                                                                                 "contact us in case your need assistance.")))

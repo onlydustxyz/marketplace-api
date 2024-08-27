@@ -2,14 +2,17 @@ package onlydust.com.marketplace.api.read.entities.hackathon;
 
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.SponsorViewEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import org.hibernate.annotations.Immutable;
@@ -27,7 +30,6 @@ import static java.util.Objects.isNull;
 
 @Entity
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Accessors(fluent = true)
@@ -35,7 +37,6 @@ import static java.util.Objects.isNull;
 @Immutable
 public class HackathonReadEntity {
     @Id
-    @EqualsAndHashCode.Include
     UUID id;
     @NonNull
     String slug;
@@ -76,7 +77,7 @@ public class HackathonReadEntity {
             inverseJoinColumns = @JoinColumn(name = "sponsorId")
     )
     @NonNull
-    Set<SponsorViewEntity> sponsors;
+    Set<SponsorReadEntity> sponsors;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -126,10 +127,10 @@ public class HackathonReadEntity {
                         .url(link.getUrl())
                 ).toList())
                 .sponsors(sponsors.stream().map(sponsor -> new SponsorResponse()
-                                .id(sponsor.getId())
-                                .name(sponsor.getName())
-                                .url(sponsor.getUrl())
-                                .logoUrl(sponsor.getLogoUrl())
+                                .id(sponsor.id())
+                                .name(sponsor.name())
+                                .url(sponsor.url())
+                                .logoUrl(sponsor.logoUrl())
                         )
                         .sorted(Comparator.comparing(SponsorResponse::getName))
                         .toList())
@@ -169,10 +170,10 @@ public class HackathonReadEntity {
                         .url(link.getUrl())
                 ).toList())
                 .sponsors(this.sponsors.stream().map(sponsor -> new onlydust.com.backoffice.api.contract.model.SponsorResponse()
-                        .id(sponsor.getId())
-                        .name(sponsor.getName())
-                        .url(sponsor.getUrl())
-                        .logoUrl(sponsor.getLogoUrl())
+                        .id(sponsor.id())
+                        .name(sponsor.name())
+                        .url(sponsor.url())
+                        .logoUrl(sponsor.logoUrl())
                 ).toList())
                 .projects(projects.stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
                 .events(events.stream()

@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

@@ -4,10 +4,11 @@ import com.github.javafaker.Faker;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
+import onlydust.com.marketplace.accounting.domain.model.Money;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
 import onlydust.com.marketplace.accounting.domain.notification.dto.NotificationBillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -18,7 +19,10 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileUserRightsV
 import onlydust.com.marketplace.accounting.domain.view.RewardAssociations;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -1948,6 +1952,6 @@ class BillingProfileServiceTest {
                         individualBillingProfile.name(), individualBillingProfile.status()))));
         assertTrue(completeYourBillingProfileCaptor.getAllValues()
                 .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(selfEmployedBillingProfile.id().value(),
-                 selfEmployedBillingProfile.name(), selfEmployedBillingProfile.status()))));
+                        selfEmployedBillingProfile.name(), selfEmployedBillingProfile.status()))));
     }
 }

@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.accounting.domain;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Amount;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.AccountId;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
@@ -12,6 +14,8 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -156,11 +160,14 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(amount);
 
         // When
-        accountBook.refund(recipient, sender, amount);
+        final var refundTransactions = accountBook.refund(recipient, sender, amount);
 
         // Then
         assertThat(accountBook.state().balanceOf(sender)).isEqualTo(amount);
         assertThat(accountBook.state().balanceOf(recipient)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(refundTransactions).hasSize(1);
+        assertThat(refundTransactions.get(0).origin()).isEqualTo(sender);
+        assertThat(refundTransactions.get(0).amount()).isEqualTo(amount);
     }
 
     @Test
@@ -214,18 +221,82 @@ public class AccountBookTest {
         assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(60L));
 
         // When
-        accountBook.refund(account2, account1, PositiveAmount.of(10L));
+        var refundTransactions = accountBook.refund(account2, account1, PositiveAmount.of(10L));
 
         // Then
         assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(10L));
         assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(30L));
+        assertThat(refundTransactions).hasSize(1);
+        assertThat(refundTransactions.get(0).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(0).amount()).isEqualTo(PositiveAmount.of(10L));
 
         // When
-        accountBook.refund(account2, account1, PositiveAmount.of(30L));
+        refundTransactions = accountBook.refund(account2, account1, PositiveAmount.of(30L));
+        assertThat(refundTransactions).hasSize(1);
+        assertThat(refundTransactions.get(0).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(0).amount()).isEqualTo(PositiveAmount.of(30L));
 
         // Then
         assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(40L));
         assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.ZERO);
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(60L));
+    }
+
+    @Test
+    public void should_refund_money_from_multiple_transfers() {
+        // Given
+        final var account1 = AccountId.of(SponsorAccount.Id.random());
+        final var account2 = AccountId.of(SponsorAccount.Id.random());
+        final var accountBook = accountBookFromEvents(
+                new MintEvent(account1, PositiveAmount.of(100L)),
+                new TransferEvent(account1, account2, PositiveAmount.of(10L)),
+                new TransferEvent(account1, account2, PositiveAmount.of(10L))
+        );
+
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(80L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(20L));
+
+        // When
+        var refundTransactions = accountBook.refund(account2, account1, PositiveAmount.of(15L));
+
+        // Then
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(95L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(5L));
+        assertThat(refundTransactions).hasSize(2);
+        assertThat(refundTransactions.get(0).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(0).amount()).isEqualTo(PositiveAmount.of(10L));
+        assertThat(refundTransactions.get(1).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(1).amount()).isEqualTo(PositiveAmount.of(5L));
+    }
+
+    @Test
+    public void should_refund_money_from_multiple_transfers_with_partial_spent() {
+        // Given
+        final var account1 = AccountId.of(SponsorAccount.Id.random());
+        final var account2 = AccountId.of(SponsorAccount.Id.random());
+        final var account3 = AccountId.of(SponsorAccount.Id.random());
+        final var accountBook = accountBookFromEvents(
+                new MintEvent(account1, PositiveAmount.of(100L)),
+                new TransferEvent(account1, account2, PositiveAmount.of(10L)),
+                new TransferEvent(account1, account2, PositiveAmount.of(10L)),
+                new TransferEvent(account2, account3, PositiveAmount.of(1L))
+        );
+
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(80L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(19L));
+        assertThat(accountBook.state().balanceOf(account3)).isEqualTo(PositiveAmount.of(1L));
+
+        // When
+        var refundTransactions = accountBook.refund(account2, account1, PositiveAmount.of(15L));
+
+        // Then
+        assertThat(accountBook.state().balanceOf(account1)).isEqualTo(PositiveAmount.of(95L));
+        assertThat(accountBook.state().balanceOf(account2)).isEqualTo(PositiveAmount.of(4L));
+        assertThat(refundTransactions).hasSize(2);
+        assertThat(refundTransactions.get(0).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(0).amount()).isEqualTo(PositiveAmount.of(9L));
+        assertThat(refundTransactions.get(1).origin()).isEqualTo(account1);
+        assertThat(refundTransactions.get(1).amount()).isEqualTo(PositiveAmount.of(6L));
     }
 
     @Test

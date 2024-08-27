@@ -6,10 +6,12 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import net.minidev.json.JSONArray;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
+import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
@@ -20,6 +22,10 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -530,29 +536,33 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         }""");
 
         // When
+        final var programId = ProgramId.random();
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
-        final SponsorAccountStatement strk = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(strkId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(strk.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
         final UUID ethId = currencyRepository.findByCode("ETH").orElseThrow().id();
-        final SponsorAccountStatement eth = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(ethId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(eth.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(ethId));
 
         final UUID usdcId = currencyRepository.findByCode("USDC").orElseThrow().id();
-        final SponsorAccountStatement usdc = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(usdcId), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.STELLAR, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.allocate(usdc.account().id(), projectId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
+        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdcId));
 
         indexerApiWireMockServer.stubFor(WireMock.put(
                         WireMock.urlEqualTo("/api/v1/users/%s".formatted(authenticatedUser.user().getGithubUserId())))

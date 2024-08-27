@@ -5,7 +5,10 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
@@ -17,12 +20,10 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "users", schema = "iam")
@@ -41,7 +42,7 @@ public class UserViewEntity implements Serializable {
 
     @Column(nullable = false)
     String email;
-    
+
     @Type(
             value = EnumArrayType.class,
             parameters = @Parameter(
@@ -64,14 +65,6 @@ public class UserViewEntity implements Serializable {
     @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId", insertable = false, updatable = false)
     @NonNull
     AllUserViewEntity allUserView;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "sponsors_users",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "sponsor_id")
-    )
-    List<SponsorViewEntity> sponsors;
 
     @NonNull
     ZonedDateTime lastSeenAt;

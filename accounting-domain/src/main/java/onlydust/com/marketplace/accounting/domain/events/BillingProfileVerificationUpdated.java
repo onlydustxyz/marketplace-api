@@ -4,7 +4,7 @@ import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationType;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.jobs.OutboxSkippingException;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
@@ -48,11 +48,11 @@ public class BillingProfileVerificationUpdated extends Event {
         return false;
     }
 
-    public boolean rejected(){
+    public boolean rejected() {
         return this.verificationStatus == VerificationStatus.REJECTED;
     }
 
-    public boolean closed(){
+    public boolean closed() {
         return this.verificationStatus == VerificationStatus.CLOSED;
     }
 }

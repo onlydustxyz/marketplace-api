@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
@@ -14,7 +15,9 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
@@ -23,7 +26,7 @@ import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.
 @NoArgsConstructor(force = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Table(name = "sponsors", schema = "public") //  TODO change to programs after migration
+@Table(name = "programs", schema = "public")
 @Immutable
 @Accessors(fluent = true)
 public class ProgramReadEntity {
@@ -34,10 +37,13 @@ public class ProgramReadEntity {
     @NonNull
     String name;
 
+    String url;
+    String logoUrl;
+
     @ManyToMany
     @JoinTable(
-            name = "sponsors_users",
-            joinColumns = @JoinColumn(name = "sponsor_id"),
+            name = "program_leads",
+            joinColumns = @JoinColumn(name = "program_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "userId")
     )
     @NonNull
@@ -65,13 +71,16 @@ public class ProgramReadEntity {
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()
                 .id(id)
-                .name(name);
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
     }
 
     public ProgramResponse toResponse() {
         return new ProgramResponse()
                 .id(id)
                 .name(name)
+                .url(Optional.ofNullable(url).map(URI::create).orElse(null))
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
@@ -81,10 +90,25 @@ public class ProgramReadEntity {
         return new ProgramPageItemResponse()
                 .id(id)
                 .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
+    }
+
+    public ProgramLinkResponse toBoLinkResponse() {
+        return new ProgramLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl);
+    }
+
+    public onlydust.com.marketplace.api.contract.model.ProgramLinkResponse toLinkResponse() {
+        return new onlydust.com.marketplace.api.contract.model.ProgramLinkResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
     }
 }

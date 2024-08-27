@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.PayoutPreferenceStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.PayoutPreferenceEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.PayoutPreferenceRepository;

@@ -1,13 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.adapters;
 
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.api.postgres.adapter.PostgresBillingProfileAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;

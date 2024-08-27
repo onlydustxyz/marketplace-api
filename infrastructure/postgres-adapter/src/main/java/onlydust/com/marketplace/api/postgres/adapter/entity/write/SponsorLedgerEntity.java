@@ -1,10 +1,9 @@
 package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
-
-import jakarta.persistence.*;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.util.UUID;
 

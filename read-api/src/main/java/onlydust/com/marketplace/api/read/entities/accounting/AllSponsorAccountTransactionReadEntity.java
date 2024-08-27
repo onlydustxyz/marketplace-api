@@ -8,7 +8,7 @@ import onlydust.com.backoffice.api.contract.model.HistoricalTransactionType;
 import onlydust.com.backoffice.api.contract.model.MoneyWithUsdEquivalentResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionHistoryPageItemResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.mapper.NetworkMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -52,8 +52,8 @@ public class AllSponsorAccountTransactionReadEntity {
     BigDecimal amount;
 
     @ManyToOne
-    @JoinColumn(name = "projectId")
-    ProjectLinkReadEntity project;
+    @JoinColumn(name = "programId")
+    ProgramReadEntity program;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -85,7 +85,7 @@ public class AllSponsorAccountTransactionReadEntity {
                 .type(type.toBoResponse())
                 .network(NetworkMapper.map(network))
                 .lockedUntil(sponsorAccount.lockedUntil())
-                .project(project == null ? null : project.toBoLinkResponse())
+                .program(program == null ? null : program.toBoLinkResponse())
                 .amount(new MoneyWithUsdEquivalentResponse()
                         .amount(amount)
                         .currency(sponsorAccount.currency().toBoShortResponse())

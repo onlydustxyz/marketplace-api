@@ -6,8 +6,11 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.support.TransactionSynchronization;
 
 import java.util.*;
+
+import static org.springframework.transaction.support.TransactionSynchronizationManager.registerSynchronization;
 
 public class AccountBookEventStorageStub implements AccountBookEventStorage {
     public final Map<Currency, List<IdentifiedAccountBookEvent>> events = new HashMap<>();
@@ -25,9 +28,9 @@ public class AccountBookEventStorageStub implements AccountBookEventStorage {
     }
 
     @Override
-    public synchronized void insert(@NonNull AccountBookAggregate.Id accountBookId,
-                                    @NonNull Currency currency,
-                                    @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
+    public synchronized void insert(final @NonNull AccountBookAggregate.Id accountBookId,
+                                    final @NonNull Currency currency,
+                                    final @NonNull List<IdentifiedAccountBookEvent> pendingEvents) {
         final var events = new ArrayList<>(getAll(currency));
         long eventId = events.isEmpty() ? 0 : events.get(events.size() - 1).id();
         for (var event : pendingEvents) {
@@ -36,6 +39,16 @@ public class AccountBookEventStorageStub implements AccountBookEventStorage {
         }
         events.addAll(pendingEvents);
         this.events.put(currency, events);
+
+        registerSynchronization(new TransactionSynchronization() {
+            public void afterCompletion(int status) {
+                if (status != STATUS_COMMITTED) evictAccountBook(currency);
+            }
+        });
+    }
+
+    private void evictAccountBook(final @NonNull Currency currency) {
+        this.events.remove(currency);
     }
 
     @NonNull

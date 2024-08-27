@@ -3866,6 +3866,73 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/programs:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Programs
+      summary: Create a program
+      operationId: createProgram
+      description: Create a program
+      requestBody:
+        description: Program
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProgramRequest'
+      responses:
+        "200":
+          description: 'New program'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProgramResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/programs/logos:
+    post:
+      security:
+        - { }
+      tags:
+        - Programs
+      summary: Upload a program logo
+      operationId: uploadProgramLogo
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   /api/v1/programs/{programId}:
     get:
       security:
@@ -4077,7 +4144,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionPageResponse'
+                $ref: '#/components/schemas/ProgramTransactionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4088,7 +4155,7 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Sponsors
+        - ReadSponsors
       summary: Get sponsor data
       operationId: getSponsor
       description: |
@@ -4105,7 +4172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorDetailsResponse'
+                $ref: '#/components/schemas/SponsorResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4118,7 +4185,7 @@ paths:
       tags:
         - ReadSponsors
       summary: Get the list of all transactions related to this sponsor
-      operationId: getSponsorTransactionHistory
+      operationId: getSponsorTransactions
       parameters:
         - in: path
           name: sponsorId
@@ -4181,7 +4248,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionHistoryPageResponse'
+                $ref: '#/components/schemas/SponsorTransactionPageResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4193,9 +4260,9 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Sponsors
-      summary: Allocate a budget to a project
-      operationId: allocateBudgetToProject
-      description: Allocate a budget to a project
+      summary: Allocate a budget to a program
+      operationId: allocateBudgetToProgram
+      description: Allocate a budget to a program
       parameters:
         - in: path
           name: sponsorId
@@ -4238,7 +4305,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AllocateRequest'
+              $ref: '#/components/schemas/GrantRequest'
       responses:
         "204":
           description: 'The funds have been allocated'
@@ -4253,9 +4320,9 @@ paths:
         - bearerAuth: [ ]
       tags:
         - Sponsors
-      summary: Allocate a budget to a project
-      operationId: unallocateBudgetFromProject
-      description: Unallocate some budget from a project
+      summary: Unallocate budget from a program
+      operationId: unallocateBudgetFromProgram
+      description: Unallocate some budget from a program
       parameters:
         - in: path
           name: sponsorId
@@ -5732,6 +5799,33 @@ components:
         issueCount:
           type: integer
 
+    CreateProgramRequest:
+      type: object
+      required:
+        - name
+        - programLead
+      properties:
+        name:
+          type: string
+          description: Program name
+          example: Starkware Exploration Team
+        url:
+          type: string
+          format: uri
+          description: Program's website URL
+        logoUrl:
+          type: string
+          format: uri
+          description: Program's logo URL
+        programLeadId:
+          $ref: '#/components/schemas/UserId'
+
+    CreateProgramResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+
     ProgramPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -5756,6 +5850,10 @@ components:
           type: string
           description: Program name
           example: Starkware Exploration Team
+        logoUrl:
+          type: string
+          format: uri
+          description: Program's logo URL
 
     ProgramPageItemResponse:
       allOf:
@@ -5792,6 +5890,10 @@ components:
             - totalGranted
             - totalRewarded
           properties:
+            url:
+              type: string
+              format: uri
+              description: Program's website URL
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
@@ -5833,7 +5935,7 @@ components:
           description: Number of transactions for this month
           example: 42
 
-    SponsorShortResponse:
+    SponsorLinkResponse:
       type: object
       required:
         - id
@@ -5854,7 +5956,7 @@ components:
 
     SponsorResponse:
       allOf:
-        - $ref: '#/components/schemas/SponsorShortResponse'
+        - $ref: '#/components/schemas/SponsorLinkResponse'
         - type: object
           required:
             - url
@@ -5864,27 +5966,6 @@ components:
               format: url
               description: URL of sponsor's website
               example: 'https://ethereum.org'
-
-    SponsorLinkResponse:
-      allOf:
-        - $ref: '#/components/schemas/SponsorShortResponse'
-
-    SponsorDetailsResponse:
-      allOf:
-        - $ref: '#/components/schemas/SponsorResponse'
-        - type: object
-          required:
-            - availableBudgets
-            - projects
-          properties:
-            availableBudgets:
-              type: array
-              items:
-                $ref: '#/components/schemas/Money'
-            projects:
-              type: array
-              items:
-                $ref: '#/components/schemas/ProjectWithBudgetResponse'
 
     EcosystemResponse:
       type: object
@@ -6268,10 +6349,10 @@ components:
           type: array
           items:
             type: string
-        sponsors:
+        programs:
           type: array
           items:
-            $ref: '#/components/schemas/SponsorResponse'
+            $ref: '#/components/schemas/ProgramLinkResponse'
         languages:
           type: array
           items:
@@ -8649,9 +8730,24 @@ components:
         hasAcceptedInvoiceMandate:
           type: boolean
 
-    ProjectWithBudgetResponse:
+    ProgramLinkResponse:
+      type: object
+      required:
+        - id
+        - name
+        - logoUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/ProgramId'
+        name:
+          type: string
+        logoUrl:
+          type: string
+          format: uri
+
+    ProgramWithBudgetResponse:
       allOf:
-        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - totalUsdBudget
@@ -8664,7 +8760,7 @@ components:
               items:
                 $ref: '#/components/schemas/Money'
 
-    TransactionHistoryPageResponse:
+    SponsorTransactionPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -8674,9 +8770,9 @@ components:
             transactions:
               type: array
               items:
-                $ref: '#/components/schemas/TransactionHistoryPageItemResponse'
+                $ref: '#/components/schemas/SponsorTransactionPageItemResponse'
 
-    TransactionHistoryPageItemResponse:
+    SponsorTransactionPageItemResponse:
       type: object
       required:
         - date
@@ -8691,12 +8787,12 @@ components:
           format: date-time
         type:
           $ref: '#/components/schemas/SponsorAccountTransactionType'
-        project:
-          $ref: '#/components/schemas/ProjectLinkResponse'
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
           $ref: '#/components/schemas/Money'
 
-    TransactionPageResponse:
+    ProgramTransactionPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
         - type: object
@@ -8853,9 +8949,23 @@ components:
         - DATE
         - TYPE
         - AMOUNT
-        - PROJECT
+        - PROGRAM
 
     AllocateRequest:
+      type: object
+      required:
+        - programId
+        - amount
+        - currencyId
+      properties:
+        programId:
+          $ref: '#/components/schemas/ProgramId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
+    GrantRequest:
       type: object
       required:
         - projectId

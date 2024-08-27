@@ -4,12 +4,12 @@ import jakarta.persistence.EntityManagerFactory;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.CompanyBillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PayoutPreferenceFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -161,7 +161,7 @@ public class InvoicesApiIT extends AbstractMarketplaceApiIT {
                               "networks": ["ETHEREUM"]
                             },
                             {
-                              
+                        
                               "id": "95e079c9-609c-4531-8c5c-13217306b299",
                               "networks": ["ETHEREUM"]
                             },
