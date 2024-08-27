@@ -118,6 +118,7 @@ public class SponsorReadEntity {
                 .name(name)
                 .logoUrl(logoUrl)
                 .url(url)
-                .programs(programs.stream().map(ProgramReadEntity::toBoLinkResponse).toList());
+                .programs(programs.stream().map(ProgramReadEntity::toBoLinkResponse).toList())
+                .leads(leads.stream().map(AllUserReadEntity::toBoLinkResponse).toList());
     }
 }
