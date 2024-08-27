@@ -554,7 +554,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         // Given
         final var authenticatedUser = userAuthHelper.create();
 
-        // When user has no sponsor
+        // When user has no programs
         client.get()
                 .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -565,11 +565,13 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .jsonPath("$.programs.length()").isEqualTo(0);
 
-        programHelper.create(authenticatedUser);
-        programHelper.create(authenticatedUser);
-        programHelper.create(authenticatedUser);
 
-        // When user no sponsors
+        final var sponsorId = SponsorId.of("eb04a5de-4802-4071-be7b-9007b563d48d");
+        programHelper.create(sponsorId, authenticatedUser);
+        programHelper.create(sponsorId, authenticatedUser);
+        programHelper.create(sponsorId, authenticatedUser);
+
+        // When user has programs
         client.get()
                 .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())

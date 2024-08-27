@@ -43,35 +43,61 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     class GivenNoProgram {
         @Test
         void should_not_be_able_to_create_program_when_not_sponsor_lead() {
+            final var programLead = userAuthHelper.create();
+
             client.post()
-                    .uri(getApiURI(PROGRAMS))
+                    .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
                             {
-                              "name": "Awesome program"
+                              "name": "Awesome program",
+                              "leadIds": ["%s"]
                             }
-                            """)
+                            """.formatted(programLead.user().getId()))
                     .exchange()
                     .expectStatus()
                     .isUnauthorized();
         }
 
         @Test
-        void should_create_program_with_required_fields_only() {
+        void should_not_create_program_with_unexisting_leads() {
             // Given
             addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
 
             // When
             client.post()
-                    .uri(getApiURI(PROGRAMS))
+                    .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
                             {
-                              "name": "Awesome program"
+                              "name": "Awesome program",
+                              "leadIds": ["%s"]
                             }
-                            """)
+                            """.formatted(UUID.randomUUID()))
+                    .exchange()
+                    .expectStatus()
+                    .is5xxServerError();
+        }
+
+        @Test
+        void should_create_program_with_required_fields_only() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+            final var programLead = userAuthHelper.create();
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Awesome program",
+                              "leadIds": ["%s"]
+                            }
+                            """.formatted(programLead.user().getId()))
                     .exchange()
                     .expectStatus()
                     .is2xxSuccessful()
@@ -88,7 +114,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             // When
             client.post()
-                    .uri(getApiURI(PROGRAMS))
+                    .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
@@ -96,7 +122,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                               "name": "Foo program",
                               "url": "https://foo.bar",
                               "logoUrl": "https://foo.bar/logo.png",
-                              "programLeadId": "%s"
+                              "leadIds": ["%s"]
                             }
                             """.formatted(programLead.user().getId()))
                     .exchange()
@@ -119,15 +145,90 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.url").isEqualTo("https://foo.bar")
                     .jsonPath("$.logoUrl").isEqualTo("https://foo.bar/logo.png");
         }
+
+        @Test
+        void should_update_program() {
+            // Given
+            addSponsorFor(caller, UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"));
+            final var programLead1 = userAuthHelper.create();
+            final var programLead2 = userAuthHelper.create();
+            final var programLead3 = userAuthHelper.create();
+            final var programId = new MutableObject<String>();
+
+            client.post()
+                    .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Foo program",
+                              "url": "https://foo.bar",
+                              "logoUrl": "https://foo.bar/logo.png",
+                              "leadIds": ["%s"]
+                            }
+                            """.formatted(programLead1.user().getId()))
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").value(programId::setValue);
+
+            // When
+            client.put()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                              "name": "Updated program",
+                              "url": "https://updated.bar",
+                              "logoUrl": "https://updated.bar/logo.png",
+                              "leadIds": ["%s", "%s"]
+                            }
+                            """.formatted(programLead2.user().getId(), programLead3.user().getId()))
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful();
+
+            // Then
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead2.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(programId.getValue())
+                    .jsonPath("$.name").isEqualTo("Updated program")
+                    .jsonPath("$.url").isEqualTo("https://updated.bar")
+                    .jsonPath("$.logoUrl").isEqualTo("https://updated.bar/logo.png");
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead3.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk();
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(programId.getValue())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + programLead1.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isUnauthorized();
+        }
     }
 
     @Nested
     class GivenMyProgram {
+        Sponsor sponsor;
         Program program;
 
         @BeforeEach
         void setUp() {
-            program = programHelper.create(caller);
+            sponsor = sponsorHelper.create();
+            program = programHelper.create(sponsor.id(), caller);
         }
 
         @Test
@@ -246,7 +347,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
-                final var anotherProgram = programHelper.create();
+                final var anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
@@ -1715,11 +1816,13 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMyProgram {
+        Sponsor sponsor;
         Program program;
 
         @BeforeEach
         void setUp() {
-            program = programHelper.create();
+            sponsor = sponsorHelper.create();
+            program = programHelper.create(sponsor.id());
         }
 
         @Test

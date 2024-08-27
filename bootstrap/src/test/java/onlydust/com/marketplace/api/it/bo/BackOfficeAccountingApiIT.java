@@ -14,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.contract.model.CreateRewardResponse;
+import onlydust.com.marketplace.api.helper.SponsorHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
@@ -88,6 +89,8 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     PdfStoragePort pdfStoragePort;
     @Autowired
     RewardStatusStorage rewardStatusStorage;
+    @Autowired
+    SponsorHelper sponsorHelper;
     UserAuthHelper.AuthenticatedBackofficeUser camille;
     Program program;
 
@@ -99,7 +102,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
         camille = userAuthHelper.authenticateCamille();
-        program = programHelper.create();
+        program = programHelper.create(sponsorHelper.create().id());
     }
 
     @Test

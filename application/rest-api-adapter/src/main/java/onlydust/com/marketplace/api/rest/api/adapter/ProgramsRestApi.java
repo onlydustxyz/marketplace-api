@@ -11,9 +11,11 @@ import onlydust.com.marketplace.api.contract.ProgramsApi;
 import onlydust.com.marketplace.api.contract.model.CreateProgramRequest;
 import onlydust.com.marketplace.api.contract.model.CreateProgramResponse;
 import onlydust.com.marketplace.api.contract.model.GrantRequest;
+import onlydust.com.marketplace.api.contract.model.UpdateProgramRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.ProgramFacadePort;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
@@ -21,7 +23,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
@@ -56,15 +57,29 @@ public class ProgramsRestApi implements ProgramsApi {
     }
 
     @Override
-    public ResponseEntity<CreateProgramResponse> createProgram(CreateProgramRequest request) {
+    public ResponseEntity<CreateProgramResponse> createProgram(UUID sponsorId, CreateProgramRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserSponsorLead(authenticatedUser.id()))
-            throw unauthorized("User %s is not authorized to create program".formatted(authenticatedUser.id()));
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
+            throw unauthorized("User %s is not authorized to create program for sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
-        final var program = programFacadePort.create(request.getName(), request.getUrl(), request.getLogoUrl(),
-                Optional.ofNullable(request.getProgramLeadId()).map(UserId::of).orElse(null));
+        final var program = programFacadePort.create(request.getName(), SponsorId.of(sponsorId), request.getUrl(), request.getLogoUrl(),
+                request.getLeadIds().stream().map(UserId::of).toList());
 
         return ok(new CreateProgramResponse().id(program.id().value()));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateProgram(UUID programId, UpdateProgramRequest request) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserSponsorLeadOfProgram(authenticatedUser.id(), ProgramId.of(programId)) &&
+            !permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
+            throw unauthorized("User %s is not authorized to modify program %s".formatted(authenticatedUser.id(), programId));
+
+        programFacadePort.update(programId, request.getName(), request.getUrl(), request.getLogoUrl(),
+                request.getLeadIds().stream().map(UserId::of).toList());
+
+        return noContent().build();
     }
 }

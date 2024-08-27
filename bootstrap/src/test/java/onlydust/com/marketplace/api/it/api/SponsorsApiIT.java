@@ -63,12 +63,12 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
             @BeforeEach
             void setUp() {
-                final var program = programHelper.create();
+                final var program = programHelper.create(sponsor.id());
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
-                final var anotherProgram = programHelper.create();
+                final var anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 

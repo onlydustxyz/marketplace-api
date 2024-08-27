@@ -24,7 +24,7 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
     void setUp() {
         final var sponsor = sponsorHelper.create();
         final var sponsorId = SponsorId.of(sponsor.id().value());
-        final var program = programHelper.create(userAuthHelper.create());
+        final var program = programHelper.create(sponsorId, userAuthHelper.create());
         final var programId = ProgramId.of(program.id().value());
 
         final var projectLead = userAuthHelper.create();

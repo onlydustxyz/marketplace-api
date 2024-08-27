@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorLeadEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
@@ -35,6 +36,12 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
 
     @Override
     @Transactional
+    public boolean isAdminOfProgramSponsor(UUID userId, ProgramId programId) {
+        return sponsorLeadRepository.findByUserIdAndProgramId(userId, programId.value()).isPresent();
+    }
+
+    @Override
+    @Transactional
     public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
         sponsorLeadRepository.save(new SponsorLeadEntity(leadId, sponsorId.value()));
     }
@@ -46,6 +53,7 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
     }
 
     @Override
+    @Transactional
     public void save(Sponsor sponsor) {
         sponsorRepository.save(SponsorEntity.of(sponsor));
     }

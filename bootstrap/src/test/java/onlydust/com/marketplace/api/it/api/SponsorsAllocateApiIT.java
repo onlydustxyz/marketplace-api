@@ -21,7 +21,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setup() {
         user = userAuthHelper.authenticateAntho();
-        programId = programHelper.create().id();
+        programId = programHelper.create(sponsorId).id();
     }
 
     @Test

@@ -67,7 +67,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             final var sponsorId = SponsorId.of(sponsor.id().value());
 
             programs = LongStream.range(1, 14).mapToObj(i -> {
-                final var program = programHelper.create(caller);
+                final var program = programHelper.create(sponsorId, caller);
                 final var programId = ProgramId.of(program.id().value());
 
                 accountingHelper.createSponsorAccount(sponsorId, i * 100, USDC);
@@ -118,7 +118,7 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             final var sponsor = sponsorHelper.create();
             final var sponsorId = SponsorId.of(sponsor.id().value());
 
-            program = programHelper.create(caller);
+            program = programHelper.create(sponsorId, caller);
             final var programId = ProgramId.of(program.id().value());
 
             final var projectLead = userAuthHelper.create();

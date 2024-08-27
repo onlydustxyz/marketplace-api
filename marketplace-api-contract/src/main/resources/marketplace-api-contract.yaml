@@ -3866,7 +3866,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/programs:
+  /api/v1/sponsors/{sponsorId}/programs:
     post:
       security:
         - bearerAuth: [ ]
@@ -3875,6 +3875,12 @@ paths:
       summary: Create a program
       operationId: createProgram
       description: Create a program
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
       requestBody:
         description: Program
         required: true
@@ -3956,6 +3962,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProgramResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Programs
+      summary: Update a program
+      operationId: updateProgram
+      description: Update a program
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+      requestBody:
+        description: Program
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProgramRequest'
+      responses:
+        "204":
+          description: 'Program updated'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -5803,7 +5837,7 @@ components:
       type: object
       required:
         - name
-        - programLead
+        - leadIds
       properties:
         name:
           type: string
@@ -5817,8 +5851,14 @@ components:
           type: string
           format: uri
           description: Program's logo URL
-        programLeadId:
-          $ref: '#/components/schemas/UserId'
+        leadIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+
+    UpdateProgramRequest:
+      allOf:
+        - $ref: '#/components/schemas/CreateProgramRequest'
 
     CreateProgramResponse:
       type: object

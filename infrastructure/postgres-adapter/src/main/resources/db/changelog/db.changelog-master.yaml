@@ -489,3 +489,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000321_fix_quotes_in_json.sql
   - include:
       file: db/changelog/changelogs/00000322_update_sponsor_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000322_add_sponsor_id_to_programs.sql

@@ -61,13 +61,7 @@ public class SponsorReadEntity {
     @NonNull
     Set<AllUserReadEntity> leads;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "sponsors_programs",
-            schema = "public",
-            joinColumns = @JoinColumn(name = "sponsorId"),
-            inverseJoinColumns = @JoinColumn(name = "programId")
-    )
+    @OneToMany(mappedBy = "sponsor", fetch = FetchType.LAZY)
     @NonNull
     @OrderBy("name")
     List<ProgramReadEntity> programs;
