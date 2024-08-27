@@ -251,7 +251,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 PageRequest.of(sanitizedPageIndex, sanitizePageSize, JpaSort.unsafe(Sort.Direction.DESC, "created_at")));
         final NotificationPageResponse notificationPageResponse = new NotificationPageResponse();
         notificationReadEntityPage.stream()
-                .map(notificationReadEntity -> notificationReadEntity.toNotificationPageItemResponse(publicProjectReadRepository))
+                .map(notificationReadEntity -> notificationReadEntity.toNotificationPageItemResponse(projectLinkReadRepository))
                 .forEach(notificationPageResponse::addNotificationsItem);
         notificationPageResponse.setHasMore(notificationReadEntityPage.hasNext());
         notificationPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, notificationReadEntityPage.getTotalPages()));

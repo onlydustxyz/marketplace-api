@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
@@ -11,8 +10,11 @@ import onlydust.com.marketplace.api.contract.model.NotificationStatus;
 import onlydust.com.marketplace.api.contract.model.NotificationsPatchRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -56,6 +58,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        projectHelper.updateVisibility(ProjectId.of(bretzel), ProjectVisibility.PRIVATE);
 
         notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())

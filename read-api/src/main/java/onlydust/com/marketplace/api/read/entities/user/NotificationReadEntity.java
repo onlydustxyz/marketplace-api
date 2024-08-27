@@ -9,7 +9,9 @@ import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
+import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
+import onlydust.com.marketplace.api.read.repositories.ProjectLinkReadRepository;
 import onlydust.com.marketplace.api.read.repositories.PublicProjectReadRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
@@ -75,7 +77,7 @@ public class NotificationReadEntity {
         };
     }
 
-    public NotificationPageItemResponse toNotificationPageItemResponse(final PublicProjectReadRepository publicProjectReadRepository) {
+    public NotificationPageItemResponse toNotificationPageItemResponse(final ProjectLinkReadRepository projectLinkReadRepository) {
         final NotificationPageItemResponseData notificationPageItemResponseData = new NotificationPageItemResponseData();
         NotificationType notificationType = null;
         if (data.notification() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
@@ -117,11 +119,11 @@ public class NotificationReadEntity {
             ));
         } else if (data.notification() instanceof ApplicationToReview applicationToReview) {
             notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
-            final PublicProjectReadEntity projectReadEntity = publicProjectReadRepository.findById(applicationToReview.getProject().id())
+            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationToReview.getProject().id())
                     .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
             notificationPageItemResponseData.setMaintainerApplicationToReview(new NotificationMaintainerApplicationToReview(
-                    projectReadEntity.getSlug(),
-                    projectReadEntity.getName(),
+                    projectLinkReadEntity.slug(),
+                    projectLinkReadEntity.name(),
                     applicationToReview.getUser().githubId(),
                     applicationToReview.getIssue().id(),
                     applicationToReview.getIssue().title(),
@@ -129,11 +131,11 @@ public class NotificationReadEntity {
             ));
         } else if (data.notification() instanceof ApplicationAccepted applicationAccepted) {
             notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
-            final PublicProjectReadEntity projectReadEntity = publicProjectReadRepository.findById(applicationAccepted.getProject().id())
+            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationAccepted.getProject().id())
                     .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
             notificationPageItemResponseData.setContributorProjectApplicationAccepted(new NotificationContributorProjectApplicationAccepted(
-                    projectReadEntity.getName(),
-                    projectReadEntity.getSlug(),
+                    projectLinkReadEntity.name(),
+                    projectLinkReadEntity.slug(),
                     applicationAccepted.getIssue().id(),
                     applicationAccepted.getIssue().title()
             ));
