@@ -477,3 +477,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000317_add_currency_cmc_id.sql
   - include:
       file: db/changelog/changelogs/00000318_improve_project_recommendations.sql
+  - include:
+      file: db/changelog/changelogs/00000319_improve_project_recommendations.sql
