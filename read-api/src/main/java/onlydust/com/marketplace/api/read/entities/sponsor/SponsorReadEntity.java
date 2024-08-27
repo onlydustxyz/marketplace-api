@@ -16,11 +16,13 @@ import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import static java.util.stream.Collectors.groupingBy;
+import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -37,7 +39,6 @@ public class SponsorReadEntity {
     @NonNull
     String name;
 
-    @NonNull
     String url;
 
     String logoUrl;
@@ -75,15 +76,19 @@ public class SponsorReadEntity {
         return new SponsorResponse()
                 .id(id)
                 .name(name)
-                .url(url)
-                .logoUrl(logoUrl);
+                .url(url == null ? null : URI.create(url))
+                .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
+                .totalDeposited(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::initialAllowance))
+                .totalAvailable(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalRewarded));
     }
 
     public SponsorLinkResponse toLinkResponse() {
         return new SponsorLinkResponse()
                 .id(id)
                 .name(name)
-                .logoUrl(logoUrl);
+                .logoUrl(logoUrl == null ? null : URI.create(logoUrl));
     }
 
     public SponsorDetailsResponse toBoResponse() {

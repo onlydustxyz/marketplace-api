@@ -183,13 +183,11 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                             {
                               "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
                               "name": "AS Nancy Lorraine",
-                              "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                             },
                             {
                               "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
                               "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                             }
                           ],
