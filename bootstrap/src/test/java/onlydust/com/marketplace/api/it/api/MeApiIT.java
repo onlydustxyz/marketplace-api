@@ -548,6 +548,40 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         """);
     }
 
+
+    @Test
+    void should_return_programs() {
+        // Given
+        final var authenticatedUser = userAuthHelper.create();
+
+        // When user has no sponsor
+        client.get()
+                .uri(ME)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.programs.length()").isEqualTo(0);
+
+        programHelper.create(authenticatedUser);
+        programHelper.create(authenticatedUser);
+        programHelper.create(authenticatedUser);
+
+        // When user no sponsors
+        client.get()
+                .uri(ME)
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.programs.length()").isEqualTo(3);
+    }
+
+
     private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final RewardRequest rewardRequest = new RewardRequest()
