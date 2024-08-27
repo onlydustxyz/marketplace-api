@@ -38,6 +38,9 @@ public class SponsorStatPerCurrencyReadEntity implements ProgramTransactionStat 
     BigDecimal initialAllowance;
 
     @NonNull
+    BigDecimal totalGranted;
+
+    @NonNull
     BigDecimal totalAllocated;
 
     @NonNull

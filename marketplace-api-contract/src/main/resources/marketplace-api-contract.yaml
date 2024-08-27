@@ -5950,7 +5950,7 @@ components:
           example: Ethereum Foundation
         logoUrl:
           type: string
-          format: url
+          format: uri
           description: Direct URL to sponsor's logo image
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
 
@@ -5959,13 +5959,24 @@ components:
         - $ref: '#/components/schemas/SponsorLinkResponse'
         - type: object
           required:
-            - url
+            - totalDeposited
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
           properties:
             url:
               type: string
-              format: url
+              format: uri
               description: URL of sponsor's website
               example: 'https://ethereum.org'
+            totalDeposited:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
 
     EcosystemResponse:
       type: object
@@ -7213,7 +7224,7 @@ components:
             sponsors:
               type: array
               items:
-                $ref: '#/components/schemas/SponsorResponse'
+                $ref: '#/components/schemas/SponsorLinkResponse'
             hasCompletedVerificationInformation:
               type: boolean
             hasCompletedOnboarding:
@@ -9104,7 +9115,7 @@ components:
             sponsors:
               type: array
               items:
-                $ref: '#/components/schemas/SponsorResponse'
+                $ref: '#/components/schemas/SponsorLinkResponse'
             projects:
               type: array
               items:
@@ -9145,7 +9156,7 @@ components:
         status:
           $ref: '#/components/schemas/CommitteeStatus'
         sponsor:
-          $ref: '#/components/schemas/SponsorResponse'
+          $ref: '#/components/schemas/SponsorLinkResponse'
 
     CommitteeApplicationResponse:
       type: object
