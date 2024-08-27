@@ -69,7 +69,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     @Override
-    public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<ProgramProjectsPageResponse> getProgramProjects(UUID programId, Integer pageIndex, Integer pageSize, String search) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!accountingPermissionService.isUserProgramLead(UserId.of(authenticatedUser.id()), SponsorId.of(programId)))
@@ -78,7 +78,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         int index = sanitizePageIndex(pageIndex);
         int size = sanitizePageSize(pageSize);
 
-        final var page = projectReadRepository.findGrantedProjects(programId, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
+        final var page = projectReadRepository.findGrantedProjects(programId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
         final var response = new ProgramProjectsPageResponse()
                 .projects(page.getContent().stream().map(p -> p.toProgramProjectPageItemResponse(programId)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))

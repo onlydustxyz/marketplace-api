@@ -21,9 +21,10 @@ public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUI
             left join fetch gp.perProgramStatsPerCurrency
             left join fetch gp.contributionStats
             left join fetch gp.rewardStats
-            where p.id = :programId
+            where p.id = :programId and
+            (:search is null or element(gp).name ilike concat('%', cast(:search as String), '%'))
             """)
-    Page<ProjectReadEntity> findGrantedProjects(UUID programId, Pageable pageable);
+    Page<ProjectReadEntity> findGrantedProjects(UUID programId, String search, Pageable pageable);
 
     @Query("""
             select p

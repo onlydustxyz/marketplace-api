@@ -1551,6 +1551,26 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @Test
+            void should_search_program_projects_by_name() {
+                // When
+                client.get()
+                        .uri(getApiURI(PROGRAM_PROJECTS.formatted(program.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "search", project1.getName().substring(0, 5)
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.projects.size()").isEqualTo(1)
+                        .jsonPath("$.projects[0].id").isEqualTo(project1.getId().toString())
+                ;
+            }
+
+            @Test
             void should_grant_a_project() {
                 // When
                 client.post()
