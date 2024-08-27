@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.model.RewardId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import jakarta.persistence.*;
 

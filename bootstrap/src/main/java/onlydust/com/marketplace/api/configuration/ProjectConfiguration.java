@@ -157,8 +157,9 @@ public class ProjectConfiguration {
     @Bean
     PermissionService permissionService(final ProjectStoragePort projectStoragePort,
                                         final ContributionStoragePort contributionStoragePort,
-                                        final ProjectSponsorStoragePort sponsorStoragePort) {
-        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort);
+                                        final SponsorStoragePort sponsorStoragePort,
+                                        final ProgramStoragePort programStoragePort) {
+        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort, programStoragePort);
     }
 
     @Bean
@@ -420,5 +421,17 @@ public class ProjectConfiguration {
                                                                final RewardFacadePort rewardFacadePort, final ProjectStoragePort projectStoragePort,
                                                                final ProjectCurrencyStoragePort projectCurrencyStoragePort) {
         return new AutomatedRewardService(githubSearchPort, projectFacadePort, rewardFacadePort, projectStoragePort, projectCurrencyStoragePort);
+    }
+
+
+    @Bean
+    public SponsorFacadePort sponsorFacadePort(final SponsorStoragePort sponsorStoragePort, final ImageStoragePort imageStoragePort) {
+        return new SponsorService(sponsorStoragePort, imageStoragePort);
+    }
+
+
+    @Bean
+    public ProgramFacadePort programFacadePort(final ProgramStoragePort programStoragePort) {
+        return new ProgramService(programStoragePort);
     }
 }

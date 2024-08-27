@@ -9,7 +9,6 @@ import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.RewardStatusStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
@@ -43,6 +42,7 @@ import org.testcontainers.utility.MountableFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -186,6 +186,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String ME_NOTIFICATIONS_COUNT = "/api/v1/me/notifications/count";
     protected static final String ME_NOTIFICATIONS_ALL = "/api/v1/me/notifications/all";
     protected static final String ME_NOTIFICATION_SETTINGS = "/api/v1/me/notification-settings";
+    protected static final String PROGRAMS = "/api/v1/programs";
     protected static final String PROGRAM_BY_ID = "/api/v1/programs/%s";
     protected static final String PROGRAM_STATS_TRANSACTIONS = "/api/v1/programs/%s/stats/transactions";
     protected static final String PROGRAM_TRANSACTIONS = "/api/v1/programs/%s/transactions";
@@ -243,6 +244,8 @@ public class AbstractMarketplaceApiIT {
     protected UserAuthHelper userAuthHelper;
     @Autowired
     protected ProgramHelper programHelper;
+    @Autowired
+    protected SponsorHelper sponsorHelper;
     @Autowired
     protected ProjectHelper projectHelper;
     @Autowired
@@ -361,31 +364,31 @@ public class AbstractMarketplaceApiIT {
                 .toUri();
     }
 
-    protected void addSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+    protected void addSponsorFor(UserAuthHelper.AuthenticatedUser user, UUID sponsorId) {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
-                        INSERT INTO sponsors_users
+                        INSERT INTO sponsor_leads
                         VALUES (:sponsorId, :userId)
                         ON CONFLICT DO NOTHING
                         """)
                 .setParameter("userId", user.user().getId())
-                .setParameter("sponsorId", sponsorId.value())
+                .setParameter("sponsorId", sponsorId)
                 .executeUpdate();
         em.flush();
         em.getTransaction().commit();
         em.close();
     }
 
-    protected void removeSponsorFor(UserAuthHelper.AuthenticatedUser user, SponsorId sponsorId) {
+    protected void removeSponsorFor(UserAuthHelper.AuthenticatedUser user, UUID sponsorId) {
         final EntityManager em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
         em.createNativeQuery("""
-                        DELETE FROM sponsors_users
+                        DELETE FROM sponsor_leads
                         WHERE user_id = :userId AND sponsor_id = :sponsorId
                         """)
                 .setParameter("userId", user.user().getId())
-                .setParameter("sponsorId", sponsorId.value())
+                .setParameter("sponsorId", sponsorId)
                 .executeUpdate();
         em.flush();
         em.getTransaction().commit();

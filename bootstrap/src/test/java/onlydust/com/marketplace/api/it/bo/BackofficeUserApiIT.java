@@ -1,6 +1,6 @@
 package onlydust.com.marketplace.api.it.bo;
 
-import onlydust.com.marketplace.accounting.domain.model.user.UserId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;

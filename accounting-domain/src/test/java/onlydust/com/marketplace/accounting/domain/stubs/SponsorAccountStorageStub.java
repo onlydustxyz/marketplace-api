@@ -3,8 +3,8 @@ package onlydust.com.marketplace.accounting.domain.stubs;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
 import onlydust.com.marketplace.accounting.domain.port.out.SponsorAccountStorage;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.util.ArrayList;
 import java.util.List;

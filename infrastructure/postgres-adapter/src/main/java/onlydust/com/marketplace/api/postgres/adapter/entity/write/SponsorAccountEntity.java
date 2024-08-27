@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.time.Instant;
 import java.util.HashSet;
