@@ -37,4 +37,11 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, J
             REFRESH MATERIALIZED VIEW CONCURRENTLY top_project_recommendations;
             """)
     void refreshRecommendations();
+
+    @Modifying
+    @Query(nativeQuery = true, value = """
+            REFRESH MATERIALIZED VIEW CONCURRENTLY bi.project_contribution_stats;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY bi.project_reward_stats;
+            """)
+    void refreshStats();
 }

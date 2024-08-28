@@ -362,4 +362,9 @@ public class ProjectService implements ProjectFacadePort {
     public void refreshRecommendations() {
         projectStoragePort.refreshRecommendations();
     }
+
+    @Override
+    public void refreshStats() {
+        projectStoragePort.refreshStats();
+    }
 }

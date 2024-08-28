@@ -79,4 +79,6 @@ public interface ProjectStoragePort {
     List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId);
 
     void refreshRecommendations();
+
+    void refreshStats();
 }

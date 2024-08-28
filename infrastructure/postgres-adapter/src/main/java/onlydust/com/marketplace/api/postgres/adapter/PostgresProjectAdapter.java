@@ -450,4 +450,10 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     public void refreshRecommendations() {
         projectRepository.refreshRecommendations();
     }
+
+    @Override
+    @Transactional
+    public void refreshStats() {
+        projectRepository.refreshStats();
+    }
 }
