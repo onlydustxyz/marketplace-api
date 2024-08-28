@@ -4,8 +4,11 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
+import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
+import onlydust.com.marketplace.api.read.repositories.SponsorTransactionMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.SponsorId;
@@ -18,10 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
@@ -37,6 +43,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final PermissionService permissionService;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
     private final SponsorReadRepository sponsorReadRepository;
+    private final SponsorTransactionMonthlyStatsReadRepository sponsorTransactionMonthlyStatsReadRepository;
 
     @Override
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
@@ -92,5 +99,37 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
 
         return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SponsorTransactionStatListResponse> getSponsorTransactionsStats(UUID sponsorId, String fromDate, String toDate,
+                                                                                          List<SponsorTransactionType> types, String search) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
+            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+
+        final var stats = sponsorTransactionMonthlyStatsReadRepository.findAll(
+                        sponsorId,
+                        DateMapper.parseNullable(fromDate),
+                        DateMapper.parseNullable(toDate),
+                        search,
+                        types == null ? null : types.stream().map(SponsorTransactionType::name).toList())
+                .stream().collect(groupingBy(SponsorTransactionMonthlyStatReadEntity::date));
+
+        final var response = new SponsorTransactionStatListResponse()
+                .stats(stats.entrySet().stream().map(e -> new SponsorTransactionStatResponse()
+                                        .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
+                                        .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAvailable))
+                                        .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAllocated))
+                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalGranted))
+                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalRewarded))
+                                        .transactionCount(e.getValue().stream().mapToInt(SponsorTransactionMonthlyStatReadEntity::transactionCount).sum())
+                                )
+                                .sorted(comparing(SponsorTransactionStatResponse::getDate))
+                                .toList()
+                );
+
+        return ok(response);
     }
 }

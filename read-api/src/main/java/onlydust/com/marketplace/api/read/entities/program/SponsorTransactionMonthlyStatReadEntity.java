@@ -17,23 +17,18 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
-@IdClass(ProgramTransactionMonthlyStatReadEntity.PrimaryKey.class)
-public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransactionStat {
+@IdClass(SponsorTransactionMonthlyStatReadEntity.PrimaryKey.class)
+public class SponsorTransactionMonthlyStatReadEntity implements ProgramTransactionStat {
     @Id
     @NonNull
-    UUID programId;
+    UUID sponsorId;
 
     @Id
     @NonNull
     UUID currencyId;
 
     @Id
-    @Getter(AccessLevel.NONE)
     Date date;
-
-    public Date date() {
-        return date;
-    }
 
     @NonNull
     @ManyToOne
@@ -42,6 +37,9 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
 
     @NonNull
     BigDecimal totalAvailable;
+
+    @NonNull
+    BigDecimal totalAllocated;
 
     @NonNull
     BigDecimal totalGranted;
@@ -54,7 +52,7 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
 
     @EqualsAndHashCode
     public static class PrimaryKey {
-        UUID programId;
+        UUID sponsorId;
         UUID currencyId;
         Date date;
     }

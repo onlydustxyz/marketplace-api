@@ -1,14 +1,19 @@
 package onlydust.com.marketplace.api.read.entities.accounting;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.HistoricalTransactionType;
 import onlydust.com.backoffice.api.contract.model.MoneyWithUsdEquivalentResponse;
 import onlydust.com.backoffice.api.contract.model.TransactionHistoryPageItemResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.mapper.NetworkMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -22,7 +27,6 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(schema = "accounting", name = "all_sponsor_account_transactions")
@@ -30,7 +34,6 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 @Accessors(fluent = true)
 public class AllSponsorAccountTransactionReadEntity {
     @Id
-    @EqualsAndHashCode.Include
     @NonNull
     UUID id;
 
@@ -44,9 +47,14 @@ public class AllSponsorAccountTransactionReadEntity {
     Type type;
 
     @ManyToOne
-    @JoinColumn(name = "sponsorAccountId")
+    @JoinColumn(name = "sponsorId")
     @NonNull
-    SponsorAccountReadEntity sponsorAccount;
+    SponsorReadEntity sponsor;
+
+    @ManyToOne
+    @JoinColumn(name = "currencyId")
+    @NonNull
+    CurrencyReadEntity currency;
 
     @NonNull
     BigDecimal amount;
@@ -79,16 +87,15 @@ public class AllSponsorAccountTransactionReadEntity {
     }
 
     public TransactionHistoryPageItemResponse toBoResponse() {
-        final var usdQuote = sponsorAccount.currency().latestUsdQuote() == null ? null : sponsorAccount.currency().latestUsdQuote().getPrice();
+        final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
         return new TransactionHistoryPageItemResponse()
                 .date(timestamp)
                 .type(type.toBoResponse())
                 .network(NetworkMapper.map(network))
-                .lockedUntil(sponsorAccount.lockedUntil())
                 .program(program == null ? null : program.toBoLinkResponse())
                 .amount(new MoneyWithUsdEquivalentResponse()
                         .amount(amount)
-                        .currency(sponsorAccount.currency().toBoShortResponse())
+                        .currency(currency.toBoShortResponse())
                         .conversionRate(usdQuote)
                         .dollarsEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount))));
     }

@@ -1,15 +1,20 @@
 package onlydust.com.marketplace.api.read.entities.accounting;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
+import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
+import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
@@ -26,7 +31,6 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
 @NoArgsConstructor(force = true)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Table(name = "account_book_transactions", schema = "accounting")
@@ -34,7 +38,6 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 @Accessors(fluent = true)
 public class AccountBookTransactionReadEntity {
     @Id
-    @EqualsAndHashCode.Include
     @NonNull
     UUID id;
 
@@ -48,8 +51,9 @@ public class AccountBookTransactionReadEntity {
     Type type;
 
     @ManyToOne
-    @JoinColumn(name = "sponsorAccountId")
-    SponsorAccountReadEntity sponsorAccount;
+    @JoinColumn(name = "sponsorId")
+    @NonNull
+    SponsorReadEntity sponsor;
 
     @ManyToOne
     @JoinColumn(name = "programId")
@@ -72,8 +76,8 @@ public class AccountBookTransactionReadEntity {
 
     @NonNull
     @ManyToOne
-    @JoinColumn(name = "accountBookId")
-    AccountBookReadEntity accountBook;
+    @JoinColumn(name = "currencyId")
+    CurrencyReadEntity currency;
 
     public static Type map(SponsorAccountTransactionType type) {
         return switch (type) {
@@ -85,7 +89,7 @@ public class AccountBookTransactionReadEntity {
     }
 
     public SponsorTransactionPageItemResponse toPageItemResponse() {
-        final var usdQuote = accountBook.currency().latestUsdQuote() == null ? null : accountBook.currency().latestUsdQuote().getPrice();
+        final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
         return new SponsorTransactionPageItemResponse()
                 .id(id)
                 .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
@@ -93,8 +97,8 @@ public class AccountBookTransactionReadEntity {
                 .program(program == null ? null : program.toLinkResponse())
                 .amount(new Money()
                         .amount(amount)
-                        .prettyAmount(pretty(amount, accountBook.currency().decimals(), usdQuote))
-                        .currency(accountBook.currency().toShortResponse())
+                        .prettyAmount(pretty(amount, currency.decimals(), usdQuote))
+                        .currency(currency.toShortResponse())
                         .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
                         .usdConversionRate(usdQuote)
                 );
@@ -120,19 +124,19 @@ public class AccountBookTransactionReadEntity {
     }
 
     private Money toMoney(@NonNull BigDecimal amount) {
-        final var usdQuote = accountBook.currency().latestUsdQuote() == null ? null : accountBook.currency().latestUsdQuote().getPrice();
+        final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
 
         return new Money()
                 .amount(amount)
-                .currency(accountBook.currency().toShortResponse())
-                .prettyAmount(pretty(amount, accountBook.currency().decimals(), usdQuote))
+                .currency(currency.toShortResponse())
+                .prettyAmount(pretty(amount, currency.decimals(), usdQuote))
                 .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
                 .usdConversionRate(usdQuote);
     }
 
     private ProgramTransactionPageItemResponseThirdParty thirdParty() {
         return project == null ?
-                new ProgramTransactionPageItemResponseThirdParty().sponsor(sponsorAccount.sponsor().toLinkResponse()) :
+                new ProgramTransactionPageItemResponseThirdParty().sponsor(sponsor.toLinkResponse()) :
                 new ProgramTransactionPageItemResponseThirdParty().project(project().toLinkResponse());
     }
 

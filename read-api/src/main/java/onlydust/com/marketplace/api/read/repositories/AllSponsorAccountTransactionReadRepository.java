@@ -15,11 +15,11 @@ public interface AllSponsorAccountTransactionReadRepository extends Repository<A
     @Query(value = """
             SELECT t
             FROM AllSponsorAccountTransactionReadEntity t
-            JOIN FETCH t.sponsorAccount sa
+            JOIN FETCH t.sponsor s
             LEFT JOIN FETCH t.program
-            JOIN FETCH sa.currency c
+            JOIN FETCH t.currency c
             LEFT JOIN FETCH c.latestUsdQuote
-            WHERE sa.sponsorId = :sponsorId AND
+            WHERE s.id = :sponsorId AND
                     (:types IS NULL OR t.type IN :types)
             """)
     Page<AllSponsorAccountTransactionReadEntity> findAll(@NonNull UUID sponsorId,
