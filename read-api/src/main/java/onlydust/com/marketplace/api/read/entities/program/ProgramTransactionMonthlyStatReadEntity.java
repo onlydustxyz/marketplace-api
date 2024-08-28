@@ -28,7 +28,12 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
     UUID currencyId;
 
     @Id
+    @Getter(AccessLevel.NONE)
     Date date;
+
+    public Date date() {
+        return date;
+    }
 
     @NonNull
     @ManyToOne

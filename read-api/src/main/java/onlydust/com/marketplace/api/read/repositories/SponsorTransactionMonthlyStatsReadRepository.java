@@ -12,7 +12,16 @@ import java.util.UUID;
 public interface SponsorTransactionMonthlyStatsReadRepository extends Repository<SponsorTransactionMonthlyStatReadEntity,
         ProgramTransactionMonthlyStatReadEntity.PrimaryKey> {
     @Query(value = """
-            with stats as (select abt.sponsor_id                                                                                                    as sponsor_id,
+            with data AS (SELECT generate_series(date_trunc('month', coalesce(cast(:fromDate as timestamp), min(abt.timestamp), CURRENT_DATE)),
+                                                 date_trunc('month', coalesce(cast(:toDate as timestamp), CURRENT_DATE)),
+                                                 '1 mon') AS date,
+                                 abt.sponsor_id  as sponsor_id,
+                                 abt.currency_id as currency_id
+                          FROM accounting.account_book_transactions abt
+                          WHERE abt.sponsor_id = :sponsorId
+                          GROUP BY abt.sponsor_id,
+                                   abt.currency_id),
+                stats as (select abt.sponsor_id                                                                                                    as sponsor_id,
                                   abt.currency_id                                                                                                   as currency_id,
                                   date_trunc('month', abt.timestamp)                                                                                as date,
             
@@ -31,10 +40,7 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                                   count(*)                                                                                                          as transaction_count
                            from accounting.account_book_transactions abt
                                     left join programs pgm on pgm.id = abt.program_id
-                           where abt.sponsor_id = :sponsorId
-                             and (cast(:fromDate as text) is null or abt.timestamp >= :fromDate)
-                             and (cast(:toDate as text) is null or date_trunc('month', abt.timestamp) <= :toDate)
-                             and (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
+                           where (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
                              and (coalesce(:types) is null or (
                                ('DEPOSITED' in (:types) and abt.type = 'MINT' and abt.program_id is null) or
                                ('ALLOCATED' in (:types) and abt.type = 'TRANSFER' and abt.program_id is not null and project_id is null) or
@@ -43,16 +49,17 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                            group by abt.sponsor_id,
                                     abt.currency_id,
                                     date_trunc('month', abt.timestamp))
-            select s.sponsor_id                                                    as sponsor_id,
-                   s.currency_id                                                   as currency_id,
-                   s.date                                                          as date,
-                   sum(s.total_deposited - s.total_allocated)
-                   over (partition by s.sponsor_id, s.currency_id order by s.date) as total_available,
-                   s.total_allocated                                               as total_allocated,
-                   s.total_granted                                                 as total_granted,
-                   s.total_rewarded                                                as total_rewarded,
-                   s.transaction_count                                             as transaction_count
-            from stats s
+            select d.sponsor_id                                                    as sponsor_id,
+                   d.currency_id                                                   as currency_id,
+                   d.date                                                          as date,
+                   sum(coalesce(s.total_deposited, 0) - coalesce(s.total_allocated, 0))
+                   over (partition by d.sponsor_id, d.currency_id order by d.date) as total_available,
+                   coalesce(s.total_allocated, 0)                                  as total_allocated,
+                   coalesce(s.total_granted, 0)                                    as total_granted,
+                   coalesce(s.total_rewarded, 0)                                   as total_rewarded,
+                   coalesce(s.transaction_count, 0)                                as transaction_count
+            from data d
+                   left join stats s on d.sponsor_id = s.sponsor_id and d.currency_id = s.currency_id and d.date = s.date
             """, nativeQuery = true)
     List<SponsorTransactionMonthlyStatReadEntity> findAll(final UUID sponsorId, Date fromDate, Date toDate, String search, List<String> types);
 }
