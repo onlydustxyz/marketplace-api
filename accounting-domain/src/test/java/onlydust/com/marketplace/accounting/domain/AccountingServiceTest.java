@@ -232,7 +232,7 @@ public class AccountingServiceTest {
             assertThat(sponsorAccount.allowance()).isEqualTo(amountToMint);
 
             verify(accountBookObserver).on(any(), any(),
-                    eq(List.of(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amountToMint))));
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amountToMint)));
         }
 
         /*
@@ -270,7 +270,7 @@ public class AccountingServiceTest {
             assertThat(savedAccount.lockedUntil()).isEqualTo(sponsorAccount.account().lockedUntil());
 
             verify(accountBookObserver).on(any(), any(),
-                    eq(List.of(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amount))));
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.account().id())), amount)));
         }
 
         /*
@@ -312,7 +312,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, otherSponsorId, PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
 
             assertThat(accountBookEventStorage.events).isEmpty();
         }
@@ -374,9 +374,9 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
 
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), amount),
                     new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), amount)
@@ -403,9 +403,9 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
 
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount1.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount2.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
@@ -476,9 +476,9 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
             verify(accountBookObserver).on(any(), any(),
-                    eq(List.of(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccountId)), amount))));
+                    eq(new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccountId)), amount)));
             verify(accountBookObserver).on(any(), any(),
-                    eq(List.of(new AccountBook.Transaction(Type.REFUND, List.of(AccountId.of(sponsorAccountId)), amount))));
+                    eq(new AccountBook.Transaction(Type.REFUND, List.of(AccountId.of(sponsorAccountId)), amount)));
         }
 
         /*
@@ -515,9 +515,9 @@ public class AccountingServiceTest {
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
 
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), amount),
                     new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), amount)
@@ -535,7 +535,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
         }
 
         /*
@@ -634,9 +634,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(4, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId2)),
@@ -738,9 +738,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(5, new FullRefundEvent(AccountId.of(rewardId1)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId1)),
@@ -831,9 +831,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(3, new RefundEvent(AccountId.of(sponsorAccount.id()), AccountId.ROOT, amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsorAccount.id())), amount),
                     new AccountBook.Transaction(REFUND, List.of(AccountId.of(sponsorAccount.id())), amount)
@@ -862,9 +862,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(4, new RefundEvent(AccountId.of(projectId1), AccountId.of(programId), amount))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), amount),
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId1)),
@@ -884,7 +884,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
         }
 
         /*
@@ -933,9 +933,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(4, new TransferEvent(AccountId.of(projectId2), AccountId.of(rewardId2), PositiveAmount.of(100L)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId)), PositiveAmount.of(100L)),
                     new AccountBook.Transaction(TRANSFER, List.of(AccountId.of(sponsorAccount.id()), AccountId.of(programId), AccountId.of(projectId2)),
@@ -1232,9 +1232,9 @@ public class AccountingServiceTest {
                     IdentifiedAccountBookEvent.of(11, new FullRefundEvent(AccountId.of(rewardId)))
             );
             assertThat(accountBookEventStorage.events.get(currency)).containsAll(events);
-            final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+            final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
             verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-            final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+            final var transactions = transactionsCaptor.getAllValues();
             // @formatter:off
             assertThat(transactions).containsExactly(
                     new AccountBook.Transaction(MINT, List.of(AccountId.of(unlockedSponsorSponsorAccount1.id())), PositiveAmount.of(200L)),
@@ -1817,9 +1817,9 @@ public class AccountingServiceTest {
                 new BurnEvent(AccountId.of(payment2.id()), PositiveAmount.of(1_500L))
         );
 
-        final var transactionsCaptor = ArgumentCaptor.forClass(List.class);
+        final var transactionsCaptor = ArgumentCaptor.forClass(AccountBook.Transaction.class);
         verify(accountBookObserver, atLeastOnce()).on(any(), any(), transactionsCaptor.capture());
-        final var transactions = transactionsCaptor.getAllValues().stream().flatMap(List::stream).toList();
+        final var transactions = transactionsCaptor.getAllValues();
         // @formatter:off
         assertThat(transactions).containsExactlyInAnyOrder(
                 new AccountBook.Transaction(MINT, List.of(AccountId.of(sponsor1Account1.id())), PositiveAmount.of(10_000L)),

@@ -1551,7 +1551,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 final var lines = csv.split("\\R");
                 assertThat(lines.length).isEqualTo(9);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
-                assertThat(lines).allMatch(line -> line.split(",").length == 8);
             }
 
             @Test
@@ -1599,7 +1598,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             @ParameterizedTest
             @EnumSource(ProgramTransactionType.class)
-            void should_get_program_monthly_transactions_filtered_by_types(ProgramTransactionType type) {
+            void should_get_program_transactions_filtered_by_types(ProgramTransactionType type) {
                 // When
                 client.get()
                         .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(

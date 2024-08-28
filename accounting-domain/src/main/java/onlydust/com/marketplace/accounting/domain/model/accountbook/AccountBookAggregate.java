@@ -9,10 +9,14 @@ import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.kernel.model.EventType;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.accounting.domain.model.PositiveAmount.min;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -37,27 +41,66 @@ public class AccountBookAggregate implements AccountBook {
 
     @Override
     public synchronized List<Transaction> mint(AccountId account, PositiveAmount amount) {
-        return emit(new MintEvent(account, amount));
+        return emit(CurrentDateProvider.now(), new MintEvent(account, amount));
     }
 
     @Override
     public synchronized List<Transaction> burn(AccountId account, PositiveAmount amount) {
-        return emit(new BurnEvent(account, amount));
+        return emit(CurrentDateProvider.now(), new BurnEvent(account, amount));
+    }
+
+    public synchronized void transfer(List<AccountId> from, AccountId to, PositiveAmount amount) {
+        var remainingAmount = amount;
+
+        final var originAccounts = from.iterator();
+        final var now = CurrentDateProvider.now();
+
+        while (remainingAmount.isStrictlyPositive() && originAccounts.hasNext()) {
+            final var originAccount = originAccounts.next();
+            final var allocatedAmount = min(remainingAmount, state.balanceOf(originAccount));
+
+            if (allocatedAmount.isStrictlyPositive()) {
+                emit(now, new TransferEvent(originAccount, to, allocatedAmount));
+                remainingAmount = PositiveAmount.of(remainingAmount.subtract(allocatedAmount));
+            }
+        }
+
+        if (remainingAmount.isStrictlyPositive())
+            throw badRequest("Not enough funds to transfer %s from %s to %s".formatted(amount, from, to));
     }
 
     @Override
     public synchronized List<Transaction> transfer(AccountId from, AccountId to, PositiveAmount amount) {
-        return emit(new TransferEvent(from, to, amount));
+        return emit(CurrentDateProvider.now(), new TransferEvent(from, to, amount));
+    }
+
+    public synchronized void refund(AccountId from, List<AccountId> to, PositiveAmount amount) {
+        final var destinationAccounts = to.iterator();
+        final var now = CurrentDateProvider.now();
+
+        var remainingAmount = amount;
+        while (remainingAmount.isStrictlyPositive() && destinationAccounts.hasNext()) {
+            final var destinationAccount = destinationAccounts.next();
+            final var unallocatedAmount = min(remainingAmount, state.transferredAmount(destinationAccount, from));
+
+            if (unallocatedAmount.isStrictlyPositive()) {
+                emit(now, new RefundEvent(from, destinationAccount, unallocatedAmount));
+                remainingAmount = PositiveAmount.of(remainingAmount.subtract(unallocatedAmount));
+            }
+        }
+
+        if (remainingAmount.isStrictlyPositive())
+            throw badRequest("Not enough funds to refund %s from %s to %s".formatted(amount, from, to));
     }
 
     @Override
     public synchronized List<Transaction> refund(AccountId from, AccountId to, PositiveAmount amount) {
-        return emit(new RefundEvent(from, to, amount));
+        return emit(CurrentDateProvider.now(), new RefundEvent(from, to, amount));
     }
 
     @Override
     public synchronized List<Transaction> refund(AccountId from) {
-        return emit(new FullRefundEvent(from));
+        return emit(CurrentDateProvider.now(), new FullRefundEvent(from));
     }
 
     public ReadOnlyAccountBookState state() {
@@ -87,13 +130,12 @@ public class AccountBookAggregate implements AccountBook {
         return result;
     }
 
-    private List<Transaction> emit(AccountBookEvent<List<Transaction>> event) {
+    private List<Transaction> emit(final ZonedDateTime now, AccountBookEvent<List<Transaction>> event) {
         final var result = state.accept(event);
-        final var now = CurrentDateProvider.now();
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), now, event));
         incrementEventId();
         if (observer != null)
-            observer.on(id, now, result);
+            result.forEach(t -> observer.on(id, now, t));
 
         return result;
     }

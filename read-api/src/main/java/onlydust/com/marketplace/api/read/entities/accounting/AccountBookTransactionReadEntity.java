@@ -88,36 +88,11 @@ public class AccountBookTransactionReadEntity {
         };
     }
 
-    public SponsorTransactionPageItemResponse toPageItemResponse() {
-        final var usdQuote = currency.latestUsdQuote() == null ? null : currency.latestUsdQuote().getPrice();
-        return new SponsorTransactionPageItemResponse()
-                .id(id)
-                .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
-                .type(map(type))
-                .program(program == null ? null : program.toLinkResponse())
-                .amount(new Money()
-                        .amount(amount)
-                        .prettyAmount(pretty(amount, currency.decimals(), usdQuote))
-                        .currency(currency.toShortResponse())
-                        .usdEquivalent(prettyUsd(usdQuote == null ? null : usdQuote.multiply(amount)))
-                        .usdConversionRate(usdQuote)
-                );
-    }
-
-    private SponsorAccountTransactionType map(Type type) {
-        return switch (type) {
-            case MINT -> SponsorAccountTransactionType.DEPOSIT;
-            case BURN -> SponsorAccountTransactionType.WITHDRAWAL;
-            case TRANSFER -> SponsorAccountTransactionType.ALLOCATION;
-            case REFUND -> SponsorAccountTransactionType.UNALLOCATION;
-        };
-    }
-
     public ProgramTransactionPageItemResponse toProgramTransactionPageItemResponse() {
         return new ProgramTransactionPageItemResponse()
                 .id(id)
                 .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
-                .type(transactionType())
+                .type(programTransactionType())
                 .thirdParty(thirdParty())
                 .amount(toMoney(amount))
                 ;
@@ -140,20 +115,57 @@ public class AccountBookTransactionReadEntity {
                 new ProgramTransactionPageItemResponseThirdParty().project(project().toLinkResponse());
     }
 
-    private ProgramTransactionType transactionType() {
+    private ProgramTransactionType programTransactionType() {
         return switch (type) {
             case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
             case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
         };
     }
 
-    public void toCsv(CSVPrinter csv) throws IOException {
+    private SponsorTransactionType sponsorTransactionType() {
+        return switch (type) {
+            case MINT -> SponsorTransactionType.DEPOSITED;
+            case BURN -> throw new IllegalStateException("BURN transaction type is not allowed for sponsor transactions");
+            case TRANSFER -> SponsorTransactionType.ALLOCATED;
+            case REFUND -> SponsorTransactionType.RETURNED;
+        };
+    }
+
+    public void toProgramCsv(CSVPrinter csv) throws IOException {
         final var amount = toMoney(this.amount);
         csv.printRecord(id,
                 timestamp,
-                transactionType().name(),
+                programTransactionType().name(),
                 thirdParty().getProject() == null ? null : thirdParty().getProject().getId(),
                 thirdParty().getSponsor() == null ? null : thirdParty().getSponsor().getId(),
+                amount.getAmount(),
+                amount.getCurrency().getCode(),
+                amount.getUsdEquivalent()
+        );
+    }
+
+    public SponsorTransactionPageItemResponse toSponsorTransactionPageItemResponse() {
+        return new SponsorTransactionPageItemResponse()
+                .id(id)
+                .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
+                .type(sponsorTransactionType())
+                .program(program == null ? null : program.toLinkResponse())
+                .amount(toMoney(amount))
+                .depositStatus(depositStatus())
+                ;
+    }
+
+    private SponsorDepositTransactionStatus depositStatus() {
+        return type == Type.MINT ? SponsorDepositTransactionStatus.COMPLETED : null; // TODO
+    }
+
+    public void toSponsorCsv(CSVPrinter csv) throws IOException {
+        final var amount = toMoney(this.amount);
+        csv.printRecord(id,
+                timestamp,
+                sponsorTransactionType().name(),
+                depositStatus(),
+                program == null ? null : program.id(),
                 amount.getAmount(),
                 amount.getCurrency().getCode(),
                 amount.getUsdEquivalent()
