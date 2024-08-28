@@ -4309,8 +4309,12 @@ paths:
         - bearerAuth: [ ]
       tags:
         - ReadSponsors
-      summary: Get the list of all transactions related to this sponsor
+      summary: Get sponsor transactions
       operationId: getSponsorTransactions
+      description: |
+        Get sponsor transactions.
+        Use Accept: text/csv header to get the response in CSV format.
+        Only sponsor leaders can access this information.
       parameters:
         - in: path
           name: sponsorId
@@ -4319,12 +4323,10 @@ paths:
             $ref: '#/components/schemas/SponsorId'
         - in: query
           name: pageIndex
-          required: true
           schema:
             type: integer
         - in: query
           name: pageSize
-          required: true
           schema:
             type: integer
         - in: query
@@ -4338,38 +4340,20 @@ paths:
             type: string
             pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
         - in: query
-          name: currencies
-          description: Currency filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/CurrencyId'
-        - in: query
-          name: projects
-          description: Project filter
-          schema:
-            type: array
-            items:
-              $ref: '#/components/schemas/ProjectId'
-        - in: query
           name: types
-          description: Transaction type filter
+          description: Transaction types filter
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/SponsorAccountTransactionType'
+              $ref: '#/components/schemas/SponsorTransactionType'
         - in: query
-          name: sort
-          description: Sort order
+          name: search
           schema:
-            $ref: '#/components/schemas/SponsorAccountTransactionSort'
-        - in: query
-          name: direction
-          schema:
-            $ref: '#/components/schemas/SortDirection'
+            type: string
+          description: Search by program name
       responses:
         "200":
-          description: 'The sponsor transaction history'
+          description: 'The sponsor transactions'
           content:
             application/json:
               schema:
@@ -8996,10 +8980,10 @@ components:
     SponsorTransactionPageItemResponse:
       type: object
       required:
+        - id
         - date
         - type
         - amount
-        - currency
       properties:
         id:
           $ref: '#/components/schemas/TransactionId'
@@ -9007,11 +8991,13 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/SponsorAccountTransactionType'
+          $ref: '#/components/schemas/SponsorTransactionType'
         program:
           $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
           $ref: '#/components/schemas/Money'
+        depositStatus:
+          $ref: '#/components/schemas/SponsorDepositTransactionStatus'
 
     ProgramTransactionPageResponse:
       allOf:
@@ -9162,6 +9148,12 @@ components:
         - DEPOSITED
         - ALLOCATED
         - RETURNED
+
+    SponsorDepositTransactionStatus:
+      type: string
+      enum:
+        - PENDING
+        - COMPLETED
 
     SponsorAccountTransactionType:
       type: string

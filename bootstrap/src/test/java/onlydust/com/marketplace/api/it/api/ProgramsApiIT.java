@@ -1599,7 +1599,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             @ParameterizedTest
             @EnumSource(ProgramTransactionType.class)
-            void should_get_program_monthly_transactions_filtered_by_types(ProgramTransactionType type) {
+            void should_get_program_transactions_filtered_by_types(ProgramTransactionType type) {
                 // When
                 client.get()
                         .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(

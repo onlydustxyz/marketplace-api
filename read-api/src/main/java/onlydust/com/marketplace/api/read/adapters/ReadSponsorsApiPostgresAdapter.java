@@ -16,21 +16,21 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
@@ -62,46 +62,40 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     }
 
     @Override
-    public ResponseEntity<SponsorTransactionPageResponse> getSponsorTransactions(UUID sponsorId,
-                                                                                 Integer pageIndex,
-                                                                                 Integer pageSize,
-                                                                                 String fromDate,
-                                                                                 String toDate,
-                                                                                 List<UUID> currencies,
-                                                                                 List<UUID> programs,
-                                                                                 List<SponsorAccountTransactionType> types,
-                                                                                 SponsorAccountTransactionSort sort,
-                                                                                 SortDirection direction) {
+    public ResponseEntity<SponsorTransactionPageResponse> getSponsorTransactions(UUID sponsorId, Integer pageIndex, Integer pageSize, String fromDate,
+                                                                                 String toDate, List<SponsorTransactionType> types, String search) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
 
-        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
-            throw forbidden("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
-
-        final var sortBy = switch (Optional.ofNullable(sort).orElse(SponsorAccountTransactionSort.DATE)) {
-            case DATE -> "timestamp";
-            case TYPE -> "type";
-            case AMOUNT -> "amount";
-            case PROGRAM -> "p.name";
-        };
-
-        final var page = accountBookTransactionReadRepository.findAllFromSponsor(
-                sponsorId,
-                types == null ? null : types.stream().map(AccountBookTransactionReadEntity::map).toList(),
-                currencies,
-                programs,
-                DateMapper.parseNullable(fromDate),
-                DateMapper.parseNullable(toDate),
-                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.ASC ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy))
-        );
+        final var page = findAccountBookTransactions(sponsorId, fromDate, toDate, types, search, index, size);
 
         final var response = new SponsorTransactionPageResponse()
-                .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toPageItemResponse).toList())
+                .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toSponsorTransactionPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
 
-        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+        return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    private Page<AccountBookTransactionReadEntity> findAccountBookTransactions(UUID sponsorId, String fromDate, String toDate,
+                                                                               List<SponsorTransactionType> types, String search, int index, int size) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
+            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+
+
+        final var page = accountBookTransactionReadRepository.findAllForSponsor(
+                sponsorId,
+                DateMapper.parseNullable(fromDate),
+                DateMapper.parseNullable(toDate),
+                search,
+                types == null ? null : types.stream().map(SponsorTransactionType::name).toList(),
+                PageRequest.of(index, size, Sort.by("timestamp"))
+        );
+        return page;
     }
 
     @Override
