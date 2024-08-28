@@ -743,6 +743,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "ddd", "DDD"))
                 .build());
+        notificationService.push(hayden.user().getId(), ApplicationRefused.builder()
+                .issue(new NotificationIssue(3L, faker.internet().url(), "title3", faker.rickAndMorty().location(),
+                        faker.lorem().characters()))
+                .project(new NotificationProject(bretzel, "abc", "ABC"))
+                .build());
         notificationService.push(hayden.user().getId(), BillingProfileVerificationClosed.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("6230df7a-f6c9-4cc4-930c-b310d83c0703")))
                 .billingProfileName("bpHaydenClosed2")
@@ -755,7 +760,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
 
         // When
         notificationSummaryEmailJob.run();
-        Thread.sleep(1000L);
+        Thread.sleep(2000L);
 
         // Then
         customerIOWireMockServer.verify(1,
@@ -857,6 +862,14 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                         {
                                           "title": "Your application has been accepted",
                                           "description": "Your application for title2 has been accepted",
+                                          "button": {
+                                            "text": "See my applications",
+                                            "link": "https://develop-app.onlydust.com/applications"
+                                          }
+                                        },
+                                        {
+                                          "title": "Your application has been refused",
+                                          "description": "Your application for title3 has been refused",
                                           "button": {
                                             "text": "See my applications",
                                             "link": "https://develop-app.onlydust.com/applications"
