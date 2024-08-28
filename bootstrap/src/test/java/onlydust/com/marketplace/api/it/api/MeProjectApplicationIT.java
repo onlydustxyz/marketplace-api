@@ -999,6 +999,22 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 "isRegistered": true
                               },
                               "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "motivations": "My motivations 2",
+                              "problemSolvingApproach": null
+                            },
+                            {
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "project": {
                                 "id": "c66b929a-664d-40b9-96c4-90d3efd32a3c",
                                 "slug": "yolo-croute",
                                 "name": "Yolo croute",
