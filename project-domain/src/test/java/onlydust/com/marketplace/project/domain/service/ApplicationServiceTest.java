@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -175,10 +176,10 @@ public class ApplicationServiceTest {
         verify(applicationObserver).onApplicationCreated(application);
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-
+                
                 ### My background and how it can be leveraged
                 %s
-
+                
                 ### How I plan on tackling this issue
                 %s
                 """.formatted(project.getSlug(), motivation, problemSolvingApproach));
@@ -197,7 +198,7 @@ public class ApplicationServiceTest {
 
         verify(githubApiPort).createComment(personalAccessToken, issue, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-
+                
                 ### My background and how it can be leveraged
                 %s
                 """.formatted(project.getSlug(), motivation));
@@ -292,10 +293,10 @@ public class ApplicationServiceTest {
 
         verify(githubApiPort).updateComment(personalAccessToken, issue.repoId(), commentId, """
                 I am applying to this issue via [OnlyDust platform](https://local-app.onlydust.xyz/p/%s).
-
+                
                 ### My background and how it can be leveraged
                 %s
-
+                
                 ### How I plan on tackling this issue
                 %s
                 """.formatted(project.getSlug(), updatedApplication.motivations(), updatedApplication.problemSolvingApproach()));
@@ -520,10 +521,22 @@ public class ApplicationServiceTest {
         @Test
         void should_accepting_application() {
             // When
+            final Application refusedApplication = Application.fromMarketplace(
+                    projectId,
+                    githubUserId + 1,
+                    issue.id(),
+                    GithubComment.Id.random(),
+                    faker.lorem().sentence(),
+                    faker.lorem().sentence()
+            );
+            when(projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), ProjectId.of(application.projectId())))
+                    .thenReturn(List.of(application, refusedApplication));
             applicationService.acceptApplication(application.id(), userId);
 
             // Then
             verify(githubApiPort).assign(githubToken.token(), issue.repoId(), issue.number(), applicant.login());
+            verify(applicationObserver).onApplicationAccepted(application, userId);
+            verify(applicationObserver).onApplicationRefused(refusedApplication);
         }
     }
 }

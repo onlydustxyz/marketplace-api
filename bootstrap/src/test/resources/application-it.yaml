@@ -69,6 +69,7 @@ infrastructure:
     verification-closed-email-id: 50
     verification-rejected-email-id: 60
     weekly-notifications-email-id: 70
+    project-application-refused-email-id: 80
 application:
   web:
     machine-to-machine:

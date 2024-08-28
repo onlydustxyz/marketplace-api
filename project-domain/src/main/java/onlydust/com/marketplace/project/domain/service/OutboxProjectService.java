@@ -47,4 +47,8 @@ public class OutboxProjectService implements ProjectObserverPort, ApplicationObs
     @Override
     public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
+
+    @Override
+    public void onApplicationRefused(Application application) {
+    }
 }

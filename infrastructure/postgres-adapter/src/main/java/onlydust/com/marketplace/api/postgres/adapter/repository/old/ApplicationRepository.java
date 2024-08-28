@@ -31,4 +31,6 @@ public interface ApplicationRepository extends JpaRepository<ApplicationEntity, 
                                AND gia.user_id IS NULL)
             """, nativeQuery = true)
     void deleteObsoleteApplications();
+
+    List<ApplicationEntity> findAllByProjectIdAndIssueId(UUID projectId, Long issueId);
 }

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -26,4 +27,6 @@ public interface ProjectApplicationStoragePort {
     void deleteApplicationsByIssueId(GithubIssue.Id issueId);
 
     void deleteObsoleteApplications();
+
+    List<Application> findApplicationsOnIssueAndProject(GithubIssue.Id issueId, ProjectId projectId);
 }

@@ -41,4 +41,6 @@ public class CustomerIOProperties {
     Integer completeYourBillingProfileEmailId;
     @NonNull
     Integer weeklyNotificationsEmailId;
+    @NonNull
+    Integer projectApplicationRefusedEmailId;
 }

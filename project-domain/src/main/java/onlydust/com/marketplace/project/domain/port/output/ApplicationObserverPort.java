@@ -12,4 +12,6 @@ public interface ApplicationObserverPort {
     void onApplicationAccepted(Application application, UUID projectLeadId);
 
     void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon);
+
+    void onApplicationRefused(Application application);
 }

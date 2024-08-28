@@ -29,4 +29,9 @@ public class ApplicationObserverComposite implements ApplicationObserverPort {
     public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
         observers.forEach(observer -> observer.onHackathonExternalApplicationDetected(issue, applicantId, hackathon));
     }
+
+    @Override
+    public void onApplicationRefused(Application application) {
+        observers.forEach(observer -> observer.onApplicationRefused(application));
+    }
 }

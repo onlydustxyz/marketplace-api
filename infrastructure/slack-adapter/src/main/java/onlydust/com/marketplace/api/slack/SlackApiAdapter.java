@@ -114,4 +114,9 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
 
     }
+
+    @Override
+    public void onApplicationRefused(Application application) {
+
+    }
 }
