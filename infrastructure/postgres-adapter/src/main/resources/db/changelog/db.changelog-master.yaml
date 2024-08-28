@@ -495,3 +495,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000323_update_account_book_projection.sql
   - include:
       file: db/changelog/changelogs/00000323_update_program_stats_view.sql
+  - include:
+      file: db/changelog/changelogs/00000324_all_users_perf_optimization.sql
