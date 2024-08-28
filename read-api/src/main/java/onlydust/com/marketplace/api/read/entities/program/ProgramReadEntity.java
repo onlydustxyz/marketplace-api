@@ -7,10 +7,13 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.MoneyResponse;
 import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
+import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
+import onlydust.com.marketplace.api.contract.model.SponsorProgramPageItemResponse;
 import onlydust.com.marketplace.api.read.entities.project.ProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
@@ -117,5 +120,29 @@ public class ProgramReadEntity {
                 .id(id)
                 .name(name)
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null));
+    }
+
+    public ProgramWithBudgetResponse toBoProgramWithBudgetResponse() {
+        return new ProgramWithBudgetResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .remainingBudgets(statsPerCurrency.stream()
+                        .map(s -> new MoneyResponse()
+                                .currency(s.currency().toBoShortResponse())
+                                .amount(s.totalAvailable()))
+                        .toList());
+    }
+
+    public SponsorProgramPageItemResponse toSponsorProgramPageItemResponse() {
+        return new SponsorProgramPageItemResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
+                .projectCount(stats.grantedProjectCount())
+                .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
+                .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));
     }
 }

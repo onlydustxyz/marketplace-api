@@ -33,13 +33,17 @@ public class ProgramStatPerCurrencyReadEntity implements ProgramTransactionStat 
     CurrencyReadEntity currency;
 
     @NonNull
-    BigDecimal totalAvailable;
+    BigDecimal totalAllocated;
 
     @NonNull
     BigDecimal totalGranted;
 
     @NonNull
     BigDecimal totalRewarded;
+
+    public BigDecimal totalAvailable() {
+        return totalAllocated.subtract(totalGranted);
+    }
 
     @EqualsAndHashCode
     public static class PrimaryKey {

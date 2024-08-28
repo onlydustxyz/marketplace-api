@@ -14,7 +14,6 @@ public interface SponsorReadRepository extends Repository<SponsorReadEntity, UUI
             SELECT s
             FROM SponsorReadEntity s
             LEFT JOIN FETCH s.statsPerCurrency
-            LEFT JOIN FETCH s.perProgramStatsPerCurrency
             LEFT JOIN FETCH s.leads
             WHERE s.id = :sponsorId
             """)
