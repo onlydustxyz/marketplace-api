@@ -17,6 +17,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Month;
 import java.util.Map;
 
@@ -1850,7 +1852,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
             @Test
             void should_get_sponsor_monthly_transactions_stats_filtered_by_search() {
-                final var search = program.name().split(" ")[0];
+                final var search = URLEncoder.encode(program.name().split(" ")[0], StandardCharsets.UTF_8);
 
                 // When
                 client.get()
@@ -2278,7 +2280,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
             @Test
             void should_get_sponsor_transactions_filtered_by_search() {
                 // Given
-                final var search = program.name().split(" ")[0];
+                final var search = URLEncoder.encode(program.name().split(" ")[0], StandardCharsets.UTF_8);
 
                 // When
                 client.get()
