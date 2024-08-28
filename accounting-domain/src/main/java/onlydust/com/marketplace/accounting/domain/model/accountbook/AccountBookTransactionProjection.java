@@ -40,7 +40,7 @@ public class AccountBookTransactionProjection {
     }
 
     public String key() {
-        return "%s-%s-%s-%s-%s-%s-%s".formatted(currencyId, type, sponsorId, programId, projectId, rewardId, paymentId);
+        return "%s-%s-%s-%s-%s-%s-%s-%s".formatted(timestamp, currencyId, type, sponsorId, programId, projectId, rewardId, paymentId);
     }
 
     private AccountBookTransactionProjection with(final @NonNull List<AccountBook.AccountId> path) {
