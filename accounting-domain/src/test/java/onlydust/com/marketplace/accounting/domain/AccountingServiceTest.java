@@ -312,7 +312,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, otherSponsorId, PositiveAmount.of(10L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
 
             assertThat(accountBookEventStorage.events).isEmpty();
         }
@@ -535,7 +535,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
         }
 
         /*
@@ -884,7 +884,7 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.unallocate(programId, sponsorId, PositiveAmount.of(400L), currency.id()))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessageContaining("Not enough funds to unallocate");
+                    .hasMessageContaining("Not enough funds to refund");
         }
 
         /*
