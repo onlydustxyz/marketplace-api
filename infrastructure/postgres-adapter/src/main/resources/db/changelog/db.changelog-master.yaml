@@ -493,3 +493,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000322_add_sponsor_id_to_programs.sql
   - include:
       file: db/changelog/changelogs/00000323_update_account_book_projection.sql
+  - include:
+      file: db/changelog/changelogs/00000323_update_program_stats_view.sql

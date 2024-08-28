@@ -6,7 +6,9 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
+import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorTransactionMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -29,8 +31,8 @@ import java.util.UUID;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
-import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -43,6 +45,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final PermissionService permissionService;
     private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
     private final SponsorReadRepository sponsorReadRepository;
+    private final ProgramReadRepository programReadRepository;
     private final SponsorTransactionMonthlyStatsReadRepository sponsorTransactionMonthlyStatsReadRepository;
 
     @Override
@@ -131,5 +134,26 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                 );
 
         return ok(response);
+    }
+
+    @Override
+    public ResponseEntity<SponsorProgramPageResponse> getSponsorPrograms(UUID sponsorId, Integer pageIndex, Integer pageSize, String search) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
+            throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+
+        int index = sanitizePageIndex(pageIndex);
+        int size = sanitizePageSize(pageSize);
+
+        final var page = programReadRepository.findSponsorPrograms(sponsorId, search, PageRequest.of(index, size, Sort.by(Sort.Direction.ASC, "name")));
+        final var response = new SponsorProgramPageResponse()
+                .programs(page.getContent().stream().map(ProgramReadEntity::toSponsorProgramPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
     }
 }

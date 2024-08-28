@@ -3867,6 +3867,46 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/sponsors/{sponsorId}/programs:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadSponsors
+      summary: Get sponsor programs
+      operationId: getSponsorPrograms
+      description: |
+        Get the list of all programs owned by the sponsor.
+        Only sponsor leaders can access this information.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: pageIndex
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by program name
+      responses:
+        "200":
+          description: 'Sponsor programs page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SponsorProgramPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     post:
       security:
         - bearerAuth: [ ]
@@ -5974,6 +6014,44 @@ components:
             totalGranted:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+
+    SponsorProgramPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - programs
+          properties:
+            programs:
+              type: array
+              items:
+                $ref: '#/components/schemas/SponsorProgramPageItemResponse'
+
+    SponsorProgramPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramLinkResponse'
+        - type: object
+          required:
+            - leads
+            - projectCount
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            projectCount:
+              type: integer
+              description: Number of projects in the program
+              example: 42
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalReceived:
               $ref: '#/components/schemas/DetailedTotalMoney'
 
     ProgramResponse:

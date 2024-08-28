@@ -29,5 +29,14 @@ public interface ProgramReadRepository extends Repository<ProgramReadEntity, UUI
             LEFT JOIN FETCH c.latestUsdQuote
             WHERE p.id = :programId
             """)
-    Optional<ProgramReadEntity> findById(UUID programId);
+    Optional<ProgramReadEntity> findById(final UUID programId);
+
+    @Query("""
+            select p
+            from SponsorReadEntity s
+            join s.programs p
+            where s.id = :sponsorId and
+            (:search is null or element(p).name ilike concat('%', cast(:search as String), '%'))
+            """)
+    Page<ProgramReadEntity> findSponsorPrograms(final UUID sponsorId, final String search, final Pageable pageable);
 }

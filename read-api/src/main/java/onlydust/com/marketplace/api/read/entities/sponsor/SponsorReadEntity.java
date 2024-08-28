@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 
 @Entity
@@ -42,10 +40,6 @@ public class SponsorReadEntity {
     String url;
 
     String logoUrl;
-
-    @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
-    @NonNull
-    Set<SponsorStatPerCurrencyPerProgramReadEntity> perProgramStatsPerCurrency;
 
     @OneToMany(mappedBy = "sponsorId", fetch = FetchType.LAZY)
     @NonNull
@@ -94,16 +88,8 @@ public class SponsorReadEntity {
                 .availableBudgets(statsPerCurrency.stream()
                         .map(SponsorStatPerCurrencyReadEntity::toSponsorBudgetResponse)
                         .toList())
-                .programs(perProgramStatsPerCurrency.stream()
-                        .collect(groupingBy(SponsorStatPerCurrencyPerProgramReadEntity::program))
-                        .entrySet().stream()
-                        .map(e -> new ProgramWithBudgetResponse()
-                                .id(e.getKey().id())
-                                .name(e.getKey().name())
-                                .logoUrl(e.getKey().logoUrl())
-                                .remainingBudgets(e.getValue().stream()
-                                        .map(stat -> stat.toBoMoneyResponse(s -> s.totalAllocated().subtract(s.totalGranted())))
-                                        .toList()))
+                .programs(programs.stream()
+                        .map(ProgramReadEntity::toBoProgramWithBudgetResponse)
                         .toList())
                 .leads(leads.stream()
                         .map(AllUserReadEntity::toBoLinkResponse)
