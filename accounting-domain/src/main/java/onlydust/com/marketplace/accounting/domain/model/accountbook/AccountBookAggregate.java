@@ -93,7 +93,7 @@ public class AccountBookAggregate implements AccountBook {
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), now, event));
         incrementEventId();
         if (observer != null)
-            result.forEach(e -> observer.on(id, now, e));
+            observer.on(id, now, result);
 
         return result;
     }

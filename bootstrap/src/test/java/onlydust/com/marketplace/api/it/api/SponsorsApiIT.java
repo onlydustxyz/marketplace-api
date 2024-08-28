@@ -1085,7 +1085,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": 3
+                                      "transactionCount": 2
                                     },
                                     {
                                       "date": "2024-07-01",
@@ -1441,13 +1441,13 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
                         .jsonPath("$.stats[1].transactionCount").isEqualTo(3)
                         .jsonPath("$.stats[2].date").isEqualTo("2024-06-01")
-                        .jsonPath("$.stats[2].transactionCount").isEqualTo(3)
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(2)
                 ;
             }
 
             @Test
             void should_get_sponsor_monthly_transactions_stats_filtered_by_search() {
-                final var search = program.name();
+                final var search = program.name().split(" ")[0];
 
                 // When
                 client.get()
