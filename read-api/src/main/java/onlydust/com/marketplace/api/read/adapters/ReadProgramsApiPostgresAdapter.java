@@ -146,7 +146,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         try (final var printer = new CSVPrinter(sw, format)) {
             printer.printRecord("id", "timestamp", "transaction_type", "project_id", "sponsor_id", "amount", "currency", "usd_amount");
             for (final var transaction : page.getContent())
-                transaction.toCsv(printer);
+                transaction.toProgramCsv(printer);
         } catch (final IOException e) {
             throw internalServerError("Error while exporting transactions to CSV", e);
         }

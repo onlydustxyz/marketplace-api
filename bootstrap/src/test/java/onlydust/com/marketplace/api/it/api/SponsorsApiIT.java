@@ -131,6 +131,25 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
+        @Test
+        void should_get_sponsor_transactions_in_csv() {
+            // When
+            final var csv = client.get()
+                    .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.ACCEPT, "text/csv")
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+
+            final var lines = new String(csv).split("\\R");
+            assertThat(lines.length).isEqualTo(1);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+        }
+
         @Nested
         class GivenSomeTransactions {
             Program program;
@@ -2298,6 +2317,26 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                             case RETURNED -> 1;
                         })
                         .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
+            }
+
+            @Test
+            void should_get_sponsor_transactions_in_csv() {
+                // When
+                final var csv = client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .header(HttpHeaders.ACCEPT, "text/csv")
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody(String.class)
+                        .returnResult().getResponseBody();
+
+                final var lines = csv.split("\\R");
+                assertThat(lines.length).isEqualTo(10);
+                assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+                assertThat(lines).allMatch(line -> line.split(",").length == 8);
             }
         }
     }

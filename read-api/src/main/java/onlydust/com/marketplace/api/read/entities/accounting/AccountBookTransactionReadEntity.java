@@ -131,7 +131,7 @@ public class AccountBookTransactionReadEntity {
         };
     }
 
-    public void toCsv(CSVPrinter csv) throws IOException {
+    public void toProgramCsv(CSVPrinter csv) throws IOException {
         final var amount = toMoney(this.amount);
         csv.printRecord(id,
                 timestamp,
@@ -157,5 +157,18 @@ public class AccountBookTransactionReadEntity {
 
     private SponsorDepositTransactionStatus depositStatus() {
         return type == Type.MINT ? SponsorDepositTransactionStatus.COMPLETED : null; // TODO
+    }
+
+    public void toSponsorCsv(CSVPrinter csv) throws IOException {
+        final var amount = toMoney(this.amount);
+        csv.printRecord(id,
+                timestamp,
+                sponsorTransactionType().name(),
+                depositStatus(),
+                program == null ? null : program.id(),
+                amount.getAmount(),
+                amount.getCurrency().getCode(),
+                amount.getUsdEquivalent()
+        );
     }
 }
