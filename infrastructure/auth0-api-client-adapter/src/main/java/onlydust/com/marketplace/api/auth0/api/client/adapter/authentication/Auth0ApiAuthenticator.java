@@ -10,7 +10,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -45,37 +44,33 @@ public class Auth0ApiAuthenticator {
             })
             .build();
 
-    public String getAuth0ManagementApiAccessToken() throws IOException, InterruptedException {
-        final var tokenResponse = accessTokenCache.getIfPresent(CACHE_KEY);
-        if (tokenResponse != null) {
-            return tokenResponse.getAccessToken();
-        }
-
-        final var newTokenResponse = negotiateAuth0ManagementApiAccessToken();
-        accessTokenCache.put(CACHE_KEY, newTokenResponse);
-        return newTokenResponse.getAccessToken();
+    public String getAuth0ManagementApiAccessToken() {
+        return accessTokenCache.get(CACHE_KEY, s -> negotiateAuth0ManagementApiAccessToken()).getAccessToken();
     }
 
-    private Auth0ManagementApiAccessTokenResponse negotiateAuth0ManagementApiAccessToken() throws IOException,
-            InterruptedException {
-        final HttpResponse<byte[]> httpResponse = httpClient.send(HttpRequest.newBuilder()
-                .uri(URI.create(properties.getDomainBaseUri() + "/oauth/token"))
-                .header("Content-Type", "application/json")
-                .POST(ofByteArray(objectMapper.writeValueAsBytes(Auth0ManagementApiAccessTokenRequest.builder()
-                        .grantType("client_credentials")
-                        .clientId(properties.getClientId())
-                        .clientSecret(properties.getClientSecret())
-                        .audience(properties.getDomainBaseUri() + "/api/v2/")
-                        .build())))
-                .build(), HttpResponse.BodyHandlers.ofByteArray()
-        );
+    private Auth0ManagementApiAccessTokenResponse negotiateAuth0ManagementApiAccessToken() {
+        try {
+            final HttpResponse<byte[]> httpResponse = httpClient.send(HttpRequest.newBuilder()
+                    .uri(URI.create(properties.getDomainBaseUri() + "/oauth/token"))
+                    .header("Content-Type", "application/json")
+                    .POST(ofByteArray(objectMapper.writeValueAsBytes(Auth0ManagementApiAccessTokenRequest.builder()
+                            .grantType("client_credentials")
+                            .clientId(properties.getClientId())
+                            .clientSecret(properties.getClientSecret())
+                            .audience(properties.getDomainBaseUri() + "/api/v2/")
+                            .build())))
+                    .build(), HttpResponse.BodyHandlers.ofByteArray()
+            );
 
-        final int statusCode = httpResponse.statusCode();
-        if (statusCode != HttpStatus.OK.value()) {
-            throw OnlyDustException.internalServerError(("Error (status %d) when negotiating a new " +
-                                                         "management access token for Auth0 API: %s").formatted(statusCode, httpResponse.body()));
+            final int statusCode = httpResponse.statusCode();
+            if (statusCode != HttpStatus.OK.value()) {
+                throw OnlyDustException.internalServerError(("Error (status %d) when negotiating a new " +
+                                                             "management access token for Auth0 API: %s").formatted(statusCode, httpResponse.body()));
+            }
+
+            return objectMapper.readValue(httpResponse.body(), Auth0ManagementApiAccessTokenResponse.class);
+        } catch (Exception e) {
+            throw OnlyDustException.internalServerError("Failed to negotiate auth0 api access token", e);
         }
-
-        return objectMapper.readValue(httpResponse.body(), Auth0ManagementApiAccessTokenResponse.class);
     }
 }
