@@ -135,7 +135,7 @@ public class AccountBookAggregate implements AccountBook {
         pendingEvents.add(new IdentifiedAccountBookEvent<>(nextEventId(), now, event));
         incrementEventId();
         if (observer != null)
-            observer.on(id, now, result);
+            result.forEach(t -> observer.on(id, now, t));
 
         return result;
     }
