@@ -9,11 +9,13 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 
@@ -28,6 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TagAccounting
 public class SponsorsApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    ProjectFacadePort projectFacadePort;
+
     UserAuthHelper.AuthenticatedUser caller;
 
     @BeforeEach
@@ -222,6 +227,8 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 at("2024-08-03T00:00:00Z", () -> rewardHelper.cancel(project1Id, projectLead, reward6));
 
                 at("2024-08-15T00:00:00Z", () -> accountingHelper.pay(reward1, reward2, reward3, reward4, reward5));
+
+                projectFacadePort.refreshStats();
             }
 
             @Test

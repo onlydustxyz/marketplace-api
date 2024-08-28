@@ -60,4 +60,6 @@ public interface ProjectFacadePort {
     void updateProjectsTags();
 
     void refreshRecommendations();
+
+    void refreshStats();
 }

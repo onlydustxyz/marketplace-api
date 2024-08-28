@@ -38,6 +38,7 @@ application:
     boost-rewards-cron-expression: ${NODE_GUARDIANS_BOOST_REWARDS_CRON_EXPRESSION}
     send-summary-notifications-emails-cron-expression: "0 0 8 * * MON"
     refresh-project-recommendations-cron-expression: "0 0 0 * * *" # every day at 1:00am
+    refresh-project-stats: 300000 # 5 minutes
   sumsub:
     webhook:
       secret: ${SUMSUB_WEBHOOK_SECRET}
