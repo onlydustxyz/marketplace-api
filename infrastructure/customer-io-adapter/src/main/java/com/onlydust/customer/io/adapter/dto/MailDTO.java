@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
+import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
@@ -45,6 +46,19 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 notificationRecipient.email(),
                 summaryNotificationsDTO.title(),
                 summaryNotificationsDTO);
+    }
+
+    public static MailDTO<ProjectApplicationRefusedDTO> from(CustomerIOProperties customerIOProperties, SendableNotification notification,
+                                                             ApplicationRefused applicationRefused) {
+        final ProjectApplicationRefusedDTO projectApplicationRefusedDTO = ProjectApplicationRefusedDTO.fromEvent(notification.recipient().login(),
+                applicationRefused, customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getProjectApplicationRefusedEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                customerIOProperties.getOnlyDustMarketingEmail(),
+                notification.recipient().email(),
+                projectApplicationRefusedDTO.title(),
+                projectApplicationRefusedDTO
+        );
     }
 
     public record IdentifiersDTO(String id, String email) {

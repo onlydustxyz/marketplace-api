@@ -189,6 +189,7 @@ infrastructure:
     kyc-individual-verification-email-id: ${CUSTOMER_IO_KYC_INDIVIDUAL_VERIFICATION_EMAIL_ID}
     complete-your-billing-profile-email-id: ${CUSTOMER_IO_COMPLETE_YOUR_BILLING_PROFILE_EMAIL_ID}
     weekly-notifications-email-id: ${CUSTOMER_IO_WEEKLY_NOTIFICATIONS_EMAIL_ID}
+    project-application-refused-email-id: ${CUSTOMER_IO_APPLICATION_REFUSED_EMAIL_ID}
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}

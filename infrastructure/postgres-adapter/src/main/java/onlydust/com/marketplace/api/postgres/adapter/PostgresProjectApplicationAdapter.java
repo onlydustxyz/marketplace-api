@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
@@ -67,5 +68,14 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
     @Transactional
     public void deleteObsoleteApplications() {
         applicationRepository.deleteObsoleteApplications();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Application> findApplicationsOnIssueAndProject(GithubIssue.Id issueId, ProjectId projectId) {
+        return applicationRepository.findAllByProjectIdAndIssueId(projectId.value(), issueId.value())
+                .stream()
+                .map(ApplicationEntity::toDomain)
+                .toList();
     }
 }

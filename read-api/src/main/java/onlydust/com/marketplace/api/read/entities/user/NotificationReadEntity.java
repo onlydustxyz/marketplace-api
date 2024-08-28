@@ -20,6 +20,7 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdReso
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
+import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -138,6 +139,16 @@ public class NotificationReadEntity {
                     projectLinkReadEntity.slug(),
                     applicationAccepted.getIssue().id(),
                     applicationAccepted.getIssue().title()
+            ));
+        } else if (data.notification() instanceof ApplicationRefused applicationRefused) {
+            notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_REFUSED;
+            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationRefused.getProject().id())
+                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationRefused.getProject())));
+            notificationPageItemResponseData.setContributorProjectApplicationRefused(new NotificationContributorProjectApplicationRefused(
+                    projectLinkReadEntity.name(),
+                    projectLinkReadEntity.slug(),
+                    applicationRefused.getIssue().id(),
+                    applicationRefused.getIssue().title()
             ));
         } else if (data.notification() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
             notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED;

@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
+import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
@@ -94,6 +95,12 @@ public record SummaryNotificationsDTO(@NonNull String title,
                 return new SummaryNotificationDTO(
                         "Your application has been accepted",
                         "Your application for %s has been accepted".formatted(applicationAccepted.getIssue().title()),
+                        new ButtonDTO("See my applications", getMarketplaceMyApplicationsFromEnvironment(environment))
+                );
+            } else if (sendableNotification.data() instanceof ApplicationRefused applicationRefused) {
+                return new SummaryNotificationDTO(
+                        "Your application has been refused",
+                        "Your application for %s has been refused".formatted(applicationRefused.getIssue().title()),
                         new ButtonDTO("See my applications", getMarketplaceMyApplicationsFromEnvironment(environment))
                 );
             } else if (sendableNotification.data() instanceof CompleteYourBillingProfile completeYourBillingProfile) {

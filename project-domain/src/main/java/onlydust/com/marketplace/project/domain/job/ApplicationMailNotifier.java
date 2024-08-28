@@ -8,6 +8,7 @@ import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
+import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
@@ -65,5 +66,19 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
 
     @Override
     public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
+    }
+
+    @Override
+    public void onApplicationRefused(Application application) {
+        userStoragePort.getRegisteredUserByGithubId(application.applicantId()).ifPresent(applicant -> {
+            final var project = projectStoragePort.getById(application.projectId())
+                    .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));
+            final var issue = githubStoragePort.findIssueById(application.issueId())
+                    .orElseThrow(() -> notFound("Issue %s not found".formatted(application.issueId())));
+            notificationPort.push(applicant.id(), ApplicationRefused.builder()
+                    .project(NotificationProject.of(project))
+                    .issue(NotificationIssue.of(issue))
+                    .build());
+        });
     }
 }

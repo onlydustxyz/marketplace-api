@@ -5,6 +5,7 @@ import jakarta.persistence.EntityManager;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ApplicationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
@@ -365,6 +366,21 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 null
         ));
 
+        final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
+        applicationRepository.save(new ApplicationEntity(
+                UUID.randomUUID(),
+                ZonedDateTime.now(),
+                UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
+                pierre.user().getGithubUserId(),
+                Application.Origin.GITHUB,
+                1974125983L,
+                112L,
+                "My motivations 2",
+                null
+        ));
+
+
+
         githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
                 .withHeader("Authorization", matching("Bearer .*"))
                 .willReturn(aResponse()
@@ -453,6 +469,31 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application has been accepted!")))
         );
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getProjectApplicationRefusedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(pierre.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data", equalToJson("""
+                                {
+                                  "username" : "PierreOucif",
+                                  "title": "Issue application refused",
+                                  "description": "Thank you for your interest in project <b>Bretzel</b>.<br /><br />We wanted to inform you that the issue Test #7 you applied for <b>has been assigned to another candidate</b>. However, we encourage you to continue exploring other projects and applying to different opportunities that match your skills and interests.",
+                                  "button" : {
+                                                "text": "Explore more projects",
+                                                "link": "https://develop-app.onlydust.com/projects"
+                                              }
+                                }
+                                """, true, false)))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo("pierre.oucif@gadz.org")))
+                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Issue application refused")))
+        );
+
+
     }
 
     @Test
@@ -950,6 +991,22 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "pendingApplications": [
+                            {
+                              "applicant": {
+                                "githubUserId": 16590657,
+                                "login": "PierreOucif",
+                                "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4",
+                                "isRegistered": true
+                              },
+                              "project": {
+                                "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                "slug": "bretzel",
+                                "name": "Bretzel",
+                                "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                              },
+                              "motivations": "My motivations 2",
+                              "problemSolvingApproach": null
+                            },
                             {
                               "applicant": {
                                 "githubUserId": 16590657,

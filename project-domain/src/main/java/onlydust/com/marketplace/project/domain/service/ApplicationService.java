@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
@@ -78,6 +79,11 @@ public class ApplicationService implements ApplicationFacadePort {
 
         githubApiPort.assign(githubAppToken.token(), issue.repoId(), issue.number(), applicant.login());
         applicationObserver.onApplicationAccepted(application, userId);
+
+        projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), ProjectId.of(application.projectId()))
+                .stream()
+                .filter(a -> !a.applicantId().equals(application.applicantId()))
+                .forEach(applicationObserver::onApplicationRefused);
     }
 
     @Override
@@ -125,13 +131,13 @@ public class ApplicationService implements ApplicationFacadePort {
                 """.formatted(globalConfig.getAppBaseUrl(), project.getSlug());
 
         final var motivationsSection = """
-
+                
                 ### My background and how it can be leveraged
                 %s
                 """.formatted(motivations);
 
         final var problemSolvingApproachSection = (problemSolvingApproach == null || problemSolvingApproach.isBlank()) ? "" : """
-
+                
                 ### How I plan on tackling this issue
                 %s
                 """.formatted(problemSolvingApproach);
