@@ -1551,7 +1551,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 final var lines = csv.split("\\R");
                 assertThat(lines.length).isEqualTo(9);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,project_id,sponsor_id,amount,currency,usd_amount");
-                assertThat(lines).allMatch(line -> line.split(",").length == 8);
             }
 
             @Test

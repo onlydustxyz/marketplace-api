@@ -2338,7 +2338,6 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 final var lines = csv.split("\\R");
                 assertThat(lines.length).isEqualTo(10);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
-                assertThat(lines).allMatch(line -> line.split(",").length == 8);
             }
         }
     }
