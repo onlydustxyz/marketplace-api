@@ -49,28 +49,25 @@ public class Auth0UserInfoService {
             })
             .build();
 
-    public Auth0JwtClaims getUserInfo(String accessToken) throws IOException, InterruptedException {
-        final var userClaims = userInfoCache.getIfPresent(accessToken);
-        if (userClaims != null) {
-            return userClaims;
-        }
-
-        final var newUserClaims = fetchUserInfo(accessToken);
-        userInfoCache.put(accessToken, newUserClaims);
-        return newUserClaims;
+    public Auth0JwtClaims getUserInfo(String accessToken) throws IOException {
+        return userInfoCache.get(accessToken, this::fetchUserInfo);
     }
 
-    private Auth0JwtClaims fetchUserInfo(String accessToken) throws IOException, InterruptedException {
+    private Auth0JwtClaims fetchUserInfo(String accessToken) {
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(properties.userInfoUrl))
                 .header("Authorization", "Bearer " + accessToken)
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != 200)
-            throw OnlyDustException.internalServerError("Unable to get user info from Auth0: [%d] %s".formatted(response.statusCode(), response.body()));
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200)
+                throw OnlyDustException.internalServerError("Unable to get user info from Auth0: [%d] %s".formatted(response.statusCode(), response.body()));
 
-        return objectMapper.readValue(response.body(), Auth0JwtClaims.class);
+            return objectMapper.readValue(response.body(), Auth0JwtClaims.class);
+        } catch (Exception e) {
+            throw OnlyDustException.internalServerError("Failed to fetch user info from auth0", e);
+        }
     }
 
     private long getExpirationTime(String accessToken) {
