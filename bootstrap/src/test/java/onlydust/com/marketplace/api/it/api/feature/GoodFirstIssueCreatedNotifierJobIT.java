@@ -55,15 +55,15 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         final Long issueId13 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "COMPLETED", dummyContributor);
         final Long issueId14 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now().minusMinutes(6), null, "OPEN", dummyContributor);
         final Long issueId15 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
-        final Long issueId16 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
+        final Long issueId16= githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
         githubHelper.addLabelToIssue(issueId11, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId13, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId14, "good-First_ISSUE2", ZonedDateTime.now().minusMinutes(6));
         githubHelper.addLabelToIssue(issueId11, "JavaLover", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId15, "good-first-issue-10", ZonedDateTime.now());
+        githubHelper.assignIssueToContributor(issueId15, dummyContributor.user().getGithubUserId());
         githubHelper.addLabelToIssue(issueId16, "good-first-issue-20", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId16, "hackathon-gfi", ZonedDateTime.now());
-        githubHelper.assignIssueToContributor(issueId15, dummyContributor.user().getGithubUserId());
         hackathonHelper.createHackathon(Hackathon.Status.PUBLISHED, List.of("hackathon-gfi"), List.of(projectId1));
         final Long issueId21 = githubHelper.createIssue(repo2.getId(), ZonedDateTime.now().minusDays(1), null, "OPEN", dummyContributor);
         githubHelper.addLabelToIssue(issueId21, "GOOD-First_ISSUE", ZonedDateTime.now());
