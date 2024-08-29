@@ -5,10 +5,15 @@ import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransaction
 import onlydust.com.marketplace.api.infura.Web3Client;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransferTransaction;
+import org.web3j.utils.Convert;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Optional;
+
+import static org.web3j.utils.Convert.fromWei;
 
 @Slf4j
 public class Web3EvmTransactionStorageAdapter extends Web3Client implements BlockchainTransactionStoragePort<EvmTransaction, EvmTransaction.Hash> {
@@ -21,9 +26,13 @@ public class Web3EvmTransactionStorageAdapter extends Web3Client implements Bloc
         return getTransactionByHash(reference.toString()).getTransaction()
                 .map(tx -> {
                     final var block = getBlockByHash(tx.getBlockHash(), false).getBlock();
-                    return new EvmTransaction(
+                    return new EvmTransferTransaction(
+                            blockchain(),
                             Ethereum.transactionHash(tx.getHash()),
-                            Instant.ofEpochSecond(block.getTimestamp().longValue()).atZone(ZoneOffset.UTC));
+                            Instant.ofEpochSecond(block.getTimestamp().longValue()).atZone(ZoneOffset.UTC),
+                            Ethereum.accountAddress(tx.getFrom()),
+                            Ethereum.accountAddress(tx.getTo()),
+                            fromWei(BigDecimal.valueOf(tx.getValue().longValue()), Convert.Unit.ETHER));
                 });
     }
 }

@@ -25,7 +25,7 @@ public class DepositEntity {
     UUID id;
 
     @NonNull
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
     TransferTransactionEntity transaction;
 
     @NonNull
