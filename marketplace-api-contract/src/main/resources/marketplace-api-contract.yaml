@@ -9963,6 +9963,8 @@ components:
               $ref: '#/components/schemas/NotificationContributorProjectApplicationAccepted'
             contributorProjectApplicationRefused:
               $ref: '#/components/schemas/NotificationContributorProjectApplicationRefused'
+            contributorProjectGoodFirstIssueCreated:
+              $ref: '#/components/schemas/NotificationContributorProjectGoodFirstIssueCreated'
             globalBillingProfileReminder:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileReminder'
             globalBillingProfileVerificationRejected:
@@ -9995,6 +9997,7 @@ components:
         - CONTRIBUTOR_REWARDS_PAID
         - CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED
         - CONTRIBUTOR_PROJECT_APPLICATION_REFUSED
+        - CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED
         - GLOBAL_BILLING_PROFILE_REMINDER
         - GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED
         - GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED
@@ -10100,6 +10103,23 @@ components:
           type: number
 
     NotificationContributorProjectApplicationAccepted:
+      type: object
+      required:
+        - projectName
+        - projectSlug
+        - issueId
+        - issueName
+      properties:
+        projectName:
+          type: string
+        projectSlug:
+          $ref: '#/components/schemas/ProjectSlug'
+        issueId:
+          $ref: '#/components/schemas/IssueId'
+        issueName:
+          type: string
+
+    NotificationContributorProjectGoodFirstIssueCreated:
       type: object
       required:
         - projectName

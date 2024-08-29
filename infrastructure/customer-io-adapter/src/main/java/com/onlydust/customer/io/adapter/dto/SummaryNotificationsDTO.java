@@ -4,10 +4,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
+import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
@@ -102,6 +99,12 @@ public record SummaryNotificationsDTO(@NonNull String title,
                         "Your application has been refused",
                         "Your application for %s has been refused".formatted(applicationRefused.getIssue().title()),
                         new ButtonDTO("See my applications", getMarketplaceMyApplicationsFromEnvironment(environment))
+                );
+            } else if (sendableNotification.data() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
+                return new SummaryNotificationDTO(
+                        "New good first issue",
+                        "New good first issue %s on project %s".formatted(goodFirstIssueCreated.getIssue().title(), goodFirstIssueCreated.getProject().name()),
+                        new ButtonDTO("View issue", getMarketplaceFrontendUrlFromEnvironment(environment) + "p/" + goodFirstIssueCreated.getProject().slug())
                 );
             } else if (sendableNotification.data() instanceof CompleteYourBillingProfile completeYourBillingProfile) {
                 return new SummaryNotificationDTO(
