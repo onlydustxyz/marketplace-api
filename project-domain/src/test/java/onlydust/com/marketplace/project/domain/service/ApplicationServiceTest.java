@@ -54,7 +54,7 @@ public class ApplicationServiceTest {
             faker.rickAndMorty().quote(),
             faker.internet().url(),
             faker.rickAndMorty().character(),
-            0);
+            0, faker.pokemon().name(), faker.pokemon().name(), List.of());
     final GithubComment.Id commentId = GithubComment.Id.random();
     final String motivation = faker.lorem().sentence();
     final String problemSolvingApproach = faker.lorem().sentence();
@@ -110,7 +110,7 @@ public class ApplicationServiceTest {
                 faker.rickAndMorty().quote(),
                 faker.internet().url(),
                 faker.rickAndMorty().character(),
-                1)));
+                1, faker.pokemon().name(), faker.pokemon().name(), List.of())));
 
         // When
         assertThatThrownBy(() -> applicationService.applyOnProject(githubUserId, projectId, issue.id(), motivation, problemSolvingApproach))

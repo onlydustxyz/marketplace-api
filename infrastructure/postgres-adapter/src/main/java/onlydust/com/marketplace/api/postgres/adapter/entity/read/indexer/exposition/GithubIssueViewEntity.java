@@ -9,6 +9,8 @@ import org.hibernate.annotations.Immutable;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.Objects.isNull;
+
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -21,39 +23,21 @@ public class GithubIssueViewEntity {
     @EqualsAndHashCode.Include
     @NonNull
     Long id;
-
-    @ManyToOne
-    @NonNull
-    GithubRepoViewEntity repo;
     @NonNull
     Long number;
     @NonNull
     String title;
-    @Enumerated(EnumType.STRING)
-    @NonNull
-    Status status;
     @NonNull
     Date createdAt;
     Date closedAt;
-    @ManyToOne
-    GithubAccountViewEntity author;
     @NonNull
     String htmlUrl;
     String body;
     @NonNull
-    Integer commentsCount;
-    @NonNull
-    String repoOwnerLogin;
-    @NonNull
     String repoName;
     @NonNull
-    String repoHtmlUrl;
-    @NonNull
-    String authorLogin;
-    @NonNull
-    String authorHtmlUrl;
-    @NonNull
-    String authorAvatarUrl;
+    @Column(name = "repo_id")
+    Long repoId;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
     @JoinTable(
@@ -70,8 +54,12 @@ public class GithubIssueViewEntity {
             schema = "indexer_exp",
             joinColumns = @JoinColumn(name = "issue_id"),
             inverseJoinColumns = @JoinColumn(name = "label_id"))
-    @NonNull
     List<GithubLabelViewEntity> labels;
+
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", insertable = false, updatable = false)
+    @NonNull
+    GithubAccountViewEntity author;
 
     public enum Status {
         OPEN, COMPLETED, CANCELLED
@@ -79,12 +67,16 @@ public class GithubIssueViewEntity {
 
     public GithubIssue toDomain() {
         return new GithubIssue(GithubIssue.Id.of(id),
-                repo.id,
+                repoId,
                 number,
                 title,
                 body,
                 htmlUrl,
                 repoName,
-                assignees.size());
+                assignees.size(),
+                author.login(),
+                author.avatarUrl(),
+                isNull(labels) ? List.of() : labels.stream().map(GithubLabelViewEntity::getName).sorted(String::compareTo).toList()
+        );
     }
 }

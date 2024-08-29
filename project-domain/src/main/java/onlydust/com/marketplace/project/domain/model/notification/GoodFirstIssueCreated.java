@@ -1,23 +1,25 @@
-package onlydust.com.marketplace.project.domain.model.notification.dto;
+package onlydust.com.marketplace.project.domain.model.notification;
+
 
 import lombok.*;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationType;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationDetailedIssue;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@NotificationType("ApplicationRefused")
+@NotificationType("GoodFirstIssueCreated")
 @Builder
-public class ApplicationRefused extends NotificationData {
+public class GoodFirstIssueCreated extends NotificationData {
     @NonNull
     NotificationProject project;
     @NonNull
-    NotificationIssue issue;
+    NotificationDetailedIssue issue;
 
-    @Override
     public NotificationCategory category() {
         return NotificationCategory.CONTRIBUTOR_PROJECT;
     }

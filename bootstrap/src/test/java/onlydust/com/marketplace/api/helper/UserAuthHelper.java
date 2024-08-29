@@ -35,7 +35,7 @@ public class UserAuthHelper {
 
     public AuthenticatedUser create() {
         return signUpUser(
-                faker.random().nextLong(),
+                faker.random().nextLong(10000),
                 faker.internet().slug(),
                 faker.internet().avatar(),
                 false);

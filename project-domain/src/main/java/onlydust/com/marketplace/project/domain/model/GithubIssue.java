@@ -2,6 +2,8 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.NonNull;
 
+import java.util.List;
+
 public record GithubIssue(@NonNull Id id,
                           @NonNull Long repoId,
                           @NonNull Long number,
@@ -9,7 +11,10 @@ public record GithubIssue(@NonNull Id id,
                           String description,
                           @NonNull String htmlUrl,
                           @NonNull String repoName,
-                          int assigneeCount) {
+                          int assigneeCount,
+                          String authorLogin,
+                          String authorAvatarUrl,
+                          List<String> labels) {
     public boolean isAssigned() {
         return assigneeCount > 0;
     }

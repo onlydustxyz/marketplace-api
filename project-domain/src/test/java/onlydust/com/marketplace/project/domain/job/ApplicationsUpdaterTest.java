@@ -49,7 +49,7 @@ class ApplicationsUpdaterTest {
             faker.rickAndMorty().quote(),
             faker.internet().url(),
             faker.rickAndMorty().character(),
-            0);
+            0, faker.pokemon().name(), faker.pokemon().name(), List.of());
 
     @BeforeEach
     void setup() {
@@ -154,7 +154,7 @@ class ApplicationsUpdaterTest {
                     faker.rickAndMorty().quote(),
                     faker.internet().url(),
                     faker.rickAndMorty().character(),
-                    1)));
+                    1, faker.pokemon().name(), faker.pokemon().name(), List.of())));
 
             // When
             applicationsUpdater.process(event);
@@ -223,7 +223,7 @@ class ApplicationsUpdaterTest {
                     .createdAt(faker.date().birthday().toInstant().atZone(ZoneOffset.UTC))
                     .body("""
                             > Can I work on this ?
-
+                            
                             Yeah sure!
                             """)
                     .build());

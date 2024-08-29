@@ -46,7 +46,10 @@ class ApplicationMailNotifierTest {
             faker.lorem().paragraph(),
             faker.internet().url(),
             faker.lordOfTheRings().character(),
-            faker.number().randomDigit()
+            faker.number().randomDigit(),
+            faker.rickAndMorty().character(),
+            faker.rickAndMorty().location(),
+            List.of()
     );
 
     @BeforeEach

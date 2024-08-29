@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsForProjectEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.OnboardingEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
@@ -16,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeade
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -54,6 +56,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     private final CurrencyRepository currencyRepository;
     private final BillingProfileUserRepository billingProfileUserRepository;
     private final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository;
+    private final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -287,5 +290,14 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     public Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId) {
         return githubUserWithTelegramQueryRepository.findByUserId(userId)
                 .map(GithubUserWithTelegramQueryEntity::toDomain);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(UUID projectId) {
+        return notificationSettingsForProjectRepository.findAllByProjectIdAndOnGoodFirstIssueAdded(projectId, true).stream()
+                .map(NotificationSettingsForProjectEntity::getUserId)
+                .map(UserId::of)
+                .toList();
     }
 }

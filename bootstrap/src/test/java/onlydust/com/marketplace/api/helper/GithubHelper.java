@@ -7,6 +7,7 @@ import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -103,6 +104,89 @@ public class GithubHelper {
                 insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state) 
                 values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED') 
                 """, parameters);
+    }
+
+    public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
+        final var parameters = new HashMap<String, Object>();
+        final Long issueId = faker.random().nextLong(1000);
+        parameters.put("id", issueId);
+        parameters.put("repoId", repoId);
+        parameters.put("number", faker.random().nextInt(10));
+        parameters.put("title", faker.lorem().sentence());
+        parameters.put("body", faker.lorem().sentence());
+        parameters.put("status", status);
+        parameters.put("commentsCount", faker.random().nextInt(10));
+        parameters.put("createdAt", createdAt);
+        parameters.put("closedAt", closedAt);
+        parameters.put("authorId", contributor.user().getGithubUserId());
+        parameters.put("htmlUrl", faker.internet().url());
+        parameters.put("repoOwnerLogin", faker.lorem().word());
+        parameters.put("repoName", faker.lorem().word());
+        parameters.put("repoHtmlUrl", faker.internet().url());
+        parameters.put("authorLogin", faker.rickAndMorty().character());
+        parameters.put("authorHtmlUrl", faker.internet().url());
+        parameters.put("authorAvatarUrl", faker.internet().url());
+        parameters.put("contributorId", contributor.user().getGithubUserId());
+        parameters.put("contributorLogin", contributor.user().getGithubLogin());
+        parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
+        parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
+
+
+        databaseHelper.executeQuery(
+                """
+                                INSERT INTO indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
+                                VALUES (:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
+                                ON CONFLICT DO NOTHING;
+                        
+                                INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
+                                VALUES (:id, :repoId, :number, :title, cast(:status as indexer_exp.github_issue_status), :createdAt, :closedAt, :authorId, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :authorLogin, :authorHtmlUrl, :authorAvatarUrl);
+                        """,
+                parameters
+        );
+        return issueId;
+    }
+
+    public void addLabelToIssue(Long issueId, String label, ZonedDateTime addedToIssueAt) {
+        final var labelParameters = new HashMap<String, Object>();
+        labelParameters.put("id", faker.random().nextInt(200));
+        labelParameters.put("label", label);
+        labelParameters.put("description", faker.lorem().sentence());
+
+        databaseHelper.executeQuery(
+                """
+                        INSERT INTO indexer_exp.github_labels (id, name, description)
+                        VALUES (:id, :label, :description)
+                        ON CONFLICT DO NOTHING;
+                        """,
+                labelParameters
+        );
+
+        final var issueLabelParameters = new HashMap<String, Object>();
+        issueLabelParameters.put("issueId", issueId);
+        issueLabelParameters.put("label", label);
+        issueLabelParameters.put("createdAt", addedToIssueAt);
+        issueLabelParameters.put("updatedAt", addedToIssueAt);
+        databaseHelper.executeQuery(
+                """
+                                    INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id, tech_created_at, tech_updated_at)
+                                    SELECT :issueId, gl.id, :createdAt, :updatedAt
+                                    FROM indexer_exp.github_labels gl
+                                    WHERE gl.name = :label
+                        """,
+                issueLabelParameters
+        );
+    }
+
+    public void assignIssueToContributor(Long issueId, Long contributorId) {
+        final var parameters = new HashMap<String, Object>();
+        parameters.put("contributorId", contributorId);
+        parameters.put("issueId", issueId);
+
+        databaseHelper.executeQuery(
+                """
+                        INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (:issueId, :contributorId);
+                        """, parameters
+        );
     }
 
 }
