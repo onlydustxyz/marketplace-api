@@ -7,9 +7,7 @@ import onlydust.com.backoffice.api.contract.model.PostBatchPaymentRequest;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.AccountingHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
@@ -20,6 +18,8 @@ import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfile
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -806,19 +806,19 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                                 "sentBy": "AnthonyBuisset"
                               },
                               {
-                                "id": "#E33EA",
-                                "projectName": "kaaper",
-                                "currency": "USDC",
-                                "amount": "1000.000",
-                                "contributionsNumber": "85",
-                                "sentBy": "AnthonyBuisset"
-                              },
-                              {
                                 "id": "#D22F7",
                                 "projectName": "kaaper",
                                 "currency": "USDC",
                                 "amount": "1000.000",
                                 "contributionsNumber": "79",
+                                "sentBy": "AnthonyBuisset"
+                              },
+                              {
+                                "id": "#E33EA",
+                                "projectName": "kaaper",
+                                "currency": "USDC",
+                                "amount": "1000.000",
+                                "contributionsNumber": "85",
                                 "sentBy": "AnthonyBuisset"
                               }
                             ],
