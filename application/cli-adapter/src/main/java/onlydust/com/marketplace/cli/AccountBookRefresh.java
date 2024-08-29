@@ -66,7 +66,7 @@ public class AccountBookRefresh implements CommandLineRunner {
         public void refresh(List<IdentifiedAccountBookEvent> events, AccountBookProjector projector) {
             events.forEach(e -> {
                 final var transactions = receive((IdentifiedAccountBookEvent<List<Transaction>>) e);
-                projector.on(id(), e.timestamp(), transactions);
+                transactions.forEach(t -> projector.on(id(), e.timestamp(), t));
             });
         }
     }

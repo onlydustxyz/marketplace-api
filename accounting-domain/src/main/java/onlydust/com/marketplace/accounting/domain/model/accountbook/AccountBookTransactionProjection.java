@@ -39,10 +39,6 @@ public class AccountBookTransactionProjection {
         return left == null ? right : left.amount(left.amount().add(right.amount()));
     }
 
-    public String key() {
-        return "%s-%s-%s-%s-%s-%s-%s".formatted(currencyId, type, sponsorId, programId, projectId, rewardId, paymentId);
-    }
-
     private AccountBookTransactionProjection with(final @NonNull List<AccountBook.AccountId> path) {
         path.forEach(this::with);
         return this;

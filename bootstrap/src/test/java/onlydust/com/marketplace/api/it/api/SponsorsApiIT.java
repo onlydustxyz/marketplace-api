@@ -9,13 +9,18 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Month;
 import java.util.Map;
 
@@ -25,6 +30,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TagAccounting
 public class SponsorsApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    ProjectFacadePort projectFacadePort;
+
     UserAuthHelper.AuthenticatedUser caller;
 
     @BeforeEach
@@ -108,6 +116,47 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
             ;
         }
 
+        @Test
+        void should_get_sponsor_transactions() {
+            // When
+            client.get()
+                    .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 0,
+                              "totalItemNumber": 0,
+                              "hasMore": false,
+                              "nextPageIndex": 0,
+                              "transactions": []
+                            }
+                            """);
+        }
+
+        @Test
+        void should_get_sponsor_transactions_in_csv() {
+            // When
+            final var csv = client.get()
+                    .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.ACCEPT, "text/csv")
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+
+            final var lines = new String(csv).split("\\R");
+            assertThat(lines.length).isEqualTo(1);
+            assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+        }
+
         @Nested
         class GivenSomeTransactions {
             Program program;
@@ -134,12 +183,12 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     accountingHelper.unallocate(program.id(), sponsor.id(), 700, USDC);
                 });
 
-                at("2024-02-03T00:00:00Z", () -> {
+                at("2024-02-01T00:00:00Z", () -> {
                     accountingHelper.createSponsorAccount(sponsor.id(), 12, ETH);
                     accountingHelper.allocate(sponsor.id(), program.id(), 12, ETH);
                 });
 
-                at("2024-02-03T00:00:00Z", () -> {
+                at("2024-02-04T00:00:00Z", () -> {
                     accountingHelper.createSponsorAccount(sponsor.id(), 2_000, USDC);
                     accountingHelper.allocate(sponsor.id(), anotherProgram.id(), 1_500, USDC);
                 });
@@ -178,6 +227,8 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 at("2024-08-03T00:00:00Z", () -> rewardHelper.cancel(project1Id, projectLead, reward6));
 
                 at("2024-08-15T00:00:00Z", () -> accountingHelper.pay(reward1, reward2, reward3, reward4, reward5));
+
+                projectFacadePort.refreshStats();
             }
 
             @Test
@@ -622,7 +673,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": 5
+                                      "transactionCount": 4
                                     },
                                     {
                                       "date": "2024-03-01",
@@ -1808,7 +1859,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
             @Test
             void should_get_sponsor_monthly_transactions_stats_filtered_by_search() {
-                final var search = program.name().split(" ")[0];
+                final var search = URLEncoder.encode(program.name().split(" ")[0], StandardCharsets.UTF_8);
 
                 // When
                 client.get()
@@ -1852,7 +1903,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     }
                     case ALLOCATED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(3);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
                     case RETURNED -> {
@@ -2090,6 +2141,211 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                 """)
                 ;
             }
+
+            @Test
+            void should_get_sponsor_transactions() {
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                        .expectBody()
+                        .jsonPath("$.transactions[1].program.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[2].program.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[4].program.id").isEqualTo(program.id().toString())
+                        .json("""
+                                {
+                                  "totalPageNumber": 2,
+                                  "totalItemNumber": 9,
+                                  "hasMore": true,
+                                  "nextPageIndex": 1,
+                                  "transactions": [
+                                    {
+                                      "date": "2024-01-01T00:00:00Z",
+                                      "type": "DEPOSITED",
+                                      "program": null,
+                                      "amount": {
+                                        "amount": 2200,
+                                        "prettyAmount": 2200,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 2222.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": "COMPLETED"
+                                    },
+                                    {
+                                      "date": "2024-01-01T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 2200,
+                                        "prettyAmount": 2200,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 2222.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-01-15T00:00:00Z",
+                                      "type": "RETURNED",
+                                      "amount": {
+                                        "amount": 700,
+                                        "prettyAmount": 700,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 707.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-02-01T00:00:00Z",
+                                      "type": "DEPOSITED",
+                                      "program": null,
+                                      "amount": {
+                                        "amount": 12,
+                                        "prettyAmount": 12,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 21383.81,
+                                        "usdConversionRate": 1781.983987
+                                      },
+                                      "depositStatus": "COMPLETED"
+                                    },
+                                    {
+                                      "date": "2024-02-01T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 12,
+                                        "prettyAmount": 12,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 21383.81,
+                                        "usdConversionRate": 1781.983987
+                                      },
+                                      "depositStatus": null
+                                    }
+                                  ]
+                                }
+                                """);
+            }
+
+            @Test
+            void should_get_sponsor_transactions_filtered_by_date() {
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "fromDate", "2024-01-01",
+                                "toDate", "2024-01-31"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(3)
+                        .jsonPath("$.transactions[?(@.date < '2024-01-01')]").doesNotExist()
+                        .jsonPath("$.transactions[?(@.date > '2024-02-01')]").doesNotExist();
+            }
+
+            @Test
+            void should_get_sponsor_transactions_filtered_by_search() {
+                // Given
+                final var search = URLEncoder.encode(program.name().split(" ")[0], StandardCharsets.UTF_8);
+
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id()), Map.of(
+                                "pageIndex", "0",
+                                "pageSize", "5",
+                                "search", search
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(3)
+                        .jsonPath("$.transactions[?(@.program.id != '%s')]".formatted(program.id())).doesNotExist();
+            }
+
+            @ParameterizedTest
+            @EnumSource(SponsorTransactionType.class)
+            void should_get_sponsor_transactions_filtered_by_types(SponsorTransactionType type) {
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id()), Map.of(
+                                "types", type.name()
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
+                            case DEPOSITED -> 4;
+                            case ALLOCATED -> 4;
+                            case RETURNED -> 1;
+                        })
+                        .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
+            }
+
+            @Test
+            void should_get_sponsor_transactions_in_csv() {
+                // When
+                final var csv = client.get()
+                        .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .header(HttpHeaders.ACCEPT, "text/csv")
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody(String.class)
+                        .returnResult().getResponseBody();
+
+                final var lines = csv.split("\\R");
+                assertThat(lines.length).isEqualTo(10);
+                assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
+            }
         }
     }
 
@@ -2119,6 +2375,18 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(SPONSOR_STATS_TRANSACTIONS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isUnauthorized();
+        }
+
+        @Test
+        void should_be_unauthorized_getting_sponsor_transactions() {
+            // When
+            client.get()
+                    .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then

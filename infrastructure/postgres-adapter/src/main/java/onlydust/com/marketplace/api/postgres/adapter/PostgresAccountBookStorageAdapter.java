@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookEnt
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.AccountBookTransactionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.AccountBookTransactionRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -19,8 +20,21 @@ public class PostgresAccountBookStorageAdapter implements AccountBookStorage {
     private final @NonNull AccountBookTransactionRepository accountBookTransactionRepository;
 
     @Override
+    @Transactional
     public void save(AccountBookTransactionProjection projection) {
-        accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection));
+        accountBookTransactionRepository.findByTimestampAndTypeAndCurrencyIdAndSponsorIdAndProgramIdAndProjectIdAndRewardIdAndPaymentId(
+                projection.timestamp(),
+                projection.type(),
+                projection.currencyId().value(),
+                projection.sponsorId().value(),
+                projection.programId() == null ? null : projection.programId().value(),
+                projection.projectId() == null ? null : projection.projectId().value(),
+                projection.rewardId() == null ? null : projection.rewardId().value(),
+                projection.paymentId() == null ? null : projection.paymentId().value()
+        ).ifPresentOrElse(
+                entity -> entity.amount(entity.amount().add(projection.amount().getValue())),
+                () -> accountBookTransactionRepository.save(AccountBookTransactionEntity.fromDomain(projection))
+        );
     }
 
     @Override

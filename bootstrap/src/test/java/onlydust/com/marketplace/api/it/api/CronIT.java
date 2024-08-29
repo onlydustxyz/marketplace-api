@@ -23,6 +23,7 @@ public class CronIT extends AbstractMarketplaceApiIT {
         assertDoesNotThrow(() -> userFacadePort.refreshUserRanksAndStats());
         assertDoesNotThrow(() -> languageFacadePort.updateProjectsLanguages());
         assertDoesNotThrow(() -> projectFacadePort.refreshRecommendations());
+        assertDoesNotThrow(() -> projectFacadePort.refreshStats());
     }
 
     @Test

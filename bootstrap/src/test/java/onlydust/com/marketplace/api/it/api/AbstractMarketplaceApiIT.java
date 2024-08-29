@@ -166,6 +166,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String SPONSOR_ALLOCATE = "/api/v1/sponsors/%s/allocate";
     protected static final String SPONSOR_UNALLOCATE = "/api/v1/sponsors/%s/unallocate";
     protected static final String SPONSOR_STATS_TRANSACTIONS = "/api/v1/sponsors/%s/stats/transactions";
+    protected static final String SPONSOR_TRANSACTIONS = "/api/v1/sponsors/%s/transactions";
     protected static final String HACKATHONS = "/api/v1/hackathons";
     protected static final String HACKATHONS_BY_SLUG = "/api/v1/hackathons/slug/%s";
     protected static final String HACKATHON_BY_ID_PROJECT_ISSUES = "/api/v1/hackathons/%s/project-issues";

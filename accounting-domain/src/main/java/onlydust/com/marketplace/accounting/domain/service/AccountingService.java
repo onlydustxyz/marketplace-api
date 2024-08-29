@@ -69,46 +69,18 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void allocate(final SponsorId from, final ProgramId to, final PositiveAmount amount, final Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency).state();
+        final var sponsorAccountIds = sponsorAccountStorage.find(from, currencyId).stream()
+                .map(SponsorAccount::id)
+                .toList();
 
-        final var sponsorAccounts = sponsorAccountStorage.find(from, currencyId).iterator();
-        var remainingAmount = amount;
-        while (remainingAmount.isStrictlyPositive() && sponsorAccounts.hasNext()) {
-            final var sponsorAccount = sponsorAccounts.next();
-            final var allocatedAmount = PositiveAmount.min(remainingAmount, accountBook.balanceOf(AccountId.of(sponsorAccount.id())));
-
-            if (allocatedAmount.isStrictlyPositive()) {
-                transfer(sponsorAccount.id(), to, allocatedAmount, currencyId);
-                remainingAmount = PositiveAmount.of(remainingAmount.subtract(allocatedAmount));
-            }
-        }
-        if (remainingAmount.isStrictlyPositive()) {
-            throw badRequest("Not enough funds to allocate %s to program %s".formatted(amount, to));
-        }
+        transfer(sponsorAccountIds, to, amount, currencyId);
     }
 
     @Override
     @Transactional
     public void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var currency = getCurrency(currencyId);
-        final var accountBook = getAccountBook(currency).state();
-        final var transferredAmount = accountBook.transferredAmountPerOrigin(AccountId.of(from));
-
-        final var sponsorAccounts = reversed(sponsorAccountStorage.find(to, currencyId)).iterator();
-        var remainingAmount = amount;
-        while (remainingAmount.isStrictlyPositive() && sponsorAccounts.hasNext()) {
-            final var sponsorAccount = sponsorAccounts.next();
-            final var unallocatedAmount = PositiveAmount.min(remainingAmount, transferredAmount.getOrDefault(AccountId.of(sponsorAccount.id()),
-                    PositiveAmount.ZERO));
-            if (unallocatedAmount.isStrictlyPositive()) {
-                refund(from, sponsorAccount.id(), unallocatedAmount, currencyId);
-                remainingAmount = PositiveAmount.of(remainingAmount.subtract(unallocatedAmount));
-            }
-        }
-        if (remainingAmount.isStrictlyPositive()) {
-            throw badRequest("Not enough funds to unallocate %s from program %s".formatted(amount, from));
-        }
+        final var sponsorAccountIds = reversed(sponsorAccountStorage.find(to, currencyId)).stream().map(SponsorAccount::id).toList();
+        refund(from, sponsorAccountIds, amount, currencyId);
     }
 
     private static <T> List<T> reversed(List<T> list) {
@@ -147,7 +119,7 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     @Transactional
     public void createReward(ProjectId from, RewardId to, PositiveAmount amount, Currency.Id currencyId) {
-        final var accountBookState = transfer(from, to, amount, currencyId);
+        final var accountBookState = transfer(List.of(from), to, amount, currencyId);
         final var accountBookFacade = new AccountBookFacade(sponsorAccountStorage, accountBookState);
         rewardStatusFacadePort.create(accountBookFacade, to);
         accountingObserver.onRewardCreated(to, accountBookFacade);
@@ -326,7 +298,11 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
+        if (from instanceof List froms)
+            accountBook.transfer(froms.stream().map(AccountId::of).toList(), AccountId.of(to), amount);
+        else
+            accountBook.transfer(AccountId.of(from), AccountId.of(to), amount);
+
         saveAccountBook(currency, accountBook);
         return accountBook.state();
     }
@@ -335,7 +311,11 @@ public class AccountingService implements AccountingFacadePort {
         final var currency = getCurrency(currencyId);
         final var accountBook = getAccountBook(currency);
 
-        accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
+        if (to instanceof List tos)
+            accountBook.refund(AccountId.of(from), tos.stream().map(AccountId::of).toList(), amount);
+        else
+            accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
+        
         saveAccountBook(currency, accountBook);
         return accountBook.state();
     }

@@ -133,6 +133,12 @@ public class JobScheduler {
         projectFacadePort.refreshRecommendations();
     }
 
+    @Scheduled(fixedDelayString = "${application.cron.refresh-project-stats}")
+    public void refreshProjectStats() {
+        LOGGER.info("Refresh project stats");
+        projectFacadePort.refreshStats();
+    }
+
     @Scheduled(fixedDelayString = "${application.cron.cleanup-obsolete-applications}")
     public void cleanUpObsoleteApplications() {
         LOGGER.info("Cleanup obsolete applications");
