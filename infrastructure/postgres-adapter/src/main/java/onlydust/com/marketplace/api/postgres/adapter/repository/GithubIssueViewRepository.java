@@ -24,6 +24,7 @@ public interface GithubIssueViewRepository extends Repository<GithubIssueViewEnt
               and (gil.tech_created_at >= :now at time zone :timezone - interval '5 minutes' or gi.created_at >= :now at time zone :timezone - interval '5 minutes')
               and gi.status = 'OPEN'
               and gia.user_id is null
+              and NOT exists(SELECT 1 FROM hackathon_issues hi WHERE hi.issue_id = gi.id)
             """, nativeQuery = true)
     List<GithubIssueViewEntity> findAllGoodFirstIssuesCreatedSince5Minutes(ZonedDateTime now, String timezone);
 
