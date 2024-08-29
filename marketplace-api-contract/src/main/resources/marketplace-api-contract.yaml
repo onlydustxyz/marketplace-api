@@ -4837,6 +4837,25 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/currencies:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadCurrency
+      summary: List all supported currencies
+      operationId: listCurrencies
+      description: List all supported currencies with their supported networks and corresponding OnlyDust wallet address
+      responses:
+        "200":
+          description: 'List of all supported currencies'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportedCurrencyListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -4954,6 +4973,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ShortCurrencyResponse'
+
+    SupportedCurrencyListResponse:
+      type: object
+      description: List of currencies with their supported networks
+      required:
+        - currencies
+      properties:
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportedCurrencyResponse'
 
 
     # VALUE OBJECTS ==================================================================
@@ -7286,6 +7316,26 @@ components:
           format: uri
         decimals:
           type: integer
+
+    SupportedCurrencyResponse:
+      allOf:
+        - $ref: '#/components/schemas/ShortCurrencyResponse'
+        - type: object
+          required:
+            - symbol
+          properties:
+            onlyDustWallets:
+              type: array
+              items:
+                $ref: '#/components/schemas/OnlyDustWalletResponse'
+
+    OnlyDustWalletResponse:
+      type: object
+      properties:
+        address:
+          type: string
+        network:
+          $ref: '#/components/schemas/NetworkContract'
 
     ContributionPageResponse:
       allOf:

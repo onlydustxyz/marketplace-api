@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccoun
 import onlydust.com.marketplace.api.infura.adapters.EthWeb3EnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidatorAdapter;
+import onlydust.com.marketplace.api.read.adapters.ReadCurrencyApiPostgresAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
@@ -17,6 +18,7 @@ import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -171,5 +173,11 @@ public class AccountingConfiguration {
     @Bean
     public BillingProfileVerificationRejectionReasonFacadePort billingProfileVerificationRejectionReasonFacadePort(final BillingProfileStoragePort billingProfileStoragePort) {
         return new BillingProfileVerificationRejectionReasonService(billingProfileStoragePort);
+    }
+
+    @Bean
+    @ConfigurationProperties(value = "application.onlydust-wallets", ignoreUnknownFields = false)
+    public ReadCurrencyApiPostgresAdapter.OnlyDustWallets onlyDustWallets() {
+        return new ReadCurrencyApiPostgresAdapter.OnlyDustWallets();
     }
 }
