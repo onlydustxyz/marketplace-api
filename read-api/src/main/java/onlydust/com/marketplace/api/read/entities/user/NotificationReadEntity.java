@@ -10,17 +10,12 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
 import onlydust.com.marketplace.api.read.repositories.ProjectLinkReadRepository;
-import onlydust.com.marketplace.api.read.repositories.PublicProjectReadRepository;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdResolver;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
+import onlydust.com.marketplace.project.domain.model.notification.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -149,6 +144,16 @@ public class NotificationReadEntity {
                     projectLinkReadEntity.slug(),
                     applicationRefused.getIssue().id(),
                     applicationRefused.getIssue().title()
+            ));
+        } else if (data.notification() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
+            notificationType = NotificationType.CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED;
+            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(goodFirstIssueCreated.getProject().id())
+                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(goodFirstIssueCreated.getProject())));
+            notificationPageItemResponseData.setContributorProjectGoodFirstIssueCreated(new NotificationContributorProjectGoodFirstIssueCreated(
+                    projectLinkReadEntity.name(),
+                    projectLinkReadEntity.slug(),
+                    goodFirstIssueCreated.getIssue().id(),
+                    goodFirstIssueCreated.getIssue().title()
             ));
         } else if (data.notification() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
             notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED;

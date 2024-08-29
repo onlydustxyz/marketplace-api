@@ -43,4 +43,6 @@ public class CustomerIOProperties {
     Integer weeklyNotificationsEmailId;
     @NonNull
     Integer projectApplicationRefusedEmailId;
+    @NonNull
+    Integer issueCreatedEmailId;
 }

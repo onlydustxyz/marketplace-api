@@ -434,4 +434,12 @@ public class ProjectConfiguration {
     public ProgramFacadePort programFacadePort(final ProgramStoragePort programStoragePort) {
         return new ProgramService(programStoragePort);
     }
+
+    @Bean
+    public GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob(final GithubStoragePort githubStoragePort,
+                                                                             final ProjectStoragePort projectStoragePort,
+                                                                             final UserStoragePort userStoragePort,
+                                                                             final NotificationPort notificationPort) {
+        return new GoodFirstIssueCreatedNotifierJob(githubStoragePort, projectStoragePort, userStoragePort, notificationPort);
+    }
 }

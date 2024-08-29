@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
+import onlydust.com.marketplace.project.domain.job.GoodFirstIssueCreatedNotifierJob;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.LanguageFacadePort;
@@ -39,6 +40,7 @@ public class JobScheduler {
     private final ApplicationsCleaner applicationsCleaner;
     private final BillingProfileFacadePort billingProfileFacadePort;
     private final NotificationSummaryEmailJob notificationSummaryEmailJob;
+    private final GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob;
 
     @Scheduled(fixedDelayString = "${application.cron.indexer-sync-job-delay}")
     public void processPendingIndexerApiCalls() {
@@ -155,5 +157,10 @@ public class JobScheduler {
         notificationSummaryEmailJob.run();
     }
 
+    @Scheduled(fixedDelayString = "${application.cron.notify-good-first-issues-created-job-delay}")
+    public void notifyGoodFirstIssuesCreated() {
+        LOGGER.info("Notify good first issues created");
+        goodFirstIssueCreatedNotifierJob.run();
+    }
 
 }

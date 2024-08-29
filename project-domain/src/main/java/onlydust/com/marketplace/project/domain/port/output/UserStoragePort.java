@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Contributor;
@@ -52,4 +53,6 @@ public interface UserStoragePort {
     void historizeUserRanks();
 
     Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId);
+
+    List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(UUID projectId);
 }

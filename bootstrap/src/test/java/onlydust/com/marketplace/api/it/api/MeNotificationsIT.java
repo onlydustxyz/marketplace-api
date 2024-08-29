@@ -15,10 +15,8 @@ import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
+import onlydust.com.marketplace.project.domain.model.notification.*;
+import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationDetailedIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
@@ -110,6 +108,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "bbb", "bBb"))
                 .build());
+        notificationService.push(hayden.user().getId(), GoodFirstIssueCreated.builder()
+                .project(new NotificationProject(bretzel, "bbb", "bBb"))
+                .issue(new NotificationDetailedIssue(1111L, faker.internet().url(), "gfi-1", faker.rickAndMorty().character(), null, faker.pokemon().name(),
+                        faker.internet().url(), List.of()))
+                .build());
 
         // When
         client.get()
@@ -123,10 +126,33 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 9,
+                          "totalItemNumber": 10,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": {
+                                  "projectName": "Bretzel",
+                                  "projectSlug": "bretzel",
+                                  "issueId": 1111,
+                                  "issueName": "gfi-1"
+                                },
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_PROJECT_APPLICATION_REFUSED",
@@ -144,6 +170,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueId": 2,
                                   "issueName": "title2"
                                 },
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -161,6 +188,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": {
@@ -186,6 +214,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueName": "title1"
                                 },
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -206,6 +235,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -230,6 +260,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -252,6 +283,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -273,6 +305,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -297,6 +330,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -317,6 +351,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -338,10 +373,33 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 9,
+                          "totalItemNumber": 10,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": {
+                                  "projectName": "Bretzel",
+                                  "projectSlug": "bretzel",
+                                  "issueId": 1111,
+                                  "issueName": "gfi-1"
+                                },
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_PROJECT_APPLICATION_REFUSED",
@@ -359,6 +417,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueId": 2,
                                   "issueName": "title2"
                                 },
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -376,6 +435,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": {
@@ -401,6 +461,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "issueName": "title1"
                                 },
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -421,6 +482,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -445,6 +507,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -467,6 +530,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -488,6 +552,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -512,6 +577,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -532,6 +598,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorRewardsPaid": null,
                                 "contributorProjectApplicationAccepted": null,
                                 "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null
@@ -573,7 +640,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 9
+                              "count": 10
                             }
                         """);
 
@@ -588,7 +655,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 9
+                              "count": 10
                             }
                         """);
 
@@ -757,6 +824,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .billingProfileName("bpPierreRejected2")
                 .rejectionReason("rejectionReason3")
                 .build());
+        notificationService.push(pierre.user().getId(), GoodFirstIssueCreated.builder()
+                .project(new NotificationProject(bretzel, "ddd", "DDD"))
+                .issue(new NotificationDetailedIssue(22L, faker.rickAndMorty().character(), "gfi-2", faker.rickAndMorty().character(), null,
+                        faker.pokemon().name(), faker.internet().url(), List.of()))
+                .build());
 
         // When
         notificationSummaryEmailJob.run();
@@ -804,6 +876,14 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                          "button": {
                                            "text": "Resume verification",
                                            "link": "https://develop-app.onlydust.com/settings/billing/069632d9-6fa2-46d9-80e8-608661309e64/general-information"
+                                         }
+                                       },
+                                       {
+                                         "title" : "New good first issue",
+                                         "description" : "New good first issue gfi-2 on project DDD",
+                                         "button" : {
+                                           "text" : "View issue",
+                                           "link" : "https://develop-app.onlydust.com/p/ddd"
                                          }
                                        }
                                      ]

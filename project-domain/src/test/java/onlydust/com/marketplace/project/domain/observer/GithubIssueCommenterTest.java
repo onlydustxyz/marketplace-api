@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -90,7 +91,11 @@ class GithubIssueCommenterTest {
                 faker.rickAndMorty().quote(),
                 faker.internet().url(),
                 faker.rickAndMorty().character(),
-                0);
+                0,
+                faker.lordOfTheRings().location(),
+                faker.lorem().sentence(),
+                List.of()
+                );
 
         final Project project = Project.builder()
                 .id(UUID.randomUUID())

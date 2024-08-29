@@ -17,4 +17,6 @@ public interface GithubStoragePort {
     Optional<GithubIssue> findIssueById(GithubIssue.Id issueId);
 
     Optional<Long> findInstallationIdByRepoId(Long repoId);
+
+    List<GithubIssue> findGoodFirstIssuesCreatedSince5Minutes();
 }

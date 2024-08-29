@@ -285,7 +285,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     AppUserFacadePort appUserFacadePort;
     @Autowired
-    GithubHelper githubHelper;
+    protected GithubHelper githubHelper;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {

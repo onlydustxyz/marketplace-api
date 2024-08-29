@@ -11,8 +11,9 @@ import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingPr
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
+import onlydust.com.marketplace.project.domain.model.notification.GoodFirstIssueCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
@@ -52,6 +53,8 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
             sendEmail(MailDTO.from(customerIOProperties, notification, billingProfileVerificationClosed));
         } else if (notification.data() instanceof ApplicationRefused applicationRefused) {
             sendEmail(MailDTO.from(customerIOProperties, notification, applicationRefused));
+        } else if (notification.data() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, goodFirstIssueCreated));
         }
     }
 

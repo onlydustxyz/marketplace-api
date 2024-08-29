@@ -151,7 +151,8 @@ public class PostgresConfiguration {
                                                    final RewardViewRepository rewardViewRepository,
                                                    final CurrencyRepository currencyRepository,
                                                    final BillingProfileUserRepository billingProfileUserRepository,
-                                                   final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository) {
+                                                   final GithubUserWithTelegramQueryRepository githubUserWithTelegramQueryRepository,
+                                                   final NotificationSettingsForProjectRepository notificationSettingsForProjectRepository) {
         return new PostgresUserAdapter(
                 customContributorRepository,
                 userRepository,
@@ -166,7 +167,8 @@ public class PostgresConfiguration {
                 rewardViewRepository,
                 currencyRepository,
                 billingProfileUserRepository,
-                githubUserWithTelegramQueryRepository);
+                githubUserWithTelegramQueryRepository,
+                notificationSettingsForProjectRepository);
     }
 
     @Bean

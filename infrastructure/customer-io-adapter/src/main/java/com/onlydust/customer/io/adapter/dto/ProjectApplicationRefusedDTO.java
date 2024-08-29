@@ -1,10 +1,7 @@
 package com.onlydust.customer.io.adapter.dto;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.dto.ApplicationRefused;
-
-import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyApplicationsFromEnvironment;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
 
 public record ProjectApplicationRefusedDTO(@NonNull String username,
                                            @NonNull String title,
