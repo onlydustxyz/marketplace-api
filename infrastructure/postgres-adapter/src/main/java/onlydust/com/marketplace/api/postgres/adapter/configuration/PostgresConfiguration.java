@@ -356,6 +356,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    PostgresDepositStorage postgresDepositStorage(final DepositRepository depositRepository) {
+        return new PostgresDepositStorage(depositRepository);
+    }
+
+    @Bean
     PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository,
                                                   final SponsorLeadRepository sponsorLeadRepository) {
         return new PostgresSponsorAdapter(sponsorRepository, sponsorLeadRepository);

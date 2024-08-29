@@ -499,3 +499,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000324_all_users_perf_optimization.sql
   - include:
       file: db/changelog/changelogs/00000325_reward_statuses_optimization.sql
+  - include:
+      file: db/changelog/changelogs/00000325_create_deposits_table.sql

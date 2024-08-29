@@ -2,8 +2,8 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
-import java.time.ZonedDateTime;
+import java.util.Optional;
 
 public interface BlockchainFacadePort {
-    ZonedDateTime getTransactionTimestamp(Blockchain blockchain, String reference);
+    Optional<Blockchain.Transaction> getTransaction(Blockchain blockchain, String reference);
 }

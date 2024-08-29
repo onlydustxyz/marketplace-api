@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountingService;
@@ -75,8 +76,16 @@ public class AccountingServiceConcurrencyTest {
         private void setupAccountingService() {
             accountBookEventStorage = new AccountBookEventStorageStub();
             cachedAccountBookProvider = new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class), mock(AccountBookObserver.class));
-            accountingService = new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver,
-                    projectAccountingObserver, invoiceStoragePort, rewardStatusFacadePort, receiptStoragePort);
+            accountingService = new AccountingService(cachedAccountBookProvider,
+                    sponsorAccountStorage,
+                    currencyStorage,
+                    accountingObserver,
+                    projectAccountingObserver,
+                    invoiceStoragePort,
+                    rewardStatusFacadePort,
+                    receiptStoragePort,
+                    mock(BlockchainFacadePort.class),
+                    mock(DepositStoragePort.class));
         }
 
         @BeforeAll
@@ -155,8 +164,16 @@ public class AccountingServiceConcurrencyTest {
             for (int i = 0; i < INSTANCE_COUNT; i++) {
                 accountBookProviders.add(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class),
                         mock(AccountBookObserver.class)));
-                accountingServices.add(new AccountingService(accountBookProviders.get(i), sponsorAccountStorage, currencyStorage, accountingObserver,
-                        projectAccountingObserver, invoiceStoragePort, rewardStatusFacadePort, receiptStoragePort));
+                accountingServices.add(new AccountingService(accountBookProviders.get(i),
+                        sponsorAccountStorage,
+                        currencyStorage,
+                        accountingObserver,
+                        projectAccountingObserver,
+                        invoiceStoragePort,
+                        rewardStatusFacadePort,
+                        receiptStoragePort,
+                        mock(BlockchainFacadePort.class),
+                        mock(DepositStoragePort.class)));
             }
         }
 

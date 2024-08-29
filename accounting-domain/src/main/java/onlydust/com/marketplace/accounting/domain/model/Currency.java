@@ -5,6 +5,7 @@ import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 import java.math.BigDecimal;
 import java.net.URI;
@@ -176,11 +177,11 @@ public class Currency implements Cloneable {
     @Deprecated
     public Network legacyNetwork() {
         return switch (code.toString()) {
-            case Currency.Code.USD_STR, Currency.Code.EUR_STR -> Network.SEPA;
-            case Currency.Code.APT_STR -> Network.APTOS;
-            case Currency.Code.ETH_STR, Currency.Code.LORDS_STR, Currency.Code.USDC_STR -> Network.ETHEREUM;
-            case Currency.Code.OP_STR -> Network.OPTIMISM;
-            case Currency.Code.STRK_STR -> Network.STARKNET;
+            case Code.USD_STR, Code.EUR_STR -> Network.SEPA;
+            case Code.APT_STR -> Network.APTOS;
+            case Code.ETH_STR, Code.LORDS_STR, Code.USDC_STR -> Network.ETHEREUM;
+            case Code.OP_STR -> Network.OPTIMISM;
+            case Code.STRK_STR -> Network.STARKNET;
 
             default -> throw new IllegalArgumentException("Currency %s not supported".formatted(code));
         };
@@ -249,12 +250,22 @@ public class Currency implements Cloneable {
         public final static Code STRK = Code.of(STRK_STR);
         public final static Code OP = Code.of(OP_STR);
         public final static Code USDC = Code.of(USDC_STR);
+        public final static Code XLM = Code.of(XLM_STR);
 
         String inner;
 
         @Override
         public String toString() {
             return inner;
+        }
+
+        public static Code of(Blockchain blockchain) {
+            return switch (blockchain) {
+                case ETHEREUM, OPTIMISM -> ETH;
+                case STARKNET -> null;
+                case APTOS -> APT;
+                case STELLAR -> XLM;
+            };
         }
     }
 

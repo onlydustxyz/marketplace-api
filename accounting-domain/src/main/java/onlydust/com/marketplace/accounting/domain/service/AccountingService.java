@@ -8,12 +8,14 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookAggregate;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.ReadOnlyAccountBookState;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -35,6 +37,8 @@ public class AccountingService implements AccountingFacadePort {
     private final InvoiceStoragePort invoiceStoragePort;
     private final RewardStatusFacadePort rewardStatusFacadePort;
     private final ReceiptStoragePort receiptStorage;
+    private final BlockchainFacadePort blockchainFacadePort;
+    private final DepositStoragePort depositStoragePort;
 
     @Override
     @Transactional
@@ -452,5 +456,38 @@ public class AccountingService implements AccountingFacadePort {
     public Map<SponsorAccount, PositiveAmount> transferredAmountPerOrigin(RewardId id, Currency.Id currencyId) {
         return getAccountBook(currencyId).state().transferredAmountPerOrigin(AccountId.of(id)).entrySet().stream()
                 .collect(toMap(e -> mustGetSponsorAccount(e.getKey().sponsorAccountId()), Map.Entry::getValue));
+    }
+
+    @Override
+    public Deposit previewDeposit(final @NonNull SponsorId sponsorId, final @NonNull Network network, final @NonNull String transactionReference) {
+        final var blockchain = network.blockchain()
+                .orElseThrow(() -> badRequest("Network %s is not associated with a blockchain".formatted(network)));
+
+        final var transaction = blockchainFacadePort.getTransaction(blockchain, transactionReference)
+                .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(transactionReference, blockchain.pretty())));
+
+        if (transaction instanceof Blockchain.TransferTransaction transferTransaction) {
+            final var currency = transferTransaction.contractAddress()
+                    .map(address -> currencyStorage.findByErc20(blockchain, address)
+                            .orElseThrow(() -> badRequest("Currency %s not supported on blockchain %s".formatted(address, blockchain.pretty()))))
+                    .orElseGet(() -> currencyStorage.findByCode(Currency.Code.of(blockchain))
+                            .orElseThrow(() -> badRequest("Native currency not supported on blockchain %s".formatted(blockchain.pretty()))));
+
+            final var deposit = Deposit.preview(sponsorId, transferTransaction, currency, null);
+            depositStoragePort.save(deposit);
+            return deposit;
+        }
+
+        throw badRequest("Transaction %s is not a transfer transaction".formatted(transactionReference));
+    }
+
+    @Override
+    public Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency) {
+        final var accountBookState = getAccountBook(currency.id()).state();
+
+        return sponsorAccountStorage.find(sponsorId, currency.id()).stream()
+                .map(sponsorAccount -> accountBookState.balanceOf(AccountId.of(sponsorAccount.id())))
+                .reduce(PositiveAmount::add)
+                .orElse(PositiveAmount.ZERO);
     }
 }
