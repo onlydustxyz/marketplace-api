@@ -9,6 +9,8 @@ import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.SponsorsApi;
 import onlydust.com.marketplace.api.contract.model.AllocateRequest;
+import onlydust.com.marketplace.api.contract.model.PreviewDepositRequest;
+import onlydust.com.marketplace.api.contract.model.PreviewDepositResponse;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
@@ -19,8 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DepositMapper.toPreviewResponse;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.NetworkMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.noContent;
+import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Tags(@Tag(name = "Sponsors"))
@@ -46,6 +51,22 @@ public class SponsorsRestApi implements SponsorsApi {
         );
 
         return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<PreviewDepositResponse> previewDeposit(UUID sponsorId, PreviewDepositRequest request) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), SponsorId.of(sponsorId))
+                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
+
+        final var deposit = accountingFacadePort.previewDeposit(SponsorId.of(sponsorId),
+                map(request.getNetwork()),
+                request.getTransactionReference());
+
+        final var currentBalance = accountingFacadePort.getSponsorBalance(deposit.sponsorId(), deposit.currency());
+
+        return ok(toPreviewResponse(deposit, sponsor, currentBalance));
     }
 
     @Override

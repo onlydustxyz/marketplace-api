@@ -9,9 +9,9 @@ import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransaction;
 
-import java.time.ZonedDateTime;
+import java.util.Optional;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static java.util.function.Function.identity;
 
 @AllArgsConstructor
 public class BlockchainService implements BlockchainFacadePort {
@@ -22,13 +22,13 @@ public class BlockchainService implements BlockchainFacadePort {
     private final BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> stellarTransactionStoragePort;
 
     @Override
-    public ZonedDateTime getTransactionTimestamp(Blockchain blockchain, String reference) {
+    public Optional<Blockchain.Transaction> getTransaction(Blockchain blockchain, String reference) {
         return (switch (blockchain) {
-            case ETHEREUM -> ethereumTransactionStoragePort.get(Ethereum.transactionHash(reference)).map(EvmTransaction::timestamp);
-            case OPTIMISM -> optimismTransactionStoragePort.get(Optimism.transactionHash(reference)).map(EvmTransaction::timestamp);
-            case APTOS -> aptosTransactionStoragePort.get(Aptos.transactionHash(reference)).map(AptosTransaction::timestamp);
-            case STARKNET -> starknetTransactionStoragePort.get(StarkNet.transactionHash(reference)).map(StarknetTransaction::timestamp);
-            case STELLAR -> stellarTransactionStoragePort.get(Stellar.transactionHash(reference)).map(StellarTransaction::timestamp);
-        }).orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(reference, blockchain)));
+            case ETHEREUM -> ethereumTransactionStoragePort.get(Ethereum.transactionHash(reference)).map(identity());
+            case OPTIMISM -> optimismTransactionStoragePort.get(Optimism.transactionHash(reference)).map(identity());
+            case APTOS -> aptosTransactionStoragePort.get(Aptos.transactionHash(reference)).map(identity());
+            case STARKNET -> starknetTransactionStoragePort.get(StarkNet.transactionHash(reference)).map(identity());
+            case STELLAR -> stellarTransactionStoragePort.get(Stellar.transactionHash(reference)).map(identity());
+        });
     }
 }

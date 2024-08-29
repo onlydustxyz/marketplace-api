@@ -5,13 +5,13 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.Wallet;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.PaymentPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
@@ -47,10 +47,14 @@ public class PaymentService implements PaymentPort {
             throw badRequest("Batch payment %s is already paid".formatted(paymentId.value()));
         }
 
-        final Payment updatedPayment = payment.toBuilder()
+        final var blockchain = payment.network().blockchain().orElseThrow();
+        final var transaction = blockchainFacadePort.getTransaction(blockchain, transactionReference)
+                .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(transactionReference, blockchain.pretty())));
+
+        final var updatedPayment = payment.toBuilder()
                 .status(Payment.Status.PAID)
-                .transactionHash(transactionReference)
-                .confirmedAt(blockchainFacadePort.getTransactionTimestamp(payment.network().blockchain().orElseThrow(), transactionReference))
+                .transactionHash(transaction.reference())
+                .confirmedAt(transaction.timestamp())
                 .build();
 
         accountingFacadePort.confirm(updatedPayment);

@@ -1,10 +1,13 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.out.CurrencyStorage;
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCurrencyStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,11 @@ public class PostgresCurrencyAdapter implements CurrencyStorage, ProjectCurrency
     @Override
     public Boolean exists(Currency.Code code) {
         return repository.existsByCode(code.toString());
+    }
+
+    @Override
+    public Optional<Currency> findByErc20(final @NonNull Blockchain blockchain, final @NonNull String address) {
+        return repository.findByErc20(NetworkEnumEntity.of(blockchain), address).map(CurrencyEntity::toDomain);
     }
 
     @Override

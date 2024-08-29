@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.repository;
 
+import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.CurrencyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,4 +25,12 @@ public interface CurrencyRepository extends JpaRepository<CurrencyEntity, UUID> 
             ORDER BY c.code
             """, nativeQuery = true)
     Set<CurrencyEntity> listUserRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds);
+
+    @Query("""
+            SELECT c
+            FROM CurrencyEntity c
+            JOIN FETCH c.erc20
+            WHERE element(c.erc20).blockchain = :blockchain AND element(c.erc20).address = :contractAddress
+            """)
+    Optional<CurrencyEntity> findByErc20(NetworkEnumEntity blockchain, String contractAddress);
 }

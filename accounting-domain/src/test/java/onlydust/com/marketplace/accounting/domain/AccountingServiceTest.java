@@ -9,6 +9,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.IdentifiedAccountBookEvent;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
+import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
@@ -21,6 +22,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStu
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.*;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
@@ -30,6 +32,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -53,6 +56,8 @@ public class AccountingServiceTest {
     final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
     final ReceiptStoragePort receiptStoragePort = mock(ReceiptStoragePort.class);
     AccountBookEventStorageStub accountBookEventStorage;
+    final BlockchainFacadePort blockchainFacadePort = mock(BlockchainFacadePort.class);
+    final DepositStoragePort depositStoragePort = mock(DepositStoragePort.class);
     AccountingService accountingService;
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
@@ -127,8 +132,15 @@ public class AccountingServiceTest {
     private void setupAccountingService() {
         accountBookEventStorage = new AccountBookEventStorageStub();
         accountingService = new AccountingService(new CachedAccountBookProvider(accountBookEventStorage, mock(AccountBookStorage.class), accountBookObserver),
-                sponsorAccountStorage, currencyStorage,
-                accountingObserver, projectAccountingObserver, invoiceStoragePort, rewardStatusFacadePort, receiptStoragePort);
+                sponsorAccountStorage,
+                currencyStorage,
+                accountingObserver,
+                projectAccountingObserver,
+                invoiceStoragePort,
+                rewardStatusFacadePort,
+                receiptStoragePort,
+                blockchainFacadePort,
+                depositStoragePort);
     }
 
     @BeforeAll
@@ -1665,6 +1677,171 @@ public class AccountingServiceTest {
 
             // Then
             assertThat(payableRewards).isEmpty();
+        }
+    }
+
+    @Nested
+    class Deposits {
+        final SponsorId sponsorId = SponsorId.random();
+
+        @Test
+        void should_reject_non_supported_networks() {
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.SEPA, "REF 123465"))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Network SEPA is not associated with a blockchain");
+        }
+
+        @Test
+        void should_reject_when_transaction_not_found() {
+            // Given
+            final var transactionReference = faker.crypto().sha256();
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transactionReference))
+                    .thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transactionReference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction %s not found on blockchain Ethereum".formatted(transactionReference));
+        }
+
+        @Test
+        void should_reject_when_transaction_not_a_transfer() {
+            // Given
+            final var transaction = Transaction.fake();
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction %s is not a transfer transaction".formatted(transaction.reference));
+        }
+
+        @Test
+        void should_reject_deposit_for_native_transfer_if_not_supported() {
+            // Given
+            final var transaction = TransferTransaction.fakeNative();
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(currencyStorage.findByCode(Currency.Code.ETH)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Native currency not supported on blockchain Ethereum");
+        }
+
+        @Test
+        void should_create_deposit_for_native_transfer() {
+            // Given
+            final var transaction = TransferTransaction.fakeNative();
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(currencyStorage.findByCode(Currency.Code.ETH)).thenReturn(Optional.of(Currencies.ETH));
+
+            // When
+            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+
+            // Then
+            assertThat(deposit.id()).isNotNull();
+            assertThat(deposit.sponsorId()).isEqualTo(sponsorId);
+            assertThat(deposit.transaction()).isEqualTo(transaction);
+            assertThat(deposit.status()).isEqualTo(Deposit.Status.DRAFT);
+            assertThat(deposit.currency()).isEqualTo(Currencies.ETH);
+            assertThat(deposit.billingInformation()).isNull();
+
+            verify(depositStoragePort).save(deposit);
+        }
+
+
+        @Test
+        void should_reject_deposit_for_erc20_transfer_if_not_supported() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(currencyStorage.findByErc20(Blockchain.ETHEREUM, transaction.address)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Currency %s not supported on blockchain Ethereum".formatted(transaction.address));
+        }
+
+        @Test
+        void should_create_deposit_for_erc20_transfer() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(currencyStorage.findByErc20(Blockchain.ETHEREUM, transaction.address))
+                    .thenReturn(Optional.of(Currencies.USDC));
+
+            // When
+            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+
+            // Then
+            assertThat(deposit.id()).isNotNull();
+            assertThat(deposit.sponsorId()).isEqualTo(sponsorId);
+            assertThat(deposit.transaction()).isEqualTo(transaction);
+            assertThat(deposit.status()).isEqualTo(Deposit.Status.DRAFT);
+            assertThat(deposit.currency()).isEqualTo(Currencies.USDC);
+            assertThat(deposit.billingInformation()).isNull();
+
+            verify(depositStoragePort).save(deposit);
+        }
+
+        record Transaction(String reference, ZonedDateTime timestamp) implements Blockchain.Transaction {
+            static Transaction fake() {
+                final var faker = new Faker();
+                return new Transaction(faker.crypto().sha256(),
+                        ZonedDateTime.now());
+            }
+        }
+
+        record TransferTransaction(String reference,
+                                   ZonedDateTime timestamp,
+                                   String senderAddress,
+                                   String recipientAddress,
+                                   BigDecimal amount,
+                                   String address) implements Blockchain.TransferTransaction {
+            @Override
+            public Optional<String> contractAddress() {
+                return Optional.ofNullable(address);
+            }
+
+            static TransferTransaction fakeNative() {
+                final var faker = new Faker();
+                return new TransferTransaction(faker.crypto().sha256(),
+                        ZonedDateTime.now(),
+                        faker.crypto().sha256(),
+                        faker.crypto().sha256(),
+                        BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
+                        null);
+            }
+
+            static TransferTransaction fakeErc20() {
+                final var faker = new Faker();
+                return new TransferTransaction(faker.crypto().sha256(),
+                        ZonedDateTime.now(),
+                        faker.crypto().sha256(),
+                        faker.crypto().sha256(),
+                        BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
+                        faker.crypto().sha256());
+            }
         }
     }
 

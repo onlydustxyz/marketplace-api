@@ -3940,6 +3940,42 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/sponsors/{sponsorId}/deposits:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Sponsors
+      summary: Preview a deposit
+      operationId: previewDeposit
+      description: |
+        Preview a deposit.
+        This will fetch the transaction information from the blockchain and return the amount that will be deposited.
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+      requestBody:
+        description: Deposit
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreviewDepositRequest'
+      responses:
+        "200":
+          description: 'New deposit'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreviewDepositResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/programs/logos:
     post:
       security:
@@ -5941,6 +5977,75 @@ components:
         id:
           $ref: '#/components/schemas/ProgramId'
 
+    PreviewDepositRequest:
+      type: object
+      required:
+        - network
+        - transactionReference
+      properties:
+        network:
+          $ref: '#/components/schemas/NetworkContract'
+        transactionReference:
+          type: string
+          description: The transaction reference
+          example: 0x1234567890abcdef
+
+    PreviewDepositResponse:
+      type: object
+      required:
+        - amount
+        - senderInformation
+      properties:
+        amount:
+          $ref: '#/components/schemas/Money'
+        currentBalance:
+          $ref: '#/components/schemas/Money'
+        finalBalance:
+          $ref: '#/components/schemas/Money'
+        senderInformation:
+          $ref: '#/components/schemas/DepositSenderInformation'
+        billingInformation:
+          $ref: '#/components/schemas/DepositBillingInformation'
+
+    DepositSenderInformation:
+      type: object
+      required:
+        - name
+        - accountNumber
+        - transactionReference
+      properties:
+        name:
+          type: string
+          description: The name of the sender
+        accountNumber:
+          type: string
+          description: The account number of the sender
+        transactionReference:
+          type: string
+          description: The transaction reference
+
+    DepositBillingInformation:
+      type: object
+      properties:
+        companyName:
+          type: string
+        companyAddress:
+          type: string
+        companyCountry:
+          type: string
+        companyId:
+          type: string
+        vatNumber:
+          type: string
+        billingEmail:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+    
     ProgramPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'

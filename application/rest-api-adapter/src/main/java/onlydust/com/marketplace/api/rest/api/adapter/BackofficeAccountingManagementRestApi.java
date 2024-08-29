@@ -21,6 +21,7 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -123,7 +124,10 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
         final var network = mapTransactionNetwork(payRewardRequest.getNetwork());
         final var transactionTimestamp = network.blockchain()
-                .map(blockchain -> blockchainFacadePort.getTransactionTimestamp(blockchain, payRewardRequest.getReference()))
+                .map(blockchain -> blockchainFacadePort.getTransaction(blockchain, payRewardRequest.getReference())
+                        .map(Blockchain.Transaction::timestamp)
+                        .orElseThrow(() -> badRequest("Transaction %s not found on blockchain %s"
+                                .formatted(payRewardRequest.getReference(), blockchain.pretty()))))
                 .orElse(ZonedDateTime.now());
 
         accountingFacadePort.pay(
