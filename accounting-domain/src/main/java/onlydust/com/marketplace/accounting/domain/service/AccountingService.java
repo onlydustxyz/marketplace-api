@@ -319,7 +319,7 @@ public class AccountingService implements AccountingFacadePort {
             accountBook.refund(AccountId.of(from), tos.stream().map(AccountId::of).toList(), amount);
         else
             accountBook.refund(AccountId.of(from), AccountId.of(to), amount);
-        
+
         saveAccountBook(currency, accountBook);
         return accountBook.state();
     }
@@ -466,19 +466,28 @@ public class AccountingService implements AccountingFacadePort {
         final var transaction = blockchainFacadePort.getTransaction(blockchain, transactionReference)
                 .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(transactionReference, blockchain.pretty())));
 
-        if (transaction instanceof Blockchain.TransferTransaction transferTransaction) {
-            final var currency = transferTransaction.contractAddress()
-                    .map(address -> currencyStorage.findByErc20(blockchain, address)
-                            .orElseThrow(() -> badRequest("Currency %s not supported on blockchain %s".formatted(address, blockchain.pretty()))))
-                    .orElseGet(() -> currencyStorage.findByCode(Currency.Code.of(blockchain))
-                            .orElseThrow(() -> badRequest("Native currency not supported on blockchain %s".formatted(blockchain.pretty()))));
+        final var transferTransaction = check(transaction);
+        
+        final var currency = transferTransaction.contractAddress()
+                .map(address -> currencyStorage.findByErc20(blockchain, address)
+                        .orElseThrow(() -> badRequest("Currency %s not supported on blockchain %s".formatted(address, blockchain.pretty()))))
+                .orElseGet(() -> currencyStorage.findByCode(Currency.Code.of(blockchain))
+                        .orElseThrow(() -> badRequest("Native currency not supported on blockchain %s".formatted(blockchain.pretty()))));
 
-            final var deposit = Deposit.preview(sponsorId, transferTransaction, currency, null);
-            depositStoragePort.save(deposit);
-            return deposit;
+        final var deposit = Deposit.preview(sponsorId, transferTransaction, currency, null);
+        depositStoragePort.save(deposit);
+        return deposit;
+    }
+
+    private Blockchain.TransferTransaction check(Blockchain.Transaction transaction) {
+        if (transaction instanceof Blockchain.TransferTransaction transferTransaction) {
+            if (transaction.status() != Blockchain.Transaction.Status.CONFIRMED)
+                throw badRequest("Transaction %s is not confirmed".formatted(transaction.reference()));
+
+            return transferTransaction;
         }
 
-        throw badRequest("Transaction %s is not a transfer transaction".formatted(transactionReference));
+        throw badRequest("Transaction %s is not a transfer transaction".formatted(transaction.reference()));
     }
 
     @Override

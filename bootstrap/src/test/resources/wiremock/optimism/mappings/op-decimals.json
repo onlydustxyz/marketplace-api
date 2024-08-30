@@ -10,7 +10,7 @@
                     "method": "eth_call",
                     "params": [
                         {
-                            "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+                            "to": "0x4200000000000000000000000000000000000042",
                             "data": "0x313ce567"
                         },
                         "latest"
@@ -23,7 +23,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-usdc-decimals.json",
+        "bodyFileName": "body-op-decimals.json",
         "headers": {
             "Content-Type": "application/json"
         }

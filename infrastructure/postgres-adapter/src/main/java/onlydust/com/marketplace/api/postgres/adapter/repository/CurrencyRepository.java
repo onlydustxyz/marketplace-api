@@ -29,8 +29,8 @@ public interface CurrencyRepository extends JpaRepository<CurrencyEntity, UUID> 
     @Query("""
             SELECT c
             FROM CurrencyEntity c
-            JOIN FETCH c.erc20
-            WHERE element(c.erc20).blockchain = :blockchain AND element(c.erc20).address = :contractAddress
+            JOIN FETCH c.erc20 e
+            WHERE e.blockchain = :blockchain AND LOWER(e.address) = LOWER(:contractAddress)
             """)
     Optional<CurrencyEntity> findByErc20(NetworkEnumEntity blockchain, String contractAddress);
 }

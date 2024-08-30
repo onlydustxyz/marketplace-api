@@ -16,6 +16,7 @@ public interface DepositMapper {
                                                     final @NonNull Sponsor sponsor,
                                                     final @NonNull Amount currentBalance) {
         return new PreviewDepositResponse()
+                .id(deposit.id().value())
                 .amount(toMoney(deposit.transaction().amount(), deposit.currency()))
                 .currentBalance(toMoney(currentBalance.getValue(), deposit.currency()))
                 .finalBalance(toMoney(currentBalance.getValue().add(deposit.transaction().amount()), deposit.currency()))
@@ -23,8 +24,8 @@ public interface DepositMapper {
                 .billingInformation(toBillingInformation(deposit.billingInformation()));
     }
 
-    static DepositBillingInformation toBillingInformation(final @NonNull Deposit.BillingInformation billingInformation) {
-        return new DepositBillingInformation()
+    static DepositBillingInformation toBillingInformation(final Deposit.BillingInformation billingInformation) {
+        return billingInformation == null ? null : new DepositBillingInformation()
                 .companyName(billingInformation.companyName())
                 .companyAddress(billingInformation.companyAddress())
                 .companyCountry(billingInformation.companyCountry())

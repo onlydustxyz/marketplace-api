@@ -1,0 +1,56 @@
+{
+    "jsonrpc": "2.0",
+    "id": {{jsonPath request.body '$.id'}},
+    "result": {
+        "blockHash": "0x1535cc7ebc7a5f1910eff021cde3268089befde5cae841690a87b200118ec1c4",
+        "blockNumber": "0x76ef7a0",
+        "contractAddress": null,
+        "cumulativeGasUsed": "0x1c545e",
+        "effectiveGasPrice": "0x48796",
+        "from": "0x8d345c1dcf02495a1e7089a7bc61c77fe2326027",
+        "gasUsed": "0x14f84",
+        "l1BaseFeeScalar": "0x146b",
+        "l1BlobBaseFee": "0x1",
+        "l1BlobBaseFeeScalar": "0xf79c5",
+        "l1Fee": "0x346f84842",
+        "l1GasPrice": "0x64511cd2",
+        "l1GasUsed": "0x640",
+        "logs": [
+            {
+                "address": "0x4200000000000000000000000000000000000042",
+                "blockHash": "0x1535cc7ebc7a5f1910eff021cde3268089befde5cae841690a87b200118ec1c4",
+                "blockNumber": "0x76ef7a0",
+                "data": "0x000000000000000000000000000000000000000000000000c4773282a89dfcf8",
+                "logIndex": "0x4c",
+                "removed": false,
+                "topics": [
+                    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                    "0x0000000000000000000000008d345c1dcf02495a1e7089a7bc61c77fe2326027",
+                    "0x0000000000000000000000001c9d4522e258138f36b4b356bb8afc6be013f902"
+                ],
+                "transactionHash": "{{jsonPath request.body '$.params[0]'}}",
+                "transactionIndex": "0x9"
+            },
+            {
+                "address": "0x4200000000000000000000000000000000000042",
+                "blockHash": "0x1535cc7ebc7a5f1910eff021cde3268089befde5cae841690a87b200118ec1c4",
+                "blockNumber": "0x76ef7a0",
+                "data": "0x0000000000000000000000000000000000000000000372a1c6547e1d41a1e2300000000000000000000000000000000000000000000372a101dd4b9a9903e538",
+                "logIndex": "0x4d",
+                "removed": false,
+                "topics": [
+                    "0xdec2bacdd2f05b59de34da9b523dff8be42e5e38e818c82fdb0bae774387a724",
+                    "0x0000000000000000000000005e349eca2dc61abcd9dd99ce94d04136151a09ee"
+                ],
+                "transactionHash": "{{jsonPath request.body '$.params[0]'}}",
+                "transactionIndex": "0x9"
+            }
+        ],
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000040000000000000000020000008000000000000000000000000200000000000000000000200000000000040000000000000000000000000000000000210000000000100000000000000000000000000000000000800000000000000000000000000040000000000000000000800000000000000000000000000000000000000000000000002000000000000000000000000008000000000400000000040000000001000000000000000000000000000000000000000000000000000000000000000",
+        "status": "0x1",
+        "to": "0x4200000000000000000000000000000000000042",
+        "transactionHash": "0x821fd2b9b7c950d712ffa13b2b7bed56db35b3919f40baf10d816d4dc35a479f",
+        "transactionIndex": "0x9",
+        "type": "0x2"
+    }
+}

@@ -12,6 +12,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
@@ -253,7 +254,10 @@ public class PaymentServiceTest {
         // When
         when(accountingRewardStoragePort.findPayment(batchPaymentId)).thenReturn(Optional.of(payment));
         when(ethereumTransactionStoragePort.get(Ethereum.transactionHash(transactionHash)))
-                .thenReturn(Optional.of(new EvmTransaction(Ethereum.transactionHash(transactionHash), ZonedDateTime.now())));
+                .thenReturn(Optional.of(new EvmTransaction(Blockchain.ETHEREUM,
+                        Ethereum.transactionHash(transactionHash),
+                        ZonedDateTime.now(),
+                        Blockchain.Transaction.Status.CONFIRMED)));
         rewardService.markPaymentAsPaid(batchPaymentId, transactionHash);
 
         // Then

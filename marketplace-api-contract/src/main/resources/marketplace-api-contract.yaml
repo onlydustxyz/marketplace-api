@@ -5037,6 +5037,11 @@ components:
       format: uuid
       description: Sponsor account transaction ID
 
+    DepositId:
+      type: string
+      format: uuid
+      description: OnlyDust deposit ID
+
     ProjectSlug:
       type: string
       description: OnlyDust project pretty ID that is computed from its name. This ID CAN change over time.
@@ -6023,9 +6028,14 @@ components:
     PreviewDepositResponse:
       type: object
       required:
+        - id
         - amount
+        - currentBalance
+        - finalBalance
         - senderInformation
       properties:
+        id:
+          $ref: '#/components/schemas/DepositId'
         amount:
           $ref: '#/components/schemas/Money'
         currentBalance:
