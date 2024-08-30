@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
+import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.Transaction.Status.CONFIRMED;
+
 @AllArgsConstructor
 public class StellarTransactionStorageAdapter implements BlockchainTransactionStoragePort<StellarTransaction, StellarTransaction.Hash> {
     private final SorobanClient client;
@@ -19,6 +21,7 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
         return client.transaction(reference.toString())
                 .map(t -> new StellarTransaction(
                         reference,
-                        Instant.ofEpochSecond(t.getCreatedAt()).atZone(ZoneOffset.UTC)));
+                        Instant.ofEpochSecond(t.getCreatedAt()).atZone(ZoneOffset.UTC),
+                        CONFIRMED)); // FIXME: status
     }
 }
