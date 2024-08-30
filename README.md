@@ -84,4 +84,13 @@ echo "pinentry-program $(which pinentry-mac)" >> ~/.gnupg/gpg-agent.conf
 killall gpg-agent
 ```
 
-Optionally, [configure JetBrains to sign commits](https://www.jetbrains.com/help/idea/2024.2/set-up-GPG-commit-signing.html?Set_up_GPG_commit_signing&utm_source=product&utm_medium=link&utm_campaign=IU&utm_content=2024.2#u7gxqt_31)
+Optionally, [configure JetBrains to sign commits](https://www.jetbrains.com/help/idea/2024.2/set-up-GPG-commit-signing.html?Set_up_GPG_commit_signing&utm_source=product&utm_medium=link&utm_campaign=IU&utm_content=2024.2#u7gxqt_31):
+
+> Start IntelliJ IDEA (or restart it to make sure it loads the changes you've made to your environment).
+>
+> In the Settings dialog, go to Version Control | Git, and click the Configure GPG Key button.
+>
+> In the dialog that opens, click Sign commits with GPG key and select the key you want to use from the list.
+>
+> Now every commit will be signed with the selected key. The state of the GPG signature will be displayed in the Commit details pane on the Log tab.
+
