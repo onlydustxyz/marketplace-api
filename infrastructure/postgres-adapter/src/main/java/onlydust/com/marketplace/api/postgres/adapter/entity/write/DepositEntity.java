@@ -14,14 +14,16 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "deposits", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true, chain = true)
+@Accessors(fluent = true)
 public class DepositEntity {
     @Id
+    @NonNull
     UUID id;
 
     @NonNull

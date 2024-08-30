@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -12,43 +14,94 @@ import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class PermissionService {
+public class PermissionService implements PermissionPort {
     private final ProjectStoragePort projectStoragePort;
     private final ContributionStoragePort contributionStoragePort;
     private final SponsorStoragePort sponsorStoragePort;
     private final ProgramStoragePort programStoragePort;
 
-    public boolean isUserProjectLead(UUID projectId, UUID projectLeadId) {
-        return projectStoragePort.getProjectLeadIds(projectId).contains(projectLeadId);
+
+    @Override
+    public boolean isUserProjectLead(ProjectId projectId, UserId projectLeadId) {
+        return projectStoragePort.getProjectLeadIds(projectId.value()).contains(projectLeadId.value());
     }
 
+    @Deprecated
+    public boolean isUserProjectLead(UUID projectId, UUID projectLeadId) {
+        return isUserProjectLead(ProjectId.of(projectId), UserId.of(projectLeadId));
+    }
+
+    
+    @Override
     public boolean isUserContributor(String contributionId, Long githubUserId) {
         return contributionStoragePort.getContributorId(contributionId).equals(githubUserId);
     }
 
+
+    @Override
+    public boolean isRepoLinkedToProject(ProjectId projectId, Long githubRepoId) {
+        return projectStoragePort.getProjectRepoIds(projectId.value()).contains(githubRepoId);
+    }
+
+    @Deprecated
     public boolean isRepoLinkedToProject(UUID projectId, Long githubRepoId) {
-        return projectStoragePort.getProjectRepoIds(projectId).contains(githubRepoId);
+        return isRepoLinkedToProject(ProjectId.of(projectId), githubRepoId);
     }
 
+
+    @Override
+    public boolean hasUserAccessToProject(ProjectId projectId, UserId userId) {
+        return projectStoragePort.hasUserAccessToProject(projectId.value(), userId.value())
+               || programStoragePort.isAdmin(userId.value(), projectId);
+    }
+
+    @Deprecated
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
-        return projectStoragePort.hasUserAccessToProject(projectId, userId)
-               || programStoragePort.isAdmin(userId, ProjectId.of(projectId));
+        return hasUserAccessToProject(ProjectId.of(projectId), UserId.of(userId));
     }
 
+
+    @Override
+    public boolean hasUserAccessToProject(String projectSlug, UserId userId) {
+        return projectStoragePort.hasUserAccessToProject(projectSlug, userId.value())
+               || programStoragePort.isAdmin(userId.value(), projectSlug);
+    }
+
+    @Deprecated
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
-        return projectStoragePort.hasUserAccessToProject(projectSlug, userId)
-               || programStoragePort.isAdmin(userId, projectSlug);
+        return hasUserAccessToProject(projectSlug, UserId.of(userId));
     }
 
+
+    @Override
+    public boolean isUserSponsorLead(UserId userId, SponsorId sponsorId) {
+        return sponsorStoragePort.isAdmin(userId.value(), sponsorId);
+    }
+
+    @Deprecated
     public boolean isUserSponsorLead(UUID userId, SponsorId sponsorId) {
-        return sponsorStoragePort.isAdmin(userId, sponsorId);
+        return isUserSponsorLead(UserId.of(userId), sponsorId);
     }
 
+
+    @Override
+    public boolean isUserSponsorLeadOfProgram(UserId userId, ProgramId programId) {
+        return sponsorStoragePort.isAdminOfProgramSponsor(userId.value(), programId);
+    }
+
+    @Deprecated
     public boolean isUserSponsorLeadOfProgram(UUID userId, ProgramId programId) {
-        return sponsorStoragePort.isAdminOfProgramSponsor(userId, programId);
+        return isUserSponsorLeadOfProgram(UserId.of(userId), programId);
     }
 
+
+    @Override
+    public boolean isUserProgramLead(UserId userId, ProgramId programId) {
+        return programStoragePort.isAdmin(userId.value(), programId);
+    }
+
+    @Deprecated
     public boolean isUserProgramLead(UUID userId, ProgramId programId) {
-        return programStoragePort.isAdmin(userId, programId);
+        return isUserProgramLead(UserId.of(userId), programId);
     }
 }

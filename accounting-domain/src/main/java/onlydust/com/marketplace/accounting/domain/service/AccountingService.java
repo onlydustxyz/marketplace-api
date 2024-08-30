@@ -11,11 +11,9 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.model.ProgramId;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -39,6 +37,7 @@ public class AccountingService implements AccountingFacadePort {
     private final ReceiptStoragePort receiptStorage;
     private final BlockchainFacadePort blockchainFacadePort;
     private final DepositStoragePort depositStoragePort;
+    private final PermissionPort permissionPort;
 
     @Override
     @Transactional
@@ -498,5 +497,17 @@ public class AccountingService implements AccountingFacadePort {
                 .map(sponsorAccount -> accountBookState.balanceOf(AccountId.of(sponsorAccount.id())))
                 .reduce(PositiveAmount::add)
                 .orElse(PositiveAmount.ZERO);
+    }
+
+    @Override
+    public void updateDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation) {
+        final var sponsorId = depositStoragePort.findDepositSponsor(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        if (!permissionPort.isUserSponsorLead(userId, sponsorId)) {
+            throw forbidden("User %s is not allowed to update deposit %s".formatted(userId, depositId));
+        }
+
+        depositStoragePort.saveStatusAndBillingInformation(depositId, Deposit.Status.PENDING, billingInformation);
     }
 }

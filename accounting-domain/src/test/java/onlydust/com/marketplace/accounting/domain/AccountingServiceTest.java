@@ -26,6 +26,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -58,6 +59,7 @@ public class AccountingServiceTest {
     AccountBookEventStorageStub accountBookEventStorage;
     final BlockchainFacadePort blockchainFacadePort = mock(BlockchainFacadePort.class);
     final DepositStoragePort depositStoragePort = mock(DepositStoragePort.class);
+    final PermissionPort permissionPort = mock(PermissionPort.class);
     AccountingService accountingService;
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
@@ -140,7 +142,8 @@ public class AccountingServiceTest {
                 rewardStatusFacadePort,
                 receiptStoragePort,
                 blockchainFacadePort,
-                depositStoragePort);
+                depositStoragePort,
+                permissionPort);
     }
 
     @BeforeAll

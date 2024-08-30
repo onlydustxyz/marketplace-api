@@ -2,10 +2,7 @@ package onlydust.com.marketplace.accounting.domain.port.in;
 
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.*;
-import onlydust.com.marketplace.kernel.model.ProgramId;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -64,4 +61,6 @@ public interface AccountingFacadePort {
     Deposit previewDeposit(SponsorId sponsorId, Network network, String transactionReference);
 
     Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency);
+
+    void updateDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
 }

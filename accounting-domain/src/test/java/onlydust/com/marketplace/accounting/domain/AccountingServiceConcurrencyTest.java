@@ -17,6 +17,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageS
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
 import onlydust.com.marketplace.kernel.model.*;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import org.junit.jupiter.api.*;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -40,6 +41,7 @@ public class AccountingServiceConcurrencyTest {
     final InvoiceStoragePort invoiceStoragePort = mock(InvoiceStoragePort.class);
     final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
     final ReceiptStoragePort receiptStoragePort = mock(ReceiptStoragePort.class);
+    final PermissionPort permissionPort = mock(PermissionPort.class);
     SponsorAccount sponsorAccount;
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
@@ -85,7 +87,8 @@ public class AccountingServiceConcurrencyTest {
                     rewardStatusFacadePort,
                     receiptStoragePort,
                     mock(BlockchainFacadePort.class),
-                    mock(DepositStoragePort.class));
+                    mock(DepositStoragePort.class),
+                    permissionPort);
         }
 
         @BeforeAll
@@ -173,7 +176,8 @@ public class AccountingServiceConcurrencyTest {
                         rewardStatusFacadePort,
                         receiptStoragePort,
                         mock(BlockchainFacadePort.class),
-                        mock(DepositStoragePort.class)));
+                        mock(DepositStoragePort.class),
+                        permissionPort));
             }
         }
 
