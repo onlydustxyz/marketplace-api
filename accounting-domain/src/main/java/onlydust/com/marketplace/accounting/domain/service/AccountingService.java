@@ -466,16 +466,20 @@ public class AccountingService implements AccountingFacadePort {
                 .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(transactionReference, blockchain.pretty())));
 
         final var transferTransaction = check(transaction);
-        
+
         final var currency = transferTransaction.contractAddress()
                 .map(address -> currencyStorage.findByErc20(blockchain, address)
                         .orElseThrow(() -> badRequest("Currency %s not supported on blockchain %s".formatted(address, blockchain.pretty()))))
                 .orElseGet(() -> currencyStorage.findByCode(Currency.Code.of(blockchain))
                         .orElseThrow(() -> badRequest("Native currency not supported on blockchain %s".formatted(blockchain.pretty()))));
 
-        final var deposit = Deposit.preview(sponsorId, transferTransaction, currency, null);
+        final var deposit = Deposit.preview(sponsorId, transferTransaction, currency);
         depositStoragePort.save(deposit);
-        return deposit;
+
+        final var latestBillingInformation = depositStoragePort.findLatestBillingInformation(sponsorId);
+        return deposit.toBuilder()
+                .billingInformation(latestBillingInformation.orElse(null))
+                .build();
     }
 
     private Blockchain.TransferTransaction check(Blockchain.Transaction transaction) {

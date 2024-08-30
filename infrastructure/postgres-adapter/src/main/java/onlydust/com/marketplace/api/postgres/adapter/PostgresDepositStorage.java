@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.DepositEntity;
@@ -35,5 +36,11 @@ public class PostgresDepositStorage implements DepositStoragePort {
                 .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
         deposit.status(status);
         deposit.billingInformation(billingInformation);
+    }
+
+    @Override
+    public Optional<Deposit.BillingInformation> findLatestBillingInformation(@NonNull SponsorId sponsorId) {
+        return depositRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
+                .map(DepositEntity::billingInformation);
     }
 }
