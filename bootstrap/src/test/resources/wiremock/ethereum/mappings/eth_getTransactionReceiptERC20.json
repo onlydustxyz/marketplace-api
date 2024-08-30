@@ -7,13 +7,9 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_call",
+                    "method": "eth_getTransactionReceipt",
                     "params": [
-                        {
-                            "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
-                            "data": "0x313ce567"
-                        },
-                        "latest"
+                        "0x626f7613dfb503b441cb15f205441a73608795b73974bc6d142e6b72e8b81a2f"
                     ]
                 },
                 "ignoreArrayOrder": true,
@@ -23,7 +19,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-usdc-decimals.json",
+        "bodyFileName": "body-eth_getTransactionReceiptERC20.json",
         "headers": {
             "Content-Type": "application/json"
         }

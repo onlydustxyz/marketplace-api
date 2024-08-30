@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.port.out.BlockchainTransactionStoragePort;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.RpcClient;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 
 import java.time.Instant;
@@ -17,6 +18,8 @@ public class AptosTransactionStorageAdapter implements BlockchainTransactionStor
     @Override
     public Optional<AptosTransaction> get(AptosTransaction.Hash reference) {
         return client.getTransactionByHash(reference.toString())
-                .map(t -> new AptosTransaction(Aptos.transactionHash(t.hash()), Instant.ofEpochMilli(t.timestamp() / 1000).atZone(ZoneOffset.UTC)));
+                .map(t -> new AptosTransaction(Aptos.transactionHash(t.hash()),
+                        Instant.ofEpochMilli(t.timestamp() / 1000).atZone(ZoneOffset.UTC),
+                        Blockchain.Transaction.Status.CONFIRMED)); // FIXME: status
     }
 }

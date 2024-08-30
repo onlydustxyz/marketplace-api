@@ -49,7 +49,10 @@ public class TransferTransactionEntity {
 
     public static TransferTransactionEntity of(Blockchain.TransferTransaction transaction) {
         return TransferTransactionEntity.builder()
+                .id(UUID.randomUUID())
+                .timestamp(transaction.timestamp())
                 .reference(transaction.reference())
+                .blockchain(NetworkEnumEntity.valueOf(transaction.blockchain().name()))
                 .senderAddress(transaction.senderAddress())
                 .recipientAddress(transaction.recipientAddress())
                 .amount(transaction.amount())

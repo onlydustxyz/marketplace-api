@@ -1,0 +1,26 @@
+{
+    "jsonrpc": "2.0",
+    "id": {{jsonPath request.body '$.id'}},
+    "result": {
+        "accessList": [],
+        "blockHash": "0xab6248cf9afd4d51eee811b2bc25a28d9e050aa1d503fb317b4ecda228957a6f",
+        "blockNumber": "0x13af2f5",
+        "chainId": "0x1",
+        "from": "0xe6f63ed2d861e2a4d2de598262565250ffc11d24",
+        "gas": "0x17166",
+        "gasPrice": "0x55f91e59",
+        "hash": "{{jsonPath request.body '$.params[0]'}}",
+        "input": "0xa9059cbb0000000000000000000000008371e21f595dbf98caffdcef665ebcaccb983cb1000000000000000000000000000000000000000000000000000000002e4dd52b",
+        "maxFeePerGas": "0x6c6b00fb",
+        "maxPriorityFeePerGas": "0x1dcd6500",
+        "nonce": "0x0",
+        "r": "0x1e1301861b0f3ad7ecb8d5b0279ae74f60707b5ccf86640cc52c2f2d3f29eb40",
+        "s": "0x38f25e6a8f3b06e9a1e6d35b2ae3fe135b7dbfe99ec0a5ec72189f484bb5b502",
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "transactionIndex": "0x1b",
+        "type": "0x2",
+        "v": "0x0",
+        "value": "0x0",
+        "yParity": "0x0"
+    }
+}
