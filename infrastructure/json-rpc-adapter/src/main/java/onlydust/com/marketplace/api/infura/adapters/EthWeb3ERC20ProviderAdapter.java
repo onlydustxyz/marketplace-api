@@ -4,7 +4,6 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.ERC20;
 import onlydust.com.marketplace.accounting.domain.port.out.ERC20Provider;
 import onlydust.com.marketplace.api.infura.Web3Client;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Hash;
 import org.web3j.abi.TypeReference;
 import org.web3j.abi.datatypes.Function;
@@ -22,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 public class EthWeb3ERC20ProviderAdapter extends Web3Client implements ERC20Provider {
     public EthWeb3ERC20ProviderAdapter(final Properties properties) {
@@ -41,7 +41,7 @@ public class EthWeb3ERC20ProviderAdapter extends Web3Client implements ERC20Prov
         } catch (ExecutionException | InterruptedException e) {
             if (e.getCause() instanceof ContractCallException)
                 return Optional.empty();
-            throw OnlyDustException.internalServerError("Unable to fetch ERC20 name at address %s".formatted(address), e);
+            throw internalServerError("Unable to fetch ERC20 name at address %s".formatted(address), e);
         }
     }
 

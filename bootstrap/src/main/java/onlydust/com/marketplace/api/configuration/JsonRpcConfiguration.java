@@ -30,8 +30,9 @@ public class JsonRpcConfiguration {
     }
 
     @Bean
-    public Web3EvmTransactionStorageAdapter ethereumTransactionStorageAdapter(final Web3Client.Properties ethereumProperties) {
-        return new Web3EvmTransactionStorageAdapter(ethereumProperties);
+    public Web3EvmTransactionStorageAdapter ethereumTransactionStorageAdapter(final Web3Client.Properties ethereumProperties,
+                                                                              final EthWeb3ERC20ProviderAdapter ethereumERC20Provider) {
+        return new Web3EvmTransactionStorageAdapter(ethereumProperties, ethereumERC20Provider);
     }
 
     @Bean
@@ -46,8 +47,9 @@ public class JsonRpcConfiguration {
     }
 
     @Bean
-    public Web3EvmTransactionStorageAdapter optimismTransactionStorageAdapter(final Web3Client.Properties optimismProperties) {
-        return new Web3EvmTransactionStorageAdapter(optimismProperties);
+    public Web3EvmTransactionStorageAdapter optimismTransactionStorageAdapter(final Web3Client.Properties optimismProperties,
+                                                                              final EthWeb3ERC20ProviderAdapter optimismERC20Provider) {
+        return new Web3EvmTransactionStorageAdapter(optimismProperties, optimismERC20Provider);
     }
 
     @Bean

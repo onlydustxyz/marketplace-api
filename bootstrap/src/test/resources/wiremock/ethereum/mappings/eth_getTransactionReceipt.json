@@ -6,7 +6,7 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_getBlockByHash"
+                    "method": "eth_getTransactionReceipt"
                 },
                 "ignoreArrayOrder": true,
                 "ignoreExtraElements": true
@@ -15,7 +15,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-eth_getBlockByHash.json",
+        "bodyFileName": "body-eth_getTransactionReceipt.json",
         "headers": {
             "Content-Type": "application/json"
         }

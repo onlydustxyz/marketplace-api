@@ -1,4 +1,5 @@
 {
+    "priority": 1,
     "request": {
         "url": "/",
         "method": "POST",
@@ -6,7 +7,10 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_getBlockByHash"
+                    "method": "eth_getTransactionByHash",
+                    "params": [
+                        "0x626f7613dfb503b441cb15f205441a73608795b73974bc6d142e6b72e8b81a2f"
+                    ]
                 },
                 "ignoreArrayOrder": true,
                 "ignoreExtraElements": true
@@ -15,7 +19,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-eth_getBlockByHash.json",
+        "bodyFileName": "body-eth_getTransactionByHashERC20.json",
         "headers": {
             "Content-Type": "application/json"
         }
