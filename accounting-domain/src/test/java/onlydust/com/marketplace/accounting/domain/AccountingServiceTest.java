@@ -1689,6 +1689,11 @@ public class AccountingServiceTest {
     class Deposits {
         final SponsorId sponsorId = SponsorId.random();
 
+        @BeforeEach
+        void setup() {
+            when(blockchainFacadePort.sanitizedTransactionReference(any(), anyString())).thenAnswer(i -> i.getArgument(1));
+        }
+
         @Test
         void should_reject_non_supported_networks() {
             assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.SEPA, "REF 123465"))
@@ -1922,7 +1927,7 @@ public class AccountingServiceTest {
 
             static TransferTransaction fakeNative(Status status) {
                 final var faker = new Faker();
-                return new TransferTransaction(faker.crypto().sha256(),
+                return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         status,
@@ -1934,7 +1939,7 @@ public class AccountingServiceTest {
 
             static TransferTransaction fakeErc20() {
                 final var faker = new Faker();
-                return new TransferTransaction(faker.crypto().sha256(),
+                return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         Status.CONFIRMED,
