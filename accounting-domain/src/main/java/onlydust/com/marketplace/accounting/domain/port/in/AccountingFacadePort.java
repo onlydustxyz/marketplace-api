@@ -62,5 +62,5 @@ public interface AccountingFacadePort {
 
     Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency);
 
-    void updateDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
+    void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
 }

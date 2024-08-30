@@ -521,7 +521,7 @@ public class AccountingService implements AccountingFacadePort {
 
     @Override
     @Transactional
-    public void updateDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation) {
+    public void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation) {
         final var deposit = depositStoragePort.find(depositId)
                 .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
 

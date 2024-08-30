@@ -394,7 +394,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_update_deposit() {
             // Given
-            final var deposit = depositHelper.create(sponsor.id(), Network.ETHEREUM);
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
 
             // When
             client.put()
@@ -468,7 +468,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_with_same_transaction_reference() {
             // Given
-            final var deposit = depositHelper.create(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
 
             // When
             client.post()
@@ -521,7 +521,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_be_unauthorized_to_update_a_deposit() {
             // Given
-            final var deposit = depositHelper.create(sponsor.id(), Network.ETHEREUM);
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
 
             // When
             client.put()

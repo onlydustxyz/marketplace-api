@@ -15,11 +15,11 @@ public class DepositHelper {
 
     private final Faker faker = new Faker();
 
-    public Deposit create(SponsorId sponsorId, Network network) {
-        return accountingFacadePort.previewDeposit(sponsorId, network, "0x" + faker.random().hex());
+    public Deposit preview(SponsorId sponsorId, Network network) {
+        return preview(sponsorId, network, "0x" + faker.random().hex());
     }
 
-    public Deposit create(SponsorId sponsorId, Network network, String transactionReference) {
+    public Deposit preview(SponsorId sponsorId, Network network, String transactionReference) {
         return accountingFacadePort.previewDeposit(sponsorId, network, transactionReference);
     }
 }

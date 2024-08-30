@@ -77,7 +77,7 @@ public class SponsorsRestApi implements SponsorsApi {
     public ResponseEntity<Void> updateDeposit(UUID depositId, UpdateDepositRequest updateDepositRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        accountingFacadePort.updateDeposit(
+        accountingFacadePort.submitDeposit(
                 UserId.of(authenticatedUser.id()),
                 Deposit.Id.of(depositId),
                 DepositMapper.fromBillingInformation(updateDepositRequest.getBillingInformation())
