@@ -1720,6 +1720,22 @@ public class AccountingServiceTest {
                     .hasMessage("Transaction %s is not a transfer transaction".formatted(transaction.reference));
         }
 
+        @ParameterizedTest
+        @EnumSource(value = Blockchain.Transaction.Status.class, names = {"CONFIRMED"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_reject_when_transaction_not_confirmed(Blockchain.Transaction.Status status) {
+            // Given
+            final var transaction = TransferTransaction.fakeNative(status);
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction %s is not confirmed".formatted(transaction.reference));
+        }
+
         @Test
         void should_reject_deposit_for_native_transfer_if_not_supported() {
             // Given
@@ -1760,7 +1776,6 @@ public class AccountingServiceTest {
 
             verify(depositStoragePort).save(deposit);
         }
-
 
         @Test
         void should_reject_deposit_for_erc20_transfer_if_not_supported() {
@@ -1828,11 +1843,15 @@ public class AccountingServiceTest {
             }
 
             static TransferTransaction fakeNative() {
+                return fakeNative(Status.CONFIRMED);
+            }
+
+            static TransferTransaction fakeNative(Status status) {
                 final var faker = new Faker();
                 return new TransferTransaction(faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
-                        Status.CONFIRMED,
+                        status,
                         faker.crypto().sha256(),
                         faker.crypto().sha256(),
                         BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
