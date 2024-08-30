@@ -1,4 +1,5 @@
 {
+    "priority": 1,
     "request": {
         "url": "/",
         "method": "POST",
@@ -6,14 +7,9 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_call",
+                    "method": "eth_getTransactionReceipt",
                     "params": [
-                        {
-                            "from": "0x3a21b08e9acc1d60728a06e26e8e99713b2aa7de",
-                            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                            "data": "0x01ffc9a736372b0700000000000000000000000000000000000000000000000000000000"
-                        },
-                        "latest"
+                        "0x821fd2b9b7c950d712ffa13b2b7bed56db35b3919f40baf10d816d4dc35a479f"
                     ]
                 },
                 "ignoreArrayOrder": true,
@@ -23,7 +19,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-eth_call-resolver-supportsInterface_ERC20.json",
+        "bodyFileName": "body-eth_getTransactionReceiptERC20.json",
         "headers": {
             "Content-Type": "application/json"
         }

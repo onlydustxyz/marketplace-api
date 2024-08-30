@@ -6,11 +6,7 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_getCode",
-                    "params": [
-                        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-                        "latest"
-                    ]
+                    "method": "eth_getTransactionByHash"
                 },
                 "ignoreArrayOrder": true,
                 "ignoreExtraElements": true
@@ -19,7 +15,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-eth_getCodeERC20.json",
+        "bodyFileName": "body-eth_getTransactionByHash.json",
         "headers": {
             "Content-Type": "application/json"
         }

@@ -1,4 +1,5 @@
 {
+    "priority": 1,
     "request": {
         "url": "/",
         "method": "POST",
@@ -6,9 +7,12 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_getCode",
+                    "method": "eth_call",
                     "params": [
-                        "0xb060429d14266d06a8be63281205668be823604f",
+                        {
+                            "to": "0x4200000000000000000000000000000000000042",
+                            "data": "0x313ce567"
+                        },
                         "latest"
                     ]
                 },
@@ -19,7 +23,7 @@
     },
     "response": {
         "status": 200,
-        "bodyFileName": "body-eth_getCode.json",
+        "bodyFileName": "body-op-decimals.json",
         "headers": {
             "Content-Type": "application/json"
         }

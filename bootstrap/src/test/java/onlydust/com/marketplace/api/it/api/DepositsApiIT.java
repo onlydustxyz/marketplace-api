@@ -166,6 +166,146 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_be_preview_a_deposit_of_eth_on_optimism() {
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "OPTIMISM",
+                                "transactionReference": "0x1234567890123456789012345678901234567890"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 0.029180771065409698,
+                                "prettyAmount": 0.02918,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 52.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "finalBalance": {
+                                "amount": 0.029180771065409698,
+                                "prettyAmount": 0.02918,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 52.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x1f9090aae28b8a3dceadf281b0f12828e676c326",
+                                "transactionReference": "0x1234567890123456789012345678901234567890"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
+        }
+
+        @Test
+        void should_be_preview_a_deposit_of_op_on_optimism() {
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "OPTIMISM",
+                                "transactionReference": "0x821fd2b9b7c950d712ffa13b2b7bed56db35b3919f40baf10d816d4dc35a479f"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 14.156839490418507000,
+                                "prettyAmount": 14.156839490418507000,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "finalBalance": {
+                                "amount": 14.156839490418507000,
+                                "prettyAmount": 14.156839490418507000,
+                                "currency": {
+                                  "id": "00ca98a5-0197-4b76-a208-4bfc55ea8256",
+                                  "code": "OP",
+                                  "name": "Optimism",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x8d345c1dcf02495a1e7089a7bc61c77fe2326027",
+                                "transactionReference": "0x821fd2b9b7c950d712ffa13b2b7bed56db35b3919f40baf10d816d4dc35a479f"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
+        }
     }
 
     @Nested

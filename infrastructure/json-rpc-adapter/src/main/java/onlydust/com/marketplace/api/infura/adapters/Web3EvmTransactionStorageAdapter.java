@@ -72,7 +72,7 @@ public class Web3EvmTransactionStorageAdapter extends Web3Client implements Bloc
                             receipt.isStatusOK() ? CONFIRMED : FAILED,
                             Ethereum.accountAddress(l._from),
                             Ethereum.accountAddress(l._to),
-                            BigDecimal.valueOf(l._value.longValue(), decimals.intValue()),
+                            new BigDecimal(l._value, decimals.intValue()),
                             Ethereum.contractAddress(transaction.getTo())))
                     .findFirst()
                     .map(identity());
