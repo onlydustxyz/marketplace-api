@@ -72,6 +72,10 @@ infrastructure:
     project-application-refused-email-id: 80
     issue-created-email-id: 90
 application:
+  onlydust-wallets:
+    ethereum: 0xthisisafakeaddress
+    starknet: 0xanotherfakeaddress
+    aptos: 0xyetanotherfakeaddress
   web:
     machine-to-machine:
       api-key: "some-api-key"
