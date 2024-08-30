@@ -11,8 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
-
 @AllArgsConstructor
 public class PostgresDepositStorage implements DepositStoragePort {
     private final DepositRepository depositRepository;
@@ -24,23 +22,18 @@ public class PostgresDepositStorage implements DepositStoragePort {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Optional<SponsorId> findDepositSponsor(Deposit.Id depositId) {
-        return depositRepository.findById(depositId.value()).map(DepositEntity::sponsorId).map(SponsorId::of);
-    }
-
-    @Override
-    @Transactional
-    public void saveStatusAndBillingInformation(Deposit.Id depositId, Deposit.Status status, Deposit.BillingInformation billingInformation) {
-        final var deposit = depositRepository.findById(depositId.value())
-                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
-        deposit.status(status);
-        deposit.billingInformation(billingInformation);
+    public Optional<Deposit> find(Deposit.Id depositId) {
+        return depositRepository.findById(depositId.value()).map(DepositEntity::toDomain);
     }
 
     @Override
     public Optional<Deposit.BillingInformation> findLatestBillingInformation(@NonNull SponsorId sponsorId) {
         return depositRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
                 .map(DepositEntity::billingInformation);
+    }
+
+    @Override
+    public Optional<Deposit> findByTransactionReference(@NonNull String transactionReference) {
+        return depositRepository.findByTransactionReference(transactionReference).map(DepositEntity::toDomain);
     }
 }

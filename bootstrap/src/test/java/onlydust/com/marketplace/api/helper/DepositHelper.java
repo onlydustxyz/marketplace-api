@@ -18,4 +18,8 @@ public class DepositHelper {
     public Deposit create(SponsorId sponsorId, Network network) {
         return accountingFacadePort.previewDeposit(sponsorId, network, "0x" + faker.random().hex());
     }
+
+    public Deposit create(SponsorId sponsorId, Network network, String transactionReference) {
+        return accountingFacadePort.previewDeposit(sponsorId, network, transactionReference);
+    }
 }

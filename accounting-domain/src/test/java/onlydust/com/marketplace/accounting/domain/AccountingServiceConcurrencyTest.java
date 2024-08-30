@@ -88,6 +88,7 @@ public class AccountingServiceConcurrencyTest {
                     receiptStoragePort,
                     mock(BlockchainFacadePort.class),
                     mock(DepositStoragePort.class),
+                    mock(TransactionStoragePort.class),
                     permissionPort);
         }
 
@@ -177,6 +178,7 @@ public class AccountingServiceConcurrencyTest {
                         receiptStoragePort,
                         mock(BlockchainFacadePort.class),
                         mock(DepositStoragePort.class),
+                        mock(TransactionStoragePort.class),
                         permissionPort));
             }
         }

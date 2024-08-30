@@ -464,6 +464,30 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_preview_a_deposit_with_same_transaction_reference() {
+            // Given
+            final var deposit = depositHelper.create(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "ETHEREUM",
+                                "transactionReference": "0x111112222233333"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(deposit.id().value().toString());
+        }
     }
 
     @Nested

@@ -6,4 +6,6 @@ import java.util.Optional;
 
 public interface BlockchainFacadePort {
     Optional<Blockchain.Transaction> getTransaction(Blockchain blockchain, String reference);
+
+    String sanitizedTransactionReference(Blockchain blockchain, String reference);
 }
