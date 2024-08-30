@@ -3,204 +3,51 @@
     "id": {{jsonPath request.body '$.id'}},
     "result": {
         "type": "INVOKE",
-        "transaction_hash": "0x6f744862e608e67442d4737571d1da440e33c8e22f22e90a6e759d166e9369c",
+        "transaction_hash": "0x15b2c010276e6a8eb3739972869d6f9bf4e0ce441c047895a8b44bd8ea9bfdb",
         "actual_fee": {
-            "amount": "0x6a406d5cd0",
-            "unit": "WEI"
+            "amount": "0x4180dc49364813",
+            "unit": "FRI"
         },
         "execution_status": "SUCCEEDED",
-        "finality_status": "ACCEPTED_ON_L2",
+        "finality_status": "ACCEPTED_ON_L1",
         "block_hash": "0x29369230c32633ec9950456a363d8d919c8e4bc5d6b783ba89772051c7b4366",
-        "block_number": 669512,
+        "block_number": 663292,
         "messages_sent": [],
         "events": [
             {
-                "from_address": "0x4878d1148318a31829523ee9c6a5ee563af6cd87f90a30809e5b0d27db8a9b",
-                "keys": [
-                    "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
-                    "0x57ee37291d82ca6ce49c99f7918d210a5c4332b3aae8416c18a016e988f6937",
-                    "0x127021a1b5a52d3174c2ab077c2b043c80369250d29428cee956d76ee51584f"
-                ],
-                "data": [
-                    "0x39dd985",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x422d33a3638dcc4c62e72e1d6942cd31eb643ef596ccac2351e0e21f6cd4bf4",
-                "keys": [
-                    "0x297be67eb977068ccd2304c6440368d4a6114929aeb860c98b6a7e91f96e2ef",
-                    "0x43726577",
-                    "0x1"
-                ],
-                "data": [
-                    "0x1",
-                    "0x7b50001",
-                    "0x57ee37291d82ca6ce49c99f7918d210a5c4332b3aae8416c18a016e988f6937",
-                    "0x4",
-                    "0x1809",
-                    "0xf03",
-                    "0x1f19",
-                    "0x207a",
-                    "0x66bc7494",
-                    "0x66c227bd",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x422d33a3638dcc4c62e72e1d6942cd31eb643ef596ccac2351e0e21f6cd4bf4",
-                "keys": [
-                    "0x297be67eb977068ccd2304c6440368d4a6114929aeb860c98b6a7e91f96e2ef",
-                    "0x496e76656e746f7279"
-                ],
-                "data": [
-                    "0x2",
-                    "0x377f0005",
-                    "0x2",
-                    "0xa",
-                    "0x1",
-                    "0x9fbc8460",
-                    "0x39634db59",
-                    "0xc1a1a808",
-                    "0x56e6c2c3a",
-                    "0x8",
-                    "0x42",
-                    "0x77522",
-                    "0xa9",
-                    "0x116a1",
-                    "0x2",
-                    "0xeb6c4",
-                    "0x59",
-                    "0x3ee1",
-                    "0x8f",
-                    "0x2",
-                    "0x3",
-                    "0xb22",
-                    "0x18",
-                    "0x363b",
-                    "0x7",
-                    "0x1121b5",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x422d33a3638dcc4c62e72e1d6942cd31eb643ef596ccac2351e0e21f6cd4bf4",
-                "keys": [
-                    "0x297be67eb977068ccd2304c6440368d4a6114929aeb860c98b6a7e91f96e2ef",
-                    "0x50726f636573736f72",
-                    "0x1"
-                ],
-                "data": [
-                    "0x2",
-                    "0x67a0005",
-                    "0x1",
-                    "0x1",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x80000000",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x422d33a3638dcc4c62e72e1d6942cd31eb643ef596ccac2351e0e21f6cd4bf4",
-                "keys": [
-                    "0x17d3031632aeed96ab9d68226d6439ef5fdc0bb7f8086a7cc6a54207da53e4"
-                ],
-                "data": [
-                    "0x5",
-                    "0x67a",
-                    "0x1",
-                    "0x1",
-                    "0x7b5",
-                    "0x57ee37291d82ca6ce49c99f7918d210a5c4332b3aae8416c18a016e988f6937"
-                ]
-            },
-            {
-                "from_address": "0x57ee37291d82ca6ce49c99f7918d210a5c4332b3aae8416c18a016e988f6937",
-                "keys": [
-                    "0x1dcde06aabdbca2f80aa51392b345d7549d7757aa855f7e37f5d335ac8243b1",
-                    "0x7f3170791b64dba865d67ee6d6a9cf969a3f417effcefe7b424599cff1f6ce6"
-                ],
-                "data": [
-                    "0x3",
-                    "0x1",
-                    "0x1",
-                    "0x1",
-                    "0x0",
-                    "0x1",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x4878d1148318a31829523ee9c6a5ee563af6cd87f90a30809e5b0d27db8a9b",
-                "keys": [
-                    "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
-                    "0x127021a1b5a52d3174c2ab077c2b043c80369250d29428cee956d76ee51584f",
-                    "0x455f986e8eef5fbfbdf7c8246a38eae29d0bbd9af7e657bb268fb8a801d9ab3"
-                ],
-                "data": [
-                    "0x1939f3f",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x4878d1148318a31829523ee9c6a5ee563af6cd87f90a30809e5b0d27db8a9b",
-                "keys": [
-                    "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9",
-                    "0x127021a1b5a52d3174c2ab077c2b043c80369250d29428cee956d76ee51584f",
-                    "0x57ee37291d82ca6ce49c99f7918d210a5c4332b3aae8416c18a016e988f6937"
-                ],
-                "data": [
-                    "0x20a3a46",
-                    "0x0"
-                ]
-            },
-            {
-                "from_address": "0x709581a5fdc685876ccebf3062d2f6a352ff55c81bd751cf29997a07bc6fc69",
-                "keys": [
-                    "0x1dcde06aabdbca2f80aa51392b345d7549d7757aa855f7e37f5d335ac8243b1",
-                    "0x6f744862e608e67442d4737571d1da440e33c8e22f22e90a6e759d166e9369c"
-                ],
-                "data": [
-                    "0x1",
-                    "0x1",
-                    "0x1"
-                ]
-            },
-            {
-                "from_address": "0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+                "from_address": "0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8",
                 "keys": [
                     "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9"
                 ],
                 "data": [
-                    "0x709581a5fdc685876ccebf3062d2f6a352ff55c81bd751cf29997a07bc6fc69",
+                    "0x8a518279505bb4b95ff3f2f9700501ccef4c8720f259480c76cbf49dd2b6b8",
+                    "0x39b01fbac905c359757a65ae41b75d5c4b0f16a0f0e8dd9aca1506da545eef8",
+                    "0x839b680",
+                    "0x0"
+                ]
+            },
+            {
+                "from_address": "0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d",
+                "keys": [
+                    "0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9"
+                ],
+                "data": [
+                    "0x8a518279505bb4b95ff3f2f9700501ccef4c8720f259480c76cbf49dd2b6b8",
                     "0x1176a1bd84444c89232ec27754698e5d2e7e1a7f1539f12027f28b23ec9f3d8",
-                    "0x6a406d5cd0",
+                    "0x4180dc49364813",
                     "0x0"
                 ]
             }
         ],
         "execution_resources": {
-            "steps": 82798,
-            "pedersen_builtin_applications": 122,
-            "range_check_builtin_applications": 3049,
-            "ec_op_builtin_applications": 15,
-            "poseidon_builtin_applications": 111,
+            "steps": 288229,
+            "pedersen_builtin_applications": 25,
+            "range_check_builtin_applications": 29791,
+            "bitwise_builtin_applications": 54,
+            "poseidon_builtin_applications": 3,
             "data_availability": {
                 "l1_gas": 0,
-                "l1_data_gas": 896
+                "l1_data_gas": 192
             }
         }
     }

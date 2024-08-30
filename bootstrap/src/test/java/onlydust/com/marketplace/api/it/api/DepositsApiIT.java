@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -301,6 +303,79 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                               "senderInformation": {
                                 "accountNumber": "0x8d345c1dcf02495a1e7089a7bc61c77fe2326027",
                                 "transactionReference": "0x821fd2b9b7c950d712ffa13b2b7bed56db35b3919f40baf10d816d4dc35a479f"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
+        }
+
+        @Test
+        void should_be_preview_a_deposit_of_usdc_on_starknet() {
+            // Given
+            currencyHelper.addERC20Support(Blockchain.STARKNET, Currency.Code.USDC);
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "STARKNET",
+                                "transactionReference": "0x015b2c010276e6a8eb3739972869d6f9bf4e0ce441c047895a8b44bd8ea9bfdb"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 138.000000,
+                                "prettyAmount": 138.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 139.38,
+                                "usdConversionRate": 1.010001
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 1.010001
+                              },
+                              "finalBalance": {
+                                "amount": 138.000000,
+                                "prettyAmount": 138.00,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 139.38,
+                                "usdConversionRate": 1.010001
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x8a518279505bb4b95ff3f2f9700501ccef4c8720f259480c76cbf49dd2b6b8",
+                                "transactionReference": "0x015b2c010276e6a8eb3739972869d6f9bf4e0ce441c047895a8b44bd8ea9bfdb"
                               },
                               "billingInformation": null
                             }

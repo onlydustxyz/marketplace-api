@@ -255,6 +255,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected HackathonHelper hackathonHelper;
     @Autowired
+    protected CurrencyHelper currencyHelper;
+    @Autowired
     OutboxConsumerJob indexerOutboxJob;
     @Autowired
     OutboxConsumerJob trackingOutboxJob;
