@@ -1804,16 +1804,20 @@ public class AccountingServiceTest {
             verify(depositStoragePort).save(deposit);
         }
 
-        record Transaction(String reference, ZonedDateTime timestamp) implements Blockchain.Transaction {
+        record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
             static Transaction fake() {
                 final var faker = new Faker();
                 return new Transaction(faker.crypto().sha256(),
-                        ZonedDateTime.now());
+                        ZonedDateTime.now(),
+                        Blockchain.ETHEREUM,
+                        Status.CONFIRMED);
             }
         }
 
         record TransferTransaction(String reference,
                                    ZonedDateTime timestamp,
+                                   Blockchain blockchain,
+                                   Status status,
                                    String senderAddress,
                                    String recipientAddress,
                                    BigDecimal amount,
@@ -1827,6 +1831,8 @@ public class AccountingServiceTest {
                 final var faker = new Faker();
                 return new TransferTransaction(faker.crypto().sha256(),
                         ZonedDateTime.now(),
+                        Blockchain.ETHEREUM,
+                        Status.CONFIRMED,
                         faker.crypto().sha256(),
                         faker.crypto().sha256(),
                         BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
@@ -1837,6 +1843,8 @@ public class AccountingServiceTest {
                 final var faker = new Faker();
                 return new TransferTransaction(faker.crypto().sha256(),
                         ZonedDateTime.now(),
+                        Blockchain.ETHEREUM,
+                        Status.CONFIRMED,
                         faker.crypto().sha256(),
                         faker.crypto().sha256(),
                         BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),

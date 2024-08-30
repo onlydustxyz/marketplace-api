@@ -6,13 +6,7 @@
             {
                 "equalToJson": {
                     "jsonrpc": "2.0",
-                    "method": "eth_call",
-                    "params": [
-                        {
-                            "to": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85"
-                        },
-                        "latest"
-                    ]
+                    "method": "eth_call"
                 },
                 "ignoreArrayOrder": true,
                 "ignoreExtraElements": true

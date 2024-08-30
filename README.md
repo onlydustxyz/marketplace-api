@@ -94,9 +94,3 @@ Optionally, [configure JetBrains to sign commits](https://www.jetbrains.com/help
 >
 > Now every commit will be signed with the selected key. The state of the GPG signature will be displayed in the Commit details pane on the Log tab.
 
-### Infrastucture
-
-#### Web3 integration
-
-See the dedicated [README.md](./infrastructure/json-rpc-adapter/README.md) for more information.
-
