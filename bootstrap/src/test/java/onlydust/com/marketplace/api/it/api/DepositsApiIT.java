@@ -515,8 +515,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             {
                               "amount": {
-                                "amount": 10000,
-                                "prettyAmount": 10000,
+                                "amount": 0.00010000,
+                                "prettyAmount": 0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -524,7 +524,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": 3013.40,
+                                "usdEquivalent": 0.00,
                                 "usdConversionRate": 0.30134
                               },
                               "currentBalance": {
@@ -541,8 +541,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                                 "usdConversionRate": 0.30134
                               },
                               "finalBalance": {
-                                "amount": 10000,
-                                "prettyAmount": 10000,
+                                "amount": 0.00010000,
+                                "prettyAmount": 0,
                                 "currency": {
                                   "id": "48388edb-fda2-4a32-b228-28152a147500",
                                   "code": "APT",
@@ -550,7 +550,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                                   "logoUrl": null,
                                   "decimals": 8
                                 },
-                                "usdEquivalent": 3013.40,
+                                "usdEquivalent": 0.00,
                                 "usdConversionRate": 0.30134
                               },
                               "senderInformation": {

@@ -8,7 +8,6 @@ import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.infrastructure.HttpClient;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -131,8 +130,8 @@ public class RpcClient extends HttpClient {
                         super(properties);
                     }
 
-                    public BigDecimal amount() {
-                        return new BigDecimal(properties().get("amount").toString());
+                    public BigInteger amount() {
+                        return new BigInteger(properties().get("amount").toString());
                     }
                 }
 
@@ -141,8 +140,8 @@ public class RpcClient extends HttpClient {
                         super(properties);
                     }
 
-                    public BigDecimal amount() {
-                        return new BigDecimal(properties().get("amount").toString());
+                    public BigInteger amount() {
+                        return new BigInteger(properties().get("amount").toString());
                     }
                 }
             }

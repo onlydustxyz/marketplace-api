@@ -10,6 +10,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransferTransaction;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.util.Optional;
@@ -23,10 +24,10 @@ public class AptosTransactionStorageAdapter implements BlockchainTransactionStor
     @Override
     public Optional<AptosTransaction> get(AptosTransaction.Hash reference) {
         return client.getTransactionByHash(reference.toString())
-                .map(AptosTransactionStorageAdapter::fromTransaction);
+                .map(this::fromTransaction);
     }
 
-    private static @NonNull AptosTransaction fromTransaction(final @NonNull RpcClient.TransactionResponse transaction) {
+    private @NonNull AptosTransaction fromTransaction(final @NonNull RpcClient.TransactionResponse transaction) {
         if (!transaction.payload().isTransfer())
             throw badRequest("Transaction %s is not a transfer transaction".formatted(transaction.hash()));
 
@@ -40,14 +41,18 @@ public class AptosTransactionStorageAdapter implements BlockchainTransactionStor
             throw badRequest("Transaction %s withdrawal amount %s does not match deposit amount %s".formatted(transaction.hash(),
                     withdrawal.data().asWithdrawal().amount(), deposit.data().asDeposit().amount()));
 
+        final var coinType = Aptos.coinType(transaction.payload().typeArguments().get(0));
+        final var coin = client.getAccountResource(coinType.contractAddress(), coinType.resourceType())
+                .orElseThrow(() -> badRequest("Coin %s not found".formatted(coinType.toString())));
+
         return new AptosTransferTransaction(
                 Aptos.transactionHash(transaction.hash()),
                 Instant.ofEpochMilli(transaction.timestamp() / 1000).atZone(ZoneOffset.UTC),
                 transaction.success() ? Blockchain.Transaction.Status.CONFIRMED : AptosTransaction.Status.FAILED,
                 Aptos.accountAddress(withdrawal.guid().accountAddress()),
                 Aptos.accountAddress(deposit.guid().accountAddress()),
-                withdrawal.data().asWithdrawal().amount(),
-                Aptos.coinType(transaction.payload().typeArguments().get(0))
+                new BigDecimal(withdrawal.data().asWithdrawal().amount(), coin.data().decimals()),
+                coinType
         );
     }
 }
