@@ -1,0 +1,1 @@
+DROP VIEW accounting.all_sponsor_account_transactions;

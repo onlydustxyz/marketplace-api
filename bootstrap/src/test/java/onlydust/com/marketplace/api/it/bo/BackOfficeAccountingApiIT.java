@@ -41,7 +41,6 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.backoffice.api.contract.model.BillingProfileType.INDIVIDUAL;
@@ -280,136 +279,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.debt").isEqualTo(20)
                 .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
         ;
-
-
-        client.get()
-                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(COCA_COLAX), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "10"
-                )))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
-                .jsonPath("$.transactions[?(@.type == 'REFUND' && @.amount.amount == 50)].program.id").isEqualTo(program.id().toString())
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 6,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "transactions": [
-                            {
-                              "type": "REFUND",
-                              "network": null,
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 40,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            },
-                            {
-                              "type": "WITHDRAWAL",
-                              "network": "ETHEREUM",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 30,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            },
-                            {
-                              "type": "WITHDRAWAL",
-                              "network": "ETHEREUM",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 30,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            },
-                            {
-                              "type": "REFUND",
-                              "network": null,
-                              "lockedUntil": null,
-                              "amount": {
-                                "amount": 50,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            },
-                            {
-                              "type": "TRANSFER",
-                              "network": null,
-                              "lockedUntil": null,
-                              "amount": {
-                                "amount": 90,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            },
-                            {
-                              "type": "DEPOSIT",
-                              "network": "ETHEREUM",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                  "code": "STRK",
-                                  "name": "StarkNet Token",
-                                  "logoUrl": null,
-                                  "decimals": 18
-                                },
-                                "dollarsEquivalent": null,
-                                "conversionRate": null
-                              }
-                            }
-                          ]
-                        }
-                        """);
 
     }
 
@@ -811,63 +680,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
         ;
-
-        client.get()
-                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "10"
-                )))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "transactions": [
-                            {
-                              "type": "TRANSFER",
-                              "network": null,
-                              "lockedUntil": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.010001
-                              }
-                            },
-                            {
-                              "type": "DEPOSIT",
-                              "network": "ETHEREUM",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.010001
-                              }
-                            }
-                          ]
-                        }
-                        """);
     }
 
     @Test
@@ -1067,63 +879,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
         ;
-
-        client.get()
-                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "10"
-                )))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "transactions": [
-                            {
-                              "type": "TRANSFER",
-                              "network": null,
-                              "lockedUntil": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.010001
-                              }
-                            },
-                            {
-                              "type": "DEPOSIT",
-                              "network": "STARKNET",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                  "code": "USDC",
-                                  "name": "USD Coin",
-                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                  "decimals": 6
-                                },
-                                "dollarsEquivalent": 101.00,
-                                "conversionRate": 1.010001
-                              }
-                            }
-                          ]
-                        }
-                        """);
     }
 
     @Test
@@ -1277,63 +1032,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .jsonPath("$.accounts[0].debt").isEqualTo(0)
                 .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
         ;
-
-        client.get()
-                .uri(getApiURI(GET_SPONSORS_TRANSACTIONS.formatted(REDBULL), Map.of(
-                        "pageIndex", "0",
-                        "pageSize", "10"
-                )))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.transactions[?(@.type == 'TRANSFER')].program.id").isEqualTo(program.id().toString())
-                .json("""
-                        {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 2,
-                          "hasMore": false,
-                          "nextPageIndex": 0,
-                          "transactions": [
-                            {
-                              "type": "TRANSFER",
-                              "network": null,
-                              "lockedUntil": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                  "code": "APT",
-                                  "name": "Aptos Coin",
-                                  "logoUrl": null,
-                                  "decimals": 8
-                                },
-                                "dollarsEquivalent": 30.13,
-                                "conversionRate": 0.30134
-                              }
-                            },
-                            {
-                              "type": "DEPOSIT",
-                              "network": "APTOS",
-                              "lockedUntil": null,
-                              "program": null,
-                              "amount": {
-                                "amount": 100,
-                                "currency": {
-                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
-                                  "code": "APT",
-                                  "name": "Aptos Coin",
-                                  "logoUrl": null,
-                                  "decimals": 8
-                                },
-                                "dollarsEquivalent": 30.13,
-                                "conversionRate": 0.30134
-                              }
-                            }
-                          ]
-                        }
-                        """);
     }
 
     @Test
