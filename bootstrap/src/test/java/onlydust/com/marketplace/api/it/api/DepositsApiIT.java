@@ -704,6 +704,76 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_preview_a_deposit_of_usdc_on_stellar() {
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "STELLAR",
+                                "transactionReference": "97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 0.1837502,
+                                "prettyAmount": 0.18,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 0.19,
+                                "usdConversionRate": 1.010001
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 1.010001
+                              },
+                              "finalBalance": {
+                                "amount": 0.1837502,
+                                "prettyAmount": 0.18,
+                                "currency": {
+                                  "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                  "code": "USDC",
+                                  "name": "USD Coin",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                  "decimals": 6
+                                },
+                                "usdEquivalent": 0.19,
+                                "usdConversionRate": 1.010001
+                              },
+                              "senderInformation": {
+                                "accountNumber": "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL",
+                                "transactionReference": "97157d6c947af69ea379edee2883562cb4b18a7882d366d368b595d899d82835"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
+        }
     }
 
     @Nested

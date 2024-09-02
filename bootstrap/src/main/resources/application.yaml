@@ -152,6 +152,8 @@ infrastructure:
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
   stellar:
+    horizon:
+      base-uri: https://horizon.stellar.org
     soroban:
       base-uri: https://soroban-rpc.mainnet.stellar.gateway.fm
       account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
