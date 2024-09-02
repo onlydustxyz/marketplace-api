@@ -11,11 +11,9 @@ import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BlockchainFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.model.ProgramId;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -39,6 +37,8 @@ public class AccountingService implements AccountingFacadePort {
     private final ReceiptStoragePort receiptStorage;
     private final BlockchainFacadePort blockchainFacadePort;
     private final DepositStoragePort depositStoragePort;
+    private final TransactionStoragePort transactionStoragePort;
+    private final PermissionPort permissionPort;
 
     @Override
     @Transactional
@@ -463,18 +463,37 @@ public class AccountingService implements AccountingFacadePort {
         final var blockchain = network.blockchain()
                 .orElseThrow(() -> badRequest("Network %s is not associated with a blockchain".formatted(network)));
 
-        final var transaction = blockchainFacadePort.getTransaction(blockchain, transactionReference)
-                .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(transactionReference, blockchain.pretty())));
+        final var deposit = tryCreateDeposit(sponsorId, blockchain, transactionReference);
+
+        final var latestBillingInformation = depositStoragePort.findLatestBillingInformation(sponsorId);
+        return deposit.toBuilder()
+                .billingInformation(latestBillingInformation.orElse(null))
+                .build();
+    }
+
+    private Deposit tryCreateDeposit(final @NonNull SponsorId sponsorId, final @NonNull Blockchain blockchain, final @NonNull String transactionReference) {
+        final var sanitizedTransactionReference = blockchainFacadePort.sanitizedTransactionReference(blockchain, transactionReference);
+
+        if (transactionStoragePort.exists(sanitizedTransactionReference)) {
+            final var existingDeposit = depositStoragePort.findByTransactionReference(sanitizedTransactionReference);
+            if (existingDeposit.isPresent() && existingDeposit.get().status() == Deposit.Status.DRAFT) {
+                return existingDeposit.get();
+            }
+            throw badRequest("Transaction %s already exists".formatted(sanitizedTransactionReference));
+        }
+
+        final var transaction = blockchainFacadePort.getTransaction(blockchain, sanitizedTransactionReference)
+                .orElseThrow(() -> notFound("Transaction %s not found on blockchain %s".formatted(sanitizedTransactionReference, blockchain.pretty())));
 
         final var transferTransaction = check(transaction);
-        
+
         final var currency = transferTransaction.contractAddress()
                 .map(address -> currencyStorage.findByErc20(blockchain, address)
                         .orElseThrow(() -> badRequest("Currency %s not supported on blockchain %s".formatted(address, blockchain.pretty()))))
                 .orElseGet(() -> currencyStorage.findByCode(Currency.Code.of(blockchain))
                         .orElseThrow(() -> badRequest("Native currency not supported on blockchain %s".formatted(blockchain.pretty()))));
 
-        final var deposit = Deposit.preview(sponsorId, transferTransaction, currency, null);
+        final var deposit = Deposit.preview(sponsorId, transferTransaction, currency);
         depositStoragePort.save(deposit);
         return deposit;
     }
@@ -498,5 +517,21 @@ public class AccountingService implements AccountingFacadePort {
                 .map(sponsorAccount -> accountBookState.balanceOf(AccountId.of(sponsorAccount.id())))
                 .reduce(PositiveAmount::add)
                 .orElse(PositiveAmount.ZERO);
+    }
+
+    @Override
+    @Transactional
+    public void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        if (!permissionPort.isUserSponsorLead(userId, deposit.sponsorId())) {
+            throw forbidden("User %s is not allowed to update deposit %s".formatted(userId, depositId));
+        }
+
+        depositStoragePort.save(deposit.toBuilder()
+                .status(Deposit.Status.PENDING)
+                .billingInformation(billingInformation)
+                .build());
     }
 }

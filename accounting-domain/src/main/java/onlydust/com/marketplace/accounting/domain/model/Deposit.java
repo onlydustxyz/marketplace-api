@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -10,6 +11,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 import java.util.UUID;
 
+@Builder(toBuilder = true)
 public record Deposit(@NonNull Id id,
                       @NonNull SponsorId sponsorId,
                       @NonNull Blockchain.TransferTransaction transaction,
@@ -19,9 +21,8 @@ public record Deposit(@NonNull Id id,
 
     public static Deposit preview(final @NonNull SponsorId sponsorId,
                                   final @NonNull Blockchain.TransferTransaction transaction,
-                                  final @NonNull Currency currency,
-                                  final BillingInformation billingInformation) {
-        return new Deposit(Id.random(), sponsorId, transaction, currency, Status.DRAFT, billingInformation);
+                                  final @NonNull Currency currency) {
+        return new Deposit(Id.random(), sponsorId, transaction, currency, Status.DRAFT, null);
     }
 
     public enum Status {

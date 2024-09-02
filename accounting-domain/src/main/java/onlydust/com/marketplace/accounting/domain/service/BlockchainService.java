@@ -31,4 +31,15 @@ public class BlockchainService implements BlockchainFacadePort {
             case STELLAR -> stellarTransactionStoragePort.get(Stellar.transactionHash(reference)).map(identity());
         });
     }
+
+    @Override
+    public String sanitizedTransactionReference(Blockchain blockchain, String reference) {
+        return (switch (blockchain) {
+            case ETHEREUM -> Ethereum.transactionHash(reference).toString();
+            case OPTIMISM -> Optimism.transactionHash(reference).toString();
+            case APTOS -> Aptos.transactionHash(reference).toString();
+            case STARKNET -> StarkNet.transactionHash(reference).toString();
+            case STELLAR -> Stellar.transactionHash(reference).toString();
+        });
+    }
 }

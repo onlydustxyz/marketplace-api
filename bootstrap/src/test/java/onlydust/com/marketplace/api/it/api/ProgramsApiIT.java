@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.GrantRequest;
 import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
@@ -29,6 +30,7 @@ import java.util.UUID;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.helper.JSONPathAssertion.jsonObjectEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TagAccounting
@@ -537,6 +539,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             @Test
             void should_get_program_monthly_transactions_stats() {
                 // When
+                final ObjectMapper objectMapper = new ObjectMapper();
                 client.get()
                         .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id())))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
@@ -545,71 +548,71 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
-                        .json("""
+                        .jsonPath("$.stats[?(@.date == '2024-01-01')]").value(jsonObjectEquals("""
                                 {
-                                  "stats": [
-                                    {
-                                      "date": "2024-01-01",
-                                      "totalAvailable": {
-                                        "totalUsdEquivalent": 1515.00,
-                                        "totalPerCurrency": [
-                                          {
-                                            "amount": 1500,
-                                            "prettyAmount": 1500,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 1515.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": 100
-                                          }
-                                        ]
-                                      },
-                                      "totalGranted": {
-                                        "totalUsdEquivalent": 0.00,
-                                        "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          }
-                                        ]
-                                      },
-                                      "totalRewarded": {
-                                        "totalUsdEquivalent": 0.00,
-                                        "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          }
-                                        ]
-                                      },
-                                      "transactionCount": 2
-                                    },
-                                    {
+                                  "date": "2024-01-01",
+                                  "totalAvailable": {
+                                    "totalUsdEquivalent": 1515.00,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 1500,
+                                        "prettyAmount": 1500,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 1515.00,
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": 100
+                                      }
+                                    ]
+                                  },
+                                  "totalGranted": {
+                                    "totalUsdEquivalent": 0.00,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 0,
+                                        "prettyAmount": 0,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 0.00,
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "totalRewarded": {
+                                    "totalUsdEquivalent": 0.00,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 0,
+                                        "prettyAmount": 0,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 0.00,
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "transactionCount": 2
+                                }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-02-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-02-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 22898.81,
@@ -711,8 +714,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 1
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-03-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-03-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 22898.81,
@@ -814,8 +819,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 0
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-04-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-04-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 18627.84,
@@ -917,8 +924,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 3
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-05-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-05-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13281.89,
@@ -1020,8 +1029,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 1
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-06-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-06-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13483.89,
@@ -1123,8 +1134,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 1
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-07-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-07-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13483.89,
@@ -1226,8 +1239,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         ]
                                       },
                                       "transactionCount": 2
-                                    },
-                                    {
+                                    }
+                                """))
+                        .jsonPath("$.stats[?(@.date == '2024-08-01')]").value(jsonObjectEquals("""
+                                {
                                       "date": "2024-08-01",
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13483.89,
@@ -1330,9 +1345,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                       },
                                       "transactionCount": 4
                                     }
-                                  ]
-                                }
-                                """)
+                                """))
                 ;
             }
 

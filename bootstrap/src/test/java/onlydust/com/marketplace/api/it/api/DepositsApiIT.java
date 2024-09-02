@@ -1,19 +1,28 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
+import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagAccounting
 public class DepositsApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser caller;
+
+    @Autowired
+    DepositRepository depositRepository;
 
     @BeforeEach
     void setUp() {
@@ -381,6 +390,104 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             }
                             """);
         }
+
+        @Test
+        void should_update_deposit() {
+            // Given
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
+
+            // When
+            client.put()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(deposit.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "billingInformation": {
+                                    "companyName": "TechCorp Solutions",
+                                    "companyAddress": "123 Innovation Street, Tech City, TC 12345",
+                                    "companyCountry": "United States",
+                                    "companyId": "TC-987654321",
+                                    "vatNumber": "VAT123456789",
+                                    "billingEmail": "billing@techcorp.com",
+                                    "firstName": "John",
+                                    "lastName": "Doe",
+                                    "email": "john.doe@techcorp.com"
+                                }
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful();
+
+            // Then
+            final var depositEntity = depositRepository.findById(deposit.id().value()).orElseThrow();
+            assertThat(depositEntity.billingInformation().companyName()).isEqualTo("TechCorp Solutions");
+            assertThat(depositEntity.status()).isEqualTo(Deposit.Status.PENDING);
+
+            // When another preview is made, the latest billing information should be returned
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "ETHEREUM",
+                                "transactionReference": "0x999888777"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "senderInformation": {
+                                "accountNumber": "0x1f9090aae28b8a3dceadf281b0f12828e676c326",
+                                "transactionReference": "0x0999888777"
+                              },
+                              "billingInformation": {
+                                "companyName": "TechCorp Solutions",
+                                "companyAddress": "123 Innovation Street, Tech City, TC 12345",
+                                "companyCountry": "United States",
+                                "companyId": "TC-987654321",
+                                "vatNumber": "VAT123456789",
+                                "billingEmail": "billing@techcorp.com",
+                                "firstName": "John",
+                                "lastName": "Doe",
+                                "email": "john.doe@techcorp.com"
+                              }
+                            }
+                            """);
+        }
+
+        @Test
+        void should_preview_a_deposit_with_same_transaction_reference() {
+            // Given
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "ETHEREUM",
+                                "transactionReference": "0x111112222233333"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(deposit.id().value().toString());
+        }
     }
 
     @Nested
@@ -403,6 +510,37 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             {
                                 "network": "ETHEREUM",
                                 "transactionReference": "0x1234567890123456789012345678901234567890"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isForbidden();
+        }
+
+        @Test
+        void should_be_unauthorized_to_update_a_deposit() {
+            // Given
+            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
+
+            // When
+            client.put()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(deposit.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "billingInformation": {
+                                    "companyName": "TechCorp Solutions",
+                                    "companyAddress": "123 Innovation Street, Tech City, TC 12345",
+                                    "companyCountry": "United States",
+                                    "companyId": "TC-987654321",
+                                    "vatNumber": "VAT123456789",
+                                    "billingEmail": "billing@techcorp.com",
+                                    "firstName": "John",
+                                    "lastName": "Doe",
+                                    "email": "john.doe@techcorp.com"
+                                }
                             }
                             """)
                     .exchange()

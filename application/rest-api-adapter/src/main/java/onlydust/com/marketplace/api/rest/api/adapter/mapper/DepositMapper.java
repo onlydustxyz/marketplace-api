@@ -37,6 +37,20 @@ public interface DepositMapper {
                 .email(billingInformation.email());
     }
 
+    static Deposit.BillingInformation fromBillingInformation(final DepositBillingInformation billingInformation) {
+        return billingInformation == null ? null : new Deposit.BillingInformation(
+                billingInformation.getCompanyName(),
+                billingInformation.getCompanyAddress(),
+                billingInformation.getCompanyCountry(),
+                billingInformation.getCompanyId(),
+                billingInformation.getVatNumber(),
+                billingInformation.getBillingEmail(),
+                billingInformation.getFirstName(),
+                billingInformation.getLastName(),
+                billingInformation.getEmail()
+        );
+    }
+
     static DepositSenderInformation toSenderInformation(final @NonNull Sponsor sponsor,
                                                         final @NonNull Blockchain.TransferTransaction transaction) {
         return new DepositSenderInformation()

@@ -14,10 +14,7 @@ import onlydust.com.marketplace.api.read.adapters.ReadCurrencyApiPostgresAdapter
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
-import onlydust.com.marketplace.kernel.port.output.IndexerPort;
-import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
-import onlydust.com.marketplace.kernel.port.output.OutboxPort;
+import onlydust.com.marketplace.kernel.port.output.*;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,10 +39,12 @@ public class AccountingConfiguration {
                                                      final @NonNull RewardStatusService rewardStatusService,
                                                      final @NonNull ReceiptStoragePort receiptStoragePort,
                                                      final @NonNull BlockchainFacadePort blockchainFacadePort,
-                                                     final @NonNull DepositStoragePort depositStoragePort
+                                                     final @NonNull DepositStoragePort depositStoragePort,
+                                                     final @NonNull TransactionStoragePort transactionStoragePort,
+                                                     final @NonNull PermissionPort permissionPort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort);
+                invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort);
     }
 
     @Bean
