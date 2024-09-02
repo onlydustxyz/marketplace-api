@@ -5,15 +5,19 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.SponsorsApi;
 import onlydust.com.marketplace.api.contract.model.AllocateRequest;
 import onlydust.com.marketplace.api.contract.model.PreviewDepositRequest;
 import onlydust.com.marketplace.api.contract.model.PreviewDepositResponse;
+import onlydust.com.marketplace.api.contract.model.UpdateDepositRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DepositMapper;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -67,6 +71,19 @@ public class SponsorsRestApi implements SponsorsApi {
         final var currentBalance = accountingFacadePort.getSponsorBalance(deposit.sponsorId(), deposit.currency());
 
         return ok(toPreviewResponse(deposit, sponsor, currentBalance));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateDeposit(UUID depositId, UpdateDepositRequest updateDepositRequest) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        accountingFacadePort.submitDeposit(
+                UserId.of(authenticatedUser.id()),
+                Deposit.Id.of(depositId),
+                DepositMapper.fromBillingInformation(updateDepositRequest.getBillingInformation())
+        );
+
+        return noContent().build();
     }
 
     @Override

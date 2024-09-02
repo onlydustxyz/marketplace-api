@@ -6,12 +6,18 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransferTransaction;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
+
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Entity
 @Getter
@@ -58,5 +64,21 @@ public class TransferTransactionEntity {
                 .amount(transaction.amount())
                 .contractAddress(transaction.contractAddress().orElse(null))
                 .build();
+    }
+
+    public Blockchain.TransferTransaction toDomain() {
+        return switch (blockchain) {
+            case ETHEREUM, OPTIMISM -> new EvmTransferTransaction(
+                    Blockchain.valueOf(blockchain.name()),
+                    new EvmTransaction.Hash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    new EvmAccountAddress(senderAddress),
+                    new EvmAccountAddress(recipientAddress),
+                    amount,
+                    contractAddress != null ? new EvmContractAddress(contractAddress) : null
+            );
+            default -> throw internalServerError("Unknown blockchain: " + blockchain);
+        };
     }
 }

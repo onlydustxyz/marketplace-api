@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -14,14 +15,16 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(name = "deposits", schema = "accounting")
 @NoArgsConstructor(force = true)
 @AllArgsConstructor
 @Builder(access = AccessLevel.PRIVATE)
-@Accessors(fluent = true, chain = true)
+@Accessors(fluent = true)
 public class DepositEntity {
     @Id
+    @NonNull
     UUID id;
 
     @NonNull
@@ -50,6 +53,17 @@ public class DepositEntity {
                 .currency(CurrencyEntity.of(deposit.currency()))
                 .status(deposit.status())
                 .billingInformation(deposit.billingInformation())
+                .build();
+    }
+
+    public Deposit toDomain() {
+        return Deposit.builder()
+                .id(Deposit.Id.of(id))
+                .transaction(transaction.toDomain())
+                .sponsorId(SponsorId.of(sponsorId))
+                .currency(currency.toDomain())
+                .status(status)
+                .billingInformation(billingInformation)
                 .build();
     }
 }

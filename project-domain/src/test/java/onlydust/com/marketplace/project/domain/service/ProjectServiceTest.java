@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -51,7 +53,8 @@ public class ProjectServiceTest {
     @BeforeEach
     void setUp() {
         // Default expectations, should be overridden in test if needed
-        when(permissionService.isUserProjectLead(any(), any())).thenReturn(true);
+        when(permissionService.isUserProjectLead(any(UUID.class), any(UUID.class))).thenReturn(true);
+        when(permissionService.isUserProjectLead(any(ProjectId.class), any(UserId.class))).thenReturn(true);
     }
 
     @Test

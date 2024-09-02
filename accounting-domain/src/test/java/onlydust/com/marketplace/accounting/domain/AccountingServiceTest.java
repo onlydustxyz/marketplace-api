@@ -26,6 +26,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.port.output.PermissionPort;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -58,6 +59,8 @@ public class AccountingServiceTest {
     AccountBookEventStorageStub accountBookEventStorage;
     final BlockchainFacadePort blockchainFacadePort = mock(BlockchainFacadePort.class);
     final DepositStoragePort depositStoragePort = mock(DepositStoragePort.class);
+    final TransactionStoragePort transactionStoragePort = mock(TransactionStoragePort.class);
+    final PermissionPort permissionPort = mock(PermissionPort.class);
     AccountingService accountingService;
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
@@ -140,7 +143,9 @@ public class AccountingServiceTest {
                 rewardStatusFacadePort,
                 receiptStoragePort,
                 blockchainFacadePort,
-                depositStoragePort);
+                depositStoragePort,
+                transactionStoragePort,
+                permissionPort);
     }
 
     @BeforeAll
@@ -1684,6 +1689,11 @@ public class AccountingServiceTest {
     class Deposits {
         final SponsorId sponsorId = SponsorId.random();
 
+        @BeforeEach
+        void setup() {
+            when(blockchainFacadePort.sanitizedTransactionReference(any(), anyString())).thenAnswer(i -> i.getArgument(1));
+        }
+
         @Test
         void should_reject_non_supported_networks() {
             assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.SEPA, "REF 123465"))
@@ -1695,6 +1705,9 @@ public class AccountingServiceTest {
         void should_reject_when_transaction_not_found() {
             // Given
             final var transactionReference = faker.crypto().sha256();
+
+            when(transactionStoragePort.exists(transactionReference)).thenReturn(false);
+
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transactionReference))
                     .thenReturn(Optional.empty());
 
@@ -1709,6 +1722,8 @@ public class AccountingServiceTest {
         void should_reject_when_transaction_not_a_transfer() {
             // Given
             final var transaction = Transaction.fake();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1726,6 +1741,8 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeNative(status);
 
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
 
@@ -1740,6 +1757,8 @@ public class AccountingServiceTest {
         void should_reject_deposit_for_native_transfer_if_not_supported() {
             // Given
             final var transaction = TransferTransaction.fakeNative();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1757,6 +1776,8 @@ public class AccountingServiceTest {
         void should_create_deposit_for_native_transfer() {
             // Given
             final var transaction = TransferTransaction.fakeNative();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1782,6 +1803,8 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeErc20();
 
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
 
@@ -1798,6 +1821,8 @@ public class AccountingServiceTest {
         void should_create_deposit_for_erc20_transfer() {
             // Given
             final var transaction = TransferTransaction.fakeErc20();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1817,6 +1842,60 @@ public class AccountingServiceTest {
             assertThat(deposit.billingInformation()).isNull();
 
             verify(depositStoragePort).save(deposit);
+        }
+
+        @Test
+        void should_get_existing_deposit_for_transactionReference() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var existingDeposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
+
+            // When
+            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+
+            // Then
+            assertThat(deposit).isEqualTo(existingDeposit);
+            verify(depositStoragePort, never()).save(deposit);
+        }
+
+        @Test
+        void should_throw_when_transaction_already_exists_and_not_linked_to_a_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction %s already exists".formatted(transaction.reference));
+
+            // Then
+            verify(depositStoragePort, never()).save(any());
+        }
+
+        @Test
+        void should_throw_when_transaction_already_exists_and_is_linked_to_a_non_draft_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var existingDeposit = Deposit.preview(sponsorId, transaction, Currencies.USDC).toBuilder().status(Deposit.Status.PENDING).build();
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction %s already exists".formatted(transaction.reference));
+
+            // Then
+            verify(depositStoragePort, never()).save(any());
         }
 
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
@@ -1848,7 +1927,7 @@ public class AccountingServiceTest {
 
             static TransferTransaction fakeNative(Status status) {
                 final var faker = new Faker();
-                return new TransferTransaction(faker.crypto().sha256(),
+                return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         status,
@@ -1860,7 +1939,7 @@ public class AccountingServiceTest {
 
             static TransferTransaction fakeErc20() {
                 final var faker = new Faker();
-                return new TransferTransaction(faker.crypto().sha256(),
+                return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         Status.CONFIRMED,

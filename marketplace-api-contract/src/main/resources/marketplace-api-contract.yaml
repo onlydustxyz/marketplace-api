@@ -3976,6 +3976,37 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/deposits/{depositId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - Sponsors
+      summary: Update deposit status and billing information
+      operationId: updateDeposit
+      description: |
+        Update deposit status and billing information.
+      parameters:
+        - in: path
+          name: depositId
+          required: true
+          schema:
+            $ref: '#/components/schemas/DepositId'
+      requestBody:
+        description: Deposit
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDepositRequest'
+      responses:
+        "204":
+          description: 'Deposit updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/programs/logos:
     post:
       security:
@@ -6044,6 +6075,12 @@ components:
           $ref: '#/components/schemas/Money'
         senderInformation:
           $ref: '#/components/schemas/DepositSenderInformation'
+        billingInformation:
+          $ref: '#/components/schemas/DepositBillingInformation'
+
+    UpdateDepositRequest:
+      type: object
+      properties:
         billingInformation:
           $ref: '#/components/schemas/DepositBillingInformation'
 

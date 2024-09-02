@@ -361,6 +361,11 @@ public class PostgresConfiguration {
     }
 
     @Bean
+    PostgresTransactionStorage postgresTransactionStorage(final TransferTransactionRepository transferTransactionRepository) {
+        return new PostgresTransactionStorage(transferTransactionRepository);
+    }
+
+    @Bean
     PostgresSponsorAdapter postgresSponsorAdapter(final SponsorRepository sponsorRepository,
                                                   final SponsorLeadRepository sponsorLeadRepository) {
         return new PostgresSponsorAdapter(sponsorRepository, sponsorLeadRepository);
