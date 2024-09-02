@@ -29,7 +29,11 @@ public class AptosTransactionStorageAdapter implements BlockchainTransactionStor
 
     private @NonNull AptosTransaction fromTransaction(final @NonNull RpcClient.TransactionResponse transaction) {
         if (!transaction.payload().isTransfer())
-            throw badRequest("Transaction %s is not a transfer transaction".formatted(transaction.hash()));
+            return new AptosTransaction(
+                    Aptos.transactionHash(transaction.hash()),
+                    Instant.ofEpochMilli(transaction.timestamp() / 1000).atZone(ZoneOffset.UTC),
+                    transaction.success() ? Blockchain.Transaction.Status.CONFIRMED : AptosTransaction.Status.FAILED
+            );
 
         final var withdrawal = transaction.events().stream().filter(e -> e.type() == Event.Type.WITHDRAWAL).findFirst()
                 .orElseThrow(() -> badRequest("Transaction %s does not contain a withdrawal event".formatted(transaction.hash())));
