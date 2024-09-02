@@ -39,7 +39,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        void should_be_preview_a_deposit_of_eth_on_ethereum() {
+        void should_preview_a_deposit_of_eth_on_ethereum() {
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -109,7 +109,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        void should_be_preview_a_deposit_of_usdc_on_ethereum() {
+        void should_preview_a_deposit_of_usdc_on_ethereum() {
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -179,7 +179,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        void should_be_preview_a_deposit_of_eth_on_optimism() {
+        void should_preview_a_deposit_of_eth_on_optimism() {
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -249,7 +249,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        void should_be_preview_a_deposit_of_op_on_optimism() {
+        void should_preview_a_deposit_of_op_on_optimism() {
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -319,7 +319,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
-        void should_be_preview_a_deposit_of_usdc_on_starknet() {
+        void should_preview_a_deposit_of_usdc_on_starknet() {
             // Given
             currencyHelper.addERC20Support(Blockchain.STARKNET, Currency.Code.USDC);
 
@@ -487,6 +487,79 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(deposit.id().value().toString());
+        }
+
+        @Test
+        void should_preview_a_deposit_of_apt_on_aptos() {
+            // Given
+            currencyHelper.addERC20Support(Blockchain.APTOS, Currency.Code.APT);
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "APTOS",
+                                "transactionReference": "0xa16d8c7b6891ccaa63bcb854762a092a1d8ab4c9d9f2b8b11ca0880dfda9526a"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 10000,
+                                "prettyAmount": 10000,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 3013.40,
+                                "usdConversionRate": 0.30134
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 0.30134
+                              },
+                              "finalBalance": {
+                                "amount": 10000,
+                                "prettyAmount": 10000,
+                                "currency": {
+                                  "id": "48388edb-fda2-4a32-b228-28152a147500",
+                                  "code": "APT",
+                                  "name": "Aptos Coin",
+                                  "logoUrl": null,
+                                  "decimals": 8
+                                },
+                                "usdEquivalent": 3013.40,
+                                "usdConversionRate": 0.30134
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x4fdad0b542bae2fa39f42af8c0d347190c3508fed0eeaa8710701c12aaa16f63",
+                                "transactionReference": "0xa16d8c7b6891ccaa63bcb854762a092a1d8ab4c9d9f2b8b11ca0880dfda9526a"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
         }
     }
 
