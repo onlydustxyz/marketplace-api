@@ -244,7 +244,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                                                                                                                                        "/general-information"
                         ).formatted(billingProfileId))))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo(title)))
         );
     }
@@ -616,7 +615,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                                  - SSN is incorrect. Provide a correct SSN.""")))
                         .withRequestBody(matchingJsonPath("$.message_data.hasMoreInformation", equalTo("true")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo(title)))
         );
     }
@@ -1070,7 +1068,6 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                                                               }
                                 """, true, false)))
                         .withRequestBody(matchingJsonPath("$.to", equalTo("test@onlydust.xyz")))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Verify your identity to validate your company")))
         );
     }

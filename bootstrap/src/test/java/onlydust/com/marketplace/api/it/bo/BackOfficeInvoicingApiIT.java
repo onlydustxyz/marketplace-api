@@ -564,7 +564,6 @@ public class BackOfficeInvoicingApiIT extends AbstractMarketplaceBackOfficeApiIT
                                                               }
                                 """.formatted(rejectionReason), true, false)))
                         .withRequestBody(matchingJsonPath("$.to", equalTo("abuisset@gmail.com")))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("An invoice for 2 reward(s) got rejected")))
         );
 

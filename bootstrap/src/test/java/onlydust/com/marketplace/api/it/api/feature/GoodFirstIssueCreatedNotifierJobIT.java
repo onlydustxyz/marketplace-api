@@ -105,7 +105,6 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
                         .withRequestBody(matchingJsonPath("$.message_data.issue.createdBy.name", equalTo(issue11.authorLogin())))
                         .withRequestBody(matchingJsonPath("$.message_data.issue.createdBy.avatarUrl", equalTo(issue11.authorAvatarUrl())))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(user2.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New good first issue"))));
 
         customerIOWireMockServer.verify(1,
@@ -130,7 +129,6 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
                         .withRequestBody(matchingJsonPath("$.message_data.issue.createdBy.name", equalTo(issue21.authorLogin())))
                         .withRequestBody(matchingJsonPath("$.message_data.issue.createdBy.avatarUrl", equalTo(issue21.authorAvatarUrl())))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(user1.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New good first issue"))));
 
         customerIOWireMockServer.verify(2, postRequestedFor(urlEqualTo("/send/email")));

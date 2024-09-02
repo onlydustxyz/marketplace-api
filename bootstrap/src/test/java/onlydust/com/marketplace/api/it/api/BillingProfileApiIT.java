@@ -824,7 +824,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                         "validate it.")))
 
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser1.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
         );
 
@@ -846,7 +845,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                         "validate it.")))
 
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser1.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
         );
 
@@ -868,7 +866,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                         "validate it.")))
 
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser2.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
         );
 
@@ -989,7 +986,6 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                                         "validate it.")))
 
                         .withRequestBody(matchingJsonPath("$.to", equalTo(authenticatedUser2.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Complete your billing profile")))
         );
     }
