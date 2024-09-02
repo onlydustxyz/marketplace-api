@@ -319,42 +319,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /bo/v1/sponsors/{sponsorId}/transactions:
-    get:
-      security:
-        - bearerAuth: [ ]
-      tags:
-        - BackofficeAccountingRead
-      summary: Get the list of all transactions related to this sponsor
-      operationId: getSponsorTransactionHistory
-      parameters:
-        - in: path
-          name: sponsorId
-          required: true
-          schema:
-            $ref: '#/components/schemas/SponsorId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: 'The sponsor transaction history'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransactionHistoryPageResponse'
-        "401":
-          $ref: '#/components/responses/UnauthorizedError'
-        "500":
-          $ref: '#/components/responses/InternalServerError'
-
   /bo/v1/sponsor-accounts/{accountId}/allowance:
     put:
       security:
