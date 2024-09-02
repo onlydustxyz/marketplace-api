@@ -1,11 +1,13 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.SponsorTransactionStatListResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -17,7 +19,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -174,6 +175,10 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 final var anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
+
+                at("2023-12-31T00:00:00Z", () -> {
+                    depositHelper.create(UserId.of(caller.user().getId()), sponsor.id(), Network.ETHEREUM);
+                });
 
                 at("2024-01-01T00:00:00Z", () -> {
                     accountingHelper.createSponsorAccount(sponsor.id(), 2_200, USDC);
@@ -2159,45 +2164,27 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 client.get()
                         .uri(getApiURI(SPONSOR_TRANSACTIONS.formatted(sponsor.id()), Map.of(
                                 "pageIndex", "0",
-                                "pageSize", "5"
+                                "pageSize", "10"
                         )))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                         .exchange()
                         // Then
                         .expectStatus()
-                        .isEqualTo(HttpStatus.PARTIAL_CONTENT)
+                        .is2xxSuccessful()
                         .expectBody()
+                        .consumeWith(System.out::println)
+                        .jsonPath("$.transactions[0].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[1].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[2].program.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[4].program.id").isEqualTo(program.id().toString())
                         .json("""
                                 {
-                                  "totalPageNumber": 2,
-                                  "totalItemNumber": 9,
-                                  "hasMore": true,
-                                  "nextPageIndex": 1,
+                                  "totalPageNumber": 1,
+                                  "totalItemNumber": 6,
+                                  "hasMore": false,
+                                  "nextPageIndex": 0,
                                   "transactions": [
                                     {
-                                      "date": "2024-01-01T00:00:00Z",
-                                      "type": "DEPOSITED",
-                                      "program": null,
-                                      "amount": {
-                                        "amount": 2200,
-                                        "prettyAmount": 2200,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 2222.00,
-                                        "usdConversionRate": 1.010001
-                                      },
-                                      "depositStatus": "COMPLETED"
-                                    },
-                                    {
-                                      "date": "2024-01-01T00:00:00Z",
+                                      "date": "2023-12-31T23:00:00Z",
                                       "type": "ALLOCATED",
                                       "amount": {
                                         "amount": 2200,
@@ -2215,7 +2202,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                       "depositStatus": null
                                     },
                                     {
-                                      "date": "2024-01-15T00:00:00Z",
+                                      "date": "2024-01-14T23:00:00Z",
                                       "type": "RETURNED",
                                       "amount": {
                                         "amount": 700,
@@ -2233,26 +2220,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                       "depositStatus": null
                                     },
                                     {
-                                      "date": "2024-02-01T00:00:00Z",
-                                      "type": "DEPOSITED",
-                                      "program": null,
-                                      "amount": {
-                                        "amount": 12,
-                                        "prettyAmount": 12,
-                                        "currency": {
-                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                          "code": "ETH",
-                                          "name": "Ether",
-                                          "logoUrl": null,
-                                          "decimals": 18
-                                        },
-                                        "usdEquivalent": 21383.81,
-                                        "usdConversionRate": 1781.983987
-                                      },
-                                      "depositStatus": "COMPLETED"
-                                    },
-                                    {
-                                      "date": "2024-02-01T00:00:00Z",
+                                      "date": "2024-01-31T23:00:00Z",
                                       "type": "ALLOCATED",
                                       "amount": {
                                         "amount": 12,
@@ -2268,6 +2236,61 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                         "usdConversionRate": 1781.983987
                                       },
                                       "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-02-03T23:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 1500,
+                                        "prettyAmount": 1500,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 1515.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-03-11T23:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 1,
+                                        "prettyAmount": 1,
+                                        "currency": {
+                                          "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                                          "code": "BTC",
+                                          "name": "Bitcoin",
+                                          "logoUrl": null,
+                                          "decimals": 8
+                                        },
+                                        "usdEquivalent": null,
+                                        "usdConversionRate": null
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-04-23T17:06:59Z",
+                                      "type": "DEPOSITED",
+                                      "program": null,
+                                      "amount": {
+                                        "amount": 0.029180771065409698,
+                                        "prettyAmount": 0.02918,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 52.00,
+                                        "usdConversionRate": 1781.983987
+                                      },
+                                      "depositStatus": "PENDING"
                                     }
                                   ]
                                 }
@@ -2290,7 +2313,8 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
-                        .jsonPath("$.transactions.size()").isEqualTo(3)
+                        .consumeWith(System.out::println)
+                        .jsonPath("$.transactions.size()").isEqualTo(1)
                         .jsonPath("$.transactions[?(@.date < '2024-01-01')]").doesNotExist()
                         .jsonPath("$.transactions[?(@.date > '2024-02-01')]").doesNotExist();
             }
@@ -2313,6 +2337,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
+                        .consumeWith(System.out::println)
                         .jsonPath("$.transactions.size()").isEqualTo(3)
                         .jsonPath("$.transactions[?(@.program.id != '%s')]".formatted(program.id())).doesNotExist();
             }
@@ -2332,7 +2357,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .isOk()
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
-                            case DEPOSITED -> 4;
+                            case DEPOSITED -> 1;
                             case ALLOCATED -> 4;
                             case RETURNED -> 1;
                         })
@@ -2354,7 +2379,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .returnResult().getResponseBody();
 
                 final var lines = csv.split("\\R");
-                assertThat(lines.length).isEqualTo(10);
+                assertThat(lines.length).isEqualTo(7);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
             }
         }

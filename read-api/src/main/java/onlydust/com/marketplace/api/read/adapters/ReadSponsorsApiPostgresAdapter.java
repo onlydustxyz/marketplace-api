@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
-import onlydust.com.marketplace.api.read.repositories.AccountBookTransactionReadRepository;
+import onlydust.com.marketplace.api.read.repositories.AllTransactionReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorTransactionMonthlyStatsReadRepository;
@@ -50,7 +50,7 @@ import static org.springframework.http.ResponseEntity.status;
 public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final PermissionService permissionService;
-    private final AccountBookTransactionReadRepository accountBookTransactionReadRepository;
+    private final AllTransactionReadRepository allTransactionReadRepository;
     private final SponsorReadRepository sponsorReadRepository;
     private final ProgramReadRepository programReadRepository;
     private final SponsorTransactionMonthlyStatsReadRepository sponsorTransactionMonthlyStatsReadRepository;
@@ -81,7 +81,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var page = findAccountBookTransactions(sponsorId, fromDate, toDate, types, search, index, size);
 
         final var response = new SponsorTransactionPageResponse()
-                .transactions(page.getContent().stream().map(AccountBookTransactionReadEntity::toSponsorTransactionPageItemResponse).toList())
+                .transactions(page.getContent().stream().map(AllTransactionReadEntity::toSponsorTransactionPageItemResponse).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())
@@ -119,23 +119,22 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK).body(csv);
     }
 
-    private Page<AccountBookTransactionReadEntity> findAccountBookTransactions(UUID sponsorId,
-                                                                               String fromDate,
-                                                                               String toDate,
-                                                                               List<SponsorTransactionType> types,
-                                                                               String search,
-                                                                               int index,
-                                                                               int size) {
+    private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID sponsorId,
+                                                                       String fromDate,
+                                                                       String toDate,
+                                                                       List<SponsorTransactionType> types,
+                                                                       String search,
+                                                                       int index,
+                                                                       int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
             throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
 
-        final var page = accountBookTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
+        return allTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate), search, types == null ? null : types.stream().map(SponsorTransactionType::name).toList(),
-                PageRequest.of(index, size, Sort.by("timestamp")));
-        return page;
+                PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp"), Sort.Order.by("depositStatus").nullsLast())));
     }
 
     @Override
