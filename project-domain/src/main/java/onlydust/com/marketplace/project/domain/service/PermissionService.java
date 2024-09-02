@@ -11,6 +11,7 @@ import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -31,7 +32,7 @@ public class PermissionService implements PermissionPort {
         return isUserProjectLead(ProjectId.of(projectId), UserId.of(projectLeadId));
     }
 
-    
+
     @Override
     public boolean isUserContributor(String contributionId, Long githubUserId) {
         return contributionStoragePort.getContributorId(contributionId).equals(githubUserId);
@@ -50,26 +51,26 @@ public class PermissionService implements PermissionPort {
 
 
     @Override
-    public boolean hasUserAccessToProject(ProjectId projectId, UserId userId) {
-        return projectStoragePort.hasUserAccessToProject(projectId.value(), userId.value())
-               || programStoragePort.isAdmin(userId.value(), projectId);
+    public boolean hasUserAccessToProject(ProjectId projectId, Optional<UserId> userId) {
+        return projectStoragePort.hasUserAccessToProject(projectId.value(), userId.map(UserId::value).orElse(null))
+               || (userId.isPresent() && programStoragePort.isAdmin(userId.get().value(), projectId));
     }
 
     @Deprecated
     public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
-        return hasUserAccessToProject(ProjectId.of(projectId), UserId.of(userId));
+        return hasUserAccessToProject(ProjectId.of(projectId), Optional.ofNullable(userId).map(UserId::of));
     }
 
 
     @Override
-    public boolean hasUserAccessToProject(String projectSlug, UserId userId) {
-        return projectStoragePort.hasUserAccessToProject(projectSlug, userId.value())
-               || programStoragePort.isAdmin(userId.value(), projectSlug);
+    public boolean hasUserAccessToProject(String projectSlug, Optional<UserId> userId) {
+        return projectStoragePort.hasUserAccessToProject(projectSlug, userId.map(UserId::value).orElse(null))
+               || (userId.isPresent() && programStoragePort.isAdmin(userId.get().value(), projectSlug));
     }
 
     @Deprecated
     public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
-        return hasUserAccessToProject(projectSlug, UserId.of(userId));
+        return hasUserAccessToProject(projectSlug, Optional.ofNullable(userId).map(UserId::of));
     }
 
 
