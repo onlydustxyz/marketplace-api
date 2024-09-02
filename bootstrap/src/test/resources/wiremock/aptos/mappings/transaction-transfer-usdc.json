@@ -1,4 +1,5 @@
 {
+    "priority": 1,
     "request": {
         "urlPattern": "/transactions/by_hash/0x77d88076dbd3fb848b0fc6ce48123e6270974d7369419326983fe540ca5384db",
         "method": "GET"

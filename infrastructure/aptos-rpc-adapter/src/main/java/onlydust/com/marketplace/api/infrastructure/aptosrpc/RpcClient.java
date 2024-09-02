@@ -1,7 +1,12 @@
 package onlydust.com.marketplace.api.infrastructure.aptosrpc;
 
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.*;
 import lombok.experimental.Accessors;
@@ -57,7 +62,8 @@ public class RpcClient extends HttpClient {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record AccountResponse(@JsonProperty("sequence_number") String sequenceNumber, @JsonProperty("authentication_key") String authenticationKey) {
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public record AccountResponse(String sequenceNumber, String authenticationKey) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -69,9 +75,9 @@ public class RpcClient extends HttpClient {
         @NoArgsConstructor(force = true)
         @AllArgsConstructor
         @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
         public static class Event {
             Guid guid;
-            @JsonProperty("sequence_number")
             String sequenceNumber;
             @Getter(AccessLevel.NONE)
             @NonNull
@@ -79,7 +85,8 @@ public class RpcClient extends HttpClient {
             Data data;
 
             @JsonIgnoreProperties(ignoreUnknown = true)
-            public record Guid(@JsonProperty("creation_number") String creationNumber, @JsonProperty("account_address") String accountAddress) {
+            @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+            public record Guid(String creationNumber, String accountAddress) {
             }
 
             public Type type() {
@@ -148,7 +155,8 @@ public class RpcClient extends HttpClient {
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
-        public record Payload(String function, @JsonProperty("type_arguments") List<String> typeArguments, List<String> arguments, String type) {
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+        public record Payload(String function, List<String> typeArguments, List<String> arguments, String type) {
             public boolean isTransfer() {
                 return "0x1::aptos_account::transfer_coins".equals(function);
             }
