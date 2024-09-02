@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
@@ -629,6 +629,76 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                               "senderInformation": {
                                 "accountNumber": "0x4fdad0b542bae2fa39f42af8c0d347190c3508fed0eeaa8710701c12aaa16f63",
                                 "transactionReference": "0x77d88076dbd3fb848b0fc6ce48123e6270974d7369419326983fe540ca5384db"
+                              },
+                              "billingInformation": null
+                            }
+                            """);
+        }
+
+        @Test
+        void should_preview_a_deposit_of_xlm_on_stellar() {
+            // Given
+            currencyHelper.addNativeCryptoSupport(Currency.Code.XLM);
+
+            // When
+            client.post()
+                    .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""
+                            {
+                                "network": "STELLAR",
+                                "transactionReference": "01cab5c04cf265b2995a2e5c4e961cad82d38bfb9e950ec3f6e33e5ff28500d8"
+                            }
+                            """)
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 1.2760000,
+                                "prettyAmount": 1.2760000,
+                                "currency": {
+                                  "code": "XLM",
+                                  "name": "Stellar",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+                                  "decimals": 7
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "code": "XLM",
+                                  "name": "Stellar",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+                                  "decimals": 7
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "finalBalance": {
+                                "amount": 1.2760000,
+                                "prettyAmount": 1.2760000,
+                                "currency": {
+                                  "code": "XLM",
+                                  "name": "Stellar",
+                                  "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/512.png",
+                                  "decimals": 7
+                                },
+                                "usdEquivalent": null,
+                                "usdConversionRate": null
+                              },
+                              "senderInformation": {
+                                "accountNumber": "GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL",
+                                "transactionReference": "01cab5c04cf265b2995a2e5c4e961cad82d38bfb9e950ec3f6e33e5ff28500d8"
                               },
                               "billingInformation": null
                             }

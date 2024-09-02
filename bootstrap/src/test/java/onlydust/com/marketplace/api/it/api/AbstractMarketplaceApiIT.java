@@ -222,6 +222,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer ethereumWireMockServer;
     @Autowired
     protected WireMockServer starknetWireMockServer;
+    @Autowired
+    protected WireMockServer sorobanWireMockServer;
     @InjectWireMock("customer-io")
     protected WireMockServer customerIOWireMockServer;
     @InjectWireMock("node-guardians")
