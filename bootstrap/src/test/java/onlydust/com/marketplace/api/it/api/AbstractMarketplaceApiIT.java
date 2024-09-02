@@ -201,6 +201,7 @@ public class AbstractMarketplaceApiIT {
             .withDatabaseName("marketplace_db")
             .withUsername("test")
             .withPassword("test")
+            .withCommand("postgres -c max_wal_size=2GB")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/dumps"), "/tmp")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/docker_init"), "/docker-entrypoint-initdb.d")
             .withCopyFileToContainer(MountableFile.forClasspathResource("/database/scripts"), "/scripts")
