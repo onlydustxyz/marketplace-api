@@ -262,8 +262,7 @@ public class Currency implements Cloneable {
         public static Code of(Blockchain blockchain) {
             return switch (blockchain) {
                 case ETHEREUM, OPTIMISM -> ETH;
-                case STARKNET -> null;
-                case APTOS -> APT;
+                case STARKNET, APTOS -> null;
                 case STELLAR -> XLM;
             };
         }

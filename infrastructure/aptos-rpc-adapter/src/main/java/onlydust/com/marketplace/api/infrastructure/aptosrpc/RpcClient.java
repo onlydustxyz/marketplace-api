@@ -1,12 +1,15 @@
 package onlydust.com.marketplace.api.infrastructure.aptosrpc;
 
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.netty.handler.codec.http.HttpMethod;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.infrastructure.HttpClient;
 
@@ -15,7 +18,9 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -57,11 +62,105 @@ public class RpcClient extends HttpClient {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record AccountResponse(@JsonProperty("sequence_number") String sequenceNumber, @JsonProperty("authentication_key") String authenticationKey) {
+    @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    public record AccountResponse(String sequenceNumber, String authenticationKey) {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public record TransactionResponse(Long version, String hash, Long timestamp) {
+    public record TransactionResponse(Long version, String hash, Long timestamp, Boolean success, Payload payload, List<Event> events) {
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @Value
+        @Accessors(fluent = true)
+        @NoArgsConstructor(force = true)
+        @AllArgsConstructor
+        @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+        public static class Event {
+            Guid guid;
+            String sequenceNumber;
+            @Getter(AccessLevel.NONE)
+            @NonNull
+            String type;
+            Data data;
+
+            @JsonIgnoreProperties(ignoreUnknown = true)
+            @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+            public record Guid(String creationNumber, String accountAddress) {
+            }
+
+            public Type type() {
+                return switch (type) {
+                    case "0x1::coin::DepositEvent" -> Type.DEPOSIT;
+                    case "0x1::coin::WithdrawEvent" -> Type.WITHDRAWAL;
+                    case "0x1::transaction_fee::FeeStatement" -> Type.FEE_STATEMENT;
+                    default -> {
+                        LOGGER.warn("Unknown event type: {}", type);
+                        yield null;
+                    }
+                };
+            }
+
+            public enum Type {
+                DEPOSIT, WITHDRAWAL, FEE_STATEMENT
+            }
+
+            @AllArgsConstructor
+            public static class Data {
+                final Map<String, Object> properties = new HashMap<>();
+
+                public Data(Map<String, Object> properties) {
+                    this.properties.putAll(properties);
+                }
+
+                @JsonAnySetter
+                protected void add(String property, Object value) {
+                    properties.put(property, value);
+                }
+
+                @JsonAnyGetter
+                protected Map<String, Object> properties() {
+                    return properties;
+                }
+
+                public Deposit asDeposit() {
+                    return new Deposit(properties);
+                }
+
+                public Withdrawal asWithdrawal() {
+                    return new Withdrawal(properties);
+                }
+
+                @AllArgsConstructor
+                public static class Deposit extends Data {
+                    public Deposit(Map<String, Object> properties) {
+                        super(properties);
+                    }
+
+                    public BigInteger amount() {
+                        return new BigInteger(properties().get("amount").toString());
+                    }
+                }
+
+                public static class Withdrawal extends Data {
+                    public Withdrawal(Map<String, Object> properties) {
+                        super(properties);
+                    }
+
+                    public BigInteger amount() {
+                        return new BigInteger(properties().get("amount").toString());
+                    }
+                }
+            }
+        }
+
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+        public record Payload(String function, List<String> typeArguments, List<String> arguments, String type) {
+            public boolean isTransfer() {
+                return "0x1::aptos_account::transfer_coins".equals(function);
+            }
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

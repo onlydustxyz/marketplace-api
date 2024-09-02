@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.helper;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,13 @@ public class CurrencyHelper {
                 case Currency.Code.USDC_STR -> StarkNet.contractAddress("0x53c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8");
                 default -> throw new IllegalArgumentException("Unsupported ERC20 token in tests");
             };
+
+            case APTOS -> switch (code.toString()) {
+                case Currency.Code.APT_STR -> Aptos.coinType("0x1::aptos_coin::AptosCoin");
+                case Currency.Code.USDC_STR -> Aptos.coinType("0xf22bede237a07e121b56d91a491eb7bcdfd1f5907926a9e58338f964a01b17fa::asset::USDC");
+                default -> throw new IllegalArgumentException("Unsupported ERC20 token in tests");
+            };
+
             default -> throw new IllegalArgumentException("Unsupported blockchain in tests");
         });
     }
