@@ -17,9 +17,9 @@ public class JSONPathAssertion {
             public void accept(Object json) {
                 try {
                     if (json instanceof JSONArray jsonArray) {
-                        JSONAssert.assertEquals(objectMapper.writeValueAsString(jsonArray.get(0)), expectedJson, true);
+                        JSONAssert.assertEquals(expectedJson, objectMapper.writeValueAsString(jsonArray.get(0)), true);
                     } else {
-                        JSONAssert.assertEquals(objectMapper.writeValueAsString(json), expectedJson, true);
+                        JSONAssert.assertEquals(expectedJson, objectMapper.writeValueAsString(json), true);
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
