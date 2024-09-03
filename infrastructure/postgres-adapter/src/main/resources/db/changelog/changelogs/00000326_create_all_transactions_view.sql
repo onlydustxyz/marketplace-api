@@ -1,5 +1,12 @@
 DROP VIEW accounting.all_sponsor_account_transactions;
 
+
+
+ALTER TABLE accounting.account_book_transactions
+    ALTER COLUMN timestamp TYPE timestamptz USING timestamp AT TIME ZONE 'UTC';
+
+
+
 CREATE VIEW accounting.all_transactions AS
 SELECT abt.id,
        abt.timestamp,
@@ -29,3 +36,5 @@ FROM accounting.deposits d
          JOIN accounting.transfer_transactions tt on tt.id = d.transaction_id
 WHERE d.status = 'COMPLETED'
    OR d.status = 'PENDING';
+
+

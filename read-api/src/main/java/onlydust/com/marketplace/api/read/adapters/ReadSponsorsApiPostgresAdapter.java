@@ -36,6 +36,7 @@ import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.HttpStatus.OK;
@@ -146,8 +147,8 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
             throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
         final var stats = sponsorTransactionMonthlyStatsReadRepository.findAll(sponsorId,
-                        DateMapper.parseNullable(fromDate),
-                        DateMapper.parseNullable(toDate),
+                        toZoneDateTime(DateMapper.parseNullable(fromDate)),
+                        toZoneDateTime(DateMapper.parseNullable(toDate)),
                         search,
                         types == null ? null : types.stream().map(SponsorTransactionType::name).toList())
                 .stream()
