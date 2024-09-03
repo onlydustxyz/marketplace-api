@@ -17,7 +17,7 @@ public interface PublicProjectReadRepository extends Repository<PublicProjectRea
             order by pr.score desc nulls last,
                      -p.rank,
                      p.name
-            """, nativeQuery = true)
+            """, countQuery = "select count(*) from public_projects", nativeQuery = true)
     Page<PublicProjectReadEntity> findAllRecommendedForUser(Long githubUserId, Pageable pageable);
 
     @Query(value = """
