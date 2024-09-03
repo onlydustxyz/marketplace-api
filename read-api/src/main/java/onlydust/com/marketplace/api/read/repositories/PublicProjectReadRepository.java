@@ -15,6 +15,7 @@ public interface PublicProjectReadRepository extends Repository<PublicProjectRea
             from public_projects p
                      left join project_recommendations pr on pr.project_id = p.id and pr.github_user_id = :githubUserId
             order by pr.score desc nulls last,
+                     -p.rank,
                      p.name
             """, nativeQuery = true)
     Page<PublicProjectReadEntity> findAllRecommendedForUser(Long githubUserId, Pageable pageable);
