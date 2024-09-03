@@ -846,7 +846,6 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                      "id": "fc92397c-3431-4a84-8054-845376b630a0",
                                      "email": "pierre.oucif@gadz.org"
                                    },
-                                   "from": "Camille from OnlyDust <admin@onlydust.xyz>",
                                    "to": "pierre.oucif@gadz.org",
                                    "subject": "Weekly notifications",
                                    "message_data": {
@@ -902,7 +901,6 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                       "id": "eaa1ddf3-fea5-4cef-825b-336f8e775e05",
                                       "email": "haydenclearymusic@gmail.com"
                                     },
-                                    "from": "Camille from OnlyDust <admin@onlydust.xyz>",
                                     "to": "haydenclearymusic@gmail.com",
                                     "subject": "Weekly notifications",
                                     "message_data": {
