@@ -9,6 +9,7 @@ import com.slack.api.methods.MethodsClient;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
+import jakarta.annotation.PostConstruct;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.helper.JwtVerifierStub;
@@ -36,6 +37,11 @@ public class MarketplaceApiApplicationIT {
 
     public static void main(String[] args) {
         SpringApplication.run(MarketplaceApiApplication.class, args);
+    }
+
+    @PostConstruct
+    public static void setGlobalDefaults() {
+        MarketplaceApiApplication.setGlobalDefaults();
     }
 
     private final ImageStoragePort imageStoragePort = mock(ImageStoragePort.class);
