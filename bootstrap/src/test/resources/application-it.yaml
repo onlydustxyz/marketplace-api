@@ -77,9 +77,7 @@ infrastructure:
     marketing-topic-id: 3
 application:
   onlydust-wallets:
-    ethereum: 0xthisisafakeaddress
-    starknet: 0xanotherfakeaddress
-    aptos: 0xyetanotherfakeaddress
+    ethereum: '0xb060429d14266d06a8be63281205668be823604f'
   web:
     machine-to-machine:
       api-key: "some-api-key"

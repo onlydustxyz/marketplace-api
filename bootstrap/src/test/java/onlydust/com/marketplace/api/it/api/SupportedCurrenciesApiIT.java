@@ -36,12 +36,7 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Aptos Coin",
                               "logoUrl": null,
                               "decimals": 8,
-                              "onlyDustWallets": [
-                                {
-                                  "address": "0xyetanotherfakeaddress",
-                                  "network": "APTOS"
-                                }
-                              ]
+                              "onlyDustWallets": []
                             },
                             {
                               "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
@@ -59,7 +54,7 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "decimals": 18,
                               "onlyDustWallets": [
                                 {
-                                  "address": "0xthisisafakeaddress",
+                                  "address": "0xb060429d14266d06a8be63281205668be823604f",
                                   "network": "ETHEREUM"
                                 }
                               ]
@@ -78,7 +73,12 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "name": "Optimism",
                               "logoUrl": null,
                               "decimals": 18,
-                              "onlyDustWallets": []
+                              "onlyDustWallets": [
+                                {
+                                  "address": "0xaEF011B2374D723652796BF25a9FEE9e81C45a36",
+                                  "network": "OPTIMISM"
+                                }
+                              ]
                             },
                             {
                               "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
@@ -88,7 +88,7 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "decimals": 18,
                               "onlyDustWallets": [
                                 {
-                                  "address": "0xthisisafakeaddress",
+                                  "address": "0xb060429d14266d06a8be63281205668be823604f",
                                   "network": "ETHEREUM"
                                 }
                               ]
@@ -109,8 +109,12 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
                               "decimals": 6,
                               "onlyDustWallets": [
                                 {
-                                  "address": "0xthisisafakeaddress",
+                                  "address": "0xb060429d14266d06a8be63281205668be823604f",
                                   "network": "ETHEREUM"
+                                },
+                                {
+                                  "address": "GCY2AHYGO4DBKMMNITVD7ZHYG5W2PEYFW7XOCJVUPI3GAOYNR5HVRN3O",
+                                  "network": "STELLAR"
                                 }
                               ]
                             }
