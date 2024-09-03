@@ -14,6 +14,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.port.output.PermissionPort;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
@@ -39,6 +40,7 @@ public class AccountingService implements AccountingFacadePort {
     private final DepositStoragePort depositStoragePort;
     private final TransactionStoragePort transactionStoragePort;
     private final PermissionPort permissionPort;
+    private final OnlyDustWallets onlyDustWallets;
 
     @Override
     @Transactional
@@ -501,7 +503,16 @@ public class AccountingService implements AccountingFacadePort {
     private Blockchain.TransferTransaction check(Blockchain.Transaction transaction) {
         if (transaction instanceof Blockchain.TransferTransaction transferTransaction) {
             if (transaction.status() != Blockchain.Transaction.Status.CONFIRMED)
-                throw badRequest("Transaction %s is not confirmed".formatted(transaction.reference()));
+                throw badRequest("Transaction %s is not confirmed on blockchain %s"
+                        .formatted(transaction.reference(), transaction.blockchain()));
+
+            final var expectedRecipientAddress = onlyDustWallets.get(transferTransaction.blockchain())
+                    .orElseThrow(() -> badRequest("Transaction's (%s) blockchain (%s) is not supported for deposits"
+                            .formatted(transaction.reference(), transferTransaction.blockchain())));
+
+            if (!StringUtils.equalsIgnoreCase(transferTransaction.recipientAddress(), expectedRecipientAddress))
+                throw badRequest("Transaction's (%s) recipient (%s) is not equal to the OnlyDust wallet (%s) expected on blockchain %s"
+                        .formatted(transaction.reference(), transferTransaction.recipientAddress(), expectedRecipientAddress, transaction.blockchain()));
 
             return transferTransaction;
         }

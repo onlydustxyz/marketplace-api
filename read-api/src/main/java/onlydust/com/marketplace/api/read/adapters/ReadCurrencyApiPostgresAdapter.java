@@ -1,8 +1,8 @@
 package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.contract.ReadCurrencyApi;
 import onlydust.com.marketplace.api.contract.model.NetworkContract;
@@ -13,8 +13,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Optional;
 
 import static java.util.Comparator.comparing;
 
@@ -56,26 +54,5 @@ public class ReadCurrencyApiPostgresAdapter implements ReadCurrencyApi {
                 )
                 .sorted(comparing(SupportedCurrencyResponse::getCode))
                 .toList()));
-    }
-
-    @Data
-    public static class OnlyDustWallets {
-        String ethereum;
-        String optimism;
-        String starknet;
-        String aptos;
-        String stellar;
-        String sepa;
-
-        public Optional<String> get(Network network) {
-            return switch (network) {
-                case ETHEREUM -> Optional.ofNullable(ethereum);
-                case OPTIMISM -> Optional.ofNullable(optimism);
-                case STARKNET -> Optional.ofNullable(starknet);
-                case APTOS -> Optional.ofNullable(aptos);
-                case STELLAR -> Optional.ofNullable(stellar);
-                case SEPA -> Optional.ofNullable(sepa);
-            };
-        }
     }
 }
