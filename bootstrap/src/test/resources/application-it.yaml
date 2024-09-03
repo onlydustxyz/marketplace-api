@@ -31,6 +31,9 @@ infrastructure:
     private-key: 0xcc6a05adc43ec626fd374dc325ed7d95bd13d35758997931a70cbdc26cc129fe
   starknet:
     private-key: 0xcc6a05adc43ec626fd374dc325ed7d95bd13d35758997931a70cbdc26cc129fe
+  stellar:
+    soroban:
+      account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
   coinmarketcap:
     api-key: CMC_API_KEY
   sumsub:

@@ -135,28 +135,28 @@ infrastructure:
         client-secret: ${AUTH0_M2M_CLIENT_SECRET}
         pat-cache-ttl-in-seconds: 3600
   aptos:
-    base-uri: https://api.mainnet.aptoslabs.com/v1
+    base-uri: ${APTOS_RPC_URL}
   coinmarketcap:
     base-uri: https://pro-api.coinmarketcap.com
     api-key: ${COINMARKETCAP_API_KEY}
   ethereum:
-    base-uri: https://mainnet.infura.io/v3/${INFURA_API_KEY}
+    base-uri: ${ETHEREUM_RPC_URL}
     blockchain: ethereum
     private-key: ${ETHEREUM_PRIVATE_KEY}
   optimism:
-    base-uri: https://optimism-mainnet.infura.io/v3/${INFURA_API_KEY}
+    base-uri: ${OPTIMISM_RPC_URL}
     blockchain: optimism
     private-key: ${ETHEREUM_PRIVATE_KEY}
   starknet:
-    base-uri: https://starknet.blockpi.network/v1/rpc/public
+    base-uri: ${STARKNET_RPC_URL}
     blockchain: starknet
     private-key: ${ETHEREUM_PRIVATE_KEY}
   stellar:
     horizon:
-      base-uri: https://horizon.stellar.org
+      base-uri: ${STELLAR_HORIZON_URL}
     soroban:
-      base-uri: https://soroban-rpc.mainnet.stellar.gateway.fm
-      account-id: GAIYZIEWGAEYIVMX5TMSD43HROWXX5WG35KTL6467P52S477IQQJIUEL
+      base-uri: ${STELLAR_SOROBAN_URL}
+      account-id: ${STELLAR_ACCOUNT_ID}
   posthog:
     base-uri: https://eu.posthog.com
     api-key: ${POSTHOG_API_KEY}
