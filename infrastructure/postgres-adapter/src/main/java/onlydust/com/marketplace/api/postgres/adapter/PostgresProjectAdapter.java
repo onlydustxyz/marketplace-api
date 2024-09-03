@@ -330,11 +330,6 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public boolean isLinkedToAProject(Long repoId) {
-        return projectRepoRepository.existsByRepoId(repoId);
-    }
-
-    @Override
     public Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var page = churnedContributorViewEntityRepository.findAllByProjectId(
                 projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,

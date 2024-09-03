@@ -5,6 +5,8 @@ import onlydust.com.marketplace.project.domain.model.event.OnGithubIssueAssigned
 
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
+
 public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssueAssignedTrackingEvent> {
     @Override
     public void addProperties(final OnGithubIssueAssignedTrackingEvent event, final ObjectNode properties) {
@@ -13,6 +15,7 @@ public class GithubIssueAssignedEventReader implements EventReader<OnGithubIssue
         properties.put("assignee_github_id", event.assigneeGithubId());
         properties.put("assignee_user_id", event.assigneeUserId() == null ? null : event.assigneeUserId().toString());
         properties.put("is_good_first_issue", event.isGoodFirstIssue());
+        properties.put("project_id",isNull(event.projectId()) ? null :  event.projectId().toString());
     }
 
     @Override
