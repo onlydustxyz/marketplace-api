@@ -503,3 +503,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000325_create_deposits_table.sql
   - include:
       file: db/changelog/changelogs/00000326_create_all_transactions_view.sql
+  - include:
+      file: db/changelog/changelogs/00000327_timestamp_to_timestamptz.sql
