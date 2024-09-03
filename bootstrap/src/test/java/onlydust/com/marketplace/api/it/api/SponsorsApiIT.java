@@ -166,7 +166,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
             @BeforeEach
             void setUp() {
-                program = programHelper.create(sponsor.id());
+                program = programHelper.create(sponsor.id(), "My program " + faker.random().nextLong());
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
@@ -2298,7 +2298,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
             @Test
             void should_get_sponsor_transactions_filtered_by_search() {
                 // Given
-                final var search = URLEncoder.encode(program.name().split(" ")[0], StandardCharsets.UTF_8);
+                final var search = program.name();
 
                 // When
                 client.get()
