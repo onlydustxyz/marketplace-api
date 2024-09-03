@@ -33,8 +33,7 @@ public class MarketplaceApiApplication {
     }
 
     @PostConstruct
-    public void init() {
-        // Setting default JVM timezone as UTC
+    public static void setGlobalDefaults() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         Locale.setDefault(Locale.ENGLISH);
     }

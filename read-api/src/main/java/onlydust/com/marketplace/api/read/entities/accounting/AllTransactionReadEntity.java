@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook.Transaction.Type;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -26,6 +27,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.UUID;
 
+import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
@@ -33,10 +35,10 @@ import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 @NoArgsConstructor(force = true)
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Table(name = "account_book_transactions", schema = "accounting")
+@Table(name = "all_transactions", schema = "accounting")
 @Immutable
 @Accessors(fluent = true)
-public class AccountBookTransactionReadEntity {
+public class AllTransactionReadEntity {
     @Id
     @NonNull
     UUID id;
@@ -79,6 +81,11 @@ public class AccountBookTransactionReadEntity {
     @JoinColumn(name = "currencyId")
     CurrencyReadEntity currency;
 
+    @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(columnDefinition = "deposit_status")
+    Deposit.Status depositStatus;
+
     public static Type map(SponsorAccountTransactionType type) {
         return switch (type) {
             case DEPOSIT -> Type.MINT;
@@ -119,15 +126,18 @@ public class AccountBookTransactionReadEntity {
         return switch (type) {
             case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
             case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
+            case DEPOSIT, SPEND, WITHDRAW ->
+                    throw new IllegalStateException("DEPOSIT, SPEND, WITHDRAW transaction types are not allowed for program transactions");
         };
     }
 
     private SponsorTransactionType sponsorTransactionType() {
         return switch (type) {
-            case MINT -> SponsorTransactionType.DEPOSITED;
-            case BURN -> throw new IllegalStateException("BURN transaction type is not allowed for sponsor transactions");
+            case MINT, DEPOSIT -> SponsorTransactionType.DEPOSITED;
             case TRANSFER -> SponsorTransactionType.ALLOCATED;
             case REFUND -> SponsorTransactionType.RETURNED;
+            case WITHDRAW -> throw new NotImplementedException("WITHDRAW transaction type is not implemented");
+            case BURN, SPEND -> throw new IllegalStateException("BURN, SPEND transaction types are not allowed for program transactions");
         };
     }
 
@@ -156,7 +166,11 @@ public class AccountBookTransactionReadEntity {
     }
 
     private SponsorDepositTransactionStatus depositStatus() {
-        return type == Type.MINT ? SponsorDepositTransactionStatus.COMPLETED : null; // TODO
+        return isNull(depositStatus) ? null : switch (depositStatus) {
+            case PENDING -> SponsorDepositTransactionStatus.PENDING;
+            case COMPLETED -> SponsorDepositTransactionStatus.COMPLETED;
+            case DRAFT, REJECTED -> throw new IllegalStateException("DRAFT, REJECTED deposit status are not allowed here");
+        };
     }
 
     public void toSponsorCsv(CSVPrinter csv) throws IOException {
@@ -170,5 +184,21 @@ public class AccountBookTransactionReadEntity {
                 amount.getCurrency().getCode(),
                 amount.getUsdEquivalent()
         );
+    }
+
+    public enum Type {
+        /**
+         * Deposit made by a sponsor
+         */
+        DEPOSIT,
+        /**
+         * Withdrawal made by a sponsor (opposite of DEPOSIT)
+         */
+        WITHDRAW,
+        SPEND,
+        MINT,
+        BURN,
+        TRANSFER,
+        REFUND
     }
 }

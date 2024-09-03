@@ -8,7 +8,7 @@ import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -28,7 +28,7 @@ public class SponsorTransactionMonthlyStatReadEntity implements ProgramTransacti
     UUID currencyId;
 
     @Id
-    Date date;
+    ZonedDateTime date;
 
     @NonNull
     @ManyToOne
@@ -54,6 +54,6 @@ public class SponsorTransactionMonthlyStatReadEntity implements ProgramTransacti
     public static class PrimaryKey {
         UUID sponsorId;
         UUID currencyId;
-        Date date;
+        ZonedDateTime date;
     }
 }

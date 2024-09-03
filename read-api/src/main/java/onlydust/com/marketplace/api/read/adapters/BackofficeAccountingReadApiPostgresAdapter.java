@@ -5,11 +5,13 @@ import onlydust.com.backoffice.api.contract.BackofficeAccountingReadApi;
 import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
-import onlydust.com.marketplace.api.read.entities.accounting.AllSponsorAccountTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BatchPaymentReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardStatusReadEntity;
-import onlydust.com.marketplace.api.read.repositories.*;
+import onlydust.com.marketplace.api.read.repositories.BatchPaymentReadRepository;
+import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
+import onlydust.com.marketplace.api.read.repositories.RewardReadRepository;
+import onlydust.com.marketplace.api.read.repositories.SponsorAccountReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.read.entities.accounting.AllSponsorAccountTransactionReadEntity.Type.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
@@ -38,7 +39,6 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
     private final SponsorAccountReadRepository sponsorAccountReadRepository;
     private final AccountingFacadePort accountingFacadePort;
     private final BatchPaymentReadRepository batchPaymentReadRepository;
-    private final AllSponsorAccountTransactionReadRepository allSponsorAccountTransactionReadRepository;
     private final RewardReadRepository rewardReadRepository;
     private final BillingProfileReadRepository billingProfileReadRepository;
 
@@ -117,23 +117,5 @@ public class BackofficeAccountingReadApiPostgresAdapter implements BackofficeAcc
                         .toList());
 
         return ok(response);
-    }
-
-    @Override
-    public ResponseEntity<TransactionHistoryPageResponse> getSponsorTransactionHistory(UUID sponsorId, Integer pageIndex, Integer pageSize) {
-        final var page = allSponsorAccountTransactionReadRepository.findAll(
-                sponsorId,
-                List.of(WITHDRAW, DEPOSIT, TRANSFER, REFUND),
-                PageRequest.of(pageIndex, pageSize, Sort.by("timestamp").descending())
-        );
-
-        final var response = new TransactionHistoryPageResponse()
-                .transactions(page.getContent().stream().map(AllSponsorAccountTransactionReadEntity::toBoResponse).toList())
-                .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()));
-
-        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
     }
 }
