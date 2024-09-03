@@ -1,7 +1,5 @@
 package onlydust.com.marketplace.api.read.repositories;
 
-import lombok.NonNull;
-import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBook;
 import onlydust.com.marketplace.api.read.entities.accounting.AccountBookTransactionReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,30 +11,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface AccountBookTransactionReadRepository extends Repository<AccountBookTransactionReadEntity, UUID> {
-
-    @Query(value = """
-            SELECT t
-            FROM AccountBookTransactionReadEntity t
-            JOIN FETCH t.sponsor s
-            JOIN FETCH t.currency c
-            LEFT JOIN FETCH t.program p
-            LEFT JOIN FETCH c.latestUsdQuote
-            WHERE s.id = :sponsorId AND
-                  t.reward IS NULL AND
-                  (:types IS NULL OR t.type IN :types) AND
-                  (:currencies IS NULL OR c.id IN :currencies) AND
-                  (:programs IS NULL OR p.id IN :programs) AND
-                  (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
-                  (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate)
-            """)
-    Page<AccountBookTransactionReadEntity> findAllFromSponsor(@NonNull UUID sponsorId,
-                                                              List<AccountBook.Transaction.Type> types,
-                                                              List<UUID> currencies,
-                                                              List<UUID> programs,
-                                                              Date fromDate,
-                                                              Date toDate,
-                                                              Pageable pageable);
-
     @Query(value = """
             SELECT t
             FROM AccountBookTransactionReadEntity t
