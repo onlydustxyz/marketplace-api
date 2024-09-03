@@ -12,10 +12,6 @@ public class CustomerIOProperties {
     @NonNull
     String apiKey;
     @NonNull
-    String onlyDustAdminEmail;
-    @NonNull
-    String onlyDustMarketingEmail;
-    @NonNull
     Integer rewardsPaidEmailId;
     @NonNull
     Integer rewardCanceledEmailId;

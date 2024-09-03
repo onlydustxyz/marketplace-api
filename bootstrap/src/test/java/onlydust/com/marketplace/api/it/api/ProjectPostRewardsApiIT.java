@@ -235,7 +235,6 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.reward.sentBy", equalTo(pierre.user().getGithubLogin())))
                         .withRequestBody(matchingJsonPath("$.message_data.reward.contributionsNumber", equalTo("0")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("New reward received ✨")))
         );
 

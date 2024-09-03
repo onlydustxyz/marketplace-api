@@ -172,7 +172,6 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
                                                                                                 "Please reach out to project lead(s) for more explanation or " +
                                                                                                 "contact us in case your need assistance.")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(pierre.user().getEmail())))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustAdminEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Reward #E1498 got canceled"))));
     }
 }

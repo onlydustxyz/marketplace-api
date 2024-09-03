@@ -466,7 +466,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 }
                                 """, true, false)))
                         .withRequestBody(matchingJsonPath("$.to", containing("abuisset")))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application has been accepted!")))
         );
 
@@ -489,7 +488,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                                 }
                                 """, true, false)))
                         .withRequestBody(matchingJsonPath("$.to", equalTo("pierre.oucif@gadz.org")))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Issue application refused")))
         );
 

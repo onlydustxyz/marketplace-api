@@ -753,7 +753,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             "id": "fc92397c-3431-4a84-8054-845376b630a0",
                             "email": null
                           },
-                          "from": "Camille from OnlyDust <admin@onlydust.xyz>",
                           "to": "pierre.oucif@gadz.org",
                           "subject": "Your rewards are processed! 🥳",
                           "message_data": {
@@ -789,7 +788,6 @@ public class BackOfficeBatchPaymentApiIT extends AbstractMarketplaceBackOfficeAp
                             "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                             "email": null
                           },
-                          "from": "Camille from OnlyDust <admin@onlydust.xyz>",
                           "to": "abuisset@gmail.com",
                           "subject": "Your rewards are processed! 🥳",
                           "message_data": {

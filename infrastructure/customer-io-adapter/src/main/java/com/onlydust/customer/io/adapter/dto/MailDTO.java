@@ -21,17 +21,15 @@ import static java.util.Objects.isNull;
 @Builder
 public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message_id") String transactionalMessageId,
                                    @NonNull IdentifiersDTO identifiers,
-                                   @NonNull String from,
                                    @NonNull String to,
                                    @NonNull String subject,
                                    @NonNull @JsonProperty("message_data") MessageData messageData
 ) {
 
-    public MailDTO(@NonNull String transactionalMessageId, @NonNull IdentifiersDTO identifiers, @NonNull String from, @NonNull String to,
+    public MailDTO(@NonNull String transactionalMessageId, @NonNull IdentifiersDTO identifiers, @NonNull String to,
                    @NonNull String subject, @NonNull MessageData messageData) {
         this.transactionalMessageId = transactionalMessageId;
         this.identifiers = identifiers;
-        this.from = from;
         this.to = to;
         this.subject = subject;
         this.messageData = messageData;
@@ -43,7 +41,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getWeeklyNotificationsEmailId().toString(),
                 mapIdentifiers(notificationRecipient),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notificationRecipient.email(),
                 summaryNotificationsDTO.title(),
                 summaryNotificationsDTO);
@@ -55,7 +52,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 applicationRefused, customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getProjectApplicationRefusedEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 projectApplicationRefusedDTO.title(),
                 projectApplicationRefusedDTO
@@ -71,7 +67,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
             @NonNull InvoiceRejected invoiceRejected) {
         return new MailDTO<>(customerIOProperties.getInvoiceRejectedEmailId().toString(),
                 new IdentifiersDTO(notification.recipientId().toString(), null),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "An invoice for %d reward(s) got rejected".formatted(invoiceRejected.rewards().size()),
                 InvoiceRejectedDTO.fromEvent(notification.recipient().login(), invoiceRejected, customerIOProperties.getEnvironment()));
@@ -86,7 +81,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 billingProfileVerificationClosed, customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getVerificationClosedEmailId().toString(),
                 new IdentifiersDTO(notification.recipientId().toString(), null),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 verificationClosedDTO.title(),
                 verificationClosedDTO);
@@ -97,7 +91,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                  @NonNull RewardReceived rewardReceived) {
         return new MailDTO<>(customerIOProperties.getNewRewardReceivedEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "New reward received ✨",
                 RewardCreatedDTO.fromEvent(notification.recipient().login(), rewardReceived, customerIOProperties.getEnvironment()));
@@ -109,7 +102,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
         return new MailDTO<>(
                 customerIOProperties.getRewardCanceledEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "Reward %s got canceled".formatted(rewardCanceled.shortReward().getId().pretty()),
                 RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled, customerIOProperties.getEnvironment()));
@@ -120,7 +112,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                @NonNull RewardsPaid rewardsPaid) {
         return new MailDTO<>(customerIOProperties.getRewardsPaidEmailId().toString(),
                 mapIdentifiers(notification.recipient().email(), notification.recipientId()),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "Your rewards are processed! 🥳",
                 RewardsPaidDTO.fromEvent(notification.recipient().login(), rewardsPaid, customerIOProperties.getEnvironment()));
@@ -131,7 +122,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                            @NonNull CommitteeApplicationCreated committeeApplicationCreated) {
         return new MailDTO<>(customerIOProperties.getNewCommitteeApplicationEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 "Your application to committee %s".formatted(committeeApplicationCreated.getCommitteeName()),
                 NewCommitteeApplicationDTO.fromEvent(notification.recipient().login(), committeeApplicationCreated, customerIOProperties.getEnvironment()));
@@ -142,7 +132,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                               @NonNull ApplicationAccepted applicationAccepted) {
         return new MailDTO<>(customerIOProperties.getProjectApplicationAcceptedEmailId().toString(),
                 mapIdentifiers(notification.recipient().email(), notification.recipientId()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 "Your application has been accepted!",
                 ProjectApplicationAcceptedDTO.fromEvent(notification.recipient().login(), applicationAccepted, customerIOProperties.getEnvironment()));
@@ -152,7 +141,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                            @NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
         return new MailDTO<>(customerIOProperties.getKycIndividualVerificationEmailId().toString(),
                 mapIdentifiers(billingProfileChildrenKycVerification.individualKycIdentity().email(), null),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 billingProfileChildrenKycVerification.individualKycIdentity().email(),
                 "Verify your identity to validate your company",
                 KycIdentityVerificationDTO.from(billingProfileChildrenKycVerification)
@@ -164,7 +152,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                                                               @NonNull CompleteYourBillingProfile completeYourBillingProfile) {
         return new MailDTO<>(customerIOProperties.getCompleteYourBillingProfileEmailId().toString(),
                 mapIdentifiers(notification.recipient().email(), notification.recipientId()),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 "Complete your billing profile",
                 CompleteYourBillingProfileDTO.from(completeYourBillingProfile, notification.recipient().login(), customerIOProperties.getEnvironment())
@@ -179,7 +166,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 billingProfileVerificationRejected, customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getVerificationRejectedEmailId().toString(),
                 mapIdentifiers(notification.recipient().email(), notification.recipientId()),
-                customerIOProperties.getOnlyDustAdminEmail(),
                 notification.recipient().email(),
                 verificationRejectedDTO.title(),
                 verificationRejectedDTO);
@@ -192,7 +178,6 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getIssueCreatedEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
-                customerIOProperties.getOnlyDustMarketingEmail(),
                 notification.recipient().email(),
                 issueCreatedDTO.title(),
                 issueCreatedDTO);

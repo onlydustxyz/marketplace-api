@@ -173,7 +173,6 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                                 equalTo("https://develop-app.onlydust.com/c/%s/applicant?p=%s".formatted(committeeId.value(), bretzel.toString()))))
                         .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("PierreOucif")))
                         .withRequestBody(matchingJsonPath("$.to", equalTo(contactEmail)))
-                        .withRequestBody(matchingJsonPath("$.from", equalTo(customerIOProperties.getOnlyDustMarketingEmail())))
                         .withRequestBody(matchingJsonPath("$.subject", equalTo("Your application to committee %s".formatted("Mr. Needful")))));
 
         // When
