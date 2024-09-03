@@ -40,4 +40,11 @@ public class CurrencyHelper {
             default -> throw new IllegalArgumentException("Unsupported blockchain in tests");
         });
     }
+
+    public void addNativeCryptoSupport(Currency.Code code) {
+        currencyFacadePort.addNativeCryptocurrencySupport(code, switch (code.toString()) {
+            case Currency.Code.XLM_STR -> 7;
+            default -> throw new IllegalArgumentException("Unsupported currency in tests");
+        });
+    }
 }

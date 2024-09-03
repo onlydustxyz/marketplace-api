@@ -1,0 +1,55 @@
+{
+    "_links": {
+        "self": {
+            "href": "https://horizon.stellar.org/assets?asset_code=USDC\u0026asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN\u0026cursor=\u0026limit=1\u0026order=asc"
+        },
+        "next": {
+            "href": "https://horizon.stellar.org/assets?asset_code=USDC\u0026asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN\u0026cursor=USDC_GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN_credit_alphanum4\u0026limit=1\u0026order=asc"
+        },
+        "prev": {
+            "href": "https://horizon.stellar.org/assets?asset_code=USDC\u0026asset_issuer=GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN\u0026cursor=USDC_GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN_credit_alphanum4\u0026limit=1\u0026order=desc"
+        }
+    },
+    "_embedded": {
+        "records": [
+            {
+                "_links": {
+                    "toml": {
+                        "href": "https://centre.io/.well-known/stellar.toml"
+                    }
+                },
+                "asset_type": "credit_alphanum4",
+                "asset_code": "USDC",
+                "asset_issuer": "GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN",
+                "paging_token": "USDC_GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN_credit_alphanum4",
+                "contract_id": "CCW67TSZV3SSS2HXMBQ5JFGCKJNXKZM7UQUWUZPUTHXSTZLEO7SJMI75",
+                "num_accounts": 1043585,
+                "num_claimable_balances": 424,
+                "num_liquidity_pools": 556,
+                "num_contracts": 53,
+                "num_archived_contracts": 6,
+                "amount": "273204393.9958619",
+                "accounts": {
+                    "authorized": 1043585,
+                    "authorized_to_maintain_liabilities": 0,
+                    "unauthorized": 0
+                },
+                "claimable_balances_amount": "11372.9632530",
+                "liquidity_pools_amount": "2982549.3834121",
+                "contracts_amount": "926800.6825963",
+                "archived_contracts_amount": "31.3897177",
+                "balances": {
+                    "authorized": "273204393.9958619",
+                    "authorized_to_maintain_liabilities": "0.0000000",
+                    "unauthorized": "0.0000000"
+                },
+                "flags": {
+                    "auth_required": false,
+                    "auth_revocable": true,
+                    "auth_immutable": false,
+                    "auth_clawback_enabled": false
+                }
+            }
+        ]
+    }
+}
