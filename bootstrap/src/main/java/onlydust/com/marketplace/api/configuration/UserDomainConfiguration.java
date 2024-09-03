@@ -34,8 +34,10 @@ public class UserDomainConfiguration {
     }
 
     @Bean
-    public NotificationSettingsService notificationSettingsService(final NotificationSettingsStoragePort notificationSettingsStoragePort) {
-        return new NotificationSettingsService(notificationSettingsStoragePort);
+    public NotificationSettingsService notificationSettingsService(final NotificationSettingsStoragePort notificationSettingsStoragePort,
+                                                                   final MarketingNotificationSettingsStoragePort marketingNotificationSettingsStoragePort,
+                                                                   final AppUserStoragePort appUserStoragePort) {
+        return new NotificationSettingsService(notificationSettingsStoragePort,marketingNotificationSettingsStoragePort, appUserStoragePort);
     }
 
     @Bean

@@ -74,6 +74,7 @@ infrastructure:
     weekly-notifications-email-id: 70
     project-application-refused-email-id: 80
     issue-created-email-id: 90
+    marketing-topic-id: 3
 application:
   onlydust-wallets:
     ethereum: 0xthisisafakeaddress

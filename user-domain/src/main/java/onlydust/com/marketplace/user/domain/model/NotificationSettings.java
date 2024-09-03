@@ -37,4 +37,11 @@ public class NotificationSettings {
             );
         }
     }
+
+    public boolean hasSubscribedToMarketingEmailNotifications() {
+        return Optional.ofNullable(this.channelsPerCategory.get(NotificationCategory.GLOBAL_MARKETING))
+                .map(notificationChannels -> notificationChannels.stream().anyMatch(notificationChannel -> notificationChannel.equals(NotificationChannel.EMAIL)))
+                .orElse(false);
+
+    }
 }
