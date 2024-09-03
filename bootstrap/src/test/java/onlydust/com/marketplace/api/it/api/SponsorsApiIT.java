@@ -2084,10 +2084,12 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody()
-                        .jsonPath("$.stats[0].date").isEqualTo("2024-01-01")
-                        .jsonPath("$.stats[0].transactionCount").isEqualTo(2)
-                        .jsonPath("$.stats[1].date").isEqualTo("2024-02-01")
-                        .jsonPath("$.stats[1].transactionCount").isEqualTo(1)
+                        .jsonPath("$.stats[0].date").isEqualTo("2023-12-01")
+                        .jsonPath("$.stats[0].transactionCount").isEqualTo(0)
+                        .jsonPath("$.stats[1].date").isEqualTo("2024-01-01")
+                        .jsonPath("$.stats[1].transactionCount").isEqualTo(2)
+                        .jsonPath("$.stats[2].date").isEqualTo("2024-02-01")
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(1)
                 ;
             }
 
@@ -2105,21 +2107,27 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isOk()
                         .expectBody(SponsorTransactionStatListResponse.class)
+                        .consumeWith(System.out::println)
                         .returnResult().getResponseBody().getStats();
 
                 switch (type) {
                     case DEPOSITED -> {
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.DECEMBER).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                     }
                     case ALLOCATED -> {
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.DECEMBER).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(2);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
                     case RETURNED -> {
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.DECEMBER).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                     }
                 }
             }
@@ -2572,7 +2580,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .isOk()
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
-                            case DEPOSITED -> 1;
+                            case DEPOSITED -> 2;
                             case ALLOCATED -> 4;
                             case RETURNED -> 1;
                         })
@@ -2594,7 +2602,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .returnResult().getResponseBody();
 
                 final var lines = csv.split("\\R");
-                assertThat(lines.length).isEqualTo(7);
+                assertThat(lines.length).isEqualTo(8);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
             }
         }

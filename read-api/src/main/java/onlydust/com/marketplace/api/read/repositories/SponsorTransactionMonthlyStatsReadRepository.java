@@ -37,7 +37,7 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                                   coalesce(sum(amount) filter ( where type = 'TRANSFER' and reward_id is not null and payment_id is null ), 0)
                                       - coalesce(sum(amount) filter ( where type = 'REFUND' and reward_id is not null and payment_id is null ), 0)  as total_rewarded,
             
-                                  count(*) filter ( where abt.project_id is null )                                                                  as transaction_count
+                                  count(*) filter ( where tx.project_id is null )                                                                  as transaction_count
                            from accounting.all_transactions tx
                                     left join programs pgm on pgm.id = tx.program_id
                            where (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
