@@ -41,4 +41,12 @@ public class CustomerIOProperties {
     Integer projectApplicationRefusedEmailId;
     @NonNull
     Integer issueCreatedEmailId;
+    @NonNull
+    String trackingBaseUri;
+    @NonNull
+    String trackingSiteId;
+    @NonNull
+    String trackingApiKey;
+    @NonNull
+    Integer marketingTopicId;
 }

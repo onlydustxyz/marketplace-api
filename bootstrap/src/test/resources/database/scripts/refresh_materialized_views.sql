@@ -13,5 +13,3 @@ REFRESH MATERIALIZED VIEW global_users_ranks;
 REFRESH MATERIALIZED VIEW repo_languages;
 REFRESH MATERIALIZED VIEW project_languages;
 REFRESH MATERIALIZED VIEW top_project_recommendations;
-REFRESH MATERIALIZED VIEW bi.project_contribution_stats;
-REFRESH MATERIALIZED VIEW bi.project_reward_stats;

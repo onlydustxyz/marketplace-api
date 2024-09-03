@@ -6122,7 +6122,7 @@ components:
           type: string
         email:
           type: string
-    
+
     ProgramPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -10055,7 +10055,8 @@ components:
         - MAINTAINER_PROJECT_PROGRAM
         - CONTRIBUTOR_REWARD
         - CONTRIBUTOR_PROJECT
-        - KYC_KYB_BILLING_PROFILE
+        - GLOBAL_BILLING_PROFILE
+        - GLOBAL_MARKETING
 
     NotificationSettingsForProjectResponse:
       allOf:

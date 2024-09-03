@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.client.CustomerIOTrackingApiHttpClient;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import com.slack.api.RequestConfigurator;
 import com.slack.api.methods.MethodsClient;
@@ -93,7 +94,8 @@ public class MarketplaceApiApplicationIT {
 
     @Bean
     public CustomerIOAdapter notificationInstantEmailSender(final CustomerIOProperties customerIOProperties,
-                                                            final CustomerIOHttpClient customerIOHttpClient) {
-        return spy(new CustomerIOAdapter(customerIOHttpClient, customerIOProperties));
+                                                            final CustomerIOHttpClient customerIOHttpClient,
+                                                            final CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient) {
+        return spy(new CustomerIOAdapter(customerIOHttpClient, customerIOTrackingApiHttpClient, customerIOProperties));
     }
 }

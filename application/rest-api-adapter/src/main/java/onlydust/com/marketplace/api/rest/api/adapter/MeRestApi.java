@@ -365,7 +365,8 @@ public class MeRestApi implements MeApi {
             channelsPerCategory.put(switch (notificationSettingPutRequest.getCategory()) {
                 case CONTRIBUTOR_REWARD -> NotificationCategory.CONTRIBUTOR_REWARD;
                 case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
-                case KYC_KYB_BILLING_PROFILE -> NotificationCategory.KYC_KYB_BILLING_PROFILE;
+                case GLOBAL_BILLING_PROFILE -> NotificationCategory.GLOBAL_BILLING_PROFILE;
+                case GLOBAL_MARKETING -> NotificationCategory.GLOBAL_MARKETING;
                 case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
                 case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
             }, notificationSettingPutRequest.getChannels().stream()

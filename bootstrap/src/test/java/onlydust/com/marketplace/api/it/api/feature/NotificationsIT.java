@@ -50,8 +50,8 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     private final TestNotification rewardNotification2Data = new TestNotification(2, NotificationCategory.CONTRIBUTOR_REWARD);
     private final TestNotification rewardNotification3Data = new TestNotification(3, NotificationCategory.CONTRIBUTOR_REWARD);
     private final TestNotification rewardNotification4Data = new TestNotification(4, NotificationCategory.CONTRIBUTOR_REWARD);
-    private final TestNotification kycNotification1Data = new TestNotification(100, NotificationCategory.KYC_KYB_BILLING_PROFILE);
-    private final TestNotification kycNotification2Data = new TestNotification(101, NotificationCategory.KYC_KYB_BILLING_PROFILE);
+    private final TestNotification kycNotification1Data = new TestNotification(100, NotificationCategory.GLOBAL_BILLING_PROFILE);
+    private final TestNotification kycNotification2Data = new TestNotification(101, NotificationCategory.GLOBAL_BILLING_PROFILE);
 
     private static Notification olivierRewardNotification1;
     private static Notification olivierRewardNotification2;
@@ -159,7 +159,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.IN_APP),
-                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
+                                NotificationCategory.GLOBAL_BILLING_PROFILE, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP)
                         ))
                         .build());
 
@@ -185,7 +185,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.IN_APP),
-                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.EMAIL,
+                                NotificationCategory.GLOBAL_BILLING_PROFILE, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.EMAIL,
                                         NotificationChannel.IN_APP)
                         ))
                         .build());
@@ -224,7 +224,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
-                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.EMAIL,
+                                NotificationCategory.GLOBAL_BILLING_PROFILE, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.EMAIL,
                                         NotificationChannel.IN_APP)
                         ))
                         .build());
@@ -264,7 +264,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),
-                                NotificationCategory.KYC_KYB_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
+                                NotificationCategory.GLOBAL_BILLING_PROFILE, List.of(NotificationChannel.IN_APP)
                         ))
                         .build());
 

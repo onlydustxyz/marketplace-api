@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import com.github.tomakehurst.wiremock.client.WireMock;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import org.junit.jupiter.api.MethodOrderer;
@@ -153,7 +154,7 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "EMAIL"
                               ],
-                              "category": "KYC_KYB_BILLING_PROFILE"
+                              "category": "GLOBAL_BILLING_PROFILE"
                             },
                             {
                               "channels": [
@@ -189,7 +190,7 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "SUMMARY_EMAIL"
                               ],
-                              "category": "KYC_KYB_BILLING_PROFILE"
+                              "category": "GLOBAL_BILLING_PROFILE"
                             },
                             {
                               "channels": [
@@ -217,6 +218,13 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
+        customerIOTrackingApiWireMockServer.verify(1, WireMock.putRequestedFor(WireMock.urlEqualTo("/customers/%s".formatted(hayden.user().getEmail())))
+                .withHeader("Authorization", WireMock.equalTo("Basic JHtDVVNUT01FUl9JT19UUkFDS0lOR19TSVRFX0lEfToke0NVU1RPTUVSX0lPX1RSQUNLSU5HX0FQSV9LRVl9"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {"cio_subscription_preferences":{"topics":{"topic_3":false}}}
+                        """))
+        );
+
         // When
         client.get()
                 .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
@@ -233,7 +241,7 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "SUMMARY_EMAIL"
                               ],
-                              "category": "KYC_KYB_BILLING_PROFILE"
+                              "category": "GLOBAL_BILLING_PROFILE"
                             },
                             {
                               "channels": [
@@ -257,6 +265,104 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                         }
                         """);
 
+        // When
+        client.put()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
+                .header("Authorization", BEARER_PREFIX + hayden.jwt())
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "notificationSettings": [
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "GLOBAL_BILLING_PROFILE"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL", "SUMMARY_EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_REWARD"
+                            },
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "MAINTAINER_PROJECT_CONTRIBUTOR"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_PROJECT"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "GLOBAL_MARKETING"
+                            }
+                          ]
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        customerIOTrackingApiWireMockServer.verify(1, WireMock.putRequestedFor(WireMock.urlEqualTo("/customers/%s".formatted(hayden.user().getEmail())))
+                .withHeader("Authorization", WireMock.equalTo("Basic JHtDVVNUT01FUl9JT19UUkFDS0lOR19TSVRFX0lEfToke0NVU1RPTUVSX0lPX1RSQUNLSU5HX0FQSV9LRVl9"))
+                .withRequestBody(WireMock.equalToJson("""
+                        {"cio_subscription_preferences":{"topics":{"topic_3":true}}}
+                        """))
+        );
+
+        // When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATION_SETTINGS))
+                .header("Authorization", BEARER_PREFIX + hayden.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "notificationSettings": [
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "GLOBAL_BILLING_PROFILE"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL", "SUMMARY_EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_REWARD"
+                            },
+                            {
+                              "channels": [
+                                "SUMMARY_EMAIL"
+                              ],
+                              "category": "MAINTAINER_PROJECT_CONTRIBUTOR"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "CONTRIBUTOR_PROJECT"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "GLOBAL_MARKETING"
+                            }
+                          ]
+                        }
+                        """);
 
     }
 }

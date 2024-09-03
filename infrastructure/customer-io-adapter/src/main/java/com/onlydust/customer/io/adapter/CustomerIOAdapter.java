@@ -1,7 +1,9 @@
 package com.onlydust.customer.io.adapter;
 
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.client.CustomerIOTrackingApiHttpClient;
 import com.onlydust.customer.io.adapter.dto.MailDTO;
+import com.onlydust.customer.io.adapter.dto.UpdateCustomerDTO;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.AllArgsConstructor;
@@ -15,7 +17,9 @@ import onlydust.com.marketplace.project.domain.model.notification.ApplicationRef
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.notification.GoodFirstIssueCreated;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
+import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
+import onlydust.com.marketplace.user.domain.port.output.MarketingNotificationSettingsStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -24,8 +28,9 @@ import java.util.List;
 
 @AllArgsConstructor
 @Slf4j
-public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
+public class CustomerIOAdapter implements NotificationSender, EmailStoragePort, MarketingNotificationSettingsStoragePort {
     private final CustomerIOHttpClient customerIOHttpClient;
+    private final CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient;
     private CustomerIOProperties customerIOProperties;
 
     @Override
@@ -76,5 +81,13 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort {
         } else {
             LOGGER.error("Cannot send email for unmanaged class %s".formatted(object.getClass().getSimpleName()));
         }
+    }
+
+    @Override
+    @Retryable(maxAttempts = 3, backoff = @Backoff(delay = 200, multiplier = 2))
+    public void update(String email, NotificationSettings settings) {
+        customerIOTrackingApiHttpClient.send("/customers/%s".formatted(email), HttpMethod.PUT,
+                UpdateCustomerDTO.fromTopicIdAndSubscription(customerIOProperties.getMarketingTopicId(), settings.hasSubscribedToMarketingEmailNotifications()),
+                Void.class);
     }
 }

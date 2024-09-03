@@ -27,6 +27,6 @@ public class BillingProfileVerificationRejected extends NotificationData {
 
     @Override
     public NotificationCategory category() {
-        return NotificationCategory.KYC_KYB_BILLING_PROFILE;
+        return NotificationCategory.GLOBAL_BILLING_PROFILE;
     }
 }

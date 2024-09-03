@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.configuration;
 
 import com.onlydust.customer.io.adapter.CustomerIOAdapter;
 import com.onlydust.customer.io.adapter.client.CustomerIOHttpClient;
+import com.onlydust.customer.io.adapter.client.CustomerIOTrackingApiHttpClient;
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -23,14 +24,21 @@ public class CustomerIOConfiguration {
     }
 
     @Bean
+    public CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient(final CustomerIOProperties customerIOProperties) {
+        return new CustomerIOTrackingApiHttpClient(customerIOProperties);
+    }
+
+    @Bean
     public CustomerIOAdapter notificationInstantEmailSender(final CustomerIOProperties customerIOProperties,
-                                                            final CustomerIOHttpClient customerIOHttpClient) {
-        return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
+                                                            final CustomerIOHttpClient customerIOHttpClient,
+                                                            final CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient) {
+        return new CustomerIOAdapter(customerIOHttpClient, customerIOTrackingApiHttpClient, customerIOProperties);
     }
 
     @Bean
     public EmailStoragePort emailStoragePort(final CustomerIOProperties customerIOProperties,
-                                             final CustomerIOHttpClient customerIOHttpClient) {
-        return new CustomerIOAdapter(customerIOHttpClient, customerIOProperties);
+                                             final CustomerIOHttpClient customerIOHttpClient,
+                                             final CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient) {
+        return new CustomerIOAdapter(customerIOHttpClient, customerIOTrackingApiHttpClient, customerIOProperties);
     }
 }

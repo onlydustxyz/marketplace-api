@@ -65,7 +65,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         @ConfigureWireMock(name = "sumsub", property = "infrastructure.sumsub.base-uri"),
         @ConfigureWireMock(name = "customer-io", property = "infrastructure.customer-io.base-uri"),
         @ConfigureWireMock(name = "node-guardians", property = "infrastructure.node-guardians.base-uri"),
-        @ConfigureWireMock(name = "langchain", property = "langchain4j.open-ai.chat-model.base-url")
+        @ConfigureWireMock(name = "langchain", property = "langchain4j.open-ai.chat-model.base-url"),
+        @ConfigureWireMock(name = "customer-io-tracking-api", property = "infrastructure.customer-io.tracking-base-uri"),
 })
 public class AbstractMarketplaceApiIT {
 
@@ -231,6 +232,8 @@ public class AbstractMarketplaceApiIT {
     protected WireMockServer nodeGuardiansWireMockServer;
     @InjectWireMock("langchain")
     protected WireMockServer langchainWireMockServer;
+    @InjectWireMock("customer-io-tracking-api")
+    protected WireMockServer customerIOTrackingApiWireMockServer;
 
     @LocalServerPort
     int port;

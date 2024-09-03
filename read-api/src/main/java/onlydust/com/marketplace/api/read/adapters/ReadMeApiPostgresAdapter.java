@@ -233,7 +233,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                                 }).toList(),
                         switch (notificationCategoryListEntry.getKey()) {
                             case CONTRIBUTOR_REWARD -> NotificationCategory.CONTRIBUTOR_REWARD;
-                            case KYC_KYB_BILLING_PROFILE -> NotificationCategory.KYC_KYB_BILLING_PROFILE;
+                            case GLOBAL_MARKETING -> NotificationCategory.GLOBAL_MARKETING;
+                            case GLOBAL_BILLING_PROFILE -> NotificationCategory.GLOBAL_BILLING_PROFILE;
                             case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
                             case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
                             case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
