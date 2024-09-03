@@ -2,9 +2,12 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorReadApi;
+import onlydust.com.backoffice.api.contract.model.DepositPage;
 import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
+import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
+import onlydust.com.marketplace.api.read.repositories.DepositReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -28,13 +31,31 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("bo")
 public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSponsorReadApi {
     private final SponsorReadRepository sponsorReadRepository;
+    private final DepositReadRepository depositReadRepository;
 
     @Override
     public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {
         final var sponsor = sponsorReadRepository.findById(sponsorId)
                 .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
 
-        return ok(sponsor.toBoResponse());
+        return ok(sponsor.toBoDetailsResponse());
+    }
+
+    @Override
+    public ResponseEntity<DepositPage> getSponsorDeposits(UUID sponsorId, Integer pageIndex, Integer pageSize) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = depositReadRepository.findAllBySponsorId(sponsorId, PageRequest.of(index, size, Sort.by("transaction.timestamp").descending()));
+
+        final var response = new DepositPage()
+                .deposits(page.getContent().stream().map(DepositReadEntity::toBoPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return status(response.getHasMore() ? PARTIAL_CONTENT : OK).body(response);
     }
 
     @Override

@@ -86,7 +86,7 @@ public class SponsorReadEntity {
                 .logoUrl(logoUrl == null ? null : URI.create(logoUrl));
     }
 
-    public SponsorDetailsResponse toBoResponse() {
+    public SponsorDetailsResponse toBoDetailsResponse() {
         return new SponsorDetailsResponse()
                 .id(id)
                 .name(name)
@@ -98,6 +98,18 @@ public class SponsorReadEntity {
                 .programs(programs.stream()
                         .map(ProgramReadEntity::toBoProgramWithBudgetResponse)
                         .toList())
+                .leads(leads.stream()
+                        .map(AllUserReadEntity::toBoLinkResponse)
+                        .toList())
+                ;
+    }
+
+    public onlydust.com.backoffice.api.contract.model.SponsorResponse toBoResponse() {
+        return new onlydust.com.backoffice.api.contract.model.SponsorResponse()
+                .id(id)
+                .name(name)
+                .url(url)
+                .logoUrl(logoUrl)
                 .leads(leads.stream()
                         .map(AllUserReadEntity::toBoLinkResponse)
                         .toList())

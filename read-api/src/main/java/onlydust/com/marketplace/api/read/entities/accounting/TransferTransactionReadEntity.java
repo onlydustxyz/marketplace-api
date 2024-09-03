@@ -7,15 +7,21 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
+import lombok.extern.slf4j.Slf4j;
+import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
+import onlydust.com.backoffice.api.contract.model.TransferTransactionResponse;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.blockchain.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Entity
 @NoArgsConstructor(force = true)
 @Getter
@@ -36,7 +42,7 @@ public class TransferTransactionReadEntity {
     @NonNull
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    NetworkEnumEntity blockchain;
+    TransactionNetwork blockchain;
 
     @NonNull
     String senderAddress;
@@ -48,4 +54,30 @@ public class TransferTransactionReadEntity {
     BigDecimal amount;
 
     String contractAddress;
+
+    private URI blockExplorerUrl() {
+        try {
+            return switch (blockchain) {
+                case SEPA -> null;
+                case ETHEREUM -> Ethereum.BLOCK_EXPLORER.url(Ethereum.transactionHash(reference));
+                case OPTIMISM -> Optimism.BLOCK_EXPLORER.url(Optimism.transactionHash(reference));
+                case STARKNET -> StarkNet.BLOCK_EXPLORER.url(StarkNet.transactionHash(reference));
+                case APTOS -> Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash(reference));
+                case STELLAR -> Stellar.BLOCK_EXPLORER.url(Stellar.transactionHash(reference));
+            };
+        } catch (OnlyDustException e) {
+            LOGGER.error("Error while generating block explorer URL for blockchain %s and reference %s".formatted(blockchain, reference), e);
+            return null;
+        }
+    }
+
+    public TransferTransactionResponse toBoResponse() {
+        return new TransferTransactionResponse()
+                .id(id)
+                .network(blockchain)
+                .reference(reference)
+                .timestamp(timestamp)
+                .amount(amount)
+                .blockExplorerUrl(blockExplorerUrl());
+    }
 }

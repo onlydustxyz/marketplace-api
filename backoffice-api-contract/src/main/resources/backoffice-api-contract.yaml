@@ -1101,6 +1101,44 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/sponsors/{sponsorId}/deposits:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeSponsorRead
+      summary: Get sponsor deposits
+      operationId: getSponsorDeposits
+      description: |
+        Get sponsor deposits
+      parameters:
+        - in: path
+          name: sponsorId
+          required: true
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: pageIndex
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: 'Sponsor data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositPage'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/sponsors/{sponsorId}/leads/{leadId}:
     put:
       security:
@@ -2844,6 +2882,7 @@ components:
         - name
         - url
         - logoUrl
+        - leads
       properties:
         id:
           $ref: '#/components/schemas/SponsorId'
@@ -2853,6 +2892,10 @@ components:
           type: string
         logoUrl:
           type: string
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLinkResponse'
 
     ProgramLinkResponse:
       type: object
@@ -2881,10 +2924,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/ProgramLinkResponse'
-            leads:
-              type: array
-              items:
-                $ref: '#/components/schemas/UserLinkResponse'
 
     SponsorDetailsResponse:
       allOf:
@@ -2906,6 +2945,32 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserLinkResponse'
+
+    DepositPage:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - deposits
+          properties:
+            deposits:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepositPageItemResponse'
+
+    DepositPageItemResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/DepositId'
+        sponsor:
+          $ref: '#/components/schemas/SponsorResponse'
+        transaction:
+          $ref: '#/components/schemas/TransferTransactionResponse'
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        status:
+          $ref: '#/components/schemas/DepositStatus'
 
     EcosystemPage:
       allOf:
@@ -3144,6 +3209,21 @@ components:
       type: string
       format: uuid
 
+    TransferTransactionId:
+      type: string
+      format: uuid
+
+    DepositId:
+      type: string
+      format: uuid
+
+    DepositStatus:
+      type: string
+      enum:
+        - PENDING
+        - COMPLETED
+        - REJECTED
+
     TransactionReceipt:
       type: object
       required:
@@ -3167,6 +3247,31 @@ components:
         thirdPartyAccountNumber:
           type: string
           description: IBAN, account number, ENS or wallet address
+
+    TransferTransactionResponse:
+      type: object
+      required:
+        - id
+        - network
+        - reference
+        - timestamp
+        - amount
+        - blockExplorerUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/TransferTransactionId'
+        network:
+          $ref: '#/components/schemas/TransactionNetwork'
+        reference:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        blockExplorerUrl:
+          type: string
+          format: uri
 
     TransactionNetwork:
       type: string

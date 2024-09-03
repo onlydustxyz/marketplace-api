@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.backoffice.api.contract.model.DepositPageItemResponse;
+import onlydust.com.backoffice.api.contract.model.DepositStatus;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
@@ -45,8 +47,17 @@ public class DepositReadEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    Deposit.Status status;
+    DepositStatus status;
 
     @JdbcTypeCode(SqlTypes.JSON)
     Deposit.BillingInformation billingInformation;
+
+    public DepositPageItemResponse toBoPageItemResponse() {
+        return new DepositPageItemResponse()
+                .id(id)
+                .sponsor(sponsor.toBoResponse())
+                .transaction(transaction.toBoResponse())
+                .currency(currency.toBoShortResponse())
+                .status(status);
+    }
 }
