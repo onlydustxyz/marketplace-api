@@ -545,4 +545,17 @@ public class AccountingService implements AccountingFacadePort {
                 .billingInformation(billingInformation)
                 .build());
     }
+
+    @Override
+    public void rejectDeposit(Deposit.Id depositId) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        if (deposit.status() != Deposit.Status.PENDING)
+            throw badRequest("Deposit %s is not pending".formatted(depositId));
+
+        depositStoragePort.save(deposit.toBuilder()
+                .status(Deposit.Status.REJECTED)
+                .build());
+    }
 }

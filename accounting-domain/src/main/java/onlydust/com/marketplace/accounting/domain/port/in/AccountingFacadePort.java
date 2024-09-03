@@ -63,4 +63,6 @@ public interface AccountingFacadePort {
     Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency);
 
     void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
+
+    void rejectDeposit(Deposit.Id depositId);
 }

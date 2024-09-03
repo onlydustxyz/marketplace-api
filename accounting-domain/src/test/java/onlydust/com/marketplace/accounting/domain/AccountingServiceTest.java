@@ -1943,6 +1943,49 @@ public class AccountingServiceTest {
             verify(depositStoragePort, never()).save(any());
         }
 
+        @Test
+        void should_prevent_rejecting_deposit_if_not_found() {
+            // Given
+            final var depositId = Deposit.Id.random();
+            when(depositStoragePort.find(any())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.rejectDeposit(depositId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s not found".formatted(depositId));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Deposit.Status.class, names = {"PENDING"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_prevent_rejecting_deposit_if_not_pending(Deposit.Status status) {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(status).build()));
+
+            // When
+            assertThatThrownBy(() -> accountingService.rejectDeposit(deposit.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s is not pending".formatted(deposit.id()));
+        }
+
+        @Test
+        void should_reject_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+
+            // When
+            accountingService.rejectDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.REJECTED).build());
+        }
+
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
             static Transaction fake() {
                 final var faker = new Faker();
