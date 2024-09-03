@@ -42,11 +42,12 @@ public class AccountingConfiguration {
                                                      final @NonNull DepositStoragePort depositStoragePort,
                                                      final @NonNull TransactionStoragePort transactionStoragePort,
                                                      final @NonNull PermissionPort permissionPort,
-                                                     final @NonNull OnlyDustWallets onlyDustWallets
+                                                     final @NonNull OnlyDustWallets onlyDustWallets,
+                                                     final @NonNull AccountingSponsorStoragePort accountingSponsorStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
                 invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort,
-                onlyDustWallets);
+                onlyDustWallets,accountingSponsorStoragePort);
     }
 
     @Bean

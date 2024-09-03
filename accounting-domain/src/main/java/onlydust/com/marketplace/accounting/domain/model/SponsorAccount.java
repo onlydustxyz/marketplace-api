@@ -3,8 +3,10 @@ package onlydust.com.marketplace.accounting.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -166,6 +168,17 @@ public class SponsorAccount {
             this.type = type;
         }
 
+        public static @NonNull Transaction deposit(final @NonNull SponsorView sponsor,
+                                                   final @NonNull Blockchain.TransferTransaction transaction) {
+            return new Transaction(
+                    transaction.timestamp(),
+                    Type.DEPOSIT,
+                    Network.fromBlockchain(transaction.blockchain()),
+                    transaction.reference(),
+                    PositiveAmount.of(transaction.amount()),
+                    transaction.senderAddress(),
+                    sponsor.name());
+        }
 
         @NoArgsConstructor(staticName = "random")
         @EqualsAndHashCode(callSuper = true)

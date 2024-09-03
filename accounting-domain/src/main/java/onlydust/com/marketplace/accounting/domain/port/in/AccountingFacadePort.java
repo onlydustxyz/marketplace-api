@@ -65,4 +65,6 @@ public interface AccountingFacadePort {
     void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
 
     void rejectDeposit(Deposit.Id depositId);
+    
+    void approveDeposit(Deposit.Id depositId);
 }
