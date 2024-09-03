@@ -29,8 +29,13 @@ public class ProgramHelper {
 
     @Transactional
     public Program create(SponsorId sponsorId) {
+        return create(sponsorId, faker.lordOfTheRings().character() + " " + faker.random().nextLong());
+    }
+
+    @Transactional
+    public Program create(SponsorId sponsorId, String name) {
         return programFacadePort.create(
-                faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
+                name,
                 sponsorId,
                 URI.create(faker.internet().url()),
                 URI.create(faker.internet().url()),
