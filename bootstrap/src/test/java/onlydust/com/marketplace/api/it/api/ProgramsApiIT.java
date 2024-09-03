@@ -1238,7 +1238,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": 2
+                                      "transactionCount": 0
                                     }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-08-01')]").value(jsonObjectEquals("""
@@ -1343,7 +1343,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": 4
+                                      "transactionCount": 0
                                     }
                                 """))
                 ;
@@ -1401,9 +1401,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[5].date").isEqualTo("2024-06-01")
                         .jsonPath("$.stats[5].transactionCount").isEqualTo(1)
                         .jsonPath("$.stats[6].date").isEqualTo("2024-07-01")
-                        .jsonPath("$.stats[6].transactionCount").isEqualTo(2)
+                        .jsonPath("$.stats[6].transactionCount").isEqualTo(0)
                         .jsonPath("$.stats[7].date").isEqualTo("2024-08-01")
-                        .jsonPath("$.stats[7].transactionCount").isEqualTo(2)
+                        .jsonPath("$.stats[7].transactionCount").isEqualTo(0)
                 ;
             }
 

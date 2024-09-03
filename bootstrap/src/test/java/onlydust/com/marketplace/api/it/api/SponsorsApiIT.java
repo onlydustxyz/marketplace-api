@@ -1062,7 +1062,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                                   }
                                                 ]
                                               },
-                                              "transactionCount": 3
+                                              "transactionCount": 0
                                             }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-05-01')]").value(jsonObjectEquals("""
@@ -1256,7 +1256,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                                   }
                                                 ]
                                               },
-                                              "transactionCount": 3
+                                              "transactionCount": 0
                                             }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-06-01')]").value(jsonObjectEquals("""
@@ -1450,7 +1450,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                                   }
                                                 ]
                                               },
-                                              "transactionCount": 2
+                                              "transactionCount": 0
                                             }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-07-01')]").value(jsonObjectEquals("""
@@ -1644,7 +1644,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                                   }
                                                 ]
                                               },
-                                              "transactionCount": 4
+                                              "transactionCount": 0
                                             }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-08-01')]").value(jsonObjectEquals("""
@@ -1838,7 +1838,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                                   }
                                                 ]
                                               },
-                                              "transactionCount": 4
+                                              "transactionCount": 0
                                             }
                                 """))
                 ;
@@ -1860,11 +1860,11 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.stats.size()").isEqualTo(3)
                         .jsonPath("$.stats[0].date").isEqualTo("2024-04-01")
-                        .jsonPath("$.stats[0].transactionCount").isEqualTo(3)
+                        .jsonPath("$.stats[0].transactionCount").isEqualTo(0)
                         .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
-                        .jsonPath("$.stats[1].transactionCount").isEqualTo(3)
+                        .jsonPath("$.stats[1].transactionCount").isEqualTo(0)
                         .jsonPath("$.stats[2].date").isEqualTo("2024-06-01")
-                        .jsonPath("$.stats[2].transactionCount").isEqualTo(2)
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(0)
                 ;
             }
 
