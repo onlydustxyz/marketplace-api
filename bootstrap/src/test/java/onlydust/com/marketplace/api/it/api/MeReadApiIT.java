@@ -70,6 +70,20 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "shortDescription": "A special project for Paco"
                             },
                             {
+                              "id": "f39b827f-df73-498c-8853-99bc3f562723",
+                              "slug": "qa-new-contributions",
+                              "name": "QA new contributions",
+                              "logoUrl": null,
+                              "shortDescription": "QA new contributions"
+                            },
+                            {
+                              "id": "61076487-6ec5-4751-ab0d-3b876c832239",
+                              "slug": "toto",
+                              "name": "toto",
+                              "logoUrl": null,
+                              "shortDescription": "to"
+                            },
+                            {
                               "id": "98873240-31df-431a-81dc-7d6fe01143a0",
                               "slug": "aiolia-du-lion",
                               "name": "Aiolia du Lion",
@@ -84,25 +98,11 @@ public class MeReadApiIT extends AbstractMarketplaceApiIT {
                               "shortDescription": "An interactive tutorial to get you up and running with Starknet"
                             },
                             {
-                              "id": "97f6b849-1545-4064-83f1-bc5ded33a8b3",
-                              "slug": "anthology-project",
-                              "name": "Anthology project",
-                              "logoUrl": "https://cdn.filestackcontent.com/pgjvFWS8Teq2Yns89IKg",
-                              "shortDescription": "A very cool project lead by Antho"
-                            },
-                            {
-                              "id": "2073b3b2-60f4-488c-8a0a-ab7121ed850c",
-                              "slug": "apibara",
-                              "name": "Apibara",
+                              "id": "247ac542-762d-44cb-b8d4-4d6199c916be",
+                              "slug": "bretzel-196",
+                              "name": "Bretzel 196",
                               "logoUrl": null,
-                              "shortDescription": "Listen to starknet events using gRPC and build your own node"
-                            },
-                            {
-                              "id": "7d04163c-4187-4313-8066-61504d34fc56",
-                              "slug": "bretzel",
-                              "name": "Bretzel",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png",
-                              "shortDescription": "A project for people who love fruits"
+                              "shortDescription": "bretzel gives you wings"
                             }
                           ]
                         }
