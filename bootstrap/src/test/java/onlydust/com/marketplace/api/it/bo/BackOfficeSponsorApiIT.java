@@ -1,8 +1,10 @@
 package onlydust.com.marketplace.api.it.bo;
 
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
@@ -290,7 +292,14 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Test
     @Order(6)
     void should_get_sponsors() {
+        // Given
         final String jwt = pierre.jwt();
+        depositHelper.preview(SponsorId.of("58a0a05c-c81e-447c-910f-629817a987b8"), Network.ETHEREUM);
+        depositHelper.preview(SponsorId.of("4202fd03-f316-458f-a642-421c7b3c7026"), Network.ETHEREUM);
+        depositHelper.preview(SponsorId.of("4202fd03-f316-458f-a642-421c7b3c7026"), Network.APTOS);
+        depositHelper.preview(SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb"), Network.STELLAR);
+        depositHelper.preview(SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb"), Network.OPTIMISM);
+        depositHelper.preview(SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb"), Network.STARKNET);
 
         // When
         client.get()
@@ -301,6 +310,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 2,

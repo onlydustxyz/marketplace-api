@@ -11,9 +11,11 @@ import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorLinkResponse;
 import onlydust.com.marketplace.api.contract.model.SponsorResponse;
+import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.net.URI;
 import java.util.List;
@@ -60,6 +62,11 @@ public class SponsorReadEntity {
     @OrderBy("name")
     List<ProgramReadEntity> programs;
 
+    @OneToMany(mappedBy = "sponsor", fetch = FetchType.LAZY)
+    @NonNull
+    @SQLRestriction("status = 'PENDING'")
+    Set<DepositReadEntity> pendingDeposits;
+
     public SponsorResponse toResponse() {
         return new SponsorResponse()
                 .id(id)
@@ -104,6 +111,7 @@ public class SponsorReadEntity {
                 .logoUrl(logoUrl)
                 .url(url)
                 .programs(programs.stream().map(ProgramReadEntity::toBoLinkResponse).toList())
-                .leads(leads.stream().map(AllUserReadEntity::toBoLinkResponse).toList());
+                .leads(leads.stream().map(AllUserReadEntity::toBoLinkResponse).toList())
+                .pendingDepositCount(pendingDeposits.size());
     }
 }

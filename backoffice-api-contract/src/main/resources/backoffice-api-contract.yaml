@@ -2873,7 +2873,10 @@ components:
         - type: object
           required:
             - programs
+            - pendingDepositCount
           properties:
+            pendingDepositCount:
+              type: integer
             programs:
               type: array
               items:
