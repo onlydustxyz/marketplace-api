@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.model.blockchain.Blockchain.Transaction.Status.*;
 
 @AllArgsConstructor
@@ -39,7 +40,14 @@ public class StellarTransactionStorageAdapter implements BlockchainTransactionSt
     @SneakyThrows
     private @NonNull StellarTransaction from(final @NonNull StellarTransaction.Hash reference,
                                              final @NonNull GetTransactionResponse response) {
-        final var tx = TransactionEnvelope.fromXdrBase64(response.getEnvelopeXdr()).getV1().getTx();
+
+        final var envelope = TransactionEnvelope.fromXdrBase64(Optional.ofNullable(response.getEnvelopeXdr())
+                .orElseThrow(() -> internalServerError("Transaction %s has no envelope".formatted(reference))));
+
+        final var tx = switch (envelope.getDiscriminant()) {
+            case ENVELOPE_TYPE_TX -> envelope.getV1().getTx();
+            default -> throw internalServerError("Transaction %s envelope type is not supported: %s".formatted(reference, envelope.getDiscriminant()));
+        };
 
         return Arrays.stream(tx.getOperations())
                 .filter(op -> op.getBody().getDiscriminant() == OperationType.PAYMENT)
