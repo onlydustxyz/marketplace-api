@@ -108,8 +108,6 @@ public class GithubHelper {
 
     public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
         final var parameters = new HashMap<String, Object>();
-        final Long issueId = faker.random().nextLong(1000);
-        parameters.put("id", issueId);
         parameters.put("repoId", repoId);
         parameters.put("number", faker.random().nextInt(10));
         parameters.put("title", faker.lorem().sentence());
@@ -131,6 +129,14 @@ public class GithubHelper {
         parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
         parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
 
+        final Long nextIssueId = databaseHelper.<Long>executeReadQuery(
+                """
+                        select id + 1  from indexer_exp.github_issues
+                        order by id desc
+                        limit 1
+                        """, Map.of()
+        );
+        parameters.put("id", nextIssueId);
 
         databaseHelper.executeQuery(
                 """
@@ -143,7 +149,7 @@ public class GithubHelper {
                         """,
                 parameters
         );
-        return issueId;
+        return nextIssueId;
     }
 
     public void addLabelToIssue(Long issueId, String label, ZonedDateTime addedToIssueAt) {

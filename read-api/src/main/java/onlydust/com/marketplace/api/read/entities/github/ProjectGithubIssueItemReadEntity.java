@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
 
@@ -118,6 +119,8 @@ public class ProjectGithubIssueItemReadEntity {
                                         contributorResponse.getGithubUserId(),
                                         contributorResponse.getLogin(),
                                         contributorResponse.getAvatarUrl()))
+                                .collect(Collectors.toSet())
+                                .stream()
                                 .sorted(Comparator.comparing(GithubUserResponse::getLogin))
                                 .toList())
                 .assignees(isNull(assignees) ? List.of() : assignees.stream().sorted(Comparator.comparing(GithubUserResponse::getLogin)).toList())

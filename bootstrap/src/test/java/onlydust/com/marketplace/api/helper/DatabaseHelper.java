@@ -26,4 +26,21 @@ public class DatabaseHelper {
         em.getTransaction().commit();
         em.close();
     }
+
+    public <Result> Result executeReadQuery(@Language("PostgreSQL") final @NonNull String query, final Map<String, Object> parameters) {
+        EntityManager em = entityManagerFactory.createEntityManager();
+        Result result = null;
+        try {
+            em.getTransaction().begin();
+            final var q = em.createNativeQuery(query);
+            parameters.forEach(q::setParameter);
+            return (Result) q.getSingleResult();
+        } finally {
+            em.flush();
+            em.getTransaction().commit();
+            em.close();
+        }
+    }
+
+
 }

@@ -40,46 +40,43 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                     JOIN indexer_exp.github_accounts author_account on i.author_id = author_account.id
                     LEFT JOIN iam.users od_author on od_author.github_user_id = author_account.id
                      LEFT JOIN repo_languages rl ON rl.repo_id = i.repo_id
-                     LEFT JOIN (select gia.issue_id,
-                                       jsonb_agg(
-                                               jsonb_build_object(
-                                                       'githubUserId', ga.id,
-                                                       'login', ga.login,
-                                                       'avatarUrl', user_avatar_url(ga.id, ga.avatar_url)
-                                               )
-                                       ) users
-                                from indexer_exp.github_issues_assignees gia
-                                         LEFT JOIN indexer_exp.github_accounts ga on ga.id = gia.user_id
-                                group by gia.issue_id) assignees on assignees.issue_id = i.id
+                     LEFT JOIN LATERAL (select jsonb_agg(
+                                                        jsonb_build_object(
+                                                                'githubUserId', ga.id,
+                                                                'login', ga.login,
+                                                                'avatarUrl', user_avatar_url(ga.id, ga.avatar_url)
+                                                        )
+                                                ) users
+                                         from indexer_exp.github_issues_assignees gia
+                                                  LEFT JOIN indexer_exp.github_accounts ga on ga.id = gia.user_id
+                                         where gia.issue_id = i.id) assignees on true
                      LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
                      LEFT JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
                      LEFT JOIN hackathon_issues h ON h.issue_id = i.id
-                     LEFT JOIN (select a.issue_id,
-                                       jsonb_agg(
-                                               jsonb_build_object(
-                                                       'id', a.id,
-                                                       'motivations', a.motivations,
-                                                       'problemSolvingApproach', a.problem_solving_approach,
-                                                       'applicant', jsonb_build_object(
-                                                               'githubUserId', ga2.id,
-                                                               'login', ga2.login,
-                                                               'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
-                                                               'isRegistered', u.id is not null
-                                                                    )
-                                               )
-                                       ) applications
-                                from applications a
-                                         join indexer_exp.github_accounts ga2 on ga2.id = a.applicant_id
-                                         left join iam.users u on u.github_user_id = ga2.id
-                                where a.project_id = :projectId
-                                group by a.issue_id) applications on applications.issue_id = i.id
-                     LEFT JOIN (SELECT gil.issue_id, jsonb_agg(jsonb_build_object(
-                                   'name', gl.name,
-                                   'description', gl.description
-                               )) strings
-                        FROM indexer_exp.github_issues_labels gil
-                                 JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
-                        GROUP BY gil.issue_id) labels on labels.issue_id = i.id
+                     LEFT JOIN LATERAL (select jsonb_agg(
+                                                            jsonb_build_object(
+                                                                    'id', a.id,
+                                                                    'motivations', a.motivations,
+                                                                    'problemSolvingApproach', a.problem_solving_approach,
+                                                                    'applicant', jsonb_build_object(
+                                                                            'githubUserId', ga2.id,
+                                                                            'login', ga2.login,
+                                                                            'avatarUrl', user_avatar_url(ga2.id, ga2.avatar_url),
+                                                                            'isRegistered', u.id is not null
+                                                                                 )
+                                                            )
+                                                    ) applications
+                                             from applications a
+                                                      join indexer_exp.github_accounts ga2 on ga2.id = a.applicant_id
+                                                      left join iam.users u on u.github_user_id = ga2.id
+                                             where a.issue_id = i.id) applications on true
+                     LEFT JOIN LATERAL (SELECT jsonb_agg(jsonb_build_object(
+                                                        'name', gl.name,
+                                                        'description', gl.description
+                                                          )) strings
+                                         FROM indexer_exp.github_issues_labels gil
+                                                  JOIN indexer_exp.github_labels gl on gil.label_id = gl.id
+                                         where gil.issue_id = i.id) labels on true
             WHERE p.id = :projectId
               AND (coalesce(:statuses) IS NULL OR i.status = ANY (cast(:statuses as indexer_exp.github_issue_status[])))
               AND (:isAssigned IS NULL

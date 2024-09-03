@@ -14,7 +14,6 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
@@ -38,10 +37,6 @@ public class ApplicationEntity {
     Application.Origin origin;
     @NonNull
     Long issueId;
-
-    @ManyToOne
-    @JoinColumn(name = "issueId", insertable = false, updatable = false)
-    GithubIssueViewEntity issue;
 
     @NonNull
     Long commentId;
