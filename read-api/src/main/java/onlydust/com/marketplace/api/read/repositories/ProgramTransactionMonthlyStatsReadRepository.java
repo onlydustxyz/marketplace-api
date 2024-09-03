@@ -33,7 +33,7 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                              coalesce(sum(amount) filter ( where type = 'TRANSFER' and project_id is not null and reward_id is not null and payment_id is null ), 0)
                                  - coalesce(sum(amount) filter ( where type = 'REFUND' and project_id is not null and reward_id is not null and payment_id is null ), 0) as total_rewarded,
             
-                             count(*)                                                                                                                                    as transaction_count
+                             count(*) filter ( where abt.reward_id is null )                                                                                             as transaction_count
                            from accounting.account_book_transactions abt
                                     left join projects p on p.id = abt.project_id
                                     join programs pgm on pgm.id = abt.program_id
