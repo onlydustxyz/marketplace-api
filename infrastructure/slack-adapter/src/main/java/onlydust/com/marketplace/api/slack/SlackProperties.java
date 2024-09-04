@@ -9,4 +9,5 @@ public class SlackProperties {
     String kycKybChannel;
     String devRelChannel;
     Boolean tagAllChannel;
+    String financeChannel;
 }

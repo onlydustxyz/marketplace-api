@@ -6,7 +6,9 @@ import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
+import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 
 @TagAccounting
 public class DepositsApiIT extends AbstractMarketplaceApiIT {
@@ -408,6 +411,9 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
+        @Autowired
+        SlackApiAdapter slackApiAdapter;
+
         @Test
         void should_update_deposit() {
             // Given
@@ -442,6 +448,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             final var depositEntity = depositRepository.findById(deposit.id().value()).orElseThrow();
             assertThat(depositEntity.billingInformation().companyName()).isEqualTo("TechCorp Solutions");
             assertThat(depositEntity.status()).isEqualTo(Deposit.Status.PENDING);
+            verify(slackApiAdapter).onDepositSubmittedByUser(UserId.of(caller.user().getId()), deposit.id());
 
             // When another preview is made, the latest billing information should be returned
             client.post()

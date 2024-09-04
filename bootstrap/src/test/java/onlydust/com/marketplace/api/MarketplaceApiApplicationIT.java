@@ -11,6 +11,7 @@ import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.request.chat.ChatPostMessageRequest;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import jakarta.annotation.PostConstruct;
+import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.accounting.domain.port.out.PdfStoragePort;
 import onlydust.com.marketplace.api.helper.Auth0ApiClientStub;
 import onlydust.com.marketplace.api.helper.JwtVerifierStub;
@@ -19,10 +20,7 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
-import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -88,8 +86,11 @@ public class MarketplaceApiApplicationIT {
                                            final SlackApiClient slackApiClient,
                                            final UserStoragePort userStoragePort,
                                            final ProjectStoragePort projectStoragePort,
-                                           final HackathonStoragePort hackathonStoragePort) {
-        return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort));
+                                           final HackathonStoragePort hackathonStoragePort,
+                                           final DepositStoragePort depositStoragePort,
+                                           final SponsorStoragePort sponsorStoragePort) {
+        return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
+                sponsorStoragePort));
     }
 
     @Bean

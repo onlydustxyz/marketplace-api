@@ -41,6 +41,7 @@ public class AccountingService implements AccountingFacadePort {
     private final TransactionStoragePort transactionStoragePort;
     private final PermissionPort permissionPort;
     private final OnlyDustWallets onlyDustWallets;
+    private final DepositObserverPort depositObserverPort;
     private final AccountingSponsorStoragePort accountingSponsorStoragePort;
 
     @Override
@@ -545,6 +546,8 @@ public class AccountingService implements AccountingFacadePort {
                 .status(Deposit.Status.PENDING)
                 .billingInformation(billingInformation)
                 .build());
+
+        depositObserverPort.onDepositSubmittedByUser(userId, depositId);
     }
 
     @Override

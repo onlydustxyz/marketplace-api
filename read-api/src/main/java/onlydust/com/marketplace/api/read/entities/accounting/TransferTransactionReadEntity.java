@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.backoffice.api.contract.model.TransferTransactionResponse;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
-import onlydust.com.marketplace.kernel.model.blockchain.*;
+import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -59,11 +59,11 @@ public class TransferTransactionReadEntity {
         try {
             return switch (blockchain) {
                 case SEPA -> null;
-                case ETHEREUM -> Ethereum.BLOCK_EXPLORER.url(Ethereum.transactionHash(reference));
-                case OPTIMISM -> Optimism.BLOCK_EXPLORER.url(Optimism.transactionHash(reference));
-                case STARKNET -> StarkNet.BLOCK_EXPLORER.url(StarkNet.transactionHash(reference));
-                case APTOS -> Aptos.BLOCK_EXPLORER.url(Aptos.transactionHash(reference));
-                case STELLAR -> Stellar.BLOCK_EXPLORER.url(Stellar.transactionHash(reference));
+                case ETHEREUM -> Blockchain.ETHEREUM.getBlockExplorerUrl(reference);
+                case OPTIMISM -> Blockchain.OPTIMISM.getBlockExplorerUrl(reference);
+                case STARKNET -> Blockchain.STARKNET.getBlockExplorerUrl(reference);
+                case APTOS -> Blockchain.APTOS.getBlockExplorerUrl(reference);
+                case STELLAR -> Blockchain.STELLAR.getBlockExplorerUrl(reference);
             };
         } catch (OnlyDustException e) {
             LOGGER.error("Error while generating block explorer URL for blockchain %s and reference %s".formatted(blockchain, reference), e);

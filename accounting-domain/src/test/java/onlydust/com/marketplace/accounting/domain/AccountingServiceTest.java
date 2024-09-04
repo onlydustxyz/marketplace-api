@@ -63,6 +63,7 @@ public class AccountingServiceTest {
     final TransactionStoragePort transactionStoragePort = mock(TransactionStoragePort.class);
     final PermissionPort permissionPort = mock(PermissionPort.class);
     final OnlyDustWallets onlyDustWallets = mock(OnlyDustWallets.class);
+    final DepositObserverPort depositObserverPort = mock(DepositObserverPort.class);
 
     final AccountingSponsorStoragePort accountingSponsorStoragePort = mock(AccountingSponsorStoragePort.class);
     AccountingService accountingService;
@@ -151,6 +152,7 @@ public class AccountingServiceTest {
                 transactionStoragePort,
                 permissionPort,
                 onlyDustWallets,
+                depositObserverPort,
                 accountingSponsorStoragePort);
     }
 
@@ -2124,6 +2126,27 @@ public class AccountingServiceTest {
             assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
                     new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(100L))
             );
+        }
+
+        @Test
+        void should_submit_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC).toBuilder().status(Deposit.Status.PENDING).build();
+            final UserId userId = UserId.random();
+            final Deposit.BillingInformation billingInformation = new Deposit.BillingInformation(null, null, null, null, null, null, null, null, null);
+
+            // When
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit));
+            when(permissionPort.isUserSponsorLead(userId, deposit.sponsorId())).thenReturn(true);
+            accountingService.submitDeposit(userId, deposit.id(), billingInformation);
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder()
+                    .status(Deposit.Status.PENDING)
+                    .billingInformation(billingInformation)
+                    .build());
+            verify(depositObserverPort).onDepositSubmittedByUser(userId, deposit.id());
         }
 
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
