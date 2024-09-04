@@ -8,6 +8,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.*;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.*;
 import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccountValidatorAdapter;
+import onlydust.com.marketplace.api.infrastructure.project.ProjectServiceAdapter;
 import onlydust.com.marketplace.api.infura.adapters.EthWeb3EnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidatorAdapter;
@@ -15,6 +16,7 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
 import onlydust.com.marketplace.kernel.port.output.*;
+import onlydust.com.marketplace.project.domain.service.ProjectNotifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -74,12 +76,19 @@ public class AccountingConfiguration {
     }
 
     @Bean
+    public ProjectServicePort projectServicePort(final @NonNull ProjectNotifier projectNotifier) {
+        return new ProjectServiceAdapter(projectNotifier);
+    }
+
+    @Bean
     public AccountingNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
                                                      final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
                                                      final @NonNull InvoiceStoragePort invoiceStoragePort,
                                                      final @NonNull NotificationPort notificationPort,
-                                                     final @NonNull EmailStoragePort emailStoragePort) {
-        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort, emailStoragePort);
+                                                     final @NonNull EmailStoragePort emailStoragePort,
+                                                     final @NonNull ProjectServicePort projectServicePort) {
+        return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort, emailStoragePort,
+                projectServicePort);
     }
 
     @Bean

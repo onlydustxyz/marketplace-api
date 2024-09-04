@@ -3,18 +3,22 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
+import onlydust.com.marketplace.project.domain.port.input.ProgramObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @AllArgsConstructor
-public class ProjectNotifier implements CommitteeObserverPort {
+public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPort {
 
     private final NotificationPort notificationPort;
     private final ProjectStoragePort projectStoragePort;
@@ -27,5 +31,10 @@ public class ProjectNotifier implements CommitteeObserverPort {
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);
         notificationPort.push(userId, new CommitteeApplicationCreated(projectInfos.name(), projectId,
                 committee.name(), committeeId.value(), committee.applicationEndDate()));
+    }
+
+    @Override
+    public void onFundsAllocatedToProgram(@NonNull SponsorId sponsorId, @NonNull ProgramId programId, @NonNull BigDecimal amount, @NonNull UUID currencyId) {
+        // TODO: Implement this method
     }
 }
