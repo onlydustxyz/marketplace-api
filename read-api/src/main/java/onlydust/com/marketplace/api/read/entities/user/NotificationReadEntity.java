@@ -10,8 +10,10 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
+import onlydust.com.marketplace.api.read.repositories.CurrencyReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProjectLinkReadRepository;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdResolver;
@@ -27,6 +29,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -73,7 +76,10 @@ public class NotificationReadEntity {
         };
     }
 
-    public NotificationPageItemResponse toNotificationPageItemResponse(final ProjectLinkReadRepository projectLinkReadRepository) {
+    public NotificationPageItemResponse toNotificationPageItemResponse(final ProjectLinkReadRepository projectLinkReadRepository,
+                                                                       final SponsorReadRepository sponsorReadRepository,
+                                                                       final ProgramReadRepository programReadRepository,
+                                                                       final CurrencyReadRepository currencyReadRepository) {
         final NotificationPageItemResponseData notificationPageItemResponseData = new NotificationPageItemResponseData();
         NotificationType notificationType = null;
         if (data.notification() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
@@ -116,7 +122,7 @@ public class NotificationReadEntity {
         } else if (data.notification() instanceof ApplicationToReview applicationToReview) {
             notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
             final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationToReview.getProject().id())
-                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
+                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
             notificationPageItemResponseData.setMaintainerApplicationToReview(new NotificationMaintainerApplicationToReview(
                     projectLinkReadEntity.slug(),
                     projectLinkReadEntity.name(),
@@ -128,7 +134,7 @@ public class NotificationReadEntity {
         } else if (data.notification() instanceof ApplicationAccepted applicationAccepted) {
             notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
             final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationAccepted.getProject().id())
-                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
+                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
             notificationPageItemResponseData.setContributorProjectApplicationAccepted(new NotificationContributorProjectApplicationAccepted(
                     projectLinkReadEntity.name(),
                     projectLinkReadEntity.slug(),
@@ -138,7 +144,7 @@ public class NotificationReadEntity {
         } else if (data.notification() instanceof ApplicationRefused applicationRefused) {
             notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_REFUSED;
             final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationRefused.getProject().id())
-                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(applicationRefused.getProject())));
+                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationRefused.getProject())));
             notificationPageItemResponseData.setContributorProjectApplicationRefused(new NotificationContributorProjectApplicationRefused(
                     projectLinkReadEntity.name(),
                     projectLinkReadEntity.slug(),
@@ -148,7 +154,7 @@ public class NotificationReadEntity {
         } else if (data.notification() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
             notificationType = NotificationType.CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED;
             final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(goodFirstIssueCreated.getProject().id())
-                    .orElseThrow(() -> OnlyDustException.internalServerError(("Project %s must exist").formatted(goodFirstIssueCreated.getProject())));
+                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(goodFirstIssueCreated.getProject())));
             notificationPageItemResponseData.setContributorProjectGoodFirstIssueCreated(new NotificationContributorProjectGoodFirstIssueCreated(
                     projectLinkReadEntity.name(),
                     projectLinkReadEntity.slug(),
@@ -174,8 +180,23 @@ public class NotificationReadEntity {
                     completeYourBillingProfile.billingProfile().billingProfileId(),
                     completeYourBillingProfile.billingProfile().billingProfileName()
             ));
+        } else if (data.notification() instanceof FundsAllocatedToProgram fundsAllocatedToProgram) {
+            notificationType = NotificationType.PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM;
+            final var sponsor = sponsorReadRepository.findById(fundsAllocatedToProgram.sponsorId().value())
+                    .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(fundsAllocatedToProgram.sponsorId())));
+            final var program = programReadRepository.findById(fundsAllocatedToProgram.programId().value())
+                    .orElseThrow(() -> internalServerError("Program %s doesn't exist".formatted(fundsAllocatedToProgram.programId())));
+            final var currency = currencyReadRepository.findById(fundsAllocatedToProgram.currencyId())
+                    .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(fundsAllocatedToProgram.currencyId())));
+
+            notificationPageItemResponseData.setProgramLeadFundsAllocatedToProgram(new NotificationProgramLeadFundsAllocatedToProgram(
+                    program.toLinkResponse(),
+                    sponsor.toLinkResponse(),
+                    fundsAllocatedToProgram.amount(),
+                    currency.code()
+            ));
         } else {
-            throw OnlyDustException.internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
+            throw internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
         }
 
         return new NotificationPageItemResponse()
