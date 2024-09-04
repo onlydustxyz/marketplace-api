@@ -44,7 +44,10 @@ public class DepositHelper {
                 """, Map.of(
                 "id", transactionId,
                 "blockchain", network.blockchain().get().name(),
-                "reference", "0x" + faker.random().hex(),
+                "reference", switch (network) {
+                    case STELLAR -> faker.random().hex();
+                    default -> "0x" + faker.random().hex();
+                },
                 "index", 0,
                 "timestamp", CurrentDateProvider.now(),
                 "senderAddress", "0x" + faker.random().hex(),

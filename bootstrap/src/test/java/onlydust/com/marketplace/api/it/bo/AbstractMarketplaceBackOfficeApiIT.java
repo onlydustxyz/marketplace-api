@@ -12,10 +12,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
 import onlydust.com.marketplace.api.MarketplaceApiApplicationIT;
 import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
-import onlydust.com.marketplace.api.helper.AccountingHelper;
-import onlydust.com.marketplace.api.helper.ProgramHelper;
-import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.helper.WireMockInitializer;
+import onlydust.com.marketplace.api.helper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
@@ -107,6 +104,8 @@ public class AbstractMarketplaceBackOfficeApiIT {
     ProgramHelper programHelper;
     @Autowired
     AccountingHelper accountingHelper;
+    @Autowired
+    DepositHelper depositHelper;
 
     @Autowired
     UserRepository userRepository;
@@ -161,6 +160,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String GET_ME = "/bo/v1/me";
     protected static final String GET_GITHUB_REPOS = "/bo/v1/repositories";
     protected static final String GET_SPONSORS = "/bo/v2/sponsors";
+    protected static final String SPONSOR_DEPOSITS = "/bo/v1/sponsors/%s/deposits";
     protected static final String GET_SPONSOR = "/bo/v1/sponsors/%s";
     protected static final String POST_SPONSORS = "/bo/v1/sponsors";
     protected static final String PUT_SPONSORS = "/bo/v1/sponsors/%s";
