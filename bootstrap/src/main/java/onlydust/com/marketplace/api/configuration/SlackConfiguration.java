@@ -2,12 +2,14 @@ package onlydust.com.marketplace.api.configuration;
 
 import com.slack.api.Slack;
 import com.slack.api.methods.MethodsClient;
+import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.slack.AsyncSlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,7 +40,10 @@ public class SlackConfiguration {
                                            final SlackApiClient slackApiClient,
                                            final UserStoragePort userStoragePort,
                                            final ProjectStoragePort projectStoragePort,
-                                           final HackathonStoragePort hackathonStoragePort) {
-        return new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort);
+                                           final HackathonStoragePort hackathonStoragePort,
+                                           final DepositStoragePort depositStoragePort,
+                                           final SponsorStoragePort sponsorStoragePort) {
+        return new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
+                sponsorStoragePort);
     }
 }

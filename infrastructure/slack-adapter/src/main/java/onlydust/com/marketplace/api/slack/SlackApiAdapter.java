@@ -4,22 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileObserverPort;
+import onlydust.com.marketplace.accounting.domain.port.out.DepositObserverPort;
+import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
+import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
-import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 
 import java.util.Set;
@@ -27,13 +28,15 @@ import java.util.UUID;
 
 @Slf4j
 @AllArgsConstructor
-public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort, ApplicationObserverPort {
+public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObserverPort, HackathonObserverPort, ApplicationObserverPort, DepositObserverPort {
 
     private final SlackProperties slackProperties;
     private final SlackApiClient slackApiClient;
     private final UserStoragePort userStoragePort;
     private final ProjectStoragePort projectStoragePort;
     private final HackathonStoragePort hackathonStoragePort;
+    private final DepositStoragePort depositStoragePort;
+    private final SponsorStoragePort sponsorStoragePort;
 
     @Override
     public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
@@ -118,5 +121,20 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     @Override
     public void onApplicationRefused(Application application) {
 
+    }
+
+    @Override
+    public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
+        final var user = userStoragePort.getRegisteredUserById(userId.value())
+                .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId.value())));
+        final Deposit deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
+        final Sponsor sponsor = sponsorStoragePort.get(deposit.sponsorId())
+                .orElseThrow(() -> OnlyDustException.notFound("Sponsor not found %s".formatted(deposit.sponsorId().value())));
+        slackApiClient.sendNotification(
+                slackProperties.getFinanceChannel(),
+                "New deposit submitted on sponsor %s".formatted(sponsor.name()),
+                DepositSubmittedOnSponsorMapper.mapToSlackBlock(user, sponsor, deposit, slackProperties.getEnvironment())
+        );
     }
 }
