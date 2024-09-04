@@ -2051,6 +2051,81 @@ public class AccountingServiceTest {
             );
         }
 
+        @Test
+        void should_approve_deposit_for_sponsor_with_partial_debt() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20(250);
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            final var sponsor = SponsorView.builder().id(sponsorId).name("Sponsor").logoUrl(URI.create(faker.internet().url())).build();
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+            when(accountingSponsorStoragePort.getView(sponsorId)).thenReturn(Optional.of(sponsor));
+            when(currencyStorage.get(Currencies.USDC.id())).thenReturn(Optional.of(Currencies.USDC));
+
+            final var sponsorAccountStatement = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, Currencies.USDC.id(), null,
+                    PositiveAmount.of(100L));
+
+            // When
+            accountingService.approveDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.COMPLETED).build());
+
+            final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccountStatement.class);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccountCaptor.capture());
+            final var sponsorAccount = sponsorAccountCaptor.getValue();
+            assertThat(sponsorAccount.debt().getValue()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(sponsorAccount.account().id()).isEqualTo(sponsorAccountStatement.account().id());
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(transaction.amount()));
+            assertThat(sponsorAccount.allowance()).isEqualTo(PositiveAmount.of(transaction.amount()));
+
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId)).hasSize(1);
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId).get(0).id()).isEqualTo(sponsorAccount.account().id());
+
+            assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(BigDecimal.valueOf(150.0)))
+            );
+        }
+
+        @Test
+        void should_approve_deposit_for_sponsor_with_full_debt() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20(25);
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            final var sponsor = SponsorView.builder().id(sponsorId).name("Sponsor").logoUrl(URI.create(faker.internet().url())).build();
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+            when(accountingSponsorStoragePort.getView(sponsorId)).thenReturn(Optional.of(sponsor));
+            when(currencyStorage.get(Currencies.USDC.id())).thenReturn(Optional.of(Currencies.USDC));
+
+            final var sponsorAccountStatement = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, Currencies.USDC.id(), null,
+                    PositiveAmount.of(100L));
+
+            reset(accountingObserver);
+
+            // When
+            accountingService.approveDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.COMPLETED).build());
+
+            final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccountStatement.class);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccountCaptor.capture());
+            final var sponsorAccount = sponsorAccountCaptor.getValue();
+            assertThat(sponsorAccount.debt().getValue()).isEqualByComparingTo(BigDecimal.valueOf(75));
+            assertThat(sponsorAccount.account().id()).isEqualTo(sponsorAccountStatement.account().id());
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(transaction.amount()));
+            assertThat(sponsorAccount.allowance()).isEqualTo(PositiveAmount.of(PositiveAmount.of(100L)));
+
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId)).hasSize(1);
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId).get(0).id()).isEqualTo(sponsorAccount.account().id());
+
+            assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(100L))
+            );
+        }
+
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
             static Transaction fake() {
                 final var faker = new Faker();
@@ -2069,6 +2144,8 @@ public class AccountingServiceTest {
                                    String recipientAddress,
                                    BigDecimal amount,
                                    String address) implements Blockchain.TransferTransaction {
+            static final Faker faker = new Faker();
+
             @Override
             public Optional<String> contractAddress() {
                 return Optional.ofNullable(address);
@@ -2079,7 +2156,6 @@ public class AccountingServiceTest {
             }
 
             static TransferTransaction fakeNative(Status status) {
-                final var faker = new Faker();
                 return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
@@ -2091,14 +2167,17 @@ public class AccountingServiceTest {
             }
 
             static TransferTransaction fakeErc20() {
-                final var faker = new Faker();
+                return fakeErc20(faker.number().randomDouble(2, 1, 1000));
+            }
+
+            static TransferTransaction fakeErc20(double amount) {
                 return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         Status.CONFIRMED,
                         faker.crypto().sha256(),
                         faker.crypto().sha256(),
-                        BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
+                        BigDecimal.valueOf(amount),
                         faker.crypto().sha256());
             }
         }

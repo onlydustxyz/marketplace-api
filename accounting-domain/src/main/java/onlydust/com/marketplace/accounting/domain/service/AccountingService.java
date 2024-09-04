@@ -576,9 +576,17 @@ public class AccountingService implements AccountingFacadePort {
                 .status(Deposit.Status.COMPLETED)
                 .build());
 
-        createSponsorAccountWithInitialBalance(deposit.sponsorId(),
-                deposit.currency().id(),
-                null,
-                SponsorAccount.Transaction.deposit(sponsor, deposit.transaction()));
+        final var accountBook = getAccountBook(deposit.currency());
+        final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction());
+
+        sponsorAccountStorage.find(deposit.sponsorId(), deposit.currency().id())
+                .stream()
+                .map(sponsorAccount -> sponsorAccountStatement(sponsorAccount, accountBook.state()))
+                .filter(statement -> statement.debt().isStrictlyPositive())
+                .findFirst()
+                .ifPresentOrElse(
+                        statement -> fund(statement.account().id(), transaction),
+                        () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
+                );
     }
 }
