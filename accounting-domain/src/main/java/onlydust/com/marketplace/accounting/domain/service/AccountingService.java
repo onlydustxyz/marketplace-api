@@ -41,6 +41,7 @@ public class AccountingService implements AccountingFacadePort {
     private final TransactionStoragePort transactionStoragePort;
     private final PermissionPort permissionPort;
     private final OnlyDustWallets onlyDustWallets;
+    private final AccountingSponsorStoragePort accountingSponsorStoragePort;
 
     @Override
     @Transactional
@@ -544,5 +545,48 @@ public class AccountingService implements AccountingFacadePort {
                 .status(Deposit.Status.PENDING)
                 .billingInformation(billingInformation)
                 .build());
+    }
+
+    @Override
+    public void rejectDeposit(Deposit.Id depositId) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        if (deposit.status() != Deposit.Status.PENDING)
+            throw badRequest("Deposit %s is not pending".formatted(depositId));
+
+        depositStoragePort.save(deposit.toBuilder()
+                .status(Deposit.Status.REJECTED)
+                .build());
+    }
+
+    @Override
+    @Transactional
+    public void approveDeposit(Deposit.Id depositId) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        if (deposit.status() != Deposit.Status.PENDING)
+            throw badRequest("Deposit %s is not pending".formatted(depositId));
+
+        final var sponsor = accountingSponsorStoragePort.getView(deposit.sponsorId())
+                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(deposit.sponsorId())));
+
+        depositStoragePort.save(deposit.toBuilder()
+                .status(Deposit.Status.COMPLETED)
+                .build());
+
+        final var accountBook = getAccountBook(deposit.currency());
+        final var transaction = SponsorAccount.Transaction.deposit(sponsor, deposit.transaction());
+
+        sponsorAccountStorage.find(deposit.sponsorId(), deposit.currency().id())
+                .stream()
+                .map(sponsorAccount -> sponsorAccountStatement(sponsorAccount, accountBook.state()))
+                .filter(statement -> statement.debt().isStrictlyPositive())
+                .findFirst()
+                .ifPresentOrElse(
+                        statement -> fund(statement.account().id(), transaction),
+                        () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
+                );
     }
 }

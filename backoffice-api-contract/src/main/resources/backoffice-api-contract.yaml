@@ -1139,6 +1139,38 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/deposits/{depositId}:
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeSponsorManagement
+      summary: Update deposit
+      operationId: updateDeposit
+      description: |
+        Update deposit.
+        Only pending deposits can be updated.
+      parameters:
+        - in: path
+          name: depositId
+          required: true
+          schema:
+            $ref: '#/components/schemas/DepositId'
+      requestBody:
+        description: Deposit data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DepositUpdateRequest'
+      responses:
+        "204":
+          description: 'Deposit updated'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/sponsors/{sponsorId}/leads/{leadId}:
     put:
       security:
@@ -4269,6 +4301,14 @@ components:
           type: array
           items:
             type: string
+
+    DepositUpdateRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          $ref: '#/components/schemas/DepositStatus'
 
     LanguageUpdateRequest:
       type: object

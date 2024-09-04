@@ -91,7 +91,8 @@ public class AccountingServiceConcurrencyTest {
                     mock(DepositStoragePort.class),
                     mock(TransactionStoragePort.class),
                     permissionPort,
-                    onlyDustWallets);
+                    onlyDustWallets,
+                    mock(AccountingSponsorStoragePort.class));
         }
 
         @BeforeAll
@@ -182,7 +183,8 @@ public class AccountingServiceConcurrencyTest {
                         mock(DepositStoragePort.class),
                         mock(TransactionStoragePort.class),
                         permissionPort,
-                        onlyDustWallets));
+                        onlyDustWallets,
+                        mock(AccountingSponsorStoragePort.class)));
             }
         }
 

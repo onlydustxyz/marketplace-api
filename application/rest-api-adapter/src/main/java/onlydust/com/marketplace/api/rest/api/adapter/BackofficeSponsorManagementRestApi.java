@@ -4,9 +4,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorManagementApi;
+import onlydust.com.backoffice.api.contract.model.DepositUpdateRequest;
 import onlydust.com.backoffice.api.contract.model.SponsorCreateResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.backoffice.api.contract.model.UploadImageResponse;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
+import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
@@ -30,6 +33,7 @@ import static org.springframework.http.ResponseEntity.noContent;
 public class BackofficeSponsorManagementRestApi implements BackofficeSponsorManagementApi {
 
     private final SponsorFacadePort sponsorFacadePort;
+    private final AccountingFacadePort accountingFacadePort;
 
     @Override
     public ResponseEntity<SponsorCreateResponse> createSponsor(SponsorRequest request) {
@@ -39,6 +43,17 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
                 request.getLeads().stream().map(UserId::of).toList());
         return ResponseEntity.ok(new SponsorCreateResponse()
                 .id(sponsor.id().value()));
+    }
+
+    @Override
+    public ResponseEntity<Void> updateDeposit(UUID depositId, DepositUpdateRequest request) {
+        switch (request.getStatus()) {
+            case PENDING -> throw badRequest("Cannot update deposit to PENDING status");
+            case COMPLETED -> throw badRequest("Not implemented");
+            case REJECTED -> accountingFacadePort.rejectDeposit(Deposit.Id.of(depositId));
+        }
+
+        return noContent().build();
     }
 
     @Override

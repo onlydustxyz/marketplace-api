@@ -19,6 +19,7 @@ import onlydust.com.marketplace.accounting.domain.stubs.AccountBookEventStorageS
 import onlydust.com.marketplace.accounting.domain.stubs.Currencies;
 import onlydust.com.marketplace.accounting.domain.stubs.ERC20Tokens;
 import onlydust.com.marketplace.accounting.domain.stubs.SponsorAccountStorageStub;
+import onlydust.com.marketplace.accounting.domain.view.SponsorView;
 import onlydust.com.marketplace.accounting.domain.view.UserView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.*;
@@ -63,6 +64,7 @@ public class AccountingServiceTest {
     final PermissionPort permissionPort = mock(PermissionPort.class);
     final OnlyDustWallets onlyDustWallets = mock(OnlyDustWallets.class);
 
+    final AccountingSponsorStoragePort accountingSponsorStoragePort = mock(AccountingSponsorStoragePort.class);
     AccountingService accountingService;
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
@@ -148,7 +150,8 @@ public class AccountingServiceTest {
                 depositStoragePort,
                 transactionStoragePort,
                 permissionPort,
-                onlyDustWallets);
+                onlyDustWallets,
+                accountingSponsorStoragePort);
     }
 
     @BeforeAll
@@ -220,7 +223,6 @@ public class AccountingServiceTest {
         final Currency currency = Currencies.USDC;
         final SponsorId sponsorId = SponsorId.random();
         final ProgramId programId = ProgramId.random();
-        final ProjectId projectId = ProjectId.random();
 
         @BeforeEach
         void setup() {
@@ -1943,6 +1945,187 @@ public class AccountingServiceTest {
             verify(depositStoragePort, never()).save(any());
         }
 
+        @Test
+        void should_prevent_rejecting_deposit_if_not_found() {
+            // Given
+            final var depositId = Deposit.Id.random();
+            when(depositStoragePort.find(any())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.rejectDeposit(depositId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s not found".formatted(depositId));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Deposit.Status.class, names = {"PENDING"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_prevent_rejecting_deposit_if_not_pending(Deposit.Status status) {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(status).build()));
+
+            // When
+            assertThatThrownBy(() -> accountingService.rejectDeposit(deposit.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s is not pending".formatted(deposit.id()));
+        }
+
+        @Test
+        void should_reject_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+
+            // When
+            accountingService.rejectDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.REJECTED).build());
+        }
+
+        @Test
+        void should_prevent_approving_deposit_if_not_found() {
+            // Given
+            final var depositId = Deposit.Id.random();
+            when(depositStoragePort.find(any())).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.approveDeposit(depositId))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s not found".formatted(depositId));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = Deposit.Status.class, names = {"PENDING"}, mode = EnumSource.Mode.EXCLUDE)
+        void should_prevent_approving_deposit_if_not_pending(Deposit.Status status) {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(status).build()));
+
+            // When
+            assertThatThrownBy(() -> accountingService.approveDeposit(deposit.id()))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Deposit %s is not pending".formatted(deposit.id()));
+        }
+
+        @Test
+        void should_approve_deposit() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20();
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            final var sponsor = SponsorView.builder().id(sponsorId).name("Sponsor").logoUrl(URI.create(faker.internet().url())).build();
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+            when(accountingSponsorStoragePort.getView(sponsorId)).thenReturn(Optional.of(sponsor));
+            when(currencyStorage.get(Currencies.USDC.id())).thenReturn(Optional.of(Currencies.USDC));
+
+            // When
+            accountingService.approveDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.COMPLETED).build());
+
+            final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccountStatement.class);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccountCaptor.capture());
+            final var sponsorAccount = sponsorAccountCaptor.getValue();
+            assertThat(sponsorAccount.debt().getValue()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(sponsorAccount.account().sponsorId()).isEqualTo(sponsorId);
+            assertThat(sponsorAccount.account().currency()).isEqualTo(Currencies.USDC);
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(transaction.amount()));
+            assertThat(sponsorAccount.account().lockedUntil()).isEmpty();
+            assertThat(sponsorAccount.allowance()).isEqualTo(PositiveAmount.of(transaction.amount()));
+
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId)).hasSize(1);
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId).get(0).id()).isEqualTo(sponsorAccount.account().id());
+
+            assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(transaction.amount))
+            );
+        }
+
+        @Test
+        void should_approve_deposit_for_sponsor_with_partial_debt() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20(250);
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            final var sponsor = SponsorView.builder().id(sponsorId).name("Sponsor").logoUrl(URI.create(faker.internet().url())).build();
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+            when(accountingSponsorStoragePort.getView(sponsorId)).thenReturn(Optional.of(sponsor));
+            when(currencyStorage.get(Currencies.USDC.id())).thenReturn(Optional.of(Currencies.USDC));
+
+            final var sponsorAccountStatement = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, Currencies.USDC.id(), null,
+                    PositiveAmount.of(100L));
+
+            // When
+            accountingService.approveDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.COMPLETED).build());
+
+            final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccountStatement.class);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccountCaptor.capture());
+            final var sponsorAccount = sponsorAccountCaptor.getValue();
+            assertThat(sponsorAccount.debt().getValue()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(sponsorAccount.account().id()).isEqualTo(sponsorAccountStatement.account().id());
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(transaction.amount()));
+            assertThat(sponsorAccount.allowance()).isEqualTo(PositiveAmount.of(transaction.amount()));
+
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId)).hasSize(1);
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId).get(0).id()).isEqualTo(sponsorAccount.account().id());
+
+            assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(100L)),
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(BigDecimal.valueOf(150.0)))
+            );
+        }
+
+        @Test
+        void should_approve_deposit_for_sponsor_with_full_debt() {
+            // Given
+            final var transaction = TransferTransaction.fakeErc20(25);
+            final var deposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
+            final var sponsor = SponsorView.builder().id(sponsorId).name("Sponsor").logoUrl(URI.create(faker.internet().url())).build();
+
+            when(depositStoragePort.find(deposit.id())).thenReturn(Optional.of(deposit.toBuilder().status(Deposit.Status.PENDING).build()));
+            when(accountingSponsorStoragePort.getView(sponsorId)).thenReturn(Optional.of(sponsor));
+            when(currencyStorage.get(Currencies.USDC.id())).thenReturn(Optional.of(Currencies.USDC));
+
+            final var sponsorAccountStatement = accountingService.createSponsorAccountWithInitialAllowance(sponsorId, Currencies.USDC.id(), null,
+                    PositiveAmount.of(100L));
+
+            reset(accountingObserver);
+
+            // When
+            accountingService.approveDeposit(deposit.id());
+
+            // Then
+            verify(depositStoragePort).save(deposit.toBuilder().status(Deposit.Status.COMPLETED).build());
+
+            final var sponsorAccountCaptor = ArgumentCaptor.forClass(SponsorAccountStatement.class);
+            verify(accountingObserver).onSponsorAccountBalanceChanged(sponsorAccountCaptor.capture());
+            final var sponsorAccount = sponsorAccountCaptor.getValue();
+            assertThat(sponsorAccount.debt().getValue()).isEqualByComparingTo(BigDecimal.valueOf(75));
+            assertThat(sponsorAccount.account().id()).isEqualTo(sponsorAccountStatement.account().id());
+            assertThat(sponsorAccount.account().unlockedBalance()).isEqualTo(Amount.of(transaction.amount()));
+            assertThat(sponsorAccount.allowance()).isEqualTo(PositiveAmount.of(PositiveAmount.of(100L)));
+
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId)).hasSize(1);
+            assertThat(sponsorAccountStorage.getSponsorAccounts(sponsorId).get(0).id()).isEqualTo(sponsorAccount.account().id());
+
+            assertThat(accountBookEventStorage.events.get(Currencies.USDC).stream().map(IdentifiedAccountBookEvent::data)).containsExactly(
+                    new MintEvent(AccountId.of(sponsorAccount.account().id()), PositiveAmount.of(100L))
+            );
+        }
+
         record Transaction(String reference, ZonedDateTime timestamp, Blockchain blockchain, Status status) implements Blockchain.Transaction {
             static Transaction fake() {
                 final var faker = new Faker();
@@ -1961,6 +2144,8 @@ public class AccountingServiceTest {
                                    String recipientAddress,
                                    BigDecimal amount,
                                    String address) implements Blockchain.TransferTransaction {
+            static final Faker faker = new Faker();
+
             @Override
             public Optional<String> contractAddress() {
                 return Optional.ofNullable(address);
@@ -1971,7 +2156,6 @@ public class AccountingServiceTest {
             }
 
             static TransferTransaction fakeNative(Status status) {
-                final var faker = new Faker();
                 return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
@@ -1983,14 +2167,17 @@ public class AccountingServiceTest {
             }
 
             static TransferTransaction fakeErc20() {
-                final var faker = new Faker();
+                return fakeErc20(faker.number().randomDouble(2, 1, 1000));
+            }
+
+            static TransferTransaction fakeErc20(double amount) {
                 return new TransferTransaction("0x" + faker.crypto().sha256(),
                         ZonedDateTime.now(),
                         Blockchain.ETHEREUM,
                         Status.CONFIRMED,
                         faker.crypto().sha256(),
                         faker.crypto().sha256(),
-                        BigDecimal.valueOf(faker.number().randomDouble(2, 1, 1000)),
+                        BigDecimal.valueOf(amount),
                         faker.crypto().sha256());
             }
         }

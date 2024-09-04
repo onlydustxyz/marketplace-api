@@ -794,6 +794,43 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
     }
+    
+    @Test
+    @Order(8)
+    void should_reject_deposit() {
+        // Given
+        final String jwt = pierre.jwt();
+        final var sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
+        final var depositId = depositHelper.create(sponsorId, ETHEREUM, USDC, TEN, PENDING);
+
+        // When
+        client.put()
+                .uri(getApiURI(DEPOSIT.formatted(depositId), Map.of("pageIndex", "0", "pageSize", "100")))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "REJECTED"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+
+        // When
+        client.get()
+                .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsorId), Map.of("pageIndex", "0", "pageSize", "100")))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.deposits[?(@.id=='%s')].status".formatted(depositId)).isEqualTo("REJECTED")
+        ;
+
+    }
 
     @Test
     @Order(6)
