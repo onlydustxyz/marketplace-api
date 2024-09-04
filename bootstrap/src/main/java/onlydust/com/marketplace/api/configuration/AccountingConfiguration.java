@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.configuration;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookObserver;
 import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookProjector;
 import onlydust.com.marketplace.accounting.domain.port.in.*;
@@ -10,7 +11,6 @@ import onlydust.com.marketplace.api.infrastructure.aptosrpc.adapters.AptosAccoun
 import onlydust.com.marketplace.api.infura.adapters.EthWeb3EnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidatorAdapter;
-import onlydust.com.marketplace.api.read.adapters.ReadCurrencyApiPostgresAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
@@ -41,10 +41,12 @@ public class AccountingConfiguration {
                                                      final @NonNull BlockchainFacadePort blockchainFacadePort,
                                                      final @NonNull DepositStoragePort depositStoragePort,
                                                      final @NonNull TransactionStoragePort transactionStoragePort,
-                                                     final @NonNull PermissionPort permissionPort
+                                                     final @NonNull PermissionPort permissionPort,
+                                                     final @NonNull OnlyDustWallets onlyDustWallets
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
-                invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort);
+                invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort,
+                onlyDustWallets);
     }
 
     @Bean
@@ -176,7 +178,7 @@ public class AccountingConfiguration {
 
     @Bean
     @ConfigurationProperties(value = "application.onlydust-wallets", ignoreUnknownFields = false)
-    public ReadCurrencyApiPostgresAdapter.OnlyDustWallets onlyDustWallets() {
-        return new ReadCurrencyApiPostgresAdapter.OnlyDustWallets();
+    public OnlyDustWallets onlyDustWallets() {
+        return new OnlyDustWallets();
     }
 }

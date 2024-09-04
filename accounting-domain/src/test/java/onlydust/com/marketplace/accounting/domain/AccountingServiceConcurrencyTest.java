@@ -42,6 +42,7 @@ public class AccountingServiceConcurrencyTest {
     final RewardStatusFacadePort rewardStatusFacadePort = mock(RewardStatusFacadePort.class);
     final ReceiptStoragePort receiptStoragePort = mock(ReceiptStoragePort.class);
     final PermissionPort permissionPort = mock(PermissionPort.class);
+    final OnlyDustWallets onlyDustWallets = mock(OnlyDustWallets.class);
     SponsorAccount sponsorAccount;
     final Currency currency = Currencies.USDC;
     final SponsorId sponsorId = SponsorId.random();
@@ -89,7 +90,8 @@ public class AccountingServiceConcurrencyTest {
                     mock(BlockchainFacadePort.class),
                     mock(DepositStoragePort.class),
                     mock(TransactionStoragePort.class),
-                    permissionPort);
+                    permissionPort,
+                    onlyDustWallets);
         }
 
         @BeforeAll
@@ -179,7 +181,8 @@ public class AccountingServiceConcurrencyTest {
                         mock(BlockchainFacadePort.class),
                         mock(DepositStoragePort.class),
                         mock(TransactionStoragePort.class),
-                        permissionPort));
+                        permissionPort,
+                        onlyDustWallets));
             }
         }
 

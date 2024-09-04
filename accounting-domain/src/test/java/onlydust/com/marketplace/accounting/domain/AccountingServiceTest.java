@@ -61,6 +61,8 @@ public class AccountingServiceTest {
     final DepositStoragePort depositStoragePort = mock(DepositStoragePort.class);
     final TransactionStoragePort transactionStoragePort = mock(TransactionStoragePort.class);
     final PermissionPort permissionPort = mock(PermissionPort.class);
+    final OnlyDustWallets onlyDustWallets = mock(OnlyDustWallets.class);
+
     AccountingService accountingService;
     final Faker faker = new Faker();
     final String thirdPartyName = faker.name().fullName();
@@ -145,7 +147,8 @@ public class AccountingServiceTest {
                 blockchainFacadePort,
                 depositStoragePort,
                 transactionStoragePort,
-                permissionPort);
+                permissionPort,
+                onlyDustWallets);
     }
 
     @BeforeAll
@@ -1750,13 +1753,52 @@ public class AccountingServiceTest {
             assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
-                    .hasMessage("Transaction %s is not confirmed".formatted(transaction.reference));
+                    .hasMessage("Transaction %s is not confirmed on blockchain ETHEREUM".formatted(transaction.reference));
+        }
+
+        @Test
+        void should_reject_when_transaction_blockchain_is_not_supported() {
+            // Given
+            final var transaction = TransferTransaction.fakeNative(Blockchain.Transaction.Status.CONFIRMED);
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.empty());
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction's (%s) blockchain (ETHEREUM) is not supported for deposits".formatted(transaction.reference));
+        }
+
+        @Test
+        void should_reject_when_transaction_recipient_does_not_match_onlydust_wallet() {
+            // Given
+            final var transaction = TransferTransaction.fakeNative(Blockchain.Transaction.Status.CONFIRMED);
+
+            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+
+            when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
+                    .thenReturn(Optional.of(transaction));
+
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress + "42"));
+
+            // When
+            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+                    // Then
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("Transaction's (%s) recipient (%s) is not equal to the OnlyDust wallet (%s) expected on blockchain ETHEREUM".formatted(transaction.reference, transaction.recipientAddress, transaction.recipientAddress + "42"));
         }
 
         @Test
         void should_reject_deposit_for_native_transfer_if_not_supported() {
             // Given
             final var transaction = TransferTransaction.fakeNative();
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
             when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
@@ -1776,6 +1818,7 @@ public class AccountingServiceTest {
         void should_create_deposit_for_native_transfer() {
             // Given
             final var transaction = TransferTransaction.fakeNative();
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
             when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
@@ -1802,6 +1845,7 @@ public class AccountingServiceTest {
         void should_reject_deposit_for_erc20_transfer_if_not_supported() {
             // Given
             final var transaction = TransferTransaction.fakeErc20();
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
             when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 
@@ -1821,6 +1865,7 @@ public class AccountingServiceTest {
         void should_create_deposit_for_erc20_transfer() {
             // Given
             final var transaction = TransferTransaction.fakeErc20();
+            when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
             when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
 

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
+import onlydust.com.marketplace.accounting.domain.model.OnlyDustWallets;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
@@ -23,6 +24,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
 
     @Autowired
     DepositRepository depositRepository;
+    @Autowired
+    OnlyDustWallets onlyDustWallets;
 
     @BeforeEach
     void setUp() {
@@ -38,8 +41,12 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             sponsor = sponsorHelper.create(caller);
         }
 
+
         @Test
         void should_preview_a_deposit_of_eth_on_ethereum() {
+            // Given
+            onlyDustWallets.setEthereum("0xb060429d14266d06a8be63281205668be823604f");
+
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -110,6 +117,9 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         void should_preview_a_deposit_of_usdc_on_ethereum() {
+            // Given
+            onlyDustWallets.setEthereum("0x8371e21f595dbf98caffdcef665ebcaccb983cb1");
+
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -180,6 +190,9 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         void should_preview_a_deposit_of_eth_on_optimism() {
+            // Given
+            onlyDustWallets.setOptimism("0xb060429d14266d06a8be63281205668be823604f");
+
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -250,6 +263,9 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         void should_preview_a_deposit_of_op_on_optimism() {
+            // Given
+            onlyDustWallets.setOptimism("0x1c9d4522e258138f36b4b356bb8afc6be013f902");
+
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
@@ -321,6 +337,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_of_usdc_on_starknet() {
             // Given
+            onlyDustWallets.setStarknet("0x039b01fbac905c359757a65ae41b75d5c4b0f16a0f0e8dd9aca1506da545eef8");
             currencyHelper.addERC20Support(Blockchain.STARKNET, Currency.Code.USDC);
 
             // When
@@ -468,6 +485,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_with_same_transaction_reference() {
             // Given
+            onlyDustWallets.setEthereum("0xb060429d14266d06a8be63281205668be823604f");
             final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
 
             // When
@@ -492,6 +510,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_of_apt_on_aptos() {
             // Given
+            onlyDustWallets.setAptos("0xa35864ccdb3abcb64c144da4511c66457f743ee0ddf95c1b5bbfabaf67e6ac73");
             currencyHelper.addERC20Support(Blockchain.APTOS, Currency.Code.APT);
 
             // When
@@ -565,6 +584,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_of_usdc_on_aptos() {
             // Given
+            onlyDustWallets.setAptos("0xa35864ccdb3abcb64c144da4511c66457f743ee0ddf95c1b5bbfabaf67e6ac73");
             currencyHelper.addERC20Support(Blockchain.APTOS, Currency.Code.USDC);
 
             // When
@@ -638,6 +658,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_preview_a_deposit_of_xlm_on_stellar() {
             // Given
+            onlyDustWallets.setStellar("GD2VXOJ7SJS6GYWT3LIKS5KWBXYTZGIJ5TBLP5TGIKBPPWRALCZMGXEF");
             currencyHelper.addNativeCryptoSupport(Currency.Code.XLM);
 
             // When
@@ -707,6 +728,9 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         void should_preview_a_deposit_of_usdc_on_stellar() {
+            // Given
+            onlyDustWallets.setStellar("GD2VXOJ7SJS6GYWT3LIKS5KWBXYTZGIJ5TBLP5TGIKBPPWRALCZMGXEF");
+
             // When
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
