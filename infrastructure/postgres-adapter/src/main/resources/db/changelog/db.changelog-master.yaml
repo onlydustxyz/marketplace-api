@@ -509,3 +509,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000328_fix_program_projects.sql
   - include:
       file: db/changelog/changelogs/00000328_new_notification_categories.sql
+  - include:
+      file: db/changelog/changelogs/00000329_new_notification_category_settings.sql

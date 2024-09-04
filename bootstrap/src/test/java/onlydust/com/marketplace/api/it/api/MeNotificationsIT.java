@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.contract.model.NotificationPageResponse;
 import onlydust.com.marketplace.api.contract.model.NotificationPatchRequest;
 import onlydust.com.marketplace.api.contract.model.NotificationStatus;
 import onlydust.com.marketplace.api.contract.model.NotificationsPatchRequest;
+import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -58,6 +59,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         projectHelper.updateVisibility(ProjectId.of(bretzel), ProjectVisibility.PRIVATE);
+        final var sponsor = sponsorHelper.create();
+        final var program = programHelper.create(sponsor.id());
 
         notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())
@@ -98,7 +101,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("a805e770-104b-4010-b849-cbf90b93ccf4")))
                 .billingProfileName("bpHaydenClosed")
                 .build());
-        notificationService.push(pierre.user().getId(), BillingProfileVerificationRejected.builder()
+        notificationService.push(hayden.user().getId(), BillingProfileVerificationRejected.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("9222c39d-7c85-4cc4-8089-c1830bc457b0")))
                 .billingProfileName("bpPierreRejected")
                 .rejectionReason("rejectionReason1")
@@ -113,23 +116,53 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .issue(new NotificationDetailedIssue(1111L, faker.internet().url(), "gfi-1", faker.rickAndMorty().character(), null, faker.pokemon().name(),
                         faker.internet().url(), List.of()))
                 .build());
+        notificationService.push(hayden.user().getId(), FundsAllocatedToProgram.builder()
+                .amount(BigDecimal.valueOf(100))
+                .currencyId(CurrencyHelper.USDC.value())
+                .programId(program.id())
+                .sponsorId(sponsor.id())
+                .build());
 
         // When
         client.get()
-                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageIndex", "0", "pageSize", "1000")))
                 .header("Authorization", "Bearer " + hayden.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.program.id").isEqualTo(program.id().toString())
+                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.sponsor.id").isEqualTo(sponsor.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 10,
+                          "totalItemNumber": 12,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": {
+                                  "amount": 100,
+                                  "currencyCode": "USDC"
+                                }
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED",
@@ -150,7 +183,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -173,7 +207,31 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": {
+                                  "billingProfileId": "9222c39d-7c85-4cc4-8089-c1830bc457b0",
+                                  "billingProfileName": "bpPierreRejected",
+                                  "reason": "rejectionReason1"
+                                },
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -194,7 +252,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationClosed": {
                                   "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
                                   "billingProfileName": "bpHaydenClosed"
-                                }
+                                },
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -217,7 +276,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -238,7 +298,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -263,7 +324,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -286,7 +348,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -308,7 +371,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -333,7 +397,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -354,7 +419,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             }
                           ]
@@ -363,7 +429,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
 
         // When
         client.get()
-                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageIndex", "0", "pageSize", "10", "status", "UNREAD")))
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageIndex", "1", "pageSize", "10", "status", "UNREAD")))
                 .header("Authorization", "Bearer " + hayden.jwt())
                 // Then
                 .exchange()
@@ -372,192 +438,11 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "totalPageNumber": 1,
-                          "totalItemNumber": 10,
+                          "totalPageNumber": 2,
+                          "totalItemNumber": 2,
                           "hasMore": false,
-                          "nextPageIndex": 0,
+                          "nextPageIndex": 1,
                           "notifications": [
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": {
-                                  "projectName": "Bretzel",
-                                  "projectSlug": "bretzel",
-                                  "issueId": 1111,
-                                  "issueName": "gfi-1"
-                                },
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_PROJECT_APPLICATION_REFUSED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": {
-                                  "projectName": "Bretzel",
-                                  "projectSlug": "bretzel",
-                                  "issueId": 2,
-                                  "issueName": "title2"
-                                },
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": {
-                                  "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
-                                  "billingProfileName": "bpHaydenClosed"
-                                }
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": {
-                                  "projectName": "Bretzel",
-                                  "projectSlug": "bretzel",
-                                  "issueId": 1,
-                                  "issueName": "title1"
-                                },
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_REWARDS_PAID",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": {
-                                  "numberOfRewardPaid": 2,
-                                  "totalAmountDollarsEquivalent": 49.0
-                                },
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_REWARD_RECEIVED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": {
-                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
-                                  "projectName": "project-22.2-USDC",
-                                  "amount": 22.2,
-                                  "currencyCode": "USDC",
-                                  "sentByGithubLogin": "projectLead1",
-                                  "contributionCount": 3
-                                },
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_REWARD_CANCELED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": null,
-                                "contributorRewardCanceled": {
-                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
-                                  "projectName": "project-11.1-USD",
-                                  "amount": 11.1,
-                                  "currencyCode": "USD"
-                                },
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
-                            {
-                              "status": "UNREAD",
-                              "type": "CONTRIBUTOR_INVOICE_REJECTED",
-                              "data": {
-                                "maintainerApplicationToReview": null,
-                                "maintainerCommitteeApplicationCreated": null,
-                                "contributorInvoiceRejected": {
-                                  "invoiceName": "invoice1",
-                                  "rejectionReason": "rejectionReason1",
-                                  "billingProfileId": "9c003b18-81f4-40ee-827b-b2046c07d056"
-                                },
-                                "contributorRewardCanceled": null,
-                                "contributorRewardReceived": null,
-                                "contributorRewardsPaid": null,
-                                "contributorProjectApplicationAccepted": null,
-                                "contributorProjectApplicationRefused": null,
-                                "contributorProjectGoodFirstIssueCreated": null,
-                                "globalBillingProfileReminder": null,
-                                "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
-                              }
-                            },
                             {
                               "status": "UNREAD",
                               "type": "MAINTAINER_APPLICATION_TO_REVIEW",
@@ -580,7 +465,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             },
                             {
@@ -601,7 +487,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "contributorProjectGoodFirstIssueCreated": null,
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
-                                "globalBillingProfileVerificationClosed": null
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null
                               }
                             }
                           ]
@@ -640,7 +527,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 10
+                              "count": 12
                             }
                         """);
 
@@ -655,7 +542,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 10
+                              "count": 12
                             }
                         """);
 
@@ -674,7 +561,25 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                             }
                         """);
 
-
+// When
+        client.get()
+                .uri(getApiURI(ME_NOTIFICATIONS, Map.of("pageIndex", "0", "pageSize", "10")))
+                .header("Authorization", "Bearer " + pierre.jwt())
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 0,
+                          "totalItemNumber": 0,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "notifications": [
+                          ]
+                        }
+                        """);
     }
 
     private static ShortReward shortRewardStub(double val, String currencyCode) {

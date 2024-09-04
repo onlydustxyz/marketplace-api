@@ -8,10 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.accountbook.AccountBookA
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.notification.*;
-import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
-import onlydust.com.marketplace.accounting.domain.port.out.InvoiceStoragePort;
+import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
 import onlydust.com.marketplace.accounting.domain.service.AccountingNotifier;
 import onlydust.com.marketplace.accounting.domain.view.*;
@@ -50,6 +47,7 @@ public class AccountingNotifierTest {
     AccountingRewardStoragePort accountingRewardStoragePort;
     NotificationPort notificationPort;
     EmailStoragePort emailStoragePort;
+    ProjectServicePort projectServicePort;
     final Faker faker = new Faker();
 
     @BeforeEach
@@ -59,8 +57,9 @@ public class AccountingNotifierTest {
         invoiceStoragePort = mock(InvoiceStoragePort.class);
         notificationPort = mock(NotificationPort.class);
         emailStoragePort = mock(EmailStoragePort.class);
+        projectServicePort = mock(ProjectServicePort.class);
         accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort,
-                emailStoragePort);
+                emailStoragePort, projectServicePort);
     }
 
     @Nested
