@@ -250,7 +250,7 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     @Order(2)
-    void should_verify_company_billing_profile() {
+    void should_verify_company_billing_profile() throws InterruptedException {
         // Given
         final var githubUserId = faker.number().randomNumber() + faker.number().randomNumber();
         final var login = faker.name().username();
@@ -588,6 +588,8 @@ public class BillingProfileVerificationsApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful();
         billingProfileVerificationOutboxJob.run();
+
+        Thread.sleep(1000L);
 
         final String title = "Billing profile company verification rejected";
         customerIOWireMockServer.verify(1,
