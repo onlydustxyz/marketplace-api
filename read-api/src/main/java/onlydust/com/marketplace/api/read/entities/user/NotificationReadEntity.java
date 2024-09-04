@@ -5,31 +5,21 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.marketplace.accounting.domain.notification.*;
-import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
-import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.contract.model.NotificationStatus;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.repositories.CurrencyReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProjectLinkReadRepository;
-import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationTypeIdResolver;
-import onlydust.com.marketplace.project.domain.model.notification.*;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 import org.hibernate.type.SqlTypes;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
 @Entity
 @NoArgsConstructor(force = true)
@@ -67,144 +57,12 @@ public class NotificationReadEntity {
         @JsonTypeIdResolver(NotificationTypeIdResolver.class)
         private NotificationData notification;
     }
-
-
+    
     public static Boolean isReadFromContract(final NotificationStatus status) {
         return isNull(status) ? null : switch (status) {
             case READ -> true;
             case UNREAD -> false;
         };
-    }
-
-    public NotificationPageItemResponse toNotificationPageItemResponse(final ProjectLinkReadRepository projectLinkReadRepository,
-                                                                       final SponsorReadRepository sponsorReadRepository,
-                                                                       final ProgramReadRepository programReadRepository,
-                                                                       final CurrencyReadRepository currencyReadRepository) {
-        final NotificationPageItemResponseData notificationPageItemResponseData = new NotificationPageItemResponseData();
-        NotificationType notificationType = null;
-        if (data.notification() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
-            notificationPageItemResponseData.setMaintainerCommitteeApplicationCreated(new NotificationMaintainerCommitteeApplicationCreated()
-                    .committeeName(committeeApplicationCreated.getCommitteeName())
-                    .committeeId(committeeApplicationCreated.getCommitteeId())
-            );
-            notificationType = NotificationType.MAINTAINER_COMMITTEE_APPLICATION_CREATED;
-        } else if (data.notification() instanceof RewardReceived rewardReceived) {
-            notificationType = NotificationType.CONTRIBUTOR_REWARD_RECEIVED;
-            notificationPageItemResponseData.setContributorRewardReceived(new NotificationContributorRewardReceived(
-                    rewardReceived.shortReward().getId().value(),
-                    rewardReceived.shortReward().getProjectName(),
-                    rewardReceived.shortReward().getAmount(),
-                    rewardReceived.shortReward().getCurrencyCode(),
-                    rewardReceived.sentByGithubLogin(),
-                    rewardReceived.contributionCount()
-            ));
-        } else if (data.notification() instanceof RewardCanceled rewardCanceled) {
-            notificationType = NotificationType.CONTRIBUTOR_REWARD_CANCELED;
-            notificationPageItemResponseData.setContributorRewardCanceled(new NotificationContributorRewardCanceled(
-                    rewardCanceled.shortReward().getId().value(),
-                    rewardCanceled.shortReward().getProjectName(),
-                    rewardCanceled.shortReward().getAmount(),
-                    rewardCanceled.shortReward().getCurrencyCode()
-            ));
-        } else if (data.notification() instanceof InvoiceRejected invoiceRejected) {
-            notificationType = NotificationType.CONTRIBUTOR_INVOICE_REJECTED;
-            notificationPageItemResponseData.setContributorInvoiceRejected(new NotificationContributorInvoiceRejected(
-                    invoiceRejected.invoiceName(),
-                    invoiceRejected.rejectionReason(),
-                    invoiceRejected.billingProfileId()
-            ));
-        } else if (data.notification() instanceof RewardsPaid rewardsPaid) {
-            notificationType = NotificationType.CONTRIBUTOR_REWARDS_PAID;
-            notificationPageItemResponseData.setContributorRewardsPaid(new NotificationContributorRewardsPaid(
-                    rewardsPaid.shortRewards().size(),
-                    rewardsPaid.shortRewards().stream().map(ShortReward::getDollarsEquivalent).reduce(BigDecimal.ZERO, BigDecimal::add)
-            ));
-        } else if (data.notification() instanceof ApplicationToReview applicationToReview) {
-            notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
-            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationToReview.getProject().id())
-                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
-            notificationPageItemResponseData.setMaintainerApplicationToReview(new NotificationMaintainerApplicationToReview(
-                    projectLinkReadEntity.slug(),
-                    projectLinkReadEntity.name(),
-                    applicationToReview.getUser().githubId(),
-                    applicationToReview.getIssue().id(),
-                    applicationToReview.getIssue().title(),
-                    applicationToReview.getUser().login()
-            ));
-        } else if (data.notification() instanceof ApplicationAccepted applicationAccepted) {
-            notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
-            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationAccepted.getProject().id())
-                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
-            notificationPageItemResponseData.setContributorProjectApplicationAccepted(new NotificationContributorProjectApplicationAccepted(
-                    projectLinkReadEntity.name(),
-                    projectLinkReadEntity.slug(),
-                    applicationAccepted.getIssue().id(),
-                    applicationAccepted.getIssue().title()
-            ));
-        } else if (data.notification() instanceof ApplicationRefused applicationRefused) {
-            notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_REFUSED;
-            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationRefused.getProject().id())
-                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationRefused.getProject())));
-            notificationPageItemResponseData.setContributorProjectApplicationRefused(new NotificationContributorProjectApplicationRefused(
-                    projectLinkReadEntity.name(),
-                    projectLinkReadEntity.slug(),
-                    applicationRefused.getIssue().id(),
-                    applicationRefused.getIssue().title()
-            ));
-        } else if (data.notification() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
-            notificationType = NotificationType.CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED;
-            final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(goodFirstIssueCreated.getProject().id())
-                    .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(goodFirstIssueCreated.getProject())));
-            notificationPageItemResponseData.setContributorProjectGoodFirstIssueCreated(new NotificationContributorProjectGoodFirstIssueCreated(
-                    projectLinkReadEntity.name(),
-                    projectLinkReadEntity.slug(),
-                    goodFirstIssueCreated.getIssue().id(),
-                    goodFirstIssueCreated.getIssue().title()
-            ));
-        } else if (data.notification() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
-            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED;
-            notificationPageItemResponseData.setGlobalBillingProfileVerificationClosed(new NotificationGlobalBillingProfileVerificationClosed(
-                    billingProfileVerificationClosed.billingProfileId().value(),
-                    billingProfileVerificationClosed.billingProfileName())
-            );
-        } else if (data.notification() instanceof BillingProfileVerificationRejected billingProfileVerificationRejected) {
-            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED;
-            notificationPageItemResponseData.setGlobalBillingProfileVerificationRejected(new NotificationGlobalBillingProfileVerificationRejected(
-                    billingProfileVerificationRejected.billingProfileId().value(),
-                    billingProfileVerificationRejected.billingProfileName(),
-                    billingProfileVerificationRejected.rejectionReason())
-            );
-        } else if (data.notification() instanceof CompleteYourBillingProfile completeYourBillingProfile) {
-            notificationType = NotificationType.GLOBAL_BILLING_PROFILE_REMINDER;
-            notificationPageItemResponseData.setGlobalBillingProfileReminder(new NotificationGlobalBillingProfileReminder(
-                    completeYourBillingProfile.billingProfile().billingProfileId(),
-                    completeYourBillingProfile.billingProfile().billingProfileName()
-            ));
-        } else if (data.notification() instanceof FundsAllocatedToProgram fundsAllocatedToProgram) {
-            notificationType = NotificationType.PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM;
-            final var sponsor = sponsorReadRepository.findById(fundsAllocatedToProgram.sponsorId().value())
-                    .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(fundsAllocatedToProgram.sponsorId())));
-            final var program = programReadRepository.findById(fundsAllocatedToProgram.programId().value())
-                    .orElseThrow(() -> internalServerError("Program %s doesn't exist".formatted(fundsAllocatedToProgram.programId())));
-            final var currency = currencyReadRepository.findById(fundsAllocatedToProgram.currencyId())
-                    .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(fundsAllocatedToProgram.currencyId())));
-
-            notificationPageItemResponseData.setProgramLeadFundsAllocatedToProgram(new NotificationProgramLeadFundsAllocatedToProgram(
-                    program.toLinkResponse(),
-                    sponsor.toLinkResponse(),
-                    fundsAllocatedToProgram.amount(),
-                    currency.code()
-            ));
-        } else {
-            throw internalServerError("Unknown notification data type %s".formatted(data.notification().getClass().getSimpleName()));
-        }
-
-        return new NotificationPageItemResponse()
-                .id(id)
-                .type(notificationType)
-                .status(Boolean.TRUE.equals(isRead) ? NotificationStatus.READ : NotificationStatus.UNREAD)
-                .timestamp(createdAt)
-                .data(notificationPageItemResponseData);
     }
 
 }

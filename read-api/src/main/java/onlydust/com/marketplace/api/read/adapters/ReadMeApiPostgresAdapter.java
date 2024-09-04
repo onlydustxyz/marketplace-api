@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity.PrimaryKey;
 import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity;
+import onlydust.com.marketplace.api.read.mapper.NotificationMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -49,6 +50,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("api")
 public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
+    private final NotificationMapper notificationMapper;
     private final AllBillingProfileUserReadRepository allBillingProfileUserReadRepository;
     private final RewardDetailsReadRepository rewardDetailsReadRepository;
     private final RewardReadRepository rewardReadRepository;
@@ -253,7 +255,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 PageRequest.of(sanitizedPageIndex, sanitizePageSize, JpaSort.unsafe(Sort.Direction.DESC, "created_at")));
         final NotificationPageResponse notificationPageResponse = new NotificationPageResponse();
         notificationReadEntityPage.stream()
-                .map(notificationReadEntity -> notificationReadEntity.toNotificationPageItemResponse(projectLinkReadRepository))
+                .map(notificationMapper::toNotificationPageItemResponse)
                 .forEach(notificationPageResponse::addNotificationsItem);
         notificationPageResponse.setHasMore(notificationReadEntityPage.hasNext());
         notificationPageResponse.setNextPageIndex(nextPageIndex(sanitizedPageIndex, notificationReadEntityPage.getTotalPages()));
