@@ -2,13 +2,13 @@ package onlydust.com.marketplace.accounting.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.events.TrackingRewardCreated;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 
 import static java.util.Objects.isNull;
@@ -70,6 +70,11 @@ public class AccountingTrackingNotifier implements AccountingObserverPort {
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
+
+    }
+
+    @Override
+    public void onFundsAllocatedToProgram(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
 
     }
 }
