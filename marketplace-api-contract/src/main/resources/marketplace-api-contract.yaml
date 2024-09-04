@@ -10051,6 +10051,8 @@ components:
     NotificationCategory:
       type: string
       enum:
+        - SPONSOR_LEAD
+        - PROGRAM_LEAD
         - MAINTAINER_PROJECT_CONTRIBUTOR
         - MAINTAINER_PROJECT_PROGRAM
         - CONTRIBUTOR_REWARD

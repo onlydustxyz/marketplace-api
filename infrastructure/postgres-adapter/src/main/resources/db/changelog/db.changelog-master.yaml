@@ -507,3 +507,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000327_rename_billing_profile_notifications_category.sql
   - include:
       file: db/changelog/changelogs/00000328_fix_program_projects.sql
+  - include:
+      file: db/changelog/changelogs/00000328_new_notification_categories.sql

@@ -20,6 +20,7 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
+import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -158,7 +159,7 @@ public class MeRestApi implements MeApi {
 
         final var projects = contributorFacadePort.contributedProjects(authenticatedUser.githubUserId(), filters);
 
-        return ResponseEntity.ok(new ProjectListResponse()
+        return ok(new ProjectListResponse()
                 .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
         );
     }
@@ -170,7 +171,7 @@ public class MeRestApi implements MeApi {
 
         final var projects = contributorFacadePort.rewardingProjects(authenticatedUser.githubUserId());
 
-        return ResponseEntity.ok(new ProjectListResponse()
+        return ok(new ProjectListResponse()
                 .projects(projects.stream().map(ProjectMapper::mapShortProjectResponse).toList())
         );
     }
@@ -192,7 +193,7 @@ public class MeRestApi implements MeApi {
         final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.githubUserId(),
                 filters);
 
-        return ResponseEntity.ok(new ContributedReposResponse()
+        return ok(new ContributedReposResponse()
                 .repos(contributedRepos.stream().map(GithubRepoMapper::mapRepoToShortResponse).toList())
         );
     }
@@ -203,7 +204,7 @@ public class MeRestApi implements MeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardDetailsView rewardDetailsView = userFacadePort.getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(rewardId,
                 authenticatedUser.githubUserId(), authenticatedUser.administratedBillingProfiles());
-        return ResponseEntity.ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser));
+        return ok(RewardMapper.myRewardDetailsToResponse(rewardDetailsView, authenticatedUser));
     }
 
     @Override
@@ -218,7 +219,7 @@ public class MeRestApi implements MeApi {
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(rewardItemsPageResponse) :
-                ResponseEntity.ok(rewardItemsPageResponse);
+                ok(rewardItemsPageResponse);
     }
 
     @Override
@@ -228,7 +229,7 @@ public class MeRestApi implements MeApi {
                 authenticatedUser.githubUserId(),
                 authenticatedUser.administratedBillingProfiles()
         );
-        return ResponseEntity.ok(new CurrencyListResponse().currencies(currencies.stream()
+        return ok(new CurrencyListResponse().currencies(currencies.stream()
                 .map(RewardMapper::mapCurrency)
                 .sorted(comparing(ShortCurrencyResponse::getCode))
                 .toList()));
@@ -241,7 +242,7 @@ public class MeRestApi implements MeApi {
         final List<GithubAccount> githubAccounts =
                 githubOrganizationFacadePort.getOrganizationsForAuthenticatedUser(authenticatedUser);
         return githubAccounts.isEmpty() ? ResponseEntity.notFound().build() :
-                ResponseEntity.ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
+                ok(githubAccounts.stream().map(GithubMapper::mapToGithubOrganizationResponse).toList());
     }
 
     @Override
@@ -272,14 +273,14 @@ public class MeRestApi implements MeApi {
         final URL imageUrl = userFacadePort.saveAvatarImage(imageInputStream);
         final UploadImageResponse response = new UploadImageResponse();
         response.url(imageUrl.toString());
-        return ResponseEntity.ok(response);
+        return ok(response);
     }
 
     @Override
     public ResponseEntity<Void> updateMyGithubProfileData() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.updateGithubProfile(authenticatedUser.githubUserId());
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @Override
@@ -287,7 +288,7 @@ public class MeRestApi implements MeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
                 BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.id()));
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @Override
@@ -359,7 +360,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> putMyNotificationSettings(NotificationSettingsPutRequest notificationSettingsPutRequest) {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final Map<NotificationCategory, List<onlydust.com.marketplace.kernel.model.notification.NotificationChannel>> channelsPerCategory = new HashMap<>();
+        final Map<NotificationCategory, List<NotificationChannel>> channelsPerCategory = new HashMap<>();
 
         for (NotificationSettingPutRequest notificationSettingPutRequest : notificationSettingsPutRequest.getNotificationSettings()) {
             channelsPerCategory.put(switch (notificationSettingPutRequest.getCategory()) {
@@ -367,13 +368,15 @@ public class MeRestApi implements MeApi {
                 case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
                 case GLOBAL_BILLING_PROFILE -> NotificationCategory.GLOBAL_BILLING_PROFILE;
                 case GLOBAL_MARKETING -> NotificationCategory.GLOBAL_MARKETING;
+                case SPONSOR_LEAD -> NotificationCategory.SPONSOR_LEAD;
+                case PROGRAM_LEAD -> NotificationCategory.PROGRAM_LEAD;
                 case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
                 case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
             }, notificationSettingPutRequest.getChannels().stream()
                     .map(notificationChannel -> switch (notificationChannel) {
-                        case EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.EMAIL;
-                        case SUMMARY_EMAIL -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.SUMMARY_EMAIL;
-                        case IN_APP -> onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP;
+                        case EMAIL -> NotificationChannel.EMAIL;
+                        case SUMMARY_EMAIL -> NotificationChannel.SUMMARY_EMAIL;
+                        case IN_APP -> NotificationChannel.IN_APP;
                     }).toList());
         }
         notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(authenticatedUser.id()),

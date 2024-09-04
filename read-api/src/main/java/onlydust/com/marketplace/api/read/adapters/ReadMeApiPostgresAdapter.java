@@ -19,10 +19,8 @@ import onlydust.com.marketplace.api.read.entities.user.UserProfileInfoReadEntity
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
-import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -160,7 +158,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final var myRewardsPageResponse = RewardsMapper.mapMyRewardsToResponse(sanitizedPageIndex, page, rewardsStats, authenticatedUser);
 
         return myRewardsPageResponse.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
+                status(HttpStatus.PARTIAL_CONTENT).body(myRewardsPageResponse) :
                 ok(myRewardsPageResponse);
     }
 
@@ -229,7 +227,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                                 .map(notificationSettingsChannelEntity -> switch (notificationSettingsChannelEntity.channel()) {
                                     case EMAIL -> NotificationChannel.EMAIL;
                                     case SUMMARY_EMAIL -> NotificationChannel.SUMMARY_EMAIL;
-                                    case IN_APP -> throw OnlyDustException.internalServerError("In app notification settings cannot be read");
+                                    case IN_APP -> throw internalServerError("In app notification settings cannot be read");
                                 }).toList(),
                         switch (notificationCategoryListEntry.getKey()) {
                             case CONTRIBUTOR_REWARD -> NotificationCategory.CONTRIBUTOR_REWARD;
@@ -238,9 +236,11 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                             case MAINTAINER_PROJECT_PROGRAM -> NotificationCategory.MAINTAINER_PROJECT_PROGRAM;
                             case CONTRIBUTOR_PROJECT -> NotificationCategory.CONTRIBUTOR_PROJECT;
                             case MAINTAINER_PROJECT_CONTRIBUTOR -> NotificationCategory.MAINTAINER_PROJECT_CONTRIBUTOR;
+                            case SPONSOR_LEAD -> NotificationCategory.SPONSOR_LEAD;
+                            case PROGRAM_LEAD -> NotificationCategory.PROGRAM_LEAD;
                         }))
                 .forEach(notificationSettingsResponse::addNotificationSettingsItem);
-        return ResponseEntity.ok(notificationSettingsResponse);
+        return ok(notificationSettingsResponse);
     }
 
     @Override
@@ -256,11 +256,11 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .map(notificationReadEntity -> notificationReadEntity.toNotificationPageItemResponse(projectLinkReadRepository))
                 .forEach(notificationPageResponse::addNotificationsItem);
         notificationPageResponse.setHasMore(notificationReadEntityPage.hasNext());
-        notificationPageResponse.setNextPageIndex(PaginationHelper.nextPageIndex(sanitizedPageIndex, notificationReadEntityPage.getTotalPages()));
+        notificationPageResponse.setNextPageIndex(nextPageIndex(sanitizedPageIndex, notificationReadEntityPage.getTotalPages()));
         notificationPageResponse.setTotalPageNumber(notificationReadEntityPage.getTotalPages());
         notificationPageResponse.setTotalItemNumber(notificationReadEntityPage.getNumberOfElements());
 
-        return notificationPageResponse.getHasMore() ? ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(notificationPageResponse) :
+        return notificationPageResponse.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(notificationPageResponse) :
                 ok(notificationPageResponse);
     }
 
@@ -268,6 +268,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     public ResponseEntity<NotificationCountResponse> getMyNotificationsCount(NotificationStatus status) {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Boolean isRead = isReadFromContract(status);
-        return ResponseEntity.ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id())));
+        return ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id())));
     }
 }
