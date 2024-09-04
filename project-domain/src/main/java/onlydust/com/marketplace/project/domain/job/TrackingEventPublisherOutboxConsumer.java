@@ -13,6 +13,9 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.TrackingEventPublisher;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 
+import java.util.List;
+import java.util.UUID;
+
 @Slf4j
 @AllArgsConstructor
 public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
@@ -23,18 +26,26 @@ public class TrackingEventPublisherOutboxConsumer implements OutboxConsumer {
     @Override
     public void process(Event event) {
         if (event instanceof OnGithubIssueAssigned onGithubIssueAssigned) {
-            if (projectStoragePort.isLinkedToAProject(onGithubIssueAssigned.repoId())) {
+            final List<UUID> projectIdsByRepoId = projectStoragePort.findProjectIdsByRepoId(onGithubIssueAssigned.repoId());
+            if (!projectIdsByRepoId.isEmpty()) {
                 final var user = userStoragePort.getRegisteredUserByGithubId(onGithubIssueAssigned.assigneeId());
-                trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user.map(AuthenticatedUser::id)));
+                trackingEventPublisher.publish(OnGithubIssueAssignedTrackingEvent.of(onGithubIssueAssigned, user.map(AuthenticatedUser::id),
+                        projectIdsByRepoId.get(0)));
             }
         } else if (event instanceof OnPullRequestCreated onPullRequestCreated) {
-            if (projectStoragePort.isLinkedToAProject(onPullRequestCreated.repoId()))
+            final List<UUID> projectIdsByRepoId = projectStoragePort.findProjectIdsByRepoId(onPullRequestCreated.repoId());
+            if (!projectIdsByRepoId.isEmpty()) {
                 userStoragePort.getRegisteredUserByGithubId(onPullRequestCreated.authorId())
-                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestCreatedTrackingEvent.of(onPullRequestCreated, user.id())));
+                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestCreatedTrackingEvent.of(onPullRequestCreated, user.id(),
+                                projectIdsByRepoId.get(0))));
+            }
         } else if (event instanceof OnPullRequestMerged onPullRequestMerged) {
-            if (projectStoragePort.isLinkedToAProject(onPullRequestMerged.repoId()))
+            final List<UUID> projectIdsByRepoId = projectStoragePort.findProjectIdsByRepoId(onPullRequestMerged.repoId());
+            if (!projectIdsByRepoId.isEmpty()) {
                 userStoragePort.getRegisteredUserByGithubId(onPullRequestMerged.authorId())
-                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user.id())));
+                        .ifPresent(user -> trackingEventPublisher.publish(OnPullRequestMergedTrackingEvent.of(onPullRequestMerged, user.id(),
+                                projectIdsByRepoId.get(0))));
+            }
         } else if (event instanceof OnApplicationCreated onApplicationCreated) {
             final var user = userStoragePort.getRegisteredUserByGithubId(onApplicationCreated.applicantId());
             trackingEventPublisher.publish(OnApplicationCreatedTrackingEvent.of(onApplicationCreated, user.map(AuthenticatedUser::id)));

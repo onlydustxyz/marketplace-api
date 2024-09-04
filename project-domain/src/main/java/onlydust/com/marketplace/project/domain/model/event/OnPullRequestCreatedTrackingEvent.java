@@ -21,13 +21,15 @@ public class OnPullRequestCreatedTrackingEvent extends Event {
     UUID authorUserId;
     @NonNull
     ZonedDateTime createdAt;
+    UUID projectId;
 
-    public static OnPullRequestCreatedTrackingEvent of(OnPullRequestCreated onPullRequestCreated, UUID userId) {
+    public static OnPullRequestCreatedTrackingEvent of(OnPullRequestCreated onPullRequestCreated, UUID userId, UUID projectId) {
         return OnPullRequestCreatedTrackingEvent.builder()
                 .pullRequestId(onPullRequestCreated.id())
                 .authorGithubId(onPullRequestCreated.authorId())
                 .authorUserId(userId)
                 .createdAt(onPullRequestCreated.createdAt())
+                .projectId(projectId)
                 .build();
     }
 }

@@ -24,15 +24,17 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
+    UUID projectId;
 
     public static OnGithubIssueAssignedTrackingEvent of(@NonNull OnGithubIssueAssigned onGithubIssueAssigned,
-                                                        @NonNull Optional<UUID> userId) {
+                                                        @NonNull Optional<UUID> userId, UUID projectId) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())
                 .assigneeUserId(userId.orElse(null))
                 .createdAt(onGithubIssueAssigned.createdAt())
                 .assignedAt(onGithubIssueAssigned.assignedAt())
+                .projectId(projectId)
                 .isGoodFirstIssue(onGithubIssueAssigned.labels().stream().anyMatch(OnGithubIssueAssignedTrackingEvent::isGoodFirstIssue))
                 .build();
     }

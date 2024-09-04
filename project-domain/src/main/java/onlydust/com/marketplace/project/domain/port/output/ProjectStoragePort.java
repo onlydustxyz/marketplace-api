@@ -52,8 +52,6 @@ public interface ProjectStoragePort {
 
     void updateProjectsRanking();
 
-    boolean isLinkedToAProject(Long repoId);
-
     Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
 
     Page<NewcomerView> getNewcomers(UUID projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize);

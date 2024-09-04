@@ -3,6 +3,8 @@ package onlydust.com.marketplace.api.posthog.processors;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import onlydust.com.marketplace.project.domain.model.event.OnPullRequestCreatedTrackingEvent;
 
+import static java.util.Objects.isNull;
+
 public class PullRequestCreatedEventReader implements EventReader<OnPullRequestCreatedTrackingEvent> {
     @Override
     public void addProperties(final OnPullRequestCreatedTrackingEvent event, final ObjectNode properties) {
@@ -10,6 +12,7 @@ public class PullRequestCreatedEventReader implements EventReader<OnPullRequestC
         properties.put("author_github_id", event.authorGithubId());
         properties.put("author_user_id", event.authorUserId().toString());
         properties.put("pr_created_at", event.createdAt().toString());
+        properties.put("project_id",isNull(event.projectId()) ? null :  event.projectId().toString());
     }
 
     @Override

@@ -23,14 +23,16 @@ public class OnPullRequestMergedTrackingEvent extends Event {
     ZonedDateTime createdAt;
     @NonNull
     ZonedDateTime mergedAt;
+    UUID projectId;
 
-    public static OnPullRequestMergedTrackingEvent of(OnPullRequestMerged onPullRequestMerged, UUID userId) {
+    public static OnPullRequestMergedTrackingEvent of(OnPullRequestMerged onPullRequestMerged, UUID userId, UUID projectId) {
         return OnPullRequestMergedTrackingEvent.builder()
                 .pullRequestId(onPullRequestMerged.id())
                 .authorGithubId(onPullRequestMerged.authorId())
                 .authorUserId(userId)
                 .createdAt(onPullRequestMerged.createdAt())
                 .mergedAt(onPullRequestMerged.mergedAt())
+                .projectId(projectId)
                 .build();
     }
 }

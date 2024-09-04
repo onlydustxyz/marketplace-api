@@ -23,10 +23,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,7 +51,7 @@ class TrackingEventPublisherOutboxConsumerTest {
     class GivenARepoNotLinkedToAProject {
         @BeforeEach
         void setUp() {
-            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(false);
+            when(projectStoragePort.findProjectIdsByRepoId(any())).thenReturn(List.of());
         }
 
         @ParameterizedTest
@@ -86,10 +83,14 @@ class TrackingEventPublisherOutboxConsumerTest {
 
     @Nested
     class GivenNonRegisteredUser {
+
+        protected UUID projectId;
+
         @BeforeEach
         void setUp() {
+            projectId = UUID.randomUUID();
             when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.empty());
-            when(projectStoragePort.isLinkedToAProject(any())).thenReturn(true);
+            when(projectStoragePort.findProjectIdsByRepoId(anyLong())).thenReturn(List.of(projectId, UUID.randomUUID()));
         }
 
         @ParameterizedTest
@@ -174,10 +175,13 @@ class TrackingEventPublisherOutboxConsumerTest {
                 .id(UUID.randomUUID())
                 .build();
 
+        protected UUID projectId;
+
         @BeforeEach
         void setUp() {
+            projectId = UUID.randomUUID();
             when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.of(user));
-            when(projectStoragePort.isLinkedToAProject(githubRepoId)).thenReturn(true);
+            when(projectStoragePort.findProjectIdsByRepoId(githubRepoId)).thenReturn(List.of(projectId, UUID.randomUUID()));
         }
 
         @Test
