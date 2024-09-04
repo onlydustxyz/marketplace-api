@@ -396,8 +396,9 @@ public class ProjectConfiguration {
     @Bean
     public ProjectNotifier projectNotifier(final NotificationPort notificationPort,
                                            final ProjectStoragePort projectStoragePort,
-                                           final CommitteeStoragePort committeeStoragePort) {
-        return new ProjectNotifier(notificationPort, projectStoragePort, committeeStoragePort);
+                                           final CommitteeStoragePort committeeStoragePort,
+                                           final ProgramStoragePort programStoragePort) {
+        return new ProjectNotifier(notificationPort, projectStoragePort, committeeStoragePort, programStoragePort);
     }
 
     @Bean
