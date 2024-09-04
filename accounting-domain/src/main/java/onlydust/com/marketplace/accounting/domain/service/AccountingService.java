@@ -82,6 +82,7 @@ public class AccountingService implements AccountingFacadePort {
                 .toList();
 
         transfer(sponsorAccountIds, to, amount, currencyId);
+        accountingObserver.onFundsAllocatedToProgram(from, to, amount, currencyId);
     }
 
     @Override
