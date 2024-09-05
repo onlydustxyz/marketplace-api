@@ -10170,6 +10170,8 @@ components:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationClosed'
             programLeadFundsAllocatedToProgram:
               $ref: '#/components/schemas/NotificationProgramLeadFundsAllocatedToProgram'
+            programLeadFundsUnallocatedFromProgram:
+              $ref: '#/components/schemas/NotificationProgramLeadFundsUnallocatedFromProgram'
 
     NotificationCountResponse:
       type: object
@@ -10201,6 +10203,7 @@ components:
         - GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED
         - GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED
         - PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM
+        - PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM
 
     NotificationMaintainerApplicationToReview:
       type: object
@@ -10395,6 +10398,23 @@ components:
           type: string
 
     NotificationProgramLeadFundsAllocatedToProgram:
+      type: object
+      required:
+        - program
+        - sponsor
+        - amount
+        - currencyCode
+      properties:
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
+        sponsor:
+          $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          type: number
+        currencyCode:
+          type: string
+
+    NotificationProgramLeadFundsUnallocatedFromProgram:
       type: object
       required:
         - program

@@ -8,11 +8,13 @@ import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.notification.FundsAllocatedToProgram;
+import onlydust.com.marketplace.project.domain.model.notification.FundsUnallocatedFromProgram;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProgramObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 
 import java.math.BigDecimal;
@@ -27,6 +29,7 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
     private final ProjectStoragePort projectStoragePort;
     private final CommitteeStoragePort committeeStoragePort;
     private final ProgramStoragePort programStoragePort;
+    private final SponsorStoragePort sponsorStoragePort;
 
     @Override
     public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull UUID projectId, @NonNull UUID userId) {
@@ -48,6 +51,19 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
                         .programId(programId)
                         .amount(amount)
                         .currencyId(currencyId)
+                        .build()));
+    }
+
+    @Override
+    public void onFundsRefundedByProgram(@NonNull ProgramId programId, @NonNull SponsorId sponsorId, @NonNull BigDecimal value, UUID value1) {
+        final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
+
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+                FundsUnallocatedFromProgram.builder()
+                        .sponsorId(sponsorId)
+                        .programId(programId)
+                        .amount(value)
+                        .currencyId(value1)
                         .build()));
     }
 }

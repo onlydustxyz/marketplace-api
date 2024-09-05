@@ -20,4 +20,12 @@ public class ProjectServiceAdapter implements ProjectServicePort {
                                           @NonNull Currency.Id currencyId) {
         projectNotifier.onFundsAllocatedToProgram(sponsorId, programId, amount.getValue(), currencyId.value());
     }
+
+    @Override
+    public void onFundsRefundedByProgram(@NonNull ProgramId programId,
+                                         @NonNull SponsorId sponsorId,
+                                         @NonNull PositiveAmount amount,
+                                         @NonNull Currency.Id currencyId) {
+        projectNotifier.onFundsRefundedByProgram(programId, sponsorId, amount.getValue(), currencyId.value());
+    }
 }

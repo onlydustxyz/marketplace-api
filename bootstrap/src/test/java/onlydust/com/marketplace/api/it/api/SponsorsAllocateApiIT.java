@@ -6,9 +6,17 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.model.notification.FundsAllocatedToProgram;
+import onlydust.com.marketplace.project.domain.model.notification.FundsUnallocatedFromProgram;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 @TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -18,10 +26,13 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     private final static Currency.Id currencyId = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
     private UserAuthHelper.AuthenticatedUser user;
 
+    @Autowired
+    private NotificationPort notificationPort;
+
     @BeforeEach
     void setup() {
         user = userAuthHelper.authenticateAntho();
-        programId = programHelper.create(sponsorId).id();
+        programId = programHelper.create(sponsorId, userAuthHelper.authenticateOlivier()).id();
     }
 
     @Test
@@ -65,11 +76,13 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
         allocateTo(sponsorId, programId, currencyId, 1000)
                 .expectStatus()
                 .isNoContent();
+        verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
 
         // When
         unallocateFrom(sponsorId, programId, currencyId, 1000)
                 .expectStatus()
                 .isNoContent();
+        verify(notificationPort).push(any(), any(FundsUnallocatedFromProgram.class));
 
         // TODO - add call to sponsor stats endpoint
         // Then
@@ -96,6 +109,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
         allocateTo(sponsorId, programId, currencyId, 1000)
                 .expectStatus()
                 .isNoContent();
+        verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
 
         // TODO - add call to sponsor stats endpoint
         // Then
@@ -133,6 +147,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
 
     @NonNull
     private WebTestClient.ResponseSpec allocateTo(SponsorId sponsorId, ProgramId programId, Currency.Id currencyId, long amount) {
+        reset(notificationPort);
         return client.post()
                 .uri(SPONSOR_ALLOCATE.formatted(sponsorId))
                 .header("Authorization", "Bearer " + user.jwt())
@@ -149,6 +164,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
 
     @NonNull
     private WebTestClient.ResponseSpec unallocateFrom(SponsorId sponsorId, ProgramId programId, Currency.Id currencyId, long amount) {
+        reset(notificationPort);
         return client.post()
                 .uri(SPONSOR_UNALLOCATE.formatted(sponsorId))
                 .header("Authorization", "Bearer " + user.jwt())

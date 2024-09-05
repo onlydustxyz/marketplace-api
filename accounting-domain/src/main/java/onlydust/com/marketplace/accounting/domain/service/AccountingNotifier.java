@@ -189,6 +189,11 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     }
 
     @Override
+    public void onFundsRefundedByProgram(ProgramId programId, SponsorId sponsorId, PositiveAmount amount, Currency.Id currencyId) {
+        projectServicePort.onFundsRefundedByProgram(programId, sponsorId, amount, currencyId);
+    }
+
+    @Override
     public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
         emailStoragePort.send(billingProfileChildrenKycVerification.individualKycIdentity().email(), billingProfileChildrenKycVerification);
     }

@@ -122,6 +122,12 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .programId(program.id())
                 .sponsorId(sponsor.id())
                 .build());
+        notificationService.push(hayden.user().getId(), FundsUnallocatedFromProgram.builder()
+                .amount(BigDecimal.valueOf(99))
+                .currencyId(CurrencyHelper.STRK.value())
+                .programId(program.id())
+                .sponsorId(sponsor.id())
+                .build());
 
         // When
         client.get()
@@ -132,15 +138,42 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
+                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.programLeadFundsUnallocatedFromProgram.program" +
+                          ".id").isEqualTo(program.id().toString())
+                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.programLeadFundsUnallocatedFromProgram.sponsor" +
+                          ".id").isEqualTo(sponsor.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.program.id").isEqualTo(program.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.sponsor.id").isEqualTo(sponsor.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 12,
+                          "totalItemNumber": 13,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": {
+                                  "amount": 99,
+                                  "currencyCode": "STRK"
+                                }
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM",
@@ -160,7 +193,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "programLeadFundsAllocatedToProgram": {
                                   "amount": 100,
                                   "currencyCode": "USDC"
-                                }
+                                },
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -184,7 +218,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -208,7 +243,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -231,7 +267,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "reason": "rejectionReason1"
                                 },
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -253,7 +290,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "billingProfileId": "a805e770-104b-4010-b849-cbf90b93ccf4",
                                   "billingProfileName": "bpHaydenClosed"
                                 },
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -277,7 +315,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -299,7 +338,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -325,7 +365,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -349,7 +390,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -372,7 +414,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -398,7 +441,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -420,7 +464,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             }
                           ]
@@ -439,10 +484,34 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 2,
+                          "totalItemNumber": 3,
                           "hasMore": false,
                           "nextPageIndex": 1,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_INVOICE_REJECTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": {
+                                  "invoiceName": "invoice1",
+                                  "rejectionReason": "rejectionReason1",
+                                  "billingProfileId": "9c003b18-81f4-40ee-827b-b2046c07d056"
+                                },
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "MAINTAINER_APPLICATION_TO_REVIEW",
@@ -466,7 +535,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             },
                             {
@@ -488,7 +558,8 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileReminder": null,
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
-                                "programLeadFundsAllocatedToProgram": null
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUnallocatedFromProgram": null
                               }
                             }
                           ]
@@ -527,7 +598,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 12
+                              "count": 13
                             }
                         """);
 
@@ -542,7 +613,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 12
+                              "count": 13
                             }
                         """);
 

@@ -55,6 +55,8 @@ public class NotificationMapper {
             notificationType = map(completeYourBillingProfile, responseData);
         } else if (notification instanceof FundsAllocatedToProgram fundsAllocatedToProgram) {
             notificationType = map(fundsAllocatedToProgram, responseData);
+        } else if (notification instanceof FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
+            notificationType = map(fundsUnallocatedFromProgram, responseData);
         } else {
             throw internalServerError("Unknown notification data type %s".formatted(notification.getClass().getSimpleName()));
         }
@@ -65,6 +67,26 @@ public class NotificationMapper {
                 .status(Boolean.TRUE.equals(entity.isRead()) ? NotificationStatus.READ : NotificationStatus.UNREAD)
                 .timestamp(entity.getCreatedAt())
                 .data(responseData);
+    }
+
+    private @NotNull NotificationType map(FundsUnallocatedFromProgram fundsUnallocatedFromProgram,
+                                          NotificationPageItemResponseData notificationPageItemResponseData) {
+        NotificationType notificationType;
+        notificationType = NotificationType.PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM;
+        final var sponsor = sponsorReadRepository.findById(fundsUnallocatedFromProgram.sponsorId().value())
+                .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(fundsUnallocatedFromProgram.sponsorId())));
+        final var program = programReadRepository.findById(fundsUnallocatedFromProgram.programId().value())
+                .orElseThrow(() -> internalServerError("Program %s doesn't exist".formatted(fundsUnallocatedFromProgram.programId())));
+        final var currency = currencyReadRepository.findById(fundsUnallocatedFromProgram.currencyId())
+                .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(fundsUnallocatedFromProgram.currencyId())));
+
+        notificationPageItemResponseData.setProgramLeadFundsUnallocatedFromProgram(new NotificationProgramLeadFundsUnallocatedFromProgram(
+                program.toLinkResponse(),
+                sponsor.toLinkResponse(),
+                fundsUnallocatedFromProgram.amount(),
+                currency.code()
+        ));
+        return notificationType;
     }
 
     private @NotNull NotificationType map(FundsAllocatedToProgram fundsAllocatedToProgram, NotificationPageItemResponseData notificationPageItemResponseData) {

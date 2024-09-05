@@ -2,8 +2,10 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -13,6 +15,8 @@ public interface SponsorStoragePort {
     void addLeadToSponsor(UUID leadId, SponsorId sponsorId);
 
     Optional<Sponsor> get(SponsorId sponsorId);
+
+    List<UserId> findSponsorLeads(SponsorId sponsorId);
 
     void save(Sponsor sponsor);
 

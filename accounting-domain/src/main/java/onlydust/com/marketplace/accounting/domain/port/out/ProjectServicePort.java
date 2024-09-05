@@ -8,4 +8,6 @@ import onlydust.com.marketplace.kernel.model.SponsorId;
 
 public interface ProjectServicePort {
     void onFundsAllocatedToProgram(@NonNull SponsorId sponsorId, @NonNull ProgramId programId, @NonNull PositiveAmount amount, @NonNull Currency.Id currencyId);
+
+    void onFundsRefundedByProgram(@NonNull ProgramId programId, @NonNull SponsorId sponsorId, @NonNull PositiveAmount amount, @NonNull Currency.Id currencyId);
 }

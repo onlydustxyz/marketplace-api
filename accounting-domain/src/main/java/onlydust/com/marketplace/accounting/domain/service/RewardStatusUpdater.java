@@ -103,7 +103,12 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
 
     @Override
     public void onFundsAllocatedToProgram(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
-        
+
+    }
+
+    @Override
+    public void onFundsRefundedByProgram(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
+
     }
 
     @Override
