@@ -26,6 +26,8 @@ public class ProgramHelper {
     private ProgramReadRepository programReadRepository;
 
     private final Faker faker = new Faker();
+    @Autowired
+    private SponsorHelper sponsorHelper;
 
     @Transactional
     public Program create(SponsorId sponsorId) {
@@ -75,5 +77,10 @@ public class ProgramHelper {
                 Optional.ofNullable(program.url()).map(URI::create).orElse(null),
                 Optional.ofNullable(program.logoUrl()).map(URI::create).orElse(null),
                 leadIds);
+    }
+
+    @Transactional
+    public ProgramId randomId() {
+        return create(sponsorHelper.create().id()).id();
     }
 }

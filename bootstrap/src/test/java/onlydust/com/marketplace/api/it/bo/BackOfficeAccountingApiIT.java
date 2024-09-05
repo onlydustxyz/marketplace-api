@@ -51,8 +51,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TagBO
@@ -172,6 +171,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
 
         // When
+        reset(notificationPort);
         client.post()
                 .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(COCA_COLAX)))
                 .header("Authorization", "Bearer " + camille.jwt())

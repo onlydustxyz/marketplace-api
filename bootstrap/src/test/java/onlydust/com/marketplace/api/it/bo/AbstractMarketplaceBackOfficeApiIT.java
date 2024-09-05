@@ -103,6 +103,10 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @Autowired
     ProgramHelper programHelper;
     @Autowired
+    SponsorHelper sponsorHelper;
+    @Autowired
+    ProjectHelper projectHelper;
+    @Autowired
     AccountingHelper accountingHelper;
     @Autowired
     DepositHelper depositHelper;

@@ -11,9 +11,7 @@ import onlydust.com.marketplace.accounting.domain.service.AccountingService;
 import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeProjectRestApi;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,17 +42,17 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
     AccountingService accountingService;
 
     private void allocateBudgetToProject() {
-        final UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+        final var sponsorId = sponsorHelper.create().id();
         final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
-        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
-        final var programId = ProgramId.random();
+        final var programId = programHelper.create(sponsorId).id();
 
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), CurrencyHelper.STRK);
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), CurrencyHelper.STRK);
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), CurrencyHelper.STRK);
     }
 
