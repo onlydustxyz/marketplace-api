@@ -183,7 +183,25 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isNoContent();
 
-        accountingHelper.grant(program.id(), BRETZEL, 40, STRK);
+        accountingHelper.grant(program.id(), BRETZEL, 80, STRK);
+
+
+        // When
+        client.post()
+                .uri(getApiURI(PROGRAMS_BY_ID_UNGRANT.formatted(program.id())))
+                .header("Authorization", "Bearer " + camille.jwt())
+                .contentType(APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                            "projectId": "%s",
+                            "amount": 40,
+                            "currencyId": "%s"
+                        }
+                        """.formatted(BRETZEL, STRK))
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
 
         // When
         client.post()

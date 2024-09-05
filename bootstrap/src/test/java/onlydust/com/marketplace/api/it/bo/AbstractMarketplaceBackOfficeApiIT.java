@@ -175,6 +175,7 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected static final String DELETE_SPONSOR_ACCOUNTS_RECEIPTS = "/bo/v1/sponsor-accounts/%s/receipts/%s";
     protected static final String SPONSORS_BY_ID_ALLOCATE = "/bo/v1/sponsors/%s/allocate";
     protected static final String SPONSORS_BY_ID_UNALLOCATE = "/bo/v1/sponsors/%s/unallocate";
+    protected static final String PROGRAMS_BY_ID_UNGRANT = "/bo/v1/programs/%s/ungrant";
     protected static final String POST_REWARDS_PAY = "/bo/v1/rewards/%s/pay";
     protected static final String GET_ECOSYSTEMS = "/bo/v1/ecosystems";
     protected static final String GET_USERS = "/bo/v1/users";

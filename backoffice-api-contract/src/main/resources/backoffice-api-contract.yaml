@@ -558,6 +558,36 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/programs/{programId}/ungrant:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeAccountingManagement
+      summary: Refund a program by ungranting funds from a project
+      operationId: ungrantBudgetFromProject
+      description: Refund a program
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+      requestBody:
+        description: Budget to ungrant
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrantRequest'
+      responses:
+        "204":
+          description: 'The funds have been ungranted'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /bo/v1/rewards/{rewardId}/pay:
     post:
       security:
@@ -3278,6 +3308,20 @@ components:
       properties:
         programId:
           $ref: '#/components/schemas/ProgramId'
+        amount:
+          type: number
+        currencyId:
+          $ref: '#/components/schemas/CurrencyId'
+
+    GrantRequest:
+      type: object
+      required:
+        - projectId
+        - amount
+        - currencyId
+      properties:
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
         amount:
           type: number
         currencyId:
