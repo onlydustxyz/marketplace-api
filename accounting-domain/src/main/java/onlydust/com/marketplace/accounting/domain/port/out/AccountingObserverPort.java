@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.accounting.domain.port.out;
 
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
+import onlydust.com.marketplace.kernel.model.*;
 
 public interface AccountingObserverPort {
     void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount);
@@ -24,4 +24,5 @@ public interface AccountingObserverPort {
 
     void onBillingProfileDeleted(BillingProfile.Id billingProfileId);
 
+    void onFundsAllocatedToProgram(final SponsorId from, final ProgramId to, final PositiveAmount amount, final Currency.Id currencyId);
 }

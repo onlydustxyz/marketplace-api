@@ -4,16 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.RewardId;
-import onlydust.com.marketplace.accounting.domain.model.RewardStatusData;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.port.in.RewardStatusFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.model.*;
 
 import java.time.ZonedDateTime;
 
@@ -103,6 +99,11 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
         final var updatedRewardIds = accountingRewardStoragePort.removeBillingProfile(billingProfileId);
         rewardStatusFacadePort.refreshRewardsUsdEquivalentOf(updatedRewardIds);
+    }
+
+    @Override
+    public void onFundsAllocatedToProgram(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        
     }
 
     @Override

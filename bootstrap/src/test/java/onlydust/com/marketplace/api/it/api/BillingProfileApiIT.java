@@ -22,7 +22,6 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.KycRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
@@ -536,7 +535,7 @@ public class BillingProfileApiIT extends AbstractMarketplaceApiIT {
                         }""");
 
         // When
-        final var programId = ProgramId.random();
+        final var programId = programHelper.randomId();
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
         accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
                 Currency.Id.of(strkId), null,

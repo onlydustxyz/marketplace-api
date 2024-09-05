@@ -20,9 +20,7 @@ import onlydust.com.marketplace.api.helper.CurrencyHelper;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CurrencyRepository;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,15 +85,15 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
 
         // When user has a not-verified BP and some reward
         final var projectId = ProjectId.of("f39b827f-df73-498c-8853-99bc3f562723");
-        final var sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
+        final var sponsorId = sponsorHelper.create().id();
         final var usdc = currencyRepository.findByCode("USDC").orElseThrow().id();
-        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(usdc), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        final var programId = ProgramId.random();
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
+        final var programId = programHelper.create(sponsorId).id();
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
         assertAlerting(List.of(MeDatum.builder()

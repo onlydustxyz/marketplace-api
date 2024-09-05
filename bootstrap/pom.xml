@@ -220,6 +220,12 @@
             <groupId>onlydust.com.marketplace.kernel</groupId>
             <artifactId>marketplace-kernel</artifactId>
         </dependency>
+        <dependency>
+            <groupId>onlydust.com.marketplace.api</groupId>
+            <artifactId>project-adapter</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

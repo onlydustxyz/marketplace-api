@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.SponsorEnt
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.RewardService;
@@ -80,7 +79,7 @@ public class ProjectBudgetsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        final var programId = ProgramId.random();
+        final var programId = programHelper.randomId();
 
         final var usd = currencyRepository.findByCode("USD").orElseThrow();
         final var eth = currencyRepository.findByCode("ETH").orElseThrow();

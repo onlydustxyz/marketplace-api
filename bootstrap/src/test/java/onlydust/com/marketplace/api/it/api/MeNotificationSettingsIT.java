@@ -154,7 +154,19 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "EMAIL"
                               ],
-                              "category": "GLOBAL_BILLING_PROFILE"
+                              "category": "CONTRIBUTOR_PROJECT"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "PROGRAM_LEAD"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
+                              "category": "SPONSOR_LEAD"
                             },
                             {
                               "channels": [
@@ -166,13 +178,19 @@ public class MeNotificationSettingsIT extends AbstractMarketplaceApiIT {
                               "channels": [
                                 "EMAIL"
                               ],
+                              "category": "GLOBAL_MARKETING"
+                            },
+                            {
+                              "channels": [
+                                "EMAIL"
+                              ],
                               "category": "MAINTAINER_PROJECT_PROGRAM"
                             },
                             {
                               "channels": [
                                 "EMAIL"
                               ],
-                              "category": "CONTRIBUTOR_PROJECT"
+                              "category": "GLOBAL_BILLING_PROFILE"
                             }
                           ]
                         }

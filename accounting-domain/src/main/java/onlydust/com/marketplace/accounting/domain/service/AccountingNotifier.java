@@ -4,17 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.accounting.domain.port.out.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
 import java.util.List;
@@ -31,6 +31,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private final InvoiceStoragePort invoiceStoragePort;
     private final NotificationPort notificationPort;
     private final EmailStoragePort emailStoragePort;
+    private final ProjectServicePort projectServicePort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -180,6 +181,11 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
 
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
+    }
+
+    @Override
+    public void onFundsAllocatedToProgram(SponsorId sponsorId, ProgramId programId, PositiveAmount amount, Currency.Id currencyId) {
+        projectServicePort.onFundsAllocatedToProgram(sponsorId, programId, amount, currencyId);
     }
 
     @Override

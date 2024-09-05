@@ -14,6 +14,7 @@
         <module>backoffice-api-contract</module>
         <module>accounting-domain</module>
         <module>user-domain</module>
+        <module>infrastructure/project-adapter</module>
     </modules>
 
     <parent>
@@ -116,7 +117,7 @@
             <dependency>
                 <groupId>onlydust.com.marketplace.kernel</groupId>
                 <artifactId>marketplace-kernel</artifactId>
-                <version>0.32.0</version>
+                <version>0.33.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>

@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.accounting.domain.service;
 
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
+import onlydust.com.marketplace.kernel.model.*;
 
 import java.util.List;
 
@@ -54,5 +54,10 @@ public class AccountingObserverComposite implements AccountingObserverPort {
     @Override
     public void onBillingProfileDeleted(BillingProfile.Id billingProfileId) {
         observers.forEach(o -> o.onBillingProfileDeleted(billingProfileId));
+    }
+
+    @Override
+    public void onFundsAllocatedToProgram(SponsorId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        observers.forEach(o -> o.onFundsAllocatedToProgram(from, to, amount, currencyId));
     }
 }

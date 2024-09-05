@@ -28,7 +28,9 @@ import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Ethereum;
 import onlydust.com.marketplace.kernel.model.blockchain.Optimism;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Program;
+import onlydust.com.marketplace.project.domain.model.notification.FundsAllocatedToProgram;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -49,7 +51,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @TagBO
@@ -90,6 +92,9 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     RewardStatusStorage rewardStatusStorage;
     @Autowired
     SponsorHelper sponsorHelper;
+    @Autowired
+    NotificationPort notificationPort;
+
     UserAuthHelper.AuthenticatedBackofficeUser camille;
     Program program;
 
@@ -101,11 +106,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
         camille = userAuthHelper.authenticateCamille();
-        program = programHelper.create(sponsorHelper.create().id());
+        program = programHelper.create(sponsorHelper.create().id(), userAuthHelper.authenticateOlivier());
     }
 
     @Test
-    void should_allocate_budget_to_project_and_get_refunded_of_unspent_budget() {
+    void should_allocate_budget_to_program_and_get_refunded_of_unspent_budget() {
         // When
         final var response = client.post()
                 .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
@@ -166,6 +171,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         ;
 
         // When
+        reset(notificationPort);
         client.post()
                 .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(COCA_COLAX)))
                 .header("Authorization", "Bearer " + camille.jwt())
@@ -183,6 +189,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .isNoContent();
 
         accountingHelper.grant(program.id(), BRETZEL, 40, STRK);
+        verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
 
         // When
         client.post()

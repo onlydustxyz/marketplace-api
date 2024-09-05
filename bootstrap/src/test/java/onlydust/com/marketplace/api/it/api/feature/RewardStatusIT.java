@@ -28,7 +28,10 @@ import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfile
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedBackofficeUserService;
-import onlydust.com.marketplace.kernel.model.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -239,7 +242,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         projectId2 = response2.getProjectId();
 
-        final var programId = ProgramId.random();
+        final var programId = programHelper.randomId();
 
         final UUID strkId = currencyRepository.findByCode("STRK").orElseThrow().id();
         accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),

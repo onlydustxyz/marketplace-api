@@ -20,7 +20,13 @@ import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
+import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSender;
+import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
+import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
+import onlydust.com.marketplace.user.domain.service.NotificationService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -98,5 +104,16 @@ public class MarketplaceApiApplicationIT {
                                                             final CustomerIOHttpClient customerIOHttpClient,
                                                             final CustomerIOTrackingApiHttpClient customerIOTrackingApiHttpClient) {
         return spy(new CustomerIOAdapter(customerIOHttpClient, customerIOTrackingApiHttpClient, customerIOProperties));
+    }
+
+    @Bean
+    public NotificationPort notificationPort(final NotificationSettingsStoragePort notificationSettingsStoragePort,
+                                             final NotificationStoragePort notificationStoragePort,
+                                             final AppUserStoragePort userStoragePort,
+                                             final NotificationSender asyncNotificationEmailProcessor) {
+        return spy(new NotificationService(notificationSettingsStoragePort,
+                notificationStoragePort,
+                userStoragePort,
+                asyncNotificationEmailProcessor));
     }
 }

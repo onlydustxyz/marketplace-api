@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepositor
 import onlydust.com.marketplace.api.posthog.properties.PosthogProperties;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.suites.tags.TagReward;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.junit.jupiter.api.Test;
@@ -184,7 +183,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        final var programId = ProgramId.random();
+        final var programId = programHelper.randomId();
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(strkId));
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();

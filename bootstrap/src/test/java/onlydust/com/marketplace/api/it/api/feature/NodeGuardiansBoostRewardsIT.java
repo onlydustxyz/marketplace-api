@@ -25,9 +25,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoR
 import onlydust.com.marketplace.api.read.entities.reward.RewardDetailsReadEntity;
 import onlydust.com.marketplace.api.read.repositories.RewardDetailsReadRepository;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.port.input.BoostNodeGuardiansRewardsPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import org.junit.jupiter.api.Test;
@@ -93,27 +91,27 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
     }
 
     public void addBudgetToProject(final UUID projectId) {
-        final UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
-        final var programId = ProgramId.random();
-        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        final var sponsorId = sponsorHelper.create().id();
+        final var programId = programHelper.create(sponsorId).id();
+        accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.ETH.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
+        accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.USD.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.SEPA, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
-        accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
+        accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
 
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
