@@ -121,6 +121,16 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     }
 
     @Override
+    public ResponseEntity<Void> ungrantBudgetFromProject(UUID programId, GrantRequest request) {
+        accountingFacadePort.ungrant(ProjectId.of(request.getProjectId()),
+                ProgramId.of(programId),
+                PositiveAmount.of(request.getAmount()),
+                Currency.Id.of(request.getCurrencyId()));
+
+        return noContent().build();
+    }
+
+    @Override
     public ResponseEntity<Void> payReward(UUID rewardId, PayRewardRequest payRewardRequest) {
         final var network = mapTransactionNetwork(payRewardRequest.getNetwork());
         final var transactionTimestamp = network.blockchain()
