@@ -563,6 +563,7 @@ public class AccountingService implements AccountingFacadePort {
         depositStoragePort.save(deposit.toBuilder()
                 .status(Deposit.Status.REJECTED)
                 .build());
+        depositObserverPort.onDepositRejected(depositId);
     }
 
     @Override
@@ -593,5 +594,6 @@ public class AccountingService implements AccountingFacadePort {
                         statement -> fund(statement.account().id(), transaction),
                         () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
                 );
+        depositObserverPort.onDepositApproved(depositId);
     }
 }

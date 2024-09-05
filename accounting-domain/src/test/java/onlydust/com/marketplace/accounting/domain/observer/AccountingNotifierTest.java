@@ -48,6 +48,8 @@ public class AccountingNotifierTest {
     NotificationPort notificationPort;
     EmailStoragePort emailStoragePort;
     ProjectServicePort projectServicePort;
+    DepositStoragePort depositStoragePort;
+    AccountingSponsorStoragePort accountingSponsorStoragePort;
     final Faker faker = new Faker();
 
     @BeforeEach
@@ -58,8 +60,9 @@ public class AccountingNotifierTest {
         notificationPort = mock(NotificationPort.class);
         emailStoragePort = mock(EmailStoragePort.class);
         projectServicePort = mock(ProjectServicePort.class);
+        depositStoragePort = mock(DepositStoragePort.class);
         accountingNotifier = new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort,
-                emailStoragePort, projectServicePort);
+                emailStoragePort, projectServicePort, depositStoragePort);
     }
 
     @Nested

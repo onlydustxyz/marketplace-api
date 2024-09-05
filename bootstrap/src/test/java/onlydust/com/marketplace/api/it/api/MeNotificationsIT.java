@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static java.time.ZoneOffset.UTC;
 
 @TagMe
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -128,6 +129,20 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .programId(program.id())
                 .sponsorId(sponsor.id())
                 .build());
+        notificationService.push(hayden.user().getId(), DepositRejected.builder()
+                .amount(BigDecimal.valueOf(30000))
+                .currencyId(CurrencyHelper.STRK.value())
+                .sponsorId(sponsor.id())
+                .timestamp(ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, UTC))
+                .depositId(UUID.fromString("f216c7ad-1875-49a2-a8a8-c65b2d6d0675"))
+                .build());
+        notificationService.push(hayden.user().getId(), DepositApproved.builder()
+                .amount(BigDecimal.valueOf(40000))
+                .currencyId(CurrencyHelper.ETH.value())
+                .sponsorId(sponsor.id())
+                .timestamp(ZonedDateTime.of(2023, 3, 2, 0, 0, 0, 0, UTC))
+                .depositId(UUID.fromString("a216c7ad-1875-49a2-a8a8-c65b2d6d06aa"))
+                .build());
 
         // When
         client.get()
@@ -138,22 +153,24 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.programLeadFundsUnallocatedFromProgram.program" +
+                .jsonPath("$.notifications[?(@.type == 'SPONSOR_LEAD_DEPOSIT_APPROVED')].data.sponsorLeadDepositApproved.sponsor.id").isEqualTo(sponsor.id().toString())
+                .jsonPath("$.notifications[?(@.type == 'SPONSOR_LEAD_DEPOSIT_REJECTED')].data.sponsorLeadDepositRejected.sponsor.id").isEqualTo(sponsor.id().toString())
+                .jsonPath("$.notifications[?(@.type == 'SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.sponsorLeadFundsUnallocatedFromProgram.program" +
                           ".id").isEqualTo(program.id().toString())
-                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.programLeadFundsUnallocatedFromProgram.sponsor" +
+                .jsonPath("$.notifications[?(@.type == 'SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM')].data.sponsorLeadFundsUnallocatedFromProgram.sponsor" +
                           ".id").isEqualTo(sponsor.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.program.id").isEqualTo(program.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.sponsor.id").isEqualTo(sponsor.id().toString())
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 13,
+                          "totalItemNumber": 15,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
                             {
                               "status": "UNREAD",
-                              "type": "PROGRAM_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM",
+                              "type": "SPONSOR_LEAD_DEPOSIT_APPROVED",
                               "data": {
                                 "maintainerApplicationToReview": null,
                                 "maintainerCommitteeApplicationCreated": null,
@@ -168,10 +185,64 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": {
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": {
+                                  "amount": 40000,
+                                  "currencyCode": "ETH",
+                                  "timestamp": "2023-03-02T00:00:00Z"
+                                },
+                                "sponsorLeadDepositRejected": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "SPONSOR_LEAD_DEPOSIT_REJECTED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": {
+                                  "amount": 30000,
+                                  "currencyCode": "STRK",
+                                  "timestamp": "2021-01-01T00:00:00Z"
+                                }
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "sponsorLeadFundsUnallocatedFromProgram": {
                                   "amount": 99,
                                   "currencyCode": "STRK"
-                                }
+                                },
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -194,7 +265,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "amount": 100,
                                   "currencyCode": "USDC"
                                 },
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -219,7 +292,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -244,7 +319,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -268,7 +345,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 },
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -291,7 +370,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                   "billingProfileName": "bpHaydenClosed"
                                 },
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -316,7 +397,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -339,7 +422,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -366,7 +451,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -391,7 +478,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -415,7 +504,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -442,7 +533,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -465,7 +558,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             }
                           ]
@@ -484,10 +579,66 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 3,
+                          "totalItemNumber": 5,
                           "hasMore": false,
                           "nextPageIndex": 1,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARD_RECEIVED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-22.2-USDC",
+                                  "amount": 22.2,
+                                  "currencyCode": "USDC",
+                                  "sentByGithubLogin": "projectLead1",
+                                  "contributionCount": 3
+                                },
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
+                              }
+                            },
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARD_CANCELED",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": {
+                                  "rewardId": "f216c7ad-1875-49a2-a8a8-c65b2d6d0675",
+                                  "projectName": "project-11.1-USD",
+                                  "amount": 11.1,
+                                  "currencyCode": "USD"
+                                },
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_INVOICE_REJECTED",
@@ -509,7 +660,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -536,7 +689,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             },
                             {
@@ -559,7 +714,9 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                                 "globalBillingProfileVerificationRejected": null,
                                 "globalBillingProfileVerificationClosed": null,
                                 "programLeadFundsAllocatedToProgram": null,
-                                "programLeadFundsUnallocatedFromProgram": null
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
                               }
                             }
                           ]
@@ -598,7 +755,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 13
+                              "count": 15
                             }
                         """);
 
@@ -613,7 +770,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 13
+                              "count": 15
                             }
                         """);
 

@@ -6,9 +6,7 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Committee;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.FundsAllocatedToProgram;
-import onlydust.com.marketplace.project.domain.model.notification.FundsUnallocatedFromProgram;
+import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProgramObserverPort;
 import onlydust.com.marketplace.project.domain.port.output.CommitteeStoragePort;
@@ -18,6 +16,7 @@ import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
@@ -55,15 +54,45 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
     }
 
     @Override
-    public void onFundsRefundedByProgram(@NonNull ProgramId programId, @NonNull SponsorId sponsorId, @NonNull BigDecimal value, UUID value1) {
+    public void onFundsRefundedByProgram(@NonNull ProgramId programId, @NonNull SponsorId sponsorId, @NonNull BigDecimal amount, @NonNull UUID currencyId) {
         final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
 
         sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
                 FundsUnallocatedFromProgram.builder()
                         .sponsorId(sponsorId)
                         .programId(programId)
-                        .amount(value)
-                        .currencyId(value1)
+                        .amount(amount)
+                        .currencyId(currencyId)
+                        .build()));
+    }
+
+    @Override
+    public void onDepositRejected(@NonNull UUID depositId, @NonNull SponsorId sponsorId, @NonNull BigDecimal amount, @NonNull UUID currencyId,
+                                  @NonNull ZonedDateTime timestamp) {
+        final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
+
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+                DepositRejected.builder()
+                        .depositId(depositId)
+                        .sponsorId(sponsorId)
+                        .amount(amount)
+                        .currencyId(currencyId)
+                        .timestamp(timestamp)
+                        .build()));
+    }
+
+    @Override
+    public void onDepositApproved(@NonNull UUID depositId, @NonNull SponsorId sponsorId, @NonNull BigDecimal amount, @NonNull UUID currencyId,
+                                  @NonNull ZonedDateTime timestamp) {
+        final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
+
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+                DepositApproved.builder()
+                        .depositId(depositId)
+                        .sponsorId(sponsorId)
+                        .amount(amount)
+                        .currencyId(currencyId)
+                        .timestamp(timestamp)
                         .build()));
     }
 }

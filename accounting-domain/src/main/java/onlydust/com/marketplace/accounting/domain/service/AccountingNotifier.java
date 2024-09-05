@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.events.BillingProfileVerificationUpdated;
-import onlydust.com.marketplace.accounting.domain.model.Currency;
-import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
+import onlydust.com.marketplace.accounting.domain.model.*;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
@@ -25,13 +22,14 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @Slf4j
 @AllArgsConstructor
-public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort {
+public class AccountingNotifier implements AccountingObserverPort, BillingProfileObserverPort, DepositObserverPort {
     private final BillingProfileStoragePort billingProfileStoragePort;
     private final AccountingRewardStoragePort accountingRewardStoragePort;
     private final InvoiceStoragePort invoiceStoragePort;
     private final NotificationPort notificationPort;
     private final EmailStoragePort emailStoragePort;
     private final ProjectServicePort projectServicePort;
+    private final DepositStoragePort depositStoragePort;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -196,5 +194,28 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     @Override
     public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
         emailStoragePort.send(billingProfileChildrenKycVerification.individualKycIdentity().email(), billingProfileChildrenKycVerification);
+    }
+
+    @Override
+    public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
+
+    }
+
+    @Override
+    public void onDepositRejected(Deposit.Id depositId) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
+
+        projectServicePort.onDepositRejected(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
+                deposit.transaction().timestamp());
+    }
+
+    @Override
+    public void onDepositApproved(Deposit.Id depositId) {
+        final var deposit = depositStoragePort.find(depositId)
+                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
+
+        projectServicePort.onDepositApproved(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
+                deposit.transaction().timestamp());
     }
 }

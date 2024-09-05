@@ -5,6 +5,9 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
+import onlydust.com.marketplace.kernel.port.output.NotificationPort;
+import onlydust.com.marketplace.project.domain.model.notification.DepositApproved;
+import onlydust.com.marketplace.project.domain.model.notification.DepositRejected;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +28,7 @@ import static onlydust.com.marketplace.accounting.domain.model.Deposit.Status.*;
 import static onlydust.com.marketplace.accounting.domain.model.Network.*;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 @TagBO
@@ -34,6 +37,9 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     @Autowired
     private ImageStoragePort imageStoragePort;
+
+    @Autowired
+    private NotificationPort notificationPort;
 
     UserAuthHelper.AuthenticatedBackofficeUser pierre;
 
@@ -794,18 +800,19 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                         """);
 
     }
-    
+
     @Test
     @Order(8)
     void should_reject_deposit() {
         // Given
         final String jwt = pierre.jwt();
-        final var sponsorId = SponsorId.of("0980c5ab-befc-4314-acab-777fbf970cbb");
+        final var sponsorId = sponsorHelper.create(userAuthHelper.authenticateAntho()).id();
         final var depositId = depositHelper.create(sponsorId, ETHEREUM, USDC, TEN, PENDING);
 
         // When
+        reset(notificationPort);
         client.put()
-                .uri(getApiURI(DEPOSIT.formatted(depositId), Map.of("pageIndex", "0", "pageSize", "100")))
+                .uri(getApiURI(DEPOSIT.formatted(depositId)))
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
@@ -817,6 +824,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+        verify(notificationPort).push(any(), any(DepositRejected.class));
 
         // When
         client.get()
@@ -828,6 +836,45 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.deposits[?(@.id=='%s')].status".formatted(depositId)).isEqualTo("REJECTED")
+        ;
+
+    }
+
+    @Test
+    @Order(9)
+    void should_approve_deposit() {
+        // Given
+        final String jwt = pierre.jwt();
+        final var sponsorId = sponsorHelper.create(userAuthHelper.authenticateAntho()).id();
+        final var depositId = depositHelper.create(sponsorId, ETHEREUM, USDC, TEN, PENDING);
+
+        // When
+        reset(notificationPort);
+        client.put()
+                .uri(getApiURI(DEPOSIT.formatted(depositId)))
+                .header("Authorization", "Bearer " + jwt)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                        {
+                          "status": "COMPLETED"
+                        }
+                        """)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isNoContent();
+        verify(notificationPort).push(any(), any(DepositApproved.class));
+
+        // When
+        client.get()
+                .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsorId), Map.of("pageIndex", "0", "pageSize", "100")))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.deposits[?(@.id=='%s')].status".formatted(depositId)).isEqualTo("COMPLETED")
         ;
 
     }
