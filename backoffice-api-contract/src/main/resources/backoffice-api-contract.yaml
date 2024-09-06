@@ -2992,9 +2992,13 @@ components:
         - $ref: '#/components/schemas/SponsorResponse'
         - type: object
           required:
+            - pendingDepositCount
             - availableBudgets
             - programs
+            - leads
           properties:
+            pendingDepositCount:
+              type: integer
             availableBudgets:
               type: array
               items:

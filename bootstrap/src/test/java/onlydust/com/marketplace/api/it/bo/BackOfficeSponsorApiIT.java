@@ -543,6 +543,16 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                           ]
                         }
                         """);
+
+        client.get()
+                .uri(getApiURI(GET_SPONSOR.formatted("0980c5ab-befc-4314-acab-777fbf970cbb")))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .jsonPath("$.pendingDepositCount").isEqualTo(2);
     }
 
     @Test
