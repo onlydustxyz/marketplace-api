@@ -257,8 +257,111 @@ offset 90 limit 10;
 
 
 
+create materialized view poc.project_ungrouped_data as
+select c.project_id                                                            as project_id,
+       c.timestamp                                                             as timestamp,
+       NULL::numeric                                                           as total_granted_usd,
+       count(distinct c.contribution_id)                                       as contribution_count,
+       NULL::bigint                                                            as reward_count,
+       NULL::numeric                                                           as total_rewarded_usd,
+       NULL::numeric                                                           as avg_rewarded_usd,
+       count(distinct contribution_id) filter ( where c.is_merged_pr is true ) as merged_pr_count,
+       NULL::bigint                                                            as active_contributor_count,
+       NULL::bigint                                                            as onboarded_contributor_count
+from poc.contributions c
+group by c.project_id, c.timestamp
+
+union
+
+select r.project_id                                 as project_id,
+       r.timestamp                                  as timestamp,
+       NULL::numeric                                as total_granted_usd,
+       NULL                                         as contribution_count,
+       count(distinct r.reward_id)                  as reward_count,
+       dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd,
+       avg(r.amount_usd)                            as avg_rewarded_usd,
+       NULL                                         as merged_pr_count,
+       NULL                                         as active_contributor_count,
+       NULL                                         as onboarded_contributor_count
+from poc.rewards r
+group by r.project_id, r.timestamp
+
+union
+
+select pg.project_id      as project_id,
+       pg.day_timestamp   as timestamp,
+       sum(pg.usd_amount) as total_granted_usd,
+       NULL               as contribution_count,
+       NULL               as reward_count,
+       NULL               as total_rewarded_usd,
+       NULL               as avg_rewarded_usd,
+       NULL               as merged_pr_count,
+       NULL               as active_contributor_count,
+       NULL               as onboarded_contributor_count
+from poc.project_grants pg
+group by pg.project_id, pg.day_timestamp
+
+union
+
+select pc.project_id                                                 as project_id,
+       pc.day_timestamp                                              as timestamp,
+       NULL                                                          as total_granted_usd,
+       NULL                                                          as contribution_count,
+       NULL                                                          as reward_count,
+       NULL                                                          as total_rewarded_usd,
+       NULL                                                          as avg_rewarded_usd,
+       NULL                                                          as merged_pr_count,
+       count(distinct pc.contributor_id)                             as active_contributor_count,
+       count(distinct pc.contributor_id)
+       filter ( where pc.is_first_contribution_on_onlydust is true ) as onboarded_contributor_count
+from poc.project_contributors pc
+group by pc.project_id, pc.day_timestamp;
+
+create index on poc.project_ungrouped_data (project_id);
+create index on poc.project_ungrouped_data (timestamp);
+
+
 SELECT ungrouped.project_id,
-       ungrouped.week                                                                    as week,
+       sum(ungrouped.total_granted_usd) - sum(ungrouped.total_rewarded_usd)              as available_budget,
+       sum(ungrouped.total_granted_usd) / greatest(sum(ungrouped.total_rewarded_usd), 1) as percent_budget_utilized,
+       sum(ungrouped.total_granted_usd)                                                  as total_granted_usd,
+       sum(ungrouped.contribution_count)                                                 as contribution_count,
+       sum(ungrouped.reward_count)                                                       as reward_count,
+       sum(ungrouped.total_rewarded_usd)                                                 as total_rewarded_usd,
+       avg(ungrouped.avg_rewarded_usd)                                                   as avg_rewarded_usd,
+       sum(ungrouped.merged_pr_count)                                                    as merged_pr_count,
+       sum(ungrouped.active_contributor_count)                                           as active_contributor_count,
+       sum(ungrouped.onboarded_contributor_count)                                        as onboarded_contributor_count
+from poc.project_ungrouped_data ungrouped
+where ungrouped.timestamp > '2020-01-01'
+  and ungrouped.timestamp < '2025-01-02'
+group by ungrouped.project_id
+offset 100 limit 20;
+
+
+SELECT ungrouped.project_id,
+       date_trunc('week', ungrouped.timestamp)                                           as week,
+       sum(ungrouped.total_granted_usd) - sum(ungrouped.total_rewarded_usd)              as available_budget,
+       sum(ungrouped.total_granted_usd) / greatest(sum(ungrouped.total_rewarded_usd), 1) as percent_budget_utilized,
+       sum(ungrouped.total_granted_usd)                                                  as total_granted_usd,
+       sum(ungrouped.contribution_count)                                                 as contribution_count,
+       sum(ungrouped.reward_count)                                                       as reward_count,
+       sum(ungrouped.total_rewarded_usd)                                                 as total_rewarded_usd,
+       avg(ungrouped.avg_rewarded_usd)                                                   as avg_rewarded_usd,
+       sum(ungrouped.merged_pr_count)                                                    as merged_pr_count,
+       sum(ungrouped.active_contributor_count)                                           as active_contributor_count,
+       sum(ungrouped.onboarded_contributor_count)                                        as onboarded_contributor_count
+from poc.project_ungrouped_data ungrouped
+where ungrouped.timestamp > '2020-01-01'
+  and ungrouped.timestamp < '2025-01-02'
+group by ungrouped.project_id, date_trunc('week', ungrouped.timestamp);
+
+
+
+drop view poc.project_data;
+create materialized view poc.project_data as
+SELECT ungrouped.project_id,
+       ungrouped.day_timestamp                                                           as day_timestamp,
        sum(ungrouped.total_granted_usd) - sum(ungrouped.total_rewarded_usd)              as available_budget,
        sum(ungrouped.total_granted_usd) / greatest(sum(ungrouped.total_rewarded_usd), 1) as percent_budget_utilized,
        sum(ungrouped.total_granted_usd)                                                  as total_granted_usd,
@@ -270,87 +373,55 @@ SELECT ungrouped.project_id,
        sum(ungrouped.active_contributor_count)                                           as active_contributor_count,
        sum(ungrouped.onboarded_contributor_count)                                        as onboarded_contributor_count
 FROM (select c.project_id                                                            as project_id,
-             date_trunc('week', c.timestamp)                                         as week,
+             date_trunc('day', c.timestamp)                                          as day_timestamp,
              NULL::numeric                                                           as total_granted_usd,
-             NULL::uuid[]                                                            as programs,
-             array_agg(distinct c.project_category_id)                               as categories,
-             array_agg(distinct c.language_id)                                       as languages,
-             array_agg(distinct c.ecosystem_id)                                      as ecosystems,
              count(distinct c.contribution_id)                                       as contribution_count,
              NULL::bigint                                                            as reward_count,
-             NULL::uuid[]                                                            as rewards,
              NULL::numeric                                                           as total_rewarded_usd,
              NULL::numeric                                                           as avg_rewarded_usd,
              count(distinct contribution_id) filter ( where c.is_merged_pr is true ) as merged_pr_count,
              NULL::bigint                                                            as active_contributor_count,
              NULL::bigint                                                            as onboarded_contributor_count
       from poc.contributions c
-
-      where c.timestamp > '2020-01-01'
-        and c.timestamp < '2025-01-02'
-      group by c.project_id, date_trunc('week', c.timestamp)
-      having count(distinct c.contribution_id) > 0
+      group by c.project_id, date_trunc('day', c.timestamp)
 
       union
 
       select r.project_id                                 as project_id,
-             date_trunc('week', r.timestamp)              as week,
+             date_trunc('day', r.timestamp)               as day_timestamp,
              NULL::numeric                                as total_granted_usd,
-             NULL::uuid[]                                 as programs,
-             array_agg(distinct r.project_category_id)    as categories,
-             array_agg(distinct r.language_id)            as languages,
-             array_agg(distinct r.ecosystem_id)           as ecosystems,
              NULL                                         as contribution_count,
              count(distinct r.reward_id)                  as reward_count,
-             array_agg(distinct r.reward_id)              as rewards,
              dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd,
              avg(r.amount_usd)                            as avg_rewarded_usd,
              NULL                                         as merged_pr_count,
              NULL                                         as active_contributor_count,
              NULL                                         as onboarded_contributor_count
       from poc.rewards r
-
-      where r.timestamp > '2020-01-01'
-        and r.timestamp < '2025-01-02'
---and c.language_id = 'be7711c1-4373-4864-b503-78ed84af8d3d'
-      group by r.project_id, date_trunc('week', r.timestamp)
-      having dist_sum(distinct r.reward_id, r.amount_usd) > 0
+      group by r.project_id, date_trunc('day', r.timestamp)
 
       union
 
-      select pg.project_id                        as project_id,
-             date_trunc('week', pg.day_timestamp) as week,
-             sum(pg.usd_amount)                   as total_granted_usd,
-             array_agg(pg.program_id)             as programs,
-             NULL                                 as categories,
-             NULL                                 as languages,
-             NULL                                 as ecosystems,
-             NULL                                 as contribution_count,
-             NULL                                 as reward_count,
-             NULL                                 as rewards,
-             NULL                                 as total_rewarded_usd,
-             NULL                                 as avg_rewarded_usd,
-             NULL                                 as merged_pr_count,
-             NULL                                 as active_contributor_count,
-             NULL                                 as onboarded_contributor_count
+      select pg.project_id                       as project_id,
+             date_trunc('day', pg.day_timestamp) as day_timestamp,
+             sum(pg.usd_amount)                  as total_granted_usd,
+             NULL                                as contribution_count,
+             NULL                                as reward_count,
+             NULL                                as total_rewarded_usd,
+             NULL                                as avg_rewarded_usd,
+             NULL                                as merged_pr_count,
+             NULL                                as active_contributor_count,
+             NULL                                as onboarded_contributor_count
       from poc.project_grants pg
-
-      where pg.day_timestamp > '2020-01-01'
-        and pg.day_timestamp < '2025-01-02'
-      group by pg.project_id, date_trunc('week', pg.day_timestamp)
+      group by pg.project_id, date_trunc('day', pg.day_timestamp)
 
       union
 
       select pc.project_id                                                 as project_id,
-             date_trunc('week', pc.day_timestamp)                          as week,
+             date_trunc('day', pc.day_timestamp)                           as day_timestamp,
              NULL                                                          as total_granted_usd,
-             NULL                                                          as programs,
-             NULL                                                          as categories,
-             NULL                                                          as languages,
-             NULL                                                          as ecosystems,
              NULL                                                          as contribution_count,
              NULL                                                          as reward_count,
-             NULL                                                          as rewards,
              NULL                                                          as total_rewarded_usd,
              NULL                                                          as avg_rewarded_usd,
              NULL                                                          as merged_pr_count,
@@ -358,14 +429,27 @@ FROM (select c.project_id                                                       
              count(distinct pc.contributor_id)
              filter ( where pc.is_first_contribution_on_onlydust is true ) as onboarded_contributor_count
       from poc.project_contributors pc
+      group by pc.project_id, date_trunc('day', pc.day_timestamp)) as ungrouped
 
-      where pc.day_timestamp > '2020-01-01'
-        and pc.day_timestamp < '2025-01-02'
-      group by pc.project_id, date_trunc('week', pc.day_timestamp)) as ungrouped
+group by ungrouped.project_id, ungrouped.day_timestamp;
 
-group by ungrouped.project_id, ungrouped.week
-offset 100 limit 20;
-;
+
+
+select project_id,
+       sum(total_granted_usd) - sum(total_rewarded_usd)              as available_budget,
+       sum(total_granted_usd) / greatest(sum(total_rewarded_usd), 1) as percent_budget_utilized,
+       sum(total_granted_usd)                                        as total_granted_usd,
+       sum(contribution_count)                                       as contribution_count,
+       sum(reward_count)                                             as reward_count,
+       sum(total_rewarded_usd)                                       as total_rewarded_usd,
+       avg(avg_rewarded_usd)                                         as avg_rewarded_usd,
+       sum(merged_pr_count)                                          as merged_pr_count,
+       sum(active_contributor_count)                                 as active_contributor_count,
+       sum(onboarded_contributor_count)                              as onboarded_contributor_count
+from poc.project_data
+where day_timestamp > '2020-01-01'
+  and day_timestamp < '2025-01-02'
+group by project_id;
 
 
 
