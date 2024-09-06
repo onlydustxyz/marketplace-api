@@ -15,6 +15,7 @@ public interface SponsorReadRepository extends Repository<SponsorReadEntity, UUI
             FROM SponsorReadEntity s
             LEFT JOIN FETCH s.statsPerCurrency
             LEFT JOIN FETCH s.leads
+            LEFT JOIN FETCH s.pendingDeposits
             WHERE s.id = :sponsorId
             """)
     Optional<SponsorReadEntity> findById(UUID sponsorId);
@@ -22,7 +23,7 @@ public interface SponsorReadRepository extends Repository<SponsorReadEntity, UUI
     @Query("""
             SELECT s
             FROM SponsorReadEntity s
-            LEFT JOIN FETCH s.programs
+            LEFT JOIN FETCH s.leads
             WHERE :search is null or lower(s.name) LIKE lower(concat('%', cast(:search as String), '%'))
             """)
     Page<SponsorReadEntity> findAllByName(String search, Pageable pageable);

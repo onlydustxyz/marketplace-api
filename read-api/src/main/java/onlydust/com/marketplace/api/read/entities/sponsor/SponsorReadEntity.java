@@ -92,6 +92,7 @@ public class SponsorReadEntity {
                 .name(name)
                 .url(url)
                 .logoUrl(logoUrl)
+                .pendingDepositCount(pendingDeposits.size())
                 .availableBudgets(statsPerCurrency.stream()
                         .map(SponsorStatPerCurrencyReadEntity::toSponsorBudgetResponse)
                         .toList())
