@@ -380,7 +380,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         ));
 
 
-
         githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
                 .withHeader("Authorization", matching("Bearer .*"))
                 .willReturn(aResponse()
@@ -515,29 +514,33 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
                 .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
-                .withRequestBody(matchingJsonPath("model", equalTo("gpt-3.5-turbo")))
+                .withRequestBody(matchingJsonPath("model", equalTo("gpt-4o-2024-08-06")))
                 .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
-                .withRequestBody(matchingJsonPath("temperature", equalTo("0.7")))
+                .withRequestBody(matchingJsonPath("temperature", equalTo("0.0")))
                 .willReturn(okJson("""
                         {
-                          "id": "chatcmpl-9cUTl59knClLSGpf1HmnnP3hyUeYp",
-                          "created": 1718960653,
-                          "model": "gpt-3.5-turbo-0125",
+                          "id": "chatcmpl-A4Npk7YEDyndqpn2WLKqNmBNMBBd0",
+                          "object": "chat.completion",
+                          "created": 1725608292,
+                          "model": "gpt-4o-2024-08-06",
                           "choices": [
                             {
                               "index": 0,
                               "message": {
                                 "role": "assistant",
-                                "content": "true"
+                                "content": "true",
+                                "refusal": null
                               },
+                              "logprobs": null,
                               "finish_reason": "stop"
                             }
                           ],
                           "usage": {
-                            "prompt_tokens": 56,
+                            "prompt_tokens": 208,
                             "completion_tokens": 1,
-                            "total_tokens": 57
-                          }
+                            "total_tokens": 209
+                          },
+                          "system_fingerprint": "fp_8e1177b306"
                         }
                         """)));
 
@@ -657,29 +660,33 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
                 .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
-                .withRequestBody(matchingJsonPath("model", equalTo("gpt-3.5-turbo")))
+                .withRequestBody(matchingJsonPath("model", equalTo("gpt-4o-2024-08-06")))
                 .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
-                .withRequestBody(matchingJsonPath("temperature", equalTo("0.7")))
+                .withRequestBody(matchingJsonPath("temperature", equalTo("0.0")))
                 .willReturn(okJson("""
                         {
-                          "id": "chatcmpl-9cUTl59knClLSGpf1HmnnP3hyUeZz",
-                          "created": 1718960654,
-                          "model": "gpt-3.5-turbo-0125",
+                          "id": "chatcmpl-A4Npk7YEDyndqpn2WLKqNmBNMBBd0",
+                          "object": "chat.completion",
+                          "created": 1725608292,
+                          "model": "gpt-4o-2024-08-06",
                           "choices": [
                             {
                               "index": 0,
                               "message": {
                                 "role": "assistant",
-                                "content": "true"
+                                "content": "true",
+                                "refusal": null
                               },
+                              "logprobs": null,
                               "finish_reason": "stop"
                             }
                           ],
                           "usage": {
-                            "prompt_tokens": 56,
+                            "prompt_tokens": 208,
                             "completion_tokens": 1,
-                            "total_tokens": 57
-                          }
+                            "total_tokens": 209
+                          },
+                          "system_fingerprint": "fp_8e1177b306"
                         }
                         """)));
 
@@ -799,29 +806,33 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
 
         langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
                 .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
-                .withRequestBody(matchingJsonPath("model", equalTo("gpt-3.5-turbo")))
+                .withRequestBody(matchingJsonPath("model", equalTo("gpt-4o-2024-08-06")))
                 .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
-                .withRequestBody(matchingJsonPath("temperature", equalTo("0.7")))
+                .withRequestBody(matchingJsonPath("temperature", equalTo("0.0")))
                 .willReturn(okJson("""
                         {
-                          "id": "chatcmpl-9cUTl59knClLSGpf1HmnnP3hyUeZz",
-                          "created": 1718960654,
-                          "model": "gpt-3.5-turbo-0125",
+                          "id": "chatcmpl-A4Npk7YEDyndqpn2WLKqNmBNMBBd0",
+                          "object": "chat.completion",
+                          "created": 1725608292,
+                          "model": "gpt-4o-2024-08-06",
                           "choices": [
                             {
                               "index": 0,
                               "message": {
                                 "role": "assistant",
-                                "content": "true"
+                                "content": "true",
+                                "refusal": null
                               },
+                              "logprobs": null,
                               "finish_reason": "stop"
                             }
                           ],
                           "usage": {
-                            "prompt_tokens": 56,
+                            "prompt_tokens": 208,
                             "completion_tokens": 1,
-                            "total_tokens": 57
-                          }
+                            "total_tokens": 209
+                          },
+                          "system_fingerprint": "fp_8e1177b306"
                         }
                         """)));
 

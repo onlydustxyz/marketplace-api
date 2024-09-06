@@ -214,3 +214,5 @@ langchain4j:
   open-ai:
     chat-model:
       api-key: ${OPENAI_API_KEY}
+      model-name: "gpt-4o-2024-08-06"
+      temperature: 0
