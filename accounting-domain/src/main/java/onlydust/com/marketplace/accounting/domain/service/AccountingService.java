@@ -90,6 +90,7 @@ public class AccountingService implements AccountingFacadePort {
     public void unallocate(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
         final var sponsorAccountIds = reversed(sponsorAccountStorage.find(to, currencyId)).stream().map(SponsorAccount::id).toList();
         refund(from, sponsorAccountIds, amount, currencyId);
+        accountingObserver.onFundsRefundedByProgram(from, to, amount, currencyId);
     }
 
     private static <T> List<T> reversed(List<T> list) {
@@ -562,6 +563,7 @@ public class AccountingService implements AccountingFacadePort {
         depositStoragePort.save(deposit.toBuilder()
                 .status(Deposit.Status.REJECTED)
                 .build());
+        depositObserverPort.onDepositRejected(depositId);
     }
 
     @Override
@@ -592,5 +594,6 @@ public class AccountingService implements AccountingFacadePort {
                         statement -> fund(statement.account().id(), transaction),
                         () -> createSponsorAccountWithInitialBalance(deposit.sponsorId(), deposit.currency().id(), null, transaction)
                 );
+        depositObserverPort.onDepositApproved(depositId);
     }
 }

@@ -9,10 +9,12 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.SponsorLeadRepos
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,6 +52,14 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
     public Optional<Sponsor> get(SponsorId sponsorId) {
         return sponsorRepository.findById(sponsorId.value())
                 .map(SponsorEntity::toDomain);
+    }
+
+    @Override
+    public List<UserId> findSponsorLeads(SponsorId sponsorId) {
+        return sponsorLeadRepository.findBySponsorId(sponsorId.value()).stream()
+                .map(SponsorLeadEntity::getUserId)
+                .map(UserId::of)
+                .toList();
     }
 
     @Override

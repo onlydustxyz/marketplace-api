@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.SponsorLeadEnt
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,4 +19,6 @@ public interface SponsorLeadRepository extends JpaRepository<SponsorLeadEntity, 
             where s.user_id = :userId
             """, nativeQuery = true)
     Optional<SponsorLeadEntity> findByUserIdAndProgramId(UUID userId, UUID programId);
+
+    List<SponsorLeadEntity> findBySponsorId(UUID sponsorId);
 }

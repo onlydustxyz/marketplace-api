@@ -25,4 +25,6 @@ public interface AccountingObserverPort {
     void onBillingProfileDeleted(BillingProfile.Id billingProfileId);
 
     void onFundsAllocatedToProgram(final SponsorId from, final ProgramId to, final PositiveAmount amount, final Currency.Id currencyId);
+
+    void onFundsRefundedByProgram(final ProgramId from, final SponsorId to, final PositiveAmount amount, final Currency.Id currencyId);
 }

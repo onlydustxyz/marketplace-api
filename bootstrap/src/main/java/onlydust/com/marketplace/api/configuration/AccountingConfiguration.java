@@ -45,12 +45,12 @@ public class AccountingConfiguration {
                                                      final @NonNull TransactionStoragePort transactionStoragePort,
                                                      final @NonNull PermissionPort permissionPort,
                                                      final @NonNull OnlyDustWallets onlyDustWallets,
-                                                     final @NonNull DepositObserverPort depositObserverPort,
+                                                     final @NonNull DepositObserverPort depositObservers,
                                                      final @NonNull AccountingSponsorStoragePort accountingSponsorStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
                 invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort,
-                onlyDustWallets, depositObserverPort, accountingSponsorStoragePort);
+                onlyDustWallets, depositObservers, accountingSponsorStoragePort);
     }
 
     @Bean
@@ -81,14 +81,15 @@ public class AccountingConfiguration {
     }
 
     @Bean
-    public AccountingNotifier accountingMailNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
-                                                     final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
-                                                     final @NonNull InvoiceStoragePort invoiceStoragePort,
-                                                     final @NonNull NotificationPort notificationPort,
-                                                     final @NonNull EmailStoragePort emailStoragePort,
-                                                     final @NonNull ProjectServicePort projectServicePort) {
+    public AccountingNotifier accountingNotifier(final @NonNull BillingProfileStoragePort billingProfileStoragePort,
+                                                 final @NonNull AccountingRewardStoragePort accountingRewardStoragePort,
+                                                 final @NonNull InvoiceStoragePort invoiceStoragePort,
+                                                 final @NonNull NotificationPort notificationPort,
+                                                 final @NonNull EmailStoragePort emailStoragePort,
+                                                 final @NonNull ProjectServicePort projectServicePort,
+                                                 final @NonNull DepositStoragePort depositStoragePort) {
         return new AccountingNotifier(billingProfileStoragePort, accountingRewardStoragePort, invoiceStoragePort, notificationPort, emailStoragePort,
-                projectServicePort);
+                projectServicePort, depositStoragePort);
     }
 
     @Bean
@@ -191,5 +192,10 @@ public class AccountingConfiguration {
     @ConfigurationProperties(value = "application.onlydust-wallets", ignoreUnknownFields = false)
     public OnlyDustWallets onlyDustWallets() {
         return new OnlyDustWallets();
+    }
+
+    @Bean
+    public DepositObserverPort depositObservers(SlackApiAdapter slackApiAdapter, AccountingNotifier accountingNotifier) {
+        return new DepositObserverComposite(slackApiAdapter, accountingNotifier);
     }
 }

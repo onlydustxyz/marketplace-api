@@ -137,4 +137,14 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
                 DepositSubmittedOnSponsorMapper.mapToSlackBlock(user, sponsor, deposit, slackProperties.getEnvironment())
         );
     }
+
+    @Override
+    public void onDepositRejected(Deposit.Id depositId) {
+        
+    }
+
+    @Override
+    public void onDepositApproved(Deposit.Id depositId) {
+
+    }
 }

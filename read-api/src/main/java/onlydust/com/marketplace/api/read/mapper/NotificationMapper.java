@@ -55,6 +55,12 @@ public class NotificationMapper {
             notificationType = map(completeYourBillingProfile, responseData);
         } else if (notification instanceof FundsAllocatedToProgram fundsAllocatedToProgram) {
             notificationType = map(fundsAllocatedToProgram, responseData);
+        } else if (notification instanceof FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
+            notificationType = map(fundsUnallocatedFromProgram, responseData);
+        } else if (notification instanceof DepositRejected depositRejected) {
+            notificationType = map(depositRejected, responseData);
+        } else if (notification instanceof DepositApproved depositApproved) {
+            notificationType = map(depositApproved, responseData);
         } else {
             throw internalServerError("Unknown notification data type %s".formatted(notification.getClass().getSimpleName()));
         }
@@ -65,6 +71,62 @@ public class NotificationMapper {
                 .status(Boolean.TRUE.equals(entity.isRead()) ? NotificationStatus.READ : NotificationStatus.UNREAD)
                 .timestamp(entity.getCreatedAt())
                 .data(responseData);
+    }
+
+    private @NotNull NotificationType map(DepositRejected depositRejected,
+                                          NotificationPageItemResponseData notificationPageItemResponseData) {
+        NotificationType notificationType;
+        notificationType = NotificationType.SPONSOR_LEAD_DEPOSIT_REJECTED;
+        final var sponsor = sponsorReadRepository.findById(depositRejected.sponsorId().value())
+                .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(depositRejected.sponsorId())));
+        final var currency = currencyReadRepository.findById(depositRejected.currencyId())
+                .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(depositRejected.currencyId())));
+
+        notificationPageItemResponseData.setSponsorLeadDepositRejected(new NotificationSponsorLeadDepositRejected(
+                sponsor.toLinkResponse(),
+                depositRejected.amount(),
+                currency.code(),
+                depositRejected.timestamp()
+        ));
+        return notificationType;
+    }
+
+    private @NotNull NotificationType map(DepositApproved depositApproved,
+                                          NotificationPageItemResponseData notificationPageItemResponseData) {
+        NotificationType notificationType;
+        notificationType = NotificationType.SPONSOR_LEAD_DEPOSIT_APPROVED;
+        final var sponsor = sponsorReadRepository.findById(depositApproved.sponsorId().value())
+                .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(depositApproved.sponsorId())));
+        final var currency = currencyReadRepository.findById(depositApproved.currencyId())
+                .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(depositApproved.currencyId())));
+
+        notificationPageItemResponseData.setSponsorLeadDepositApproved(new NotificationSponsorLeadDepositApproved(
+                sponsor.toLinkResponse(),
+                depositApproved.amount(),
+                currency.code(),
+                depositApproved.timestamp()
+        ));
+        return notificationType;
+    }
+
+    private @NotNull NotificationType map(FundsUnallocatedFromProgram fundsUnallocatedFromProgram,
+                                          NotificationPageItemResponseData notificationPageItemResponseData) {
+        NotificationType notificationType;
+        notificationType = NotificationType.SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM;
+        final var sponsor = sponsorReadRepository.findById(fundsUnallocatedFromProgram.sponsorId().value())
+                .orElseThrow(() -> internalServerError("Sponsor %s doesn't exist".formatted(fundsUnallocatedFromProgram.sponsorId())));
+        final var program = programReadRepository.findById(fundsUnallocatedFromProgram.programId().value())
+                .orElseThrow(() -> internalServerError("Program %s doesn't exist".formatted(fundsUnallocatedFromProgram.programId())));
+        final var currency = currencyReadRepository.findById(fundsUnallocatedFromProgram.currencyId())
+                .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(fundsUnallocatedFromProgram.currencyId())));
+
+        notificationPageItemResponseData.setSponsorLeadFundsUnallocatedFromProgram(new NotificationSponsorLeadFundsUnallocatedFromProgram(
+                program.toLinkResponse(),
+                sponsor.toLinkResponse(),
+                fundsUnallocatedFromProgram.amount(),
+                currency.code()
+        ));
+        return notificationType;
     }
 
     private @NotNull NotificationType map(FundsAllocatedToProgram fundsAllocatedToProgram, NotificationPageItemResponseData notificationPageItemResponseData) {

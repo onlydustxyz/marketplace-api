@@ -10170,6 +10170,12 @@ components:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationClosed'
             programLeadFundsAllocatedToProgram:
               $ref: '#/components/schemas/NotificationProgramLeadFundsAllocatedToProgram'
+            sponsorLeadFundsUnallocatedFromProgram:
+              $ref: '#/components/schemas/NotificationSponsorLeadFundsUnallocatedFromProgram'
+            sponsorLeadDepositApproved:
+              $ref: '#/components/schemas/NotificationSponsorLeadDepositApproved'
+            sponsorLeadDepositRejected:
+              $ref: '#/components/schemas/NotificationSponsorLeadDepositRejected'
 
     NotificationCountResponse:
       type: object
@@ -10201,6 +10207,9 @@ components:
         - GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED
         - GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED
         - PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM
+        - SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM
+        - SPONSOR_LEAD_DEPOSIT_APPROVED
+        - SPONSOR_LEAD_DEPOSIT_REJECTED
 
     NotificationMaintainerApplicationToReview:
       type: object
@@ -10410,3 +10419,42 @@ components:
           type: number
         currencyCode:
           type: string
+
+    NotificationSponsorLeadFundsUnallocatedFromProgram:
+      type: object
+      required:
+        - program
+        - sponsor
+        - amount
+        - currencyCode
+      properties:
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
+        sponsor:
+          $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          type: number
+        currencyCode:
+          type: string
+
+    NotificationSponsorLeadDepositApproved:
+      type: object
+      required:
+        - sponsor
+        - amount
+        - currencyCode
+        - timestamp
+      properties:
+        sponsor:
+          $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          type: number
+        currencyCode:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+    NotificationSponsorLeadDepositRejected:
+      allOf:
+        - $ref: '#/components/schemas/NotificationSponsorLeadDepositApproved'

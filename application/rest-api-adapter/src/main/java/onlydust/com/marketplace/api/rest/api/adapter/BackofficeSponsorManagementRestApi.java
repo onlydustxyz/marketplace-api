@@ -49,7 +49,7 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
     public ResponseEntity<Void> updateDeposit(UUID depositId, DepositUpdateRequest request) {
         switch (request.getStatus()) {
             case PENDING -> throw badRequest("Cannot update deposit to PENDING status");
-            case COMPLETED -> throw badRequest("Not implemented");
+            case COMPLETED -> accountingFacadePort.approveDeposit(Deposit.Id.of(depositId));
             case REJECTED -> accountingFacadePort.rejectDeposit(Deposit.Id.of(depositId));
         }
 

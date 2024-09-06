@@ -5,4 +5,8 @@ import onlydust.com.marketplace.kernel.model.UserId;
 
 public interface DepositObserverPort {
     void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId);
+
+    void onDepositRejected(Deposit.Id depositId);
+
+    void onDepositApproved(Deposit.Id depositId);
 }
