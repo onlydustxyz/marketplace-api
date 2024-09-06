@@ -40,7 +40,8 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                                   count(*) filter ( where tx.project_id is null )                                                                  as transaction_count
                            from accounting.all_transactions tx
                                     left join programs pgm on pgm.id = tx.program_id
-                           where (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
+                           where tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND') and
+                               (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
                              and (coalesce(:types) is null or (
                                ('DEPOSITED' in (:types) and tx.type = 'DEPOSIT' and tx.deposit_status = 'COMPLETED') or
                                ('ALLOCATED' in (:types) and tx.type = 'TRANSFER' and tx.program_id is not null and project_id is null) or
