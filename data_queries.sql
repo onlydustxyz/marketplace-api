@@ -292,6 +292,79 @@ group by ungrouped.project_id, date_trunc('week', ungrouped.timestamp);
 
 
 
+drop materialized view poc.contributor_ungrouped_data;
+create materialized view poc.contributor_ungrouped_data as
+select c.contributor_id                                                        as contributor_id,
+       c.timestamp                                                             as timestamp,
+       NULL::numeric                                                           as total_granted_usd,
+       count(distinct c.contribution_id)                                       as contribution_count,
+       NULL::bigint                                                            as reward_count,
+       NULL::numeric                                                           as total_rewarded_usd,
+       NULL::numeric                                                           as avg_rewarded_usd,
+       count(distinct contribution_id) filter ( where c.is_merged_pr is true ) as merged_pr_count,
+       NULL::bigint                                                            as active_contributor_count,
+       NULL::bigint                                                            as onboarded_contributor_count
+from poc.contributions c
+group by c.contributor_id, c.timestamp
+
+union
+
+select r.contributor_id                             as contributor_id,
+       r.timestamp                                  as timestamp,
+       NULL::numeric                                as total_granted_usd,
+       NULL                                         as contribution_count,
+       count(distinct r.reward_id)                  as reward_count,
+       dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd,
+       avg(r.amount_usd)                            as avg_rewarded_usd,
+       NULL                                         as merged_pr_count,
+       NULL                                         as active_contributor_count,
+       NULL                                         as onboarded_contributor_count
+from poc.rewards r
+group by r.contributor_id, r.timestamp;
+
+
+create index on poc.contributor_ungrouped_data (contributor_id);
+create index on poc.contributor_ungrouped_data (timestamp);
+
+
+
+SELECT ungrouped.contributor_id,
+       sum(ungrouped.total_granted_usd) - sum(ungrouped.total_rewarded_usd)              as available_budget,
+       sum(ungrouped.total_granted_usd) / greatest(sum(ungrouped.total_rewarded_usd), 1) as percent_budget_utilized,
+       sum(ungrouped.total_granted_usd)                                                  as total_granted_usd,
+       sum(ungrouped.contribution_count)                                                 as contribution_count,
+       sum(ungrouped.reward_count)                                                       as reward_count,
+       sum(ungrouped.total_rewarded_usd)                                                 as total_rewarded_usd,
+       avg(ungrouped.avg_rewarded_usd)                                                   as avg_rewarded_usd,
+       sum(ungrouped.merged_pr_count)                                                    as merged_pr_count,
+       sum(ungrouped.active_contributor_count)                                           as active_contributor_count,
+       sum(ungrouped.onboarded_contributor_count)                                        as onboarded_contributor_count
+from poc.contributor_ungrouped_data ungrouped
+where ungrouped.timestamp > '2020-01-01'
+  and ungrouped.timestamp < '2025-01-02'
+group by ungrouped.contributor_id
+offset 100 limit 20;
+
+
+SELECT ungrouped.contributor_id,
+       date_trunc('week', ungrouped.timestamp)                                           as week,
+       sum(ungrouped.total_granted_usd) - sum(ungrouped.total_rewarded_usd)              as available_budget,
+       sum(ungrouped.total_granted_usd) / greatest(sum(ungrouped.total_rewarded_usd), 1) as percent_budget_utilized,
+       sum(ungrouped.total_granted_usd)                                                  as total_granted_usd,
+       sum(ungrouped.contribution_count)                                                 as contribution_count,
+       sum(ungrouped.reward_count)                                                       as reward_count,
+       sum(ungrouped.total_rewarded_usd)                                                 as total_rewarded_usd,
+       avg(ungrouped.avg_rewarded_usd)                                                   as avg_rewarded_usd,
+       sum(ungrouped.merged_pr_count)                                                    as merged_pr_count,
+       sum(ungrouped.active_contributor_count)                                           as active_contributor_count,
+       sum(ungrouped.onboarded_contributor_count)                                        as onboarded_contributor_count
+from poc.contributor_ungrouped_data ungrouped
+where ungrouped.timestamp > '2020-01-01'
+  and ungrouped.timestamp < '2025-01-02'
+group by ungrouped.contributor_id, date_trunc('week', ungrouped.timestamp);
+
+
+
 select rsd.amount_usd_equivalent
 from rewards r
          join accounting.reward_status_data rsd on rsd.reward_id = r.id
