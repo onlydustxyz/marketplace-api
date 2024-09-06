@@ -3022,6 +3022,12 @@ components:
 
     DepositPageItemResponse:
       type: object
+      required:
+        - id
+        - sponsor
+        - transaction
+        - currency
+        - status
       properties:
         id:
           $ref: '#/components/schemas/DepositId'
