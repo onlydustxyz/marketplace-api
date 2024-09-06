@@ -45,12 +45,12 @@ public class AccountingConfiguration {
                                                      final @NonNull TransactionStoragePort transactionStoragePort,
                                                      final @NonNull PermissionPort permissionPort,
                                                      final @NonNull OnlyDustWallets onlyDustWallets,
-                                                     final @NonNull DepositObserverPort accountingNotifier,
+                                                     final @NonNull DepositObserverPort depositObservers,
                                                      final @NonNull AccountingSponsorStoragePort accountingSponsorStoragePort
     ) {
         return new AccountingService(cachedAccountBookProvider, sponsorAccountStorage, currencyStorage, accountingObserver, projectAccountingObserver,
                 invoiceStoragePort, rewardStatusService, receiptStoragePort, blockchainFacadePort, depositStoragePort, transactionStoragePort, permissionPort,
-                onlyDustWallets, accountingNotifier, accountingSponsorStoragePort);
+                onlyDustWallets, depositObservers, accountingSponsorStoragePort);
     }
 
     @Bean
@@ -192,5 +192,10 @@ public class AccountingConfiguration {
     @ConfigurationProperties(value = "application.onlydust-wallets", ignoreUnknownFields = false)
     public OnlyDustWallets onlyDustWallets() {
         return new OnlyDustWallets();
+    }
+
+    @Bean
+    public DepositObserverPort depositObservers(SlackApiAdapter slackApiAdapter, AccountingNotifier accountingNotifier) {
+        return new DepositObserverComposite(slackApiAdapter, accountingNotifier);
     }
 }
