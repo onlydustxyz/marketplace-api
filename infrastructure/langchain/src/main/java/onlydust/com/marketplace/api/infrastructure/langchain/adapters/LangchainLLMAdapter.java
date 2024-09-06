@@ -19,6 +19,14 @@ public interface LangchainLLMAdapter extends LLMPort {
                - "I want to take it"
                - "On it"
                - "Can I take this one?
+            
+            Example answers :
+            
+            User : Can I take this one?
+            Assistant : TRUE
+            
+            User : I want to know more about this issue.
+            Assistant : FALSE
             """)
     boolean isCommentShowingInterestToContribute(String comment);
 }
