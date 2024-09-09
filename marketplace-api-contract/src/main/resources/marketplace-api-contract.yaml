@@ -14,6 +14,111 @@ servers:
     description: Production
 
 paths:
+  /api/v1/bi/stats/projects:
+    get:
+      tags:
+        - ReadBi
+      summary: Get projects stats for diagram
+      operationId: getBIProjectsStats
+      parameters:
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/timeGroupingParam'
+        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+      responses:
+        "200":
+          description: 'Projects stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiProjectsStatsListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/bi/stats/contributors:
+    get:
+      tags:
+        - ReadBi
+      summary: Get contributors stats for diagram
+      operationId: getBIContributorsStats
+      parameters:
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/timeGroupingParam'
+        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+      responses:
+        "200":
+          description: 'Contributors stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiContributorsStatsListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/bi/projects:
+    get:
+      tags:
+        - ReadBi
+      summary: Get projects BI
+      operationId: getBIProjects
+      parameters:
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/timeGroupingParam'
+        - $ref: '#/components/parameters/projectLeadIdsParam'
+        - $ref: '#/components/parameters/categoryIdsParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/availableBudgetUsdAmountParam'
+        - $ref: '#/components/parameters/percentUsedBudgetParam'
+        - $ref: '#/components/parameters/totalGrantedUsdAmountParam'
+        - $ref: '#/components/parameters/averageRewardUsdAmountParam'
+        - $ref: '#/components/parameters/totalRewardedUsdAmountParam'
+        - $ref: '#/components/parameters/onboardedContributorCountParam'
+        - $ref: '#/components/parameters/activeContributorCountParam'
+        - $ref: '#/components/parameters/mergedPrCountParam'
+        - $ref: '#/components/parameters/rewardCountParam'
+        - $ref: '#/components/parameters/contributionCountParam'
+      responses:
+        "200":
+          description: 'Projects BI page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiProjectsPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/bi/contributors:
+    get:
+      tags:
+        - ReadBi
+      summary: Get contributors BI
+      operationId: getBIContributors
+      parameters:
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/timeGroupingParam'
+        - $ref: '#/components/parameters/contributorTypeParam'
+        - $ref: '#/components/parameters/categoryIdsParam'
+        - $ref: '#/components/parameters/languageIdsParam'
+        - $ref: '#/components/parameters/ecosystemIdsParam'
+        - $ref: '#/components/parameters/countryCodesParam'
+        - $ref: '#/components/parameters/totalRewardedUsdAmountParam'
+        - $ref: '#/components/parameters/contributionCountParam'
+        - $ref: '#/components/parameters/mergedPrCountParam'
+        - $ref: '#/components/parameters/rewardCountParam'
+      responses:
+        "200":
+          description: 'Contributors BI page'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiContributorsPageResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/version:
     get:
       tags:
@@ -4898,6 +5003,184 @@ components:
       in: header
       name: Api-Key
 
+  parameters:
+    fromDateParam:
+      name: fromDate
+      in: query
+      required: true
+      schema:
+        type: string
+        pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+    toDateParam:
+      name: toDate
+      in: query
+      required: true
+      schema:
+        type: string
+        pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+    timeGroupingParam:
+      name: timeGrouping
+      in: query
+      required: true
+      schema:
+        $ref: '#/components/schemas/TimeGroupingEnum'
+    contributorTypeParam:
+      name: contributorType
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/ContributorTypeEnum'
+    projectIdsParam:
+      name: projectIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/ProjectId'
+    projectLeadIdsParam:
+      name: projectLeadIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/UserId'
+    categoryIdsParam:
+      name: categoryIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/ProjectCategoryId'
+    languageIdsParam:
+      name: languageIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/LanguageId'
+    ecosystemIdsParam:
+      name: ecosystemIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/EcosystemId'
+    programOrEcosystemIdsParam:
+      name: programOrEcosystemIds
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: uuid
+    countryCodesParam:
+      name: countryCodes
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          format: iso-country-code
+    contributionCountParam:
+      name: contributionCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    prCountParam:
+      name: prCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    issueCountParam:
+      name: issueCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    codeReviewCountParam:
+      name: codeReviewCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    mergedPrCountParam:
+      name: mergedPrCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    rewardCountParam:
+      name: rewardCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    onboardedContributorCountParam:
+      name: onboardedContributorCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    activeContributorCountParam:
+      name: activeContributorCount
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+    availableBudgetUsdAmountParam:
+      name: availableBudgetUsdAmount
+      in: query
+      required: false
+      example: 'gte,100.0,lte,300.0'
+      schema:
+        $ref: '#/components/schemas/DecimalNumberKpiFilter'
+    totalRewardedUsdAmountParam:
+      name: totalRewardedUsdAmount
+      in: query
+      required: false
+      example: 'gte,100.0,lte,300.0'
+      schema:
+        $ref: '#/components/schemas/DecimalNumberKpiFilter'
+    averageRewardUsdAmountParam:
+      name: averageRewardUsdAmount
+      in: query
+      required: false
+      example: 'gte,100.0,lte,300.0'
+      schema:
+        $ref: '#/components/schemas/DecimalNumberKpiFilter'
+    totalGrantedUsdAmountParam:
+      name: totalGrantedUsdAmount
+      in: query
+      required: false
+      example: 'gte,100.0,lte,300.0'
+      schema:
+        $ref: '#/components/schemas/DecimalNumberKpiFilter'
+    percentUsedBudgetParam:
+      name: percentUsedBudget
+      in: query
+      required: false
+      example: 'gte,100,lte,300'
+      schema:
+        $ref: '#/components/schemas/NumberKpiFilter'
+
+
   responses:
     InternalServerError:
       description: Internal Server Error
@@ -9319,7 +9602,7 @@ components:
 
     NumberKpi:
       type: object
-      description: A KPI that represents a number with its trend compared to last period.
+      description: A KPI that represents an integer with its trend compared to last period.
       required:
         - value
         - trend
@@ -9328,6 +9611,60 @@ components:
           type: integer
         trend:
           $ref: '#/components/schemas/Trend'
+
+    DecimalNumberKpi:
+      type: object
+      description: A KPI that represents a decimal number with its trend compared to last period.
+      required:
+        - value
+        - trend
+      properties:
+        value:
+          type: number
+        trend:
+          $ref: '#/components/schemas/Trend'
+
+    NumberKpiFilter:
+      type: object
+      properties:
+        gte:
+          type: integer
+          description: Greater than or equals
+        eq:
+          type: integer
+          description: equals
+        lte:
+          type: integer
+          description: Lower than or equals
+
+    DecimalNumberKpiFilter:
+      type: object
+      properties:
+        gte:
+          type: number
+          description: Greater than or equals
+        eq:
+          type: number
+          description: equals
+        lte:
+          type: number
+          description: Lower than or equals
+
+    TimeGroupingEnum:
+      type: string
+      enum:
+        - DAY
+        - WEEK
+        - MONTH
+        - QUARTER
+        - YEAR
+
+    ContributorTypeEnum:
+      type: string
+      enum:
+        - MAINTAINER
+        - CONTRIBUTOR
+        - PROGRAM_LEAD
 
     TransactionType:
       type: string
@@ -10458,3 +10795,209 @@ components:
     NotificationSponsorLeadDepositRejected:
       allOf:
         - $ref: '#/components/schemas/NotificationSponsorLeadDepositApproved'
+
+    BiContributorsStatsListResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/BiContributorsStatsListItemResponse'
+
+
+    BiContributorsStatsListItemResponse:
+      type: object
+      required:
+        - totalGranted
+        - totalRewarded
+        - mergedPrCount
+        - newContributorCount
+        - activeContributorCount
+        - reactivatedContributorCount
+        - churnedContributorCount
+      properties:
+        totalGranted:
+          type: number
+        totalRewarded:
+          type: number
+        mergedPrCount:
+          type: integer
+        newContributorCount:
+          type: integer
+        activeContributorCount:
+          type: integer
+        reactivatedContributorCount:
+          type: integer
+        churnedContributorCount:
+          type: integer
+
+    BiProjectsStatsListResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        stats:
+          type: array
+          items:
+            $ref: '#/components/schemas/BiProjectsStatsListItemResponse'
+
+
+    BiProjectsStatsListItemResponse:
+      type: object
+      required:
+        - totalGranted
+        - totalRewarded
+        - mergedPrCount
+        - newProjectCount
+        - activeProjectCount
+        - reactivatedProjectCount
+        - churnedProjectCount
+      properties:
+        totalGranted:
+          type: number
+        totalRewarded:
+          type: number
+        mergedPrCount:
+          type: integer
+        newProjectCount:
+          type: integer
+        activeProjectCount:
+          type: integer
+        reactivatedProjectCount:
+          type: integer
+        churnedProjectCount:
+          type: integer
+
+    BiProjectsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/BiProjectsPageItemResponse'
+
+    BiProjectsPageItemResponse:
+      type: object
+      required:
+        - project
+        - projectLeads
+        - categories
+        - languages
+        - ecosystems
+        - programs
+        - availableBudget
+        - percentUsedBudget
+        - totalGrantedUsdAmount
+        - totalRewardedUsdAmount
+        - averageRewardUsdAmount
+        - onboardedContributorCount
+        - activeContributorCount
+        - mergedPrCount
+        - rewardCount
+        - contributionCount
+      properties:
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
+        projectLeads:
+          type: array
+          items:
+            $ref: '#/components/schemas/RegisteredUserResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemResponse'
+        programs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramLinkResponse'
+        availableBudget:
+          $ref: '#/components/schemas/DetailedTotalMoney'
+        percentUsedBudget:
+          type: number
+        totalGrantedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpi'
+        totalRewardedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpi'
+        averageRewardUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpi'
+        onboardedContributorCount:
+          $ref: '#/components/schemas/NumberKpi'
+        activeContributorCount:
+          $ref: '#/components/schemas/NumberKpi'
+        mergedPrCount:
+          $ref: '#/components/schemas/NumberKpi'
+        rewardCount:
+          $ref: '#/components/schemas/NumberKpi'
+        contributionCount:
+          $ref: '#/components/schemas/NumberKpi'
+
+
+    BiContributorsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - contributors
+          properties:
+            contributors:
+              type: array
+              items:
+                $ref: '#/components/schemas/BiContributorsPageItemResponse'
+
+    BiContributorsPageItemResponse:
+      type: object
+      required:
+        - contributor
+        - projects
+        - categories
+        - languages
+        - ecosystems
+        - countryCode
+        - totalRewardedUsdAmount
+        - mergedPrCount
+        - rewardCount
+        - contributionCount
+      properties:
+        contributor:
+          $ref: '#/components/schemas/ContributorResponse'
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectLinkResponse'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryResponse'
+        languages:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageResponse'
+        ecosystems:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemResponse'
+        countryCode:
+          type: string
+          format: iso-country-code
+        totalRewardedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpi'
+        mergedPrCount:
+          $ref: '#/components/schemas/NumberKpi'
+        rewardCount:
+          $ref: '#/components/schemas/NumberKpi'
+        contributionCount:
+          $ref: '#/components/schemas/NumberKpi'
