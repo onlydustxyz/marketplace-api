@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
@@ -18,12 +19,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Month;
 import java.util.Map;
 import java.util.UUID;
@@ -32,11 +37,17 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.helper.JSONPathAssertion.jsonObjectEquals;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
 @TagAccounting
 public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
+
+    @Autowired
+    ImageStoragePort imageStoragePort;
 
     UserAuthHelper.AuthenticatedUser caller;
 
@@ -338,6 +349,23 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                               "projects": []
                             }
                             """);
+        }
+
+        @Test
+        void should_upload_logo() throws MalformedURLException {
+            when(imageStoragePort.storeImage(any(InputStream.class)))
+                    .thenReturn(new URL("https://s3.amazon.com/logo.jpeg"));
+
+            client.post()
+                    .uri(getApiURI(PROGRAMS_LOGOS))
+                    .header("Authorization", "Bearer " + caller.jwt())
+                    .body(fromResource(new FileSystemResource(getClass().getResource("/images/logo-sample.jpeg").getFile())))
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .jsonPath("$.url").isEqualTo("https://s3.amazon.com/logo.jpeg");
         }
 
         @Nested
