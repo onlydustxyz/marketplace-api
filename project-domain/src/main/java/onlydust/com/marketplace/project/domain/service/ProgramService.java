@@ -5,12 +5,15 @@ import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.port.input.ProgramFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 @AllArgsConstructor
 public class ProgramService implements ProgramFacadePort {
     private final ProgramStoragePort programStoragePort;
+    private final ImageStoragePort imageStoragePort;
 
     @Override
     @Transactional
@@ -39,5 +43,10 @@ public class ProgramService implements ProgramFacadePort {
                 .logoUrl(logoUrl)
                 .leadIds(leadIds)
                 .build());
+    }
+
+    @Override
+    public URL uploadLogo(InputStream imageInputStream) {
+        return imageStoragePort.storeImage(imageInputStream);
     }
 }

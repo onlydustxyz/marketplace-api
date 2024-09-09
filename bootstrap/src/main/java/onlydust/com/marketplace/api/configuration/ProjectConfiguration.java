@@ -433,8 +433,8 @@ public class ProjectConfiguration {
 
 
     @Bean
-    public ProgramFacadePort programFacadePort(final ProgramStoragePort programStoragePort) {
-        return new ProgramService(programStoragePort);
+    public ProgramFacadePort programFacadePort(final ProgramStoragePort programStoragePort, final ImageStoragePort imageStoragePort) {
+        return new ProgramService(programStoragePort, imageStoragePort);
     }
 
     @Bean

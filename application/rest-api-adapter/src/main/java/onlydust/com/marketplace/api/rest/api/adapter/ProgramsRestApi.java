@@ -8,10 +8,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.api.contract.ProgramsApi;
-import onlydust.com.marketplace.api.contract.model.CreateProgramRequest;
-import onlydust.com.marketplace.api.contract.model.CreateProgramResponse;
-import onlydust.com.marketplace.api.contract.model.GrantRequest;
-import onlydust.com.marketplace.api.contract.model.UpdateProgramRequest;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -20,11 +17,15 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.ProgramFacadePort;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.unauthorized;
 import static org.springframework.http.ResponseEntity.noContent;
 import static org.springframework.http.ResponseEntity.ok;
@@ -81,5 +82,19 @@ public class ProgramsRestApi implements ProgramsApi {
                 request.getLeadIds().stream().map(UserId::of).toList());
 
         return noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<UploadImageResponse> uploadProgramLogo(Resource image) {
+        InputStream imageInputStream;
+        try {
+            imageInputStream = image.getInputStream();
+        } catch (IOException e) {
+            throw badRequest("Error while reading image data", e);
+        }
+
+        final var imageUrl = programFacadePort.uploadLogo(imageInputStream);
+
+        return ResponseEntity.ok(new UploadImageResponse().url(imageUrl.toString()));
     }
 }
