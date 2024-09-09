@@ -9,7 +9,7 @@ SELECT c.id                      as contribution_id,
        lfe.language_id           as language_id,
        pe.ecosystem_id           as ecosystem_id,
        merged_prs.id IS NOT NULL as is_merged_pr
-FROM public_contributions c
+FROM completed_contributions c
          LEFT JOIN projects_ecosystems pe ON pe.project_id = ANY (c.project_ids)
 
          CROSS JOIN unnest(c.project_ids) AS projects(id)
@@ -40,7 +40,7 @@ SELECT r.id                      as reward_id,
        pe.ecosystem_id           as ecosystem_id,
        r.amount_usd_equivalent   as amount_usd,
        merged_prs.id IS NOT NULL as is_merged_pr
-FROM public_contributions c
+FROM completed_contributions c
          LEFT JOIN projects_ecosystems pe ON pe.project_id = ANY (c.project_ids)
 
          CROSS JOIN unnest(c.project_ids) AS projects(id)
@@ -85,9 +85,7 @@ group by c.contributor_id,
 ;
 
 
-DROP FUNCTION sum_func(
-    double precision, pg_catalog.anyelement, double precision
-);
+
 CREATE OR REPLACE FUNCTION sum_func(
     numeric, pg_catalog.anyelement, numeric
 )
@@ -97,9 +95,7 @@ SELECT case when $3 is not null then COALESCE($1, 0) + $3 else $1 end
 $body$
     LANGUAGE 'sql';
 
-DROP AGGREGATE dist_sum(
-    pg_catalog."any",
-    double precision);
+
 CREATE AGGREGATE dist_sum (
     pg_catalog."any",
     numeric)
@@ -175,11 +171,11 @@ select c.contributor_id        as contributor_id,
        ppc.project_category_id as project_category_id,
        lfe.language_id         as language_id,
        pe.ecosystem_id         as ecosystem_id
-from public_contributions c
+from completed_contributions c
          join project_github_repos pgr on pgr.github_repo_id = c.repo_id
          CROSS JOIN unnest(c.project_ids) AS projects(id)
          join (select cc.contributor_id, min(cc.created_at) as first_created_at
-               from public_contributions cc
+               from completed_contributions cc
                group by cc.contributor_id) first_contribution
               ON first_contribution.contributor_id = c.contributor_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = ANY (c.project_ids)
