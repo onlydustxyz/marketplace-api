@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorReadApi;
+import onlydust.com.backoffice.api.contract.model.BoDepositResponse;
 import onlydust.com.backoffice.api.contract.model.DepositPage;
 import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.SponsorPage;
@@ -32,6 +33,13 @@ import static org.springframework.http.ResponseEntity.status;
 public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSponsorReadApi {
     private final SponsorReadRepository sponsorReadRepository;
     private final DepositReadRepository depositReadRepository;
+
+    @Override
+    public ResponseEntity<BoDepositResponse> getDepositDetails(UUID depositId) {
+        final var deposit = depositReadRepository.findById(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+        return ok(deposit.toBoResponse());
+    }
 
     @Override
     public ResponseEntity<SponsorDetailsResponse> getSponsor(UUID sponsorId) {

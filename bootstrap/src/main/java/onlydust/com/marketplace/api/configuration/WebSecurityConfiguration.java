@@ -92,6 +92,12 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/sponsors/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
 
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/deposits")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/deposits/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/deposits/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/deposits/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
+                                .requestMatchers(antMatcher(HttpMethod.DELETE, "/bo/v1/deposits/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
+
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.PUT, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
                                 .requestMatchers(antMatcher(HttpMethod.PATCH, "/bo/v1/sponsor-accounts/**")).hasAnyAuthority(BO_FINANCIAL_ADMIN.name())
