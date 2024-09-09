@@ -1170,6 +1170,32 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /bo/v1/deposits/{depositId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeSponsorRead
+      summary: Get deposit details
+      operationId: getDepositDetails
+      description: |
+        Get deposit details.
+      parameters:
+        - in: path
+          name: depositId
+          required: true
+          schema:
+            $ref: '#/components/schemas/DepositId'
+      responses:
+        "200":
+          description: 'Deposit details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BoDepositResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     put:
       security:
         - bearerAuth: [ ]
@@ -3043,6 +3069,50 @@ components:
           $ref: '#/components/schemas/ShortCurrencyResponse'
         status:
           $ref: '#/components/schemas/DepositStatus'
+
+    BoDepositResponse:
+      type: object
+      required:
+        - id
+        - sponsor
+        - transaction
+        - currency
+        - status
+      properties:
+        id:
+          $ref: '#/components/schemas/DepositId'
+        sponsor:
+          $ref: '#/components/schemas/SponsorResponse'
+        transaction:
+          $ref: '#/components/schemas/TransferTransactionResponse'
+        currency:
+          $ref: '#/components/schemas/ShortCurrencyResponse'
+        status:
+          $ref: '#/components/schemas/DepositStatus'
+        billingInformation:
+          $ref: '#/components/schemas/BoDepositBillingInformation'
+
+    BoDepositBillingInformation:
+      type: object
+      properties:
+        companyName:
+          type: string
+        companyAddress:
+          type: string
+        companyCountry:
+          type: string
+        companyId:
+          type: string
+        vatNumber:
+          type: string
+        billingEmail:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
 
     EcosystemPage:
       allOf:

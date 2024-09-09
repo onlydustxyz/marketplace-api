@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface DepositReadRepository extends Repository<DepositReadEntity, UUID> {
@@ -15,4 +16,6 @@ public interface DepositReadRepository extends Repository<DepositReadEntity, UUI
             WHERE d.sponsor.id = :sponsorId AND d.status != 'DRAFT'
             """)
     Page<DepositReadEntity> findAllBySponsorId(UUID sponsorId, Pageable pageable);
+
+    Optional<DepositReadEntity> findById(UUID depositId);
 }

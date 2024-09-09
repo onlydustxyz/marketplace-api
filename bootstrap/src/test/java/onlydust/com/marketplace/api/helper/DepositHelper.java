@@ -38,6 +38,18 @@ public class DepositHelper {
     public Deposit.Id create(SponsorId sponsorId, Network network, Currency.Id currencyId, BigDecimal amount, Deposit.Status status) {
         final var transactionId = UUID.randomUUID();
         final var depositId = UUID.randomUUID();
+        final var billingInformation = new Deposit.BillingInformation(
+                faker.lordOfTheRings().location(),
+                faker.address().fullAddress(),
+                faker.country().countryCode3(),
+                String.valueOf(faker.random().nextLong()),
+                faker.finance().bic(),
+                faker.internet().emailAddress(),
+                faker.name().firstName(),
+                faker.name().lastName(),
+                faker.internet().emailAddress()
+        );
+
         databaseHelper.executeQuery("""
                 INSERT INTO accounting.transfer_transactions (id, blockchain, reference, index, timestamp, sender_address, recipient_address, amount, contract_address)
                 VALUES (:id, cast(:blockchain as accounting.network), :reference, :index, :timestamp, :senderAddress, :recipientAddress, :amount, :contractAddress)
@@ -56,14 +68,15 @@ public class DepositHelper {
                 "contractAddress", "0x" + faker.random().hex()
         ));
         databaseHelper.executeQuery("""
-                INSERT INTO accounting.deposits (id, transaction_id, sponsor_id, currency_id, status)
-                VALUES (:id, :transactionId, :sponsorId, :currencyId, cast(:status as accounting.deposit_status))
+                INSERT INTO accounting.deposits (id, transaction_id, sponsor_id, currency_id, status, billing_information)
+                VALUES (:id, :transactionId, :sponsorId, :currencyId, cast(:status as accounting.deposit_status), :billingInformation)
                 """, Map.of(
                 "id", depositId,
                 "transactionId", transactionId,
                 "sponsorId", sponsorId.value(),
                 "currencyId", currencyId.value(),
-                "status", status.name()
+                "status", status.name(),
+                "billingInformation", billingInformation
         ));
         return Deposit.Id.of(depositId);
     }

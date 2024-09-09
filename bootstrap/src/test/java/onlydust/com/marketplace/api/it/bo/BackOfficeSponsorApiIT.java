@@ -27,6 +27,7 @@ import static java.math.BigDecimal.TEN;
 import static onlydust.com.marketplace.accounting.domain.model.Deposit.Status.*;
 import static onlydust.com.marketplace.accounting.domain.model.Network.*;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
@@ -886,7 +887,54 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectBody()
                 .jsonPath("$.deposits[?(@.id=='%s')].status".formatted(depositId)).isEqualTo("COMPLETED")
         ;
+    }
 
+
+    @Test
+    @Order(9)
+    void should_get_deposit_details() {
+        // Given
+        final String jwt = pierre.jwt();
+        final var sponsorLead = userAuthHelper.authenticateAntho();
+        final var sponsor = sponsorHelper.create(sponsorLead);
+        final var depositId = depositHelper.create(sponsor.id(), ETHEREUM, USDC, TEN, PENDING);
+
+        // When
+        client.get()
+                .uri(getApiURI(DEPOSIT.formatted(depositId)))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(depositId.toString())
+                .jsonPath("$.sponsor.id").isEqualTo(sponsor.id().toString())
+                .jsonPath("$.sponsor.name").isEqualTo(sponsor.name())
+                .jsonPath("$.sponsor.url").isEqualTo(sponsor.url().toString())
+                .jsonPath("$.sponsor.logoUrl").isEqualTo(sponsor.logoUrl().toString())
+                .jsonPath("$.sponsor.leads.length()").isEqualTo(1)
+                .jsonPath("$.sponsor.leads[0].githubUserId").isEqualTo(sponsorLead.user().getGithubUserId())
+                .jsonPath("$.sponsor.leads[0].userId").isEqualTo(sponsorLead.user().getId().toString())
+                .jsonPath("$.sponsor.leads[0].login").isEqualTo(sponsorLead.user().getGithubLogin())
+                .jsonPath("$.transaction.id").isNotEmpty()
+                .jsonPath("$.transaction.network").isEqualTo("ETHEREUM")
+                .jsonPath("$.transaction.amount").isEqualTo(10)
+                .jsonPath("$.transaction.blockExplorerUrl").value(url -> assertThat((String) url).startsWith("https://etherscan.io/tx/"))
+                .jsonPath("$.currency.id").isEqualTo(USDC.toString())
+                .jsonPath("$.currency.code").isEqualTo("USDC")
+                .jsonPath("$.currency.name").isEqualTo("USD Coin")
+                .jsonPath("$.billingInformation").isNotEmpty()
+                .jsonPath("$.billingInformation.companyName").isNotEmpty()
+                .jsonPath("$.billingInformation.companyAddress").isNotEmpty()
+                .jsonPath("$.billingInformation.companyCountry").isNotEmpty()
+                .jsonPath("$.billingInformation.companyId").isNotEmpty()
+                .jsonPath("$.billingInformation.vatNumber").isNotEmpty()
+                .jsonPath("$.billingInformation.billingEmail").isNotEmpty()
+                .jsonPath("$.billingInformation.firstName").isNotEmpty()
+                .jsonPath("$.billingInformation.lastName").isNotEmpty()
+                .jsonPath("$.billingInformation.email").isNotEmpty()
+        ;
     }
 
     @Test
