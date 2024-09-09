@@ -1,7 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -29,14 +31,15 @@ public class ContributorService implements ContributorFacadePort {
                                                                          final String login,
                                                                          int maxInternalContributorCountToTriggerExternalSearch,
                                                                          int maxInternalContributorCountToReturn,
-                                                                         boolean externalSearchOnly) {
+                                                                         boolean externalSearchOnly,
+                                                                         boolean internalSearchOnly) {
 
         maxInternalContributorCountToReturn = Math.min(maxInternalContributorCountToReturn, MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN);
 
         final List<Contributor> internalContributors = externalSearchOnly ? List.of() :
                 searchInternalContributors(projectId, repoIds, login, maxInternalContributorCountToReturn);
 
-        final List<Contributor> externalContributors =
+        final List<Contributor> externalContributors = internalSearchOnly ? List.of() :
                 (externalSearchOnly || internalContributors.size() < maxInternalContributorCountToTriggerExternalSearch) &&
                 login != null && !login.isEmpty() ?
                         getExternalContributors(login) : List.of();
@@ -88,10 +91,11 @@ public class ContributorService implements ContributorFacadePort {
     private List<Contributor> getExternalContributors(String login) {
         return githubSearchPort.searchUsersByLogin(login).stream().map(
                 identity -> {
-                    final var user = userStoragePort.getRegisteredUserByGithubId(identity.githubUserId()).map(GithubUserIdentity.class::cast);
+                    final var user = userStoragePort.getRegisteredUserByGithubId(identity.githubUserId());
                     return Contributor.builder()
-                            .id(user.orElse(identity))
+                            .id(user.map(GithubUserIdentity.class::cast).orElse(identity))
                             .isRegistered(user.isPresent())
+                            .userId(user.map(AuthenticatedUser::id).map(UserId::of).orElse(null))
                             .build();
                 }
         ).toList();

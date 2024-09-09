@@ -210,6 +210,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                                 .avatarUrl(entity.getAvatarUrl())
                                 .build())
                         .isRegistered(entity.getIsRegistered())
+                        .userId(entity.getUserId() == null ? null : UserId.of(entity.getUserId()))
                         .build()).toList();
     }
 

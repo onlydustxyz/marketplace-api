@@ -18,7 +18,8 @@ public interface ContributorFacadePort {
     Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, Set<Long> repoIds, String login,
                                                                   int maxInternalContributorCountToTriggerExternalSearch,
                                                                   int maxInternalContributorCountToReturn,
-                                                                  boolean externalSearchOnly);
+                                                                  boolean externalSearchOnly,
+                                                                  boolean internalSearchOnly);
 
     Page<ContributionView> contributions(Optional<Long> callerGithubUserId,
                                          ContributionView.Filters filters,

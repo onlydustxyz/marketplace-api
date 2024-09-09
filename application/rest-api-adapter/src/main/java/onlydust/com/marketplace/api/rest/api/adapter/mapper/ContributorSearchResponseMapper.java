@@ -26,6 +26,7 @@ public class ContributorSearchResponseMapper {
                 .githubUserId(contributor.getId().githubUserId())
                 .login(contributor.getId().login())
                 .avatarUrl(contributor.getId().avatarUrl())
-                .isRegistered(contributor.getIsRegistered());
+                .isRegistered(contributor.getIsRegistered())
+                .id(contributor.getUserId() == null ? null : contributor.getUserId().value());
     }
 }

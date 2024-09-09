@@ -18,7 +18,8 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 43467246,
                   "login": "AnthonyBuisset",
                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp",
-                  "isRegistered": true
+                  "isRegistered": true,
+                  "id": "747e663f-4e68-4b42-965b-b5aebedcd4c4"
                 }
               ],
               "externalContributors": [
@@ -26,31 +27,36 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                   "githubUserId": 31220,
                   "login": "antho",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/31220?v=4",
-                  "isRegistered": false
+                  "isRegistered": false,
+                  "id": null
                 },
                 {
                   "githubUserId": 3982077,
                   "login": "anthonychu",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/3982077?v=4",
-                  "isRegistered": false
+                  "isRegistered": false,
+                  "id": null
                 },
                 {
                   "githubUserId": 36125,
                   "login": "anthonyshort",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/36125?v=4",
-                  "isRegistered": false
+                  "isRegistered": false,
+                  "id": null
                 },
                 {
                   "githubUserId": 16854916,
                   "login": "AnthoPakPak",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/16854916?v=4",
-                  "isRegistered": false
+                  "isRegistered": false,
+                  "id": null
                 },
                 {
                   "githubUserId": 101401469,
                   "login": "AnthonyByansi",
                   "avatarUrl": "https://avatars.githubusercontent.com/u/101401469?v=4",
-                  "isRegistered": false
+                  "isRegistered": false,
+                  "id": null
                 }
               ]
             }
@@ -123,31 +129,36 @@ public class ContributorSearchIT extends AbstractMarketplaceApiIT {
                                "githubUserId": 31220,
                                "login": "antho",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/31220?v=4",
-                               "isRegistered": false
+                               "isRegistered": false,
+                               "id": null
                              },
                              {
                                "githubUserId": 3982077,
                                "login": "anthonychu",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/3982077?v=4",
-                               "isRegistered": false
+                               "isRegistered": false,
+                               "id": null
                              },
                              {
                                "githubUserId": 36125,
                                "login": "anthonyshort",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/36125?v=4",
-                               "isRegistered": false
+                               "isRegistered": false,
+                               "id": null
                              },
                              {
                                "githubUserId": 16854916,
                                "login": "AnthoPakPak",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/16854916?v=4",
-                               "isRegistered": false
+                               "isRegistered": false,
+                               "id": null
                              },
                              {
                                "githubUserId": 101401469,
                                "login": "AnthonyByansi",
                                "avatarUrl": "https://avatars.githubusercontent.com/u/101401469?v=4",
-                               "isRegistered": false
+                               "isRegistered": false,
+                               "id": null
                              }
                            ]
                          }

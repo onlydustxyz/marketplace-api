@@ -46,7 +46,8 @@ public class UsersRestApi implements UsersApi {
                                                                         String login,
                                                                         Integer maxInternalContributorCountToTriggerExternalSearch,
                                                                         Integer maxInternalContributorCountToReturn,
-                                                                        Boolean externalSearchOnly) {
+                                                                        Boolean externalSearchOnly,
+                                                                        Boolean internalSearchOnly) {
         final var contributors = contributorFacadePort.searchContributors(
                 projectId,
                 repoIds != null ? new HashSet<>(repoIds) : null,
@@ -56,7 +57,8 @@ public class UsersRestApi implements UsersApi {
                         DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_TRIGGER_EXTERNAL_SEARCH,
                 maxInternalContributorCountToReturn != null ? maxInternalContributorCountToReturn :
                         DEFAULT_MAX_INTERNAL_CONTRIBUTOR_COUNT_TO_RETURN,
-                Boolean.TRUE.equals(externalSearchOnly));
+                Boolean.TRUE.equals(externalSearchOnly),
+                Boolean.TRUE.equals(internalSearchOnly));
         return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
     }
 
