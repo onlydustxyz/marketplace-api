@@ -20,7 +20,8 @@ public class CustomContributorRepository {
             		ga.login,
             		user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
             		ga.html_url,
-                    u.github_user_id IS NOT NULL as is_registered
+                    u.github_user_id IS NOT NULL as is_registered,
+                    u.id as user_id
             FROM
                 indexer_exp.github_accounts ga
                 JOIN projects_contributors pc ON pc.github_user_id = ga.id
@@ -45,7 +46,8 @@ public class CustomContributorRepository {
                 ga.login,
                 user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                 ga.html_url,
-                u.github_user_id IS NOT NULL as is_registered
+                u.github_user_id IS NOT NULL as is_registered,
+                u.id as user_id
             FROM indexer_exp.github_accounts ga
                 LEFT JOIN iam.users u on u.github_user_id = ga.id
             WHERE
@@ -64,7 +66,8 @@ public class CustomContributorRepository {
                 ga.login,
                 user_avatar_url(ga.id, ga.avatar_url) as avatar_url,
                 ga.html_url,
-                u.github_user_id IS NOT NULL as is_registered
+                u.github_user_id IS NOT NULL as is_registered,
+                u.id as user_id
             FROM indexer_exp.github_accounts ga
                 LEFT JOIN iam.users u on u.github_user_id = ga.id
             WHERE

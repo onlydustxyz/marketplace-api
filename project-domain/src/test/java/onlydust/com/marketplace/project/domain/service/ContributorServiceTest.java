@@ -48,7 +48,7 @@ public class ContributorServiceTest {
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
         when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
-                false);
+                false, false);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -90,7 +90,7 @@ public class ContributorServiceTest {
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
-                false);
+                false, false);
 
         // Then
         assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
@@ -115,7 +115,7 @@ public class ContributorServiceTest {
         // When
         when(userStoragePort.searchContributorsByLogin(repoIds, login, 100)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(null, repoIds, login, 5, 100,
-                false);
+                false, false);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -140,7 +140,7 @@ public class ContributorServiceTest {
         when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
         when(userStoragePort.searchContributorsByLogin(projectRepoIds, login, 100)).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(projectId, null, login, 5, 100,
-                false);
+                false, false);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -163,7 +163,7 @@ public class ContributorServiceTest {
         // When
         when(userStoragePort.searchContributorsByLogin(eq(Set.of()), eq(null), eq(100))).thenReturn(internalContributors);
         final var contributors = contributorService.searchContributors(null, null, null, 5, 100,
-                false);
+                false, false);
 
         // Then
         verify(githubSearchPort, never()).searchUsersByLogin(anyString());
@@ -197,7 +197,7 @@ public class ContributorServiceTest {
                                 .build()) :
                                 Optional.empty()));
         final var contributors = contributorService.searchContributors(null, null, login, 0, 0,
-                true);
+                true, false);
 
         // Then
         verify(userStoragePort, never()).searchContributorsByLogin(anySet(), anyString(), anyInt());
@@ -207,5 +207,27 @@ public class ContributorServiceTest {
                 .containsExactlyElementsOf(externalContributors.stream().map(c -> c.getId().githubUserId()).toList());
         assertThat(contributors.getRight().stream().map(Contributor::getIsRegistered).toList())
                 .containsExactlyElementsOf(externalContributors.stream().map(Contributor::getIsRegistered).toList());
+    }
+
+
+    @Test
+    void should_work_with_internalSearchOnly() {
+        // Given
+        final String login = faker.name().username();
+        final List<Contributor> internalContributors = List.of(
+                contributorFaker.contributor(),
+                contributorFaker.contributor(),
+                contributorFaker.contributor()
+        );
+
+        // When
+        when(projectStoragePort.getProjectRepoIds(projectId)).thenReturn(projectRepoIds);
+        when(userStoragePort.searchContributorsByLogin(allRepoIds, login, 100)).thenReturn(internalContributors);
+        final var contributors = contributorService.searchContributors(projectId, repoIds, login, 5, 100,
+                false, true);
+
+        // Then
+        assertThat(contributors.getLeft()).containsExactlyElementsOf(internalContributors);
+        assertThat(contributors.getRight()).isEmpty();
     }
 }

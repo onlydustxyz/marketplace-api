@@ -1321,6 +1321,13 @@ paths:
             Default value is false.
           schema:
             type: boolean
+        - in: query
+          name: internalSearchOnly
+          description: |
+            If true, only internal search is performed.
+            Default value is false.
+          schema:
+            type: boolean
       responses:
         "200":
           description: 'List of contributors'
@@ -6170,6 +6177,8 @@ components:
             isRegistered:
               type: boolean
               description: True if the user is registered on OnlyDust
+            id:
+              $ref: '#/components/schemas/UserId'
 
     RankedContributorResponse:
       allOf:
