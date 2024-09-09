@@ -150,6 +150,7 @@ create unique index on bi.contribution_project_timestamps (project_id, timestamp
 create unique index on bi.contribution_project_timestamps (timestamp, project_id);
 
 
+
 drop materialized view bi.project_ungrouped_contribution_data;
 create materialized view bi.project_ungrouped_contribution_data as
 select c.project_id                                                            as project_id,
@@ -180,6 +181,39 @@ create unique index on bi.project_ungrouped_contribution_data (timestamp, projec
 
 
 
+create materialized view bi.project_ungrouped_reward_data as
+select r.project_id                                 as project_id,
+       r.timestamp                                  as timestamp,
+       array_agg(distinct r.language_id)            as language_ids,
+       array_agg(distinct r.ecosystem_id)           as ecosystem_ids,
+       array_agg(distinct r.program_id)             as program_ids,
+       array_agg(distinct r.project_category_id)    as project_category_ids,
+       count(distinct r.reward_id)                  as reward_count,
+       dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd,
+       avg(r.amount_usd)                            as avg_rewarded_usd
+from bi.exploded_rewards r
+where r.project_id is not null
+  and r.timestamp is not null
+group by r.project_id, r.timestamp;
+
+create unique index on bi.project_ungrouped_reward_data (project_id, timestamp);
+create unique index on bi.project_ungrouped_reward_data (timestamp, project_id);
+
+
+create materialized view bi.project_daily_grant_data as
+select pg.project_id      as project_id,
+       pg.day_timestamp   as timestamp,
+       sum(pg.usd_amount) as total_granted_usd
+from bi.daily_project_grants pg
+where pg.project_id is not null
+  and pg.day_timestamp is not null
+group by pg.project_id, pg.day_timestamp;
+
+create unique index on bi.project_daily_grant_data (project_id, timestamp);
+create unique index on bi.project_daily_grant_data (timestamp, project_id);
+
+
+-- Project bars for the diagram + courbe PR merged
 SELECT date_trunc('week', ungrouped.timestamp)                                                    as period,
        count(distinct ungrouped.project_id)                                                       as active_project_count,
 
@@ -192,7 +226,9 @@ SELECT date_trunc('week', ungrouped.timestamp)                                  
 
        count(distinct ungrouped.project_id)
        filter (where ungrouped.next_contribution_timestamp is null and date_trunc('week', ungrouped.timestamp) <
-                                                                       date_trunc('week', now())) as next_period_churned_project_count
+                                                                       date_trunc('week', now())) as next_period_churned_project_count,
+
+       sum(ungrouped.merged_pr_count)                                                             as merged_pr_count
 from bi.project_ungrouped_contribution_data ungrouped
 where ungrouped.timestamp > '2020-01-01'
   and ungrouped.timestamp < '2025-01-02'
@@ -217,6 +253,48 @@ d0da4d3b-3369-4f0f-aaac-26e78feb71ab,
 c493b842-0db8-435b-85c7-5fe63ffe81f5,
 70f46521-7284-49dd-bd5b-1e5c23178ad4}'::uuid[] && ungrouped.ecosystem_ids))
 group by date_trunc('week', ungrouped.timestamp)
+order by 1 desc nulls last
+offset 0 limit 100;
+
+
+-- Courbe total rewarded
+SELECT date_trunc('week', ungrouped.timestamp) as period,
+       sum(ungrouped.total_rewarded_usd)       as total_rewarded_usd
+from bi.project_ungrouped_reward_data ungrouped
+where ungrouped.timestamp > '2020-01-01'
+  and ungrouped.timestamp < '2025-01-02'
+  and (('{63a96d57-86ef-4b21-ab46-25e9518a5d9d,
+de948c03-f39f-4342-a652-2523f1c15abd,
+1deee90d-39ba-4adb-aebc-19bae9bf4edd,
+57b061e1-bc67-49ee-9f93-53966bf31438,
+de4c23b6-c2bd-48c2-99e4-4f1c5ecf0821,
+d0da4d3b-3369-4f0f-aaac-26e78feb71ab,
+5f98d8b8-7dfa-4fc9-8ac9-e6454ae1653a,
+5f4726f2-0990-4421-aedf-3bdd6e69c0a0,
+c493b842-0db8-435b-85c7-5fe63ffe81f5,
+70f46521-7284-49dd-bd5b-1e5c23178ad4}'::uuid[] && ungrouped.program_ids)
+    or ('{63a96d57-86ef-4b21-ab46-25e9518a5d9d,
+de948c03-f39f-4342-a652-2523f1c15abd,
+1deee90d-39ba-4adb-aebc-19bae9bf4edd,
+57b061e1-bc67-49ee-9f93-53966bf31438,
+de4c23b6-c2bd-48c2-99e4-4f1c5ecf0821,
+d0da4d3b-3369-4f0f-aaac-26e78feb71ab,
+5f98d8b8-7dfa-4fc9-8ac9-e6454ae1653a,
+5f4726f2-0990-4421-aedf-3bdd6e69c0a0,
+c493b842-0db8-435b-85c7-5fe63ffe81f5,
+70f46521-7284-49dd-bd5b-1e5c23178ad4}'::uuid[] && ungrouped.ecosystem_ids))
+group by date_trunc('week', ungrouped.timestamp)
+order by 1 desc nulls last
+offset 0 limit 100;
+
+
+-- Courbe total granted
+SELECT date_trunc('week', g.timestamp) as period,
+       sum(g.total_granted_usd)        as total_granted_usd
+from bi.project_daily_grant_data g
+where g.timestamp > '2020-01-01'
+  and g.timestamp < '2025-01-02'
+group by date_trunc('week', g.timestamp)
 order by 1 desc nulls last
 offset 0 limit 100;
 
