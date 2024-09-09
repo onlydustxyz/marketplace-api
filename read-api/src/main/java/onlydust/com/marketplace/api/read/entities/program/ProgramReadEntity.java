@@ -141,6 +141,7 @@ public class ProgramReadEntity {
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())
+                .userCount(stats.userCountOfGrantedProjects())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));

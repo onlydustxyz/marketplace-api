@@ -29,4 +29,6 @@ public class ProgramStatReadEntity {
     ProgramReadEntity program;
 
     int grantedProjectCount;
+
+    int userCountOfGrantedProjects;
 }

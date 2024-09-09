@@ -511,3 +511,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000328_new_notification_categories.sql
   - include:
       file: db/changelog/changelogs/00000329_new_notification_category_settings.sql
+  - include:
+      file: db/changelog/changelogs/00000330_update_bi_program_stats.sql

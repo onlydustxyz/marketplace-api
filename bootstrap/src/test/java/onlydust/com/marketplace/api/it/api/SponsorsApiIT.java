@@ -172,6 +172,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
+                projectHelper.addRepo(project2Id, 498695724L);
                 final var anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
@@ -2153,6 +2154,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "leads": [],
                                       "projectCount": 2,
+                                      "userCount": 10,
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13483.89,
                                         "totalPerCurrency": [
@@ -2256,6 +2258,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "leads": [],
                                       "projectCount": 2,
+                                      "userCount": 10,
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 606.00,
                                         "totalPerCurrency": [
