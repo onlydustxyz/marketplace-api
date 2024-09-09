@@ -180,18 +180,19 @@ create unique index on bi.project_ungrouped_contribution_data (timestamp, projec
 
 
 
-SELECT date_trunc('week', ungrouped.timestamp)                                as period,
-       count(distinct ungrouped.project_id)                                   as active_project_count,
-       count(distinct ungrouped.project_id) filter (
-           where ungrouped.previous_contribution_timestamp is null
-           )                                                                  as new_project_count,
-       count(distinct ungrouped.project_id) filter (
-           where ungrouped.previous_contribution_timestamp <
-                 date_trunc('week', ungrouped.timestamp) - interval '1 week') as reactivated_project_count,
-       count(distinct ungrouped.project_id) filter (
-           where ungrouped.next_contribution_timestamp is null
-               and date_trunc('week', ungrouped.timestamp) < date_trunc('week', now())
-           )                                                                  as next_period_churned_project_count
+SELECT date_trunc('week', ungrouped.timestamp)                                                    as period,
+       count(distinct ungrouped.project_id)                                                       as active_project_count,
+
+       count(distinct ungrouped.project_id)
+       filter (where ungrouped.previous_contribution_timestamp is null)                           as new_project_count,
+
+       count(distinct ungrouped.project_id)
+       filter (where ungrouped.previous_contribution_timestamp < date_trunc('week', ungrouped.timestamp) -
+                                                                 interval '1 week')               as reactivated_project_count,
+
+       count(distinct ungrouped.project_id)
+       filter (where ungrouped.next_contribution_timestamp is null and date_trunc('week', ungrouped.timestamp) <
+                                                                       date_trunc('week', now())) as next_period_churned_project_count
 from bi.project_ungrouped_contribution_data ungrouped
 where ungrouped.timestamp > '2020-01-01'
   and ungrouped.timestamp < '2025-01-02'
