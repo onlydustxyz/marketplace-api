@@ -94,3 +94,55 @@ Optionally, [configure JetBrains to sign commits](https://www.jetbrains.com/help
 >
 > Now every commit will be signed with the selected key. The state of the GPG signature will be displayed in the Commit details pane on the Log tab.
 
+# 💸 Blockchains & Currencies support
+
+## Currency support per blockchain
+
+|       | Ethereum | Optimism | Starknet | Stellar | Aptos |
+|:-----:|:--------:|:--------:|:--------:|:-------:|:-----:|
+|  ETH  |    ✅     |          |          |         |       |
+|  OP   |          |    ✅     |          |         |       |
+| STRK  |    ✅     |          |    ✅     |         |       |
+|  XLM  |          |          |          |    ✅    |       |
+|  APT  |          |          |          |         |   ✅   |
+| USDC  |    ✅     |    ✅     |    ✅     |    ✅    |       |
+| LORDS |    ✅     |          |          |         |       |
+|  WLD  |          |    ✅     |          |         |       |
+
+## Feature support per blockchain
+
+|                     | Ethereum | Optimism | Starknet | Stellar | Aptos |
+|:-------------------:|:--------:|:--------:|:--------:|:-------:|:-----:|
+| Reward distribution |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
+|    ERC20 support    |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
+|  Sponsor deposits   |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
+| Account validation  |    ✅     |    ✅     |    ✅     |    ✅    |   ✅   |
+
+## How to perform a deposit
+
+In order for a deposit to be valid, it must be a transfer transaction from the user's wallet to OnlyDust wallet.
+OnlyDust wallet depends on the blockchain. The list can be found in the marketplace [configuration file](./bootstrap/src/main/resources/application.yaml).
+In production, payments must be done on the mainnet. In develop/staging, payments must be done on the testnet.
+
+### 1. Create a wallet on the blockchain
+
+* Ethereum/Optimism: [MetaMask](https://metamask.io/)
+* Starknet: [Braavos](https://braavos.app/)
+* Stellar: [Lobstr](https://lobstr.co/)
+* Aptos: [Petra](https://petra.app/)
+
+**NB**: Stellar requires a wallet to be funded with at least 1 XLM to be used.
+
+### 2. Deposit funds
+
+Use a faucet on testnets to get some test tokens.
+
+* Infura: [Infura faucet](https://www.infura.io/faucet/sepolia)
+* Learn Web3: [Learn Web3 faucet](https://learnweb3.io/faucets/)
+* USDC: [USDC faucet](https://faucet.circle.com/)
+* Starknet: [Starknet faucet](https://starknet-faucet.vercel.app/)
+
+### 3. Transfer funds
+
+Transfer the funds from your wallet to the OnlyDust wallet.
+When the transaction is confirmed, use the transaction hash to initiate the deposit on the platform.
