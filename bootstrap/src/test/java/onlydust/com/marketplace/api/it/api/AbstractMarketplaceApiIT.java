@@ -198,6 +198,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String PROGRAM_PROJECTS = "/api/v1/programs/%s/projects";
     protected static final String PROGRAM_PROJECT = "/api/v1/programs/%s/projects/%s";
     protected static final String PROGRAM_GRANT = "/api/v1/programs/%s/grant";
+    protected static final String BI_WORLD_MAP = "/api/v1/bi/world-map";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
