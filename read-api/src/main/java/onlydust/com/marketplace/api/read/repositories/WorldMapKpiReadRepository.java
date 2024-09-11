@@ -20,9 +20,11 @@ public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiRead
             join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id and kyc.country is not null
             where (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
                 and (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
-                and (coalesce(:programOrEcosystemIds) is null or cd.program_ids && :programOrEcosystemIds or cd.ecosystem_ids && :programOrEcosystemIds)
+                and (coalesce(:programOrEcosystemIds) is null or
+                     cd.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
+                     cd.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
             group by kyc.country
             order by kyc.country
             """, nativeQuery = true)
-    List<WorldMapKpiReadEntity> findActiveContributorCount(ZonedDateTime fromDate, ZonedDateTime toDate, List<UUID> programOrEcosystemIds);
+    List<WorldMapKpiReadEntity> findActiveContributorCount(ZonedDateTime fromDate, ZonedDateTime toDate, UUID[] programOrEcosystemIds);
 }

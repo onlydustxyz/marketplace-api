@@ -67,7 +67,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
             case ACTIVE_CONTRIBUTORS -> worldMapKpiReadRepository.findActiveContributorCount(
                     parseZonedNullable(fromDate),
                     parseZonedNullable(toDate),
-                    programOrEcosystemIds
+                    programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)
             );
         };
 

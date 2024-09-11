@@ -258,6 +258,8 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected SponsorHelper sponsorHelper;
     @Autowired
+    protected AccountingHelper accountingHelper;
+    @Autowired
     protected ProjectHelper projectHelper;
     @Autowired
     protected DepositHelper depositHelper;
@@ -295,13 +297,13 @@ public class AbstractMarketplaceApiIT {
     KycRepository kycRepository;
 
     @Autowired
-    AccountingHelper accountingHelper;
-    @Autowired
     EntityManagerFactory entityManagerFactory;
     @Autowired
     AppUserFacadePort appUserFacadePort;
     @Autowired
     protected GithubHelper githubHelper;
+    @Autowired
+    protected BillingProfileHelper billingProfileHelper;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {
