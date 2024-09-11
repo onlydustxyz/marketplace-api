@@ -13,10 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class ProgramHelper {
@@ -28,6 +25,8 @@ public class ProgramHelper {
     private final Faker faker = new Faker();
     @Autowired
     private SponsorHelper sponsorHelper;
+    @Autowired
+    private DatabaseHelper databaseHelper;
 
     @Transactional
     public Program create(SponsorId sponsorId) {
@@ -82,5 +81,13 @@ public class ProgramHelper {
     @Transactional
     public ProgramId randomId() {
         return create(sponsorHelper.create().id()).id();
+    }
+
+    public ProgramId getByName(String name) {
+        final UUID programId = databaseHelper.executeReadQuery("""
+                select id from programs where name = :name limit 1
+                """, Map.of("name", name));
+
+        return ProgramId.of(programId);
     }
 }

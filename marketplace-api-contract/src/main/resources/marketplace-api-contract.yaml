@@ -119,6 +119,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/world-map:
+    get:
+      tags:
+        - ReadBi
+      summary: Get KPI per country
+      operationId: getBIWorldMap
+      parameters:
+        - name: kpi
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/WorldMapKpiEnum'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/programOrEcosystemIdsParam'
+      responses:
+        "200":
+          description: 'World map'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiWorldMapListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/version:
     get:
       tags:
@@ -5014,14 +5039,14 @@ components:
     fromDateParam:
       name: fromDate
       in: query
-      required: true
+      required: false
       schema:
         type: string
         pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
     toDateParam:
       name: toDate
       in: query
-      required: true
+      required: false
       schema:
         type: string
         pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
@@ -9680,6 +9705,11 @@ components:
         - CONTRIBUTOR
         - PROGRAM_LEAD
 
+    WorldMapKpiEnum:
+      type: string
+      enum:
+        - ACTIVE_CONTRIBUTORS
+
     TransactionType:
       type: string
       enum:
@@ -11015,3 +11045,21 @@ components:
           $ref: '#/components/schemas/NumberKpi'
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
+
+    BiWorldMapListResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/BiWorldMapItemResponse'
+
+    BiWorldMapItemResponse:
+      type: object
+      required:
+        - countryCode
+        - value
+      properties:
+        countryCode:
+          type: string
+          format: iso-country-code
+        value:
+          type: number
+          format: int64

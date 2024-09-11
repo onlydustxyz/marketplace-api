@@ -1,7 +1,13 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.Value;
+import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +21,27 @@ import java.util.Map;
 public class GithubHelper {
 
     protected static final Faker faker = new Faker();
+
+    @Autowired
+    ProjectHelper projectHelper;
+
+    @Value
+    @AllArgsConstructor(staticName = "of")
+    @EqualsAndHashCode
+    @Accessors(fluent = true)
+    public static class PullRequestId {
+        static final Faker faker = new Faker();
+        Long value;
+
+        public static PullRequestId random() {
+            return of(faker.random().nextLong());
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+    }
 
     @Autowired
     DatabaseHelper databaseHelper;
@@ -69,6 +96,12 @@ public class GithubHelper {
                 "ownerLogin", owner.getLogin()
         ));
 
+        return repo;
+    }
+
+    public GithubRepo createRepo(final @NonNull ProjectId projectId) {
+        final var repo = createRepo();
+        projectHelper.addRepo(projectId, repo.getId());
         return repo;
     }
 

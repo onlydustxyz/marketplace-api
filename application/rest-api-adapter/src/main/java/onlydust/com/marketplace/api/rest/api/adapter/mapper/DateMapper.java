@@ -26,9 +26,10 @@ public interface DateMapper {
     }
 
     static Date parseNullable(final String date) {
-        if (isNull(date)) {
-            return null;
-        }
-        return parse(date);
+        return isNull(date) ? null : parse(date);
+    }
+
+    static ZonedDateTime parseZonedNullable(final String date) {
+        return toZoneDateTime(parseNullable(date));
     }
 }

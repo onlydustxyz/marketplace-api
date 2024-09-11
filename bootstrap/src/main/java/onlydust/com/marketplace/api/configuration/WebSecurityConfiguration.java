@@ -149,6 +149,7 @@ public class WebSecurityConfiguration {
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/actuator/health")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/version")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/banner")).permitAll()
+                                .requestMatchers(antMatcher(HttpMethod.GET, "/api/v1/bi/**")).permitAll()
                                 .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/sumsub/webhook")).permitAll()
                                 .anyRequest().authenticated())
 
