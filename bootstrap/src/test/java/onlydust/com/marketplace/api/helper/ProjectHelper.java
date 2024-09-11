@@ -10,7 +10,9 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class ProjectHelper {
@@ -36,6 +38,10 @@ public class ProjectHelper {
     }
 
     public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name) {
+        return create(lead, name, List.of());
+    }
+
+    public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name, List<UUID> ecosystemIds) {
         return ProjectId.of(projectFacadePort.createProject(lead.user().getId(),
                         CreateProjectCommand.builder()
                                 .firstProjectLeaderId(lead.user().getId())
@@ -43,6 +49,7 @@ public class ProjectHelper {
                                 .shortDescription(faker.lorem().sentence())
                                 .longDescription(faker.lorem().paragraph())
                                 .isLookingForContributors(faker.bool().bool())
+                                .ecosystemIds(ecosystemIds)
                                 .build())
                 .getLeft());
     }

@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -25,6 +27,8 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class ActiveContributors {
         private static final AtomicBoolean setupDone = new AtomicBoolean();
+        private UUID starknet;
+        private UUID ethereum;
         private ProgramId explorationTeam;
         private ProgramId nethermind;
         private ProgramId ethGrantingProgram;
@@ -32,10 +36,15 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
         @BeforeEach
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) {
+                starknet = ecosystemHelper.getByName("Starknet ecosystem");
+                ethereum = ecosystemHelper.getByName("Ethereum ecosystem");
+
                 explorationTeam = programHelper.getByName("Starkware Exploration Team");
                 nethermind = programHelper.getByName("Nethermind");
                 ethGrantingProgram = programHelper.getByName("Ethereum Granting Program");
             } else {
+                starknet = ecosystemHelper.create("Starknet ecosystem").id();
+                ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
 
                 final var starknetFoundation = sponsorHelper.create();
                 accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
@@ -57,12 +66,18 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                 final var marketplace_api = githubHelper.createRepo(onlyDust);
                 final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-                final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge");
+                final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge", List.of(starknet, ethereum));
                 accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH);
                 accountingHelper.grant(explorationTeam, bridge, 100, STRK);
 
                 final var bridge_api = githubHelper.createRepo(bridge);
                 final var bridge_frontend = githubHelper.createRepo(bridge);
+
+                final var madara = projectHelper.create(userAuthHelper.create(), "Madara", List.of(starknet));
+                accountingHelper.grant(explorationTeam, madara, 100, STRK);
+
+                final var madara_contracts = githubHelper.createRepo(madara);
+                final var madara_app = githubHelper.createRepo(madara);
 
                 final var antho = userAuthHelper.create();
                 billingProfileHelper.verify(antho, Country.fromIso3("FRA"));
@@ -84,15 +99,16 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                 at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
                 at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
                 at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
-                at("2021-01-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
                 at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
                 at("2021-02-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
                 at("2021-02-01T00:00:02Z", () -> githubHelper.createPullRequest(marketplace_api, pierre));
                 at("2021-02-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
                 at("2021-02-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-                at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(bridge_api, abdel));
+                at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_contracts, abdel));
+                at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_app, emma));
                 at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
+                at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
                 projectFacadePort.refreshStats();
             }
@@ -146,7 +162,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                               },
                               {
                                 "countryCode": "GBR",
-                                "value": 3
+                                "value": 2
                               },
                               {
                                 "countryCode": "MAR",
@@ -161,7 +177,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
             client.get()
                     .uri(getApiURI(BI_WORLD_MAP, Map.of(
                             "kpi", "ACTIVE_CONTRIBUTORS",
-                            "programOrEcosystemIds", Stream.of(nethermind).map(Object::toString).collect(joining(","))
+                            "programOrEcosystemIds", Stream.of(nethermind, ethereum).map(Object::toString).collect(joining(","))
                     )))
                     .exchange()
                     .expectStatus()
@@ -175,7 +191,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                               },
                               {
                                 "countryCode": "GBR",
-                                "value": 1
+                                "value": 3
                               },
                               {
                                 "countryCode": "MAR",
