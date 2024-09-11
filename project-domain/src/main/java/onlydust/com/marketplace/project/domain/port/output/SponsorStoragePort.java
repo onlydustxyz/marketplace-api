@@ -12,15 +12,11 @@ import java.util.UUID;
 public interface SponsorStoragePort {
     boolean isAdmin(UUID userId, SponsorId sponsorId);
 
-    void addLeadToSponsor(UUID leadId, SponsorId sponsorId);
-
     Optional<Sponsor> get(SponsorId sponsorId);
 
     List<UserId> findSponsorLeads(SponsorId sponsorId);
 
     void save(Sponsor sponsor);
-
-    boolean isAdminOfAnySponsor(UUID userId);
 
     boolean isAdminOfProgramSponsor(UUID userId, ProgramId programId);
 }

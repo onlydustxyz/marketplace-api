@@ -19,7 +19,5 @@ public interface SponsorFacadePort {
 
     URL uploadLogo(InputStream imageInputStream);
 
-    void addLeadToSponsor(UUID leadId, SponsorId sponsorId);
-
     Optional<Sponsor> findById(UUID leadId, SponsorId sponsorId);
 }

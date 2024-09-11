@@ -80,10 +80,4 @@ public class BackofficeSponsorManagementRestApi implements BackofficeSponsorMana
 
         return ResponseEntity.ok(response);
     }
-
-    @Override
-    public ResponseEntity<Void> addLeadToSponsor(UUID sponsorId, UUID leadId) {
-        sponsorFacadePort.addLeadToSponsor(leadId, SponsorId.of(sponsorId));
-        return noContent().build();
-    }
 }
