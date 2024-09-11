@@ -21,7 +21,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static java.math.BigDecimal.TEN;
 import static onlydust.com.marketplace.accounting.domain.model.Deposit.Status.*;
@@ -193,17 +192,23 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Order(4)
     void should_update_sponsor() {
         final String jwt = pierre.jwt();
+        final var sponsor = sponsorHelper.create();
+        sponsorHelper.addLead(sponsor.id(), userAuthHelper.authenticatePierre());
+        sponsorHelper.addLead(sponsor.id(), userAuthHelper.authenticateOlivier());
 
         // When
         client.put()
-                .uri(getApiURI(PUT_SPONSORS.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
+                .uri(getApiURI(PUT_SPONSORS.formatted(sponsor.id())))
                 .header("Authorization", "Bearer " + jwt)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new SponsorRequest()
                         .name("Foobaaaar")
                         .url(URI.create("https://www.foobaaaar.com"))
                         .logoUrl(URI.create("https://www.foobaaaar.com/logo.png"))
-                        .leads(List.of(userAuthHelper.authenticateAntho().user().getId()))
+                        .leads(List.of(
+                                userAuthHelper.authenticateOlivier().user().getId(),
+                                userAuthHelper.authenticateAntho().user().getId()
+                        ))
                 )
                 // Then
                 .exchange()
@@ -211,92 +216,19 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .isNoContent();
 
         client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted("85435c9b-da7f-4670-bf65-02b84c5da7f0")))
+                .uri(getApiURI(GET_SPONSOR.formatted(sponsor.id())))
                 .header("Authorization", "Bearer " + jwt)
                 // Then
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody()
-                .json("""
-                        {
-                          "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                          "name": "Foobaaaar",
-                          "url": "https://www.foobaaaar.com",
-                          "logoUrl": "https://www.foobaaaar.com/logo.png",
-                          "availableBudgets": [
-                            {
-                              "currency": {
-                                "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                "code": "USDC",
-                                "name": "USD Coin",
-                                "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                "decimals": 6
-                              },
-                              "initialBalance": 19823190,
-                              "currentBalance": 19822690,
-                              "initialAllowance": 19823190,
-                              "currentAllowance": 0,
-                              "debt": 0,
-                              "awaitingPaymentAmount": 0,
-                              "lockedAmounts": []
-                            },
-                            {
-                              "currency": {
-                                "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                "code": "USD",
-                                "name": "US Dollar",
-                                "logoUrl": null,
-                                "decimals": 2
-                              },
-                              "initialBalance": 4000,
-                              "currentBalance": 0,
-                              "initialAllowance": 4000,
-                              "currentAllowance": 0,
-                              "debt": 0,
-                              "awaitingPaymentAmount": 0,
-                              "lockedAmounts": []
-                            }
-                          ],
-                          "programs": [
-                            {
-                              "id": "4b1cbc61-045c-4229-8378-8ad50c2aca78",
-                              "name": "AS Nancy Lorraine",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
-                              "remainingBudgets": [
-                                {
-                                  "amount": 0,
-                                  "currency": {
-                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
-                                    "code": "USD",
-                                    "name": "US Dollar",
-                                    "logoUrl": null,
-                                    "decimals": 2
-                                  }
-                                },
-                                {
-                                  "amount": 0,
-                                  "currency": {
-                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                    "code": "USDC",
-                                    "name": "USD Coin",
-                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                    "decimals": 6
-                                  }
-                                }
-                              ]
-                            }
-                          ],
-                          "leads": [
-                            {
-                              "githubUserId": 43467246,
-                              "userId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
-                              "login": "AnthonyBuisset",
-                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                            }
-                          ]
-                        }
-                        """);
+                .jsonPath("$.name").isEqualTo("Foobaaaar")
+                .jsonPath("$.url").isEqualTo("https://www.foobaaaar.com")
+                .jsonPath("$.logoUrl").isEqualTo("https://www.foobaaaar.com/logo.png")
+                .jsonPath("$.leads[?(@.login=='AnthonyBuisset')]").exists()
+                .jsonPath("$.leads[?(@.login=='PierreOucif')]").doesNotExist()
+                .jsonPath("$.leads[?(@.login=='ofux')]").exists();
     }
 
     @Test
@@ -327,100 +259,119 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 14,
+                          "totalItemNumber": 16,
                           "hasMore": true,
                           "nextPageIndex": 1,
                           "sponsors": [
                             {
-                              "name": "Captain America",
-                              "url": "https://www.marvel.com/characters/captain-america-steve-rogers",
-                              "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg",
-                              "programs": [
-                                {
-                                  "id": "e919b1ff-c666-4dd9-99bc-522ceb5fde7a",
-                                  "name": "Captain America",
-                                  "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg"
-                                }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "ChatGPT",
-                              "url": "https://chat.openai.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
-                              "programs": [
-                                {
-                                  "id": "04315017-a917-4f60-93c5-3b9f0dbe3af4",
-                                  "name": "ChatGPT",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
-                                }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "Coca Cola",
+                              "name": "AS Nancy Lorraine",
                               "url": null,
-                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
-                              "programs": [
-                                {
-                                  "id": "451e5b61-c340-4f85-905c-da4332c968ed",
-                                  "name": "Coca Cola",
-                                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
-                                }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "Coca Colax",
-                              "url": "https://www.coca-cola-france.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg",
-                              "programs": [
-                                {
-                                  "id": "a0d5edba-0d1d-4bd2-8bca-2656b86a03f6",
-                                  "name": "Coca Colax",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
-                                }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "Creepy sponsor",
-                              "url": "https://bretzel.club/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg",
-                              "programs": [
-                                {
-                                  "id": "e92a5a4e-8730-4a30-adfb-aa78fd04471e",
-                                  "name": "Creepy sponsor",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg"
-                                }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "Foobaaaar",
-                              "url": "https://www.foobaaaar.com",
-                              "logoUrl": "https://www.foobaaaar.com/logo.png",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "4b1cbc61-045c-4229-8378-8ad50c2aca78",
                                   "name": "AS Nancy Lorraine",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
                                 }
-                              ],
+                              ]
+                            },
+                            {
+                              "name": "Captain America",
+                              "url": "https://www.marvel.com/characters/captain-america-steve-rogers",
+                              "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg",
+                              "leads": [],
+                              "pendingDepositCount": 0,
+                              "programs": [
+                                {
+                                  "id": "e919b1ff-c666-4dd9-99bc-522ceb5fde7a",
+                                  "name": "Captain America",
+                                  "logoUrl": "https://www.ed92.org/wp-content/uploads/2021/06/captain-america-2-scaled.jpg"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "ChatGPT",
+                              "url": "https://chat.openai.com/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
+                              "leads": [],
+                              "pendingDepositCount": 1,
+                              "programs": [
+                                {
+                                  "id": "04315017-a917-4f60-93c5-3b9f0dbe3af4",
+                                  "name": "ChatGPT",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Coca Cola",
+                              "url": null,
+                              "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj",
+                              "leads": [],
+                              "pendingDepositCount": 2,
+                              "programs": [
+                                {
+                                  "id": "451e5b61-c340-4f85-905c-da4332c968ed",
+                                  "name": "Coca Cola",
+                                  "logoUrl": "https://yt3.googleusercontent.com/NgMkZDr_RjcizNLNSQkAy1kmKC-qRkX-wsWTt97e1XFRstMapTAGBPO1XQJpW3J2KRv2eBkYucY=s900-c-k-c0x00ffffff-no-rj"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Coca Colax",
+                              "url": "https://www.coca-cola-france.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg",
+                              "leads": [],
+                              "pendingDepositCount": 0,
+                              "programs": [
+                                {
+                                  "id": "a0d5edba-0d1d-4bd2-8bca-2656b86a03f6",
+                                  "name": "Coca Colax",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Creepy sponsor",
+                              "url": "https://bretzel.club/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg",
+                              "leads": [],
+                              "pendingDepositCount": 0,
+                              "programs": [
+                                {
+                                  "id": "e92a5a4e-8730-4a30-adfb-aa78fd04471e",
+                                  "name": "Creepy sponsor",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10742744717192724286.jpg"
+                                }
+                              ]
+                            },
+                            {
+                              "name": "Foobaaaar",
+                              "url": "https://www.foobaaaar.com",
+                              "logoUrl": "https://www.foobaaaar.com/logo.png",
                               "leads": [
+                                {
+                                  "githubUserId": 595505,
+                                  "userId": "e461c019-ba23-4671-9b6c-3a5a18748af9",
+                                  "login": "ofux",
+                                  "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
+                                },
                                 {
                                   "githubUserId": 43467246,
                                   "userId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
                                   "login": "AnthonyBuisset",
                                   "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
                                 }
-                              ]
+                              ],
+                              "pendingDepositCount": 0,
+                              "programs": []
                             },
                             {
                               "name": "Foobar",
                               "url": "https://www.foobar.com",
                               "logoUrl": "https://www.foobar.com/logo.png",
-                              "programs": [],
                               "leads": [
                                 {
                                   "githubUserId": 16590657,
@@ -428,46 +379,37 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                                   "login": "PierreOucif",
                                   "avatarUrl": "https://avatars.githubusercontent.com/u/16590657?v=4"
                                 }
-                              ]
+                              ],
+                              "pendingDepositCount": 0,
+                              "programs": []
                             },
                             {
                               "name": "No Sponsor",
                               "url": null,
                               "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "6d13685b-2853-438e-bf78-b7d4a37adc70",
                                   "name": "No Sponsor",
                                   "logoUrl": "https://app.onlydust.com/_next/static/media/onlydust-logo.68e14357.webp"
                                 }
-                              ],
-                              "leads": []
+                              ]
                             },
                             {
                               "name": "OGC Nissa Ineos",
                               "url": "https://www.ogcnice.com/fr/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "a572bf50-3b2f-4008-8a98-f62de1acd4eb",
                                   "name": "OGC Nissa Ineos",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2946389705306833508.png"
                                 }
-                              ],
-                              "leads": []
-                            },
-                            {
-                              "name": "PSG",
-                              "url": "https://www.psg.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png",
-                              "programs": [
-                                {
-                                  "id": "a606447e-89a7-4e76-92e8-a5b020f83420",
-                                  "name": "PSG",
-                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
-                                }
-                              ],
-                              "leads": []
+                              ]
                             }
                           ]
                         }
@@ -485,61 +427,79 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 14,
+                          "totalItemNumber": 15,
                           "hasMore": false,
                           "nextPageIndex": 1,
                           "sponsors": [
                             {
+                              "name": "PSG",
+                              "url": "https://www.psg.fr/",
+                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
+                              "programs": [
+                                {
+                                  "id": "a606447e-89a7-4e76-92e8-a5b020f83420",
+                                  "name": "PSG",
+                                  "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/15168095065030147290.png"
+                                }
+                              ]
+                            },
+                            {
                               "name": "Red Bull",
                               "url": "https://www.redbull.com/",
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "4ffb631f-e850-46ef-9171-894f5b0f5f2c",
                                   "name": "Red Bull",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                                 }
-                              ],
-                              "leads": []
+                              ]
                             },
                             {
                               "name": "Starknet Foundation",
                               "url": "https://starknet.io",
                               "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "54a7604d-e7c8-4d4b-a186-9ad7fd31e4a6",
                                   "name": "Starknet Foundation",
                                   "logoUrl": "https://logos-marques.com/wp-content/uploads/2020/09/Logo-Instagram-1.png"
                                 }
-                              ],
-                              "leads": []
+                              ]
                             },
                             {
                               "name": "Theodo",
                               "url": null,
                               "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "05ad97ac-11c4-40fa-9a35-7564120e2706",
                                   "name": "Theodo",
                                   "logoUrl": "https://upload.wikimedia.org/wikipedia/fr/thumb/d/dd/Logo-theodo.png/1200px-Logo-theodo.png"
                                 }
-                              ],
-                              "leads": []
+                              ]
                             },
                             {
                               "name": "We are super sponsors!",
                               "url": null,
                               "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png",
+                              "leads": [],
+                              "pendingDepositCount": 0,
                               "programs": [
                                 {
                                   "id": "9f9a8397-802a-4f60-8db9-34264b64d747",
                                   "name": "We are super sponsors!",
                                   "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/4216570625498269873.png"
                                 }
-                              ],
-                              "leads": []
+                              ]
                             }
                           ]
                         }
@@ -889,7 +849,6 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
         ;
     }
 
-
     @Test
     @Order(9)
     void should_get_deposit_details() {
@@ -1006,58 +965,5 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .is2xxSuccessful()
                 .expectBody()
                 .jsonPath("$.url").isEqualTo("https://s3.amazon.com/logo.jpeg");
-    }
-
-    @Test
-    void should_add_and_get_sponsor_leads() {
-        // Given
-        final UUID readBull = UUID.fromString("0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa");
-        final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
-        final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-
-        // When
-        client.put()
-                .uri(getApiURI(SPONSORS_LEADS.formatted(readBull, olivierId)))
-                .header("Authorization", "Bearer " + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        // When
-        client.put()
-                .uri(getApiURI(SPONSORS_LEADS.formatted(readBull, anthoId)))
-                .header("Authorization", "Bearer " + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
-        // When
-        client.get()
-                .uri(getApiURI(GET_SPONSOR.formatted(readBull)))
-                .header("Authorization", "Bearer " + pierre.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .json("""
-                        {
-                          "leads": [
-                            {
-                              "githubUserId": 595505,
-                              "userId": "e461c019-ba23-4671-9b6c-3a5a18748af9",
-                              "login": "ofux",
-                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5494259449694867225.webp"
-                            },
-                            {
-                              "githubUserId": 43467246,
-                              "userId": "747e663f-4e68-4b42-965b-b5aebedcd4c4",
-                              "login": "AnthonyBuisset",
-                              "avatarUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/11725380531262934574.webp"
-                            }
-                          ]
-                        }""");
     }
 }

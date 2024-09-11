@@ -26,9 +26,8 @@ public class SponsorService implements SponsorFacadePort {
 
     @Override
     public Sponsor createSponsor(@NonNull String name, URI url, @NonNull URI logoUrl, @NonNull List<UserId> leads) {
-        final var sponsor = Sponsor.create(name, url, logoUrl);
+        final var sponsor = Sponsor.create(name, url, logoUrl, leads);
         sponsorStoragePort.save(sponsor);
-        leads.forEach(leadId -> sponsorStoragePort.addLeadToSponsor(leadId.value(), sponsor.id()));
         return sponsor;
     }
 
@@ -41,19 +40,13 @@ public class SponsorService implements SponsorFacadePort {
                 .name(name)
                 .url(url)
                 .logoUrl(logoUrl)
+                .leads(leads)
                 .build());
-        
-        leads.forEach(leadId -> sponsorStoragePort.addLeadToSponsor(leadId.value(), sponsor.id()));
     }
 
     @Override
     public URL uploadLogo(InputStream imageInputStream) {
         return imageStoragePort.storeImage(imageInputStream);
-    }
-
-    @Override
-    public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
-        sponsorStoragePort.addLeadToSponsor(leadId, sponsorId);
     }
 
     @Override

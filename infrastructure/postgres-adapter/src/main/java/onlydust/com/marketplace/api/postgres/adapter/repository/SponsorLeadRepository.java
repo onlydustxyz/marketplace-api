@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public interface SponsorLeadRepository extends JpaRepository<SponsorLeadEntity, SponsorLeadEntity.PrimaryKey> {
 
-    Optional<SponsorLeadEntity> findByUserId(UUID userId);
-
     @Query(value = """
             select s.*
             from sponsor_leads s

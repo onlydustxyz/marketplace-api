@@ -32,23 +32,12 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
 
     @Override
     @Transactional
-    public boolean isAdminOfAnySponsor(UUID userId) {
-        return sponsorLeadRepository.findByUserId(userId).isPresent();
-    }
-
-    @Override
-    @Transactional
     public boolean isAdminOfProgramSponsor(UUID userId, ProgramId programId) {
         return sponsorLeadRepository.findByUserIdAndProgramId(userId, programId.value()).isPresent();
     }
 
     @Override
-    @Transactional
-    public void addLeadToSponsor(UUID leadId, SponsorId sponsorId) {
-        sponsorLeadRepository.save(new SponsorLeadEntity(leadId, sponsorId.value()));
-    }
-
-    @Override
+    @Transactional(readOnly = true)
     public Optional<Sponsor> get(SponsorId sponsorId) {
         return sponsorRepository.findById(sponsorId.value())
                 .map(SponsorEntity::toDomain);
@@ -65,7 +54,8 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
     @Override
     @Transactional
     public void save(Sponsor sponsor) {
-        sponsorRepository.save(SponsorEntity.of(sponsor));
+        sponsorRepository.findById(sponsor.id().value())
+                .ifPresentOrElse(s -> s.updateWith(sponsor), () -> sponsorRepository.save(SponsorEntity.of(sponsor)));
     }
 
     @Override
