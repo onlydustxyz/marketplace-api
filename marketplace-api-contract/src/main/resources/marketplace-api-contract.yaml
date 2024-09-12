@@ -6453,41 +6453,31 @@ components:
                 $ref: '#/components/schemas/ProgramPageItemResponse'
 
     ProgramShortResponse:
-      type: object
-      required:
-        - id
-        - name
-      properties:
-        id:
-          $ref: '#/components/schemas/ProgramId'
-        name:
-          type: string
-          description: Program name
-          example: Starkware Exploration Team
-        logoUrl:
-          type: string
-          format: uri
-          description: Program's logo URL
-        url:
-          type: string
-          format: uri
-          description: Program's website URL
-
-    ProgramPageItemResponse:
       allOf:
         - $ref: '#/components/schemas/ProgramLinkResponse'
         - type: object
           required:
             - leads
+          properties:
+            url:
+              type: string
+              format: uri
+              description: Program's website URL
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+
+    ProgramPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramShortResponse'
+        - type: object
+          required:
             - projectCount
             - totalAvailable
             - totalGranted
             - totalRewarded
           properties:
-            leads:
-              type: array
-              items:
-                $ref: '#/components/schemas/RegisteredUserResponse'
             projectCount:
               type: integer
               description: Number of projects in the program
