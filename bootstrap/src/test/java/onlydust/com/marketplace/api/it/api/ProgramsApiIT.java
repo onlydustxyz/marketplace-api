@@ -241,10 +241,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
     class GivenMyProgram {
         Sponsor sponsor;
         Program program;
+        UserAuthHelper.AuthenticatedUser sponsorLead;
 
         @BeforeEach
         void setUp() {
-            sponsor = sponsorHelper.create();
+            sponsorLead = userAuthHelper.create();
+            sponsor = sponsorHelper.create(sponsorLead);
             program = programHelper.create(sponsor.id(), caller);
         }
 
@@ -261,12 +263,24 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(program.id().toString())
                     .jsonPath("$.name").isEqualTo(program.name())
+                    .jsonPath("$.leads.length()").isEqualTo(1)
+                    .jsonPath("$.leads[0].id").isEqualTo(caller.user().getId().toString())
                     .jsonPath("$.totalAvailable.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalAvailable.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalGranted.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalRewarded.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
+            ;
+
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + sponsorLead.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
             ;
         }
 
@@ -455,6 +469,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.id").isEqualTo(program.id().toString())
                         .jsonPath("$.name").isEqualTo(program.name())
+                        .jsonPath("$.leads.length()").isEqualTo(1)
+                        .jsonPath("$.leads[0].id").isEqualTo(caller.user().getId().toString())
                         .jsonPath("$.totalAvailable.totalPerCurrency[0].currency.code").isEqualTo("ETH")
                         .jsonPath("$.totalGranted.totalPerCurrency[0].currency.code").isEqualTo("ETH")
                         .jsonPath("$.totalRewarded.totalPerCurrency[0].currency.code").isEqualTo("ETH")
