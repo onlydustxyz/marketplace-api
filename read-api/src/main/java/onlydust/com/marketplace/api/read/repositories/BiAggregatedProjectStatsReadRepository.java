@@ -28,8 +28,9 @@ public interface BiAggregatedProjectStatsReadRepository extends Repository<BiAgg
                              filter (where d.next_contribution_timestamp is null and date_trunc(:timeGrouping, d.timestamp) <
                                                                                      date_trunc(:timeGrouping, now()))    as next_period_churned_project_count,
             
-                             dist_sum(distinct d.project_id, d.merged_pr_count)                                           as merged_pr_count
-                      from bi.project_contribution_data d
+                             count(distinct d.contribution_id)
+                             filter ( where d.is_merged_pr )                                                              as merged_pr_count
+                      from bi.contribution_data_cross_projects d
                       where
                         -- We need to get one interval before fromDate to calculate churned project count
                           d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval)
@@ -41,8 +42,8 @@ public interface BiAggregatedProjectStatsReadRepository extends Repository<BiAgg
             
                  aggregated_project_rewards_stats AS
                      (SELECT date_trunc(:timeGrouping, d.timestamp) as timestamp,
-                             sum(d.total_rewarded_usd_amount)       as total_rewarded_usd_amount
-                      from bi.project_reward_data d
+                             sum(d.usd_amount)                      as total_rewarded_usd_amount
+                      from bi.reward_data d
                       where d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(('1 ' || :timeGrouping) as interval)
                         and (coalesce(:programOrEcosystemIds) is null

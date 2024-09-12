@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.api.bi;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
+import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.AfterAll;
@@ -22,6 +23,7 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 
+@TagBI
 public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
