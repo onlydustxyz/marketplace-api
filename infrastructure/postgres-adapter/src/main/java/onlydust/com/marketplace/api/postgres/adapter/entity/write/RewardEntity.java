@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Reward;
 
 import java.math.BigDecimal;
@@ -82,9 +85,9 @@ public class RewardEntity {
 
     public static RewardEntity of(Reward reward) {
         return RewardEntity.builder()
-                .id(reward.id())
-                .projectId(reward.projectId())
-                .requestorId(reward.requestorId())
+                .id(reward.id().value())
+                .projectId(reward.projectId().value())
+                .requestorId(reward.requestorId().value())
                 .recipientId(reward.recipientId())
                 .currencyId(reward.currencyId().value())
                 .amount(reward.amount())
@@ -95,9 +98,9 @@ public class RewardEntity {
 
     public Reward toReward() {
         return new Reward(
-                id,
-                projectId,
-                requestorId,
+                RewardId.of(id),
+                ProjectId.of(projectId),
+                UserId.of(requestorId),
                 recipientId,
                 amount,
                 CurrencyView.Id.of(currencyId),

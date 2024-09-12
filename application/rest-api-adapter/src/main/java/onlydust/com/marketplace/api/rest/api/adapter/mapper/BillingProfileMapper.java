@@ -200,7 +200,7 @@ public interface BillingProfileMapper {
                                                          AuthenticatedUser authenticatedUser) {
         return new MyRewardPageItemResponse()
                 .id(view.getId())
-                .projectId(view.getProjectId())
+                .projectId(view.getProjectId().value())
                 .numberOfRewardedContributions(view.getNumberOfRewardedContributions())
                 .rewardedOnProjectLogoUrl(view.getRewardedOnProjectLogoUrl())
                 .rewardedOnProjectName(view.getRewardedOnProjectName())

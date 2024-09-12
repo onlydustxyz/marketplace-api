@@ -16,6 +16,7 @@ import onlydust.com.marketplace.api.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
@@ -87,7 +88,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
             );
         }
 
-        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.id()))
+        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
             throw forbidden("Only project lead can get committee application");
 
         final var project = projectInfosViewRepository.findByProjectId(projectId)
@@ -116,7 +117,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     @Override
     public ResponseEntity<MyCommitteeAssignmentsResponse> getCommitteeAssignments(UUID committeeId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var userVotesForCommittee = committeeJuryVoteViewRepository.findAllByCommitteeIdAndUserId(committeeId, authenticatedUser.id());
+        final var userVotesForCommittee = committeeJuryVoteViewRepository.findAllByCommitteeIdAndUserId(committeeId, authenticatedUser.id().value());
         if (userVotesForCommittee.isEmpty()) {
             throw notFound("No assignement found for user %s on committee %s".formatted(authenticatedUser.id(), committeeId));
         }
@@ -146,7 +147,7 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
     @Override
     public ResponseEntity<MyCommitteeAssignmentResponse> getCommitteeAssignmentOnProject(UUID committeeId, UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var votes = committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectIdAndUserId(committeeId, projectId, authenticatedUser.id());
+        final var votes = committeeJuryVoteViewRepository.findAllByCommitteeIdAndProjectIdAndUserId(committeeId, projectId, authenticatedUser.id().value());
         if (votes.isEmpty()) {
             throw notFound("No assignement found for user %s on committee %s and project %s".formatted(authenticatedUser.id(), committeeId, projectId));
         }

@@ -2064,7 +2064,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                         .bodyValue(new GrantRequest()
-                                .projectId(project1.getId())
+                                .projectId(project1.getId().value())
                                 .amount(BigDecimal.ONE)
                                 .currencyId(ETH.value()))
                         .exchange()

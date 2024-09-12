@@ -22,6 +22,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +94,8 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.id(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
+        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.id().value(), mine, search, ecosystemsJsonPath, tagsJsonPath,
+                        languagesJsonPath,
                         categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
                 .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs, hasGoodFirstIssues,
                         sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort)));
@@ -169,22 +172,22 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
     @Override
     public ResponseEntity<ProjectResponse> getProject(final UUID projectId, final Boolean includeAllAvailableRepos) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var userId = caller == null ? null : caller.id();
+        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var userId = caller.map(AuthenticatedUser::id);
 
-        if (!permissionService.hasUserAccessToProject(projectId, userId))
+        if (!permissionService.hasUserAccessToProject(ProjectId.of(projectId), userId))
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(projectId, userId));
 
         final var project = projectReadRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
-        return ok(getProjectDetails(project, caller, includeAllAvailableRepos));
+        return ok(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override
     public ResponseEntity<ProjectResponse> getProjectBySlug(final String slug, final Boolean includeAllAvailableRepos) {
-        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser().orElse(null);
-        final var userId = caller == null ? null : caller.id();
+        final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
+        final var userId = caller.map(AuthenticatedUser::id);
 
         if (!permissionService.hasUserAccessToProject(slug, userId))
             throw OnlyDustException.forbidden("Project %s is private and user %s cannot access it".formatted(slug, userId));
@@ -192,7 +195,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var project = projectReadRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
-        return ok(getProjectDetails(project, caller, includeAllAvailableRepos));
+        return ok(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override
@@ -362,7 +365,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final int sanitizePageSize = sanitizePageSize(pageSize);
 
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        if (!permissionService.isUserProjectLead(projectId, authenticatedUser.id())) {
+        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id())) {
             throw forbidden("Only project leads can read rewards on their projects");
         }
 
@@ -410,7 +413,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final int sanitizePageIndex = sanitizePageIndex(pageIndex);
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var authenticatedUser = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(projectId, authenticatedUser.get().id());
+        final var callerIsLead = authenticatedUser.isPresent() && permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.get().id());
         final var sortBy = switch (sort) {
             case LOGIN -> "(login)";
             case CONTRIBUTION_COUNT -> "(contribution_count)";
@@ -427,7 +430,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
 
         final var contributors = projectContributorQueryRepository.findProjectContributors(projectId,
                 login,
-                authenticatedUser.map(AuthenticatedUser::id).orElse(null),
+                authenticatedUser.map(AuthenticatedUser::id).map(UserId::value).orElse(null),
                 showHidden,
                 pageable);
         final var hasHiddenContributors = callerIsLead && projectContributorQueryRepository.hasHiddenContributors(projectId);

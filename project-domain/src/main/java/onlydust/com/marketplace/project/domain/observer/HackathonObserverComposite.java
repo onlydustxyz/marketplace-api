@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
 
 import java.util.List;
-import java.util.UUID;
 
 public class HackathonObserverComposite implements HackathonObserverPort {
 
@@ -15,7 +15,7 @@ public class HackathonObserverComposite implements HackathonObserverPort {
     }
 
     @Override
-    public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
+    public void onUserRegistration(Hackathon.Id hackathonId, UserId userId) {
         observers.forEach(observer -> observer.onUserRegistration(hackathonId, userId));
     }
 }

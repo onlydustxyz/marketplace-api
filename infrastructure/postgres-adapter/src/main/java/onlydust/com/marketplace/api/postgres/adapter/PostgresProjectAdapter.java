@@ -15,6 +15,8 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.*;
@@ -57,8 +59,8 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     private final ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
 
     @Override
-    public Optional<UUID> getProjectIdBySlug(String slug) {
-        return projectViewRepository.findBySlug(slug).map(ProjectViewEntity::getId);
+    public Optional<ProjectId> getProjectIdBySlug(String slug) {
+        return projectViewRepository.findBySlug(slug).map(ProjectViewEntity::getId).map(ProjectId::of);
     }
 
     @Override
@@ -79,36 +81,36 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public boolean hasUserAccessToProject(UUID projectId, UUID userId) {
-        return customProjectRepository.isProjectPublic(projectId) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectId, userId));
+    public boolean hasUserAccessToProject(ProjectId projectId, UserId userId) {
+        return customProjectRepository.isProjectPublic(projectId.value()) ||
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectId.value(), userId.value()));
     }
 
     @Override
-    public boolean hasUserAccessToProject(String projectSlug, UUID userId) {
+    public boolean hasUserAccessToProject(String projectSlug, UserId userId) {
         return customProjectRepository.isProjectPublic(projectSlug) ||
-               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId));
+               (userId != null && customProjectRepository.hasUserAccessToProject(projectSlug, userId.value()));
     }
 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Project> getById(UUID projectId) {
-        return projectRepository.findById(projectId).map(ProjectEntity::toDomain);
+    public Optional<Project> getById(ProjectId projectId) {
+        return projectRepository.findById(projectId.value()).map(ProjectEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
+    public void createProject(ProjectId projectId, String slug, String name, String shortDescription, String longDescription,
                               Boolean isLookingForContributors, List<NamedLink> moreInfos,
-                              List<Long> githubRepoIds, UUID firstProjectLeaderId,
+                              List<Long> githubRepoIds, UserId firstProjectLeaderId,
                               List<Long> githubUserIdsAsProjectLeads,
                               ProjectVisibility visibility, String imageUrl, ProjectRewardSettings rewardSettings,
                               List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
                               boolean botNotifyExternalApplications) {
         final ProjectEntity projectEntity =
                 ProjectEntity.builder()
-                        .id(projectId)
+                        .id(projectId.value())
                         .slug(slug)
                         .name(name)
                         .shortDescription(shortDescription)
@@ -121,22 +123,22 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .ignoreCodeReviews(rewardSettings.getIgnoreCodeReviews())
                         .ignoreContributionsBefore(rewardSettings.getIgnoreContributionsBefore())
                         .repos(githubRepoIds == null ? null : githubRepoIds.stream()
-                                .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                                .map(repoId -> new ProjectRepoEntity(projectId.value(), repoId))
                                 .collect(toSet()))
                         .moreInfos(moreInfos == null ? null : moreInfosToEntities(moreInfos, projectId))
-                        .projectLeaders(Set.of(new ProjectLeadEntity(projectId, firstProjectLeaderId)))
+                        .projectLeaders(Set.of(new ProjectLeadEntity(projectId.value(), firstProjectLeaderId.value())))
                         .projectLeaderInvitations(githubUserIdsAsProjectLeads == null ? null :
                                 githubUserIdsAsProjectLeads.stream()
                                         .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(),
-                                                projectId, githubUserId))
+                                                projectId.value(), githubUserId))
                                         .collect(toSet()))
                         .ecosystems(ecosystemIds == null ? null :
-                                ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId)).collect(toSet()))
+                                ecosystemIds.stream().map(ecosystemId -> new ProjectEcosystemEntity(projectId.value(), ecosystemId)).collect(toSet()))
                         .categories(categoryIds == null ? null :
-                                categoryIds.stream().map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId)).collect(toSet()))
+                                categoryIds.stream().map(categoryId -> new ProjectProjectCategoryEntity(projectId.value(), categoryId)).collect(toSet()))
                         .categorySuggestions(categorySuggestions == null ? Set.of() :
                                 categorySuggestions.stream().map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(),
-                                        categorySuggestion, projectId)).collect(toSet())
+                                        categorySuggestion, projectId.value())).collect(toSet())
                         )
                         .rank(0)
                         .botNotifyExternalApplications(botNotifyExternalApplications)
@@ -147,15 +149,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional
-    public void updateProject(UUID projectId, String slug, String name, String shortDescription,
+    public void updateProject(ProjectId projectId, String slug, String name, String shortDescription,
                               String longDescription,
                               Boolean isLookingForContributors, List<NamedLink> moreInfos,
                               List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                              List<UUID> projectLeadersToKeep, String imageUrl,
+                              List<UserId> projectLeadersToKeep, String imageUrl,
                               ProjectRewardSettings rewardSettings,
                               List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions) {
-        final var project = this.projectRepository.findById(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
+        final var project = this.projectRepository.findById(projectId.value())
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId.value())));
         project.setSlug(slug);
         project.setName(name);
         project.setShortDescription(shortDescription);
@@ -186,34 +188,34 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(projectLeaderInvitations)) {
                 projectLeaderInvitations.removeIf(invitation -> githubUserIdsAsProjectLeadersToInvite.stream()
                         .noneMatch(githubUserId -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                   invitation.getProjectId().equals(projectId)));
+                                                   invitation.getProjectId().equals(projectId.value())));
 
                 projectLeaderInvitations.addAll(githubUserIdsAsProjectLeadersToInvite.stream()
                         .filter(githubUserId -> projectLeaderInvitations.stream()
                                 .noneMatch(invitation -> invitation.getGithubUserId().equals(githubUserId) &&
-                                                         invitation.getProjectId().equals(projectId)))
-                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
+                                                         invitation.getProjectId().equals(projectId.value())))
+                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId.value(),
                                 githubUserId)).toList());
             } else {
                 project.setProjectLeaderInvitations(githubUserIdsAsProjectLeadersToInvite.stream()
-                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId,
+                        .map(githubUserId -> new ProjectLeaderInvitationEntity(UUID.randomUUID(), projectId.value(),
                                 githubUserId))
                         .collect(toSet()));
             }
         }
 
         if (!isNull(projectLeadersToKeep))
-            project.getProjectLeaders().removeIf(lead -> !projectLeadersToKeep.contains(lead.getUserId()));
+            project.getProjectLeaders().removeIf(lead -> !projectLeadersToKeep.contains(UserId.of(lead.getUserId())));
 
         if (!isNull(githubRepoIds)) {
             if (nonNull(project.getRepos())) {
                 project.getRepos().clear();
                 project.getRepos().addAll(githubRepoIds.stream()
-                        .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                        .map(repoId -> new ProjectRepoEntity(projectId.value(), repoId))
                         .collect(toSet()));
             } else {
                 project.setRepos(githubRepoIds.stream()
-                        .map(repoId -> new ProjectRepoEntity(projectId, repoId))
+                        .map(repoId -> new ProjectRepoEntity(projectId.value(), repoId))
                         .collect(toSet()));
             }
         }
@@ -222,11 +224,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(project.getEcosystems())) {
                 project.getEcosystems().clear();
                 project.getEcosystems().addAll(ecosystemIds.stream()
-                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
+                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId.value(), ecosystemId))
                         .collect(toSet()));
             } else {
                 project.setEcosystems(ecosystemIds.stream()
-                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId, ecosystemId))
+                        .map(ecosystemId -> new ProjectEcosystemEntity(projectId.value(), ecosystemId))
                         .collect(toSet()));
             }
         }
@@ -235,11 +237,11 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             if (nonNull(project.getCategories())) {
                 project.getCategories().clear();
                 project.getCategories().addAll(categoryIds.stream()
-                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
+                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId.value(), categoryId))
                         .collect(toSet()));
             } else {
                 project.setCategories(categoryIds.stream()
-                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId, categoryId))
+                        .map(categoryId -> new ProjectProjectCategoryEntity(projectId.value(), categoryId))
                         .collect(toSet()));
             }
         }
@@ -249,7 +251,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
             project.getCategorySuggestions().addAll(categorySuggestions.stream()
                     .filter(categorySuggestion -> project.getCategorySuggestions().stream()
                             .noneMatch(suggestion -> suggestion.getName().equals(categorySuggestion)))
-                    .map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(), categorySuggestion, projectId))
+                    .map(categorySuggestion -> new ProjectCategorySuggestionEntity(UUID.randomUUID(), categorySuggestion, projectId.value()))
                     .collect(toSet()));
         }
 
@@ -258,23 +260,24 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public List<UUID> getProjectLeadIds(UUID projectId) {
-        return projectLeadViewRepository.findProjectLeaders(projectId)
+    public List<UserId> getProjectLeadIds(ProjectId projectId) {
+        return projectLeadViewRepository.findProjectLeaders(projectId.value())
                 .stream()
                 .map(ProjectLeadQueryEntity::getId)
+                .map(UserId::of)
                 .toList();
     }
 
     @Override
-    public Set<Long> getProjectInvitedLeadIds(UUID projectId) {
-        return projectLeaderInvitationRepository.findAllByProjectId(projectId)
+    public Set<Long> getProjectInvitedLeadIds(ProjectId projectId) {
+        return projectLeaderInvitationRepository.findAllByProjectId(projectId.value())
                 .stream()
                 .map(ProjectLeaderInvitationEntity::getGithubUserId)
                 .collect(toSet());
     }
 
     @Override
-    public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(ProjectId projectId,
                                                                                                   ContributionType contributionType,
                                                                                                   ContributionStatus contributionStatus,
                                                                                                   Long githubUserid,
@@ -284,7 +287,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                                                                                                   Boolean includeIgnoredItems) {
 
         final List<RewardableItemView> rewardableItemViews =
-                rewardableItemRepository.findByProjectIdAndGithubUserId(projectId, githubUserid,
+                rewardableItemRepository.findByProjectIdAndGithubUserId(projectId.value(), githubUserid,
                                 isNull(contributionType) ? null : contributionType.name(),
                                 isNull(contributionStatus) ? null : contributionStatus.name(),
                                 search,
@@ -293,7 +296,7 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
                         .stream()
                         .map(RewardableItemMapper::itemToDomain)
                         .toList();
-        final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId, githubUserid,
+        final Long count = rewardableItemRepository.countByProjectIdAndGithubUserId(projectId.value(), githubUserid,
                 isNull(contributionType) ? null : contributionType.name(),
                 isNull(contributionStatus) ? null : contributionStatus.name(),
                 search, includeIgnoredItems);
@@ -306,9 +309,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<Long> getProjectRepoIds(UUID projectId) {
-        final var project = projectRepository.findById(projectId)
-                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId)));
+    public Set<Long> getProjectRepoIds(ProjectId projectId) {
+        final var project = projectRepository.findById(projectId.value())
+                .orElseThrow(() -> notFound("Project %s not found".formatted(projectId.value())));
 
         return project.getRepos() == null ? Set.of() : project.getRepos().stream()
                 .map(ProjectRepoEntity::getRepoId)
@@ -317,9 +320,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectOrganizationView> getProjectOrganizations(UUID projectId) {
-        final var project = projectViewRepository.findById(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
+    public List<ProjectOrganizationView> getProjectOrganizations(ProjectId projectId) {
+        final var project = projectViewRepository.findById(projectId.value())
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId.value())));
         return project.organizations();
     }
 
@@ -330,9 +333,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize) {
+    public Page<ChurnedContributorView> getChurnedContributors(ProjectId projectId, Integer pageIndex, Integer pageSize) {
         final var page = churnedContributorViewEntityRepository.findAllByProjectId(
-                projectId, CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
+                projectId.value(), CHURNED_CONTRIBUTOR_THRESHOLD_IN_DAYS,
                 PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC, "last_contribution_completed_at")));
         return Page.<ChurnedContributorView>builder()
                 .content(page.getContent().stream().map(ChurnedContributorQueryEntity::toDomain).toList())
@@ -342,9 +345,9 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<NewcomerView> getNewcomers(UUID projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize) {
+    public Page<NewcomerView> getNewcomers(ProjectId projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize) {
         final var page = newcomerViewEntityRepository.findAllByProjectId(
-                projectId, since, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
+                projectId.value(), since, PageRequest.of(pageIndex, pageSize, Sort.by(Sort.Direction.DESC,
                         "first_contribution_created_at")));
         return Page.<NewcomerView>builder()
                 .content(page.getContent().stream().map(NewcomerQueryEntity::toDomain).toList())
@@ -354,14 +357,14 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex,
+    public Page<ContributorActivityView> getMostActivesContributors(ProjectId projectId, Integer pageIndex,
                                                                     Integer pageSize) {
         final var format = new SimpleDateFormat("yyyy-MM-dd");
         final var fromDate =
                 Date.from(ZonedDateTime.now().minusWeeks(CONTRIBUTOR_ACTIVITY_COUNTS_THRESHOLD_IN_WEEKS).toInstant());
 
         final var page = contributorActivityViewEntityRepository.findAllByProjectId(
-                projectId, format.format(fromDate),
+                projectId.value(), format.format(fromDate),
                 PageRequest.of(pageIndex, pageSize, JpaSort.unsafe(Sort.Direction.DESC, "completed_total_count")));
         return Page.<ContributorActivityView>builder()
                 .content(page.getContent().stream().map(ContributorActivityQueryEntity::toDomain).toList())
@@ -371,19 +374,19 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     }
 
     @Override
-    public void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+    public void hideContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId) {
         hiddenContributorRepository.saveAndFlush(HiddenContributorEntity.builder()
-                .projectId(projectId)
-                .projectLeadId(projectLeadId)
+                .projectId(projectId.value())
+                .projectLeadId(projectLeadId.value())
                 .contributorGithubUserId(contributorGithubUserId)
                 .build());
     }
 
     @Override
-    public void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+    public void showContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId) {
         hiddenContributorRepository.deleteById(HiddenContributorEntity.PrimaryKey.builder()
-                .projectId(projectId)
-                .projectLeadId(projectLeadId)
+                .projectId(projectId.value())
+                .projectLeadId(projectLeadId.value())
                 .contributorGithubUserId(contributorGithubUserId)
                 .build());
     }
@@ -403,38 +406,39 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean exists(UUID projectId) {
-        return projectRepository.existsById(projectId);
+    public boolean exists(ProjectId projectId) {
+        return projectRepository.existsById(projectId.value());
     }
 
     @Override
-    public ProjectInfosView getProjectInfos(UUID projectId) {
-        return projectInfosViewRepository.findByProjectId(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)))
+    public ProjectInfosView getProjectInfos(ProjectId projectId) {
+        return projectInfosViewRepository.findByProjectId(projectId.value())
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId.value())))
                 .toView();
     }
 
     @Override
-    public List<UUID> getProjectLedIdsForUser(UUID userId) {
-        return projectRepository.getProjectLedIdsForUser(userId);
+    public List<ProjectId> getProjectLedIdsForUser(UserId userId) {
+        return projectRepository.getProjectLedIdsForUser(userId.value()).stream().map(ProjectId::of).toList();
     }
 
     @Override
-    public List<UUID> getProjectContributedOnIdsForUser(UUID userId) {
-        return projectRepository.getProjectContributedOnIdsForUser(userId);
+    public List<ProjectId> getProjectContributedOnIdsForUser(UserId userId) {
+        return projectRepository.getProjectContributedOnIdsForUser(userId.value()).stream().map(ProjectId::of).toList();
     }
 
     @Override
-    public List<UUID> findProjectIdsByRepoId(Long repoId) {
+    public List<ProjectId> findProjectIdsByRepoId(Long repoId) {
         return projectRepoRepository.findAllByRepoId(repoId)
                 .stream()
                 .map(ProjectRepoEntity::getProjectId)
+                .map(ProjectId::of)
                 .toList();
     }
 
     @Override
-    public List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId) {
-        return projectCategorySuggestionRepository.findAllByProjectId(projectId)
+    public List<ProjectCategorySuggestion> getProjectCategorySuggestions(ProjectId projectId) {
+        return projectCategorySuggestionRepository.findAllByProjectId(projectId.value())
                 .stream()
                 .map(ProjectCategorySuggestionEntity::toDomain)
                 .toList();

@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
@@ -14,24 +16,33 @@ import java.util.*;
 @Builder(toBuilder = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Committee {
-    @NonNull Id id;
-    @NonNull String name;
-    @NonNull ZonedDateTime applicationStartDate;
-    @NonNull ZonedDateTime applicationEndDate;
-    @NonNull Status status;
+    @NonNull
+    Id id;
+    @NonNull
+    String name;
+    @NonNull
+    ZonedDateTime applicationStartDate;
+    @NonNull
+    ZonedDateTime applicationEndDate;
+    @NonNull
+    Status status;
     UUID sponsorId;
 
     @Builder.Default
-    @NonNull List<ProjectQuestion> projectQuestions = new ArrayList<>();
+    @NonNull
+    List<ProjectQuestion> projectQuestions = new ArrayList<>();
 
     @Builder.Default
-    @NonNull Map<UUID, Application> projectApplications = new HashMap<>();
+    @NonNull
+    Map<ProjectId, Application> projectApplications = new HashMap<>();
 
     @Builder.Default
-    @NonNull List<UUID> juryIds = new ArrayList<>();
+    @NonNull
+    List<UserId> juryIds = new ArrayList<>();
 
     @Builder.Default
-    @NonNull List<JuryCriteria> juryCriteria = new ArrayList<>();
+    @NonNull
+    List<JuryCriteria> juryCriteria = new ArrayList<>();
 
     Integer votePerJury;
 
@@ -79,6 +90,6 @@ public class Committee {
     public record ProjectAnswer(@NonNull ProjectQuestion.Id projectQuestionId, String answer) {
     }
 
-    public record Application(@NonNull UUID userId, @NonNull UUID projectId, @NonNull List<ProjectAnswer> answers) {
+    public record Application(@NonNull UserId userId, @NonNull ProjectId projectId, @NonNull List<ProjectAnswer> answers) {
     }
 }

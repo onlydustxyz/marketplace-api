@@ -40,7 +40,7 @@ public record SummaryNotificationsDTO(@NonNull String title,
                         "Your billing profile %s has been closed, please contact support for more information"
                                 .formatted(billingProfileVerificationClosed.billingProfileName()),
                         new ButtonDTO("Contact us", getMarketplaceBillingProfileUrlFromEnvironment(environment,
-                                billingProfileVerificationClosed.billingProfileId().value()))
+                                billingProfileVerificationClosed.billingProfileId()))
                 );
             } else if (sendableNotification.data() instanceof CommitteeApplicationCreated committeeApplicationCreated) {
                 return new SummaryNotificationDTO(
@@ -121,7 +121,7 @@ public record SummaryNotificationsDTO(@NonNull String title,
                         "Your billing profile %s has been rejected because of : %s"
                                 .formatted(billingProfileVerificationRejected.billingProfileName(), billingProfileVerificationRejected.rejectionReason()),
                         new ButtonDTO("Resume verification", getMarketplaceBillingProfileUrlFromEnvironment(environment,
-                                billingProfileVerificationRejected.billingProfileId().value()))
+                                billingProfileVerificationRejected.billingProfileId()))
                 );
             } else if (sendableNotification.data() instanceof BillingProfileVerificationClosed billingProfileVerificationClosed) {
                 return new SummaryNotificationDTO(
@@ -129,7 +129,7 @@ public record SummaryNotificationsDTO(@NonNull String title,
                         "Your billing profile %s has been closed, please contact support for more information"
                                 .formatted(billingProfileVerificationClosed.billingProfileName()),
                         new ButtonDTO("Contact us", getMarketplaceBillingProfileUrlFromEnvironment(environment,
-                                billingProfileVerificationClosed.billingProfileId().value()))
+                                billingProfileVerificationClosed.billingProfileId()))
                 );
             } else if (sendableNotification.data() instanceof ApplicationToReview applicationToReview) {
                 return new SummaryNotificationDTO(

@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Banner;
 import onlydust.com.marketplace.project.domain.port.input.BannerFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.BannerStoragePort;
@@ -8,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -69,7 +69,7 @@ public class BannerService implements BannerFacadePort {
     }
 
     @Override
-    public void closeBanner(Banner.Id id, UUID userId) {
+    public void closeBanner(Banner.Id id, UserId userId) {
         final var banner = bannerStoragePort.findById(id)
                 .orElseThrow(() -> notFound("Banner %s not found".formatted(id)));
 

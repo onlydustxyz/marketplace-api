@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.contract.CommitteesApi;
 import onlydust.com.marketplace.api.contract.model.CommitteeApplicationRequest;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.CommitteeMapper;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
 import org.springframework.context.annotation.Profile;
@@ -28,7 +29,7 @@ public class CommitteeRestApi implements CommitteesApi {
     public ResponseEntity<Void> createUpdateApplicationForCommittee(UUID committeeId, UUID projectId, CommitteeApplicationRequest committeeApplicationRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Committee.Application application = CommitteeMapper.committeeApplicationRequestToDomain(committeeApplicationRequest, authenticatedUser.id(),
-                projectId);
+                ProjectId.of(projectId));
         committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), application);
         return ResponseEntity.noContent().build();
     }

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -67,7 +67,7 @@ class ProjectCategoryServiceTest {
         final var description = faker.rickAndMorty().quote();
         final var iconSlug = faker.rickAndMorty().location();
         final var suggestionId = ProjectCategorySuggestion.Id.random();
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
 
         when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(name, projectId)));
 
@@ -217,9 +217,9 @@ class ProjectCategoryServiceTest {
     void should_link_project_category_to_suggestion() {
         // Given
         final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
-        existing.projects().add(UUID.randomUUID());
+        existing.projects().add(ProjectId.random());
         final var suggestionId = ProjectCategorySuggestion.Id.random();
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
 
         when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
         when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(faker.rickAndMorty().character(), projectId)));
@@ -246,12 +246,12 @@ class ProjectCategoryServiceTest {
     void should_update_project_category_from_a_suggestion() {
         // Given
         final var existing = ProjectCategory.of(faker.rickAndMorty().character(), faker.rickAndMorty().quote(), faker.rickAndMorty().location());
-        existing.projects().add(UUID.randomUUID());
+        existing.projects().add(ProjectId.random());
         final var newName = faker.rickAndMorty().character();
         final var newDescription = faker.rickAndMorty().quote();
         final var newIconSlug = faker.rickAndMorty().location();
         final var suggestionId = ProjectCategorySuggestion.Id.random();
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
 
         when(projectCategoryStoragePort.get(existing.id())).thenReturn(Optional.of(existing));
         when(projectCategoryStoragePort.get(suggestionId)).thenReturn(Optional.of(ProjectCategorySuggestion.of(faker.rickAndMorty().character(), projectId)));

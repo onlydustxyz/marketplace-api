@@ -6,9 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import onlydust.com.backoffice.api.contract.BackofficeProjectApi;
 import onlydust.com.backoffice.api.contract.model.RewardContributorRequest;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.AutomatedRewardFacadePort;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +25,8 @@ public class BackofficeProjectRestApi implements BackofficeProjectApi {
 
     @Override
     public ResponseEntity<Void> rewardContributor(String projectSlug, RewardContributorRequest rewardContributorRequest) {
-        automatedRewardFacadePort.createOtherWorkAndReward(projectSlug, onlydustBotProperties.getProjectLeadId(), rewardContributorRequest.getRepositoryName(),
+        automatedRewardFacadePort.createOtherWorkAndReward(projectSlug, UserId.of(onlydustBotProperties.getProjectLeadId()),
+                rewardContributorRequest.getRepositoryName(),
                 rewardContributorRequest.getReason(), rewardContributorRequest.getRecipientGithubLogin(), rewardContributorRequest.getCurrencyCode(),
                 rewardContributorRequest.getAmount());
         return ResponseEntity.noContent().build();

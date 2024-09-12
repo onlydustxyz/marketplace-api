@@ -73,7 +73,7 @@ public class RewardServiceTest {
         rewardService.notifyAllNewPaidRewards();
 
         // Then
-        verify(notificationPort).push(recipient1.userId().value(), RewardsPaid.builder().shortRewards(
+        verify(notificationPort).push(recipient1.userId(), RewardsPaid.builder().shortRewards(
                 Stream.of(r11, r12).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())
@@ -83,7 +83,7 @@ public class RewardServiceTest {
                         .sentByGithubLogin(rewardDetailsView.requester().login())
                         .contributionsCount(rewardDetailsView.githubUrls().size())
                         .build()).toList()).build());
-        verify(notificationPort).push(recipient2.userId().value(), RewardsPaid.builder().shortRewards(
+        verify(notificationPort).push(recipient2.userId(), RewardsPaid.builder().shortRewards(
                 Stream.of(r21, r22).map(rewardDetailsView -> ShortReward.builder().
                         id(rewardDetailsView.id())
                         .amount(rewardDetailsView.money().amount())

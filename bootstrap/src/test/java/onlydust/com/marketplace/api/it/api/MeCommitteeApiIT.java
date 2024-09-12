@@ -1,9 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -24,8 +24,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
 
-    private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
-    private final UUID apibara = UUID.fromString("2073b3b2-60f4-488c-8a0a-ab7121ed850c");
+    private final ProjectId bretzel = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
+    private final ProjectId apibara = ProjectId.of("2073b3b2-60f4-488c-8a0a-ab7121ed850c");
 
     @Autowired
     CommitteeFacadePort committeeFacadePort;
@@ -81,8 +81,8 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
 
         committee.projectQuestions().addAll(List.of(q1, q2));
         committee.juryIds().addAll(List.of(
-                olivier.user().getId(),
-                antho.user().getId()));
+                olivier.userId(),
+                antho.userId()));
 
         committee.juryCriteria().addAll(List.of(c1, c2));
         committeeFacadePort.update(committee);
@@ -115,12 +115,12 @@ public class MeCommitteeApiIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final UserAuthHelper.AuthenticatedUser olivier = userAuthHelper.authenticateOlivier();
 
-        projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierre.user().getId()));
-        projectLeadRepository.save(new ProjectLeadEntity(apibara, pierre.user().getId()));
-        committeeFacadePort.createUpdateApplicationForCommittee(committee.id(), new Committee.Application(pierre.user().getId(), bretzel, List.of(
+        projectLeadRepository.save(new ProjectLeadEntity(bretzel.value(), pierre.user().getId()));
+        projectLeadRepository.save(new ProjectLeadEntity(apibara.value(), pierre.user().getId()));
+        committeeFacadePort.createUpdateApplicationForCommittee(committee.id(), new Committee.Application(pierre.userId(), bretzel, List.of(
                 q1BretzelAnswer
         )));
-        committeeFacadePort.createUpdateApplicationForCommittee(committee.id(), new Committee.Application(pierre.user().getId(), apibara, List.of(
+        committeeFacadePort.createUpdateApplicationForCommittee(committee.id(), new Committee.Application(pierre.userId(), apibara, List.of(
                 new Committee.ProjectAnswer(q1.id(), faker.lorem().paragraph()),
                 new Committee.ProjectAnswer(q2.id(), faker.lorem().paragraph())
         )));

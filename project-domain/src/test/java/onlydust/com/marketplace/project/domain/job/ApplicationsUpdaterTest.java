@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -19,7 +20,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,8 +40,8 @@ class ApplicationsUpdaterTest {
 
     final Faker faker = new Faker();
 
-    final UUID projectId1 = UUID.randomUUID();
-    final UUID projectId2 = UUID.randomUUID();
+    final ProjectId projectId1 = ProjectId.random();
+    final ProjectId projectId2 = ProjectId.random();
     final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
             faker.number().randomNumber(),
             faker.number().randomNumber(),

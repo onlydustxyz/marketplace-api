@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignment;
@@ -23,9 +25,9 @@ public interface CommitteeStoragePort {
 
     void saveJuryAssignments(List<JuryAssignment> juryAssignments);
 
-    void saveJuryVotes(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> votes);
+    void saveJuryVotes(UserId juryId, Committee.Id committeeId, ProjectId projectId, Map<JuryCriteria.Id, Integer> votes);
 
     List<JuryAssignment> findJuryAssignments(Committee.Id committeeId);
 
-    void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations);
+    void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<ProjectId, BigDecimal> projectAllocations);
 }

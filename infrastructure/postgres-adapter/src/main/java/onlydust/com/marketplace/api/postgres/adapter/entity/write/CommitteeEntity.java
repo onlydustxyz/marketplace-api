@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -23,14 +25,19 @@ import static java.util.stream.Collectors.*;
 public class CommitteeEntity {
     @Id
     @EqualsAndHashCode.Include
-    @NonNull UUID id;
-    @NonNull Date applicationStartDate;
-    @NonNull Date applicationEndDate;
-    @NonNull String name;
+    @NonNull
+    UUID id;
+    @NonNull
+    Date applicationStartDate;
+    @NonNull
+    Date applicationEndDate;
+    @NonNull
+    String name;
 
     @Enumerated(EnumType.STRING)
     @JdbcType(PostgreSQLEnumJdbcType.class)
-    @NonNull Committee.Status status;
+    @NonNull
+    Committee.Status status;
 
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
@@ -73,7 +80,7 @@ public class CommitteeEntity {
                 .forEach((projectId, application) -> entity.projectAnswers.addAll(CommitteeProjectAnswerEntity.fromDomain(entity, application)));
 
         committee.juryIds()
-                .forEach(jury -> entity.juries.add(CommitteeJuryEntity.fromDomain(entity, jury)));
+                .forEach(jury -> entity.juries.add(CommitteeJuryEntity.fromDomain(entity, jury.value())));
 
         committee.juryCriteria()
                 .forEach(juryCriterion -> entity.juryCriterias.add(CommitteeJuryCriteriaEntity.fromDomain(entity, juryCriterion)));
@@ -94,11 +101,11 @@ public class CommitteeEntity {
                         .map(CommitteeProjectQuestionEntity::toDomain)
                         .collect(toList()))
                 .projectApplications(Optional.ofNullable(projectAnswers).orElse(Set.of()).stream()
-                        .collect(groupingBy(CommitteeProjectAnswerEntity::getProjectId,
+                        .collect(groupingBy(c -> ProjectId.of(c.getProjectId()),
                                 mapping(CommitteeProjectAnswerEntity::toApplication,
                                         reducing(null, this::merge)))))
                 .juryIds(Optional.ofNullable(juries).orElse(Set.of()).stream()
-                        .map(CommitteeJuryEntity::getUserId)
+                        .map(j -> UserId.of(j.getUserId()))
                         .collect(toList()))
                 .juryCriteria(Optional.ofNullable(juryCriterias).orElse(List.of()).stream()
                         .map(CommitteeJuryCriteriaEntity::toDomain)

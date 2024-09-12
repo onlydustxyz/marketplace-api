@@ -7,10 +7,9 @@ import onlydust.com.marketplace.project.domain.model.Sponsor;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface SponsorStoragePort {
-    boolean isAdmin(UUID userId, SponsorId sponsorId);
+    boolean isAdmin(UserId userId, SponsorId sponsorId);
 
     Optional<Sponsor> get(SponsorId sponsorId);
 
@@ -18,5 +17,5 @@ public interface SponsorStoragePort {
 
     void save(Sponsor sponsor);
 
-    boolean isAdminOfProgramSponsor(UUID userId, ProgramId programId);
+    boolean isAdminOfProgramSponsor(UserId userId, ProgramId programId);
 }

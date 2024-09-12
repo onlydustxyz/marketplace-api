@@ -9,6 +9,7 @@ import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.repositories.ApplicationReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +47,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         }
 
         final var caller = authenticatedAppUserService.getAuthenticatedUser();
-        if (!caller.githubUserId().equals(applicantId) && !permissionService.isUserProjectLead(projectId, caller.id())) {
+        if (!caller.githubUserId().equals(applicantId) && !permissionService.isUserProjectLead(ProjectId.of(projectId), caller.id())) {
             throw forbidden("Only project leads can get project applications");
         }
 
@@ -72,7 +73,7 @@ public class ReadProjectApplicationsApiPostgresAdapter implements ReadProjectApp
         final var application =
                 applicationReadRepository.findById(applicationId).orElseThrow(() -> notFound("Application %s not found".formatted(applicationId)));
         if (!caller.githubUserId().equals(application.applicant().githubUserId()) &&
-            !permissionService.isUserProjectLead(application.projectId(), caller.id())) {
+            !permissionService.isUserProjectLead(ProjectId.of(application.projectId()), caller.id())) {
             throw forbidden("Only project leads and applicant can get application details");
         }
         return ok(application.toDto());

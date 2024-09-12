@@ -6,13 +6,13 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonEntit
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonRegistrationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRegistrationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRepository;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresHackathonAdapter implements HackathonStoragePort {
@@ -53,8 +53,8 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
 
     @Override
     @Transactional
-    public void registerUser(UUID userId, Hackathon.Id hackathonId) {
-        hackathonRegistrationRepository.saveAndFlush(new HackathonRegistrationEntity(hackathonId.value(), userId));
+    public void registerUser(UserId userId, Hackathon.Id hackathonId) {
+        hackathonRegistrationRepository.saveAndFlush(new HackathonRegistrationEntity(hackathonId.value(), userId.value()));
     }
 
     @Override

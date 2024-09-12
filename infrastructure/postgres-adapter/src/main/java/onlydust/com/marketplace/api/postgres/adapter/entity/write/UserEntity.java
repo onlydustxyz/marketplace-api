@@ -6,10 +6,10 @@ import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
@@ -74,7 +74,7 @@ public class UserEntity {
     }
 
     public NotificationRecipient toNotificationRecipient() {
-        return new NotificationRecipient(NotificationRecipient.Id.of(id),
+        return new NotificationRecipient(UserId.of(id),
                 userProfileInfo != null && !userProfileInfo.getContactEmail().isEmpty() ? userProfileInfo.getContactEmail() : email,
                 githubLogin);
     }

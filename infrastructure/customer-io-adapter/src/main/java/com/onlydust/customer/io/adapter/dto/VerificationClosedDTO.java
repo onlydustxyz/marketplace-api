@@ -23,7 +23,7 @@ public record VerificationClosedDTO(@NonNull String title,
                 .title("Billing profile %s verification closed".formatted(billingProfileVerificationClosed.billingProfileName()))
                 .description(DESCRIPTION.formatted(billingProfileVerificationClosed.billingProfileName()))
                 .button(new ButtonDTO("Contact us", getMarketplaceBillingProfileUrlFromEnvironment(environment,
-                        billingProfileVerificationClosed.billingProfileId().value())))
+                        billingProfileVerificationClosed.billingProfileId())))
                 .build();
     }
 }

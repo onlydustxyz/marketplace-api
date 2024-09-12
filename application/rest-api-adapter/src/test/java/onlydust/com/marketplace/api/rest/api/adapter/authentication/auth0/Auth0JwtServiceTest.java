@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDust
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.Auth0OnlyDustBackofficeAuthenticationService;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.backoffice.OnlyDustBackofficeAuthentication;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -74,7 +74,7 @@ class Auth0JwtServiceTest {
                         .email("pixelfact.company@gmail.com")
                         .build(), false)
         ).thenReturn(AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .login("pixelfact")
                 .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
@@ -114,7 +114,7 @@ class Auth0JwtServiceTest {
                         .name("Mehdi")
                         .avatarUrl("https://avatars.google.com/u/143011364?v=4")
                         .build())
-        ).thenReturn(new BackofficeUser(BackofficeUser.Id.random(), "pixelfact.company@gmail.com", "Mehdi",
+        ).thenReturn(new BackofficeUser(UserId.random(), "pixelfact.company@gmail.com", "Mehdi",
                 Set.of(BackofficeUser.Role.BO_READER), "https://avatars.google.com/u/143011364?v=4"));
 
 
@@ -162,7 +162,7 @@ class Auth0JwtServiceTest {
                         .email("pixelfact.company@gmail.com")
                         .build(), false)
         ).thenReturn(AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .login("pixelfact")
                 .avatarUrl("https://avatars.githubusercontent.com/u/143011364?v=4")
                 .githubUserId(143011364L)
@@ -179,7 +179,7 @@ class Auth0JwtServiceTest {
                         .githubUserId(595505L)
                         .build(), true)
         ).thenReturn(AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .login("ofux")
                 .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)
@@ -224,7 +224,7 @@ class Auth0JwtServiceTest {
                         .avatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
                         .build(), false)
         ).thenReturn(AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .login("kaelsky")
                 .avatarUrl("https://avatars.githubusercontent.com/u/31901905?v=4")
                 .githubUserId(31901905L)
@@ -241,7 +241,7 @@ class Auth0JwtServiceTest {
                         .githubUserId(595505L)
                         .build(), true)
         ).thenReturn(AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .login("ofux")
                 .avatarUrl("https://avatars.githubusercontent.com/u/595505?v=4")
                 .githubUserId(595505L)

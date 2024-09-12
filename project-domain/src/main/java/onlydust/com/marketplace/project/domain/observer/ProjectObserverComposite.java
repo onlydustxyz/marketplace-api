@@ -1,10 +1,11 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 public class ProjectObserverComposite implements ProjectObserverPort {
 
@@ -15,22 +16,22 @@ public class ProjectObserverComposite implements ProjectObserverPort {
     }
 
     @Override
-    public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+    public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
         observers.forEach(observer -> observer.onLinkedReposChanged(projectId, linkedRepoIds, unlinkedRepoIds));
     }
 
     @Override
-    public void onRewardSettingsChanged(UUID projectId) {
+    public void onRewardSettingsChanged(ProjectId projectId) {
         observers.forEach(observer -> observer.onRewardSettingsChanged(projectId));
     }
 
     @Override
-    public void onProjectCreated(UUID projectId, UUID projectLeadId) {
+    public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
         observers.forEach(observer -> observer.onProjectCreated(projectId, projectLeadId));
     }
 
     @Override
-    public void onProjectCategorySuggested(String categoryName, UUID userId) {
+    public void onProjectCategorySuggested(String categoryName, UserId userId) {
         observers.forEach(observer -> observer.onProjectCategorySuggested(categoryName, userId));
     }
 }

@@ -2,11 +2,11 @@ package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.Amount;
 import onlydust.com.marketplace.accounting.domain.model.ConvertedAmount;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.api.contract.model.ContributorsPageResponse;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -1289,7 +1289,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_find_project_contributors_as_anonymous_user() {
         // Given
-        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
+        final var projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1307,7 +1307,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(1)
     void should_find_project_contributors_as_anonymous_user_with_login_filter() {
         // Given
-        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
+        final var projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1326,7 +1326,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     @Order(2)
     void should_find_project_with_pagination() {
         // Given
-        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
+        final var projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1356,7 +1356,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_find_project_contributors_as_project_lead() {
         // Given
         final String jwt = userAuthHelper.authenticateGregoire().jwt();
-        final UUID projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
+        final var projectId = UUID.fromString("594ca5ca-48f7-49a8-9c26-84b949d4fdd9");
 
         // When
         client.get()
@@ -1376,7 +1376,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_hide_and_show_project_contributors_as_project_lead() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var veryDustyBot = 129528947L;
 
         // When
@@ -1441,7 +1441,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_find_project_contributors_as_project_lead_with_login_filter() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
         client.get()
@@ -1462,7 +1462,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_find_project_contributors_with_multi_currencies() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         final var reward1 = rewardRepository.findById(UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0")).orElseThrow();
         reward1.currencyId(currencyRepository.findByCode("ETH").orElseThrow().id());
@@ -1510,7 +1510,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_find_project_contributors_with_ignored_contributions() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         ignoredContributionsRepository.save(IgnoredContributionEntity.builder()
                 .id(IgnoredContributionEntity.Id.builder()
                         .projectId(projectId)
@@ -1562,7 +1562,7 @@ public class ProjectsGetContributorsApiIT extends AbstractMarketplaceApiIT {
     void should_find_project_contributors_with_sorting(String sort, String direction) {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         final var queryParams = new HashMap<>(Map.of("pageIndex", "0", "pageSize", "10000"));
         if (sort != null) {

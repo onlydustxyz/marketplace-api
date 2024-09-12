@@ -7,6 +7,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLea
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
@@ -31,16 +33,16 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     private UserAuthHelper.AuthenticatedBackofficeUser pierre;
-    private final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-    private final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
-    private final UUID pacoId = UUID.fromString("f20e6812-8de8-432b-9c31-2920434fe7d0");
-    private final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
-    private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
-    private final UUID calDotCom = UUID.fromString("1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e");
+    private final UserId anthoId = UserId.of("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+    private final UserId olivierId = UserId.of("e461c019-ba23-4671-9b6c-3a5a18748af9");
+    private final UserId pacoId = UserId.of("f20e6812-8de8-432b-9c31-2920434fe7d0");
+    private final ProjectId cocaColax = ProjectId.of("44c6807c-48d1-4987-a0a6-ac63f958bdae");
+    private final ProjectId bretzel = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
+    private final ProjectId calDotCom = ProjectId.of("1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e");
     static UUID committeeId;
     static UUID projectQuestionId1;
     static String projectQuestion1;
-    private final UUID pierreAppId = UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0");
+    private final UserId pierreAppId = UserId.of("fc92397c-3431-4a84-8054-845376b630a0");
 
 
     @BeforeEach
@@ -166,7 +168,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(anthoId, olivierId)
+                        List.of(anthoId.value(), olivierId.value())
                 );
 
         // When
@@ -215,8 +217,8 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(updateCommitteeRequest1.getStatus().name(), committeeResponse1.getStatus().name());
         assertNull(committeeResponse1.getSponsor());
         assertEquals(2, committeeResponse1.getJuries().size());
-        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
-        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(anthoId));
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId.value()));
+        assertTrue(committeeResponse1.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(anthoId.value()));
 
 
         final UpdateCommitteeRequest updateCommitteeRequest2 = new UpdateCommitteeRequest().name(faker.rickAndMorty().location())
@@ -224,7 +226,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                 .applicationEndDate(faker.date().future(10, TimeUnit.DAYS).toInstant().atZone(ZoneId.systemDefault()))
                 .status(CommitteeStatus.DRAFT)
                 .votePerJury(5)
-                .sponsorId(cocaColax)
+                .sponsorId(cocaColax.value())
                 .projectQuestions(
                         List.of(projectQuestionRequest3,
                                 projectQuestionRequest2)
@@ -236,7 +238,7 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
                         )
                 )
                 .juryMemberIds(
-                        List.of(pacoId, olivierId)
+                        List.of(pacoId.value(), olivierId.value())
                 );
 
 
@@ -278,13 +280,13 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
         assertEquals(updateCommitteeRequest2.getApplicationStartDate().toInstant(), committeeResponse2.getApplicationStartDate().toInstant());
         assertEquals(updateCommitteeRequest2.getApplicationEndDate().toInstant(), committeeResponse2.getApplicationEndDate().toInstant());
         assertEquals(updateCommitteeRequest2.getStatus().name(), committeeResponse2.getStatus().name());
-        assertEquals(cocaColax, committeeResponse2.getSponsor().getId());
+        assertEquals(cocaColax.value(), committeeResponse2.getSponsor().getId());
         assertEquals("Coca Colax", committeeResponse2.getSponsor().getName());
         assertEquals("https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg", committeeResponse2.getSponsor().getAvatarUrl());
         projectQuestionId1 = committeeResponse2.getProjectQuestions().get(1).getId();
         projectQuestion1 = committeeResponse2.getProjectQuestions().get(1).getQuestion();
-        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId));
-        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(pacoId));
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(olivierId.value()));
+        assertTrue(committeeResponse2.getJuries().stream().map(UserLinkResponse::getUserId).toList().contains(pacoId.value()));
         assertEquals(2, committeeResponse2.getJuries().size());
     }
 
@@ -319,13 +321,13 @@ public class BackOfficeCommitteeApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(5)
     void should_return_applications() {
         // Given
-        projectLeadRepository.save(new ProjectLeadEntity(bretzel, pierreAppId));
+        projectLeadRepository.save(new ProjectLeadEntity(bretzel.value(), pierreAppId.value()));
         final Committee.ProjectAnswer projectAnswer = new Committee.ProjectAnswer(ProjectQuestion.Id.of(projectQuestionId1), faker.lorem().paragraph());
         committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), new Committee.Application(pierreAppId, bretzel, List.of(
                 projectAnswer
         )));
 
-        projectLeadRepository.save(new ProjectLeadEntity(calDotCom, pierreAppId));
+        projectLeadRepository.save(new ProjectLeadEntity(calDotCom.value(), pierreAppId.value()));
         final Committee.ProjectAnswer projectAnswer2 = new Committee.ProjectAnswer(ProjectQuestion.Id.of(projectQuestionId1), faker.lorem().paragraph());
         committeeFacadePort.createUpdateApplicationForCommittee(Committee.Id.of(committeeId), new Committee.Application(pierreAppId, calDotCom, List.of(
                 projectAnswer2

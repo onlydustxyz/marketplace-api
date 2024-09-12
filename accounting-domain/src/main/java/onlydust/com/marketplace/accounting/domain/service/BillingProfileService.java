@@ -5,7 +5,6 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceDownload;
 import onlydust.com.marketplace.accounting.domain.model.InvoiceView;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.*;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.notification.CompleteYourBillingProfile;
@@ -17,6 +16,7 @@ import onlydust.com.marketplace.accounting.domain.view.BillingProfileCoworkerVie
 import onlydust.com.marketplace.accounting.domain.view.BillingProfileRewardView;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -51,7 +51,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public IndividualBillingProfile createIndividualBillingProfile(@NonNull UserId ownerId, @NonNull String name, Set<ProjectId> selectForProjects) {
         if (billingProfileStoragePort.individualBillingProfileExistsByUserId(ownerId))
-            throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId.value()));
+            throw OnlyDustException.forbidden("Individual billing profile already existing for user %s".formatted(ownerId));
 
         final var billingProfile = new IndividualBillingProfile(name, ownerId);
         billingProfileStoragePort.save(billingProfile);
@@ -142,7 +142,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> unauthorized("User is not allowed to upload an invoice for this billing profile"));
 
         if (!billingProfile.enabled())
-            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
+            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId));
 
         if (billingProfile.invoiceMandateAcceptanceOutdated())
             throw forbidden("Invoice mandate has not been accepted for billing profile %s".formatted(billingProfileId));
@@ -158,7 +158,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> unauthorized("User is not allowed to upload an invoice for this billing profile"));
 
         if (!billingProfile.enabled())
-            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId.value()));
+            throw unauthorized("Cannot upload an invoice on a disabled billing profile %s".formatted(billingProfileId));
 
         if (!billingProfile.invoiceMandateAcceptanceOutdated())
             throw forbidden("External invoice upload is forbidden when mandate has been accepted (billing profile %s)".formatted(billingProfileId));
@@ -331,7 +331,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
                 .orElseThrow(() -> internalServerError("User %s rights on billing profile %s were not found".formatted(userId, billingProfileId)));
 
         if (!userRights.canDelete())
-            throw unauthorized("User %s cannot delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
+            throw unauthorized("User %s cannot delete billing profile %s".formatted(userId, billingProfileId));
 
         accountingObserverPort.onBillingProfileDeleted(billingProfileId);
         billingProfileStoragePort.deleteBillingProfile(billingProfileId);
@@ -340,7 +340,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     @Override
     public void enableBillingProfile(UserId userId, BillingProfile.Id billingProfileId, Boolean enabled) {
         getBillingProfileAsAdmin(billingProfileId, userId)
-                .orElseThrow(() -> unauthorized("User %s must be admin to enable billing profile %s".formatted(userId.value(), billingProfileId.value())));
+                .orElseThrow(() -> unauthorized("User %s must be admin to enable billing profile %s".formatted(userId, billingProfileId)));
 
         billingProfileStoragePort.updateEnableBillingProfile(billingProfileId, enabled);
         accountingObserverPort.onBillingProfileEnableChanged(billingProfileId, enabled);
@@ -360,7 +360,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public void updateBillingProfileType(BillingProfile.Id billingProfileId, UserId userId, BillingProfile.Type type) {
         final var billingProfile = getBillingProfileAsAdmin(billingProfileId, userId)
                 .orElseThrow(() -> unauthorized("User %s must be admin to modify billing profile %s type to %s"
-                        .formatted(userId.value(), billingProfileId.value(), type)));
+                        .formatted(userId, billingProfileId, type)));
 
         if (type == BillingProfile.Type.INDIVIDUAL)
             throw unauthorized("User %s cannot update billing profile %s to type INDIVIDUAL".formatted(userId, billingProfileId));
@@ -379,7 +379,7 @@ public class BillingProfileService implements BillingProfileFacadePort {
     public List<BillingProfileRewardView> getInvoiceableRewardsForBillingProfile(UserId userId, BillingProfile.Id billingProfileId) {
         getBillingProfileAsAdmin(billingProfileId, userId)
                 .orElseThrow(() -> unauthorized("User %s must be admin to get invoiceable rewards of billing profile %s"
-                        .formatted(userId.value(), billingProfileId.value())));
+                        .formatted(userId, billingProfileId)));
 
         return billingProfileStoragePort.findInvoiceableRewardsForBillingProfile(billingProfileId);
     }
@@ -398,20 +398,20 @@ public class BillingProfileService implements BillingProfileFacadePort {
     private void notifyBillingProfileAdminsToCompleteTheirBillingProfiles(List<BillingProfile> billingProfilesToRemind) {
         for (BillingProfile billingProfile : billingProfilesToRemind) {
             if (billingProfile instanceof IndividualBillingProfile individualBillingProfile) {
-                notificationPort.push(individualBillingProfile.owner().id().value(),
-                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                notificationPort.push(individualBillingProfile.owner().id(),
+                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id(), billingProfile.name(),
                                 billingProfile.status())));
             }
             if (billingProfile instanceof CompanyBillingProfile companyBillingProfile) {
                 companyBillingProfile.members().stream()
                         .filter(user -> user.role().equals(BillingProfile.User.Role.ADMIN))
-                        .forEach(user -> notificationPort.push(user.id().value(),
-                                new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                        .forEach(user -> notificationPort.push(user.id(),
+                                new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id(), billingProfile.name(),
                                         billingProfile.status()))));
             }
             if (billingProfile instanceof SelfEmployedBillingProfile selfEmployedBillingProfile) {
-                notificationPort.push(selfEmployedBillingProfile.owner().id().value(),
-                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id().value(), billingProfile.name(),
+                notificationPort.push(selfEmployedBillingProfile.owner().id(),
+                        new CompleteYourBillingProfile(new NotificationBillingProfile(billingProfile.id(), billingProfile.name(),
                                 billingProfile.status())));
             }
         }

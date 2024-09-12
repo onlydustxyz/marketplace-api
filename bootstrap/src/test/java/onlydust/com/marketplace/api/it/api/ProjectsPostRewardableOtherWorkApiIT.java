@@ -165,8 +165,8 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
               "performed_via_github_app": null,
               "state_reason": "completed"
             }
-
-                """;
+            
+            """;
 
     @Autowired
     ProjectRepository projectRepository;
@@ -197,7 +197,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
         userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
+        final var projectId = projectRepository.findAll().get(0).getId();
 
         // When
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, UUID.randomUUID()))).contentType(APPLICATION_JSON).bodyValue(String.format("""
@@ -218,7 +218,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     void should_be_forbidden_given_authenticated_user_project_lead_on_not_linked_repo() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_WORK, projectId))).contentType(APPLICATION_JSON).bodyValue(String.format("""
@@ -237,7 +237,7 @@ public class ProjectsPostRewardableOtherWorkApiIT extends AbstractMarketplaceApi
     void should_create_and_close_rewardable_issue_given_a_project_lead_and_linked_repo() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final Long repoId = 498695724L;
         final String repoName = "marketplace-frontend";
         final String owner = "onlydustxyz";

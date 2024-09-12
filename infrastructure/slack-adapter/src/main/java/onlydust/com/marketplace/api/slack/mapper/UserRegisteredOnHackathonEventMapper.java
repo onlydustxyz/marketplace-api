@@ -1,9 +1,8 @@
 package onlydust.com.marketplace.api.slack.mapper;
 
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
-
-import java.util.UUID;
 
 public interface UserRegisteredOnHackathonEventMapper {
 
@@ -25,7 +24,7 @@ public interface UserRegisteredOnHackathonEventMapper {
                 		}
                 	]""";
 
-    static String mapToSlackBlock(final UUID userId, final GithubUserWithTelegramView githubUserWithTelegramView, final Hackathon hackathon,
+    static String mapToSlackBlock(final UserId userId, final GithubUserWithTelegramView githubUserWithTelegramView, final Hackathon hackathon,
                                   final String environment) {
         return BLOCK.formatted(
                 FrontUrlHelper.getBackOfficeFrontendUrlFromEnvironment(environment) + "users/%s".formatted(userId), githubUserWithTelegramView.githubLogin(),

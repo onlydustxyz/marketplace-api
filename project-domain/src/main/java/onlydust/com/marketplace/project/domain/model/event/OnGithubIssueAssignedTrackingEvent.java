@@ -3,11 +3,12 @@ package onlydust.com.marketplace.project.domain.model.event;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Value
 @EqualsAndHashCode(callSuper = true)
@@ -18,16 +19,16 @@ public class OnGithubIssueAssignedTrackingEvent extends Event {
     Long issueId;
     @NonNull
     Long assigneeGithubId;
-    UUID assigneeUserId;
+    UserId assigneeUserId;
     @NonNull
     ZonedDateTime createdAt;
     @NonNull
     ZonedDateTime assignedAt;
     boolean isGoodFirstIssue;
-    UUID projectId;
+    ProjectId projectId;
 
     public static OnGithubIssueAssignedTrackingEvent of(@NonNull OnGithubIssueAssigned onGithubIssueAssigned,
-                                                        @NonNull Optional<UUID> userId, UUID projectId) {
+                                                        @NonNull Optional<UserId> userId, ProjectId projectId) {
         return OnGithubIssueAssignedTrackingEvent.builder()
                 .issueId(onGithubIssueAssigned.id())
                 .assigneeGithubId(onGithubIssueAssigned.assigneeId())

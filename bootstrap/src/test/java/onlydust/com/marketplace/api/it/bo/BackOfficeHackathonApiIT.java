@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.it.bo;
 import onlydust.com.backoffice.api.contract.model.HackathonsPageResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -540,7 +541,7 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Test
     @Order(11)
     void should_get_updated_hackathon() {
-        hackathonStoragePort.registerUser(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UserId.of("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
 
         // When
         client.get()
@@ -1026,9 +1027,9 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
     @Order(50)
     void should_get_registered_users() {
         // Given
-        hackathonStoragePort.registerUser(UUID.fromString("dd0ab03c-5875-424b-96db-a35522eab365"), Hackathon.Id.of(hackathonId1.getValue()));
-        hackathonStoragePort.registerUser(UUID.fromString("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
-        hackathonStoragePort.registerUser(UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UserId.of("dd0ab03c-5875-424b-96db-a35522eab365"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UserId.of("fc92397c-3431-4a84-8054-845376b630a0"), Hackathon.Id.of(hackathonId1.getValue()));
+        hackathonStoragePort.registerUser(UserId.of("747e663f-4e68-4b42-965b-b5aebedcd4c4"), Hackathon.Id.of(hackathonId1.getValue()));
 
         // When
         client.get()

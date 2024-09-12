@@ -1936,22 +1936,22 @@ class BillingProfileServiceTest {
         billingProfileService.remindUsersToCompleteTheirBillingProfiles();
 
         // Then
-        final ArgumentCaptor<UUID> userIdCaptor = ArgumentCaptor.forClass(UUID.class);
-        final ArgumentCaptor<CompleteYourBillingProfile> completeYourBillingProfileCaptor = ArgumentCaptor.forClass(CompleteYourBillingProfile.class);
+        final var userIdCaptor = ArgumentCaptor.forClass(UserId.class);
+        final var completeYourBillingProfileCaptor = ArgumentCaptor.forClass(CompleteYourBillingProfile.class);
         verify(notificationPort, times(4)).push(userIdCaptor.capture(), completeYourBillingProfileCaptor.capture());
-        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin1.id().value()));
-        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin2.id().value()));
-        assertTrue(userIdCaptor.getAllValues().contains(individualAdmin.id().value()));
-        assertTrue(userIdCaptor.getAllValues().contains(selfEmployedAdmin.id().value()));
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin1.id()));
+        assertTrue(userIdCaptor.getAllValues().contains(bpCompanyAdmin2.id()));
+        assertTrue(userIdCaptor.getAllValues().contains(individualAdmin.id()));
+        assertTrue(userIdCaptor.getAllValues().contains(selfEmployedAdmin.id()));
         assertTrue(completeYourBillingProfileCaptor.getAllValues()
-                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company1.id().value(), company1.name(), company1.status()))));
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company1.id(), company1.name(), company1.status()))));
         assertFalse(completeYourBillingProfileCaptor.getAllValues()
-                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company2.id().value(), company2.name(), company2.status()))));
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(company2.id(), company2.name(), company2.status()))));
         assertTrue(completeYourBillingProfileCaptor.getAllValues()
-                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(individualBillingProfile.id().value(),
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(individualBillingProfile.id(),
                         individualBillingProfile.name(), individualBillingProfile.status()))));
         assertTrue(completeYourBillingProfileCaptor.getAllValues()
-                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(selfEmployedBillingProfile.id().value(),
+                .contains(new CompleteYourBillingProfile(new NotificationBillingProfile(selfEmployedBillingProfile.id(),
                         selfEmployedBillingProfile.name(), selfEmployedBillingProfile.status()))));
     }
 }

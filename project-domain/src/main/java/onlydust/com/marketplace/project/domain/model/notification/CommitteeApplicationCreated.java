@@ -1,12 +1,13 @@
 package onlydust.com.marketplace.project.domain.model.notification;
 
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.model.notification.NotificationType;
+import onlydust.com.marketplace.project.domain.model.Committee;
 
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -18,11 +19,11 @@ public class CommitteeApplicationCreated extends NotificationData {
     @NonNull
     String projectName;
     @NonNull
-    UUID projectId;
+    ProjectId projectId;
     @NonNull
     String committeeName;
     @NonNull
-    UUID committeeId;
+    Committee.Id committeeId;
     @NonNull
     ZonedDateTime applicationEndDate;
 

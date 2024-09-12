@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
 import onlydust.com.marketplace.project.domain.view.Money;
 import onlydust.com.marketplace.project.domain.view.ShortProjectRewardView;
@@ -50,7 +51,7 @@ public class ShortRewardQueryEntity {
 
     public ShortProjectRewardView toProjectDomain() {
         return ShortProjectRewardView.builder()
-                .rewardId(this.id)
+                .rewardId(RewardId.of(this.id))
                 .projectName(this.projectName)
                 .money(new Money(this.amount, CurrencyView.builder()
                         .code(this.currency.code())

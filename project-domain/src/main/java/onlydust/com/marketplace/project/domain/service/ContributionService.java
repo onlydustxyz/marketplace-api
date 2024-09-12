@@ -2,6 +2,8 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.port.input.ContributionFacadePort;
@@ -13,7 +15,6 @@ import onlydust.com.marketplace.project.domain.view.ContributionDetailsView;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
@@ -25,7 +26,7 @@ public class ContributionService implements ContributionFacadePort, Contribution
     final GithubApiPort githubApiPort;
 
     @Override
-    public ContributionDetailsView getContribution(UUID projectId, String contributionId, AuthenticatedUser caller) {
+    public ContributionDetailsView getContribution(ProjectId projectId, String contributionId, AuthenticatedUser caller) {
         if (!permissionService.isUserContributor(contributionId, caller.githubUserId()) &&
             !permissionService.isUserProjectLead(projectId, caller.id()))
             throw forbidden("User is not the contributor of this contribution, nor a project leader" +
@@ -34,21 +35,21 @@ public class ContributionService implements ContributionFacadePort, Contribution
     }
 
     @Override
-    public void ignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds) {
+    public void ignoreContributions(ProjectId projectId, UserId projectLeadId, List<String> contributionIds) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw forbidden("Only project leaders can edit the list of ignored contributions");
         contributionStoragePort.ignoreContributions(projectId, contributionIds);
     }
 
     @Override
-    public void unignoreContributions(UUID projectId, UUID projectLeadId, List<String> contributionIds) {
+    public void unignoreContributions(ProjectId projectId, UserId projectLeadId, List<String> contributionIds) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw forbidden("Only project leaders can edit the list of ignored contributions");
         contributionStoragePort.unignoreContributions(projectId, contributionIds);
     }
 
     @Override
-    public void unassign(UUID projectId, UUID projectLeadId, String contributionId) {
+    public void unassign(ProjectId projectId, UserId projectLeadId, String contributionId) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw forbidden("Only project leaders can unassign contributions");
 
@@ -74,20 +75,20 @@ public class ContributionService implements ContributionFacadePort, Contribution
     }
 
     @Override
-    public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+    public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
         contributionStoragePort.refreshIgnoredContributions(projectId);
     }
 
     @Override
-    public void onRewardSettingsChanged(UUID projectId) {
+    public void onRewardSettingsChanged(ProjectId projectId) {
         contributionStoragePort.refreshIgnoredContributions(projectId);
     }
 
     @Override
-    public void onProjectCreated(UUID projectId, UUID projectLeadId) {
+    public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
     }
 
     @Override
-    public void onProjectCategorySuggested(String categoryName, UUID userId) {
+    public void onProjectCategorySuggested(String categoryName, UserId userId) {
     }
 }

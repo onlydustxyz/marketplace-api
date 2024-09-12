@@ -1,12 +1,12 @@
 package onlydust.com.marketplace.project.domain.observer;
 
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPort;
 
 import java.util.List;
-import java.util.UUID;
 
 public class ApplicationObserverComposite implements ApplicationObserverPort {
     private final List<ApplicationObserverPort> observers;
@@ -21,7 +21,7 @@ public class ApplicationObserverComposite implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+    public void onApplicationAccepted(Application application, UserId projectLeadId) {
         observers.forEach(observer -> observer.onApplicationAccepted(application, projectLeadId));
     }
 

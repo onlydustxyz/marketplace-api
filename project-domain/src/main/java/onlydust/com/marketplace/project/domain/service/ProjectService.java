@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -51,7 +53,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     @Transactional
-    public Pair<UUID, String> createProject(final UUID projectLeadId, final CreateProjectCommand command) {
+    public Pair<ProjectId, String> createProject(final UserId projectLeadId, final CreateProjectCommand command) {
         final var slug = Project.slugOf(command.getName());
 
         if (projectStoragePort.getProjectIdBySlug(slug).isPresent())
@@ -60,7 +62,7 @@ public class ProjectService implements ProjectFacadePort {
         if (nonNull(command.getGithubUserIdsAsProjectLeadersToInvite()))
             indexerPort.indexUsers(command.getGithubUserIdsAsProjectLeadersToInvite());
 
-        final var projectId = uuidGeneratorPort.generate();
+        final var projectId = ProjectId.of(uuidGeneratorPort.generate());
 
         projectStoragePort.createProject(projectId,
                 slug,
@@ -92,7 +94,7 @@ public class ProjectService implements ProjectFacadePort {
 
     @Override
     @Transactional
-    public Pair<UUID, String> updateProject(UUID projectLeadId, UpdateProjectCommand command) {
+    public Pair<ProjectId, String> updateProject(UserId projectLeadId, UpdateProjectCommand command) {
         if (!permissionService.isUserProjectLead(command.getId(), projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can update their projects");
         }
@@ -166,7 +168,7 @@ public class ProjectService implements ProjectFacadePort {
                 .collect(Collectors.toSet()));
     }
 
-    private Set<String> addedCategorySuggestions(UUID projectId, List<String> suggestions) {
+    private Set<String> addedCategorySuggestions(ProjectId projectId, List<String> suggestions) {
         if (isNull(suggestions) || suggestions.isEmpty()) return Set.of();
 
         final var existingSuggestions = projectStoragePort.getProjectCategorySuggestions(projectId)
@@ -196,10 +198,10 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(UUID projectId,
+    public Page<RewardableItemView> getRewardableItemsPageByTypeForProjectLeadAndContributorId(ProjectId projectId,
                                                                                                ContributionType contributionType,
                                                                                                ContributionStatus contributionStatus,
-                                                                                               UUID projectLeadId,
+                                                                                               UserId projectLeadId,
                                                                                                Long githubUserid,
                                                                                                int pageIndex,
                                                                                                int pageSize,
@@ -215,8 +217,8 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public List<RewardableItemView> getAllCompletedRewardableItemsForProjectLeadAndContributorId(UUID projectId,
-                                                                                                 UUID projectLeadId,
+    public List<RewardableItemView> getAllCompletedRewardableItemsForProjectLeadAndContributorId(ProjectId projectId,
+                                                                                                 UserId projectLeadId,
                                                                                                  Long githubUserId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             final var allCompletedRewardableItems =
@@ -249,7 +251,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public RewardableItemView addRewardableIssue(UUID projectId, UUID projectLeadId, String issueUrl) {
+    public RewardableItemView addRewardableIssue(ProjectId projectId, UserId projectLeadId, String issueUrl) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can add other issues as rewardable items");
         }
@@ -266,7 +268,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public RewardableItemView addRewardablePullRequest(UUID projectId, UUID projectLeadId, String pullRequestUrl) {
+    public RewardableItemView addRewardablePullRequest(ProjectId projectId, UserId projectLeadId, String pullRequestUrl) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId)) {
             throw OnlyDustException.forbidden("Only project leads can add other pull requests as rewardable items");
         }
@@ -283,7 +285,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ContributionView> contributions(UUID projectId, AuthenticatedUser caller, ContributionView.Filters filters,
+    public Page<ContributionView> contributions(ProjectId projectId, AuthenticatedUser caller, ContributionView.Filters filters,
                                                 ContributionView.Sort sort, SortDirection direction,
                                                 Integer page, Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.id())) {
@@ -299,7 +301,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ContributionView> staledContributions(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
+    public Page<ContributionView> staledContributions(ProjectId projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
         final var filters = ContributionView.Filters.builder()
                 .projects(List.of(projectId))
                 .statuses(List.of(ContributionStatus.IN_PROGRESS))
@@ -310,7 +312,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ChurnedContributorView> churnedContributors(UUID projectId, AuthenticatedUser caller, Integer page,
+    public Page<ChurnedContributorView> churnedContributors(ProjectId projectId, AuthenticatedUser caller, Integer page,
                                                             Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
@@ -319,7 +321,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<NewcomerView> newcomers(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
+    public Page<NewcomerView> newcomers(ProjectId projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
@@ -327,7 +329,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public Page<ContributorActivityView> mostActives(UUID projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
+    public Page<ContributorActivityView> mostActives(ProjectId projectId, AuthenticatedUser caller, Integer page, Integer pageSize) {
         if (!permissionService.isUserProjectLead(projectId, caller.id())) {
             throw OnlyDustException.forbidden("Only project leads can view project insights");
         }
@@ -335,7 +337,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+    public void hideContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             projectStoragePort.hideContributorForProjectLead(projectId, projectLeadId, contributorGithubUserId);
         } else {
@@ -344,7 +346,7 @@ public class ProjectService implements ProjectFacadePort {
     }
 
     @Override
-    public void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId) {
+    public void showContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             projectStoragePort.showContributorForProjectLead(projectId, projectLeadId, contributorGithubUserId);
         } else {

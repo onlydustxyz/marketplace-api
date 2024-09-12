@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.view.ProjectInfosView;
 import onlydust.com.marketplace.project.domain.view.ProjectLeaderLinkView;
 import org.hibernate.annotations.Immutable;
@@ -27,8 +28,10 @@ import static java.util.Objects.isNull;
 public class ProjectInfosQueryEntity {
     @Id
     UUID id;
-    @NonNull String slug;
-    @NonNull String name;
+    @NonNull
+    String slug;
+    @NonNull
+    String name;
     String logoUrl;
     @NonNull
     String shortDescription;
@@ -54,7 +57,7 @@ public class ProjectInfosQueryEntity {
 
     public ProjectInfosView toView() {
         return new ProjectInfosView(
-                id,
+                ProjectId.of(id),
                 name,
                 slug,
                 isNull(logoUrl) ? null : URI.create(logoUrl),

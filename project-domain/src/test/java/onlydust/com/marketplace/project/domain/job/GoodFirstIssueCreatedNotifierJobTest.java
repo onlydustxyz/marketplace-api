@@ -3,13 +3,13 @@ package onlydust.com.marketplace.project.domain.job;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.notification.GoodFirstIssueCreated;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationDetailedIssue;
-import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -37,8 +36,8 @@ public class GoodFirstIssueCreatedNotifierJobTest {
         final NotificationPort notificationPort = mock(NotificationPort.class);
         final GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob = new GoodFirstIssueCreatedNotifierJob(githubStoragePort,
                 projectStoragePort, userStoragePort, notificationPort);
-        final UUID projectId1 = UUID.randomUUID();
-        final UUID projectId2 = UUID.randomUUID();
+        final ProjectId projectId1 = ProjectId.random();
+        final ProjectId projectId2 = ProjectId.random();
         final Project project1 = Project.builder()
                 .id(projectId1)
                 .slug(faker.lorem().word())
@@ -50,10 +49,10 @@ public class GoodFirstIssueCreatedNotifierJobTest {
                 .name(faker.lorem().word())
                 .build();
         final AuthenticatedUser user1 = AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .build();
         final AuthenticatedUser user2 = AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .build();
         final GithubIssue githubIssue1 = new GithubIssue(GithubIssue.Id.random(), 1L, 1L, "title1", null, faker.internet().url(),
                 faker.rickAndMorty().character(), 1, faker.pokemon().name(), faker.pokemon().name(), List.of());
@@ -71,10 +70,7 @@ public class GoodFirstIssueCreatedNotifierJobTest {
         when(projectStoragePort.getById(projectId1)).thenReturn(Optional.of(project1));
         when(projectStoragePort.getById(projectId2)).thenReturn(Optional.of(project2));
         when(userStoragePort.findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(projectId1))
-                .thenReturn(List.of(
-                        UserId.of(user1.id()),
-                        UserId.of(user2.id())
-                ));
+                .thenReturn(List.of(user1.id(), user2.id()));
         when(userStoragePort.findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(projectId2))
                 .thenReturn(List.of());
 
@@ -83,7 +79,8 @@ public class GoodFirstIssueCreatedNotifierJobTest {
 
         // Then
         final NotificationProject notificationProject = new NotificationProject(project1.getId(), project1.getSlug(), project1.getName());
-        final NotificationDetailedIssue notificationDetailedIssue = new NotificationDetailedIssue(githubIssue1.id().value(), githubIssue1.htmlUrl(), githubIssue1.title(),
+        final NotificationDetailedIssue notificationDetailedIssue = new NotificationDetailedIssue(githubIssue1.id().value(), githubIssue1.htmlUrl(),
+                githubIssue1.title(),
                 githubIssue1.repoName(),
                 githubIssue1.description(), githubIssue1.authorLogin(), githubIssue1.authorAvatarUrl(), githubIssue1.labels());
         verify(notificationPort).push(user1.id(), new GoodFirstIssueCreated(notificationProject, notificationDetailedIssue));
@@ -100,7 +97,7 @@ public class GoodFirstIssueCreatedNotifierJobTest {
         final NotificationPort notificationPort = mock(NotificationPort.class);
         final GoodFirstIssueCreatedNotifierJob goodFirstIssueCreatedNotifierJob = new GoodFirstIssueCreatedNotifierJob(githubStoragePort,
                 projectStoragePort, userStoragePort, notificationPort);
-        final UUID projectId1 = UUID.randomUUID();
+        final ProjectId projectId1 = ProjectId.random();
         final GithubIssue githubIssue1 = new GithubIssue(GithubIssue.Id.random(), 1L, 1L, "title1", null, faker.internet().url(),
                 faker.rickAndMorty().character(), 1, faker.pokemon().name(), faker.pokemon().name(), List.of());
 

@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategorySuggestion;
 
 import java.util.UUID;
@@ -26,11 +27,11 @@ public class ProjectCategorySuggestionEntity {
         return ProjectCategorySuggestionEntity.builder()
                 .id(suggestion.id().value())
                 .name(suggestion.name())
-                .projectId(suggestion.projectId())
+                .projectId(suggestion.projectId().value())
                 .build();
     }
 
     public ProjectCategorySuggestion toDomain() {
-        return new ProjectCategorySuggestion(ProjectCategorySuggestion.Id.of(id), name, projectId);
+        return new ProjectCategorySuggestion(ProjectCategorySuggestion.Id.of(id), name, ProjectId.of(projectId));
     }
 }

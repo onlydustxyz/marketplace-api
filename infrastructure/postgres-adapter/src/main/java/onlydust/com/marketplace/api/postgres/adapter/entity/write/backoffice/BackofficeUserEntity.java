@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.array.EnumArrayType;
 import io.hypersistence.utils.hibernate.type.array.internal.AbstractArrayType;
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Parameter;
@@ -63,6 +64,6 @@ public class BackofficeUserEntity {
     }
 
     public BackofficeUser toDomain() {
-        return new BackofficeUser(BackofficeUser.Id.of(id), email, name, Set.of(roles), avatarUrl);
+        return new BackofficeUser(UserId.of(id), email, name, Set.of(roles), avatarUrl);
     }
 }

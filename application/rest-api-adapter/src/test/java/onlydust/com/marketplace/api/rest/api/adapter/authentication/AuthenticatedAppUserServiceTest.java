@@ -5,12 +5,12 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.Auth0Onl
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.app.OnlyDustAppGrantedAuthority;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.GithubUserPermissionsFacadePort;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,7 +25,7 @@ public class AuthenticatedAppUserServiceTest {
     final GithubUserPermissionsFacadePort githubUserPermissionsFacadePort = mock(GithubUserPermissionsFacadePort.class);
     final AuthenticatedAppUserService authenticatedAppUserService = new AuthenticatedAppUserService(authenticationContext, githubUserPermissionsFacadePort);
 
-    final UUID userId = UUID.randomUUID();
+    final UserId userId = UserId.random();
     final long githubUserId = faker.number().randomNumber();
     final AuthenticatedUser user = AuthenticatedUser.builder()
             .githubUserId(githubUserId)

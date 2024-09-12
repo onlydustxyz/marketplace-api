@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSponsorStoragePort {
@@ -25,15 +24,15 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
 
     @Override
     @Transactional
-    public boolean isAdmin(UUID userId, SponsorId sponsorId) {
-        return sponsorLeadRepository.findById(new SponsorLeadEntity.PrimaryKey(userId, sponsorId.value()))
+    public boolean isAdmin(UserId userId, SponsorId sponsorId) {
+        return sponsorLeadRepository.findById(new SponsorLeadEntity.PrimaryKey(userId.value(), sponsorId.value()))
                 .isPresent();
     }
 
     @Override
     @Transactional
-    public boolean isAdminOfProgramSponsor(UUID userId, ProgramId programId) {
-        return sponsorLeadRepository.findByUserIdAndProgramId(userId, programId.value()).isPresent();
+    public boolean isAdminOfProgramSponsor(UserId userId, ProgramId programId) {
+        return sponsorLeadRepository.findByUserIdAndProgramId(userId.value(), programId.value()).isPresent();
     }
 
     @Override

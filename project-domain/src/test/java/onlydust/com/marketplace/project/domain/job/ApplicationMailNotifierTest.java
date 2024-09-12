@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.project.domain.job;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Application;
@@ -18,7 +20,6 @@ import org.mockito.ArgumentCaptor;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -33,7 +34,7 @@ class ApplicationMailNotifierTest {
     final Faker faker = new Faker();
 
     final Project project = Project.builder()
-            .id(UUID.randomUUID())
+            .id(ProjectId.random())
             .name(faker.rickAndMorty().character())
             .slug(faker.internet().slug())
             .build();
@@ -73,7 +74,7 @@ class ApplicationMailNotifierTest {
                 null
         );
 
-        final var projectLeads = List.of(UUID.randomUUID(), UUID.randomUUID());
+        final var projectLeads = List.of(UserId.random(), UserId.random());
         when(projectStoragePort.getProjectLeadIds(project.getId())).thenReturn(projectLeads);
         when(userStoragePort.getRegisteredUserByGithubId(application.applicantId()))
                 .thenReturn(Optional.empty());
@@ -88,7 +89,7 @@ class ApplicationMailNotifierTest {
         notifier.onApplicationCreated(application);
 
         // Then
-        final var recipientCaptor = ArgumentCaptor.forClass(UUID.class);
+        final var recipientCaptor = ArgumentCaptor.forClass(UserId.class);
         final var notificationCaptor = ArgumentCaptor.forClass(ApplicationToReview.class);
         verify(notificationPort, times(2)).push(recipientCaptor.capture(), notificationCaptor.capture());
         final var recipients = recipientCaptor.getAllValues();

@@ -49,7 +49,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
         userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
+        final var projectId = projectRepository.findAll().get(0).getId();
 
         // When
         client.get()
@@ -69,7 +69,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
     void should_get_rewardable_items_given_a_project_lead() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
         client.get()
@@ -911,7 +911,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {"rewardableItems":[],"hasMore":false,"totalPageNumber":0,"totalItemNumber":0,"nextPageIndex":0}
-                         """);
+                        """);
 
         client.get()
                 .uri(getApiURI(String.format(PROJECTS_GET_REWARDABLE_ITEMS, projectId), Map.of("githubUserId",
@@ -1389,7 +1389,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 0,
                           "nextPageIndex": 0
                         }
-                                                
+                        
                         """);
 
         // When
@@ -1411,7 +1411,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                           "totalItemNumber": 0,
                           "nextPageIndex": 0
                         }
-                                                
+                        
                         """);
     }
 
@@ -1420,7 +1420,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
     void should_get_rewardable_items_given_a_project_lead_and_ignored_contributions() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         ignoredContributionsRepository.saveAll(List.of(
                 new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()
                         .contributionId("279c2e7794a6f798c0de46c6fe23cbffcc2feb485072a25fdefc726eaf90e34d")
@@ -1568,7 +1568,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                 .isEqualTo(206)
                 .expectBody()
                 .json("""
-                         
+                        
                         {
                            "rewardableItems": [
                              {
@@ -1747,7 +1747,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
                            "totalItemNumber": 146,
                            "nextPageIndex": 1
                         }
-                         """);
+                        """);
     }
 
     @Test
@@ -1755,7 +1755,7 @@ public class ProjectsGetRewardableItemsApiIT extends AbstractMarketplaceApiIT {
     void should_get_all_completed_rewardable_items_given_a_project_lead_and_ignored_contributions() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         ignoredContributionsRepository.saveAll(List.of(
                 new IgnoredContributionEntity(IgnoredContributionEntity.Id.builder()

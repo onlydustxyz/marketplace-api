@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueAssigned;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestCreated;
 import onlydust.com.marketplace.kernel.model.event.OnPullRequestMerged;
@@ -23,7 +25,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,13 +89,13 @@ class TrackingEventPublisherOutboxConsumerTest {
     @Nested
     class GivenNonRegisteredUser {
 
-        protected UUID projectId;
+        protected ProjectId projectId;
 
         @BeforeEach
         void setUp() {
-            projectId = UUID.randomUUID();
+            projectId = ProjectId.random();
             when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.empty());
-            when(projectStoragePort.findProjectIdsByRepoId(anyLong())).thenReturn(List.of(projectId, UUID.randomUUID()));
+            when(projectStoragePort.findProjectIdsByRepoId(anyLong())).thenReturn(List.of(projectId, ProjectId.random()));
         }
 
         @ParameterizedTest
@@ -130,7 +135,7 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_publish_on_application_created() {
             // Given
             final var application = new Application(Application.Id.random(),
-                    UUID.randomUUID(),
+                    ProjectId.random(),
                     githubUserId,
                     Application.Origin.MARKETPLACE,
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),
@@ -172,16 +177,16 @@ class TrackingEventPublisherOutboxConsumerTest {
     class GivenARegisteredUser {
         final AuthenticatedUser user = AuthenticatedUser.builder()
                 .githubUserId(githubUserId)
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .build();
 
-        protected UUID projectId;
+        protected ProjectId projectId;
 
         @BeforeEach
         void setUp() {
-            projectId = UUID.randomUUID();
+            projectId = ProjectId.random();
             when(userStoragePort.getRegisteredUserByGithubId(githubUserId)).thenReturn(Optional.of(user));
-            when(projectStoragePort.findProjectIdsByRepoId(githubRepoId)).thenReturn(List.of(projectId, UUID.randomUUID()));
+            when(projectStoragePort.findProjectIdsByRepoId(githubRepoId)).thenReturn(List.of(projectId, ProjectId.random()));
         }
 
         @Test
@@ -268,7 +273,7 @@ class TrackingEventPublisherOutboxConsumerTest {
         void should_publish_on_application_created() {
             // Given
             final var application = new Application(Application.Id.random(),
-                    UUID.randomUUID(),
+                    ProjectId.random(),
                     githubUserId,
                     Application.Origin.MARKETPLACE,
                     faker.date().past(3, TimeUnit.DAYS).toInstant().atZone(ZoneOffset.UTC),

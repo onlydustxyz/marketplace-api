@@ -4,12 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubAccountViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoLanguageViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubRepoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RepoMapper;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.ProjectOrganizationView;
@@ -85,7 +85,7 @@ public class ProjectViewEntity {
 
     public Project toDomain() {
         return Project.builder()
-                .id(id)
+                .id(ProjectId.of(id))
                 .slug(slug)
                 .name(name)
                 .shortDescription(shortDescription)

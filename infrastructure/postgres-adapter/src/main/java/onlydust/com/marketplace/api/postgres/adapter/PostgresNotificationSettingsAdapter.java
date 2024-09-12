@@ -6,16 +6,15 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSe
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSettingsChannelRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationSettingsForProjectRepository;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.port.output.NotificationSettingsStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresNotificationSettingsAdapter implements NotificationSettingsStoragePort {
@@ -24,28 +23,28 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<NotificationSettings.Project> getNotificationSettingsForProject(NotificationRecipient.Id userId, ProjectId projectId) {
+    public Optional<NotificationSettings.Project> getNotificationSettingsForProject(UserId userId, ProjectId projectId) {
         return notificationSettingsForProjectRepository.findById(new NotificationSettingsForProjectEntity.PrimaryKey(userId.value(), projectId.value()))
                 .map(NotificationSettingsForProjectEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void saveNotificationSettingsForProject(NotificationRecipient.Id userId, NotificationSettings.Project settings) {
+    public void saveNotificationSettingsForProject(UserId userId, NotificationSettings.Project settings) {
         notificationSettingsForProjectRepository.save(NotificationSettingsForProjectEntity.of(userId, settings));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<NotificationChannel> getNotificationChannels(UUID recipientId, NotificationCategory category) {
-        return notificationSettingsChannelRepository.findAllByUserIdAndCategory(recipientId, category).stream()
+    public List<NotificationChannel> getNotificationChannels(UserId recipientId, NotificationCategory category) {
+        return notificationSettingsChannelRepository.findAllByUserIdAndCategory(recipientId.value(), category).stream()
                 .map(NotificationSettingsChannelEntity::channel)
                 .toList();
     }
 
     @Override
     @Transactional
-    public void create(NotificationRecipient.Id userId, NotificationSettings settings) {
+    public void create(UserId userId, NotificationSettings settings) {
         final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))
@@ -55,7 +54,7 @@ public class PostgresNotificationSettingsAdapter implements NotificationSettings
 
     @Override
     @Transactional
-    public void update(NotificationRecipient.Id userId, NotificationSettings settings) {
+    public void update(UserId userId, NotificationSettings settings) {
         final List<NotificationSettingsChannelEntity> entities = settings.channelsPerCategory().entrySet().stream()
                 .flatMap(entry -> entry.getValue().stream()
                         .map(channel -> new NotificationSettingsChannelEntity(userId.value(), entry.getKey(), channel)))

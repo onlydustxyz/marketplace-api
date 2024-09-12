@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.util.UUID;
@@ -11,11 +12,14 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @AllArgsConstructor
 public class ProjectCategorySuggestion {
-    private final @NonNull Id id;
-    private final @NonNull String name;
-    private final @NonNull UUID projectId;
+    @NonNull
+    Id id;
+    @NonNull
+    String name;
+    @NonNull
+    ProjectId projectId;
 
-    public static ProjectCategorySuggestion of(@NonNull final String name, @NonNull final UUID projectId) {
+    public static ProjectCategorySuggestion of(@NonNull final String name, @NonNull final ProjectId projectId) {
         return new ProjectCategorySuggestion(Id.random(), name, projectId);
     }
 

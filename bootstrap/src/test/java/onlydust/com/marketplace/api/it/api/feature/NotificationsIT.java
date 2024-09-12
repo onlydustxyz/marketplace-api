@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.*;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
@@ -22,7 +23,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,9 +41,9 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Autowired
     CustomerIOAdapter notificationInstantEmailSender;
 
-    private UUID olivierId;
+    private UserId olivierId;
     private NotificationRecipient olivierRecipient;
-    private UUID pierreId;
+    private UserId pierreId;
     private NotificationRecipient pierreRecipient;
 
     private final TestNotification rewardNotification1Data = new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD);
@@ -70,12 +70,12 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
         reset(notificationInstantEmailSender);
 
         final var olivier = userAuthHelper.authenticateOlivier();
-        olivierId = olivier.user().getId();
-        olivierRecipient = new NotificationRecipient(NotificationRecipient.Id.of(olivierId), olivier.user().getEmail(), olivier.user().getGithubLogin());
+        olivierId = olivier.userId();
+        olivierRecipient = new NotificationRecipient(olivierId, olivier.user().getEmail(), olivier.user().getGithubLogin());
 
         final var pierre = userAuthHelper.authenticatePierre();
-        pierreId = pierre.user().getId();
-        pierreRecipient = new NotificationRecipient(NotificationRecipient.Id.of(pierreId), pierre.user().getEmail(), pierre.user().getGithubLogin());
+        pierreId = pierre.userId();
+        pierreRecipient = new NotificationRecipient(pierreId, pierre.user().getEmail(), pierre.user().getGithubLogin());
     }
 
     @Test
@@ -111,11 +111,11 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
                 faker.internet().slug(),
                 faker.internet().avatar(),
                 false);
-        final var newUserRecipient = new NotificationRecipient(NotificationRecipient.Id.of(newUser.user().getId()), newUser.user().getEmail(),
+        final var newUserRecipient = new NotificationRecipient(newUser.userId(), newUser.user().getEmail(),
                 newUser.user().getGithubLogin());
 
         // When
-        final var notification = notificationPort.push(newUser.user().getId(), new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
+        final var notification = notificationPort.push(newUser.userId(), new TestNotification(faker.random().nextInt(1000, Integer.MAX_VALUE),
                 NotificationCategory.MAINTAINER_PROJECT_PROGRAM));
 
         // Then
@@ -133,7 +133,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(4)
     void should_return_notification_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(olivierId,
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.IN_APP)
@@ -155,7 +155,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(5)
     void should_return_multiple_notifications_for_appropriate_channels() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(olivierId,
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.IN_APP),
@@ -181,7 +181,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(10)
     void should_not_impact_old_notifications_when_channel_is_added_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(olivierId,
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.SUMMARY_EMAIL, NotificationChannel.IN_APP),
@@ -220,7 +220,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(20)
     void should_not_impact_old_notifications_when_channel_is_removed_for_category() {
         // When
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(olivierId),
+        notificationSettingsPort.updateNotificationSettings(olivierId,
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.IN_APP),
@@ -260,7 +260,7 @@ public class NotificationsIT extends AbstractMarketplaceApiIT {
     @Order(30)
     void should_not_mix_notifications_between_users() {
         // Given
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(pierreId),
+        notificationSettingsPort.updateNotificationSettings(pierreId,
                 NotificationSettings.builder()
                         .channelsPerCategory(Map.of(
                                 NotificationCategory.CONTRIBUTOR_REWARD, List.of(NotificationChannel.EMAIL, NotificationChannel.IN_APP),

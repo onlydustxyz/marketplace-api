@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.HistoricalQuoteEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
@@ -31,10 +32,10 @@ public class PostgresProjectRewardAdapter implements ProjectRewardStoragePort {
 
     @Override
     @Transactional
-    public ProjectBudgetsView findBudgets(UUID projectId) {
+    public ProjectBudgetsView findBudgets(ProjectId projectId) {
         final var usd = currencyRepository.findByCode("USD").orElseThrow(() -> internalServerError("USD currency not found"));
 
-        final var budgets = projectAllowanceRepository.findAllByProjectId(projectId).stream().map(projectAllowanceEntity -> {
+        final var budgets = projectAllowanceRepository.findAllByProjectId(projectId.value()).stream().map(projectAllowanceEntity -> {
             final var currency = currencyRepository.findById(projectAllowanceEntity.getCurrencyId())
                     .orElseThrow(() -> internalServerError("Currency %s not found".formatted(projectAllowanceEntity.getCurrencyId())));
 

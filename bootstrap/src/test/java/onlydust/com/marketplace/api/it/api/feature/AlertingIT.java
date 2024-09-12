@@ -95,7 +95,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
         final var programId = programHelper.create(sponsorId).id();
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
-        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
+        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId);
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(true)
@@ -115,7 +115,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .build()), 1);
 
         // When the user set missing payout preferences
-        updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId.value());
+        updatePayoutPreferences(authenticatedUser.user().getGithubUserId(), individualBillingProfile.id(), projectId);
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)
@@ -214,7 +214,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .build()), 1);
 
 
-        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 6000L, projectId.value());
+        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 6000L, projectId);
         assertAlerting(List.of(MeDatum.builder()
                 .githubUserId(authenticatedUser.user().getGithubUserId())
                 .missingPayoutPreference(false)
@@ -358,7 +358,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                                          boolean missingStarknetWallet) {
     }
 
-    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
+    private void sendRewardToRecipient(Long recipientId, Long amount, ProjectId projectId) {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(amount))
@@ -388,7 +388,7 @@ public class AlertingIT extends AbstractMarketplaceApiIT {
                 .is2xxSuccessful();
     }
 
-    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
+    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final ProjectId projectId) {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
         client.put()
                 .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))

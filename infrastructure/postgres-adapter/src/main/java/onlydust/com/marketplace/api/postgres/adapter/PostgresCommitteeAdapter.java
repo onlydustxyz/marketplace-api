@@ -9,6 +9,8 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeBudgetA
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeLinkViewRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeRepository;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignment;
@@ -69,8 +71,8 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                         .criteriaId(juryVote.getKey().value())
                         .score(juryVote.getValue().orElse(null))
                         .committeeId(juryAssignment.getCommitteeId().value())
-                        .projectId(juryAssignment.getProjectId())
-                        .userId(juryAssignment.getJuryId())
+                        .projectId(juryAssignment.getProjectId().value())
+                        .userId(juryAssignment.getJuryId().value())
                         .build()
                 ).collect(Collectors.toSet()))
                 .flatMap(Collection::stream)
@@ -78,14 +80,14 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
     }
 
     @Override
-    public void saveJuryVotes(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> votes) {
+    public void saveJuryVotes(UserId juryId, Committee.Id committeeId, ProjectId projectId, Map<JuryCriteria.Id, Integer> votes) {
         committeeJuryVoteRepository.saveAll(votes.entrySet().stream()
                 .map(juryVote -> CommitteeJuryVoteEntity.builder()
                         .criteriaId(juryVote.getKey().value())
                         .score(juryVote.getValue())
                         .committeeId(committeeId.value())
-                        .projectId(projectId)
-                        .userId(juryId)
+                        .projectId(projectId.value())
+                        .userId(juryId.value())
                         .build()
                 )
                 .collect(Collectors.toSet()));
@@ -101,12 +103,12 @@ public class PostgresCommitteeAdapter implements CommitteeStoragePort {
                                                 reducing(null, (a, b) -> b))))))
                 .entrySet().stream()
                 .flatMap(byProject -> byProject.getValue().entrySet().stream()
-                        .map(byJury -> JuryAssignment.withVotes(byJury.getKey(), committeeId, byProject.getKey(), byJury.getValue()))
+                        .map(byJury -> JuryAssignment.withVotes(UserId.of(byJury.getKey()), committeeId, ProjectId.of(byProject.getKey()), byJury.getValue()))
                 ).toList();
     }
 
     @Override
-    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
+    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<ProjectId, BigDecimal> projectAllocations) {
         committeeBudgetAllocationRepository.saveAll(projectAllocations.entrySet().stream()
                 .map(entry -> CommitteeBudgetAllocationEntity.fromDomain(committeeId, currencyId, entry.getKey(), entry.getValue()))
                 .collect(toList()));

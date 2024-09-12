@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
@@ -11,8 +12,6 @@ import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.input.ApplicationFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 
@@ -31,7 +30,7 @@ public class ApplicationService implements ApplicationFacadePort {
     private final GlobalConfig globalConfig;
 
     @Override
-    public void deleteApplication(Application.Id id, UUID userId, Long githubUserId) {
+    public void deleteApplication(Application.Id id, UserId userId, Long githubUserId) {
         final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
@@ -61,7 +60,7 @@ public class ApplicationService implements ApplicationFacadePort {
     }
 
     @Override
-    public void acceptApplication(Application.Id id, UUID userId) {
+    public void acceptApplication(Application.Id id, UserId userId) {
         final var application = projectApplicationStoragePort.findApplication(id)
                 .orElseThrow(() -> notFound("Application %s not found".formatted(id)));
 
@@ -80,7 +79,7 @@ public class ApplicationService implements ApplicationFacadePort {
         githubApiPort.assign(githubAppToken.token(), issue.repoId(), issue.number(), applicant.login());
         applicationObserver.onApplicationAccepted(application, userId);
 
-        projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), ProjectId.of(application.projectId()))
+        projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), application.projectId())
                 .stream()
                 .filter(a -> !a.applicantId().equals(application.applicantId()))
                 .forEach(applicationObserver::onApplicationRefused);
@@ -89,7 +88,7 @@ public class ApplicationService implements ApplicationFacadePort {
     @Override
     @Transactional
     public Application applyOnProject(@NonNull Long githubUserId,
-                                      @NonNull UUID projectId,
+                                      @NonNull ProjectId projectId,
                                       @NonNull GithubIssue.Id issueId,
                                       @NonNull String motivation,
                                       String problemSolvingApproach) {

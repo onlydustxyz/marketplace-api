@@ -26,15 +26,7 @@ public class ProjectHelper {
     private final Faker faker = new Faker();
 
     public ProjectId create(UserAuthHelper.AuthenticatedUser lead) {
-        return ProjectId.of(projectFacadePort.createProject(lead.user().getId(),
-                        CreateProjectCommand.builder()
-                                .firstProjectLeaderId(lead.user().getId())
-                                .name(faker.funnyName().name() + " " + faker.random().nextLong())
-                                .shortDescription(faker.lorem().sentence())
-                                .longDescription(faker.lorem().paragraph())
-                                .isLookingForContributors(faker.bool().bool())
-                                .build())
-                .getLeft());
+        return create(lead, faker.funnyName().name(), List.of());
     }
 
     public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name) {
@@ -42,21 +34,21 @@ public class ProjectHelper {
     }
 
     public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name, List<UUID> ecosystemIds) {
-        return ProjectId.of(projectFacadePort.createProject(lead.user().getId(),
+        return projectFacadePort.createProject(lead.userId(),
                         CreateProjectCommand.builder()
-                                .firstProjectLeaderId(lead.user().getId())
+                                .firstProjectLeaderId(lead.userId())
                                 .name(name + " " + faker.random().nextLong())
                                 .shortDescription(faker.lorem().sentence())
                                 .longDescription(faker.lorem().paragraph())
                                 .isLookingForContributors(faker.bool().bool())
                                 .ecosystemIds(ecosystemIds)
                                 .build())
-                .getLeft());
+                .getLeft();
     }
 
 
     public Project get(ProjectId projectId) {
-        return projectStoragePort.getById(projectId.value())
+        return projectStoragePort.getById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project not found"));
     }
 

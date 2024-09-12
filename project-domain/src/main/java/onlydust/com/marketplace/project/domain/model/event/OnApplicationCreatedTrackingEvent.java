@@ -3,12 +3,13 @@ package onlydust.com.marketplace.project.domain.model.event;
 import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 @Value
 @Builder(access = AccessLevel.PRIVATE)
@@ -18,10 +19,10 @@ public class OnApplicationCreatedTrackingEvent extends Event {
     @NonNull
     Application.Id applicationId;
     @NonNull
-    UUID projectId;
+    ProjectId projectId;
     @NonNull
     Long applicantGithubId;
-    UUID applicantUserId;
+    UserId applicantUserId;
     @NonNull
     Application.Origin origin;
     @NonNull
@@ -30,7 +31,7 @@ public class OnApplicationCreatedTrackingEvent extends Event {
     GithubIssue.Id issueId;
 
     public static Event of(@NonNull OnApplicationCreated onApplicationCreated,
-                           @NonNull Optional<UUID> applicantUserId) {
+                           @NonNull Optional<UserId> applicantUserId) {
         return OnApplicationCreatedTrackingEvent.builder()
                 .applicationId(onApplicationCreated.applicationId())
                 .projectId(onApplicationCreated.projectId())

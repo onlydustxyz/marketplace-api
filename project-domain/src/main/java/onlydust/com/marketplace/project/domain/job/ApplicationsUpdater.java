@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.*;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.joining;
@@ -113,7 +113,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
         }
     }
 
-    private void saveGithubApplications(GithubComment comment, List<UUID> projectIds) {
+    private void saveGithubApplications(GithubComment comment, List<ProjectId> projectIds) {
         final var applications = projectIds.stream()
                 .map(projectId -> Application.fromGithubComment(comment, projectId))
                 .toArray(Application[]::new);

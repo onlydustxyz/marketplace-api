@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -12,7 +13,10 @@ import org.junit.jupiter.api.Test;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
@@ -46,7 +50,7 @@ public class ApplicationServiceTest {
             globalConfig);
 
     final Long githubUserId = faker.number().randomNumber(10, true);
-    final UUID userId = UUID.randomUUID();
+    final UserId userId = UserId.random();
     final GithubIssue issue = new GithubIssue(GithubIssue.Id.random(),
             faker.number().randomNumber(10, true),
             faker.number().randomNumber(10, true),
@@ -59,7 +63,7 @@ public class ApplicationServiceTest {
     final String motivation = faker.lorem().sentence();
     final String problemSolvingApproach = faker.lorem().sentence();
     final String personalAccessToken = faker.internet().password();
-    final UUID projectId = UUID.randomUUID();
+    final ProjectId projectId = ProjectId.random();
     final Project project = Project.builder()
             .id(projectId)
             .slug(faker.lorem().word())
@@ -329,7 +333,7 @@ public class ApplicationServiceTest {
         );
 
         when(projectApplicationStoragePort.findApplication(application.id())).thenReturn(Optional.of(application));
-        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UserId.random()));
 
         // When
         assertThatThrownBy(() -> applicationService.deleteApplication(application.id(), userId, githubUserId))
@@ -473,7 +477,7 @@ public class ApplicationServiceTest {
         @Test
         void should_prevent_accepting_application_if_not_project_lead() {
             // Given
-            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+            when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UserId.random()));
 
             // When
             assertThatThrownBy(() -> applicationService.acceptApplication(application.id(), userId))
@@ -529,7 +533,7 @@ public class ApplicationServiceTest {
                     faker.lorem().sentence(),
                     faker.lorem().sentence()
             );
-            when(projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), ProjectId.of(application.projectId())))
+            when(projectApplicationStoragePort.findApplicationsOnIssueAndProject(application.issueId(), application.projectId()))
                     .thenReturn(List.of(application, refusedApplication));
             applicationService.acceptApplication(application.id(), userId);
 

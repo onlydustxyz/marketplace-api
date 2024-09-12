@@ -47,7 +47,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
         userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
+        final var projectId = projectRepository.findAll().get(0).getId();
 
         // When
         client.post().uri(getApiURI(String.format(PROJECTS_POST_REWARDABLE_OTHER_ISSUE, projectId))).contentType(APPLICATION_JSON).bodyValue("""
@@ -66,7 +66,7 @@ public class ProjectsPostRewardableOtherIssueApiIT extends AbstractMarketplaceAp
     void should_create_and_close_rewardable_issue_given_a_project_lead_and_linked_repo() {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
         indexerApiWireMockServer.stubFor(put(urlEqualTo("/api/v1/repos/onlydustxyz/starklings/issues/100"))

@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.input.CommitteeFacadePort;
@@ -110,7 +112,7 @@ public class CommitteeService implements CommitteeFacadePort {
         if (committee.juryCriteria().isEmpty())
             throw forbidden("Cannot assign juries to project given empty jury criteria");
 
-        final Map<UUID, Integer> projectVoteCount = new HashMap<>();
+        final Map<ProjectId, Integer> projectVoteCount = new HashMap<>();
 
         final Set<JuryAssignmentBuilder> juryAssignmentBuilders = juryIds.stream().map(juryId -> new JuryAssignmentBuilder(committeeId, juryId,
                         committee.votePerJury(), projectStoragePort.getProjectLedIdsForUser(juryId),
@@ -121,7 +123,7 @@ public class CommitteeService implements CommitteeFacadePort {
 
         for (int i = 0; i < committee.votePerJury(); i++) {
             Collections.shuffle(projectIds);
-            for (UUID projectId : projectIds) {
+            for (final var projectId : projectIds) {
                 if (projectVoteCount.getOrDefault(projectId, 0) <= maxVoteNumber) {
                     for (JuryAssignmentBuilder juryAssignmentBuilder : juryAssignmentBuilders) {
                         if (juryAssignmentBuilder.canAssignProject(projectId)) {
@@ -134,7 +136,7 @@ public class CommitteeService implements CommitteeFacadePort {
             }
         }
 
-        final Set<UUID> assignedProjectIds = juryAssignmentBuilders.stream()
+        final Set<ProjectId> assignedProjectIds = juryAssignmentBuilders.stream()
                 .map(JuryAssignmentBuilder::getAssignedOnProjectIds)
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
@@ -178,7 +180,7 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
-    public void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores) {
+    public void vote(UserId juryId, Committee.Id committeeId, ProjectId projectId, Map<JuryCriteria.Id, Integer> scores) {
         final var committee = committeeStoragePort.findById(committeeId)
                 .orElseThrow(() -> notFound("Committee %s was not found".formatted(committeeId)));
         if (committee.status() != Committee.Status.OPEN_TO_VOTES)
@@ -204,10 +206,10 @@ public class CommitteeService implements CommitteeFacadePort {
                 .stream()
                 .collect(groupingBy(JuryAssignment::getProjectId,
                         mapping(JuryAssignment::getScore, filtering(OptionalDouble::isPresent,
-                                averagingDouble(s -> s.getAsDouble())))))
+                                averagingDouble(OptionalDouble::getAsDouble)))))
                 .entrySet().stream()
                 .filter(e -> e.getValue() >= 3)
-                .collect(toMap(Map.Entry::getKey, e -> (e.getValue().doubleValue() - 3) * 2 + 1));
+                .collect(toMap(Map.Entry::getKey, e -> (e.getValue() - 3) * 2 + 1));
 
         final var totalShares = projectScores.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal.ZERO, BigDecimal::add);
         final var perShareAllocation = budget.divide(totalShares, precision + 1, RoundingMode.DOWN);
@@ -222,11 +224,11 @@ public class CommitteeService implements CommitteeFacadePort {
     }
 
     @Override
-    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations) {
+    public void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<ProjectId, BigDecimal> projectAllocations) {
         committeeStoragePort.saveAllocations(committeeId, currencyId, projectAllocations);
     }
 
-    private void checkApplicationPermission(final UUID projectId, final UUID userId) {
+    private void checkApplicationPermission(final ProjectId projectId, final UserId userId) {
         if (!permissionService.isUserProjectLead(projectId, userId))
             throw forbidden("Only project lead can send new application to committee");
         if (!projectStoragePort.exists(projectId))

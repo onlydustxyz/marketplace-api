@@ -1,13 +1,14 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public interface AccountingServicePort {
 
-    void createReward(UUID projectId, UUID rewardId, BigDecimal amount, CurrencyView.Id currencyId);
+    void createReward(ProjectId projectId, RewardId rewardId, BigDecimal amount, CurrencyView.Id currencyId);
 
-    void cancelReward(UUID rewardId, CurrencyView.Id currencyId);
+    void cancelReward(RewardId rewardId, CurrencyView.Id currencyId);
 }

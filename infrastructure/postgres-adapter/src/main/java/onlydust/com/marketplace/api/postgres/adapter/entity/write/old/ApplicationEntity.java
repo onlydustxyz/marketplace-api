@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write.old;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.postgres.adapter.entity.read.indexer.exposition.GithubIssueViewEntity;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -62,7 +62,7 @@ public class ApplicationEntity {
         return ApplicationEntity.builder()
                 .id(application.id().value())
                 .receivedAt(application.appliedAt())
-                .projectId(application.projectId())
+                .projectId(application.projectId().value())
                 .applicantId(application.applicantId())
                 .origin(application.origin())
                 .issueId(application.issueId().value())
@@ -75,7 +75,7 @@ public class ApplicationEntity {
     public Application toDomain() {
         return new Application(
                 Application.Id.of(id),
-                projectId,
+                ProjectId.of(projectId),
                 applicantId,
                 origin,
                 receivedAt,

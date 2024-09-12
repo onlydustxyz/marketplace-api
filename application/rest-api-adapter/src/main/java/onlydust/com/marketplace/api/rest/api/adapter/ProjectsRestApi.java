@@ -9,6 +9,8 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
@@ -18,7 +20,6 @@ import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
 import onlydust.com.marketplace.project.domain.view.*;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ public class ProjectsRestApi implements ProjectsApi {
                         authenticatedUser.id()));
 
         final CreateProjectResponse createProjectResponse = new CreateProjectResponse();
-        createProjectResponse.setProjectId(projectIdentity.getLeft());
+        createProjectResponse.setProjectId(projectIdentity.getLeft().value());
         createProjectResponse.setProjectSlug(projectIdentity.getRight());
         return ResponseEntity.ok(createProjectResponse);
     }
@@ -72,10 +73,10 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<UpdateProjectResponse> updateProject(UUID projectId,
                                                                UpdateProjectRequest updateProjectRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Pair<UUID, String> projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.id(),
-                mapUpdateProjectCommandToDomain(projectId,
+        final var projectIdAndSlug = projectFacadePort.updateProject(authenticatedUser.id(),
+                mapUpdateProjectCommandToDomain(ProjectId.of(projectId),
                         updateProjectRequest));
-        return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft()).projectSlug(projectIdAndSlug.getRight()));
+        return ResponseEntity.ok(new UpdateProjectResponse().projectId(projectIdAndSlug.getLeft().value()).projectSlug(projectIdAndSlug.getRight()));
     }
 
     @Override
@@ -96,7 +97,7 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<ProjectBudgetsResponse> getProjectBudgets(UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(projectId,
+        final ProjectBudgetsView projectBudgetsView = projectRewardFacadePortV2.getBudgets(ProjectId.of(projectId),
                 authenticatedUser.id());
         return ResponseEntity.ok(mapProjectBudgetsViewToResponse(projectBudgetsView));
     }
@@ -105,23 +106,23 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<CreateRewardResponse> createReward(UUID projectId, RewardRequest rewardRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var rewardId = rewardFacadePort.createReward(authenticatedUser.id(),
-                RewardMapper.rewardRequestToDomain(rewardRequest, projectId));
+                RewardMapper.rewardRequestToDomain(rewardRequest, ProjectId.of(projectId)));
         final var response = new CreateRewardResponse();
-        response.setId(rewardId);
+        response.setId(rewardId.value());
         return ResponseEntity.ok(response);
     }
 
     @Override
     public ResponseEntity<Void> cancelReward(UUID projectId, UUID rewardId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        rewardFacadePort.cancelReward(authenticatedUser.id(), projectId, rewardId);
+        rewardFacadePort.cancelReward(authenticatedUser.id(), ProjectId.of(projectId), RewardId.of(rewardId));
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<RewardDetailsResponse> getProjectReward(UUID projectId, UUID rewardId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(projectId, rewardId,
+        final RewardDetailsView rewardDetailsView = projectRewardFacadePort.getRewardByIdForProjectLead(ProjectId.of(projectId), rewardId,
                 authenticatedUser.id());
         return ResponseEntity.ok(RewardMapper.projectRewardDetailsToResponse(rewardDetailsView, authenticatedUser));
     }
@@ -132,7 +133,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageSize = sanitizePageSize(pageSize);
         final int sanitizedPageIndex = PaginationHelper.sanitizePageIndex(pageIndex);
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final Page<RewardItemView> page = projectRewardFacadePort.getRewardItemsPageByIdForProjectLead(projectId, rewardId,
+        final Page<RewardItemView> page = projectRewardFacadePort.getRewardItemsPageByIdForProjectLead(ProjectId.of(projectId), rewardId,
                 authenticatedUser.id(), sanitizedPageIndex, sanitizedPageSize);
         final RewardItemsPageResponse rewardItemsPageResponse = RewardMapper.pageToResponse(sanitizedPageIndex, page);
         return rewardItemsPageResponse.getTotalPageNumber() > 1 ?
@@ -164,7 +165,7 @@ public class ProjectsRestApi implements ProjectsApi {
             case CANCELLED -> onlydust.com.marketplace.project.domain.model.ContributionStatus.CANCELLED;
         };
         final Page<RewardableItemView> rewardableItemsPage =
-                projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId,
+                projectFacadePort.getRewardableItemsPageByTypeForProjectLeadAndContributorId(ProjectId.of(projectId),
                         contributionType, contributionStatus,
                         authenticatedUser.id(), githubUserId, sanitizedPageIndex, sanitizedPageSize, search,
                         isNull(includeIgnoredItems) ? false : includeIgnoredItems);
@@ -181,7 +182,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                                                     Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final List<RewardableItemView> rewardableItems =
-                projectFacadePort.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId,
+                projectFacadePort.getAllCompletedRewardableItemsForProjectLeadAndContributorId(ProjectId.of(projectId),
                         authenticatedUser.id(), githubUserId);
         final AllRewardableItemsResponse response =
                 RewardableItemMapper.listToResponse(rewardableItems);
@@ -192,7 +193,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<ContributionDetailsResponse> getContribution(UUID projectId, String contributionId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var contribution = contributionsFacadePort.getContribution(projectId, contributionId, authenticatedUser);
+        final var contribution = contributionsFacadePort.getContribution(ProjectId.of(projectId), contributionId, authenticatedUser);
 
         return ResponseEntity.ok(ContributionMapper.mapContributionDetails(contribution, authenticatedUser));
     }
@@ -204,12 +205,12 @@ public class ProjectsRestApi implements ProjectsApi {
 
         if (updateProjectIgnoredContributionsRequest.getContributionsToIgnore() != null &&
             !updateProjectIgnoredContributionsRequest.getContributionsToIgnore().isEmpty()) {
-            contributionsFacadePort.ignoreContributions(projectId, authenticatedUser.id(),
+            contributionsFacadePort.ignoreContributions(ProjectId.of(projectId), authenticatedUser.id(),
                     updateProjectIgnoredContributionsRequest.getContributionsToIgnore());
         }
         if (updateProjectIgnoredContributionsRequest.getContributionsToUnignore() != null &&
             !updateProjectIgnoredContributionsRequest.getContributionsToUnignore().isEmpty()) {
-            contributionsFacadePort.unignoreContributions(projectId, authenticatedUser.id(),
+            contributionsFacadePort.unignoreContributions(ProjectId.of(projectId), authenticatedUser.id(),
                     updateProjectIgnoredContributionsRequest.getContributionsToUnignore());
         }
         return noContent().build();
@@ -219,7 +220,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<RewardableItemResponse> addRewardableOtherIssue(UUID projectId,
                                                                           AddOtherIssueRequest addOtherIssueRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardableItemView issue = projectFacadePort.addRewardableIssue(projectId, authenticatedUser.id(),
+        final RewardableItemView issue = projectFacadePort.addRewardableIssue(ProjectId.of(projectId), authenticatedUser.id(),
                 addOtherIssueRequest.getGithubIssueHtmlUrl());
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(issue));
     }
@@ -228,7 +229,7 @@ public class ProjectsRestApi implements ProjectsApi {
     public ResponseEntity<RewardableItemResponse> addRewardableOtherPullRequest(UUID projectId,
                                                                                 AddOtherPullRequestRequest addOtherPullRequestRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final RewardableItemView pullRequest = projectFacadePort.addRewardablePullRequest(projectId,
+        final RewardableItemView pullRequest = projectFacadePort.addRewardablePullRequest(ProjectId.of(projectId),
                 authenticatedUser.id(),
                 addOtherPullRequestRequest.getGithubPullRequestHtmlUrl());
         return ResponseEntity.ok(RewardableItemMapper.itemToResponse(pullRequest));
@@ -240,7 +241,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final RewardableItemView issue = projectFacadePort.createAndCloseIssueForProjectIdAndRepositoryId(
                 CreateAndCloseIssueCommand.builder()
-                        .projectId(projectId)
+                        .projectId(ProjectId.of(projectId))
                         .projectLeadId(authenticatedUser.id())
                         .githubRepoId(addOtherWorkRequest.getGithubRepoId())
                         .title(addOtherWorkRequest.getTitle())
@@ -268,7 +269,7 @@ public class ProjectsRestApi implements ProjectsApi {
 
         final ContributionView.Filters filters = ContributionView.Filters.builder()
                 .contributors(Optional.ofNullable(contributorIds).orElse(List.of()))
-                .projects(List.of(projectId))
+                .projects(List.of(ProjectId.of(projectId)))
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())
@@ -277,7 +278,7 @@ public class ProjectsRestApi implements ProjectsApi {
                 .build();
 
         final var contributions = projectFacadePort.contributions(
-                projectId,
+                ProjectId.of(projectId),
                 authenticatedUser,
                 filters,
                 ContributionMapper.mapSort(sort),
@@ -302,7 +303,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
         final var contributions = projectFacadePort.staledContributions(
-                projectId,
+                ProjectId.of(projectId),
                 authenticatedUser,
                 sanitizedPageIndex,
                 sanitizedPageSize);
@@ -326,7 +327,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
         final var contributors = projectFacadePort.churnedContributors(
-                projectId,
+                ProjectId.of(projectId),
                 authenticatedUser,
                 sanitizedPageIndex,
                 sanitizedPageSize);
@@ -349,7 +350,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
         final var contributors = projectFacadePort.newcomers(
-                projectId,
+                ProjectId.of(projectId),
                 authenticatedUser,
                 sanitizedPageIndex,
                 sanitizedPageSize);
@@ -373,7 +374,7 @@ public class ProjectsRestApi implements ProjectsApi {
         final int sanitizedPageIndex = sanitizePageIndex(pageIndex);
 
         final var contributors = projectFacadePort.mostActives(
-                projectId,
+                ProjectId.of(projectId),
                 authenticatedUser,
                 sanitizedPageIndex,
                 sanitizedPageSize);
@@ -390,21 +391,21 @@ public class ProjectsRestApi implements ProjectsApi {
     @Override
     public ResponseEntity<Void> hideContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectFacadePort.hideContributorForProjectLead(projectId, authenticatedUser.id(), githubUserId);
+        projectFacadePort.hideContributorForProjectLead(ProjectId.of(projectId), authenticatedUser.id(), githubUserId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> showContributor(UUID projectId, Long githubUserId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        projectFacadePort.showContributorForProjectLead(projectId, authenticatedUser.id(), githubUserId);
+        projectFacadePort.showContributorForProjectLead(ProjectId.of(projectId), authenticatedUser.id(), githubUserId);
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> unassignContribution(UUID projectId, String contributionId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        contributionsFacadePort.unassign(projectId, authenticatedUser.id(), contributionId);
+        contributionsFacadePort.unassign(ProjectId.of(projectId), authenticatedUser.id(), contributionId);
         return noContent().build();
     }
 }

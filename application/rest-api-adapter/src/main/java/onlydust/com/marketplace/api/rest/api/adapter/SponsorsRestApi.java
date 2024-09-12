@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DepositMapper;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +77,7 @@ public class SponsorsRestApi implements SponsorsApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         accountingFacadePort.submitDeposit(
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 Deposit.Id.of(depositId),
                 DepositMapper.fromBillingInformation(updateDepositRequest.getBillingInformation())
         );

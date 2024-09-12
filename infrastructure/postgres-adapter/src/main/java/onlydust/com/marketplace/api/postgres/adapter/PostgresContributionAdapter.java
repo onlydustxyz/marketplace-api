@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.GithubRepoMapper;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -56,7 +57,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         final var contributionPage = contributionViewEntityRepository.findContributions(
                 callerGithubUserId.orElse(UNEXISTING_GITHUB_USER_ID),
                 filters.getContributors(),
-                filters.getProjects(),
+                filters.getProjects().stream().map(ProjectId::value).toList(),
                 filters.getRepos(),
                 filters.getTypes().stream().map(Enum::name).toList(),
                 filters.getStatuses().stream().map(Enum::name).toList(),
@@ -77,11 +78,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional(readOnly = true)
-    public ContributionDetailsView findContributionById(UUID projectId, String contributionId) {
-        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId, contributionId)
+    public ContributionDetailsView findContributionById(ProjectId projectId, String contributionId) {
+        final var contribution = contributionDetailsViewEntityRepository.findContributionById(projectId.value(), contributionId)
                 .orElseThrow(() -> OnlyDustException.notFound("contribution not found"));
 
-        final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId,
+        final var rewards = contributionRewardViewEntityRepository.listByContributionId(projectId.value(),
                 contributionId);
         return contribution.toView()
                 .withRewards(rewards.stream().map(ContributionRewardQueryEntity::toView).toList());
@@ -103,7 +104,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters) {
-        return shortProjectViewEntityRepository.listProjectsByContributor(contributorId, filters.getProjects(),
+        return shortProjectViewEntityRepository.listProjectsByContributor(contributorId, filters.getProjects().stream().map(ProjectId::value).toList(),
                         filters.getRepos()).stream()
                 .map(ProjectMapper::mapShortProjectViewToProject)
                 .toList();
@@ -112,7 +113,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<GithubRepo> listReposByContributor(Long contributorId, ContributionView.Filters filters) {
-        return githubRepoViewEntityRepository.listReposByContributor(contributorId, filters.getProjects(),
+        return githubRepoViewEntityRepository.listReposByContributor(contributorId, filters.getProjects().stream().map(ProjectId::value).toList(),
                         filters.getRepos()).stream()
                 .map(GithubRepoMapper::map)
                 .toList();
@@ -127,11 +128,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional
-    public void ignoreContributions(UUID projectId, List<String> contributionIds) {
+    public void ignoreContributions(ProjectId projectId, List<String> contributionIds) {
         customIgnoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 CustomIgnoredContributionEntity.builder()
                         .id(CustomIgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
+                                .projectId(projectId.value())
                                 .contributionId(contributionId)
                                 .build())
                         .ignored(true)
@@ -141,7 +142,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         ignoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 IgnoredContributionEntity.builder()
                         .id(IgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
+                                .projectId(projectId.value())
                                 .contributionId(contributionId)
                                 .build())
                         .build()
@@ -150,11 +151,11 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional
-    public void unignoreContributions(UUID projectId, List<String> contributionIds) {
+    public void unignoreContributions(ProjectId projectId, List<String> contributionIds) {
         customIgnoredContributionsRepository.saveAllAndFlush(contributionIds.stream().map(contributionId ->
                 CustomIgnoredContributionEntity.builder()
                         .id(CustomIgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
+                                .projectId(projectId.value())
                                 .contributionId(contributionId)
                                 .build())
                         .ignored(false)
@@ -164,7 +165,7 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
         ignoredContributionsRepository.deleteAll(contributionIds.stream().map(contributionId ->
                 IgnoredContributionEntity.builder()
                         .id(IgnoredContributionEntity.Id.builder()
-                                .projectId(projectId)
+                                .projectId(projectId.value())
                                 .contributionId(contributionId)
                                 .build())
                         .build()
@@ -174,15 +175,15 @@ public class PostgresContributionAdapter implements ContributionStoragePort {
 
     @Override
     @Transactional
-    public void refreshIgnoredContributions(UUID projectId) {
-        final var repoIds = projectRepository.findById(projectId)
+    public void refreshIgnoredContributions(ProjectId projectId) {
+        final var repoIds = projectRepository.findById(projectId.value())
                 .orElseThrow(() -> OnlyDustException.notFound("project %s not found".formatted(projectId)))
                 .getRepos().stream()
                 .map(ProjectRepoEntity::getRepoId)
                 .toList();
 
-        ignoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId);
-        customIgnoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId);
+        ignoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId.value());
+        customIgnoredContributionsRepository.deleteContributionsThatAreNotPartOfTheProjectAnymore(projectId.value());
         refreshIgnoredContributions(repoIds);
     }
 

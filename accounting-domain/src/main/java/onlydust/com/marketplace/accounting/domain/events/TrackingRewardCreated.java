@@ -6,9 +6,10 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -21,7 +22,7 @@ import java.util.UUID;
 @EventType("TrackingRewardCreated")
 public class TrackingRewardCreated extends Event {
     @NonNull
-    UUID projectId;
+    ProjectId projectId;
     @NonNull
     Long githubRecipientId;
     UUID recipientId;

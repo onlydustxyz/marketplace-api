@@ -2,6 +2,7 @@ package onlydust.com.marketplace.user.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
 import onlydust.com.marketplace.user.domain.port.input.BackofficeUserFacadePort;
 import onlydust.com.marketplace.user.domain.port.output.BackofficeUserStoragePort;
@@ -17,7 +18,7 @@ public class BackofficeUserService implements BackofficeUserFacadePort {
     public BackofficeUser getUserByIdentity(@NonNull final BackofficeUser.Identity identity) {
         return backofficeUserStoragePort.getUserByEmail(identity.email()).orElseGet(() -> {
             final var user = new BackofficeUser(
-                    BackofficeUser.Id.random(),
+                    UserId.random(),
                     identity.email(),
                     identity.name(),
                     Set.of(BackofficeUser.Role.BO_READER),

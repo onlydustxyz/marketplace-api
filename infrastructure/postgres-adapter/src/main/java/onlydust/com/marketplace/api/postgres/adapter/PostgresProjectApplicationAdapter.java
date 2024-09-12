@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @AllArgsConstructor
 public class PostgresProjectApplicationAdapter implements ProjectApplicationStoragePort {
@@ -29,8 +28,8 @@ public class PostgresProjectApplicationAdapter implements ProjectApplicationStor
     }
 
     @Override
-    public Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId) {
-        return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId, issueId.value())
+    public Optional<Application> findApplication(Long applicantId, ProjectId projectId, GithubIssue.Id issueId) {
+        return applicationRepository.findByApplicantIdAndProjectIdAndIssueId(applicantId, projectId.value(), issueId.value())
                 .map(ApplicationEntity::toDomain);
     }
 

@@ -2,6 +2,9 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -50,8 +53,8 @@ public class BoostNodeGuardiansRewardsServiceTest {
     void should_boost_rewards() {
         // Given
         final long githubRepoId = faker.number().randomNumber();
-        final UUID projectLeadId = UUID.randomUUID();
-        final UUID projectId = UUID.randomUUID();
+        final UserId projectLeadId = UserId.random();
+        final ProjectId projectId = ProjectId.random();
         final UUID ecosystemId = UUID.randomUUID();
         final ContributorLinkView recipient1 = ContributorLinkView.builder()
                 .login(faker.gameOfThrones().character())
@@ -77,31 +80,31 @@ public class BoostNodeGuardiansRewardsServiceTest {
         final ShortProjectRewardView r11 = ShortProjectRewardView.builder()
                 .recipient(recipient1)
                 .money(new Money(BigDecimal.valueOf(120), strk))
-                .rewardId(UUID.randomUUID())
+                .rewardId(RewardId.random())
                 .projectName(faker.rickAndMorty().character())
                 .build();
         final ShortProjectRewardView r12 = ShortProjectRewardView.builder()
                 .recipient(recipient1)
                 .money(new Money(BigDecimal.valueOf(230), strk))
-                .rewardId(UUID.randomUUID())
+                .rewardId(RewardId.random())
                 .projectName(faker.rickAndMorty().character())
                 .build();
         final ShortProjectRewardView r13 = ShortProjectRewardView.builder()
                 .recipient(recipient1)
                 .money(new Money(BigDecimal.valueOf(1000), usd))
-                .rewardId(UUID.randomUUID())
+                .rewardId(RewardId.random())
                 .projectName(faker.rickAndMorty().character())
                 .build();
         final ShortProjectRewardView r21 = ShortProjectRewardView.builder()
                 .recipient(recipient2)
                 .money(new Money(BigDecimal.valueOf(2000), usd))
-                .rewardId(UUID.randomUUID())
+                .rewardId(RewardId.random())
                 .projectName(faker.rickAndMorty().character())
                 .build();
         final ShortProjectRewardView r22 = ShortProjectRewardView.builder()
                 .recipient(recipient2)
                 .money(new Money(BigDecimal.valueOf(250.4), strk))
-                .rewardId(UUID.randomUUID())
+                .rewardId(RewardId.random())
                 .projectName(faker.rickAndMorty().character())
                 .build();
         final List<ShortProjectRewardView> shortProjectRewardViews = List.of(
@@ -127,10 +130,10 @@ public class BoostNodeGuardiansRewardsServiceTest {
                 .id("22")
                 .number(22L)
                 .build();
-        final UUID rBoosted11 = UUID.randomUUID();
-        final UUID rBoosted12 = UUID.randomUUID();
-        final UUID rBoosted21 = UUID.randomUUID();
-        final UUID rBoosted22 = UUID.randomUUID();
+        final var rBoosted11 = RewardId.random();
+        final var rBoosted12 = RewardId.random();
+        final var rBoosted21 = RewardId.random();
+        final var rBoosted22 = RewardId.random();
         final BoostNodeGuardiansRewards e11 = BoostNodeGuardiansRewards.builder()
                 .amount(Stream.of(r11, r12).map(ShortProjectRewardView::getMoney).map(Money::amount).reduce(BigDecimal::add).get().multiply(BigDecimal.valueOf(0.02D)))
                 .projectId(projectId)
@@ -263,7 +266,7 @@ public class BoostNodeGuardiansRewardsServiceTest {
         verify(boostedRewardStoragePort).updateBoostedRewardsWithBoostRewardId(List.of(r22.getRewardId()), recipient2.getGithubUserId(), rBoosted22);
     }
 
-    private CreateAndCloseIssueCommand createOtherWorkerFromStubs(final UUID projectId, final UUID projectLeadId, final Long githubRepoId,
+    private CreateAndCloseIssueCommand createOtherWorkerFromStubs(final ProjectId projectId, final UserId projectLeadId, final Long githubRepoId,
                                                                   final List<ShortProjectRewardView> shortProjectRewardViews,
                                                                   final Integer expectedBoostCount) {
         return CreateAndCloseIssueCommand.builder()

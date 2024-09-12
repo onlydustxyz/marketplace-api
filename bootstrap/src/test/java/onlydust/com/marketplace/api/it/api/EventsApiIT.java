@@ -8,6 +8,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContribut
 import onlydust.com.marketplace.api.postgres.adapter.repository.IndexingEventRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.event.OnContributionChanged;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
@@ -66,7 +67,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Test
     public void should_refresh_ignored_contributions_on_contributions_change_event() {
         // Given
-        final UUID projectId = createProject(REWARD_SETTINGS);
+        final var projectId = createProject(REWARD_SETTINGS);
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
 
@@ -108,7 +109,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Test
     public void should_refresh_ignored_contributions_on_contributions_change_event_on_multiple_repos() {
         // Given
-        final UUID projectId = createProject(REWARD_SETTINGS);
+        final var projectId = createProject(REWARD_SETTINGS);
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
         customUnignoreContribution(projectId, repo2ContributionIds.get(0));
@@ -153,7 +154,7 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     @Test
     public void should_not_ignore_anything_is_nothing_is_to_ignore() {
         // Given
-        final UUID projectId = createProject(new ProjectRewardSettings(false, false, false, null));
+        final var projectId = createProject(new ProjectRewardSettings(false, false, false, null));
 
         // For now, nothing is ignored
         assertIgnored(projectId);
@@ -169,14 +170,14 @@ public class EventsApiIT extends AbstractMarketplaceApiIT {
     }
 
     private UUID createProject(ProjectRewardSettings rewardSettings) {
-        final UUID projectId = UUID.randomUUID();
-        final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
+        final var projectId = ProjectId.random();
+        final var leadId = userAuthHelper.authenticatePierre().userId();
         projectStoragePort.createProject(projectId, "name-" + projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",
                 rewardSettings, List.of(), List.of(), List.of(), true);
-        return projectId;
+        return projectId.value();
     }
 
     private void assertIgnored(UUID projectId, String... expectedIgnoredContributionIds) {

@@ -10,6 +10,7 @@ import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookEventStorage;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountBookStorage;
 import onlydust.com.marketplace.accounting.domain.service.CachedAccountBookProvider;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class BackofficeDebugRestApi implements BackofficeDebugApi {
         if (!debugProperties.environment.equals("develop")) {
             throw internalServerError("User can be reset only on the develop environment");
         }
-        appUserFacadePort.resetAndReplaceUser(replaceAndResetUserRequest.getUserId(), replaceAndResetUserRequest.getNewGithubLogin(),
+        appUserFacadePort.resetAndReplaceUser(UserId.of(replaceAndResetUserRequest.getUserId()), replaceAndResetUserRequest.getNewGithubLogin(),
                 replaceAndResetUserRequest.getGithubOAuthAppId(), replaceAndResetUserRequest.getGithubOAuthAppSecret());
         return ResponseEntity.noContent().build();
     }

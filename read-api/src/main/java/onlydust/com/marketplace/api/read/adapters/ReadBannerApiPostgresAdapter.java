@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.read.entities.BannerReadEntity;
 import onlydust.com.marketplace.api.read.repositories.BannerReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ public class ReadBannerApiPostgresAdapter implements ReadBannerApi {
         final Boolean hiddeIgnoredByMeFilter = Optional.ofNullable(hiddenIgnoredByMe).orElse(Boolean.FALSE);
 
         final var banner = hiddeIgnoredByMeFilter ?
-                bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).orElse(null))
+                bannerReadRepository.findMyFirstVisibleBanner(authenticatedUser.map(AuthenticatedUser::id).map(UserId::value).orElse(null))
                 : bannerReadRepository.findFirstVisibleBanner();
 
         return banner.map(BannerReadEntity::toResponse)

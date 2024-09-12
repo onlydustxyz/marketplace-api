@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,7 +146,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final Date newDate = faker.date().birthday(0, 3);
 
         // When
-        postgresUserAdapter.updateOnboardingCompletionDate(userId, newDate);
+        postgresUserAdapter.updateOnboardingCompletionDate(UserId.of(userId), newDate);
 
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
@@ -168,7 +169,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         final Date newDate = faker.date().birthday(0, 3);
 
         // When
-        postgresUserAdapter.updateTermsAndConditionsAcceptanceDate(userId, newDate);
+        postgresUserAdapter.updateTermsAndConditionsAcceptanceDate(UserId.of(userId), newDate);
 
         // Then
         final OnboardingEntity updatedOnboardingEntity = onboardingRepository.getById(userId);
@@ -203,7 +204,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                     System.out.println("Thread " + Thread.currentThread().getName() + " started");
                     final var user = AuthenticatedUser.builder()
                             .githubUserId(githubUserId)
-                            .id(UUID.randomUUID())
+                            .id(UserId.random())
                             .login(userData.login())
                             .avatarUrl(userData.avatarUrl())
                             .email(userData.email())
@@ -259,7 +260,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (200, 1);
                 INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (300, 1);
                 ALTER TABLE indexer_exp.github_issues_assignees ENABLE TRIGGER ALL;
-
+                
                 ALTER TABLE public.applications DISABLE TRIGGER ALL;
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('10e0ca81-7633-4357-a88b-168278facfab', '2023-08-07 11:38:54', gen_random_uuid(), null, 'MARKETPLACE', 1000);
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('11e0ca81-7633-4357-a88b-168278facfab', '2023-08-07 11:38:54', gen_random_uuid(), 100, 'MARKETPLACE', 1000);
@@ -268,7 +269,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('14e0ca81-7633-4357-a88b-168278facfab', '2023-08-07 11:38:54', gen_random_uuid(), 201, 'MARKETPLACE', 1000);
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('15e0ca81-7633-4357-a88b-168278facfab', '2023-08-07 11:38:54', gen_random_uuid(), 300, 'MARKETPLACE', 1000);
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('16e0ca81-7633-4357-a88b-168278facfab', '2023-08-07 11:38:54', gen_random_uuid(), 301, 'MARKETPLACE', 1000);
-
+                
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('17e0ca81-7633-4357-a88b-168278facfab', '2099-08-07 11:38:54', gen_random_uuid(), null, 'MARKETPLACE', 1000);
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('18e0ca81-7633-4357-a88b-168278facfab', '2099-08-07 11:38:54', gen_random_uuid(), 100, 'MARKETPLACE', 1000);
                 INSERT INTO public.applications (id, received_at, project_id, issue_id, origin, applicant_id) VALUES ('19e0ca81-7633-4357-a88b-168278facfab', '2099-08-07 11:38:54', gen_random_uuid(), 101, 'MARKETPLACE', 1000);

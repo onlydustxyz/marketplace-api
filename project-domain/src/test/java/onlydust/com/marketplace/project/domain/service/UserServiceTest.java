@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -59,7 +61,7 @@ public class UserServiceTest {
     void should_markUserAsOnboarded() {
         // Given
         dateProvider.setNow(faker.date().birthday(0, 1));
-        final UUID userId = UUID.randomUUID();
+        final UserId userId = UserId.random();
 
         // When
         userService.markUserAsOnboarded(userId);
@@ -72,7 +74,7 @@ public class UserServiceTest {
     void should_updateTermsAndConditionsAcceptanceDate() {
         // Given
         dateProvider.setNow(faker.date().birthday(0, 1));
-        final UUID userId = UUID.randomUUID();
+        final UserId userId = UserId.random();
 
         // When
         userService.updateTermsAndConditionsAcceptanceDate(userId);
@@ -84,7 +86,7 @@ public class UserServiceTest {
     @Test
     void should_accept_lead_invitation() {
         // Given
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
         final Long githubUserId = faker.number().randomNumber();
 
         // When
@@ -97,7 +99,7 @@ public class UserServiceTest {
     @Test
     void should_update_profile() {
         // Given
-        final UUID userId = UUID.randomUUID();
+        final UserId userId = UserId.random();
 
         final var avatar = faker.internet().avatar();
         final var bio = faker.lorem().sentence();
@@ -296,11 +298,11 @@ public class UserServiceTest {
     @Test
     void should_fail_to_claim_project_with_project_leads() {
         // Given
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
         final var caller = AuthenticatedUser.builder().build();
 
         // When
-        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UUID.randomUUID()));
+        when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of(UserId.random()));
         when(projectStoragePort.getProjectInvitedLeadIds(projectId)).thenReturn(Set.of());
         when(projectStoragePort.getProjectOrganizations(projectId)).thenReturn(List.of());
         OnlyDustException onlyDustException = null;
@@ -319,7 +321,7 @@ public class UserServiceTest {
     @Test
     void should_fail_to_claim_project_with_pending_project_leads() {
         // Given
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
         final var caller = AuthenticatedUser.builder().build();
 
         // When
@@ -342,7 +344,7 @@ public class UserServiceTest {
     @Test
     void should_fail_to_claim_project_with_no_organizations() {
         // Given
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
         final var caller = AuthenticatedUser.builder().build();
 
         // When
@@ -366,7 +368,7 @@ public class UserServiceTest {
     void should_fail_to_claim_project_if_user_not_github_admin_on_every_orga() {
         // Given
         final var user = AuthenticatedUser.builder().githubUserId(faker.random().nextLong()).login(faker.pokemon().name()).build();
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());
@@ -399,8 +401,8 @@ public class UserServiceTest {
 
     @Test
     void should_claim_project() {
-        final var user = AuthenticatedUser.builder().id(UUID.randomUUID()).githubUserId(faker.random().nextLong()).login(faker.pokemon().name()).build();
-        final UUID projectId = UUID.randomUUID();
+        final var user = AuthenticatedUser.builder().id(UserId.random()).githubUserId(faker.random().nextLong()).login(faker.pokemon().name()).build();
+        final ProjectId projectId = ProjectId.random();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId)).thenReturn(List.of());

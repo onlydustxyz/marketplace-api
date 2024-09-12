@@ -2,14 +2,14 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
 import lombok.Value;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 
 import java.util.List;
-import java.util.UUID;
 
 @Value
 @Builder(toBuilder = true)
 public class Project {
-    UUID id;
+    ProjectId id;
     String slug;
     String name;
     String shortDescription;

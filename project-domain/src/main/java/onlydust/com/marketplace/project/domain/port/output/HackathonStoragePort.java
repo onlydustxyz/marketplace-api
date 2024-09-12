@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public interface HackathonStoragePort {
     void save(@NonNull Hackathon hackathon);
@@ -20,7 +20,7 @@ public interface HackathonStoragePort {
 
     void delete(Hackathon.Id hackathonId);
 
-    void registerUser(UUID userId, Hackathon.Id hackathonId);
+    void registerUser(UserId userId, Hackathon.Id hackathonId);
 
     Optional<Hackathon> findUpcomingHackathonByIssueId(@NonNull GithubIssue.Id issueId);
 }

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.net.URI;
@@ -36,7 +37,7 @@ public class Banner {
     ZonedDateTime updatedAt;
 
     @NonNull
-    Set<UUID> closedBy;
+    Set<UserId> closedBy;
     ZonedDateTime date;
 
     public Banner(final @NonNull String shortDescription, final @NonNull String longDescription, final @NonNull String title, final @NonNull String subTitle,
@@ -46,7 +47,7 @@ public class Banner {
                 new HashSet<>(), date);
     }
 
-    public void close(final @NonNull UUID userId) {
+    public void close(final @NonNull UserId userId) {
         closedBy.add(userId);
     }
 

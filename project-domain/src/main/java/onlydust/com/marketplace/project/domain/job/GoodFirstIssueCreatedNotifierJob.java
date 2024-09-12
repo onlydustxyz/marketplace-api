@@ -13,8 +13,6 @@ import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @AllArgsConstructor
 public class GoodFirstIssueCreatedNotifierJob {
 
@@ -34,12 +32,12 @@ public class GoodFirstIssueCreatedNotifierJob {
                     goodFirstIssueCreatedSince5Minutes.authorAvatarUrl(),
                     goodFirstIssueCreatedSince5Minutes.labels()
             );
-            for (UUID projectId : projectStoragePort.findProjectIdsByRepoId(goodFirstIssueCreatedSince5Minutes.repoId())) {
+            for (final var projectId : projectStoragePort.findProjectIdsByRepoId(goodFirstIssueCreatedSince5Minutes.repoId())) {
                 final NotificationProject notificationProject = projectStoragePort.getById(projectId)
                         .map(project -> new NotificationProject(projectId, project.getSlug(), project.getName()))
                         .orElseThrow(() -> OnlyDustException.internalServerError("Project %s not found".formatted(projectId)));
                 for (UserId userId : userStoragePort.findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(projectId)) {
-                    notificationPort.push(userId.value(), GoodFirstIssueCreated.builder()
+                    notificationPort.push(userId, GoodFirstIssueCreated.builder()
                             .issue(notificationDetailedIssue)
                             .project(notificationProject)
                             .build());

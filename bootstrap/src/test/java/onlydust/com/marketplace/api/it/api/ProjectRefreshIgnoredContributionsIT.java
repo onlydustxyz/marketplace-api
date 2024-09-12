@@ -7,6 +7,8 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredCon
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,7 +76,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_nothing() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         // Then
         final var ignoredContributions = ignoredContributionsRepository.findAllByProjectId(projectId);
@@ -84,7 +86,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_issues_unless_they_are_customingly_unignored() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
         customUnignoreContribution(projectId, repo2ContributionIds.get(4));
@@ -130,7 +132,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_pull_requests_unless_they_are_customingly_unignored() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
         customUnignoreContribution(projectId, repo1ContributionIds.get(2));
@@ -179,7 +181,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_code_reviews_unless_they_are_customingly_unignored() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         // When
         updateRewardSettings(projectId, """
@@ -221,7 +223,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_contributions_created_before() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
 
@@ -265,7 +267,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_contributions_created_before_and_all_issues() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(0));
         customIgnoreContribution(projectId, repo2ContributionIds.get(0)); // should not affect result
@@ -310,7 +312,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_ignore_all_code_reviews_and_issues_unless_they_are_customingly_unignored() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo2ContributionIds.get(4));
 
@@ -354,7 +356,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void refreshIgnoredContributions_should_unignore_all_code_reviews_unless_they_are_customingly_ignored() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         customUnignoreContribution(projectId, repo1ContributionIds.get(1));
         customIgnoreContribution(projectId, repo2ContributionIds.get(0));
@@ -436,7 +438,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     @Test
     void should_update_ignored_contributions_when_project_repos_change() {
         // Given
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         updateRewardSettings(projectId, """
                 {
@@ -552,7 +554,7 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
     void refreshIgnoredContributions_should_not_affect_other_projects() {
         // Given
         final UUID otherProjectId = createProject();
-        final UUID projectId = createProject();
+        final var projectId = createProject();
 
         var ignoredContributions = ignoredContributionsRepository.findAllByProjectId(otherProjectId);
         assertThat(ignoredContributions).isEmpty();
@@ -574,15 +576,15 @@ public class ProjectRefreshIgnoredContributionsIT extends AbstractMarketplaceApi
 
 
     private UUID createProject() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID leadId = userAuthHelper.authenticatePierre().user().getId();
+        final ProjectId projectId = ProjectId.random();
+        final UserId leadId = userAuthHelper.authenticatePierre().userId();
         projectStoragePort.createProject(projectId, "name-" + projectId,
                 "Name " + projectId, "a", "b", false, List.of(),
                 List.of(repo1, repo2),
                 leadId, List.of(), ProjectVisibility.PUBLIC, "",
                 new ProjectRewardSettings(false, false, false, null),
                 List.of(), List.of(), List.of(), true);
-        return projectId;
+        return projectId.value();
     }
 
     private void updateRewardSettings(UUID projectId, String rewardSettings) {

@@ -1,15 +1,15 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-
-import java.util.UUID;
 
 public interface ApplicationFacadePort {
 
     Application applyOnProject(@NonNull Long githubUserId,
-                               @NonNull UUID projectId,
+                               @NonNull ProjectId projectId,
                                @NonNull GithubIssue.Id issueId,
                                @NonNull String motivation,
                                String problemSolvingApproach);
@@ -19,7 +19,7 @@ public interface ApplicationFacadePort {
                                   @NonNull String motivation,
                                   String problemSolvingApproach);
 
-    void deleteApplication(Application.Id id, UUID userId, Long githubUserId);
+    void deleteApplication(Application.Id id, UserId userId, Long githubUserId);
 
-    void acceptApplication(Application.Id id, UUID userId);
+    void acceptApplication(Application.Id id, UserId userId);
 }

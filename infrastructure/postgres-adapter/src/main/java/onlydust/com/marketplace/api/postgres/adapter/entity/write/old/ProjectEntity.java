@@ -4,11 +4,11 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.*;
-import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.accounting.domain.view.ProjectShortView;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategorySuggestionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectEcosystemEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
@@ -101,7 +101,7 @@ public class ProjectEntity {
 
     public Project toDomain() {
         return Project.builder()
-                .id(id)
+                .id(ProjectId.of(id))
                 .slug(slug)
                 .name(name)
                 .shortDescription(shortDescription)

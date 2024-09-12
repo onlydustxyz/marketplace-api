@@ -17,7 +17,6 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.RewardMapper;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
@@ -28,7 +27,6 @@ import onlydust.com.marketplace.project.domain.port.input.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.NotificationStatusUpdateRequest;
 import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
@@ -43,10 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.Objects.isNull;
+import static java.util.stream.Collectors.toMap;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.UserMapper.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.sanitizePageSize;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -85,7 +83,7 @@ public class MeRestApi implements MeApi {
     @Override
     public ResponseEntity<Void> acceptInvitationToLeadProject(UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        userFacadePort.acceptInvitationToLeadProject(authenticatedUser.githubUserId(), projectId);
+        userFacadePort.acceptInvitationToLeadProject(authenticatedUser.githubUserId(), ProjectId.of(projectId));
         return noContent().build();
     }
 
@@ -93,7 +91,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<ProjectApplicationCreateResponse> applyOnProject(ProjectApplicationCreateRequest applicationRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var application = applicationFacadePort.applyOnProject(authenticatedUser.githubUserId(),
-                applicationRequest.getProjectId(),
+                ProjectId.of(applicationRequest.getProjectId()),
                 GithubIssue.Id.of(applicationRequest.getIssueId()),
                 applicationRequest.getMotivation(),
                 applicationRequest.getProblemSolvingApproach());
@@ -187,7 +185,7 @@ public class MeRestApi implements MeApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final var filters = ContributionView.Filters.builder()
-                .projects(Optional.ofNullable(projects).orElse(List.of()))
+                .projects(Optional.ofNullable(projects).orElse(List.of()).stream().map(ProjectId::of).toList())
                 .build();
 
         final var contributedRepos = contributorFacadePort.contributedRepos(authenticatedUser.githubUserId(),
@@ -249,7 +247,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> claimProject(UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         userFacadePort.claimProjectForAuthenticatedUser(
-                projectId, authenticatedUser
+                ProjectId.of(projectId), authenticatedUser
         );
         return noContent().build();
     }
@@ -287,7 +285,7 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> setMyPayoutPreferenceForProject(PayoutPreferenceRequest payoutPreferenceRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         payoutPreferenceFacadePort.setPayoutPreference(ProjectId.of(payoutPreferenceRequest.getProjectId()),
-                BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), UserId.of(authenticatedUser.id()));
+                BillingProfile.Id.of(payoutPreferenceRequest.getBillingProfileId()), authenticatedUser.id());
         return ok().build();
     }
 
@@ -318,9 +316,9 @@ public class MeRestApi implements MeApi {
     public ResponseEntity<Void> voteForCommitteeAssignment(UUID committeeId, UUID projectId,
                                                            VoteForCommitteeAssignmentRequest voteForCommitteeAssignmentRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        committeeFacadePort.vote(authenticatedUser.id(), Committee.Id.of(committeeId), projectId,
+        committeeFacadePort.vote(authenticatedUser.id(), Committee.Id.of(committeeId), ProjectId.of(projectId),
                 voteForCommitteeAssignmentRequest.getVotes().stream()
-                        .collect(Collectors.toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), v -> v.getVote())));
+                        .collect(toMap(v -> JuryCriteria.Id.of(v.getCriteriaId()), VoteForCommitteeAssignmentRequestVotesInner::getVote)));
 
         return noContent().build();
     }
@@ -330,7 +328,7 @@ public class MeRestApi implements MeApi {
                                                                       NotificationSettingsForProjectPatchRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         notificationSettingsPort.patchNotificationSettingsForProject(
-                NotificationRecipient.Id.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 new NotificationSettings.Project(ProjectId.of(projectId),
                         Optional.ofNullable(request.getOnGoodFirstIssueAdded())));
         return noContent().build();
@@ -379,7 +377,7 @@ public class MeRestApi implements MeApi {
                         case IN_APP -> NotificationChannel.IN_APP;
                     }).toList());
         }
-        notificationSettingsPort.updateNotificationSettings(NotificationRecipient.Id.of(authenticatedUser.id()),
+        notificationSettingsPort.updateNotificationSettings(authenticatedUser.id(),
                 NotificationSettings.builder().channelsPerCategory(channelsPerCategory).build());
         return noContent().build();
     }

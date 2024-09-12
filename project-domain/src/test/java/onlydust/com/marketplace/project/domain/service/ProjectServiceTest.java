@@ -53,7 +53,6 @@ public class ProjectServiceTest {
     @BeforeEach
     void setUp() {
         // Default expectations, should be overridden in test if needed
-        when(permissionService.isUserProjectLead(any(UUID.class), any(UUID.class))).thenReturn(true);
         when(permissionService.isUserProjectLead(any(ProjectId.class), any(UserId.class))).thenReturn(true);
     }
 
@@ -70,18 +69,18 @@ public class ProjectServiceTest {
                 .longDescription(faker.lorem().paragraph())
                 .isLookingForContributors(false)
                 .moreInfos(List.of(NamedLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
-                .firstProjectLeaderId(UUID.randomUUID())
+                .firstProjectLeaderId(UserId.random())
                 .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
                 .ecosystemIds(ecosystemIds)
                 .categorySuggestions(categorySuggestions)
                 .build();
-        final UUID expectedProjectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final var expectedProjectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
 
         // When
-        when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId);
+        when(uuidGeneratorPort.generate()).thenReturn(expectedProjectId.value());
         final var projectIdentity = projectService.createProject(projectLeadId, command);
 
         // Then
@@ -89,14 +88,15 @@ public class ProjectServiceTest {
         assertNotNull(projectIdentity.getLeft());
         assertThat(projectIdentity.getRight()).isEqualTo(Project.slugOf(command.getName()));
         verify(indexerPort, times(1)).indexUsers(usersToInviteAsProjectLeaders);
-        final ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
-        verify(projectObserverPort).onProjectCreated(uuidArgumentCaptor.capture(), uuidArgumentCaptor.capture());
+        final var projectIdArgumentCaptor = ArgumentCaptor.forClass(ProjectId.class);
+        final var userIdArgumentCaptor = ArgumentCaptor.forClass(UserId.class);
+        verify(projectObserverPort).onProjectCreated(projectIdArgumentCaptor.capture(), userIdArgumentCaptor.capture());
         verify(projectObserverPort).onLinkedReposChanged(expectedProjectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of());
         verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(0), projectLeadId);
         verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(1), projectLeadId);
-        assertEquals(expectedProjectId, uuidArgumentCaptor.getAllValues().get(0));
-        assertEquals(projectLeadId, uuidArgumentCaptor.getAllValues().get(1));
+        assertEquals(expectedProjectId, projectIdArgumentCaptor.getAllValues().get(0));
+        assertEquals(projectLeadId, userIdArgumentCaptor.getAllValues().get(0));
     }
 
 
@@ -105,8 +105,8 @@ public class ProjectServiceTest {
         // Given
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final var categorySuggestions = List.of(faker.lorem().word(), faker.internet().slug());
         final UpdateProjectCommand command = UpdateProjectCommand.builder()
                 .id(projectId)
@@ -157,7 +157,7 @@ public class ProjectServiceTest {
         verify(projectObserverPort).onLinkedReposChanged(projectId,
                 command.getGithubRepoIds().stream().collect(Collectors.toUnmodifiableSet()), Set.of(1L, 2L, 3L));
         verify(projectObserverPort).onRewardSettingsChanged(projectId);
-        verify(projectObserverPort, never()).onProjectCategorySuggested(categorySuggestions.get(0), projectId);
+        verify(projectObserverPort, never()).onProjectCategorySuggested(categorySuggestions.get(0), projectLeadId);
         verify(projectObserverPort).onProjectCategorySuggested(categorySuggestions.get(1), projectLeadId);
     }
 
@@ -166,8 +166,8 @@ public class ProjectServiceTest {
         // Given
         final String imageUrl = faker.internet().image();
         final var usersToInviteAsProjectLeaders = List.of(faker.number().randomNumber());
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final UpdateProjectCommand command = UpdateProjectCommand.builder()
                 .id(projectId)
                 .name(faker.pokemon().name())
@@ -176,7 +176,7 @@ public class ProjectServiceTest {
                 .isLookingForContributors(false)
                 .moreInfos(List.of(NamedLink.builder().value(faker.lorem().sentence()).url(faker.internet().url()).build()))
                 .githubUserIdsAsProjectLeadersToInvite(usersToInviteAsProjectLeaders)
-                .projectLeadersToKeep(List.of(UUID.randomUUID()))
+                .projectLeadersToKeep(List.of(UserId.random()))
                 .githubRepoIds(List.of(faker.number().randomNumber()))
                 .imageUrl(imageUrl)
                 .rewardSettings(
@@ -213,12 +213,12 @@ public class ProjectServiceTest {
 
     @Test
     void should_check_project_lead_permissions_when_getting_project_rewardable_items_by_id_given_a_valid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+                .thenReturn(List.of(UserId.random(), projectLeadId));
         projectService.getRewardableItemsPageByTypeForProjectLeadAndContributorId(projectId, null, null, projectLeadId,
                 12345L, 0, 50, null, null);
 
@@ -229,8 +229,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_throw_forbidden_exception_when_getting_project_rewardable_items_by_id_given_an_invalid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
@@ -252,12 +252,12 @@ public class ProjectServiceTest {
 
     @Test
     void should_check_project_lead_permissions_when_getting_completed_rewardable_items_given_a_valid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
 
         // When
         when(projectStoragePort.getProjectLeadIds(projectId))
-                .thenReturn(List.of(UUID.randomUUID(), projectLeadId));
+                .thenReturn(List.of(UserId.random(), projectLeadId));
         projectService.getAllCompletedRewardableItemsForProjectLeadAndContributorId(projectId, projectLeadId, 12345L);
 
         // Then
@@ -267,8 +267,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_throw_forbidden_exception_when_getting_completed_rewardable_items_given_an_invalid_project_lead() {
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
@@ -290,8 +290,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_throw_forbidden_exception_when_creating_rewardable_issue_given_an_invalid_project_lead() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
 
         // When
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
@@ -315,8 +315,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_throw_forbidden_exception_when_creating_rewardable_issue_given_a_valid_project_lead_and_invalid_github_repo_id() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final Long githubRepoId = 1L;
 
         // When
@@ -345,8 +345,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_create_and_close_rewardable_issue_given_a_valid_project_lead_and_valid_github_repo_id() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final Long githubRepoId = 1L;
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
@@ -386,8 +386,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_add_rewardable_issue() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
         final Long issueNumber = 1234L;
@@ -415,8 +415,8 @@ public class ProjectServiceTest {
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
         final Long issueNumber = 1234L;
@@ -436,8 +436,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_reject_invalid_issue_url() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
 
@@ -458,8 +458,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_add_rewardable_pull_request() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
         final Long pullRequestNumber = 1234L;
@@ -487,8 +487,8 @@ public class ProjectServiceTest {
                 mock(ImageStoragePort.class),
                 mock(UUIDGeneratorPort.class), permissionService, indexerPort, dateProvider,
                 mock(ContributionStoragePort.class), mock(DustyBotStoragePort.class), mock(GithubStoragePort.class));
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
         final Long pullRequestNumber = 1234L;
@@ -508,8 +508,8 @@ public class ProjectServiceTest {
 
     @Test
     void should_reject_invalid_pull_request_url() {
-        final UUID projectId = UUID.randomUUID();
-        final UUID projectLeadId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
+        final UserId projectLeadId = UserId.random();
         final String githubRepoOwner = faker.name().username();
         final String githubRepoName = faker.pokemon().name();
 
@@ -530,9 +530,9 @@ public class ProjectServiceTest {
     @Test
     void should_forbid_access_to_contributions_for_non_leaders() {
         // Given
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final var projectLead = AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .githubUserId(faker.number().randomNumber())
                 .build();
 
@@ -547,9 +547,9 @@ public class ProjectServiceTest {
     @Test
     void should_list_project_contributions() {
         // Given
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final var projectLead = AuthenticatedUser.builder()
-                .id(UUID.randomUUID())
+                .id(UserId.random())
                 .githubUserId(faker.number().randomNumber())
                 .build();
         final var filters = ContributionView.Filters.builder()
@@ -590,8 +590,8 @@ public class ProjectServiceTest {
     @Test
     void should_hide_contributors() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributorId = faker.number().randomNumber();
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
 
@@ -605,8 +605,8 @@ public class ProjectServiceTest {
     @Test
     void should_show_contributors() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributorId = faker.number().randomNumber();
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
 
@@ -620,8 +620,8 @@ public class ProjectServiceTest {
     @Test
     void should_prevent_non_project_leads_from_hiding_contributors() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributorId = faker.number().randomNumber();
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
 
@@ -635,8 +635,8 @@ public class ProjectServiceTest {
     @Test
     void should_prevent_non_project_leads_from_showing_contributors() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributorId = faker.number().randomNumber();
         when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(false);
 
