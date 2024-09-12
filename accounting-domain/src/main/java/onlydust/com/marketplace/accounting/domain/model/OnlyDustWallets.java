@@ -1,11 +1,17 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 
 import java.util.Optional;
 
 @Data
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class OnlyDustWallets {
     String ethereum;
     String optimism;

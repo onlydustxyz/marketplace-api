@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,9 +31,22 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     OnlyDustWallets onlyDustWallets;
 
+    OnlyDustWallets originalOnlyDustWallets;
+
     @BeforeEach
     void setUp() {
         caller = userAuthHelper.create();
+        originalOnlyDustWallets = onlyDustWallets.toBuilder().build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        onlyDustWallets.setStellar(originalOnlyDustWallets.getStellar());
+        onlyDustWallets.setEthereum(originalOnlyDustWallets.getEthereum());
+        onlyDustWallets.setOptimism(originalOnlyDustWallets.getOptimism());
+        onlyDustWallets.setStarknet(originalOnlyDustWallets.getStarknet());
+        onlyDustWallets.setAptos(originalOnlyDustWallets.getAptos());
+        onlyDustWallets.setSepa(originalOnlyDustWallets.getSepa());
     }
 
     @Nested
