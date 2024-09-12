@@ -517,3 +517,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000332_bi_project_contributors_view.sql
   - include:
       file: db/changelog/changelogs/00000333_update_bi_project_contributors_view.sql
+  - include:
+      file: db/changelog/changelogs/00000334_bi_views_for_projects_diagram.sql

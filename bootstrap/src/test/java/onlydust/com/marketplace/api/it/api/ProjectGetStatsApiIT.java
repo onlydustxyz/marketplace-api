@@ -2,7 +2,7 @@ package onlydust.com.marketplace.api.it.api;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.suites.tags.TagProject;
+import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
@@ -18,7 +18,7 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 
 
-@TagProject
+@TagBI
 public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
     ProjectId projectId;
 

@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.http.HttpHeaders;
 
 @TagAccounting
@@ -16,7 +16,8 @@ public class SupportedCurrenciesApiIT extends AbstractMarketplaceApiIT {
         caller = userAuthHelper.create();
     }
 
-    @Test
+
+    @RepeatedTest(10)
     void should_return_supported_currencies() {
         // When
         client.get()

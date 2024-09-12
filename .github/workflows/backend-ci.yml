@@ -56,7 +56,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [ Accounting, BO, Concurrency, Me, Project, Reward, User, Others ]
+        suite: [ Accounting, BO, Concurrency, Me, Project, Reward, User, BI, Others ]
     name: ITs [${{ matrix.suite }}]
     runs-on: ubuntu-latest
     needs: [ build ]
