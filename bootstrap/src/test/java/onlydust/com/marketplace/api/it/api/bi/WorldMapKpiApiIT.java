@@ -31,91 +31,84 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class ActiveContributors {
         private static final AtomicBoolean setupDone = new AtomicBoolean();
-        private UUID starknet;
-        private UUID ethereum;
-        private ProgramId explorationTeam;
-        private ProgramId nethermind;
-        private ProgramId ethGrantingProgram;
+        private static UUID starknet;
+        private static UUID ethereum;
+        private static ProgramId explorationTeam;
+        private static ProgramId nethermind;
+        private static ProgramId ethGrantingProgram;
 
         @BeforeEach
         synchronized void setup() {
-            if (setupDone.compareAndExchange(false, true)) {
-                starknet = ecosystemHelper.getByName("Starknet ecosystem");
-                ethereum = ecosystemHelper.getByName("Ethereum ecosystem");
+            if (setupDone.compareAndExchange(false, true)) return;
 
-                explorationTeam = programHelper.getByName("Starkware Exploration Team");
-                nethermind = programHelper.getByName("Nethermind");
-                ethGrantingProgram = programHelper.getByName("Ethereum Granting Program");
-            } else {
-                starknet = ecosystemHelper.create("Starknet ecosystem").id();
-                ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
+            starknet = ecosystemHelper.create("Starknet ecosystem").id();
+            ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
 
-                final var starknetFoundation = sponsorHelper.create();
-                accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
+            final var starknetFoundation = sponsorHelper.create();
+            accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
 
-                explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team").id();
-                accountingHelper.allocate(starknetFoundation.id(), explorationTeam, 7_000, STRK);
-                nethermind = programHelper.create(starknetFoundation.id(), "Nethermind").id();
-                accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
+            explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team").id();
+            accountingHelper.allocate(starknetFoundation.id(), explorationTeam, 7_000, STRK);
+            nethermind = programHelper.create(starknetFoundation.id(), "Nethermind").id();
+            accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
-                final var ethFoundation = sponsorHelper.create();
-                accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
-                ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
-                accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
+            final var ethFoundation = sponsorHelper.create();
+            accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
+            ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
+            accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
 
-                final var onlyDust = projectHelper.create(userAuthHelper.authenticatePierre(), "OnlyDust");
-                accountingHelper.grant(nethermind, onlyDust, 100, STRK);
-                accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH);
+            final var onlyDust = projectHelper.create(userAuthHelper.authenticatePierre(), "OnlyDust");
+            accountingHelper.grant(nethermind, onlyDust, 100, STRK);
+            accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH);
 
-                final var marketplace_api = githubHelper.createRepo(onlyDust);
-                final var marketplace_frontend = githubHelper.createRepo(onlyDust);
+            final var marketplace_api = githubHelper.createRepo(onlyDust);
+            final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-                final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge", List.of(starknet, ethereum));
-                accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH);
-                accountingHelper.grant(explorationTeam, bridge, 100, STRK);
+            final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge", List.of(starknet, ethereum));
+            accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH);
+            accountingHelper.grant(explorationTeam, bridge, 100, STRK);
 
-                final var bridge_api = githubHelper.createRepo(bridge);
-                final var bridge_frontend = githubHelper.createRepo(bridge);
+            final var bridge_api = githubHelper.createRepo(bridge);
+            final var bridge_frontend = githubHelper.createRepo(bridge);
 
-                final var madara = projectHelper.create(userAuthHelper.create(), "Madara", List.of(starknet));
-                accountingHelper.grant(explorationTeam, madara, 100, STRK);
+            final var madara = projectHelper.create(userAuthHelper.create(), "Madara", List.of(starknet));
+            accountingHelper.grant(explorationTeam, madara, 100, STRK);
 
-                final var madara_contracts = githubHelper.createRepo(madara);
-                final var madara_app = githubHelper.createRepo(madara);
+            final var madara_contracts = githubHelper.createRepo(madara);
+            final var madara_app = githubHelper.createRepo(madara);
 
-                final var antho = userAuthHelper.create();
-                billingProfileHelper.verify(antho, Country.fromIso3("FRA"));
-                final var pierre = userAuthHelper.create();
-                billingProfileHelper.verify(pierre, Country.fromIso3("FRA"));
-                final var mehdi = userAuthHelper.create();
-                billingProfileHelper.verify(mehdi, Country.fromIso3("MAR"));
-                final var hayden = userAuthHelper.create();
-                billingProfileHelper.verify(hayden, Country.fromIso3("GBR"));
-                final var abdel = userAuthHelper.create();
-                billingProfileHelper.verify(abdel, Country.fromIso3("MAR"));
-                final var emma = userAuthHelper.create();
-                billingProfileHelper.verify(emma, Country.fromIso3("GBR"));
-                final var james = userAuthHelper.create();
-                billingProfileHelper.verify(james, Country.fromIso3("GBR"));
+            final var antho = userAuthHelper.create();
+            billingProfileHelper.verify(antho, Country.fromIso3("FRA"));
+            final var pierre = userAuthHelper.create();
+            billingProfileHelper.verify(pierre, Country.fromIso3("FRA"));
+            final var mehdi = userAuthHelper.create();
+            billingProfileHelper.verify(mehdi, Country.fromIso3("MAR"));
+            final var hayden = userAuthHelper.create();
+            billingProfileHelper.verify(hayden, Country.fromIso3("GBR"));
+            final var abdel = userAuthHelper.create();
+            billingProfileHelper.verify(abdel, Country.fromIso3("MAR"));
+            final var emma = userAuthHelper.create();
+            billingProfileHelper.verify(emma, Country.fromIso3("GBR"));
+            final var james = userAuthHelper.create();
+            billingProfileHelper.verify(james, Country.fromIso3("GBR"));
 
-                at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
-                at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-                at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-                at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
-                at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
-                at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
+            at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
+            at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
+            at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
+            at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
+            at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
+            at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-                at("2021-02-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
-                at("2021-02-01T00:00:02Z", () -> githubHelper.createPullRequest(marketplace_api, pierre));
-                at("2021-02-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-                at("2021-02-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-                at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_contracts, abdel));
-                at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_app, emma));
-                at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
-                at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
+            at("2021-02-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
+            at("2021-02-01T00:00:02Z", () -> githubHelper.createPullRequest(marketplace_api, pierre));
+            at("2021-02-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
+            at("2021-02-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
+            at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_contracts, abdel));
+            at("2021-02-01T00:00:06Z", () -> githubHelper.createPullRequest(madara_app, emma));
+            at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
+            at("2021-02-01T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
-                projectFacadePort.refreshStats();
-            }
+            projectFacadePort.refreshStats();
         }
 
         @AfterAll

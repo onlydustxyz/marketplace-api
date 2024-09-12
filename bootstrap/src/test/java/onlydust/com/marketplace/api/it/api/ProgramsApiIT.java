@@ -32,6 +32,7 @@ import java.net.URL;
 import java.time.Month;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
@@ -53,7 +54,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        caller = userAuthHelper.create();
+        caller = userAuthHelper.authenticateAntho();
     }
 
     @Nested
@@ -64,7 +65,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             client.post()
                     .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.create().jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
                             {
@@ -239,13 +240,17 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenMyProgram {
-        Sponsor sponsor;
-        Program program;
+        private static Sponsor sponsor;
+        private static Program program;
         UserAuthHelper.AuthenticatedUser sponsorLead;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
-        void setUp() {
-            sponsorLead = userAuthHelper.create();
+        synchronized void setUp() {
+            sponsorLead = userAuthHelper.authenticateOlivier();
+
+            if (setupDone.compareAndExchange(false, true)) return;
+
             sponsor = sponsorHelper.create(sponsorLead);
             program = programHelper.create(sponsor.id(), caller);
         }
@@ -384,13 +389,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @Nested
         class GivenSomeTransactions {
-            Sponsor sponsor;
-            Project project1;
-            ProjectId project2Id;
+            private static Project project1;
+            private static ProjectId project2Id;
+            private static final AtomicBoolean setupDone = new AtomicBoolean();
 
             @BeforeEach
             void setUp() {
-                sponsor = sponsorHelper.create();
+                if (setupDone.compareAndExchange(false, true)) return;
+
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
@@ -2116,12 +2122,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMyProgram {
-        Sponsor sponsor;
-        Program program;
+        private static Program program;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
         void setUp() {
-            sponsor = sponsorHelper.create();
+            if (setupDone.compareAndExchange(false, true)) return;
+
+            final var sponsor = sponsorHelper.create();
             program = programHelper.create(sponsor.id());
         }
 

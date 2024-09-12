@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.Month;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
@@ -38,16 +39,19 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
     UserAuthHelper.AuthenticatedUser caller;
 
     @BeforeEach
-    void setUp() {
-        caller = userAuthHelper.create();
+    synchronized void setUp() {
+        caller = userAuthHelper.authenticateAntho();
     }
 
     @Nested
     class GivenMySponsor {
-        Sponsor sponsor;
+        private static Sponsor sponsor;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
         void setUp() {
+            if (setupDone.compareAndExchange(false, true)) return;
+
             sponsor = sponsorHelper.create(caller);
         }
 
@@ -161,12 +165,17 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
         @Nested
         class GivenSomeTransactions {
-            Program program;
-            Project project1;
-            ProjectId project2Id;
+            private static Program program;
+            private static Project project1;
+            private static ProjectId project2Id;
+
+            private static final AtomicBoolean setupDone = new AtomicBoolean();
 
             @BeforeEach
             void setUp() {
+                if (setupDone.compareAndExchange(false, true)) return;
+
+                sponsor = sponsorHelper.create(caller);
                 program = programHelper.create(sponsor.id(), "My program " + faker.random().nextLong());
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
@@ -2613,10 +2622,13 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMySponsor {
-        Sponsor sponsor;
+        private static Sponsor sponsor;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
         void setUp() {
+            if (setupDone.compareAndExchange(false, true)) return;
+
             sponsor = sponsorHelper.create();
         }
 
