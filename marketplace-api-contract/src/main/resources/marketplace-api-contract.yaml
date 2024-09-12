@@ -10844,6 +10844,7 @@ components:
     BiContributorsStatsListItemResponse:
       type: object
       required:
+        - timestamp
         - totalGranted
         - totalRewarded
         - mergedPrCount
@@ -10852,6 +10853,9 @@ components:
         - reactivatedContributorCount
         - churnedContributorCount
       properties:
+        timestamp:
+          type: string
+          format: date-time
         totalGranted:
           type: number
         totalRewarded:

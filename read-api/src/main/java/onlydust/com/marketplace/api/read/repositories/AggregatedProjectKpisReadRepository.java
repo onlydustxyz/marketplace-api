@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.read.repositories;
 
 import lombok.NonNull;
-import onlydust.com.marketplace.api.read.entities.bi.BiAggregatedProjectStatsReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedProjectKpisReadEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface BiAggregatedProjectStatsReadRepository extends Repository<BiAggregatedProjectStatsReadEntity, ZonedDateTime> {
+public interface AggregatedProjectKpisReadRepository extends Repository<AggregatedProjectKpisReadEntity, ZonedDateTime> {
 
     @Query(value = """
             WITH aggregated_project_stats AS
@@ -18,14 +18,14 @@ public interface BiAggregatedProjectStatsReadRepository extends Repository<BiAgg
                              count(distinct d.project_id)                                                                 as active_project_count,
             
                              count(distinct d.project_id)
-                             filter (where d.previous_contribution_timestamp is null)                                     as new_project_count,
+                             filter (where d.previous_project_contribution_timestamp is null)                             as new_project_count,
             
                              count(distinct d.project_id)
-                             filter (where d.previous_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
+                             filter (where d.previous_project_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
                                                                                cast(('1 ' || :timeGrouping) as interval)) as reactivated_project_count,
             
                              count(distinct d.project_id)
-                             filter (where d.next_contribution_timestamp is null and date_trunc(:timeGrouping, d.timestamp) <
+                             filter (where d.next_project_contribution_timestamp is null and date_trunc(:timeGrouping, d.timestamp) <
                                                                                      date_trunc(:timeGrouping, now()))    as next_period_churned_project_count,
             
                              count(distinct d.contribution_id)
@@ -83,8 +83,8 @@ public interface BiAggregatedProjectStatsReadRepository extends Repository<BiAgg
                      LEFT JOIN aggregated_project_rewards_stats aprs
                                ON allt.timestamp = aprs.timestamp
             """, nativeQuery = true)
-    List<BiAggregatedProjectStatsReadEntity> findAll(@NonNull String timeGrouping,
-                                                     @NonNull ZonedDateTime fromDate,
-                                                     @NonNull ZonedDateTime toDate,
-                                                     List<UUID> programOrEcosystemIds);
+    List<AggregatedProjectKpisReadEntity> findAll(@NonNull String timeGrouping,
+                                                  @NonNull ZonedDateTime fromDate,
+                                                  @NonNull ZonedDateTime toDate,
+                                                  List<UUID> programOrEcosystemIds);
 }
