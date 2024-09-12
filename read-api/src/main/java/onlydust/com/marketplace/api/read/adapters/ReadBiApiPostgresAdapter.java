@@ -3,11 +3,13 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.BiAggregatedProjectStatsReadEntity;
-import onlydust.com.marketplace.api.read.repositories.BiAggregatedProjectStatsReadRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedContributorKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedProjectKpisReadEntity;
 import onlydust.com.marketplace.api.read.entities.bi.WorldMapKpiReadEntity;
+import onlydust.com.marketplace.api.read.repositories.AggregatedContributorKpisReadRepository;
+import onlydust.com.marketplace.api.read.repositories.AggregatedProjectKpisReadRepository;
 import onlydust.com.marketplace.api.read.repositories.WorldMapKpiReadRepository;
+import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +32,9 @@ import static org.springframework.http.ResponseEntity.ok;
 @Profile("api")
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2022-12-01T00:00:00Z");
-    private final BiAggregatedProjectStatsReadRepository biAggregatedProjectStatsReadRepository;
+    private final AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository;
+    private final AggregatedContributorKpisReadRepository aggregatedContributorKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
-
 
 
     @Override
@@ -48,8 +50,25 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     @Override
     public ResponseEntity<BiContributorsStatsListResponse> getBIContributorsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
                                                                                   List<UUID> programOrEcosystemIds) {
-        return ReadBiApi.super.getBIContributorsStats(timeGrouping, fromDate, toDate, programOrEcosystemIds);
+        final var statsPerTimestamp = aggregatedContributorKpisReadRepository.findAll(
+                        timeGrouping.name(),
+                        sanitizedDate(fromDate, DEFAULT_FROM_DATE),
+                        sanitizedDate(toDate, ZonedDateTime.now()),
+                        programOrEcosystemIds).stream()
+                .collect(Collectors.toMap(AggregatedContributorKpisReadEntity::timestamp, Function.identity()));
+
+        final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
+                    var stats = statsPerTimestamp.get(timestamp);
+                    var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
+                    return stats.toDto(statsOfPreviousPeriod);
+                })
+                .sorted(Comparator.comparing(BiContributorsStatsListItemResponse::getTimestamp))
+                .skip(1) // Skip the first element as it is the previous period used to compute churned project count
+                .toList();
+
+        return ResponseEntity.ok(new BiContributorsStatsListResponse().stats(mergedStats));
     }
+
 
     @Override
     public ResponseEntity<BiProjectsPageResponse> getBIProjects(TimeGroupingEnum timeGrouping, String fromDate, String toDate, List<UUID> projectLeadIds,
@@ -67,11 +86,12 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     @Override
     public ResponseEntity<BiProjectsStatsListResponse> getBIProjectsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
                                                                           List<UUID> programOrEcosystemIds) {
-        final var fromTime = Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(DEFAULT_FROM_DATE);
-        final var toTime = Optional.ofNullable(DateMapper.parseNullable(toDate)).map(DateMapper::toZoneDateTime).orElse(ZonedDateTime.now());
-
-        final var statsPerTimestamp = biAggregatedProjectStatsReadRepository.findAll(timeGrouping.name(), fromTime, toTime, programOrEcosystemIds).stream()
-                .collect(Collectors.toMap(BiAggregatedProjectStatsReadEntity::timestamp, Function.identity()));
+        final var statsPerTimestamp = aggregatedProjectKpisReadRepository.findAll(
+                        timeGrouping.name(),
+                        sanitizedDate(fromDate, DEFAULT_FROM_DATE),
+                        sanitizedDate(toDate, ZonedDateTime.now()),
+                        programOrEcosystemIds).stream()
+                .collect(Collectors.toMap(AggregatedProjectKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
                     var stats = statsPerTimestamp.get(timestamp);
@@ -101,5 +121,9 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         return ok(kpis.stream()
                 .map(WorldMapKpiReadEntity::toListItemResponse)
                 .toList());
+    }
+
+    private static ZonedDateTime sanitizedDate(String fromDate, ZonedDateTime defaultFromDate) {
+        return Optional.ofNullable(DateMapper.parseNullable(fromDate)).map(DateMapper::toZoneDateTime).orElse(defaultFromDate);
     }
 }

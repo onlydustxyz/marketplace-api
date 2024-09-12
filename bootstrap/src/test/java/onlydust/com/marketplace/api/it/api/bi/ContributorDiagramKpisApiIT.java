@@ -9,13 +9,13 @@ import java.util.Map;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @TagBI
-public class BiProjectDiagramIT extends AbstractMarketplaceApiIT {
+public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
 
     @Test
     public void should_get_aggregate_project_stats_for_diagram() {
         // When
         client.get()
-                .uri(getApiURI(BI_STATS_PROJECTS, Map.of("timeGrouping", "WEEK")))
+                .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "WEEK")))
                 .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
                 // Then
                 .exchange()
@@ -29,7 +29,7 @@ public class BiProjectDiagramIT extends AbstractMarketplaceApiIT {
     public void should_get_aggregate_project_stats_for_diagram_between_dates() {
         // When
         client.get()
-                .uri(getApiURI(BI_STATS_PROJECTS, Map.of("timeGrouping", "DAY", "fromDate", "2022-01-01", "toDate", "2022-12-31")))
+                .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2022-01-01", "toDate", "2022-12-31")))
                 .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
                 // Then
                 .exchange()
