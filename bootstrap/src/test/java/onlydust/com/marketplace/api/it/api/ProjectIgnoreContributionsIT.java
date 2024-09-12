@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.api.it.api;
 
-import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.CustomIgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.IgnoredContributionEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomIgnoredContributionsRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.IgnoredContributionsRepository;
+import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(1)
     public void should_ignore_contributions() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()
@@ -83,7 +83,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(2)
     public void should_unignore_contribution() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()
@@ -130,7 +130,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(3)
     public void should_ignore_and_unignore_contributions_all_together() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()
@@ -180,7 +180,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(4)
     public void should_do_nothing_when_lists_are_empty() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()
@@ -228,7 +228,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(10)
     public void should_return_403_when_caller_is_not_leader() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()
@@ -252,7 +252,7 @@ public class ProjectIgnoreContributionsIT extends AbstractMarketplaceApiIT {
     @Order(11)
     public void should_return_401_when_caller_is_not_authenticated() {
         // Given
-        UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723"); // Yolo croute
 
         // When
         client.patch()

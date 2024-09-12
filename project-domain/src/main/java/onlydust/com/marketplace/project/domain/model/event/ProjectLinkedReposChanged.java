@@ -6,9 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +16,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @EventType("ProjectLinkedReposChanged")
 public class ProjectLinkedReposChanged extends Event {
-    UUID projectId;
+    ProjectId projectId;
     java.util.Set<Long> linkedRepoIds;
     Set<Long> unlinkedRepoIds;
 }

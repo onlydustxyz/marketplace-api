@@ -3,7 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
-import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
@@ -27,7 +27,7 @@ public class ContributorService implements ContributorFacadePort {
     private final RewardStoragePort rewardStoragePort;
 
     @Override
-    public Pair<List<Contributor>, List<Contributor>> searchContributors(final UUID projectId, final Set<Long> repoIds,
+    public Pair<List<Contributor>, List<Contributor>> searchContributors(final ProjectId projectId, final Set<Long> repoIds,
                                                                          final String login,
                                                                          int maxInternalContributorCountToTriggerExternalSearch,
                                                                          int maxInternalContributorCountToReturn,
@@ -78,7 +78,7 @@ public class ContributorService implements ContributorFacadePort {
         return rewardStoragePort.listProjectsByRecipient(githubUserId);
     }
 
-    private List<Contributor> searchInternalContributors(UUID projectId, Set<Long> repoIds, String login,
+    private List<Contributor> searchInternalContributors(ProjectId projectId, Set<Long> repoIds, String login,
                                                          int maxInternalContributorCountToReturn) {
         final Set<Long> searchInRepoIds = repoIds != null ? new HashSet<>(repoIds) : new HashSet<>();
         if (projectId != null) {
@@ -95,7 +95,7 @@ public class ContributorService implements ContributorFacadePort {
                     return Contributor.builder()
                             .id(user.map(GithubUserIdentity.class::cast).orElse(identity))
                             .isRegistered(user.isPresent())
-                            .userId(user.map(AuthenticatedUser::id).map(UserId::of).orElse(null))
+                            .userId(user.map(AuthenticatedUser::id).orElse(null))
                             .build();
                 }
         ).toList();

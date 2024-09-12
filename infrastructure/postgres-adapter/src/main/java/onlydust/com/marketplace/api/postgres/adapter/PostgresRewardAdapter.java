@@ -3,11 +3,8 @@ package onlydust.com.marketplace.api.postgres.adapter;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.Payment;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingRewardStoragePort;
 import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
@@ -20,8 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.mapper.ProjectMapper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
-import onlydust.com.marketplace.kernel.model.RewardStatus;
-import onlydust.com.marketplace.kernel.model.UuidWrapper;
+import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Reward;
@@ -52,14 +48,14 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional
-    public void delete(UUID rewardId) {
-        rewardRepository.deleteById(rewardId);
+    public void delete(RewardId rewardId) {
+        rewardRepository.deleteById(rewardId.value());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Reward> get(UUID rewardId) {
-        return rewardRepository.findById(rewardId).map(RewardEntity::toReward);
+    public Optional<Reward> get(RewardId rewardId) {
+        return rewardRepository.findById(rewardId.value()).map(RewardEntity::toReward);
     }
 
     @Override
@@ -161,24 +157,24 @@ public class PostgresRewardAdapter implements RewardStoragePort, AccountingRewar
 
     @Override
     @Transactional
-    public void markRewardsAsBoosted(List<UUID> rewardsBoosted, Long recipientId) {
-        for (UUID rewardBoostedId : rewardsBoosted) {
-            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId, recipientId, null));
+    public void markRewardsAsBoosted(List<RewardId> rewardsBoosted, Long recipientId) {
+        for (final var rewardBoostedId : rewardsBoosted) {
+            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId.value(), recipientId, null));
         }
     }
 
     @Override
     @Transactional
-    public void updateBoostedRewardsWithBoostRewardId(List<UUID> rewardsBoosted, Long recipientId, UUID rewardId) {
-        for (UUID rewardBoostedId : rewardsBoosted) {
-            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId, recipientId, rewardId));
+    public void updateBoostedRewardsWithBoostRewardId(List<RewardId> rewardsBoosted, Long recipientId, RewardId rewardId) {
+        for (final var rewardBoostedId : rewardsBoosted) {
+            nodeGuardianBoostRewardRepository.save(new NodeGuardianBoostRewardEntity(rewardBoostedId.value(), recipientId, rewardId.value()));
         }
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<ShortProjectRewardView> getRewardsToBoostFromEcosystemNotLinkedToProject(UUID ecosystemId, UUID projectId) {
-        return shortRewardViewRepository.findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(ecosystemId, projectId).stream()
+    public List<ShortProjectRewardView> getRewardsToBoostFromEcosystemNotLinkedToProject(UUID ecosystemId, ProjectId projectId) {
+        return shortRewardViewRepository.findRewardsToBoosWithNodeGuardiansForEcosystemIdNotLinkedToProject(ecosystemId, projectId.value()).stream()
                 .map(ShortRewardQueryEntity::toProjectDomain).toList();
     }
 

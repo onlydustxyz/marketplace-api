@@ -3,6 +3,7 @@ package onlydust.com.marketplace.user.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
@@ -15,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -47,7 +47,7 @@ public class AppUserService implements AppUserFacadePort {
                     }
 
                     final var user = appUserStoragePort.createUser(AuthenticatedUser.builder()
-                            .id(UUID.randomUUID())
+                            .id(UserId.random())
                             .roles(List.of(AuthenticatedUser.Role.USER))
                             .githubUserId(githubUserIdentity.githubUserId())
                             .avatarUrl(githubUserIdentity.avatarUrl())
@@ -62,7 +62,7 @@ public class AppUserService implements AppUserFacadePort {
 
     @Override
     @Transactional
-    public void resetAndReplaceUser(UUID appUserId, String newGithubLogin, String githubOAuthAppId, String githubOAuthAppSecret) {
+    public void resetAndReplaceUser(UserId appUserId, String newGithubLogin, String githubOAuthAppId, String githubOAuthAppSecret) {
         final Long currentGithubUserId = appUserStoragePort.getGithubUserId(appUserId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("User %s github id not found".formatted(appUserId)));
         final List<GithubUserIdentity> githubUserIdentities = githubUserStoragePort.searchUsers(newGithubLogin);

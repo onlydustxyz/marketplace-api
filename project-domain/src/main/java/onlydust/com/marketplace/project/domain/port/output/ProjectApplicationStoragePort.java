@@ -16,7 +16,7 @@ public interface ProjectApplicationStoragePort {
 
     Optional<Application> findApplication(Application.Id id);
 
-    Optional<Application> findApplication(Long applicantId, UUID projectId, GithubIssue.Id issueId);
+    Optional<Application> findApplication(Long applicantId, ProjectId projectId, GithubIssue.Id issueId);
 
     List<Application> findApplications(Long applicantId, GithubIssue.Id issueId);
 

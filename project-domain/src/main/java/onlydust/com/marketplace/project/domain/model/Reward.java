@@ -6,23 +6,33 @@ import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 @Value
 @Accessors(fluent = true)
 public class Reward {
-    @NonNull UUID id;
-    @NonNull UUID projectId;
-    @NonNull UUID requestorId;
-    @NonNull Long recipientId;
-    @NonNull BigDecimal amount;
-    @NonNull CurrencyView.Id currencyId;
-    @NonNull Date requestedAt;
-    @NonNull List<Item> rewardItems;
+    @NonNull
+    RewardId id;
+    @NonNull
+    ProjectId projectId;
+    @NonNull
+    UserId requestorId;
+    @NonNull
+    Long recipientId;
+    @NonNull
+    BigDecimal amount;
+    @NonNull
+    CurrencyView.Id currencyId;
+    @NonNull
+    Date requestedAt;
+    @NonNull
+    List<Item> rewardItems;
 
     @Builder
     @Data

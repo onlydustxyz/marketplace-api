@@ -6,24 +6,25 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.BillingProfileUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ContactInformationEntity;
-import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.UserProfileInfoEntity;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.UserAllocatedTimeToContribute;
-import onlydust.com.marketplace.project.domain.model.UserProfile;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 public interface UserMapper {
 
     static AuthenticatedUser mapUserToDomain(UserViewEntity user, List<ProjectLedIdQueryEntity> projectLedIdViewEntities,
                                              List<BillingProfileUserEntity> billingProfiles) {
         return AuthenticatedUser.builder()
-                .id(user.id())
+                .id(UserId.of(user.id()))
                 .githubUserId(user.githubUserId())
                 .login(user.login())
                 .email(user.email())
@@ -41,7 +42,7 @@ public interface UserMapper {
 
     static AuthenticatedUser mapCreatedUserToDomain(final UserEntity userEntity) {
         return AuthenticatedUser.builder()
-                .id(userEntity.getId())
+                .id(UserId.of(userEntity.getId()))
                 .githubUserId(userEntity.getGithubUserId())
                 .login(userEntity.getGithubLogin())
                 .email(userEntity.getEmail())
@@ -53,7 +54,7 @@ public interface UserMapper {
 
     static UserEntity mapUserToEntity(AuthenticatedUser user) {
         return UserEntity.builder()
-                .id(user.id())
+                .id(user.id().value())
                 .githubUserId(user.githubUserId())
                 .githubLogin(user.login())
                 .githubAvatarUrl(user.avatarUrl())
@@ -72,9 +73,9 @@ public interface UserMapper {
         };
     }
 
-    static Set<ContactInformationEntity> mapContactInformationsToEntity(UUID userId, List<Contact> contacts) {
+    static Set<ContactInformationEntity> mapContactInformationsToEntity(UserId userId, List<Contact> contacts) {
         return isNull(contacts) ? null : contacts.stream().map(contact -> ContactInformationEntity.builder()
-                .userId(userId)
+                .userId(userId.value())
                 .channel(contact.getChannel())
                 .contact(contact.getContact())
                 .isPublic(switch (contact.getVisibility()) {

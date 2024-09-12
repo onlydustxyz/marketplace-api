@@ -2,24 +2,25 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.NonNull;
 import lombok.Value;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Value
 public class JuryAssignmentBuilder {
     Committee.Id committeeId;
-    UUID juryId;
+    UserId juryId;
     Integer votePerJury;
-    Set<UUID> projectLeadOnProjectIds = new HashSet<>();
-    Set<UUID> contributorOnProjectIds = new HashSet<>();
-    Set<UUID> assignedOnProjectIds = new HashSet<>();
+    Set<ProjectId> projectLeadOnProjectIds = new HashSet<>();
+    Set<ProjectId> contributorOnProjectIds = new HashSet<>();
+    Set<ProjectId> assignedOnProjectIds = new HashSet<>();
 
-    public JuryAssignmentBuilder(@NonNull Committee.Id committeeId, @NonNull UUID juryId, @NonNull Integer votePerJury,
-                                 @NonNull List<UUID> projectLeadOnProjectIds,
-                                 @NonNull List<UUID> contributorOnProjectIds) {
+    public JuryAssignmentBuilder(@NonNull Committee.Id committeeId, @NonNull UserId juryId, @NonNull Integer votePerJury,
+                                 @NonNull List<ProjectId> projectLeadOnProjectIds,
+                                 @NonNull List<ProjectId> contributorOnProjectIds) {
         this.committeeId = committeeId;
         this.juryId = juryId;
         this.votePerJury = votePerJury;
@@ -27,12 +28,12 @@ public class JuryAssignmentBuilder {
         this.contributorOnProjectIds.addAll(contributorOnProjectIds);
     }
 
-    public boolean canAssignProject(UUID projectId) {
+    public boolean canAssignProject(ProjectId projectId) {
         return this.assignedOnProjectIds.size() < this.votePerJury && !this.assignedOnProjectIds.contains(projectId)
-                && !this.projectLeadOnProjectIds.contains(projectId) && !this.contributorOnProjectIds.contains(projectId);
+               && !this.projectLeadOnProjectIds.contains(projectId) && !this.contributorOnProjectIds.contains(projectId);
     }
 
-    public void assignProject(UUID projectId) {
+    public void assignProject(ProjectId projectId) {
         this.assignedOnProjectIds.add(projectId);
     }
 

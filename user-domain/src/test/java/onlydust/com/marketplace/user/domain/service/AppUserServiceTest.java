@@ -4,6 +4,7 @@ package onlydust.com.marketplace.user.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,7 +50,7 @@ class AppUserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final AuthenticatedUser user =
-                AuthenticatedUser.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
@@ -70,7 +70,7 @@ class AppUserServiceTest {
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).email(faker.internet().emailAddress()).build();
 
         final AuthenticatedUser user =
-                AuthenticatedUser.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).email(githubUserIdentity.email()).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
@@ -89,7 +89,7 @@ class AppUserServiceTest {
         final GithubUserIdentity githubUserIdentity =
                 GithubUserIdentity.builder().githubUserId(faker.number().randomNumber()).avatarUrl(faker.internet().avatar()).login(faker.hacker().verb()).build();
         final AuthenticatedUser user =
-                AuthenticatedUser.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).build();
+                AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).build();
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.of(user));
@@ -110,7 +110,7 @@ class AppUserServiceTest {
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.createUser(any())).thenReturn(AuthenticatedUser.builder().id(UUID.randomUUID()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build());
+        when(userStoragePort.createUser(any())).thenReturn(AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build());
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then

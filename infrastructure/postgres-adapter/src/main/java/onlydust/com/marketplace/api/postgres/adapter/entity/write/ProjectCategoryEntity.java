@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 
 import java.util.Set;
@@ -35,7 +36,7 @@ public class ProjectCategoryEntity {
                 .description(projectCategory.description())
                 .iconSlug(projectCategory.iconSlug())
                 .projectCategories(projectCategory.projects().stream()
-                        .map(projectId -> new ProjectProjectCategoryEntity(projectId, projectCategory.id().value()))
+                        .map(projectId -> new ProjectProjectCategoryEntity(projectId.value(), projectCategory.id().value()))
                         .collect(toSet()))
                 .build();
     }
@@ -46,6 +47,6 @@ public class ProjectCategoryEntity {
                 name,
                 description,
                 iconSlug,
-                projectCategories.stream().map(ProjectProjectCategoryEntity::getProjectId).collect(toSet()));
+                projectCategories.stream().map(ProjectProjectCategoryEntity::getProjectId).map(ProjectId::of).collect(toSet()));
     }
 }

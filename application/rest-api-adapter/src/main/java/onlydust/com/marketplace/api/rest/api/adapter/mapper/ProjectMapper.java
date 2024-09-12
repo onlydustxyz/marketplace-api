@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.CreateProjectCommand;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import onlydust.com.marketplace.project.domain.model.Project;
@@ -8,7 +10,6 @@ import onlydust.com.marketplace.project.domain.model.UpdateProjectCommand;
 import onlydust.com.marketplace.project.domain.view.UserLinkView;
 
 import java.util.Date;
-import java.util.UUID;
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
@@ -16,7 +17,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.to
 
 public interface ProjectMapper {
     static CreateProjectCommand mapCreateProjectCommandToDomain(CreateProjectRequest createProjectRequest,
-                                                                UUID authenticatedUserId) {
+                                                                UserId authenticatedUserId) {
         return CreateProjectCommand.builder()
                 .name(createProjectRequest.getName())
                 .shortDescription(createProjectRequest.getShortDescription())
@@ -35,14 +36,15 @@ public interface ProjectMapper {
                 .build();
     }
 
-    static UpdateProjectCommand mapUpdateProjectCommandToDomain(UUID projectId,
+    static UpdateProjectCommand mapUpdateProjectCommandToDomain(ProjectId projectId,
                                                                 UpdateProjectRequest updateProjectRequest) {
         return UpdateProjectCommand.builder()
                 .id(projectId)
                 .name(updateProjectRequest.getName())
                 .shortDescription(updateProjectRequest.getShortDescription())
                 .longDescription(updateProjectRequest.getLongDescription())
-                .projectLeadersToKeep(updateProjectRequest.getProjectLeadsToKeep())
+                .projectLeadersToKeep(updateProjectRequest.getProjectLeadsToKeep() == null ? null :
+                        updateProjectRequest.getProjectLeadsToKeep().stream().map(UserId::of).toList())
                 .githubUserIdsAsProjectLeadersToInvite(updateProjectRequest.getInviteGithubUserIdsAsProjectLeads())
                 .rewardSettings(mapRewardSettingsToDomain(updateProjectRequest.getRewardSettings()))
                 .githubRepoIds(updateProjectRequest.getGithubRepoIds())
@@ -103,7 +105,7 @@ public interface ProjectMapper {
 
     static ProjectShortResponse mapShortProjectResponse(Project project) {
         return new ProjectShortResponse()
-                .id(project.getId())
+                .id(project.getId().value())
                 .name(project.getName())
                 .logoUrl(project.getLogoUrl())
                 .slug(project.getSlug())

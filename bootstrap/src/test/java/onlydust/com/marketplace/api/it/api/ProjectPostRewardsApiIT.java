@@ -42,7 +42,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 .amount(BigDecimal.ONE)
                 .currencyId(CurrencyHelper.USD.value())
                 .recipientId(1L);
-        final UUID projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
 
         // When
         client.post()
@@ -60,7 +60,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
+        final var projectId = projectRepository.findAll().get(0).getId();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.ONE)
                 .currencyId(CurrencyHelper.USD.value())
@@ -90,7 +90,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(1))
                 .currencyId(CurrencyHelper.STRK.value())
@@ -118,7 +118,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(12.95))
                 .currencyId(CurrencyHelper.ETH.value())
@@ -182,7 +182,7 @@ public class ProjectPostRewardsApiIT extends AbstractMarketplaceApiIT {
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),
                         PositiveAmount.of(200000L),
                         faker.rickAndMorty().character(), faker.hacker().verb()));
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var programId = programHelper.randomId();
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(strkId));
         accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(strkId));

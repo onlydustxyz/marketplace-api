@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
 import onlydust.com.marketplace.kernel.model.Event;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
@@ -40,7 +42,7 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
 
     @Override
     @Transactional
-    public void boostProject(UUID projectId, UUID projectLeadId, Long githubRepoId, UUID ecosystemId) {
+    public void boostProject(ProjectId projectId, UserId projectLeadId, Long githubRepoId, UUID ecosystemId) {
         List<ShortProjectRewardView> rewardsToBoost = boostedRewardStoragePort.getRewardsToBoostFromEcosystemNotLinkedToProject(ecosystemId, projectId);
 
         final Map<ContributorLinkView, List<ShortProjectRewardView>> rewardsMapToRecipientLogin = rewardsToBoost.stream()
@@ -145,7 +147,7 @@ public class BoostNodeGuardiansRewardsService implements BoostNodeGuardiansRewar
                             .repoId(boostNodeGuardiansRewards.getRepoId())
                             .build()))
                     .build();
-            final UUID rewardId = rewardFacadePort.createReward(boostNodeGuardiansRewards.getProjectLeadId(), requestRewardCommand);
+            final var rewardId = rewardFacadePort.createReward(boostNodeGuardiansRewards.getProjectLeadId(), requestRewardCommand);
             boostedRewardStoragePort.updateBoostedRewardsWithBoostRewardId(
                     boostNodeGuardiansRewards.getBoostedRewards().stream().map(BoostNodeGuardiansRewards.BoostedReward::getId).toList(),
                     boostNodeGuardiansRewards.getRecipientId(), rewardId);

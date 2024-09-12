@@ -2,11 +2,11 @@ package onlydust.com.marketplace.user.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationStatusUpdateRequest;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -30,7 +29,7 @@ public class NotificationService implements NotificationPort {
     private final NotificationSender asyncNotificationEmailProcessor;
 
     @Override
-    public Notification push(UUID recipientId, NotificationData notificationData) {
+    public Notification push(UserId recipientId, NotificationData notificationData) {
         final var channels = notificationSettingsStoragePort.getNotificationChannels(recipientId, notificationData.category());
         final var notification = Notification.of(recipientId, notificationData, new HashSet<>(channels));
         notificationStoragePort.save(notification);
@@ -41,17 +40,17 @@ public class NotificationService implements NotificationPort {
         return notification;
     }
 
-    private void sendEmail(UUID recipientId, Notification notification) {
-        userStoragePort.findById(NotificationRecipient.Id.of(recipientId))
+    private void sendEmail(UserId recipientId, Notification notification) {
+        userStoragePort.findById(recipientId)
                 .ifPresent(user -> asyncNotificationEmailProcessor.send(SendableNotification.of(user, notification)));
     }
 
-    public void markAllInAppUnreadAsRead(UUID userId) {
+    public void markAllInAppUnreadAsRead(UserId userId) {
         notificationStoragePort.markAllInAppUnreadAsRead(userId);
     }
 
     @Transactional
-    public void updateInAppNotificationsStatus(UUID userId, List<NotificationStatusUpdateRequest> notificationStatusUpdateRequests) {
+    public void updateInAppNotificationsStatus(UserId userId, List<NotificationStatusUpdateRequest> notificationStatusUpdateRequests) {
         final Map<NotificationStatusUpdateRequest.NotificationStatus, List<NotificationStatusUpdateRequest>> notificationStatusListMap =
                 notificationStatusUpdateRequests.stream().collect(Collectors.groupingBy(NotificationStatusUpdateRequest::notificationStatus));
         final List<NotificationStatusUpdateRequest> unread = notificationStatusListMap.get(NotificationStatusUpdateRequest.NotificationStatus.UNREAD);

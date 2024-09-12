@@ -1,14 +1,16 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
+
 import java.util.Set;
-import java.util.UUID;
 
 public interface ProjectObserverPort {
-    void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
+    void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds);
 
-    void onRewardSettingsChanged(UUID projectId);
+    void onRewardSettingsChanged(ProjectId projectId);
 
-    void onProjectCreated(UUID projectId, UUID projectLeadId);
+    void onProjectCreated(ProjectId projectId, UserId projectLeadId);
 
-    void onProjectCategorySuggested(String categoryName, UUID userId);
+    void onProjectCategorySuggested(String categoryName, UserId userId);
 }

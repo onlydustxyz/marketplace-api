@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.util.HashSet;
@@ -19,7 +20,7 @@ public class ProjectCategory {
     private @NonNull String name;
     private @NonNull String description;
     private @NonNull String iconSlug;
-    private @NonNull Set<UUID> projects;
+    private @NonNull Set<ProjectId> projects;
 
     public static ProjectCategory of(@NonNull final String name, @NonNull final String description, @NonNull final String iconSlug) {
         return new ProjectCategory(Id.random(), name, description, iconSlug, new HashSet<>());

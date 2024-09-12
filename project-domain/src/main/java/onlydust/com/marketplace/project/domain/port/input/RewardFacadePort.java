@@ -1,11 +1,12 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 
-import java.util.UUID;
-
 public interface RewardFacadePort {
-    UUID createReward(UUID projectLeadId, RequestRewardCommand requestRewardCommand);
+    RewardId createReward(UserId projectLeadId, RequestRewardCommand requestRewardCommand);
 
-    void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId);
+    void cancelReward(UserId projectLeadId, ProjectId projectId, RewardId rewardId);
 }

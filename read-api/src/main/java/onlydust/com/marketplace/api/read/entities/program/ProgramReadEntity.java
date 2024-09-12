@@ -91,6 +91,7 @@ public class ProgramReadEntity {
                 .name(name)
                 .url(Optional.ofNullable(url).map(URI::create).orElse(null))
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
@@ -100,6 +101,7 @@ public class ProgramReadEntity {
         return new ProgramPageItemResponse()
                 .id(id)
                 .name(name)
+                .url(Optional.ofNullable(url).map(URI::create).orElse(null))
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())

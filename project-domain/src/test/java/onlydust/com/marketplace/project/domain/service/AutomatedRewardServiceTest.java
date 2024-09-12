@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -39,13 +41,13 @@ public class AutomatedRewardServiceTest {
         final AutomatedRewardService automatedRewardService = new AutomatedRewardService(githubSearchPort, projectFacadePort, rewardFacadePort,
                 projectStoragePort, projectCurrencyStoragePort);
         final String projectSlug = faker.rickAndMorty().character();
-        final UUID projectLeadId = UUID.randomUUID();
+        final UserId projectLeadId = UserId.random();
         final String repositoryName = faker.lordOfTheRings().character();
         final String reason = faker.lorem().sentence();
         final String recipientLogin = faker.pokemon().name();
         final String currencyCode = faker.animal().name();
         final BigDecimal amount = BigDecimal.valueOf(faker.number().randomNumber());
-        final UUID projectId = UUID.randomUUID();
+        final ProjectId projectId = ProjectId.random();
         final UUID currencyId = UUID.randomUUID();
         final long recipientId = 3L;
         final long otherWorkId = 5L;
@@ -92,10 +94,10 @@ public class AutomatedRewardServiceTest {
         );
 
         // Then
-        final ArgumentCaptor<RequestRewardCommand> requestRewardCommandArgumentCaptor = ArgumentCaptor.forClass(RequestRewardCommand.class);
-        final ArgumentCaptor<UUID> uuidArgumentCaptor = ArgumentCaptor.forClass(UUID.class);
-        verify(rewardFacadePort).createReward(uuidArgumentCaptor.capture(), requestRewardCommandArgumentCaptor.capture());
-        assertEquals(projectLeadId, uuidArgumentCaptor.getValue());
+        final var requestRewardCommandArgumentCaptor = ArgumentCaptor.forClass(RequestRewardCommand.class);
+        final var userIdArgumentCaptor = ArgumentCaptor.forClass(UserId.class);
+        verify(rewardFacadePort).createReward(userIdArgumentCaptor.capture(), requestRewardCommandArgumentCaptor.capture());
+        assertEquals(projectLeadId, userIdArgumentCaptor.getValue());
         assertEquals(projectId, requestRewardCommandArgumentCaptor.getValue().getProjectId());
         assertEquals(amount, requestRewardCommandArgumentCaptor.getValue().getAmount());
         assertEquals(currencyId, requestRewardCommandArgumentCaptor.getValue().getCurrencyId().value());

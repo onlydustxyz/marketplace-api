@@ -301,7 +301,7 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
 
-        verify(slackApiAdapter).onUserRegistration(hackathonId1, olivier.user().getId());
+        verify(slackApiAdapter).onUserRegistration(hackathonId1, olivier.userId());
 
         // When
         client.get()

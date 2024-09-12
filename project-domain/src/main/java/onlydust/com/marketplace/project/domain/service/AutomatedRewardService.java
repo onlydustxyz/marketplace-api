@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.CreateAndCloseIssueCommand;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -31,9 +32,9 @@ public class AutomatedRewardService implements AutomatedRewardFacadePort {
     private final ProjectCurrencyStoragePort projectCurrencyStoragePort;
 
     @Override
-    public void createOtherWorkAndReward(String projectSlug, UUID projectLeadId, String repositoryName, String reason, String recipientLogin,
+    public void createOtherWorkAndReward(String projectSlug, UserId projectLeadId, String repositoryName, String reason, String recipientLogin,
                                          String currencyCode, BigDecimal amount) {
-        final UUID projectId = projectStoragePort.getProjectIdBySlug(projectSlug)
+        final var projectId = projectStoragePort.getProjectIdBySlug(projectSlug)
                 .orElseThrow(() -> OnlyDustException.internalServerError("Project slug %s not found".formatted(projectSlug)));
 
         final ProjectOrganizationRepoView repository = projectStoragePort.getProjectOrganizations(projectId).stream().map(ProjectOrganizationView::getRepos)

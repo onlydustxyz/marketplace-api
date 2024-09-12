@@ -90,7 +90,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
     }
 
-    public void addBudgetToProject(final UUID projectId) {
+    public void addBudgetToProject(final ProjectId projectId) {
         final var sponsorId = sponsorHelper.create().id();
         final var programId = programHelper.create(sponsorId).id();
         accountingService.createSponsorAccountWithInitialBalance(sponsorId,
@@ -113,9 +113,9 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
 
-        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
-        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
-        accountingService.grant(programId, ProjectId.of(projectId), PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.STRK.value()));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.ETH.value()));
+        accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(CurrencyHelper.USD.value()));
     }
 
     @Autowired
@@ -128,31 +128,31 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
         // Given
         setupNodeGuardiansApiMocks();
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticatePierre();
-        final UUID marketplace = UUID.fromString("45ca43d6-130e-4bf7-9776-2b1eb1dcb782"); // Marketplace
-        final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"); // Bretzel
+        final var marketplace = ProjectId.of("45ca43d6-130e-4bf7-9776-2b1eb1dcb782"); // Marketplace
+        final var bretzel = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56"); // Bretzel
         addBudgetToProject(bretzel);
         addBudgetToProject(marketplace);
         final Long githubRepoId = 498695724L;
         final UUID ecosystemId = UUID.fromString("6ab7fa6c-c418-4997-9c5f-55fb021a8e5c"); // Ethereum linked to Bretzel
-        projectLeadRepository.save(new ProjectLeadEntity(marketplace, authenticatedUser.user().getId()));
-        projectLeadRepository.save(new ProjectLeadEntity(bretzel, authenticatedUser.user().getId()));
+        projectLeadRepository.save(new ProjectLeadEntity(marketplace.value(), authenticatedUser.user().getId()));
+        projectLeadRepository.save(new ProjectLeadEntity(bretzel.value(), authenticatedUser.user().getId()));
         final Long oliver = 595505L;
-        projectRepoRepository.save(new ProjectRepoEntity(marketplace, githubRepoId));
+        projectRepoRepository.save(new ProjectRepoEntity(marketplace.value(), githubRepoId));
 
         // When
-        boostNodeGuardiansRewardsPort.boostProject(marketplace, authenticatedUser.user().getId(), githubRepoId, ecosystemId);
+        boostNodeGuardiansRewardsPort.boostProject(marketplace, authenticatedUser.userId(), githubRepoId, ecosystemId);
 
         // Then
         assertEquals(0, nodeGuardianBoostRewardRepository.count());
         assertEquals(0, boostNodeGuardiansRewardsRepository.count());
 
-        final UUID rewardId1 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 1000L, CurrencyHelper.STRK.value(), bretzel);
-        final UUID rewardId2 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 500L, CurrencyHelper.ETH.value(), bretzel);
-        final UUID rewardId3 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 200L, CurrencyHelper.USD.value(), bretzel);
+        final var rewardId1 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 1000L, CurrencyHelper.STRK.value(), bretzel);
+        final var rewardId2 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 500L, CurrencyHelper.ETH.value(), bretzel);
+        final var rewardId3 = sendRewardToRecipient(authenticatedUser.jwt(), oliver, 200L, CurrencyHelper.USD.value(), bretzel);
 
         // When
         setupGithubApiMocks();
-        boostNodeGuardiansRewardsPort.boostProject(marketplace, authenticatedUser.user().getId(), githubRepoId, ecosystemId);
+        boostNodeGuardiansRewardsPort.boostProject(marketplace, authenticatedUser.userId(), githubRepoId, ecosystemId);
 
         assertEquals(1, nodeGuardianBoostRewardRepository.count());
         assertEquals(1, boostNodeGuardiansRewardsRepository.count());
@@ -180,7 +180,8 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
             assertEquals(EventEntity.Status.PROCESSED, boostNodeGuardiansRewardsEventEntity.getStatus());
         }
 
-        final Page<RewardDetailsReadEntity> projectRewards = rewardDetailsReadRepository.findProjectRewards(marketplace, null, List.of(oliver), null, null,
+        final Page<RewardDetailsReadEntity> projectRewards = rewardDetailsReadRepository.findProjectRewards(marketplace.value(), null, List.of(oliver), null,
+                null,
                 PageRequest.of(0, 50, RewardDetailsReadRepository.sortBy(RewardsSort.REQUESTED_AT,
                         SortDirection.DESC)));
 
@@ -192,7 +193,7 @@ public class NodeGuardiansBoostRewardsIT extends AbstractMarketplaceApiIT {
 
     }
 
-    private UUID sendRewardToRecipient(String jwt, Long recipientId, Long amount, UUID currencyId, UUID projectId) {
+    private UUID sendRewardToRecipient(String jwt, Long recipientId, Long amount, UUID currencyId, ProjectId projectId) {
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(amount))
                 .currencyId(currencyId)

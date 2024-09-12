@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -9,7 +10,6 @@ import onlydust.com.marketplace.project.domain.view.ContributionView;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface ContributionStoragePort {
     Page<ContributionView> findContributions(Optional<Long> callerGithubUserId,
@@ -19,7 +19,7 @@ public interface ContributionStoragePort {
                                              Integer page,
                                              Integer pageSize);
 
-    ContributionDetailsView findContributionById(UUID projectId, String contributionId);
+    ContributionDetailsView findContributionById(ProjectId projectId, String contributionId);
 
     List<Project> listProjectsByContributor(Long contributorId, ContributionView.Filters filters);
 
@@ -27,11 +27,11 @@ public interface ContributionStoragePort {
 
     Long getContributorId(String contributionId);
 
-    void ignoreContributions(UUID projectId, List<String> contributionIds);
+    void ignoreContributions(ProjectId projectId, List<String> contributionIds);
 
-    void unignoreContributions(UUID projectId, List<String> contributionIds);
+    void unignoreContributions(ProjectId projectId, List<String> contributionIds);
 
-    void refreshIgnoredContributions(UUID projectId);
+    void refreshIgnoredContributions(ProjectId projectId);
 
     void refreshIgnoredContributions(List<Long> repoIds);
 }

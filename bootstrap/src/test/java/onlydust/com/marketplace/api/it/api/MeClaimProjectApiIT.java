@@ -1,11 +1,11 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagMe;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProjectLeaderInvitationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
+import onlydust.com.marketplace.api.suites.tags.TagMe;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String githubPAT = faker.rickAndMorty().character();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre(githubPAT);
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         projectLeadRepository.delete(ProjectLeadEntity.builder()
                 .projectId(projectId)
                 .userId(pierre.user().getId())
@@ -71,7 +71,7 @@ public class MeClaimProjectApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String githubPAT = faker.rickAndMorty().character();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre(githubPAT);
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
 
         // When
         githubWireMockServer.stubFor(get(urlEqualTo("/orgs/onlydustxyz/memberships/PierreOucif")).withHeader(

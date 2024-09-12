@@ -11,7 +11,6 @@ import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
-import onlydust.com.marketplace.api.read.entities.hackathon.HackathonReadEntity;
 import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
@@ -51,7 +50,7 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
         final var hackathon = hackathonReadRepository.findBySlug(hackathonSlug)
                 .orElseThrow(() -> OnlyDustException.notFound("Hackathon not found for slug %s".formatted(hackathonSlug)));
         final Boolean isRegistered = authenticatedUser.map(AuthenticatedUser::id)
-                .map(userId -> hackathonReadRepository.isRegisteredToHackathon(userId, hackathon.id()))
+                .map(userId -> hackathonReadRepository.isRegisteredToHackathon(userId.value(), hackathon.id()))
                 .orElse(null);
         return ok(hackathon.toResponse(isRegistered));
     }

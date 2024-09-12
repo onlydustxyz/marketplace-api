@@ -70,7 +70,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var user = userReadRepository.findMe(authenticatedUser.id())
+        final var user = userReadRepository.findMe(authenticatedUser.id().value())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
         final var userAuthorizedToApplyOnGithubIssues = githubUserPermissionsFacadePort.isUserAuthorizedToApplyOnProject(user.githubUserId());
         final var hasMissingPayoutPreferences = rewardReadRepository.existsByRecipientIdAndStatus_Status(authenticatedUser.githubUserId(),
@@ -103,7 +103,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<OnboardingCompletionResponse> getOnboardingCompletion() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.id())
+        final var journeyCompletion = userReadRepository.findMeOnboarding(authenticatedUser.id().value())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
 
         return ok(journeyCompletion.onboardingCompletion().toResponse());
@@ -133,7 +133,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<MyBillingProfilesResponse> getMyBillingProfiles() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var billingProfiles = allBillingProfileUserReadRepository.findAllByUserId(authenticatedUser.id());
+        final var billingProfiles = allBillingProfileUserReadRepository.findAllByUserId(authenticatedUser.id().value());
 
         final var response = new MyBillingProfilesResponse()
                 .billingProfiles(billingProfiles.stream().map(AllBillingProfileUserReadEntity::toShortResponse).toList());
@@ -167,7 +167,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<List<PayoutPreferencesItemResponse>> getMyPayoutPreferences() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var payoutPreferences = payoutPreferenceReadRepository.findAllForUser(authenticatedUser.id());
+        final var payoutPreferences = payoutPreferenceReadRepository.findAllForUser(authenticatedUser.id().value());
         return ok(payoutPreferences.stream()
                 .map(p -> p.toDto(authenticatedUser.githubUserId()))
                 .sorted(Comparator.comparing(p -> p.getProject().getName()))
@@ -177,17 +177,17 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<PrivateUserProfileResponse> getMyProfile() {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var user = userReadRepository.findMeProfile(authenticatedUser.id())
+        final var user = userReadRepository.findMeProfile(authenticatedUser.id().value())
                 .orElseThrow(() -> internalServerError("User %s not found".formatted(authenticatedUser.toString())));
-        final List<ProjectCategoryReadEntity> preferredCategories = projectCategoryReadRepository.findPreferredOnesForUser(authenticatedUser.id());
-        final List<LanguageReadEntity> preferredLanguages = languageReadRepository.findPreferredOnesForUser(authenticatedUser.id());
+        final List<ProjectCategoryReadEntity> preferredCategories = projectCategoryReadRepository.findPreferredOnesForUser(authenticatedUser.id().value());
+        final List<LanguageReadEntity> preferredLanguages = languageReadRepository.findPreferredOnesForUser(authenticatedUser.id().value());
         return ok(user.toPrivateUserProfileResponse(preferredCategories, preferredLanguages));
     }
 
     @Override
     public ResponseEntity<ProgramPageResponse> getMyPrograms(Integer pageIndex, Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var page = programReadRepository.findAllByLead(authenticatedUser.id(),
+        final var page = programReadRepository.findAllByLead(authenticatedUser.id().value(),
                 PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
 
         final var response = new ProgramPageResponse()
@@ -203,7 +203,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     @Override
     public ResponseEntity<NotificationSettingsForProjectResponse> getMyNotificationSettingsForProject(UUID projectId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var dto = notificationSettingsForProjectReadRepository.findById(new PrimaryKey(authenticatedUser.id(), projectId))
+        final var dto = notificationSettingsForProjectReadRepository.findById(new PrimaryKey(authenticatedUser.id().value(), projectId))
                 .map(NotificationSettingsForProjectReadEntity::toDto)
                 .orElseGet(() -> projectLinkReadRepository.findById(projectId)
                         .map(NotificationSettingsForProjectReadEntity::defaultDto)
@@ -216,7 +216,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     public ResponseEntity<NotificationSettingsResponse> getMyNotificationSettings() {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final NotificationSettingsResponse notificationSettingsResponse = new NotificationSettingsResponse();
-        notificationSettingsChannelReadRepository.findAllByUserId(authenticatedUser.id())
+        notificationSettingsChannelReadRepository.findAllByUserId(authenticatedUser.id().value())
                 .stream()
                 .filter(notificationSettingsChannelEntity -> !notificationSettingsChannelEntity.channel()
                         .equals(onlydust.com.marketplace.kernel.model.notification.NotificationChannel.IN_APP))
@@ -251,7 +251,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var sanitizedPageIndex = sanitizePageIndex(pageIndex);
         final Boolean isRead = isReadFromContract(status);
-        final Page<NotificationReadEntity> notificationReadEntityPage = notificationReadRepository.findAllInAppByStatusAndUserId(isRead, authenticatedUser.id(),
+        final Page<NotificationReadEntity> notificationReadEntityPage = notificationReadRepository.findAllInAppByStatusAndUserId(isRead,
+                authenticatedUser.id().value(),
                 PageRequest.of(sanitizedPageIndex, sanitizePageSize, JpaSort.unsafe(Sort.Direction.DESC, "created_at")));
         final NotificationPageResponse notificationPageResponse = new NotificationPageResponse();
         notificationReadEntityPage.stream()
@@ -270,6 +271,6 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     public ResponseEntity<NotificationCountResponse> getMyNotificationsCount(NotificationStatus status) {
         final AuthenticatedUser authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final Boolean isRead = isReadFromContract(status);
-        return ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id())));
+        return ok(new NotificationCountResponse(notificationReadRepository.countAllInAppByStatusForUserId(isRead, authenticatedUser.id().value())));
     }
 }

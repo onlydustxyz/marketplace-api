@@ -6,9 +6,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 import java.util.Date;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +16,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @EventType("UserSignedUp")
 public class UserSignedUp extends Event {
-    UUID userId;
+    UserId userId;
     Long githubUserId;
     String login;
     Date signedUpAt;

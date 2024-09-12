@@ -1,6 +1,9 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.gateway.CurrentDateProvider;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
@@ -11,7 +14,6 @@ import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -25,8 +27,8 @@ public class RewardService implements RewardFacadePort {
 
     @Override
     @Transactional
-    public UUID createReward(UUID projectLeadId,
-                             RequestRewardCommand command) {
+    public RewardId createReward(UserId projectLeadId,
+                                 RequestRewardCommand command) {
         if (!permissionService.isUserProjectLead(command.getProjectId(), projectLeadId))
             throw forbidden("User must be project lead to request a reward");
 
@@ -35,7 +37,7 @@ public class RewardService implements RewardFacadePort {
 
         indexerPort.indexUser(command.getRecipientId());
 
-        final var rewardId = UUID.randomUUID();
+        final var rewardId = RewardId.random();
         final var reward = new Reward(
                 rewardId,
                 command.getProjectId(),
@@ -63,7 +65,7 @@ public class RewardService implements RewardFacadePort {
 
     @Override
     @Transactional
-    public void cancelReward(UUID projectLeadId, UUID projectId, UUID rewardId) {
+    public void cancelReward(UserId projectLeadId, ProjectId projectId, RewardId rewardId) {
         if (!permissionService.isUserProjectLead(projectId, projectLeadId))
             throw forbidden("User must be project lead to cancel a reward");
 

@@ -4,6 +4,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
@@ -13,14 +14,12 @@ import onlydust.com.marketplace.project.domain.view.ReceiptView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
 
-import java.util.UUID;
-
 import static java.util.Objects.isNull;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.MoneyMapper.toMoney;
 
 public interface RewardMapper {
 
-    static RequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final UUID projectId) {
+    static RequestRewardCommand rewardRequestToDomain(final RewardRequest rewardRequest, final ProjectId projectId) {
         return RequestRewardCommand.builder()
                 .amount(rewardRequest.getAmount())
                 .projectId(projectId)

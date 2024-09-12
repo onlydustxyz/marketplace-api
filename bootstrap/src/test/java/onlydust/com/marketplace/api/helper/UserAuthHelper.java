@@ -10,6 +10,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.backoffice.BackofficeUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.model.BackofficeUser;
@@ -190,6 +191,9 @@ public class UserAuthHelper {
 
 
     public record AuthenticatedUser(String jwt, UserEntity user) {
+        public UserId userId() {
+            return UserId.of(user.getId());
+        }
     }
 
     public record AuthenticatedBackofficeUser(String jwt, BackofficeUserEntity user) {

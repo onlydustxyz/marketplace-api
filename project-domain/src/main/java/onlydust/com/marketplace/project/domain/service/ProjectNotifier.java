@@ -3,7 +3,9 @@ package onlydust.com.marketplace.project.domain.service;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.notification.*;
@@ -31,20 +33,20 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
     private final SponsorStoragePort sponsorStoragePort;
 
     @Override
-    public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull UUID projectId, @NonNull UUID userId) {
+    public void onNewApplication(Committee.@NonNull Id committeeId, @NonNull ProjectId projectId, @NonNull UserId userId) {
         final var committee = committeeStoragePort.findById(committeeId)
-                .orElseThrow(() -> internalServerError("Committee %s not found".formatted(committeeId.value())));
+                .orElseThrow(() -> internalServerError("Committee %s not found".formatted(committeeId)));
         final ProjectInfosView projectInfos = projectStoragePort.getProjectInfos(projectId);
         notificationPort.push(userId, new CommitteeApplicationCreated(projectInfos.name(), projectId,
-                committee.name(), committeeId.value(), committee.applicationEndDate()));
+                committee.name(), committeeId, committee.applicationEndDate()));
     }
 
     @Override
     public void onFundsAllocatedToProgram(@NonNull SponsorId sponsorId, @NonNull ProgramId programId, @NonNull BigDecimal amount, @NonNull UUID currencyId) {
         final var program = programStoragePort.findById(programId)
-                .orElseThrow(() -> internalServerError("Program %s not found".formatted(programId.value())));
+                .orElseThrow(() -> internalServerError("Program %s not found".formatted(programId)));
 
-        program.leadIds().forEach(leadId -> notificationPort.push(leadId.value(),
+        program.leadIds().forEach(leadId -> notificationPort.push(leadId,
                 FundsAllocatedToProgram.builder()
                         .sponsorId(sponsorId)
                         .programId(programId)
@@ -57,7 +59,7 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
     public void onFundsRefundedByProgram(@NonNull ProgramId programId, @NonNull SponsorId sponsorId, @NonNull BigDecimal amount, @NonNull UUID currencyId) {
         final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
 
-        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId,
                 FundsUnallocatedFromProgram.builder()
                         .sponsorId(sponsorId)
                         .programId(programId)
@@ -71,7 +73,7 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
                                   @NonNull ZonedDateTime timestamp) {
         final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
 
-        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId,
                 DepositRejected.builder()
                         .depositId(depositId)
                         .sponsorId(sponsorId)
@@ -86,7 +88,7 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
                                   @NonNull ZonedDateTime timestamp) {
         final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);
 
-        sponsorLeads.forEach(leadId -> notificationPort.push(leadId.value(),
+        sponsorLeads.forEach(leadId -> notificationPort.push(leadId,
                 DepositApproved.builder()
                         .depositId(depositId)
                         .sponsorId(sponsorId)

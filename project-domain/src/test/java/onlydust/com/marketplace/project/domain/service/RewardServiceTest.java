@@ -3,6 +3,9 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
 import onlydust.com.marketplace.project.domain.model.Reward;
@@ -17,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -34,8 +36,8 @@ public class RewardServiceTest {
             indexerPort,
             accountingServicePort
     );
-    final UUID projectLeadId = UUID.randomUUID();
-    final UUID projectId = UUID.randomUUID();
+    final UserId projectLeadId = UserId.random();
+    final ProjectId projectId = ProjectId.random();
     final Faker faker = new Faker();
     final Long recipientId = faker.number().randomNumber(5, true);
     final CurrencyView.Id usdcId = CurrencyView.Id.random();
@@ -138,7 +140,7 @@ public class RewardServiceTest {
         @Test
         void should_prevent_cancelling_a_non_existing_reward() {
             // Given
-            final var rewardId = UUID.randomUUID();
+            final var rewardId = RewardId.random();
             when(permissionService.isUserProjectLead(projectId, projectLeadId)).thenReturn(true);
             when(rewardStoragePort.get(rewardId)).thenReturn(Optional.empty());
 
@@ -152,7 +154,7 @@ public class RewardServiceTest {
 
     @Nested
     class GivenAProjectWithAReward {
-        final UUID rewardId = UUID.randomUUID();
+        final RewardId rewardId = RewardId.random();
 
         final Reward reward = new Reward(
                 rewardId,

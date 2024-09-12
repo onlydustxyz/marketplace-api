@@ -13,6 +13,7 @@ import onlydust.com.marketplace.accounting.domain.port.out.DepositObserverPort;
 import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
@@ -24,7 +25,6 @@ import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Slf4j
 @AllArgsConstructor
@@ -39,7 +39,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     private final SponsorStoragePort sponsorStoragePort;
 
     @Override
-    public void onUserRegistration(Hackathon.Id hackathonId, UUID userId) {
+    public void onUserRegistration(Hackathon.Id hackathonId, UserId userId) {
         final GithubUserWithTelegramView githubUserWithTelegramView = userStoragePort.findGithubUserWithTelegram(userId)
                 .orElseThrow(() -> OnlyDustException.internalServerError("User %s not found".formatted(userId)));
 
@@ -50,7 +50,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onProjectCreated(UUID projectId, UUID projectLeadId) {
+    public void onProjectCreated(ProjectId projectId, UserId projectLeadId) {
         final var user = userStoragePort.getRegisteredUserById(projectLeadId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(projectLeadId)));
         final var project = projectStoragePort.getById(projectId)
@@ -61,7 +61,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onBillingProfileUpdated(BillingProfileVerificationUpdated billingProfileVerificationUpdated) {
-        final var user = userStoragePort.getRegisteredUserById(billingProfileVerificationUpdated.getUserId().value())
+        final var user = userStoragePort.getRegisteredUserById(billingProfileVerificationUpdated.getUserId())
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(billingProfileVerificationUpdated.getUserId().value())));
         slackApiClient.sendNotification(slackProperties.getKycKybChannel(), "New KYC/KYB event",
                 BillingProfileVerificationEventMapper.mapToSlackBlock(billingProfileVerificationUpdated, user,
@@ -80,11 +80,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+    public void onApplicationAccepted(Application application, UserId projectLeadId) {
     }
 
     @Override
-    public void onProjectCategorySuggested(String categoryName, UUID userId) {
+    public void onProjectCategorySuggested(String categoryName, UserId userId) {
         final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId)));
         slackApiClient.sendNotification(slackProperties.getDevRelChannel(), "New project category suggested",
@@ -101,11 +101,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     }
 
     @Override
-    public void onLinkedReposChanged(UUID projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
+    public void onLinkedReposChanged(ProjectId projectId, Set<Long> linkedRepoIds, Set<Long> unlinkedRepoIds) {
     }
 
     @Override
-    public void onRewardSettingsChanged(UUID projectId) {
+    public void onRewardSettingsChanged(ProjectId projectId) {
     }
 
     @Override
@@ -125,7 +125,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onDepositSubmittedByUser(UserId userId, Deposit.Id depositId) {
-        final var user = userStoragePort.getRegisteredUserById(userId.value())
+        final var user = userStoragePort.getRegisteredUserById(userId)
                 .orElseThrow(() -> OnlyDustException.notFound("User not found %s".formatted(userId.value())));
         final Deposit deposit = depositStoragePort.find(depositId)
                 .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
@@ -140,7 +140,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
 
     @Override
     public void onDepositRejected(Deposit.Id depositId) {
-        
+
     }
 
     @Override

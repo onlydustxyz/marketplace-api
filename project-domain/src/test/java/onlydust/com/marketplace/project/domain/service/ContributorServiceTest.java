@@ -2,6 +2,8 @@ package onlydust.com.marketplace.project.domain.service;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.mocks.ContributorFaker;
 import onlydust.com.marketplace.project.domain.model.Contributor;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -10,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -27,7 +28,7 @@ public class ContributorServiceTest {
     private final ContributorFaker contributorFaker = new ContributorFaker();
     private final Faker faker = new Faker();
 
-    private final UUID projectId = UUID.randomUUID();
+    private final ProjectId projectId = ProjectId.random();
     private final Set<Long> repoIds = Set.of(10L, 20L);
     private final Set<Long> projectRepoIds = Set.of(100L, 200L, 20L);
     private final Set<Long> allRepoIds = Set.of(10L, 20L, 100L, 200L);
@@ -189,7 +190,7 @@ public class ContributorServiceTest {
         externalContributors.forEach(
                 contributor -> when(userStoragePort.getRegisteredUserByGithubId(contributor.getId().githubUserId()))
                         .thenReturn(contributor.getIsRegistered() ? Optional.of(AuthenticatedUser.builder()
-                                .id(UUID.randomUUID())
+                                .id(UserId.random())
                                 .githubUserId(contributor.getId().githubUserId())
                                 .login(contributor.getId().login())
                                 .avatarUrl(contributor.getId().avatarUrl())
@@ -201,7 +202,7 @@ public class ContributorServiceTest {
 
         // Then
         verify(userStoragePort, never()).searchContributorsByLogin(anySet(), anyString(), anyInt());
-        verify(projectStoragePort, never()).getProjectRepoIds(any(UUID.class));
+        verify(projectStoragePort, never()).getProjectRepoIds(any(ProjectId.class));
         assertThat(contributors.getLeft()).isEmpty();
         assertThat(contributors.getRight().stream().map(c -> c.getId().githubUserId()).toList())
                 .containsExactlyElementsOf(externalContributors.stream().map(c -> c.getId().githubUserId()).toList());

@@ -2,11 +2,10 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.service.GithubAppService;
-
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
@@ -52,7 +51,7 @@ public class GithubIssueCommenter implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+    public void onApplicationAccepted(Application application, UserId projectLeadId) {
         if (application.origin() != Application.Origin.MARKETPLACE) return;
 
         final var issue = githubStoragePort.findIssueById(application.issueId())

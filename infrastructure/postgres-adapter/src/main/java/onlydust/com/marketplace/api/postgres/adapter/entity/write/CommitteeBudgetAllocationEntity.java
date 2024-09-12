@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 
 import java.io.Serializable;
@@ -35,11 +36,11 @@ public class CommitteeBudgetAllocationEntity {
 
     BigDecimal amount;
 
-    public static CommitteeBudgetAllocationEntity fromDomain(Committee.Id committeeId, UUID currencyId, UUID projectId, BigDecimal amount) {
+    public static CommitteeBudgetAllocationEntity fromDomain(Committee.Id committeeId, UUID currencyId, ProjectId projectId, BigDecimal amount) {
         return CommitteeBudgetAllocationEntity.builder()
                 .committeeId(committeeId.value())
                 .currencyId(currencyId)
-                .projectId(projectId)
+                .projectId(projectId.value())
                 .amount(amount)
                 .build();
     }

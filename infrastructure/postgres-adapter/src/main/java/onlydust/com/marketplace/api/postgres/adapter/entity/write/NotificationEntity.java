@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
@@ -66,7 +67,7 @@ public class NotificationEntity {
     public static NotificationEntity of(@NonNull Notification notification) {
         return NotificationEntity.builder()
                 .id(notification.id().value())
-                .recipientId(notification.recipientId())
+                .recipientId(notification.recipientId().value())
                 .category(notification.data().category())
                 .data(new Data(notification.data()))
                 .createdAt(notification.createdAt())
@@ -77,7 +78,7 @@ public class NotificationEntity {
     public SendableNotification toDomain() {
         return SendableNotification.builder()
                 .id(Notification.Id.of(id))
-                .recipientId(recipientId)
+                .recipientId(UserId.of(recipientId))
                 .data(data.notification)
                 .createdAt(createdAt)
                 .channels(channels.stream().map(NotificationChannelEntity::channel).collect(Collectors.toSet()))

@@ -58,7 +58,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     public ResponseEntity<ProgramResponse> getProgram(UUID programId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
+        if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var program = programReadRepository.findById(programId)

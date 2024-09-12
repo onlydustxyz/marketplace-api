@@ -5,11 +5,8 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePort;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
@@ -20,6 +17,8 @@ import onlydust.com.marketplace.api.rest.api.adapter.authentication.Authenticate
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BillingProfileMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.PayoutInfoMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
@@ -61,7 +60,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                                                                           String sort,
                                                                           String direction) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        final var page = billingProfileFacadePort.invoicesOf(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId), pageIndex,
+        final var page = billingProfileFacadePort.invoicesOf(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId), pageIndex,
                 pageSize, map(sort), SortDirectionMapper.requestToDomain(direction));
         return ok(map(page, pageIndex));
     }
@@ -70,7 +69,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<InvoicePreviewResponse> previewNewInvoiceForRewardIds(UUID billingProfileId, List<UUID> rewardIds) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var preview = billingProfileFacadePort.previewInvoice(
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 BillingProfile.Id.of(billingProfileId),
                 rewardIds.stream().map(RewardId::of).toList());
 
@@ -84,11 +83,11 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
         try {
             if (fileName != null && !fileName.trim().isEmpty()) {
-                billingProfileFacadePort.uploadExternalInvoice(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId),
+                billingProfileFacadePort.uploadExternalInvoice(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId),
                         Invoice.Id.of(invoiceId),
                         fileName.trim(), pdf.getInputStream());
             } else {
-                billingProfileFacadePort.uploadGeneratedInvoice(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId),
+                billingProfileFacadePort.uploadGeneratedInvoice(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId),
                         Invoice.Id.of(invoiceId),
                         pdf.getInputStream());
             }
@@ -103,7 +102,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<Resource> downloadInvoice(UUID billingProfileId, UUID invoiceId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var invoice = billingProfileFacadePort.downloadInvoice(
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 BillingProfile.Id.of(billingProfileId),
                 Invoice.Id.of(invoiceId));
 
@@ -117,7 +116,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<Void> acceptOrDeclineInvoiceMandate(UUID billingProfileId, InvoiceMandateRequest invoiceMandateRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         if (Boolean.TRUE.equals(invoiceMandateRequest.getHasAcceptedInvoiceMandate())) {
-            billingProfileFacadePort.acceptInvoiceMandate(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId));
+            billingProfileFacadePort.acceptInvoiceMandate(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId));
         }
         return noContent().build();
     }
@@ -130,15 +129,15 @@ public class BillingProfileRestApi implements BillingProfilesApi {
 
         final var newBillingProfile = switch (billingProfileRequest.getType()) {
             case COMPANY -> billingProfileFacadePort.createCompanyBillingProfile(
-                    UserId.of(authenticatedUser.id()),
+                    authenticatedUser.id(),
                     billingProfileRequest.getName(),
                     projectIds);
             case SELF_EMPLOYED -> billingProfileFacadePort.createSelfEmployedBillingProfile(
-                    UserId.of(authenticatedUser.id()),
+                    authenticatedUser.id(),
                     billingProfileRequest.getName(),
                     projectIds);
             case INDIVIDUAL -> billingProfileFacadePort.createIndividualBillingProfile(
-                    UserId.of(authenticatedUser.id()),
+                    authenticatedUser.id(),
                     billingProfileRequest.getName(),
                     projectIds);
         };
@@ -150,7 +149,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<Void> setPayoutInfo(UUID billingProfileId, BillingProfilePayoutInfoRequest billingProfilePayoutInfoRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.updatePayoutInfo(BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 PayoutInfoMapper.mapToDomain(billingProfilePayoutInfoRequest));
         return noContent().build();
     }
@@ -162,7 +161,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         final Page<BillingProfileCoworkerView> coworkers = billingProfileFacadePort.getCoworkers(BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.id()), sanitizedPageIndex, sanitizedPageSize);
+                authenticatedUser.id(), sanitizedPageIndex, sanitizedPageSize);
         return ok(BillingProfileMapper.coworkersPageToResponse(coworkers, pageIndex));
     }
 
@@ -171,7 +170,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.inviteCoworker(
                 BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 GithubUserId.of(invitationRequest.getGithubUserId()),
                 switch (invitationRequest.getRole()) {
                     case ADMIN -> BillingProfile.User.Role.ADMIN;
@@ -185,7 +184,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         billingProfileFacadePort.removeCoworker(
                 BillingProfile.Id.of(billingProfileId),
-                UserId.of(authenticatedUser.id()),
+                authenticatedUser.id(),
                 GithubUserId.of(authenticatedUser.githubUserId()),
                 GithubUserId.of(githubUserId));
         return noContent().build();
@@ -194,14 +193,14 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<Void> deleteBillingProfile(UUID billingProfileId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        billingProfileFacadePort.deleteBillingProfile(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId));
+        billingProfileFacadePort.deleteBillingProfile(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId));
         return noContent().build();
     }
 
     @Override
     public ResponseEntity<Void> enableBillingProfile(UUID billingProfileId, BillingProfileEnableRequest billingProfileEnableRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        billingProfileFacadePort.enableBillingProfile(UserId.of(authenticatedUser.id()), BillingProfile.Id.of(billingProfileId),
+        billingProfileFacadePort.enableBillingProfile(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId),
                 billingProfileEnableRequest.getEnable());
         return noContent().build();
     }
@@ -209,7 +208,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     @Override
     public ResponseEntity<Void> updateBillingProfileType(UUID billingProfileId, BillingProfileTypeRequest billingProfileTypeRequest) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
-        billingProfileFacadePort.updateBillingProfileType(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()),
+        billingProfileFacadePort.updateBillingProfileType(BillingProfile.Id.of(billingProfileId), authenticatedUser.id(),
                 switch (billingProfileTypeRequest.getType()) {
                     case INDIVIDUAL -> BillingProfile.Type.INDIVIDUAL;
                     case COMPANY -> BillingProfile.Type.COMPANY;
@@ -227,7 +226,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
             case MEMBER -> BillingProfile.User.Role.MEMBER;
         };
 
-        billingProfileFacadePort.updateCoworkerRole(BillingProfile.Id.of(billingProfileId), UserId.of(authenticatedUser.id()),
+        billingProfileFacadePort.updateCoworkerRole(BillingProfile.Id.of(billingProfileId), authenticatedUser.id(),
                 GithubUserId.of(githubUserId), role);
 
         return noContent().build();
@@ -237,7 +236,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
     public ResponseEntity<BillingProfileInvoiceableRewardsResponse> getInvoiceableRewards(UUID billingProfileId) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(UserId.of(authenticatedUser.id()),
+        final var invoiceableRewards = billingProfileFacadePort.getInvoiceableRewardsForBillingProfile(authenticatedUser.id(),
                 BillingProfile.Id.of(billingProfileId));
 
         final var rewardNetworks = invoiceableRewards.stream()

@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.Accessors;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.net.URI;
@@ -59,7 +60,7 @@ public class BannerEntity {
                 .buttonLinkUrl(banner.buttonLinkUrl() == null ? null : banner.buttonLinkUrl().toString())
                 .visible(banner.visible())
                 .updatedAt(banner.updatedAt())
-                .closedBy(banner.closedBy().stream().map(userId -> new BannerClosedByEntity(banner.id().value(), userId)).collect(toSet()))
+                .closedBy(banner.closedBy().stream().map(userId -> new BannerClosedByEntity(banner.id().value(), userId.value())).collect(toSet()))
                 .build();
     }
 
@@ -75,7 +76,7 @@ public class BannerEntity {
                 buttonLinkUrl == null ? null : URI.create(buttonLinkUrl),
                 visible,
                 updatedAt,
-                closedBy.stream().map(BannerClosedByEntity::userId).collect(toSet()),
+                closedBy.stream().map(BannerClosedByEntity::userId).map(UserId::of).collect(toSet()),
                 date);
     }
 }

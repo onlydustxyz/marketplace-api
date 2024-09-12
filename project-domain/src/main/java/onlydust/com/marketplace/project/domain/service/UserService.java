@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
@@ -44,7 +46,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void updateProfile(final @NonNull UUID userId,
+    public void updateProfile(final @NonNull UserId userId,
                               final String avatarUrl,
                               final String location,
                               final String bio,
@@ -84,7 +86,7 @@ public class UserService implements UserFacadePort {
     }
 
     @Override
-    public void replaceProfile(UUID userId, UserProfile userProfile) {
+    public void replaceProfile(UserId userId, UserProfile userProfile) {
         userStoragePort.saveProfile(userId, userProfile);
     }
 
@@ -128,19 +130,19 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void markUserAsOnboarded(UUID userId) {
+    public void markUserAsOnboarded(UserId userId) {
         userStoragePort.updateOnboardingCompletionDate(userId, dateProvider.now());
     }
 
     @Override
     @Transactional
-    public void updateTermsAndConditionsAcceptanceDate(UUID userId) {
+    public void updateTermsAndConditionsAcceptanceDate(UserId userId) {
         userStoragePort.updateTermsAndConditionsAcceptanceDate(userId, dateProvider.now());
     }
 
     @Override
     @Transactional
-    public void acceptInvitationToLeadProject(Long githubUserId, UUID projectId) {
+    public void acceptInvitationToLeadProject(Long githubUserId, ProjectId projectId) {
         userStoragePort.acceptProjectLeaderInvitation(githubUserId, projectId);
     }
 
@@ -169,7 +171,7 @@ public class UserService implements UserFacadePort {
 
     @Override
     @Transactional
-    public void claimProjectForAuthenticatedUser(UUID projectId, AuthenticatedUser user) {
+    public void claimProjectForAuthenticatedUser(ProjectId projectId, AuthenticatedUser user) {
         final var projectLeaders = projectStoragePort.getProjectLeadIds(projectId);
         final var projectInvitedLeaders = projectStoragePort.getProjectInvitedLeadIds(projectId);
         if (!projectLeaders.isEmpty() || !projectInvitedLeaders.isEmpty()) {

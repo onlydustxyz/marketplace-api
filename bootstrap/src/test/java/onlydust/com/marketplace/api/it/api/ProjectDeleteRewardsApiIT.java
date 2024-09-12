@@ -2,17 +2,18 @@ package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
-import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.accounting.domain.service.BillingProfileService;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.suites.tags.TagReward;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.Name;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.ethereum.WalletLocator;
@@ -48,7 +49,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
     @Test
     @Order(0)
     public void should_be_unauthorized() {
-        final UUID projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final UUID rewardId = UUID.randomUUID();
 
         // When
@@ -67,7 +68,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         userAuthHelper.signUpUser(1L, faker.rickAndMorty().character(), faker.internet().url(),
                 false);
         final String jwt = userAuthHelper.authenticateUser(1L).jwt();
-        final UUID projectId = projectRepository.findAll().get(0).getId();
+        final var projectId = projectRepository.findAll().get(0).getId();
         final UUID rewardId = UUID.randomUUID();
 
         // When
@@ -91,8 +92,8 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
-        final UUID userId = pierre.user().getId();
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var userId = pierre.user().getId();
         final var rewardId = UUID.fromString("8fe07ae1-cf3b-4401-8958-a9e0b0aec7b0");
 
         final var billingProfile = billingProfileReadRepository.findByUserId(userId).stream().findFirst().orElseThrow();
@@ -138,7 +139,7 @@ public class ProjectDeleteRewardsApiIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final String jwt = pierre.jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final var rewardId = UUID.fromString("e1498a17-5090-4071-a88a-6f0b0c337c3a");
 
         // When

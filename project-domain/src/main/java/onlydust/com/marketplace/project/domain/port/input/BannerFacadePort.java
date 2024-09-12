@@ -1,10 +1,10 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Banner;
 
 import java.net.URI;
 import java.time.ZonedDateTime;
-import java.util.UUID;
 
 public interface BannerFacadePort {
     Banner createBanner(String shortDescription, String longDescription, String title, String subTitle, ZonedDateTime date, String buttonText,
@@ -19,5 +19,5 @@ public interface BannerFacadePort {
 
     void showBanner(Banner.Id id);
 
-    void closeBanner(Banner.Id id, UUID userId);
+    void closeBanner(Banner.Id id, UserId userId);
 }

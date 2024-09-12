@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.backoffice.api.contract.model.*;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
@@ -74,7 +75,7 @@ public interface BackOfficeCommitteeMapper {
                 .map(BackOfficeCommitteeMapper::getProjectQuestion)
                 .toList());
         committee.juryCriteria().addAll(updateCommitteeRequest.getJuryCriteria().stream().map(BackOfficeCommitteeMapper::getJuryCriteria).toList());
-        committee.juryIds().addAll(updateCommitteeRequest.getJuryMemberIds());
+        committee.juryIds().addAll(updateCommitteeRequest.getJuryMemberIds().stream().map(UserId::of).toList());
         return committee;
     }
 

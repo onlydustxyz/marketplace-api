@@ -40,7 +40,7 @@ public class ReadBillingProfilesApiPostgresAdapter implements ReadBillingProfile
             && billingProfile.invitations().stream().noneMatch(i -> i.getGithubUserId().equals(authenticatedUser.githubUserId())))
             throw forbidden("User %s does not have permission to read billing profile %s".formatted(authenticatedUser.id(), billingProfileId));
 
-        final var me = billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(authenticatedUser.id(), billingProfileId)
+        final var me = billingProfileUserRightsViewRepository.findForUserIdAndBillingProfileId(authenticatedUser.id().value(), billingProfileId)
                 .orElseThrow(() -> OnlyDustException.notFound("Billing profile user rights for user %s and billing profile %s not found".formatted(authenticatedUser.id(), billingProfileId)));
 
         return ok(

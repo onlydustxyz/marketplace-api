@@ -4,6 +4,7 @@ import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.job.GoodFirstIssueCreatedNotifierJob;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -11,7 +12,6 @@ import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
     void should_notify_users_on_new_good_first_issues() throws InterruptedException {
         // Given
         final UserAuthHelper.AuthenticatedUser user1 = userAuthHelper.create();
-        final NotificationRecipient.Id recipientId1 = NotificationRecipient.Id.of(user1.user().getId());
+        final UserId recipientId1 = UserId.of(user1.user().getId());
         final UserAuthHelper.AuthenticatedUser user2 = userAuthHelper.create();
-        final NotificationRecipient.Id recipientId2 = NotificationRecipient.Id.of(user2.user().getId());
+        final UserId recipientId2 = UserId.of(user2.user().getId());
         final UserAuthHelper.AuthenticatedUser dummyContributor = userAuthHelper.create();
         final ProjectId projectId1 = projectHelper.create(user1, faker.rickAndMorty().character());
         final ProjectId projectId2 = projectHelper.create(user2, faker.lordOfTheRings().character());
@@ -55,7 +55,7 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         final Long issueId13 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "COMPLETED", dummyContributor);
         final Long issueId14 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now().minusMinutes(6), null, "OPEN", dummyContributor);
         final Long issueId15 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
-        final Long issueId16= githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
+        final Long issueId16 = githubHelper.createIssue(repo1.getId(), ZonedDateTime.now(), null, "OPEN", dummyContributor);
         githubHelper.addLabelToIssue(issueId11, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId13, "good-First_ISSUE", ZonedDateTime.now());
         githubHelper.addLabelToIssue(issueId14, "good-First_ISSUE2", ZonedDateTime.now().minusMinutes(6));
@@ -77,8 +77,8 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         Thread.sleep(1000L);
 
         // Then
-        final Project project1 = projectStoragePort.getById(projectId1.value()).orElseThrow();
-        final Project project2 = projectStoragePort.getById(projectId2.value()).orElseThrow();
+        final Project project1 = projectStoragePort.getById(projectId1).orElseThrow();
+        final Project project2 = projectStoragePort.getById(projectId2).orElseThrow();
         final GithubIssue issue11 = githubStoragePort.findIssueById(GithubIssue.Id.of(issueId11)).orElseThrow();
         final GithubIssue issue21 = githubStoragePort.findIssueById(GithubIssue.Id.of(issueId21)).orElseThrow();
 

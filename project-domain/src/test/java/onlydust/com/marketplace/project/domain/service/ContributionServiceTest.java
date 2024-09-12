@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.ContributionStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -17,7 +19,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,9 +38,9 @@ class ContributionServiceTest {
     @Test
     void getContribution_should_return_contribution() {
         // Given
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final var contributionId = faker.pokemon().name();
-        final var userId = UUID.randomUUID();
+        final var userId = UserId.random();
         final var githubUserId = faker.number().randomNumber();
         final var expectedContribution =
                 ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
@@ -58,9 +59,9 @@ class ContributionServiceTest {
     @Test
     void getContribution_should_return_contribution_when_caller_is_project_leader() {
         // Given
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final var contributionId = faker.pokemon().name();
-        final var userId = UUID.randomUUID();
+        final var userId = UserId.random();
         final var githubUserId = faker.number().randomNumber();
         final var expectedContribution =
                 ContributionDetailsView.builder().id(contributionId).status(ContributionStatus.COMPLETED).build();
@@ -79,9 +80,9 @@ class ContributionServiceTest {
     @Test
     void getContribution_should_return_401_when_caller_is_not_the_contributor_nor_a_project_leader() {
         // Given
-        final var projectId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
         final var contributionId = faker.pokemon().name();
-        final var userId = UUID.randomUUID();
+        final var userId = UserId.random();
         final var githubUserId = faker.number().randomNumber();
 
         // When
@@ -97,8 +98,8 @@ class ContributionServiceTest {
     @Test
     void should_ignore_contributions() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
@@ -112,8 +113,8 @@ class ContributionServiceTest {
     @Test
     void should_return_401_from_ignore_contributions_when_caller_is_not_lead() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
@@ -129,8 +130,8 @@ class ContributionServiceTest {
     @Test
     void should_unignore_contributions() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
@@ -144,8 +145,8 @@ class ContributionServiceTest {
     @Test
     void should_return_401_from_unignore_contributions_when_caller_is_not_lead() {
         // Given
-        final var projectId = UUID.randomUUID();
-        final var projectLeadId = UUID.randomUUID();
+        final var projectId = ProjectId.random();
+        final var projectLeadId = UserId.random();
         final var contributionIds = List.of(faker.pokemon().name(), faker.pokemon().name());
 
         // When
@@ -160,10 +161,10 @@ class ContributionServiceTest {
 
     @Nested
     class UnassignContribution {
-        final UUID callerId = UUID.randomUUID();
+        final UserId callerId = UserId.random();
 
         final Project project = Project.builder()
-                .id(UUID.randomUUID())
+                .id(ProjectId.random())
                 .build();
 
         final GithubRepo repo = GithubRepo.builder()

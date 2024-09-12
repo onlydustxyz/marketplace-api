@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeade
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -72,8 +73,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<AuthenticatedUser> getRegisteredUserById(UUID userId) {
-        return userViewRepository.findById(userId).map(this::getUserDetails);
+    public Optional<AuthenticatedUser> getRegisteredUserById(UserId userId) {
+        return userViewRepository.findById(userId.value()).map(this::getUserDetails);
     }
 
     private AuthenticatedUser getUserDetails(@NotNull UserViewEntity user) {
@@ -97,8 +98,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public void updateUserLastSeenAt(UUID userId, Date lastSeenAt) {
-        userRepository.findById(userId)
+    public void updateUserLastSeenAt(UserId userId, Date lastSeenAt) {
+        userRepository.findById(userId.value())
                 .ifPresentOrElse(userEntity -> {
                     userEntity.setLastSeenAt(lastSeenAt);
                     userRepository.saveAndFlush(userEntity);
@@ -108,28 +109,28 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
     }
 
     @Override
-    public Optional<UserProfile> findProfileById(UUID userId) {
-        return userProfileInfoRepository.findById(userId).map(UserProfileInfoEntity::toDomain);
+    public Optional<UserProfile> findProfileById(UserId userId) {
+        return userProfileInfoRepository.findById(userId.value()).map(UserProfileInfoEntity::toDomain);
     }
 
     @Override
     @Transactional
-    public void saveProfile(UUID userId, UserProfile userProfile) {
-        final UserProfileInfoEntity userProfileInfoEntity = userProfileInfoRepository.findById(userId)
+    public void saveProfile(UserId userId, UserProfile userProfile) {
+        final UserProfileInfoEntity userProfileInfoEntity = userProfileInfoRepository.findById(userId.value())
                 .orElse(new UserProfileInfoEntity());
-        userProfileInfoRepository.saveAndFlush(userProfileInfoEntity.update(userId, userProfile));
+        userProfileInfoRepository.saveAndFlush(userProfileInfoEntity.update(userId.value(), userProfile));
     }
 
     @Override
     @Transactional
-    public void updateOnboardingCompletionDate(UUID userId, Date date) {
-        onboardingRepository.findById(userId)
+    public void updateOnboardingCompletionDate(UserId userId, Date date) {
+        onboardingRepository.findById(userId.value())
                 .ifPresentOrElse(onboardingEntity -> {
                     onboardingEntity.setCompletionDate(date);
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .userId(userId)
+                            .userId(userId.value())
                             .completionDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
@@ -138,14 +139,14 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date) {
-        onboardingRepository.findById(userId)
+    public void updateTermsAndConditionsAcceptanceDate(UserId userId, Date date) {
+        onboardingRepository.findById(userId.value())
                 .ifPresentOrElse(onboardingEntity -> {
                     onboardingEntity.setTermsAndConditionsAcceptanceDate(date);
                     onboardingRepository.saveAndFlush(onboardingEntity);
                 }, () -> {
                     final OnboardingEntity onboardingEntity = OnboardingEntity.builder()
-                            .userId(userId)
+                            .userId(userId.value())
                             .termsAndConditionsAcceptanceDate(date)
                             .build();
                     onboardingRepository.saveAndFlush(onboardingEntity);
@@ -154,8 +155,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId) {
-        final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId, githubUserId)
+    public void acceptProjectLeaderInvitation(Long githubUserId, ProjectId projectId) {
+        final var invitation = projectLeaderInvitationRepository.findByProjectIdAndGithubUserId(projectId.value(), githubUserId)
                 .orElseThrow(() -> notFound(format("Project leader invitation not found for project" +
                                                    " %s and user %d", projectId, githubUserId)));
 
@@ -163,8 +164,7 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
                 .orElseThrow(() -> notFound(format("User with githubId %d not found", githubUserId)));
 
         projectLeaderInvitationRepository.delete(invitation);
-        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, user.id()));
-        return user.id();
+        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId.value(), user.id().value()));
     }
 
     @Override
@@ -216,8 +216,8 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public void saveProjectLead(UUID userId, UUID projectId) {
-        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId, userId));
+    public void saveProjectLead(UserId userId, ProjectId projectId) {
+        projectLeadRepository.saveAndFlush(new ProjectLeadEntity(projectId.value(), userId.value()));
     }
 
     @Override
@@ -271,32 +271,32 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Long> getGithubUserId(UUID userId) {
-        return userRepository.findById(userId).map(UserEntity::getGithubUserId);
+    public Optional<Long> getGithubUserId(UserId userId) {
+        return userRepository.findById(userId.value()).map(UserEntity::getGithubUserId);
     }
 
     @Override
     @Transactional
-    public void replaceUser(UUID userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
-        userRepository.replaceUserByGithubUser(userId, currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
+    public void replaceUser(UserId userId, Long currentGithubUserId, Long newGithubUserId, String githubLogin, String githubAvatarUrl) {
+        userRepository.replaceUserByGithubUser(userId.value(), currentGithubUserId, newGithubUserId, githubLogin, githubAvatarUrl);
     }
 
     @Override
-    public Optional<NotificationRecipient> findById(NotificationRecipient.Id userId) {
+    public Optional<NotificationRecipient> findById(UserId userId) {
         return userRepository.findById(userId.value()).map(UserEntity::toNotificationRecipient);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId) {
-        return githubUserWithTelegramQueryRepository.findByUserId(userId)
+    public Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UserId userId) {
+        return githubUserWithTelegramQueryRepository.findByUserId(userId.value())
                 .map(GithubUserWithTelegramQueryEntity::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(UUID projectId) {
-        return notificationSettingsForProjectRepository.findAllByProjectIdAndOnGoodFirstIssueAdded(projectId, true).stream()
+    public List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(ProjectId projectId) {
+        return notificationSettingsForProjectRepository.findAllByProjectIdAndOnGoodFirstIssueAdded(projectId.value(), true).stream()
                 .map(NotificationSettingsForProjectEntity::getUserId)
                 .map(UserId::of)
                 .toList();

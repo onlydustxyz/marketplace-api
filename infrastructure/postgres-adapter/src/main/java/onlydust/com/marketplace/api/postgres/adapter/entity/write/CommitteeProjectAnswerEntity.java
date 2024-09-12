@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 
 import jakarta.persistence.*;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectQuestion;
 
@@ -44,8 +46,8 @@ public class CommitteeProjectAnswerEntity {
         return application.answers().stream()
                 .map(projectAnswer -> CommitteeProjectAnswerEntity.builder()
                         .committeeId(committee.id)
-                        .projectId(application.projectId())
-                        .userId(application.userId())
+                        .projectId(application.projectId().value())
+                        .userId(application.userId().value())
                         .questionId(projectAnswer.projectQuestionId().value())
                         .answer(projectAnswer.answer())
                         .committee(committee)
@@ -53,7 +55,9 @@ public class CommitteeProjectAnswerEntity {
     }
 
     public Committee.Application toApplication() {
-        return new Committee.Application(userId, projectId, List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.of(questionId), answer)));
+        return new Committee.Application(UserId.of(userId),
+                ProjectId.of(projectId),
+                List.of(new Committee.ProjectAnswer(ProjectQuestion.Id.of(questionId), answer)));
     }
 
     @EqualsAndHashCode

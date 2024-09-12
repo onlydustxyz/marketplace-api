@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.port.input.ProjectRewardFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectRewardStoragePort;
@@ -18,7 +20,7 @@ public class ProjectRewardService implements ProjectRewardFacadePort {
     private final PermissionService permissionService;
 
     @Override
-    public ProjectBudgetsView getBudgets(UUID projectId, UUID projectLeadId) {
+    public ProjectBudgetsView getBudgets(ProjectId projectId, UserId projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectRewardStoragePort.findBudgets(projectId);
         } else {
@@ -27,7 +29,7 @@ public class ProjectRewardService implements ProjectRewardFacadePort {
     }
 
     @Override
-    public RewardDetailsView getRewardByIdForProjectLead(UUID projectId, UUID rewardId, UUID projectLeadId) {
+    public RewardDetailsView getRewardByIdForProjectLead(ProjectId projectId, UUID rewardId, UserId projectLeadId) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectRewardStoragePort.getProjectReward(rewardId);
         } else {
@@ -36,8 +38,8 @@ public class ProjectRewardService implements ProjectRewardFacadePort {
     }
 
     @Override
-    public Page<RewardItemView> getRewardItemsPageByIdForProjectLead(UUID projectId, UUID rewardId,
-                                                                     UUID projectLeadId, int pageIndex, int pageSize) {
+    public Page<RewardItemView> getRewardItemsPageByIdForProjectLead(ProjectId projectId, UUID rewardId,
+                                                                     UserId projectLeadId, int pageIndex, int pageSize) {
         if (permissionService.isUserProjectLead(projectId, projectLeadId)) {
             return projectRewardStoragePort.getProjectRewardItems(rewardId, pageIndex, pageSize);
         } else {

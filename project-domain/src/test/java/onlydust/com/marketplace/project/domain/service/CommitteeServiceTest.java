@@ -3,6 +3,8 @@ package onlydust.com.marketplace.project.domain.service;
 import com.github.javafaker.Faker;
 import lombok.NonNull;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryAssignment;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
@@ -79,14 +81,14 @@ public class CommitteeServiceTest {
         @Test
         void given_a_committee_not_existing() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
+            final var committeeId = Committee.Id.random();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.empty());
 
             // Then
-            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(UUID.randomUUID(),
-                    UUID.randomUUID(), List.of())))
+            assertThatThrownBy(() -> committeeService.createUpdateApplicationForCommittee(committeeId, new Committee.Application(UserId.random(),
+                    ProjectId.random(), List.of())))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Committee %s was not found".formatted(committeeId.value().toString()));
         }
@@ -94,9 +96,9 @@ public class CommitteeServiceTest {
         @Test
         void given_a_user_not_project_lead() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
@@ -119,9 +121,9 @@ public class CommitteeServiceTest {
         @Test
         void given_a_project_not_existing() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
@@ -145,9 +147,9 @@ public class CommitteeServiceTest {
         @Test
         void given_a_committee_not_open_for_applications() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
@@ -169,9 +171,9 @@ public class CommitteeServiceTest {
 
         @Test
         void given_a_question_not_linked_to_committee() {
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
 
             // When
             when(committeeStoragePort.findById(committeeId)).thenReturn(Optional.of(Committee.builder()
@@ -195,9 +197,9 @@ public class CommitteeServiceTest {
         @Test
         void given_new_application() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
             final ProjectQuestion.Id projectQuestion = ProjectQuestion.Id.random();
             final Committee.Application application = new Committee.Application(userId,
                     projectId, List.of(new Committee.ProjectAnswer(projectQuestion, "A1")));
@@ -227,9 +229,9 @@ public class CommitteeServiceTest {
         @Test
         void given_application_update() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
-            final UUID userId = UUID.randomUUID();
-            final UUID projectId = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var userId = UserId.random();
+            final var projectId = ProjectId.random();
             final Committee.Application application = new Committee.Application(userId,
                     projectId, List.of());
             final Committee.Application oldApplication = new Committee.Application(userId,
@@ -278,8 +280,8 @@ public class CommitteeServiceTest {
                 .votePerJury(1)
                 .sponsorId(UUID.randomUUID())
                 .projectApplications(Map.of(
-                        UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
-                        UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())
+                        ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of()),
+                        ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())
                 ))
                 .build();
 
@@ -414,11 +416,11 @@ public class CommitteeServiceTest {
                 .status(status)
                 .applicationStartDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
-                .juryIds(List.of(UUID.randomUUID(), UUID.randomUUID()))
+                .juryIds(List.of(UserId.random(), UserId.random()))
                 .build();
 
         final var committee = existingCommittee.toBuilder()
-                .juryIds(List.of(UUID.randomUUID(), UUID.randomUUID()))
+                .juryIds(List.of(UserId.random(), UserId.random()))
                 .build();
 
         when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
@@ -474,7 +476,7 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(1)
-                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
+                    .projectApplications(Map.of(ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())))
                     .build();
 
             // When
@@ -489,7 +491,7 @@ public class CommitteeServiceTest {
         @Test
         void given_not_enough_juries_compared_to_projects() {
             // Given
-            final Committee.Id committeeId = Committee.Id.random();
+            final var committeeId = Committee.Id.random();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -497,12 +499,12 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(1)
-                    .juryIds(List.of(UUID.randomUUID()))
+                    .juryIds(List.of(UserId.random()))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
-                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
-                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
-                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of()),
-                            UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
+                    .projectApplications(Map.of(ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of()),
+                            ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of()),
+                            ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of()),
+                            ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())))
                     .build();
 
             // When
@@ -516,7 +518,7 @@ public class CommitteeServiceTest {
 
         @Test
         void given_no_jury_criteria() {
-            final Committee.Id committeeId = Committee.Id.random();
+            final var committeeId = Committee.Id.random();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -524,8 +526,8 @@ public class CommitteeServiceTest {
                     .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                     .status(Committee.Status.OPEN_TO_VOTES)
                     .votePerJury(2)
-                    .juryIds(List.of(UUID.randomUUID()))
-                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
+                    .juryIds(List.of(UserId.random()))
+                    .projectApplications(Map.of(ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())))
                     .build();
 
             // When
@@ -539,8 +541,8 @@ public class CommitteeServiceTest {
 
         @Test
         void given_no_application() {
-            final Committee.Id committeeId = Committee.Id.random();
-            final var jury1 = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var jury1 = UserId.random();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -563,8 +565,8 @@ public class CommitteeServiceTest {
 
         @Test
         void given_1_jury_with_2_votes_for_2_projects() {
-            final Committee.Id committeeId = Committee.Id.random();
-            final var jury1 = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var jury1 = UserId.random();
             final var committee = Committee.builder()
                     .id(committeeId)
                     .name(faker.rickAndMorty().character())
@@ -574,7 +576,7 @@ public class CommitteeServiceTest {
                     .votePerJury(2)
                     .juryIds(List.of(jury1))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
-                    .projectApplications(Map.of(UUID.randomUUID(), new Committee.Application(UUID.randomUUID(), UUID.randomUUID(), List.of())))
+                    .projectApplications(Map.of(ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())))
                     .build();
 
             // When
@@ -590,10 +592,10 @@ public class CommitteeServiceTest {
 
         @Test
         void given_juries_as_project_lead_and_contributor() {
-            final Committee.Id committeeId = Committee.Id.random();
-            final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
-            final var jury1 = UUID.randomUUID();
-            final var jury2 = UUID.randomUUID();
+            final var committeeId = Committee.Id.random();
+            final var projectIds = IntStream.range(0, 10).mapToObj(i -> ProjectId.random()).toList();
+            final var jury1 = UserId.random();
+            final var jury2 = UserId.random();
 
             final var committee = Committee.builder()
                     .id(committeeId)
@@ -604,7 +606,7 @@ public class CommitteeServiceTest {
                     .votePerJury(5)
                     .juryIds(List.of(jury1, jury2))
                     .juryCriteria(List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name())))
-                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UUID.randomUUID(), p, List.of()))))
+                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UserId.random(), p, List.of()))))
                     .build();
 
             // When
@@ -627,11 +629,11 @@ public class CommitteeServiceTest {
         @Test
         void given_enough_juries() {
             final var committeeId = Committee.Id.random();
-            final var projectIds = IntStream.range(0, 10).mapToObj(i -> UUID.randomUUID()).toList();
+            final var projectIds = IntStream.range(0, 10).mapToObj(i -> ProjectId.random()).toList();
             final int votePerJury = 5;
-            final var jury1 = UUID.randomUUID();
-            final var jury2 = UUID.randomUUID();
-            final var jury3 = UUID.randomUUID();
+            final var jury1 = UserId.random();
+            final var jury2 = UserId.random();
+            final var jury3 = UserId.random();
             final var juries = List.of(jury1, jury2, jury3);
             final var juryCriteria = List.of(new JuryCriteria(JuryCriteria.Id.random(), faker.pokemon().name()));
 
@@ -644,7 +646,7 @@ public class CommitteeServiceTest {
                     .votePerJury(votePerJury)
                     .juryIds(juries)
                     .juryCriteria(juryCriteria)
-                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UUID.randomUUID(), p, List.of()))))
+                    .projectApplications(projectIds.stream().collect(toMap(identity(), p -> new Committee.Application(UserId.random(), p, List.of()))))
                     .build();
 
             // When
@@ -708,9 +710,9 @@ public class CommitteeServiceTest {
             // Given
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee.toBuilder().status(Committee.Status.OPEN_TO_VOTES).build()));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
-                    JuryAssignment.virgin(UUID.randomUUID(), committee.id(), UUID.randomUUID(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria()))
+                    JuryAssignment.virgin(UserId.random(), committee.id(), ProjectId.random(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UserId.random(), committee.id(), ProjectId.random(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria())),
+                    JuryAssignment.virgin(UserId.random(), committee.id(), ProjectId.random(), List.of(fakeCriteria(), fakeCriteria(), fakeCriteria()))
             ));
 
             // When
@@ -722,20 +724,20 @@ public class CommitteeServiceTest {
         @Test
         void a_STRK_budget() {
             // Given
-            final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
-            final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
-            final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
-            final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
-            final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+            final var project1 = ProjectId.of("00000000-0000-0000-0000-000000000001");
+            final var project2 = ProjectId.of("00000000-0000-0000-0000-000000000002");
+            final var project3 = ProjectId.of("00000000-0000-0000-0000-000000000003");
+            final var project4 = ProjectId.of("00000000-0000-0000-0000-000000000004");
+            final var project5 = ProjectId.of("00000000-0000-0000-0000-000000000005");
             final var budget = BigDecimal.valueOf(15);
 
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 3)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 4)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 5))
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 3)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 4)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 5))
             ));
 
             // When
@@ -744,7 +746,7 @@ public class CommitteeServiceTest {
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
             verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(STRK), allocationsCaptor.capture());
-            final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
+            final Map<ProjectId, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(3);
             assertThat(allocations.get(project3)).isEqualTo(BigDecimal.valueOf(1.67));
             assertThat(allocations.get(project4)).isEqualTo(BigDecimal.valueOf(5).setScale(2));
@@ -755,20 +757,20 @@ public class CommitteeServiceTest {
         @Test
         void an_ETH_budget() {
             // Given
-            final var project1 = UUID.fromString("00000000-0000-0000-0000-000000000001");
-            final var project2 = UUID.fromString("00000000-0000-0000-0000-000000000002");
-            final var project3 = UUID.fromString("00000000-0000-0000-0000-000000000003");
-            final var project4 = UUID.fromString("00000000-0000-0000-0000-000000000004");
-            final var project5 = UUID.fromString("00000000-0000-0000-0000-000000000005");
+            final var project1 = ProjectId.of("00000000-0000-0000-0000-000000000001");
+            final var project2 = ProjectId.of("00000000-0000-0000-0000-000000000002");
+            final var project3 = ProjectId.of("00000000-0000-0000-0000-000000000003");
+            final var project4 = ProjectId.of("00000000-0000-0000-0000-000000000004");
+            final var project5 = ProjectId.of("00000000-0000-0000-0000-000000000005");
             final var budget = BigDecimal.valueOf(0.1);
 
             when(committeeStoragePort.findById(committee.id())).thenReturn(Optional.of(committee));
             when(committeeStoragePort.findJuryAssignments(committee.id())).thenReturn(List.of(
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 2)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 3)),
-                    JuryAssignment.withVotes(UUID.randomUUID(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 4))
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project1, Map.of(JuryCriteria.Id.random(), 1)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project2, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project3, Map.of(JuryCriteria.Id.random(), 2)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project4, Map.of(JuryCriteria.Id.random(), 3)),
+                    JuryAssignment.withVotes(UserId.random(), committee.id(), project5, Map.of(JuryCriteria.Id.random(), 4))
             ));
 
             // When
@@ -777,7 +779,7 @@ public class CommitteeServiceTest {
             // Then
             final var allocationsCaptor = ArgumentCaptor.forClass(Map.class);
             verify(committeeStoragePort).saveAllocations(eq(committee.id()), eq(ETH), allocationsCaptor.capture());
-            final Map<UUID, BigDecimal> allocations = allocationsCaptor.getValue();
+            final Map<ProjectId, BigDecimal> allocations = allocationsCaptor.getValue();
             assertThat(allocations).hasSize(2);
             assertThat(allocations.get(project4)).isEqualByComparingTo(BigDecimal.valueOf(0.025000));
             assertThat(allocations.get(project5)).isEqualByComparingTo(BigDecimal.valueOf(0.075000));

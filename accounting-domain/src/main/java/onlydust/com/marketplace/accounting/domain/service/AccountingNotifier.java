@@ -44,7 +44,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
         final var reward = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         if (nonNull(reward.recipient().email())) {
-            notificationPort.push(reward.recipient().userId().value(), RewardReceived.builder()
+            notificationPort.push(reward.recipient().userId(), RewardReceived.builder()
                     .contributionCount(reward.githubUrls().size())
                     .sentByGithubLogin(reward.requester().login())
                     .shortReward(ShortReward.builder()
@@ -68,7 +68,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                 .orElseThrow(() -> internalServerError("Reward %s not found".formatted(rewardId)));
 
         if (nonNull(reward.recipient().email())) {
-            notificationPort.push(reward.recipient().userId().value(), RewardCanceled.builder()
+            notificationPort.push(reward.recipient().userId(), RewardCanceled.builder()
                     .shortReward(ShortReward.builder()
                             .amount(reward.money().amount())
                             .currencyCode(reward.money().currency().code().toString())
@@ -114,7 +114,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
                         .build())
                 .toList();
 
-        notificationPort.push(billingProfileAdmin.userId().value(), InvoiceRejected.builder()
+        notificationPort.push(billingProfileAdmin.userId(), InvoiceRejected.builder()
                 .billingProfileId(invoice.billingProfileSnapshot().id().value())
                 .invoiceName(invoice.number().value())
                 .rejectionReason(rejectionReason)
@@ -135,13 +135,13 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private void sendBillingProfileRejectedNotification(BillingProfileVerificationUpdated event) {
         final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
                 .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
-                        .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+                        .formatted(event.getUserId(), event.getBillingProfileId())));
 
         final BillingProfile billingProfile = billingProfileStoragePort.findById(event.getBillingProfileId())
-                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId().value())));
+                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId())));
 
         if (nonNull(owner.email())) {
-            notificationPort.push(owner.userId().value(), BillingProfileVerificationRejected.builder()
+            notificationPort.push(owner.userId(), BillingProfileVerificationRejected.builder()
                     .billingProfileId(event.getBillingProfileId())
                     .billingProfileName(billingProfile.name())
                     .rejectionReason(event.getReviewMessageForApplicant())
@@ -154,13 +154,13 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     private void sendBillingProfileVerificationClosedNotification(BillingProfileVerificationUpdated event) {
         final var owner = billingProfileStoragePort.getBillingProfileOwnerById(event.getUserId())
                 .orElseThrow(() -> internalServerError(("Owner %s not found for billing profile %s")
-                        .formatted(event.getUserId().value(), event.getBillingProfileId().value())));
+                        .formatted(event.getUserId(), event.getBillingProfileId())));
 
         final BillingProfile billingProfile = billingProfileStoragePort.findById(event.getBillingProfileId())
-                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId().value())));
+                .orElseThrow(() -> internalServerError("Billing profile %s not found".formatted(event.getBillingProfileId())));
 
         if (nonNull(owner.email())) {
-            notificationPort.push(owner.userId().value(), BillingProfileVerificationClosed.builder()
+            notificationPort.push(owner.userId(), BillingProfileVerificationClosed.builder()
                     .billingProfileId(event.getBillingProfileId())
                     .billingProfileName(billingProfile.name())
                     .build());
@@ -204,7 +204,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     @Override
     public void onDepositRejected(Deposit.Id depositId) {
         final var deposit = depositStoragePort.find(depositId)
-                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
+                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId)));
 
         projectServicePort.onDepositRejected(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
                 deposit.transaction().timestamp());
@@ -213,7 +213,7 @@ public class AccountingNotifier implements AccountingObserverPort, BillingProfil
     @Override
     public void onDepositApproved(Deposit.Id depositId) {
         final var deposit = depositStoragePort.find(depositId)
-                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
+                .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId)));
 
         projectServicePort.onDepositApproved(deposit.id(), deposit.sponsorId(), deposit.transaction().amount(), deposit.currency().id(),
                 deposit.transaction().timestamp());

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.NotificationRepository;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
@@ -13,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import static java.util.Comparator.comparing;
 
@@ -44,17 +44,17 @@ public class PostgresNotificationAdapter implements NotificationStoragePort {
 
     @Override
     @Transactional
-    public void markAllInAppUnreadAsRead(UUID userId) {
-        notificationRepository.markAllInAppUnreadAsRead(userId);
+    public void markAllInAppUnreadAsRead(UserId userId) {
+        notificationRepository.markAllInAppUnreadAsRead(userId.value());
     }
 
     @Override
-    public void markInAppNotificationsAsUnreadForUser(UUID userId, List<Notification.Id> notificationIds) {
-     notificationRepository.markAllInAppAsUnread(userId, notificationIds.stream().map(UuidWrapper::value).toList());
+    public void markInAppNotificationsAsUnreadForUser(UserId userId, List<Notification.Id> notificationIds) {
+        notificationRepository.markAllInAppAsUnread(userId.value(), notificationIds.stream().map(UuidWrapper::value).toList());
     }
 
     @Override
-    public void markInAppNotificationsAsReadForUser(UUID userId, List<Notification.Id> notificationIds) {
-        notificationRepository.markAllInAppAsRead(userId, notificationIds.stream().map(UuidWrapper::value).toList());
+    public void markInAppNotificationsAsReadForUser(UserId userId, List<Notification.Id> notificationIds) {
+        notificationRepository.markAllInAppAsRead(userId.value(), notificationIds.stream().map(UuidWrapper::value).toList());
     }
 }

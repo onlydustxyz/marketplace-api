@@ -74,8 +74,7 @@ public class ProgramsRestApi implements ProgramsApi {
     public ResponseEntity<Void> updateProgram(UUID programId, UpdateProgramRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        if (!permissionService.isUserSponsorLeadOfProgram(authenticatedUser.id(), ProgramId.of(programId)) &&
-            !permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
+        if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to modify program %s".formatted(authenticatedUser.id(), programId));
 
         programFacadePort.update(programId, request.getName(), request.getUrl(), request.getLogoUrl(),

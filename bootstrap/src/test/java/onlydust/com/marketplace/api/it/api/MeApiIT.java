@@ -198,7 +198,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
         final String jwt = pierre.jwt();
         projectLeadRepository.save(new ProjectLeadEntity(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"),
                 pierre.user().getId()));
-        final UUID projectIdWithoutRepo = UUID.fromString(
+        final var projectIdWithoutRepo = UUID.fromString(
                 "c6940f66-d64e-4b29-9a7f-07abf5c3e0ed");
         projectLeaderInvitationRepository.save(new ProjectLeaderInvitationEntity(UUID.randomUUID(),
                 projectIdWithoutRepo, pierre.user().getGithubUserId()));
@@ -390,7 +390,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
                         faker.rickAndMorty().character(), faker.hacker().verb()));
         accountingService.allocate(sponsorId, programId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
         accountingService.grant(programId, projectId, PositiveAmount.of(100000L), Currency.Id.of(usdc));
-        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId.value());
+        sendRewardToRecipient(authenticatedUser.user().getGithubUserId(), 100L, projectId);
         client.get()
                 .uri(ME)
                 .header("Authorization", "Bearer " + authenticatedUser.jwt())
@@ -583,7 +583,7 @@ public class MeApiIT extends AbstractMarketplaceApiIT {
     }
 
 
-    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId) {
+    private void sendRewardToRecipient(Long recipientId, Long amount, ProjectId projectId) {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(amount))

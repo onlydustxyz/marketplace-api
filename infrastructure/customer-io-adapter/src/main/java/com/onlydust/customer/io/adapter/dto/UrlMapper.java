@@ -1,6 +1,8 @@
 package com.onlydust.customer.io.adapter.dto;
 
-import java.util.UUID;
+import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.Committee;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 
@@ -15,12 +17,12 @@ public interface UrlMapper {
         };
     }
 
-    static String getMarketplaceBillingProfileUrlFromEnvironment(String environment, UUID billingProfileId) {
+    static String getMarketplaceBillingProfileUrlFromEnvironment(String environment, BillingProfile.Id billingProfileId) {
         return getMarketplaceFrontendUrlFromEnvironment(environment) +
                "settings/billing/%s/general-information".formatted(billingProfileId);
     }
 
-    static String getMarketplaceCommitteeApplicationUrlFromEnvironment(String environment, UUID committeeId, UUID projectId) {
+    static String getMarketplaceCommitteeApplicationUrlFromEnvironment(String environment, Committee.Id committeeId, ProjectId projectId) {
         return getMarketplaceFrontendUrlFromEnvironment(environment) + "c/%s/applicant?p=%s".formatted(committeeId, projectId);
     }
 

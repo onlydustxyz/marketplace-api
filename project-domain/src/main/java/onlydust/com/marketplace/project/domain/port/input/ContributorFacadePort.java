@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 import onlydust.com.marketplace.project.domain.model.Contributor;
@@ -15,7 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface ContributorFacadePort {
-    Pair<List<Contributor>, List<Contributor>> searchContributors(UUID projectId, Set<Long> repoIds, String login,
+    Pair<List<Contributor>, List<Contributor>> searchContributors(ProjectId projectId, Set<Long> repoIds, String login,
                                                                   int maxInternalContributorCountToTriggerExternalSearch,
                                                                   int maxInternalContributorCountToReturn,
                                                                   boolean externalSearchOnly,

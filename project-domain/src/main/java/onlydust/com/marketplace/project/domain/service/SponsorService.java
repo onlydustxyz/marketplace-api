@@ -14,7 +14,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -50,7 +49,7 @@ public class SponsorService implements SponsorFacadePort {
     }
 
     @Override
-    public Optional<Sponsor> findById(UUID leadId, SponsorId sponsorId) {
+    public Optional<Sponsor> findById(UserId leadId, SponsorId sponsorId) {
         if (!sponsorStoragePort.isAdmin(leadId, sponsorId))
             throw forbidden("User %s is not allowed to access sponsor %s".formatted(leadId, sponsorId));
 

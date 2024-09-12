@@ -35,7 +35,7 @@ public class AccountingTrackingNotifier implements AccountingObserverPort {
         final var rewardDetailsView = accountingRewardStoragePort.getReward(rewardId)
                 .orElseThrow(() -> internalServerError(("Reward %s not found").formatted(rewardId.value())));
         trackingOutbox.push(new TrackingRewardCreated(
-                rewardDetailsView.project().id().value(),
+                rewardDetailsView.project().id(),
                 rewardDetailsView.recipient().githubUserId().value(),
                 isNull(rewardDetailsView.recipient().userId()) ? null : rewardDetailsView.recipient().userId().value(),
                 rewardDetailsView.requester().githubUserId().value(),
@@ -80,6 +80,6 @@ public class AccountingTrackingNotifier implements AccountingObserverPort {
 
     @Override
     public void onFundsRefundedByProgram(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
-        
+
     }
 }

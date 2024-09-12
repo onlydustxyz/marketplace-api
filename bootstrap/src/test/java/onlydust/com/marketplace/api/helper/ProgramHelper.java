@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProgramEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -83,11 +84,11 @@ public class ProgramHelper {
         return create(sponsorHelper.create().id()).id();
     }
 
-    public ProgramId getByName(String name) {
-        final UUID programId = databaseHelper.executeReadQuery("""
-                select id from programs where name = :name limit 1
+    public Program getByName(String name) {
+        final ProgramEntity program = databaseHelper.executeReadQuery("""
+                select * from programs where name = :name limit 1
                 """, Map.of("name", name));
 
-        return ProgramId.of(programId);
+        return program.toDomain();
     }
 }

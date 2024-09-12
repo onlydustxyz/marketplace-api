@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
 import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
@@ -14,7 +15,6 @@ import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
 import java.util.List;
-import java.util.UUID;
 
 import static java.util.Objects.isNull;
 
@@ -172,8 +172,8 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
     }
 
     public static MailDTO<IssueCreatedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
-                                 @NonNull SendableNotification notification,
-                                 @NonNull GoodFirstIssueCreated goodFirstIssueCreated) {
+                                                @NonNull SendableNotification notification,
+                                                @NonNull GoodFirstIssueCreated goodFirstIssueCreated) {
         final IssueCreatedDTO issueCreatedDTO = IssueCreatedDTO.from(notification.recipient().login(), goodFirstIssueCreated,
                 customerIOProperties.getEnvironment());
         return new MailDTO<>(customerIOProperties.getIssueCreatedEmailId().toString(),
@@ -183,7 +183,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 issueCreatedDTO);
     }
 
-    private static IdentifiersDTO mapIdentifiers(@NonNull String email, UUID id) {
+    private static IdentifiersDTO mapIdentifiers(@NonNull String email, UserId id) {
         return new IdentifiersDTO(isNull(id) ? null : id.toString(), isNull(id) ? email : null);
     }
 

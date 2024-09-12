@@ -2,6 +2,7 @@ package onlydust.com.marketplace.accounting.domain.view;
 
 import lombok.Builder;
 import lombok.Data;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 
 import java.util.Date;
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Builder
 public class BillingProfileRewardView {
     UUID id;
-    UUID projectId;
+    ProjectId projectId;
     Integer numberOfRewardedContributions;
     Date requestedAt;
     Date processedAt;

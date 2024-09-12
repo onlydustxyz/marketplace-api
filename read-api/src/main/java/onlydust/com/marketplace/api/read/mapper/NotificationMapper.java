@@ -153,7 +153,7 @@ public class NotificationMapper {
         NotificationType notificationType;
         notificationType = NotificationType.GLOBAL_BILLING_PROFILE_REMINDER;
         notificationPageItemResponseData.setGlobalBillingProfileReminder(new NotificationGlobalBillingProfileReminder(
-                completeYourBillingProfile.billingProfile().billingProfileId(),
+                completeYourBillingProfile.billingProfile().billingProfileId().value(),
                 completeYourBillingProfile.billingProfile().billingProfileName()
         ));
         return notificationType;
@@ -185,7 +185,7 @@ public class NotificationMapper {
     private @NotNull NotificationType map(GoodFirstIssueCreated goodFirstIssueCreated, NotificationPageItemResponseData notificationPageItemResponseData) {
         NotificationType notificationType;
         notificationType = NotificationType.CONTRIBUTOR_PROJECT_GOOD_FIRST_ISSUE_CREATED;
-        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(goodFirstIssueCreated.getProject().id())
+        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(goodFirstIssueCreated.getProject().id().value())
                 .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(goodFirstIssueCreated.getProject())));
         notificationPageItemResponseData.setContributorProjectGoodFirstIssueCreated(new NotificationContributorProjectGoodFirstIssueCreated(
                 projectLinkReadEntity.name(),
@@ -199,7 +199,7 @@ public class NotificationMapper {
     private @NotNull NotificationType map(ApplicationRefused applicationRefused, NotificationPageItemResponseData notificationPageItemResponseData) {
         NotificationType notificationType;
         notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_REFUSED;
-        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationRefused.getProject().id())
+        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationRefused.getProject().id().value())
                 .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationRefused.getProject())));
         notificationPageItemResponseData.setContributorProjectApplicationRefused(new NotificationContributorProjectApplicationRefused(
                 projectLinkReadEntity.name(),
@@ -213,7 +213,7 @@ public class NotificationMapper {
     private @NotNull NotificationType map(ApplicationAccepted applicationAccepted, NotificationPageItemResponseData notificationPageItemResponseData) {
         NotificationType notificationType;
         notificationType = NotificationType.CONTRIBUTOR_PROJECT_APPLICATION_ACCEPTED;
-        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationAccepted.getProject().id())
+        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationAccepted.getProject().id().value())
                 .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationAccepted.getProject())));
         notificationPageItemResponseData.setContributorProjectApplicationAccepted(new NotificationContributorProjectApplicationAccepted(
                 projectLinkReadEntity.name(),
@@ -227,7 +227,7 @@ public class NotificationMapper {
     private @NotNull NotificationType map(ApplicationToReview applicationToReview, NotificationPageItemResponseData notificationPageItemResponseData) {
         NotificationType notificationType;
         notificationType = NotificationType.MAINTAINER_APPLICATION_TO_REVIEW;
-        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationToReview.getProject().id())
+        final ProjectLinkReadEntity projectLinkReadEntity = projectLinkReadRepository.findById(applicationToReview.getProject().id().value())
                 .orElseThrow(() -> internalServerError(("Project %s must exist").formatted(applicationToReview.getProject())));
         notificationPageItemResponseData.setMaintainerApplicationToReview(new NotificationMaintainerApplicationToReview(
                 projectLinkReadEntity.slug(),
@@ -292,7 +292,7 @@ public class NotificationMapper {
         NotificationType notificationType;
         notificationPageItemResponseData.setMaintainerCommitteeApplicationCreated(new NotificationMaintainerCommitteeApplicationCreated()
                 .committeeName(committeeApplicationCreated.getCommitteeName())
-                .committeeId(committeeApplicationCreated.getCommitteeId())
+                .committeeId(committeeApplicationCreated.getCommitteeId().value())
         );
         notificationType = NotificationType.MAINTAINER_COMMITTEE_APPLICATION_CREATED;
         return notificationType;

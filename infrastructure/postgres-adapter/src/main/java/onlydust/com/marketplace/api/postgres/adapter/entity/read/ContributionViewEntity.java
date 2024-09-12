@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.read;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import onlydust.com.marketplace.project.domain.view.ContributorLinkView;
@@ -81,7 +82,7 @@ public class ContributionViewEntity {
 
     public ContributionView toView() {
         final var project = Project.builder()
-                .id(projectId)
+                .id(ProjectId.of(projectId))
                 .slug(projectKey)
                 .name(projectName)
                 .shortDescription(projectShortDescription)

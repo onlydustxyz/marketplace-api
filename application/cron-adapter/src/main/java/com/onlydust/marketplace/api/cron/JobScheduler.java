@@ -7,6 +7,8 @@ import onlydust.com.marketplace.accounting.domain.port.in.BillingProfileFacadePo
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.RewardStatusService;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.job.ApplicationsCleaner;
 import onlydust.com.marketplace.project.domain.job.GoodFirstIssueCreatedNotifierJob;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
@@ -99,7 +101,8 @@ public class JobScheduler {
     @Scheduled(cron = "${application.cron.boost-rewards-cron-expression}")
     public void boostNodeGuardianRewards() {
         LOGGER.info("Boost rewards for NodeGuardians");
-        boostNodeGuardiansRewardsPort.boostProject(nodeGuardiansBoostProperties.getProjectId(), nodeGuardiansBoostProperties.getProjectLeadId(),
+        boostNodeGuardiansRewardsPort.boostProject(ProjectId.of(nodeGuardiansBoostProperties.getProjectId()),
+                UserId.of(nodeGuardiansBoostProperties.getProjectLeadId()),
                 nodeGuardiansBoostProperties.getGithubRepoId(), nodeGuardiansBoostProperties.getEcosystemId());
     }
 

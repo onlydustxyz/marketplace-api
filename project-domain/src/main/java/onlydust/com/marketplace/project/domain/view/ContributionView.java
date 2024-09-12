@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.view;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ContributionStatus;
 import onlydust.com.marketplace.project.domain.model.ContributionType;
 import onlydust.com.marketplace.project.domain.model.GithubRepo;
@@ -43,7 +44,7 @@ public class ContributionView {
     @Builder
     public static class Filters {
         @Builder.Default
-        List<UUID> projects = List.of();
+        List<ProjectId> projects = List.of();
         @Builder.Default
         List<Long> contributors = List.of();
         @Builder.Default

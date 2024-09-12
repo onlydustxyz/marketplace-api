@@ -1,5 +1,7 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.view.*;
@@ -9,30 +11,30 @@ import java.util.*;
 
 public interface ProjectStoragePort {
 
-    Optional<Project> getById(UUID projectId);
+    Optional<Project> getById(ProjectId projectId);
 
-    void createProject(UUID projectId, String slug, String name, String shortDescription, String longDescription,
+    void createProject(ProjectId projectId, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
-                       List<Long> githubRepoIds, UUID firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
+                       List<Long> githubRepoIds, UserId firstProjectLeaderId, List<Long> githubUserIdsAsProjectLeads,
                        ProjectVisibility visibility
             , String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds, List<UUID> categoryIds, List<String> categorySuggestions,
                        boolean botNotifyExternalApplications);
 
-    void updateProject(UUID id, String slug, String name, String shortDescription, String longDescription,
+    void updateProject(ProjectId id, String slug, String name, String shortDescription, String longDescription,
                        Boolean isLookingForContributors, List<NamedLink> moreInfos,
                        List<Long> githubRepoIds, List<Long> githubUserIdsAsProjectLeadersToInvite,
-                       List<UUID> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds,
+                       List<UserId> projectLeadersToKeep, String imageUrl, ProjectRewardSettings rewardSettings, List<UUID> ecosystemIds,
                        List<UUID> categoryIds, List<String> categorySuggestions);
 
-    List<UUID> getProjectLeadIds(UUID projectId);
+    List<UserId> getProjectLeadIds(ProjectId projectId);
 
-    Set<Long> getProjectInvitedLeadIds(UUID projectId);
+    Set<Long> getProjectInvitedLeadIds(ProjectId projectId);
 
-    Set<Long> getProjectRepoIds(UUID projectId);
+    Set<Long> getProjectRepoIds(ProjectId projectId);
 
-    List<ProjectOrganizationView> getProjectOrganizations(UUID projectId);
+    List<ProjectOrganizationView> getProjectOrganizations(ProjectId projectId);
 
-    Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(UUID projectId,
+    Page<RewardableItemView> getProjectRewardableItemsByTypeForProjectLeadAndContributorId(ProjectId projectId,
                                                                                            ContributionType contributionType,
                                                                                            ContributionStatus contributionStatus,
                                                                                            Long githubUserid,
@@ -40,41 +42,41 @@ public interface ProjectStoragePort {
                                                                                            String search,
                                                                                            Boolean includeIgnoredItems);
 
-    Optional<UUID> getProjectIdBySlug(String slug);
+    Optional<ProjectId> getProjectIdBySlug(String slug);
 
     RewardableItemView getRewardableIssue(String repoOwner, String repoName, long issueNumber);
 
     RewardableItemView getRewardablePullRequest(String repoOwner, String repoName, long pullRequestNumber);
 
-    boolean hasUserAccessToProject(UUID projectId, UUID userId);
+    boolean hasUserAccessToProject(ProjectId projectId, UserId userId);
 
-    boolean hasUserAccessToProject(String projectSlug, UUID userId);
+    boolean hasUserAccessToProject(String projectSlug, UserId userId);
 
     void updateProjectsRanking();
 
-    Page<ChurnedContributorView> getChurnedContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+    Page<ChurnedContributorView> getChurnedContributors(ProjectId projectId, Integer pageIndex, Integer pageSize);
 
-    Page<NewcomerView> getNewcomers(UUID projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize);
+    Page<NewcomerView> getNewcomers(ProjectId projectId, ZonedDateTime since, Integer pageIndex, Integer pageSize);
 
-    Page<ContributorActivityView> getMostActivesContributors(UUID projectId, Integer pageIndex, Integer pageSize);
+    Page<ContributorActivityView> getMostActivesContributors(ProjectId projectId, Integer pageIndex, Integer pageSize);
 
-    void hideContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+    void hideContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId);
 
-    void showContributorForProjectLead(UUID projectId, UUID projectLeadId, Long contributorGithubUserId);
+    void showContributorForProjectLead(ProjectId projectId, UserId projectLeadId, Long contributorGithubUserId);
 
     void updateProjectsTags(Date now);
 
-    boolean exists(UUID projectId);
+    boolean exists(ProjectId projectId);
 
-    ProjectInfosView getProjectInfos(UUID projectId);
+    ProjectInfosView getProjectInfos(ProjectId projectId);
 
-    List<UUID> getProjectLedIdsForUser(UUID userId);
+    List<ProjectId> getProjectLedIdsForUser(UserId userId);
 
-    List<UUID> getProjectContributedOnIdsForUser(UUID userId);
+    List<ProjectId> getProjectContributedOnIdsForUser(UserId userId);
 
-    List<UUID> findProjectIdsByRepoId(Long repoId);
+    List<ProjectId> findProjectIdsByRepoId(Long repoId);
 
-    List<ProjectCategorySuggestion> getProjectCategorySuggestions(UUID projectId);
+    List<ProjectCategorySuggestion> getProjectCategorySuggestions(ProjectId projectId);
 
     void refreshRecommendations();
 

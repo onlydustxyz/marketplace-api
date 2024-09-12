@@ -1,6 +1,8 @@
 package onlydust.com.marketplace.project.domain.port.input;
 
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
@@ -24,9 +26,9 @@ public interface CommitteeFacadePort {
 
     void createUpdateApplicationForCommittee(Committee.Id committeeId, Committee.Application application);
 
-    void vote(UUID juryId, Committee.Id committeeId, UUID projectId, Map<JuryCriteria.Id, Integer> scores);
+    void vote(UserId juryId, Committee.Id committeeId, ProjectId projectId, Map<JuryCriteria.Id, Integer> scores);
 
     void allocate(Committee.Id committeeId, UUID currencyId, BigDecimal budget, int precision);
 
-    void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<UUID, BigDecimal> projectAllocations);
+    void saveAllocations(Committee.Id committeeId, UUID currencyId, Map<ProjectId, BigDecimal> projectAllocations);
 }

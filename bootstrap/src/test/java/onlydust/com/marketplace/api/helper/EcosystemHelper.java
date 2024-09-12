@@ -6,15 +6,10 @@ import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-import java.util.UUID;
-
 @Service
 public class EcosystemHelper {
     @Autowired
     private BackofficeFacadePort backofficeFacadePort;
-    @Autowired
-    private DatabaseHelper databaseHelper;
 
     private final Faker faker = new Faker();
 
@@ -30,11 +25,5 @@ public class EcosystemHelper {
         backofficeFacadePort.createEcosystem(ecosystem);
 
         return ecosystem;
-    }
-
-    public UUID getByName(String name) {
-        return databaseHelper.executeReadQuery("""
-                select id from ecosystems where name = :name limit 1
-                """, Map.of("name", name));
     }
 }

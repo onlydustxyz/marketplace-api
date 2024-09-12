@@ -3,6 +3,7 @@ package onlydust.com.marketplace.project.domain.model;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UuidWrapper;
 
 import java.time.ZonedDateTime;
@@ -15,7 +16,7 @@ public class Application {
     @NonNull
     private final Id id;
     @NonNull
-    private final UUID projectId;
+    private final ProjectId projectId;
     @NonNull
     private final Long applicantId;
     @NonNull
@@ -43,7 +44,7 @@ public class Application {
         }
     }
 
-    public static Application fromMarketplace(@NonNull UUID projectId,
+    public static Application fromMarketplace(@NonNull ProjectId projectId,
                                               @NonNull Long applicantId,
                                               @NonNull GithubIssue.Id issueId,
                                               @NonNull GithubComment.Id commentId,
@@ -60,7 +61,7 @@ public class Application {
                 problemSolvingApproach);
     }
 
-    public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull UUID projectId) {
+    public static Application fromGithubComment(@NonNull GithubComment comment, @NonNull ProjectId projectId) {
         return new Application(Id.random(),
                 projectId,
                 comment.authorId(),

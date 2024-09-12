@@ -60,7 +60,7 @@ public class RewardItemEntity {
 
     public static List<RewardItemEntity> of(Reward reward) {
         return reward.rewardItems().stream().map(item -> RewardItemEntity.builder()
-                .rewardId(reward.id())
+                .rewardId(reward.id().value())
                 .number(item.number())
                 .repoId(item.repoId())
                 .id(item.id())
@@ -69,7 +69,7 @@ public class RewardItemEntity {
                     case PULL_REQUEST -> ContributionType.PULL_REQUEST;
                     case CODE_REVIEW -> ContributionType.CODE_REVIEW;
                 })
-                .projectId(reward.projectId())
+                .projectId(reward.projectId().value())
                 .recipientId(reward.recipientId())
                 .build()).toList();
     }

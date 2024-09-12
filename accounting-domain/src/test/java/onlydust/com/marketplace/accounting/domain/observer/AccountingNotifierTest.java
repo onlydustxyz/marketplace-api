@@ -122,7 +122,7 @@ public class AccountingNotifierTest {
 
             // Then
             final var notificationPushCaptor = ArgumentCaptor.forClass(RewardReceived.class);
-            verify(notificationPort).push(eq(recipient.userId().value()), notificationPushCaptor.capture());
+            verify(notificationPort).push(eq(recipient.userId()), notificationPushCaptor.capture());
             assertThat(notificationPushCaptor.getValue().contributionCount()).isEqualTo(1);
             assertThat(notificationPushCaptor.getValue().sentByGithubLogin()).isEqualTo(requester.login());
             assertThat(notificationPushCaptor.getValue().shortReward().getAmount()).isEqualTo(moneyView.amount());
@@ -168,7 +168,7 @@ public class AccountingNotifierTest {
 
             // Then
             final var notificationCaptor = ArgumentCaptor.forClass(RewardCanceled.class);
-            verify(notificationPort).push(eq(recipientId.value()), notificationCaptor.capture());
+            verify(notificationPort).push(eq(recipientId), notificationCaptor.capture());
             final var notification = notificationCaptor.getValue();
             assertThat(notification.shortReward().getId()).isEqualTo(rewardId);
             assertThat(notification.shortReward().getProjectName()).isEqualTo(projectName);
@@ -291,7 +291,7 @@ public class AccountingNotifierTest {
 
             // Then
             final var rejectedArgumentCaptor = ArgumentCaptor.forClass(InvoiceRejected.class);
-            verify(notificationPort).push(eq(invoiceCreator.userId().value()), rejectedArgumentCaptor.capture());
+            verify(notificationPort).push(eq(invoiceCreator.userId()), rejectedArgumentCaptor.capture());
             assertThat(rejectedArgumentCaptor.getValue().rejectionReason()).isEqualTo("Invalid invoice");
             assertThat(rejectedArgumentCaptor.getValue().invoiceName()).isEqualTo(invoice.number().value());
             assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getProjectName()).isEqualTo(invoice.rewards().get(0).projectName());
@@ -319,10 +319,10 @@ public class AccountingNotifierTest {
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
                     VerificationType.KYC, VerificationStatus.CLOSED, null, UserId.random(), null, faker.rickAndMorty().character(), null,
                     faker.rickAndMorty().location());
-            final UUID userId = UUID.randomUUID();
+            final UserId userId = UserId.random();
             final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
                     faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.of(userId), faker.internet().emailAddress());
+                    userId, faker.internet().emailAddress());
             final Kyc kyc =
                     Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
                             .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();
@@ -359,10 +359,10 @@ public class AccountingNotifierTest {
             final BillingProfileVerificationUpdated billingProfileVerificationUpdated = new BillingProfileVerificationUpdated(kybId, billingProfileId,
                     VerificationType.KYC, VerificationStatus.REJECTED, faker.lorem().sentence(), UserId.random(), null, faker.rickAndMorty().character(), null,
                     faker.rickAndMorty().location());
-            final UUID userId = UUID.randomUUID();
+            final UserId userId = UserId.random();
             final ShortContributorView shortContributorView = new ShortContributorView(GithubUserId.of(faker.number().randomNumber(10, true)),
                     faker.rickAndMorty().character(), faker.gameOfThrones().character(),
-                    UserId.of(userId), faker.internet().emailAddress());
+                    userId, faker.internet().emailAddress());
             final Kyc kyc =
                     Kyc.builder().id(billingProfileVerificationUpdated.getVerificationId())
                             .billingProfileId(billingProfileId).status(VerificationStatus.VERIFIED).ownerId(UserId.random()).build();

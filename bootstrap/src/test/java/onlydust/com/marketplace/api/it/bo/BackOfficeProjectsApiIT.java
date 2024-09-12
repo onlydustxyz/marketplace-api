@@ -43,7 +43,7 @@ public class BackOfficeProjectsApiIT extends AbstractMarketplaceBackOfficeApiIT 
 
     private void allocateBudgetToProject() {
         final var sponsorId = sponsorHelper.create().id();
-        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
         final SponsorAccountStatement strkSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(sponsorId,
                 Currency.Id.of(CurrencyHelper.STRK.value()), null,
                 new SponsorAccount.Transaction(ZonedDateTime.now(), SponsorAccount.Transaction.Type.DEPOSIT, Network.ETHEREUM, faker.random().hex(),

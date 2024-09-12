@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
 import onlydust.com.marketplace.kernel.model.notification.NotificationData;
@@ -17,7 +18,6 @@ import onlydust.com.marketplace.user.domain.port.output.NotificationStoragePort;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.mockito.Mockito.*;
 
@@ -34,13 +34,13 @@ class NotificationServiceTest {
     @Test
     void push() {
         // Given
-        final var recipientId = UUID.randomUUID();
+        final var recipientId = UserId.random();
 
         // When
         when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.CONTRIBUTOR_REWARD))
                 .thenReturn(List.of(NotificationChannel.EMAIL));
-        when(userStoragePort.findById(NotificationRecipient.Id.of(recipientId)))
-                .thenReturn(java.util.Optional.of(new NotificationRecipient(NotificationRecipient.Id.of(recipientId), "foo@bar.baz", "foo")));
+        when(userStoragePort.findById(recipientId))
+                .thenReturn(java.util.Optional.of(new NotificationRecipient(recipientId, "foo@bar.baz", "foo")));
         final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD));
 
         // Then
@@ -52,13 +52,13 @@ class NotificationServiceTest {
     @Test
     void should_push_even_when_email_fails() {
         // Given
-        final var recipientId = UUID.randomUUID();
+        final var recipientId = UserId.random();
 
         // When
         when(notificationSettingsStoragePort.getNotificationChannels(recipientId, NotificationCategory.CONTRIBUTOR_REWARD))
                 .thenReturn(List.of(NotificationChannel.EMAIL));
-        when(userStoragePort.findById(NotificationRecipient.Id.of(recipientId)))
-                .thenReturn(java.util.Optional.of(new NotificationRecipient(NotificationRecipient.Id.of(recipientId), "foo@bar.baz", "foo")));
+        when(userStoragePort.findById(recipientId))
+                .thenReturn(java.util.Optional.of(new NotificationRecipient(recipientId, "foo@bar.baz", "foo")));
         doThrow(new RuntimeException("Email sending failed")).when(notificationEmailSender).send(any(SendableNotification.class));
         final var notification = notificationService.push(recipientId, new TestNotification(1, NotificationCategory.CONTRIBUTOR_REWARD));
 

@@ -185,7 +185,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                 .jsonPath("$.categories[1].name").isEqualTo("Tutorial")
                 .jsonPath("$.categorySuggestions[0]").isEqualTo("finance");
 
-        verify(slackApiAdapter).onProjectCategorySuggested("finance", user.user().getId());
+        verify(slackApiAdapter).onProjectCategorySuggested("finance", user.userId());
 
         final var entity = projectRepository.findById(projectId).orElseThrow();
         assertThat(entity.isBotNotifyExternalApplications()).isTrue();
@@ -333,7 +333,7 @@ public class ProjectCreateUpdateIT extends AbstractMarketplaceApiIT {
                         }
                         """))
         );
-        verify(slackApiAdapter).onProjectCategorySuggested("defi", user.user().getId());
+        verify(slackApiAdapter).onProjectCategorySuggested("defi", user.userId());
 
         final var entity = projectRepository.findById(projectId).orElseThrow();
         assertThat(entity.isBotNotifyExternalApplications()).isTrue();

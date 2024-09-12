@@ -22,7 +22,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.signUpUser(1L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         // When
@@ -39,7 +39,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     void should_get_reward_given_a_project_lead() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         final var billingProfile = billingProfileRepository.findById(UUID.fromString("20282367-56b0-42d3-81d3-5e4b38f67e3e")).orElseThrow();
@@ -106,7 +106,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
         // Given
         final String jwt = userAuthHelper.signUpUser(2L, faker.rickAndMorty().location(),
                 faker.internet().url(), false).jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         // When
@@ -123,7 +123,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     void should_return_pagination_reward_items_given_a_project_lead() {
         // Given
         final String jwt = userAuthHelper.authenticatePierre().jwt();
-        final UUID projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
+        final var projectId = UUID.fromString("f39b827f-df73-498c-8853-99bc3f562723");
         final UUID rewardId = UUID.fromString("85f8358c-5339-42ac-a577-16d7760d1e28");
 
         // When
@@ -232,7 +232,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     void should_return_reward_items_when_they_are_not_related_to_any_contribution() {
         // Given
         final String jwt = userAuthHelper.authenticateGregoire().jwt();
-        final UUID projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+        final var projectId = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
         final UUID rewardId = UUID.fromString("4ccf3463-c77d-42cd-85f3-b393901a89c1");
 
         // When
@@ -281,7 +281,7 @@ public class ProjectsGetRewardApiIT extends AbstractMarketplaceApiIT {
     void should_return_reward_items_with_null_contributionId_when_contribution_belongs_to_another_project() {
         // Given
         final String jwt = userAuthHelper.authenticateUser(21149076L).jwt();
-        final UUID projectId = UUID.fromString("6d955622-c1ce-4227-85ea-51cb1b3207b1");
+        final var projectId = UUID.fromString("6d955622-c1ce-4227-85ea-51cb1b3207b1");
         final UUID rewardId = UUID.fromString("f4b7c3e4-4a45-47c7-bcba-87d6d767c3de");
 
         // When

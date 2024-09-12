@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.ContributorSearchRes
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.SortDirectionMapper;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.port.input.ContributorFacadePort;
 import onlydust.com.marketplace.project.domain.view.ContributionView;
 import org.springframework.context.annotation.Profile;
@@ -49,7 +50,7 @@ public class UsersRestApi implements UsersApi {
                                                                         Boolean externalSearchOnly,
                                                                         Boolean internalSearchOnly) {
         final var contributors = contributorFacadePort.searchContributors(
-                projectId,
+                projectId == null ? null : ProjectId.of(projectId),
                 repoIds != null ? new HashSet<>(repoIds) : null,
                 login,
                 maxInternalContributorCountToTriggerExternalSearch != null ?
@@ -88,7 +89,7 @@ public class UsersRestApi implements UsersApi {
 
         final var filters = ContributionView.Filters.builder()
                 .contributors(List.of(githubUserId))
-                .projects(Optional.ofNullable(projects).orElse(List.of()))
+                .projects(Optional.ofNullable(projects).orElse(List.of()).stream().map(ProjectId::of).toList())
                 .repos(Optional.ofNullable(repositories).orElse(List.of()))
                 .types(Optional.ofNullable(types).orElse(List.of()).stream().map(ContributionMapper::mapContributionType).toList())
                 .statuses(Optional.ofNullable(statuses).orElse(List.of()).stream().map(ContributionMapper::mapContributionStatus).toList())

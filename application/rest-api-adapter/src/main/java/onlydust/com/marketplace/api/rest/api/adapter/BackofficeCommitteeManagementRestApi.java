@@ -8,6 +8,7 @@ import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeCommitteeMapper;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.pagination.PaginationHelper;
 import onlydust.com.marketplace.project.domain.model.Committee;
@@ -74,7 +75,7 @@ public class BackofficeCommitteeManagementRestApi implements BackOfficeCommittee
     public ResponseEntity<Void> updateProjectAllocations(UUID committeeId, CommitteeBudgetAllocationsUpdateRequest request) {
         committeeFacadePort.saveAllocations(Committee.Id.of(committeeId), request.getCurrencyId(),
                 request.getAllocations().stream().collect(toMap(
-                        CommitteeProjectAllocationRequest::getProjectId,
+                        r -> ProjectId.of(r.getProjectId()),
                         CommitteeProjectAllocationRequest::getAmount)));
         return noContent().build();
     }

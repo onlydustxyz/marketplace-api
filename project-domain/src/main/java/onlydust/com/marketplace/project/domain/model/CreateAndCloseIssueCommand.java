@@ -2,14 +2,14 @@ package onlydust.com.marketplace.project.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.UUID;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 
 @Data
 @Builder(toBuilder = true)
 public class CreateAndCloseIssueCommand {
-    UUID projectId;
-    UUID projectLeadId;
+    ProjectId projectId;
+    UserId projectLeadId;
     Long githubRepoId;
     String title;
     String description;

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.observer;
 
 import com.github.javafaker.Faker;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.project.domain.model.*;
 import onlydust.com.marketplace.project.domain.port.output.GithubApiPort;
@@ -17,7 +18,6 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +54,7 @@ class GithubIssueCommenterTest {
 
         private final Application application = new Application(
                 Application.Id.random(),
-                UUID.randomUUID(),
+                ProjectId.random(),
                 faker.number().randomNumber(10, true),
                 Application.Origin.MARKETPLACE,
                 faker.date().birthday().toInstant().atZone(ZoneOffset.UTC),
@@ -95,10 +95,10 @@ class GithubIssueCommenterTest {
                 faker.lordOfTheRings().location(),
                 faker.lorem().sentence(),
                 List.of()
-                );
+        );
 
         final Project project = Project.builder()
-                .id(UUID.randomUUID())
+                .id(ProjectId.random())
                 .name(faker.lorem().word())
                 .slug(faker.internet().slug())
                 .botNotifyExternalApplications(true)

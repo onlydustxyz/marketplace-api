@@ -3,7 +3,6 @@ package onlydust.com.marketplace.accounting.domain.service;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
-import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.notification.RewardsPaid;
@@ -16,6 +15,7 @@ import onlydust.com.marketplace.accounting.domain.view.EarningsView;
 import onlydust.com.marketplace.accounting.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.accounting.domain.view.ShortContributorView;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.RewardStatus;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 
@@ -74,7 +74,7 @@ public class RewardService implements AccountingRewardPort {
         for (final var listOfPaidRewardsMapToAdminEmail : rewardViews.stream().collect(groupingBy(rewardView -> rewardView.recipient().email())).entrySet()) {
             final ShortContributorView recipient = listOfPaidRewardsMapToAdminEmail.getValue().get(0).recipient();
 
-            notificationPort.push(recipient.userId().value(),
+            notificationPort.push(recipient.userId(),
                     RewardsPaid.builder()
                             .shortRewards(listOfPaidRewardsMapToAdminEmail.getValue().stream()
                                     .map(rewardDetailsView -> ShortReward.builder().

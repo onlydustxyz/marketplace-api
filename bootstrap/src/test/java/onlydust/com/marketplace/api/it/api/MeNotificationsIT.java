@@ -15,6 +15,7 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
+import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationDetailedIssue;
@@ -22,7 +23,6 @@ import onlydust.com.marketplace.project.domain.model.notification.dto.Notificati
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
 import onlydust.com.marketplace.user.domain.job.NotificationSummaryEmailJob;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.service.NotificationService;
 import onlydust.com.marketplace.user.domain.service.NotificationSettingsService;
@@ -51,7 +51,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
     NotificationService notificationService;
     @Autowired
     NotificationSettingsService notificationSettingsService;
-    private final UUID bretzel = UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56");
+    private final ProjectId bretzel = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
 
     @Test
     @Order(1)
@@ -59,84 +59,84 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
         // Given
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
-        projectHelper.updateVisibility(ProjectId.of(bretzel), ProjectVisibility.PRIVATE);
+        projectHelper.updateVisibility(bretzel, ProjectVisibility.PRIVATE);
         final var sponsor = sponsorHelper.create();
         final var program = programHelper.create(sponsor.id());
 
-        notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
+        notificationService.push(hayden.userId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())
-                .committeeId(UUID.fromString("0d95a6d2-13c7-45a5-817e-2fd83111dd6a"))
-                .projectId(UUID.randomUUID())
+                .committeeId(Committee.Id.of("0d95a6d2-13c7-45a5-817e-2fd83111dd6a"))
+                .projectId(ProjectId.random())
                 .projectName("committeeProject1")
                 .committeeName("committee1")
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationToReview.builder()
+        notificationService.push(hayden.userId(), ApplicationToReview.builder()
                 .issue(new NotificationIssue(1L, faker.internet().url(), "issue1", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "aaa", "AaA"))
-                .user(new NotificationUser(hayden.user().getId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
+                .user(new NotificationUser(hayden.userId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
                 .build());
-        notificationService.push(hayden.user().getId(), InvoiceRejected.builder()
+        notificationService.push(hayden.userId(), InvoiceRejected.builder()
                 .billingProfileId(UUID.fromString("9c003b18-81f4-40ee-827b-b2046c07d056"))
                 .invoiceName("invoice1")
                 .rejectionReason("rejectionReason1")
                 .rewards(List.of(shortRewardStub(23, "USD"), shortRewardStub(56, "STRK")))
                 .build());
-        notificationService.push(hayden.user().getId(), RewardCanceled.builder()
+        notificationService.push(hayden.userId(), RewardCanceled.builder()
                 .shortReward(shortRewardStub(11.1, "USD"))
                 .build());
-        notificationService.push(hayden.user().getId(), RewardReceived.builder()
+        notificationService.push(hayden.userId(), RewardReceived.builder()
                 .contributionCount(3)
                 .sentByGithubLogin("projectLead1")
                 .shortReward(shortRewardStub(22.2, "USDC"))
                 .build());
-        notificationService.push(hayden.user().getId(), RewardsPaid.builder()
+        notificationService.push(hayden.userId(), RewardsPaid.builder()
                 .shortRewards(List.of(shortRewardStub(24, "USD"), shortRewardStub(25, "STRK")))
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationAccepted.builder()
+        notificationService.push(hayden.userId(), ApplicationAccepted.builder()
                 .issue(new NotificationIssue(1L, faker.internet().url(), "title1", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "bbb", "bBb"))
                 .build());
-        notificationService.push(hayden.user().getId(), BillingProfileVerificationClosed.builder()
+        notificationService.push(hayden.userId(), BillingProfileVerificationClosed.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("a805e770-104b-4010-b849-cbf90b93ccf4")))
                 .billingProfileName("bpHaydenClosed")
                 .build());
-        notificationService.push(hayden.user().getId(), BillingProfileVerificationRejected.builder()
+        notificationService.push(hayden.userId(), BillingProfileVerificationRejected.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("9222c39d-7c85-4cc4-8089-c1830bc457b0")))
                 .billingProfileName("bpPierreRejected")
                 .rejectionReason("rejectionReason1")
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationRefused.builder()
+        notificationService.push(hayden.userId(), ApplicationRefused.builder()
                 .issue(new NotificationIssue(2L, faker.internet().url(), "title2", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "bbb", "bBb"))
                 .build());
-        notificationService.push(hayden.user().getId(), GoodFirstIssueCreated.builder()
+        notificationService.push(hayden.userId(), GoodFirstIssueCreated.builder()
                 .project(new NotificationProject(bretzel, "bbb", "bBb"))
                 .issue(new NotificationDetailedIssue(1111L, faker.internet().url(), "gfi-1", faker.rickAndMorty().character(), null, faker.pokemon().name(),
                         faker.internet().url(), List.of()))
                 .build());
-        notificationService.push(hayden.user().getId(), FundsAllocatedToProgram.builder()
+        notificationService.push(hayden.userId(), FundsAllocatedToProgram.builder()
                 .amount(BigDecimal.valueOf(100))
                 .currencyId(CurrencyHelper.USDC.value())
                 .programId(program.id())
                 .sponsorId(sponsor.id())
                 .build());
-        notificationService.push(hayden.user().getId(), FundsUnallocatedFromProgram.builder()
+        notificationService.push(hayden.userId(), FundsUnallocatedFromProgram.builder()
                 .amount(BigDecimal.valueOf(99))
                 .currencyId(CurrencyHelper.STRK.value())
                 .programId(program.id())
                 .sponsorId(sponsor.id())
                 .build());
-        notificationService.push(hayden.user().getId(), DepositRejected.builder()
+        notificationService.push(hayden.userId(), DepositRejected.builder()
                 .amount(BigDecimal.valueOf(30000))
                 .currencyId(CurrencyHelper.STRK.value())
                 .sponsorId(sponsor.id())
                 .timestamp(ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, UTC))
                 .depositId(UUID.fromString("f216c7ad-1875-49a2-a8a8-c65b2d6d0675"))
                 .build());
-        notificationService.push(hayden.user().getId(), DepositApproved.builder()
+        notificationService.push(hayden.userId(), DepositApproved.builder()
                 .amount(BigDecimal.valueOf(40000))
                 .currencyId(CurrencyHelper.ETH.value())
                 .sponsorId(sponsor.id())
@@ -905,59 +905,59 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
         final UserAuthHelper.AuthenticatedUser hayden = userAuthHelper.authenticateHayden();
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
 
-        notificationSettingsService.updateNotificationSettings(NotificationRecipient.Id.of(pierre.user().getId()), inAppAndSummaryEmailSettings());
-        notificationSettingsService.updateNotificationSettings(NotificationRecipient.Id.of(hayden.user().getId()), inAppAndSummaryEmailSettings());
+        notificationSettingsService.updateNotificationSettings(pierre.userId(), inAppAndSummaryEmailSettings());
+        notificationSettingsService.updateNotificationSettings(hayden.userId(), inAppAndSummaryEmailSettings());
 
-        notificationService.push(hayden.user().getId(), CommitteeApplicationCreated.builder()
+        notificationService.push(hayden.userId(), CommitteeApplicationCreated.builder()
                 .applicationEndDate(ZonedDateTime.now())
-                .committeeId(UUID.fromString("8be639e3-86e1-4a8f-a790-e8fef6a78f74"))
-                .projectId(UUID.fromString("dd227344-b2ab-471f-88be-ad9c3a4dd72b"))
+                .committeeId(Committee.Id.of("8be639e3-86e1-4a8f-a790-e8fef6a78f74"))
+                .projectId(ProjectId.of("dd227344-b2ab-471f-88be-ad9c3a4dd72b"))
                 .projectName("committeeProject2")
                 .committeeName("committee2")
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationToReview.builder()
+        notificationService.push(hayden.userId(), ApplicationToReview.builder()
                 .issue(new NotificationIssue(1L, faker.internet().url(), "issue2", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "ccc", "CCC"))
-                .user(new NotificationUser(hayden.user().getId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
+                .user(new NotificationUser(hayden.userId(), hayden.user().getGithubUserId(), hayden.user().getGithubLogin()))
                 .build());
-        notificationService.push(hayden.user().getId(), InvoiceRejected.builder()
+        notificationService.push(hayden.userId(), InvoiceRejected.builder()
                 .billingProfileId(UUID.fromString("3161998c-fd33-4e5d-9c67-0e7c7da0b942"))
                 .invoiceName("invoice2")
                 .rejectionReason("rejectionReason2")
                 .rewards(List.of(shortRewardStub(45, "ETH"), shortRewardStub(765, "OP")))
                 .build());
-        notificationService.push(hayden.user().getId(), RewardCanceled.builder()
+        notificationService.push(hayden.userId(), RewardCanceled.builder()
                 .shortReward(shortRewardStub(33.44, "WLD"))
                 .build());
-        notificationService.push(pierre.user().getId(), RewardReceived.builder()
+        notificationService.push(pierre.userId(), RewardReceived.builder()
                 .contributionCount(4)
                 .sentByGithubLogin("projectLead2")
                 .shortReward(shortRewardStub(22.2, "BTC"))
                 .build());
-        notificationService.push(pierre.user().getId(), RewardsPaid.builder()
+        notificationService.push(pierre.userId(), RewardsPaid.builder()
                 .shortRewards(List.of(shortRewardStub(11123.3, "USD"), shortRewardStub(45.3, "STRK")))
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationAccepted.builder()
+        notificationService.push(hayden.userId(), ApplicationAccepted.builder()
                 .issue(new NotificationIssue(2L, faker.internet().url(), "title2", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "ddd", "DDD"))
                 .build());
-        notificationService.push(hayden.user().getId(), ApplicationRefused.builder()
+        notificationService.push(hayden.userId(), ApplicationRefused.builder()
                 .issue(new NotificationIssue(3L, faker.internet().url(), "title3", faker.rickAndMorty().location(),
                         faker.lorem().characters()))
                 .project(new NotificationProject(bretzel, "abc", "ABC"))
                 .build());
-        notificationService.push(hayden.user().getId(), BillingProfileVerificationClosed.builder()
+        notificationService.push(hayden.userId(), BillingProfileVerificationClosed.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("6230df7a-f6c9-4cc4-930c-b310d83c0703")))
                 .billingProfileName("bpHaydenClosed2")
                 .build());
-        notificationService.push(pierre.user().getId(), BillingProfileVerificationRejected.builder()
+        notificationService.push(pierre.userId(), BillingProfileVerificationRejected.builder()
                 .billingProfileId(BillingProfile.Id.of(UUID.fromString("069632d9-6fa2-46d9-80e8-608661309e64")))
                 .billingProfileName("bpPierreRejected2")
                 .rejectionReason("rejectionReason3")
                 .build());
-        notificationService.push(pierre.user().getId(), GoodFirstIssueCreated.builder()
+        notificationService.push(pierre.userId(), GoodFirstIssueCreated.builder()
                 .project(new NotificationProject(bretzel, "ddd", "DDD"))
                 .issue(new NotificationDetailedIssue(22L, faker.rickAndMorty().character(), "gfi-2", faker.rickAndMorty().character(), null,
                         faker.pokemon().name(), faker.internet().url(), List.of()))

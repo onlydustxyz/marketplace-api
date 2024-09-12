@@ -23,7 +23,6 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.RewardEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
 import onlydust.com.marketplace.api.read.repositories.BillingProfileReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.BackofficeAccountingManagementRestApi;
@@ -69,8 +68,6 @@ import static org.mockito.Mockito.when;
 public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @Autowired
     RewardService rewardService;
-    @Autowired
-    ProjectLeadRepository projectLeadRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -136,8 +133,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     private UUID selfEmployedBPAdminRewardId12;
     private UUID selfEmployedBPAdminRewardId2;
     private UUID selfEmployedBPAdminRewardIdUsd;
-    private UUID projectId1;
-    private UUID projectId2;
+    private ProjectId projectId1;
+    private ProjectId projectId2;
     private UUID sponsorId = UUID.fromString("eb04a5de-4802-4071-be7b-9007b563d48d");
     private UUID individualBPId;
     private UUID individualIndiaBPId;
@@ -147,7 +144,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setupAuthenticationMock() {
         Mockito.reset(authenticatedBackofficeUserService);
-        when(authenticatedBackofficeUserService.getAuthenticatedBackofficeUser()).thenReturn(new BackofficeUser(BackofficeUser.Id.random(),
+        when(authenticatedBackofficeUserService.getAuthenticatedBackofficeUser()).thenReturn(new BackofficeUser(UserId.random(),
                 faker.internet().emailAddress(), faker.internet().slug(), Set.of(BackofficeUser.Role.BO_FINANCIAL_ADMIN), faker.internet().avatar()));
     }
 
@@ -207,7 +204,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
 
-        projectId1 = response1.getProjectId();
+        projectId1 = ProjectId.of(response1.getProjectId());
 
         final var response2 = client.post()
                 .uri(getApiURI(PROJECTS_POST))
@@ -240,7 +237,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .returnResult().getResponseBody();
 
 
-        projectId2 = response2.getProjectId();
+        projectId2 = ProjectId.of(response2.getProjectId());
 
         final var programId = programHelper.randomId();
 
@@ -253,8 +250,8 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(200000L), Currency.Id.of(strkId));
 
-        accountingService.grant(programId, ProjectId.of(projectId1), PositiveAmount.of(100000L), Currency.Id.of(strkId));
-        accountingService.grant(programId, ProjectId.of(projectId2), PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.grant(programId, projectId1, PositiveAmount.of(100000L), Currency.Id.of(strkId));
+        accountingService.grant(programId, projectId2, PositiveAmount.of(100000L), Currency.Id.of(strkId));
 
         final UUID usdId = currencyRepository.findByCode("USD").orElseThrow().id();
         final SponsorAccountStatement usdSponsorAccount = accountingService.createSponsorAccountWithInitialBalance(SponsorId.of(sponsorId),
@@ -264,7 +261,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         faker.rickAndMorty().character(), faker.hacker().verb()));
 
         accountingService.allocate(SponsorId.of(sponsorId), programId, PositiveAmount.of(50000L), Currency.Id.of(usdId));
-        accountingService.grant(programId, ProjectId.of(projectId1), PositiveAmount.of(50000L), Currency.Id.of(usdId));
+        accountingService.grant(programId, projectId1, PositiveAmount.of(50000L), Currency.Id.of(usdId));
 
         final var em = entityManagerFactory.createEntityManager();
         em.getTransaction().begin();
@@ -315,7 +312,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         userAuthHelper.signUpUser(6L, "ind_test", "https://avatars.githubusercontent.com/u/51669?v=4", false);
     }
 
-    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final UUID projectId) {
+    private void updatePayoutPreferences(final Long githubUserId, BillingProfile.Id billingProfileId, final ProjectId projectId) {
         final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateUser(githubUserId);
         client.put()
                 .uri(getApiURI(ME_PUT_PAYOUT_PREFERENCES))
@@ -334,52 +331,52 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
     }
 
     void setUp() {
-        projectId1 = client.get()
+        projectId1 = ProjectId.of(client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/super-project-1"))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody(ProjectResponse.class)
                 .returnResult()
-                .getResponseBody().getId();
+                .getResponseBody().getId());
 
-        projectId2 = client.get()
+        projectId2 = ProjectId.of(client.get()
                 .uri(getApiURI(PROJECTS_GET_BY_SLUG + "/super-project-2"))
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
                 .expectBody(ProjectResponse.class)
                 .returnResult()
-                .getResponseBody().getId();
+                .getResponseBody().getId());
 
         final List<RewardEntity> allRewards = rewardRepository.findAll();
 
         individualBPAdminRewardId1 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualBPAdminGithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualBPAdminGithubId)).findFirst().orElseThrow().id();
         individualIndiaBPAdminRewardId1 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualIndiaBPAdminGithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualIndiaBPAdminGithubId)).findFirst().orElseThrow().id();
         companyBPAdmin1RewardId1 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(companyBPAdmin1GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(companyBPAdmin1GithubId)).findFirst().orElseThrow().id();
         companyBPAdmin2RewardId1 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(companyBPAdmin2GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(companyBPAdmin2GithubId)).findFirst().orElseThrow().id();
         companyBPMember1RewardId1 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(companyBPMember1GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(companyBPMember1GithubId)).findFirst().orElseThrow().id();
         selfEmployedBPAdminRewardId11 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 50L)
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 50L)
                         .findFirst().orElseThrow().id();
         individualBPAdminRewardId2 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(individualBPAdminGithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId2.value()) && r.recipientId().equals(individualBPAdminGithubId)).findFirst().orElseThrow().id();
         companyBPAdmin1RewardId2 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(companyBPAdmin1GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId2.value()) && r.recipientId().equals(companyBPAdmin1GithubId)).findFirst().orElseThrow().id();
         companyBPAdmin2RewardId2 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(companyBPAdmin2GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId2.value()) && r.recipientId().equals(companyBPAdmin2GithubId)).findFirst().orElseThrow().id();
         companyBPMember1RewardId2 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(companyBPMember1GithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId2.value()) && r.recipientId().equals(companyBPMember1GithubId)).findFirst().orElseThrow().id();
         selfEmployedBPAdminRewardId2 =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId2) && r.recipientId().equals(selfEmployedBPAdminGithubId)).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId2.value()) && r.recipientId().equals(selfEmployedBPAdminGithubId)).findFirst().orElseThrow().id();
 
         selfEmployedBPAdminRewardId12 = allRewards.stream()
-                .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
+                .filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
                 .findFirst().map(RewardEntity::id).orElse(null);
 
         userRepository.findByGithubUserId(individualBPAdminGithubId).ifPresent(userEntity -> individualBPAdminId = userEntity.getId());
@@ -407,7 +404,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                         .map(BillingProfileReadEntity::id).findFirst().orElse(null);
     }
 
-    private void sendRewardToRecipient(Long recipientId, Long amount, UUID projectId, UUID currencyId) {
+    private void sendRewardToRecipient(Long recipientId, Long amount, ProjectId projectId, UUID currencyId) {
         final UserAuthHelper.AuthenticatedUser pierre = userAuthHelper.authenticatePierre();
         final RewardRequest rewardRequest = new RewardRequest()
                 .amount(BigDecimal.valueOf(amount))
@@ -1381,7 +1378,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         setUp();
         sendRewardToRecipient(selfEmployedBPAdminGithubId, 55L, projectId1, CurrencyHelper.STRK.value());
         selfEmployedBPAdminRewardId12 = rewardRepository.findAll().stream()
-                .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
+                .filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 55L)
                 .findFirst().map(RewardEntity::id).orElse(null);
 
         assertGetProjectRewardsStatusOnProject(
@@ -5050,13 +5047,13 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
 
         final List<RewardEntity> allRewards = rewardRepository.findAll();
         final var rewardBelowLimit =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualBPAdminGithubId) && r.amount().equals(new BigDecimal(4900L))).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualBPAdminGithubId) && r.amount().equals(new BigDecimal(4900L))).findFirst().orElseThrow().id();
         final var rewardIndiaBelowLimit =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualIndiaBPAdminGithubId) && r.amount().equals(new BigDecimal(19900L))).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualIndiaBPAdminGithubId) && r.amount().equals(new BigDecimal(19900L))).findFirst().orElseThrow().id();
         final var rewardAboveLimit =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualBPAdminGithubId) && r.amount().equals(new BigDecimal(5000L))).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualBPAdminGithubId) && r.amount().equals(new BigDecimal(5000L))).findFirst().orElseThrow().id();
         final var rewardIndiaAboveLimit =
-                allRewards.stream().filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(individualIndiaBPAdminGithubId) && r.amount().equals(new BigDecimal(20000L))).findFirst().orElseThrow().id();
+                allRewards.stream().filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(individualIndiaBPAdminGithubId) && r.amount().equals(new BigDecimal(20000L))).findFirst().orElseThrow().id();
 
         // Then
         assertGetMyRewardsStatus(List.of(
@@ -5245,7 +5242,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
                 .bankAccount(new BankAccount(faker.rickAndMorty().character(), faker.rickAndMorty().location()))
                 .build());
         final RewardEntity usdRewardEntity = allRewards.stream()
-                .filter(r -> r.projectId().equals(projectId1) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 212L)
+                .filter(r -> r.projectId().equals(projectId1.value()) && r.recipientId().equals(selfEmployedBPAdminGithubId) && r.amount().longValue() == 212L)
                 .findFirst()
                 .orElseThrow();
         billingProfileService.acceptInvoiceMandate(UserId.of(selfEmployedBPAdminId), BillingProfile.Id.of(selfEmployedBPId));
@@ -5349,7 +5346,7 @@ public class RewardStatusIT extends AbstractMarketplaceApiIT {
         }
     }
 
-    private void assertGetProjectRewardsStatusOnProject(final UUID projectId, final Map<UUID, String> rewardStatusMapToId) {
+    private void assertGetProjectRewardsStatusOnProject(final ProjectId projectId, final Map<UUID, String> rewardStatusMapToId) {
         // When
         final WebTestClient.BodyContentSpec json = client.get()
                 .uri(getApiURI(PROJECTS_REWARDS.formatted(projectId), Map.of("pageIndex", "0", "pageSize", "20")))

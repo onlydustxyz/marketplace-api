@@ -32,6 +32,7 @@ import java.net.URL;
 import java.time.Month;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
@@ -53,7 +54,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @BeforeEach
     void setUp() {
-        caller = userAuthHelper.create();
+        caller = userAuthHelper.authenticateAntho();
     }
 
     @Nested
@@ -64,7 +65,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
             client.post()
                     .uri(getApiURI(SPONSOR_PROGRAMS.formatted(UUID.fromString("58a0a05c-c81e-447c-910f-629817a987b8"))))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + userAuthHelper.create().jwt())
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue("""
                             {
@@ -239,12 +240,18 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenMyProgram {
-        Sponsor sponsor;
-        Program program;
+        private static Sponsor sponsor;
+        private static Program program;
+        UserAuthHelper.AuthenticatedUser sponsorLead;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
-        void setUp() {
-            sponsor = sponsorHelper.create();
+        synchronized void setUp() {
+            sponsorLead = userAuthHelper.authenticateOlivier();
+
+            if (setupDone.compareAndExchange(false, true)) return;
+
+            sponsor = sponsorHelper.create(sponsorLead);
             program = programHelper.create(sponsor.id(), caller);
         }
 
@@ -261,12 +268,24 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(program.id().toString())
                     .jsonPath("$.name").isEqualTo(program.name())
+                    .jsonPath("$.leads.length()").isEqualTo(1)
+                    .jsonPath("$.leads[0].id").isEqualTo(caller.user().getId().toString())
                     .jsonPath("$.totalAvailable.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalAvailable.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalGranted.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalRewarded.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
+            ;
+
+            // When
+            client.get()
+                    .uri(getApiURI(PROGRAM_BY_ID.formatted(program.id())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + sponsorLead.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
             ;
         }
 
@@ -370,13 +389,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
         @Nested
         class GivenSomeTransactions {
-            Sponsor sponsor;
-            Project project1;
-            ProjectId project2Id;
+            private static Project project1;
+            private static ProjectId project2Id;
+            private static final AtomicBoolean setupDone = new AtomicBoolean();
 
             @BeforeEach
             void setUp() {
-                sponsor = sponsorHelper.create();
+                if (setupDone.compareAndExchange(false, true)) return;
+
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
                 project1 = projectHelper.get(project1Id);
@@ -455,6 +475,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectBody()
                         .jsonPath("$.id").isEqualTo(program.id().toString())
                         .jsonPath("$.name").isEqualTo(program.name())
+                        .jsonPath("$.leads.length()").isEqualTo(1)
+                        .jsonPath("$.leads[0].id").isEqualTo(caller.user().getId().toString())
                         .jsonPath("$.totalAvailable.totalPerCurrency[0].currency.code").isEqualTo("ETH")
                         .jsonPath("$.totalGranted.totalPerCurrency[0].currency.code").isEqualTo("ETH")
                         .jsonPath("$.totalRewarded.totalPerCurrency[0].currency.code").isEqualTo("ETH")
@@ -2064,7 +2086,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .uri(getApiURI(PROGRAM_GRANT.formatted(program.id())))
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                         .bodyValue(new GrantRequest()
-                                .projectId(project1.getId())
+                                .projectId(project1.getId().value())
                                 .amount(BigDecimal.ONE)
                                 .currencyId(ETH.value()))
                         .exchange()
@@ -2100,12 +2122,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
     @Nested
     class GivenNotMyProgram {
-        Sponsor sponsor;
-        Program program;
+        private static Program program;
+        private static final AtomicBoolean setupDone = new AtomicBoolean();
 
         @BeforeEach
         void setUp() {
-            sponsor = sponsorHelper.create();
+            if (setupDone.compareAndExchange(false, true)) return;
+
+            final var sponsor = sponsorHelper.create();
             program = programHelper.create(sponsor.id());
         }
 

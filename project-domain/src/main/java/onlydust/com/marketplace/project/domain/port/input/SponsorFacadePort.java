@@ -10,7 +10,6 @@ import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface SponsorFacadePort {
     Sponsor createSponsor(@NonNull String name, URI url, @NonNull URI logoUrl, @NonNull List<UserId> leads);
@@ -19,5 +18,5 @@ public interface SponsorFacadePort {
 
     URL uploadLogo(InputStream imageInputStream);
 
-    Optional<Sponsor> findById(UUID leadId, SponsorId sponsorId);
+    Optional<Sponsor> findById(UserId leadId, SponsorId sponsorId);
 }

@@ -4,6 +4,7 @@ import io.hypersistence.utils.hibernate.type.array.UUIDArrayType;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.UserProfile;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.Type;
@@ -67,7 +68,7 @@ public class UserProfileInfoEntity {
 
 
     public UserProfileInfoEntity update(final UUID userId, UserProfile userProfile) {
-        final Set<ContactInformationEntity> contactInformation = mapContactInformationsToEntity(userId, userProfile.contacts());
+        final Set<ContactInformationEntity> contactInformation = mapContactInformationsToEntity(UserId.of(userId), userProfile.contacts());
 
         final UserProfileInfoEntity userProfileInfoEntity = this.toBuilder()
                 .avatarUrl(userProfile.avatarUrl())

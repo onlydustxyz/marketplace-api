@@ -2,13 +2,14 @@ package onlydust.com.marketplace.project.domain.job;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
+import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationIssue;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationProject;
 import onlydust.com.marketplace.project.domain.model.notification.dto.NotificationUser;
@@ -16,8 +17,6 @@ import onlydust.com.marketplace.project.domain.port.output.ApplicationObserverPo
 import onlydust.com.marketplace.project.domain.port.output.GithubStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
-
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 
@@ -51,7 +50,7 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
     }
 
     @Override
-    public void onApplicationAccepted(Application application, UUID projectLeadId) {
+    public void onApplicationAccepted(Application application, UserId projectLeadId) {
         userStoragePort.getRegisteredUserByGithubId(application.applicantId()).ifPresent(applicant -> {
             final var project = projectStoragePort.getById(application.projectId())
                     .orElseThrow(() -> notFound("Project %s not found".formatted(application.projectId())));

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.service;
 
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.input.HackathonFacadePort;
 import onlydust.com.marketplace.project.domain.port.input.HackathonObserverPort;
@@ -9,7 +10,6 @@ import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.UUID;
 
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -50,7 +50,7 @@ public class HackathonService implements HackathonFacadePort {
     }
 
     @Override
-    public void registerToHackathon(UUID userId, Hackathon.Id hackathonId) {
+    public void registerToHackathon(UserId userId, Hackathon.Id hackathonId) {
         if (!hackathonStoragePort.exists(hackathonId))
             throw notFound("Hackathon %s not found".formatted(hackathonId));
         hackathonStoragePort.registerUser(userId, hackathonId);

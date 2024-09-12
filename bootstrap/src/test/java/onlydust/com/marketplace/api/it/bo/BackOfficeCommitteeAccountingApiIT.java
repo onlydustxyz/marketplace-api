@@ -6,9 +6,11 @@ import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsCrea
 import onlydust.com.backoffice.api.contract.model.CommitteeBudgetAllocationsUpdateRequest;
 import onlydust.com.backoffice.api.contract.model.CommitteeProjectAllocationRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagBO;
 import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeJuryVoteRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeadRepository;
+import onlydust.com.marketplace.api.suites.tags.TagBO;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import onlydust.com.marketplace.project.domain.model.Committee.ProjectAnswer;
 import onlydust.com.marketplace.project.domain.model.JuryCriteria;
@@ -35,9 +37,9 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
 
     private UserAuthHelper.AuthenticatedBackofficeUser pierre;
     // Users
-    private static final UUID anthoId = UUID.fromString("747e663f-4e68-4b42-965b-b5aebedcd4c4");
-    private static final UUID olivierId = UUID.fromString("e461c019-ba23-4671-9b6c-3a5a18748af9");
-    private static final UUID pacoId = UUID.fromString("f20e6812-8de8-432b-9c31-2920434fe7d0");
+    private static final UserId anthoId = UserId.of("747e663f-4e68-4b42-965b-b5aebedcd4c4");
+    private static final UserId olivierId = UserId.of("e461c019-ba23-4671-9b6c-3a5a18748af9");
+    private static final UserId pacoId = UserId.of("f20e6812-8de8-432b-9c31-2920434fe7d0");
 
     // Projects
     private static final UUID apibaraId = UUID.fromString("2073b3b2-60f4-488c-8a0a-ab7121ed850c");
@@ -427,8 +429,8 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     @NonNull
     private Committee.Application fakeApplication(Committee committee, UUID projectId) {
         final var projectLead = projectLeadRepository.findAll().stream().filter(pl -> pl.getProjectId().equals(projectId)).findFirst().orElseThrow();
-        return new Committee.Application(projectLead.getUserId(),
-                projectId,
+        return new Committee.Application(UserId.of(projectLead.getUserId()),
+                ProjectId.of(projectId),
                 committee.projectQuestions().stream().map(q -> fakeProjectAnswer(q.id())).toList());
     }
 

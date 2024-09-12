@@ -26,7 +26,7 @@ public record VerificationRejectedDTO(@NonNull String title,
                 .title("Billing profile %s verification rejected".formatted(billingProfileVerificationRejected.billingProfileName()))
                 .description(DESCRIPTION.formatted(billingProfileVerificationRejected.billingProfileName()))
                 .button(new ButtonDTO("Resume verification", getMarketplaceBillingProfileUrlFromEnvironment(environment,
-                        billingProfileVerificationRejected.billingProfileId().value())))
+                        billingProfileVerificationRejected.billingProfileId())))
                 .hasMoreInformation(true)
                 .reason(billingProfileVerificationRejected.rejectionReason())
                 .build();

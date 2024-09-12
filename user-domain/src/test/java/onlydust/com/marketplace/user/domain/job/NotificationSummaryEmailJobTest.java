@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.user.domain.job;
 
 import com.github.javafaker.Faker;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.notification.Notification;
 import onlydust.com.marketplace.kernel.model.notification.NotificationCategory;
 import onlydust.com.marketplace.kernel.model.notification.NotificationChannel;
@@ -26,14 +27,14 @@ public class NotificationSummaryEmailJobTest {
         final NotificationSender notificationEmailSender = mock(NotificationSender.class);
         final NotificationStoragePort notificationStoragePort = mock(NotificationStoragePort.class);
         final NotificationSummaryEmailJob notificationSummaryEmailJob = new NotificationSummaryEmailJob(notificationStoragePort, notificationEmailSender);
-        final NotificationRecipient recipient1 = new NotificationRecipient(NotificationRecipient.Id.random(), faker.internet().emailAddress(),
+        final NotificationRecipient recipient1 = new NotificationRecipient(UserId.random(), faker.internet().emailAddress(),
                 faker.name().username());
-        final NotificationRecipient recipient2 = new NotificationRecipient(NotificationRecipient.Id.random(), faker.internet().emailAddress(),
+        final NotificationRecipient recipient2 = new NotificationRecipient(UserId.random(), faker.internet().emailAddress(),
                 faker.name().username());
         final SendableNotification n11 = SendableNotification.of(recipient1,
                 Notification.builder()
                         .channels(Set.of(NotificationChannel.SUMMARY_EMAIL))
-                        .recipientId(recipient1.id().value())
+                        .recipientId(recipient1.id())
                         .data(new DummyNotification())
                         .createdAt(ZonedDateTime.now())
                         .id(Notification.Id.random())
@@ -42,7 +43,7 @@ public class NotificationSummaryEmailJobTest {
         final SendableNotification n12 = SendableNotification.of(recipient1,
                 Notification.builder()
                         .channels(Set.of(NotificationChannel.SUMMARY_EMAIL))
-                        .recipientId(recipient1.id().value())
+                        .recipientId(recipient1.id())
                         .data(new DummyNotification())
                         .createdAt(ZonedDateTime.now())
                         .id(Notification.Id.random())
@@ -51,7 +52,7 @@ public class NotificationSummaryEmailJobTest {
         final SendableNotification n2 = SendableNotification.of(recipient2,
                 Notification.builder()
                         .channels(Set.of(NotificationChannel.SUMMARY_EMAIL))
-                        .recipientId(recipient2.id().value())
+                        .recipientId(recipient2.id())
                         .data(new DummyNotification())
                         .createdAt(ZonedDateTime.now())
                         .id(Notification.Id.random())

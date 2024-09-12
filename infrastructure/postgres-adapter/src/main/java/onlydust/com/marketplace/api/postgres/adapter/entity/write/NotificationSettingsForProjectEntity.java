@@ -3,7 +3,7 @@ package onlydust.com.marketplace.api.postgres.adapter.entity.write;
 import jakarta.persistence.*;
 import lombok.*;
 import onlydust.com.marketplace.kernel.model.ProjectId;
-import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
+import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 
 import java.io.Serializable;
@@ -39,7 +39,7 @@ public class NotificationSettingsForProjectEntity {
         UUID projectId;
     }
 
-    public static NotificationSettingsForProjectEntity of(NotificationRecipient.Id userId, NotificationSettings.Project settings) {
+    public static NotificationSettingsForProjectEntity of(UserId userId, NotificationSettings.Project settings) {
         return NotificationSettingsForProjectEntity.builder()
                 .userId(userId.value())
                 .projectId(settings.projectId().value())

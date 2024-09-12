@@ -2,6 +2,7 @@ package onlydust.com.marketplace.project.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.CurrencyView;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -16,21 +17,21 @@ import java.util.*;
 
 public interface UserStoragePort {
 
-    Optional<UserProfile> findProfileById(UUID userId);
+    Optional<UserProfile> findProfileById(UserId userId);
 
-    void saveProfile(UUID userId, UserProfile userProfile);
+    void saveProfile(UserId userId, UserProfile userProfile);
 
     Optional<AuthenticatedUser> getRegisteredUserByGithubId(Long githubId);
 
     Optional<GithubUserIdentity> getIndexedUserByGithubId(Long githubId);
 
-    Optional<AuthenticatedUser> getRegisteredUserById(UUID userId);
+    Optional<AuthenticatedUser> getRegisteredUserById(UserId userId);
 
-    void updateOnboardingCompletionDate(UUID userId, Date date);
+    void updateOnboardingCompletionDate(UserId userId, Date date);
 
-    void updateTermsAndConditionsAcceptanceDate(UUID userId, Date date);
+    void updateTermsAndConditionsAcceptanceDate(UserId userId, Date date);
 
-    UUID acceptProjectLeaderInvitation(Long githubUserId, UUID projectId);
+    void acceptProjectLeaderInvitation(Long githubUserId, ProjectId projectId);
 
     RewardDetailsView findRewardById(UUID rewardId);
 
@@ -38,7 +39,7 @@ public interface UserStoragePort {
 
     List<Contributor> searchContributorsByLogin(Set<Long> reposIds, String login, int maxContributorCountToReturn);
 
-    void saveProjectLead(UUID userId, UUID projectId);
+    void saveProjectLead(UserId userId, ProjectId projectId);
 
     List<CurrencyView> listRewardCurrencies(Long githubUserId, List<UUID> administratedBillingProfileIds);
 
@@ -52,7 +53,7 @@ public interface UserStoragePort {
 
     void historizeUserRanks();
 
-    Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UUID userId);
+    Optional<GithubUserWithTelegramView> findGithubUserWithTelegram(UserId userId);
 
-    List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(UUID projectId);
+    List<UserId> findUserIdsRegisteredOnNotifyOnNewGoodFirstIssuesOnProject(ProjectId projectId);
 }
