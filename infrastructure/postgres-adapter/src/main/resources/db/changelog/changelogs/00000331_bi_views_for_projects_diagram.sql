@@ -107,7 +107,7 @@ FROM completed_contributions c
 
 
 
-CREATE VIEW bi_internal.daily_project_grants(project_id, program_id, day_timestamp, usd_amount) AS
+CREATE MATERIALIZED VIEW bi.daily_project_grants(project_id, program_id, day_timestamp, usd_amount) AS
 select abt.project_id,
        abt.program_id,
        date_trunc('day', abt.timestamp) as day_timestamp,
@@ -125,7 +125,11 @@ from (SELECT abt.project_id,
         AND (abt.type = 'TRANSFER' OR abt.type = 'REFUND')
         AND abt.reward_id IS NULL
         AND abt.payment_id IS NULL) abt
-group by abt.project_id, abt.program_id, date_trunc('day', abt.timestamp);
+group by 1, 2, 3
+;
+create unique index contribution_project_timestamps_pk on bi.daily_project_grants (project_id, program_id, day_timestamp);
+create unique index contribution_project_timestamps_pk_inv on bi.daily_project_grants (day_timestamp, program_id, project_id);
+refresh materialized view bi.daily_project_grants;
 
 
 
@@ -179,7 +183,7 @@ select r.project_id                                 as project_id,
        array_agg(distinct r.program_id)             as program_ids,
        array_agg(distinct r.project_category_id)    as project_category_ids,
        count(distinct r.reward_id)                  as reward_count,
-       dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd,
+       dist_sum(distinct r.reward_id, r.amount_usd) as total_rewarded_usd_amount,
        avg(r.amount_usd)                            as avg_rewarded_usd
 from bi_internal.exploded_rewards r
 where r.project_id is not null
@@ -189,18 +193,3 @@ group by r.project_id, r.timestamp;
 create unique index project_ungrouped_reward_data_pk on bi.project_reward_data (project_id, timestamp);
 create unique index project_ungrouped_reward_data_pk_inv on bi.project_reward_data (timestamp, project_id);
 refresh materialized view bi.project_reward_data;
-
-
-
-CREATE MATERIALIZED VIEW bi.project_daily_grant_data AS
-select pg.project_id      as project_id,
-       pg.day_timestamp   as timestamp,
-       sum(pg.usd_amount) as total_granted_usd
-from bi_internal.daily_project_grants pg
-where pg.project_id is not null
-  and pg.day_timestamp is not null
-group by pg.project_id, pg.day_timestamp;
-
-create unique index project_daily_grant_data_pk on bi.project_daily_grant_data (project_id, timestamp);
-create unique index project_daily_grant_data_pk_inv on bi.project_daily_grant_data (timestamp, project_id);
-refresh materialized view bi.project_daily_grant_data;
