@@ -6,9 +6,11 @@ import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
@@ -20,6 +22,9 @@ import static onlydust.com.marketplace.api.helper.DateHelper.at;
 public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
     ProjectId projectId;
 
+    @Autowired
+    ProjectFacadePort projectFacadePort;
+
     @BeforeEach
     void setUp() {
         final var sponsor = sponsorHelper.create();
@@ -29,8 +34,9 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
 
         final var projectLead = userAuthHelper.create();
         projectId = projectHelper.create(projectLead);
-        final var recipient = userAuthHelper.create();
-        final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
+        final var newUser = userAuthHelper.create();
+        final var oldUser = userAuthHelper.create();
+        final var recipientId = GithubUserId.of(newUser.user().getGithubUserId());
 
         accountingHelper.createSponsorAccount(sponsorId, 1_000, USDC);
         accountingHelper.createSponsorAccount(sponsorId, 2, ETH);
@@ -40,15 +46,20 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.allocate(sponsorId, programId, 2, ETH);
         accountingHelper.allocate(sponsorId, programId, 3, BTC);
 
+        final var repo = githubHelper.createRepo();
+        projectHelper.addRepo(projectId, repo.getId());
+
+        at("2022-06-15T00:00:00Z", () -> {
+            githubHelper.createPullRequest(repo, oldUser);
+        });
+
         at("2024-06-15T00:00:00Z", () -> {
             accountingHelper.grant(programId, projectId, 1_000, USDC);
             rewardHelper.create(projectId, projectLead, recipientId, 200, USDC);
             rewardHelper.create(projectId, projectLead, recipientId, 100, USDC);
 
-            final var repo = githubHelper.createRepo();
-            projectHelper.addRepo(projectId, repo.getId());
-            githubHelper.createPullRequest(repo, recipient);
-            githubHelper.createPullRequest(repo, recipient);
+            githubHelper.createPullRequest(repo, oldUser);
+            githubHelper.createPullRequest(repo, newUser);
         });
 
         at("2024-07-12T00:00:00Z", () -> {
@@ -61,6 +72,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.grant(programId, projectId, 3, BTC);
             rewardHelper.create(projectId, projectLead, recipientId, 1, BTC);
         });
+
+        projectFacadePort.refreshStats();
     }
 
     @AfterAll
@@ -83,9 +96,9 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                         {
-                          "activeContributorCount": 1,
+                          "activeContributorCount": 2,
+                          "onboardedContributorCount": 1,
                           "mergedPrCount": 2,
-                          "rewardCount": 2,
                           "totalGranted": {
                             "totalUsdEquivalent": 4573.97,
                             "totalPerCurrency": [
@@ -100,7 +113,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 8
                                 },
                                 "usdEquivalent": null,
-                                "usdConversionRate": null
+                                "usdConversionRate": null,
+                                "ratio": null
                               },
                               {
                                 "amount": 2,
@@ -113,7 +127,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 18
                                 },
                                 "usdEquivalent": 3563.97,
-                                "usdConversionRate": 1781.983987
+                                "usdConversionRate": 1781.983987,
+                                "ratio": 78
                               },
                               {
                                 "amount": 1000,
@@ -126,7 +141,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 6
                                 },
                                 "usdEquivalent": 1010.00,
-                                "usdConversionRate": 1.010001
+                                "usdConversionRate": 1.010001,
+                                "ratio": 22
                               }
                             ]
                           },
@@ -144,7 +160,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 8
                                 },
                                 "usdEquivalent": null,
-                                "usdConversionRate": null
+                                "usdConversionRate": null,
+                                "ratio": null
                               },
                               {
                                 "amount": 2,
@@ -157,7 +174,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 18
                                 },
                                 "usdEquivalent": 3563.97,
-                                "usdConversionRate": 1781.983987
+                                "usdConversionRate": 1781.983987,
+                                "ratio": 92
                               },
                               {
                                 "amount": 300,
@@ -170,7 +188,8 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                                   "decimals": 6
                                 },
                                 "usdEquivalent": 303.00,
-                                "usdConversionRate": 1.010001
+                                "usdConversionRate": 1.010001,
+                                "ratio": 8
                               }
                             ]
                           }

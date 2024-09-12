@@ -15,7 +15,6 @@ import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.helper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
-import onlydust.com.marketplace.api.rest.api.adapter.authentication.api_key.ApiKeyAuthenticationService;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
 import org.junit.jupiter.api.BeforeAll;
@@ -80,8 +79,6 @@ public class AbstractMarketplaceBackOfficeApiIT {
     protected WireMockServer optimismWireMockServer;
     @Autowired
     protected WireMockServer starknetWireMockServer;
-    protected WireMockServer aptosWireMockServer;
-    protected WireMockServer sorobanWireMockServer;
     @Autowired
     protected WireMockServer coinmarketcapWireMockServer;
     @InjectWireMock("auth0")
@@ -97,15 +94,11 @@ public class AbstractMarketplaceBackOfficeApiIT {
     @InjectWireMock("dustyBot")
     protected WireMockServer dustyBotApiWireMockServer;
     @Autowired
-    ApiKeyAuthenticationService.Config backOfficeApiKeyAuthenticationConfig;
-    @Autowired
     CustomerIOProperties customerIOProperties;
     @Autowired
     ProgramHelper programHelper;
     @Autowired
     SponsorHelper sponsorHelper;
-    @Autowired
-    ProjectHelper projectHelper;
     @Autowired
     AccountingHelper accountingHelper;
     @Autowired

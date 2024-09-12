@@ -25,5 +25,5 @@ public class ProjectCustomStatReadEntity {
 
     int mergedPrCount;
     int activeContributorCount;
-    int rewardCount;
+    int onboardedContributorCount;
 }

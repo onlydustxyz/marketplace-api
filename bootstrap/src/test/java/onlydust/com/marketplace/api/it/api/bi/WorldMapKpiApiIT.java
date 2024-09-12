@@ -1,9 +1,11 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -112,6 +114,12 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
 
                 projectFacadePort.refreshStats();
             }
+        }
+
+        @AfterAll
+        @SneakyThrows
+        static void restore() {
+            restoreIndexerDump();
         }
 
         @Test

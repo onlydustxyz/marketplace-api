@@ -393,7 +393,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         return ok(new ProjectStatsResponse()
                 .activeContributorCount(customStats.map(ProjectCustomStatReadEntity::activeContributorCount).orElse(0))
                 .mergedPrCount(customStats.map(ProjectCustomStatReadEntity::mergedPrCount).orElse(0))
-                .rewardCount(customStats.map(ProjectCustomStatReadEntity::rewardCount).orElse(0))
+                .onboardedContributorCount(customStats.map(ProjectCustomStatReadEntity::onboardedContributorCount).orElse(0))
                 .totalGranted(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalRewarded))
         );

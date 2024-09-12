@@ -8428,16 +8428,16 @@ components:
       type: object
       required:
         - activeContributorCount
+        - onboardedContributorCount
         - mergedPrCount
-        - rewardCount
         - totalGranted
         - totalRewarded
       properties:
         activeContributorCount:
           type: integer
-        mergedPrCount:
+        onboardedContributorCount:
           type: integer
-        rewardCount:
+        mergedPrCount:
           type: integer
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'

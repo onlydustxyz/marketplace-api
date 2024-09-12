@@ -12,19 +12,17 @@ public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiRead
 
     @Query(value = """
             select
-                kyc.country as country_code,
+                cd.contributor_country            as country_code,
                 count(distinct cd.contributor_id) as value
-            from bi.contributor_data cd
-            join iam.users u on u.github_user_id = cd.contributor_id
-            join accounting.billing_profiles_users bpu on bpu.user_id = u.id
-            join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id and kyc.country is not null
-            where (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
+            from bi.contribution_data cd
+            where cd.contributor_country is not null and
+                (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
                 and (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
                 and (coalesce(:programOrEcosystemIds) is null or
                      cd.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
                      cd.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
-            group by kyc.country
-            order by kyc.country
+            group by cd.contributor_country
+            order by cd.contributor_country
             """, nativeQuery = true)
     List<WorldMapKpiReadEntity> findActiveContributorCount(ZonedDateTime fromDate, ZonedDateTime toDate, UUID[] programOrEcosystemIds);
 }
