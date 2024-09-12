@@ -16,10 +16,8 @@ import onlydust.com.marketplace.api.configuration.SwaggerConfiguration;
 import onlydust.com.marketplace.api.helper.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
-import onlydust.com.marketplace.project.domain.port.input.BackofficeFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.GithubAuthenticationPort;
 import onlydust.com.marketplace.user.domain.port.input.AppUserFacadePort;
-import onlydust.com.marketplace.user.domain.port.input.NotificationSettingsPort;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -249,8 +247,6 @@ public class AbstractMarketplaceApiIT {
     JWTVerifier jwtVerifier;
     @Autowired
     GithubAuthenticationPort githubAuthenticationPort;
-    @Autowired
-    BackofficeFacadePort backofficeFacadePort;
 
     protected UserAuthHelper userAuthHelper;
     @Autowired
@@ -277,8 +273,6 @@ public class AbstractMarketplaceApiIT {
     OutboxConsumerJob trackingOutboxJob;
     @Autowired
     OutboxConsumerJob billingProfileVerificationOutboxJob;
-    @Autowired
-    NotificationSettingsPort notificationSettingsPort;
 
 
     @Autowired
@@ -286,13 +280,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     RewardStatusStorage rewardStatusStorage;
     @Autowired
-    InvoiceRewardRepository invoiceRewardRepository;
-    @Autowired
     CurrencyRepository currencyRepository;
-    @Autowired
-    InvoiceRepository invoiceRepository;
-    @Autowired
-    BillingProfileRepository billingProfileRepository;
     @Autowired
     KybRepository kybRepository;
     @Autowired
