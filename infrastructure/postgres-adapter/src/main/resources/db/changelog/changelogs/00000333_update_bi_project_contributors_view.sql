@@ -27,10 +27,16 @@ from completed_contributions c
                              where lfe_1.extension = any (c.main_file_extensions)) lfe on true;
 
 create materialized view bi.contribution_data as
+with registered_users as (select u.id             as id,
+                                 u.github_user_id as github_user_id,
+                                 kyc.country      as country
+                          from iam.users u
+                                   join accounting.billing_profiles_users bpu on bpu.user_id = u.id
+                                   join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
 select c.contribution_id                                                 as contribution_id,
        c.contributor_id                                                  as contributor_id,
-       u.id                                                              as contributor_user_id,
-       kyc.country                                                       as contributor_country,
+       ru.id                                                             as contributor_user_id,
+       ru.country                                                        as contributor_country,
        c.timestamp                                                       as timestamp,
        c.is_first_contribution_on_onlydust                               as is_first_contribution_on_onlydust,
        array_agg(distinct c.language_id)                                 as language_ids,
@@ -40,15 +46,13 @@ select c.contribution_id                                                 as cont
        array_agg(distinct c.project_category_id)                         as project_category_ids,
        count(distinct c.contribution_id) filter ( where c.is_merged_pr ) as merged_pr_count
 from bi_internal.exploded_contributions c
-         left join iam.users u on u.github_user_id = c.contributor_id
-         left join accounting.billing_profiles_users bpu on bpu.user_id = u.id
-         left join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
+         left join registered_users ru on ru.github_user_id = c.contributor_id
 group by c.contribution_id,
          c.contributor_id,
          c.timestamp,
          c.is_first_contribution_on_onlydust,
-         u.id,
-         kyc.country;
+         ru.id,
+         ru.country;
 
 create unique index bi_contribution_data_pk on bi.contribution_data (contribution_id);
 
