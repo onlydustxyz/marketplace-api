@@ -10891,6 +10891,7 @@ components:
     BiProjectsStatsListItemResponse:
       type: object
       required:
+        - timestamp
         - totalGranted
         - totalRewarded
         - mergedPrCount
@@ -10899,6 +10900,9 @@ components:
         - reactivatedProjectCount
         - churnedProjectCount
       properties:
+        timestamp:
+          type: string
+          format: date-time
         totalGranted:
           type: number
         totalRewarded:
