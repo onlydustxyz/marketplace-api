@@ -75,7 +75,7 @@ public record SummaryNotificationsDTO(@NonNull String title,
                         "Your rewards has been paid",
                         "%s reward(s) has been paid for a total of %s USD"
                                 .formatted(rewardsPaid.shortRewards().size(), rewardsPaid.shortRewards().stream()
-                                        .map(ShortReward::getDollarsEquivalent)
+                                        .map(ShortReward::dollarsEquivalent)
                                         .reduce(BigDecimal.ZERO, BigDecimal::add)
                                         .setScale(3, RoundingMode.HALF_UP)
                                         .toString()),

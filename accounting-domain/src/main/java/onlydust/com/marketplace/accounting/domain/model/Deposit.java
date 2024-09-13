@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,7 @@ public record Deposit(@NonNull Id id,
             return Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }

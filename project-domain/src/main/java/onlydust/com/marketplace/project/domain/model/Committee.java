@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -76,6 +77,7 @@ public class Committee {
             return Committee.Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Committee.Id of(@NonNull final String uuid) {
             return Committee.Id.of(UUID.fromString(uuid));
         }

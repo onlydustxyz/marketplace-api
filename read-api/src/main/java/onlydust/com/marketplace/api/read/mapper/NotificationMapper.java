@@ -245,7 +245,7 @@ public class NotificationMapper {
         notificationType = NotificationType.CONTRIBUTOR_REWARDS_PAID;
         notificationPageItemResponseData.setContributorRewardsPaid(new NotificationContributorRewardsPaid(
                 rewardsPaid.shortRewards().size(),
-                rewardsPaid.shortRewards().stream().map(ShortReward::getDollarsEquivalent).reduce(BigDecimal.ZERO, BigDecimal::add)
+                rewardsPaid.shortRewards().stream().map(ShortReward::dollarsEquivalent).reduce(BigDecimal.ZERO, BigDecimal::add)
         ));
         return notificationType;
     }
@@ -265,10 +265,10 @@ public class NotificationMapper {
         NotificationType notificationType;
         notificationType = NotificationType.CONTRIBUTOR_REWARD_CANCELED;
         notificationPageItemResponseData.setContributorRewardCanceled(new NotificationContributorRewardCanceled(
-                rewardCanceled.shortReward().getId().value(),
-                rewardCanceled.shortReward().getProjectName(),
-                rewardCanceled.shortReward().getAmount(),
-                rewardCanceled.shortReward().getCurrencyCode()
+                rewardCanceled.shortReward().id().value(),
+                rewardCanceled.shortReward().projectName(),
+                rewardCanceled.shortReward().amount(),
+                rewardCanceled.shortReward().currencyCode()
         ));
         return notificationType;
     }
@@ -277,10 +277,10 @@ public class NotificationMapper {
         NotificationType notificationType;
         notificationType = NotificationType.CONTRIBUTOR_REWARD_RECEIVED;
         notificationPageItemResponseData.setContributorRewardReceived(new NotificationContributorRewardReceived(
-                rewardReceived.shortReward().getId().value(),
-                rewardReceived.shortReward().getProjectName(),
-                rewardReceived.shortReward().getAmount(),
-                rewardReceived.shortReward().getCurrencyCode(),
+                rewardReceived.shortReward().id().value(),
+                rewardReceived.shortReward().projectName(),
+                rewardReceived.shortReward().amount(),
+                rewardReceived.shortReward().currencyCode(),
                 rewardReceived.sentByGithubLogin(),
                 rewardReceived.contributionCount()
         ));

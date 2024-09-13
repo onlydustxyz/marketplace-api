@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -225,6 +226,7 @@ public class Currency implements Cloneable {
             return Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }

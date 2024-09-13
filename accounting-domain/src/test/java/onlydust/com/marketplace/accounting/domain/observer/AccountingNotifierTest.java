@@ -125,7 +125,7 @@ public class AccountingNotifierTest {
             verify(notificationPort).push(eq(recipient.userId()), notificationPushCaptor.capture());
             assertThat(notificationPushCaptor.getValue().contributionCount()).isEqualTo(1);
             assertThat(notificationPushCaptor.getValue().sentByGithubLogin()).isEqualTo(requester.login());
-            assertThat(notificationPushCaptor.getValue().shortReward().getAmount()).isEqualTo(moneyView.amount());
+            assertThat(notificationPushCaptor.getValue().shortReward().amount()).isEqualTo(moneyView.amount());
         }
     }
 
@@ -170,11 +170,11 @@ public class AccountingNotifierTest {
             final var notificationCaptor = ArgumentCaptor.forClass(RewardCanceled.class);
             verify(notificationPort).push(eq(recipientId), notificationCaptor.capture());
             final var notification = notificationCaptor.getValue();
-            assertThat(notification.shortReward().getId()).isEqualTo(rewardId);
-            assertThat(notification.shortReward().getProjectName()).isEqualTo(projectName);
-            assertThat(notification.shortReward().getAmount()).isEqualTo(amount);
-            assertThat(notification.shortReward().getCurrencyCode()).isEqualTo(Currency.Code.OP.toString());
-            assertThat(notification.shortReward().getDollarsEquivalent()).isNull();
+            assertThat(notification.shortReward().id()).isEqualTo(rewardId);
+            assertThat(notification.shortReward().projectName()).isEqualTo(projectName);
+            assertThat(notification.shortReward().amount()).isEqualTo(amount);
+            assertThat(notification.shortReward().currencyCode()).isEqualTo(Currency.Code.OP.toString());
+            assertThat(notification.shortReward().dollarsEquivalent()).isNull();
         }
 
         @Test
@@ -294,9 +294,9 @@ public class AccountingNotifierTest {
             verify(notificationPort).push(eq(invoiceCreator.userId()), rejectedArgumentCaptor.capture());
             assertThat(rejectedArgumentCaptor.getValue().rejectionReason()).isEqualTo("Invalid invoice");
             assertThat(rejectedArgumentCaptor.getValue().invoiceName()).isEqualTo(invoice.number().value());
-            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getProjectName()).isEqualTo(invoice.rewards().get(0).projectName());
-            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getAmount()).isEqualTo(invoice.rewards().get(0).amount().getValue());
-            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).getCurrencyCode()).isEqualTo(invoice.rewards().get(0).amount().getCurrency().code().toString());
+            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).projectName()).isEqualTo(invoice.rewards().get(0).projectName());
+            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).amount()).isEqualTo(invoice.rewards().get(0).amount().getValue());
+            assertThat(rejectedArgumentCaptor.getValue().rewards().get(0).currencyCode()).isEqualTo(invoice.rewards().get(0).amount().getCurrency().code().toString());
         }
 
         @Test

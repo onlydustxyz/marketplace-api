@@ -103,7 +103,7 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 customerIOProperties.getRewardCanceledEmailId().toString(),
                 mapIdentifiers(notification.recipient()),
                 notification.recipient().email(),
-                "Reward %s got canceled".formatted(rewardCanceled.shortReward().getId().pretty()),
+                "Reward %s got canceled".formatted(rewardCanceled.shortReward().id().pretty()),
                 RewardCanceledDTO.fromEvent(notification.recipient().login(), rewardCanceled, customerIOProperties.getEnvironment()));
     }
 
