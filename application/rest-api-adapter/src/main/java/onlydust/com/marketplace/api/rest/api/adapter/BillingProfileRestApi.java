@@ -58,7 +58,7 @@ public class BillingProfileRestApi implements BillingProfilesApi {
                                                                           Integer pageIndex,
                                                                           Integer pageSize,
                                                                           String sort,
-                                                                          String direction) {
+                                                                          SortDirection direction) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
         final var page = billingProfileFacadePort.invoicesOf(authenticatedUser.id(), BillingProfile.Id.of(billingProfileId), pageIndex,
                 pageSize, map(sort), SortDirectionMapper.requestToDomain(direction));

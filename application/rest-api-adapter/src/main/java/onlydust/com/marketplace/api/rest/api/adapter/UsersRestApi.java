@@ -63,7 +63,6 @@ public class UsersRestApi implements UsersApi {
         return ResponseEntity.ok(ContributorSearchResponseMapper.of(contributors.getLeft(), contributors.getRight()));
     }
 
-
     @Override
     public ResponseEntity<ContributionPageResponse> getUserContributions(Long githubUserId,
                                                                          List<ContributionType> types,
@@ -76,7 +75,7 @@ public class UsersRestApi implements UsersApi {
                                                                          String fromDate,
                                                                          String toDate,
                                                                          ContributionSort sort,
-                                                                         String direction,
+                                                                         onlydust.com.marketplace.api.contract.model.SortDirection direction,
                                                                          Integer page,
                                                                          Integer pageSize) {
         final int sanitizedPageSize = sanitizePageSize(pageSize);

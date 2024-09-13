@@ -10,9 +10,8 @@ public class SortDirectionMapperTest {
 
     @Test
     void should_map_sort_direction_to_domain() {
-        assertEquals(SortDirection.asc, requestToDomain("ASC"));
-        assertEquals(SortDirection.asc, requestToDomain(""));
+        assertEquals(SortDirection.asc, requestToDomain(onlydust.com.marketplace.api.contract.model.SortDirection.ASC));
         assertEquals(SortDirection.asc, requestToDomain(null));
-        assertEquals(SortDirection.desc, requestToDomain("DESC"));
+        assertEquals(SortDirection.desc, requestToDomain(onlydust.com.marketplace.api.contract.model.SortDirection.DESC));
     }
 }

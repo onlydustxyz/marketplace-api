@@ -63,9 +63,11 @@ paths:
       summary: Get projects BI
       operationId: getBIProjects
       parameters:
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/sortDirectionParam'
         - $ref: '#/components/parameters/fromDateParam'
         - $ref: '#/components/parameters/toDateParam'
-        - $ref: '#/components/parameters/timeGroupingParam'
         - $ref: '#/components/parameters/projectLeadIdsParam'
         - $ref: '#/components/parameters/categoryIdsParam'
         - $ref: '#/components/parameters/languageIdsParam'
@@ -80,6 +82,10 @@ paths:
         - $ref: '#/components/parameters/mergedPrCountParam'
         - $ref: '#/components/parameters/rewardCountParam'
         - $ref: '#/components/parameters/contributionCountParam'
+        - name: sort
+          in: query
+          schema:
+            $ref: '#/components/schemas/ProjectKpiSortEnum'
       responses:
         "200":
           description: 'Projects BI page'
@@ -97,6 +103,9 @@ paths:
       summary: Get contributors BI
       operationId: getBIContributors
       parameters:
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/sortDirectionParam'
         - $ref: '#/components/parameters/fromDateParam'
         - $ref: '#/components/parameters/toDateParam'
         - $ref: '#/components/parameters/timeGroupingParam'
@@ -288,18 +297,8 @@ paths:
           name: status
           schema:
             $ref: '#/components/schemas/NotificationStatus'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Notifications'
@@ -487,18 +486,8 @@ paths:
       description: |
         Get the list of programs the user is leading
       parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Programs'
@@ -694,10 +683,7 @@ paths:
           description: Sort order
           schema:
             $ref: "#/components/schemas/RewardsSort"
-        - in: query
-          name: direction
-          schema:
-            $ref: '#/components/schemas/SortDirection'
+        - $ref: '#/components/parameters/sortDirectionParam'
         - in: query
           name: currencies
           schema:
@@ -724,16 +710,8 @@ paths:
           name: status
           schema:
             $ref: '#/components/schemas/RewardStatusContract'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Page of rewards'
@@ -1501,15 +1479,7 @@ paths:
           description: Sorting field
           schema:
             $ref: '#/components/schemas/ContributionSort'
-        - in: query
-          name: direction
-          description: Sort direction
-          schema:
-            type: string
-            default: ASC
-            enum:
-              - ASC
-              - DESC
+        - $ref: '#/components/parameters/sortDirectionParam'
         - in: query
           name: pageIndex
           description: Page number
@@ -1719,16 +1689,8 @@ paths:
           description: Sort order
           schema:
             $ref: "#/components/schemas/ProjectListSort"
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of projects'
@@ -2006,16 +1968,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project good first issues'
@@ -2105,20 +2059,9 @@ paths:
           description: Sort order
           schema:
             $ref: '#/components/schemas/ProjectIssuesSort'
-        - in: query
-          name: direction
-          schema:
-            $ref: '#/components/schemas/SortDirection'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/sortDirectionParam'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project good first issues'
@@ -2158,20 +2101,9 @@ paths:
           description: Sort order
           schema:
             $ref: '#/components/schemas/ContributorsPageSortBy'
-        - in: query
-          name: direction
-          schema:
-            $ref: '#/components/schemas/SortDirection'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/sortDirectionParam'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
         - in: query
           name: showHidden
           schema:
@@ -2343,20 +2275,9 @@ paths:
           description: Sort order
           schema:
             $ref: '#/components/schemas/RewardsSort'
-        - in: query
-          name: direction
-          schema:
-            $ref: '#/components/schemas/SortDirection'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/sortDirectionParam'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of rewards'
@@ -2588,15 +2509,7 @@ paths:
           description: Sorting field
           schema:
             $ref: '#/components/schemas/ProjectContributionSort'
-        - in: query
-          name: direction
-          description: Sort direction
-          schema:
-            type: string
-            default: ASC
-            enum:
-              - ASC
-              - DESC
+        - $ref: '#/components/parameters/sortDirectionParam'
         - in: query
           name: pageIndex
           description: Page number
@@ -2645,18 +2558,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/GithubUserId'
-        - in: query
-          name: pageIndex
-          description: Page number
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          description: Number of items returned by page
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
         - in: query
           name: search
           required: false
@@ -2861,18 +2764,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project newcomers'
@@ -2904,18 +2797,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project churned contributors'
@@ -2947,18 +2830,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project most active contributors'
@@ -2990,18 +2863,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProjectId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 5
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of project staled contributions'
@@ -3055,18 +2918,8 @@ paths:
           name: sort
           schema:
             $ref: '#/components/schemas/ProjectApplicationPageSort'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-            default: 0
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
-            default: 10
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'List of applications'
@@ -3465,16 +3318,8 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/BillingProfileId'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Coworkers'
@@ -3650,16 +3495,8 @@ paths:
           schema:
             type: string
             format: uuid
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
         - in: query
           name: sort
           description: Sort order
@@ -3671,14 +3508,7 @@ paths:
               - CREATED_AT
               - AMOUNT
               - STATUS
-        - in: query
-          name: direction
-          schema:
-            default: DESC
-            type: string
-            enum:
-              - ASC
-              - DESC
+        - $ref: '#/components/parameters/sortDirectionParam'
       responses:
         "200":
           description: 'Page of invoices linked to given billing profile'
@@ -3772,16 +3602,8 @@ paths:
       summary: Get all ecosystems
       operationId: getAllEcosystems
       parameters:
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Page of ecosystem'
@@ -3814,16 +3636,8 @@ paths:
           description: Sort order
           schema:
             $ref: '#/components/schemas/EcosystemContributorsFilter'
-        - in: query
-          name: pageIndex
-          required: true
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
       responses:
         "200":
           description: 'Page of ecosystem contributors'
@@ -5061,6 +4875,25 @@ components:
       name: Api-Key
 
   parameters:
+    pageIndexParam:
+      name: pageIndex
+      in: query
+      required: true
+      schema:
+        type: integer
+        default: 0
+    pageSizeParam:
+      name: pageSize
+      in: query
+      required: true
+      schema:
+        type: integer
+        default: 5
+    sortDirectionParam:
+      name: direction
+      in: query
+      schema:
+        $ref: '#/components/schemas/SortDirection'
     fromDateParam:
       name: fromDate
       in: query
@@ -9757,6 +9590,21 @@ components:
       type: string
       enum:
         - ACTIVE_CONTRIBUTORS
+
+    ProjectKpiSortEnum:
+      type: string
+      enum:
+        - PROJECT_NAME
+        - AVAILABLE_BUDGET_USD_AMOUNT
+        - PERCENT_USED_BUDGET
+        - TOTAL_GRANTED_USD_AMOUNT
+        - AVERAGE_REWARD_USD_AMOUNT
+        - TOTAL_REWARDED_USD_AMOUNT
+        - ONBOARDED_CONTRIBUTOR_COUNT
+        - ACTIVE_CONTRIBUTOR_COUNT
+        - MERGED_PR_COUNT
+        - REWARD_COUNT
+        - CONTRIBUTION_COUNT
 
     TransactionType:
       type: string
