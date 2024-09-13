@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -63,6 +64,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_of_eth_on_ethereum() {
             // Given
             onlyDustWallets.setEthereum("0xb060429d14266d06a8be63281205668be823604f");
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -80,7 +82,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue)
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -128,6 +130,67 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                                 "transactionReference": "0x1234567890123456789012345678901234567890"
                               },
                               "billingInformation": null
+                            }
+                            """);
+
+            // When
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .jsonPath("$.id").isEqualTo(depositId.toString())
+                    .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
+                    .json("""
+                            {
+                              "amount": {
+                                "amount": 0.029180771065409698,
+                                "prettyAmount": 0.02918,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 52.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "currentBalance": {
+                                "amount": 0,
+                                "prettyAmount": 0,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 0.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "finalBalance": {
+                                "amount": 0.029180771065409698,
+                                "prettyAmount": 0.02918,
+                                "currency": {
+                                  "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                  "code": "ETH",
+                                  "name": "Ether",
+                                  "logoUrl": null,
+                                  "decimals": 18
+                                },
+                                "usdEquivalent": 52.00,
+                                "usdConversionRate": 1781.983987
+                              },
+                              "senderInformation": {
+                                "accountNumber": "0x1f9090aae28b8a3dceadf281b0f12828e676c326",
+                                "transactionReference": "0x1234567890123456789012345678901234567890"
+                              },
+                              "billingInformation": null,
+                              "status": "DRAFT"
                             }
                             """);
         }

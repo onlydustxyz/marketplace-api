@@ -4114,6 +4114,31 @@ paths:
           $ref: '#/components/responses/InternalServerError'
 
   /api/v1/deposits/{depositId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadSponsors
+      summary: Get a deposit by id
+      operationId: getDeposit
+      description: Get a deposit by id.
+      parameters:
+        - in: path
+          name: depositId
+          required: true
+          schema:
+            $ref: '#/components/schemas/DepositId'
+      responses:
+        "200":
+          description: 'Deposit details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DepositResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
     put:
       security:
         - bearerAuth: [ ]
@@ -6373,6 +6398,31 @@ components:
           description: The transaction reference
           example: 0x1234567890abcdef
 
+    DepositResponse:
+      type: object
+      required:
+        - id
+        - amount
+        - status
+        - currentBalance
+        - finalBalance
+        - senderInformation
+      properties:
+        id:
+          $ref: '#/components/schemas/DepositId'
+        amount:
+          $ref: '#/components/schemas/Money'
+        status:
+          $ref: '#/components/schemas/DepositStatus'
+        currentBalance:
+          $ref: '#/components/schemas/Money'
+        finalBalance:
+          $ref: '#/components/schemas/Money'
+        senderInformation:
+          $ref: '#/components/schemas/DepositSenderInformation'
+        billingInformation:
+          $ref: '#/components/schemas/DepositBillingInformation'
+
     PreviewDepositResponse:
       type: object
       required:
@@ -6439,6 +6489,14 @@ components:
           type: string
         email:
           type: string
+
+    DepositStatus:
+      type: string
+      enum:
+        - DRAFT
+        - PENDING
+        - COMPLETED
+        - REJECTED
 
     ProgramPageResponse:
       allOf:
