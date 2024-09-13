@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.backoffice.BackofficeUserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.BackofficeUserRepository;
@@ -193,6 +194,10 @@ public class UserAuthHelper {
     public record AuthenticatedUser(String jwt, UserEntity user) {
         public UserId userId() {
             return UserId.of(user.getId());
+        }
+
+        public GithubUserId githubUserId() {
+            return GithubUserId.of(user.getGithubUserId());
         }
     }
 

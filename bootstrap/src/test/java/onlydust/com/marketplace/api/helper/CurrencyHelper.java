@@ -2,12 +2,18 @@ package onlydust.com.marketplace.api.helper;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Quote;
 import onlydust.com.marketplace.accounting.domain.port.in.CurrencyFacadePort;
+import onlydust.com.marketplace.accounting.domain.port.out.QuoteStorage;
 import onlydust.com.marketplace.kernel.model.blockchain.Aptos;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -23,6 +29,8 @@ public class CurrencyHelper {
 
     @Autowired
     private final CurrencyFacadePort currencyFacadePort;
+    @Autowired
+    private final QuoteStorage quoteStorage;
 
     public Currency addERC20Support(Blockchain blockchain, Currency.Code code) {
         return currencyFacadePort.addERC20Support(blockchain, switch (blockchain) {
@@ -46,5 +54,9 @@ public class CurrencyHelper {
             case Currency.Code.XLM_STR -> 7;
             default -> throw new IllegalArgumentException("Unsupported currency in tests");
         });
+    }
+
+    public void setQuote(String date, Currency.Id baseCurrencyId, Currency.Id targetCurrencyId, BigDecimal rate) {
+        quoteStorage.save(List.of(new Quote(baseCurrencyId, targetCurrencyId, rate, ZonedDateTime.parse(date).toInstant())));
     }
 }
