@@ -2,13 +2,11 @@ package onlydust.com.marketplace.api.read.adapters;
 
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorReadApi;
-import onlydust.com.backoffice.api.contract.model.BoDepositResponse;
-import onlydust.com.backoffice.api.contract.model.DepositPage;
-import onlydust.com.backoffice.api.contract.model.SponsorDetailsResponse;
-import onlydust.com.backoffice.api.contract.model.SponsorPage;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.repositories.DepositReadRepository;
+import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +30,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("bo")
 public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSponsorReadApi {
     private final SponsorReadRepository sponsorReadRepository;
+    private final ProgramReadRepository programReadRepository;
     private final DepositReadRepository depositReadRepository;
 
     @Override
@@ -39,6 +38,14 @@ public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSpons
         final var deposit = depositReadRepository.findById(depositId)
                 .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
         return ok(deposit.toBoResponse());
+    }
+
+    @Override
+    public ResponseEntity<ProgramDetailsResponse> getProgram(UUID programId) {
+        final var program = programReadRepository.findById(programId)
+                .orElseThrow(() -> notFound("Program %s not found".formatted(programId)));
+
+        return ok(program.toBoDetailsResponse());
     }
 
     @Override

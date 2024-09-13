@@ -137,6 +137,87 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     }
 
     @Test
+    @Order(1)
+    void should_get_program() {
+        final String jwt = pierre.jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(PROGRAMS_BY_ID.formatted("4b1cbc61-045c-4229-8378-8ad50c2aca78")))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "id": "4b1cbc61-045c-4229-8378-8ad50c2aca78",
+                          "name": "AS Nancy Lorraine",
+                          "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png",
+                          "projects": [
+                            {
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "slug": "aldbaran-du-taureau",
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
+                              "remainingBudgets": [
+                                {
+                                  "amount": 19803190,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
+                                  }
+                                },
+                                {
+                                  "amount": 0,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  }
+                                }
+                              ]
+                            },
+                            {
+                              "id": "a0c91aee-9770-4000-a893-953ddcbd62a7",
+                              "slug": "aldbaran-du-taureau",
+                              "name": "Aldébaran du Taureau",
+                              "logoUrl": "https://www.puregamemedia.fr/media/images/uploads/2019/11/ban_saint_seiya_awakening_kotz_aldebaran_taureau.jpg/?w=790&h=inherit&fm=webp&fit=contain&s=ab78704b124d2de9525a8af91ef7c4ed",
+                              "remainingBudgets": [
+                                {
+                                  "amount": 19803190,
+                                  "currency": {
+                                    "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                    "code": "USDC",
+                                    "name": "USD Coin",
+                                    "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                    "decimals": 6
+                                  }
+                                },
+                                {
+                                  "amount": 0,
+                                  "currency": {
+                                    "id": "f35155b5-6107-4677-85ac-23f8c2a63193",
+                                    "code": "USD",
+                                    "name": "US Dollar",
+                                    "logoUrl": null,
+                                    "decimals": 2
+                                  }
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     @Order(3)
     void should_create_sponsor() {
         final var jwt = pierre.jwt();
