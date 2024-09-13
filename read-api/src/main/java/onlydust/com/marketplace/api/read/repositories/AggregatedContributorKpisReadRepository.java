@@ -12,33 +12,33 @@ import java.util.UUID;
 public interface AggregatedContributorKpisReadRepository extends Repository<AggregatedContributorKpisReadEntity, ZonedDateTime> {
 
     @Query(value = """
-            WITH aggregated_project_stats AS
-                     (SELECT date_trunc(:timeGrouping, d.timestamp)                                                       as timestamp,
-                             date_trunc(:timeGrouping, d.timestamp) - cast(('1 ' || :timeGrouping) as interval)           as timestamp_of_previous_period,
-                             count(distinct d.contributor_id)                                                             as active_contributor_count,
+            WITH aggregated_contributor_stats AS
+                     (SELECT date_trunc(:timeGrouping, d.timestamp)                                                                   as timestamp,
+                             count(distinct d.contributor_id)                                                                         as active_contributor_count,
             
                              count(distinct d.contributor_id)
-                             filter (where d.previous_contributor_contribution_timestamp is null)                         as new_contributor_count,
+                             filter (where d.previous_contributor_contribution_timestamp is null)                                     as new_contributor_count,
             
                              count(distinct d.contributor_id)
                              filter (where d.previous_contributor_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
-                                                                               cast(('1 ' || :timeGrouping) as interval)) as reactivated_contributor_count,
+                                                                                           cast(('1 ' || :timeGrouping) as interval)) as reactivated_contributor_count,
             
                              count(distinct d.contributor_id)
-                             filter (where d.next_contributor_contribution_timestamp is null and date_trunc(:timeGrouping, d.timestamp) <
-                                                                                     date_trunc(:timeGrouping, now()))    as next_period_churned_contributor_count,
+                             filter (where (d.next_contributor_contribution_timestamp is null
+                                 or d.next_contributor_contribution_timestamp >= date_trunc(:timeGrouping, d.timestamp) + cast(('2 ' || :timeGrouping) as interval))
+                                 and date_trunc(:timeGrouping, d.timestamp) < date_trunc(:timeGrouping, now()))                       as next_period_churned_contributor_count,
             
                              count(distinct d.contribution_id)
-                             filter ( where d.is_merged_pr )                                                              as merged_pr_count
+                             filter ( where d.is_merged_pr )                                                                          as merged_pr_count
                       from bi.contribution_data d
                       where
-                        -- We need to get one interval before fromDate to calculate churned project count
+                        -- We need to get one interval before fromDate to calculate churned contributor count
                           d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval)
                         and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(('1 ' || :timeGrouping) as interval)
                         and (coalesce(:programOrEcosystemIds) is null
                           or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
                           or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
-                      group by 1, 2),
+                      group by 1),
             
                  aggregated_project_rewards_stats AS
                      (SELECT date_trunc(:timeGrouping, d.timestamp) as timestamp,
@@ -61,23 +61,25 @@ public interface AggregatedContributorKpisReadRepository extends Repository<Aggr
                       group by 1),
             
                  all_timestamps_to_return AS
-                     -- We need to get one interval before fromDate to calculate churned project count
-                     (SELECT generate_series(date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval),
-                                             date_trunc(:timeGrouping, cast(:toDate as timestamptz)),
-                                             cast(('1 ' || :timeGrouping) as interval)) AS timestamp)
+                     (SELECT series.timestamp                                               as timestamp,
+                             (series.timestamp - cast(('1 ' || :timeGrouping) as interval)) as timestamp_of_previous_period
+                      -- We need to get one interval before fromDate to calculate churned project count
+                      FROM (select generate_series(date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval),
+                                                   date_trunc(:timeGrouping, cast(:toDate as timestamptz)),
+                                                   cast(('1 ' || :timeGrouping) as interval)) as timestamp) series)
             
             SELECT allt.timestamp,
-                   aps.timestamp_of_previous_period,
-                   aps.active_contributor_count,
-                   aps.new_contributor_count,
-                   aps.reactivated_contributor_count,
-                   aps.next_period_churned_contributor_count,
-                   aps.merged_pr_count,
+                   allt.timestamp_of_previous_period,
+                   acs.active_contributor_count,
+                   acs.new_contributor_count,
+                   acs.reactivated_contributor_count,
+                   acs.next_period_churned_contributor_count,
+                   acs.merged_pr_count,
                    apgs.total_granted_usd_amount,
                    aprs.total_rewarded_usd_amount
             FROM all_timestamps_to_return allt
-                     LEFT JOIN aggregated_project_stats aps
-                               ON allt.timestamp = aps.timestamp
+                     LEFT JOIN aggregated_contributor_stats acs
+                               ON allt.timestamp = acs.timestamp
                      LEFT JOIN aggregated_project_grants_stats apgs
                                ON allt.timestamp = apgs.timestamp
                      LEFT JOIN aggregated_project_rewards_stats aprs
@@ -86,5 +88,5 @@ public interface AggregatedContributorKpisReadRepository extends Repository<Aggr
     List<AggregatedContributorKpisReadEntity> findAll(@NonNull String timeGrouping,
                                                       @NonNull ZonedDateTime fromDate,
                                                       @NonNull ZonedDateTime toDate,
-                                                      List<UUID> programOrEcosystemIds);
+                                                      UUID[] programOrEcosystemIds);
 }

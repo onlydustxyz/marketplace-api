@@ -264,7 +264,7 @@ public class AbstractMarketplaceApiIT {
     @Autowired
     protected DepositHelper depositHelper;
     @Autowired
-    RewardHelper rewardHelper;
+    protected RewardHelper rewardHelper;
     @Autowired
     protected HackathonHelper hackathonHelper;
     @Autowired

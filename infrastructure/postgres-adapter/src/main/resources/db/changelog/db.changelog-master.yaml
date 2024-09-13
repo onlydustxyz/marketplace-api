@@ -521,3 +521,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000334_bi_views_for_projects_diagram.sql
   - include:
       file: db/changelog/changelogs/00000335_update_bi_contribution_data_view.sql
+  - include:
+      file: db/changelog/changelogs/00000336_fix_bi_contribution_data_view.sql

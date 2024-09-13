@@ -54,7 +54,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                         timeGrouping.name(),
                         sanitizedDate(fromDate, DEFAULT_FROM_DATE),
                         sanitizedDate(toDate, ZonedDateTime.now()),
-                        programOrEcosystemIds).stream()
+                        programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()
                 .collect(Collectors.toMap(AggregatedContributorKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
@@ -63,7 +63,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                     return stats.toDto(statsOfPreviousPeriod);
                 })
                 .sorted(Comparator.comparing(BiContributorsStatsListItemResponse::getTimestamp))
-                .skip(1) // Skip the first element as it is the previous period used to compute churned project count
+                .skip(1) // Skip the first element as it is the previous period used to compute churned contributor count
                 .toList();
 
         return ResponseEntity.ok(new BiContributorsStatsListResponse().stats(mergedStats));
@@ -90,7 +90,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                         timeGrouping.name(),
                         sanitizedDate(fromDate, DEFAULT_FROM_DATE),
                         sanitizedDate(toDate, ZonedDateTime.now()),
-                        programOrEcosystemIds).stream()
+                        programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()
                 .collect(Collectors.toMap(AggregatedProjectKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
