@@ -8,6 +8,7 @@ import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.backoffice.api.contract.model.MoneyResponse;
+import onlydust.com.backoffice.api.contract.model.ProgramDetailsResponse;
 import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
 import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
@@ -147,5 +148,15 @@ public class ProgramReadEntity {
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));
+    }
+
+    public ProgramDetailsResponse toBoDetailsResponse() {
+        return new ProgramDetailsResponse()
+                .id(id)
+                .name(name)
+                .logoUrl(logoUrl)
+                .projects(grantedProjects.stream()
+                        .map(p -> p.toBoProjectWithBudgetResponse(id))
+                        .toList());
     }
 }

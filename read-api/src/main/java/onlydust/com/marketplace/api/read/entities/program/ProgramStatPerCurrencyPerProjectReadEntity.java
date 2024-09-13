@@ -42,6 +42,10 @@ public class ProgramStatPerCurrencyPerProjectReadEntity implements ProgramTransa
     @NonNull
     BigDecimal totalRewarded;
 
+    public BigDecimal totalAvailable() {
+        return totalGranted.subtract(totalRewarded);
+    }
+
     @EqualsAndHashCode
     public static class PrimaryKey {
         UUID programId;

@@ -1227,6 +1227,35 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /bo/v1/programs/{programId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeSponsorRead
+      summary: Get program data
+      operationId: getProgram
+      description: |
+        Get sponsor data
+      parameters:
+        - in: path
+          name: programId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+      responses:
+        "200":
+          description: 'Program data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgramDetailsResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
   /bo/v1/ecosystems:
     get:
       security:
@@ -3005,6 +3034,18 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/UserLinkResponse'
+
+    ProgramDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProgramLinkResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectWithBudgetResponse'
 
     DepositPage:
       allOf:
@@ -4861,6 +4902,18 @@ components:
     ProgramWithBudgetResponse:
       allOf:
         - $ref: '#/components/schemas/ProgramLinkResponse'
+        - type: object
+          required:
+            - remainingBudgets
+          properties:
+            remainingBudgets:
+              type: array
+              items:
+                $ref: '#/components/schemas/MoneyResponse'
+
+    ProjectWithBudgetResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
             - remainingBudgets

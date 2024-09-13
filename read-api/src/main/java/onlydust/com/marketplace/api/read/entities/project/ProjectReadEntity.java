@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
+import onlydust.com.backoffice.api.contract.model.MoneyResponse;
+import onlydust.com.backoffice.api.contract.model.ProjectWithBudgetResponse;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectMoreInfoViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.ProjectTagViewEntity;
@@ -273,5 +275,19 @@ public class ProjectReadEntity {
         return new NumberKpi()
                 .value(current)
                 .trend(current < last ? Trend.DOWN : current > last ? Trend.UP : Trend.STABLE);
+    }
+
+    public ProjectWithBudgetResponse toBoProjectWithBudgetResponse(UUID programId) {
+        return new ProjectWithBudgetResponse()
+                .id(id)
+                .name(name)
+                .slug(slug)
+                .logoUrl(logoUrl)
+                .remainingBudgets(perProgramStatsPerCurrency.stream()
+                        .filter(s -> s.programId().equals(programId))
+                        .map(s -> new MoneyResponse()
+                                .currency(s.currency().toBoShortResponse())
+                                .amount(s.totalAvailable()))
+                        .toList());
     }
 }
