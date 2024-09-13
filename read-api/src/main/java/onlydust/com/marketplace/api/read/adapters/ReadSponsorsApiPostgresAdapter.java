@@ -7,10 +7,7 @@ import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadE
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
-import onlydust.com.marketplace.api.read.repositories.AllTransactionReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
-import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
-import onlydust.com.marketplace.api.read.repositories.SponsorTransactionMonthlyStatsReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.SponsorId;
@@ -55,6 +52,21 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final SponsorReadRepository sponsorReadRepository;
     private final ProgramReadRepository programReadRepository;
     private final SponsorTransactionMonthlyStatsReadRepository sponsorTransactionMonthlyStatsReadRepository;
+    private final DepositReadRepository depositReadRepository;
+
+    @Override
+    public ResponseEntity<DepositResponse> getDeposit(UUID depositId) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        final var deposit = depositReadRepository.findById(depositId)
+                .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
+
+        final var sponsorId = SponsorId.of(deposit.sponsor().id());
+        if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
+            throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
+
+        return ok(deposit.toResponse());
+    }
 
     @Override
     public ResponseEntity<SponsorResponse> getSponsor(UUID sponsorId) {
