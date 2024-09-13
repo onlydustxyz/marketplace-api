@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 
-import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceFrontendUrlFromEnvironment;
 import static com.onlydust.customer.io.adapter.dto.UrlMapper.getMarketplaceMyRewardsUrlFromEnvironment;
 
 @Builder
@@ -24,7 +23,7 @@ public record InvoiceRejectedDTO(@NonNull String title,
     public static InvoiceRejectedDTO fromEvent(@NonNull String recipientLogin, @NonNull InvoiceRejected invoiceRejected, @NonNull String environment) {
         return new InvoiceRejectedDTO("Invoice rejected",
                 DESCRIPTION.formatted(invoiceRejected.invoiceName(), invoiceRejected.rewards().stream()
-                        .map(ShortReward::getDollarsEquivalent)
+                        .map(ShortReward::dollarsEquivalent)
                         .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(3, RoundingMode.HALF_UP).toString(), invoiceRejected.rejectionReason()),
                 invoiceRejected.rewards().size(),
                 recipientLogin,

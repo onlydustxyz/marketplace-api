@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -52,6 +53,7 @@ public class Payment {
             return Payment.Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Payment.Id of(@NonNull final String uuid) {
             return Payment.Id.of(UUID.fromString(uuid));
         }

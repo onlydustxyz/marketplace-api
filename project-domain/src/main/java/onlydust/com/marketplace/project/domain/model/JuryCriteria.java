@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -36,6 +37,7 @@ public class JuryCriteria {
             return JuryCriteria.Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static JuryCriteria.Id of(@NonNull final String uuid) {
             return JuryCriteria.Id.of(UUID.fromString(uuid));
         }

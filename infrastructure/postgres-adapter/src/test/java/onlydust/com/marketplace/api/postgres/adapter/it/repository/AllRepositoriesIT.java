@@ -1,13 +1,18 @@
 package onlydust.com.marketplace.api.postgres.adapter.it.repository;
 
-import onlydust.com.marketplace.api.postgres.adapter.PostgresUserAdapter;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.AllocatedTimeEnumEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.read.UserViewEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.UserEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.*;
 import onlydust.com.marketplace.api.postgres.adapter.it.AbstractPostgresIT;
-import onlydust.com.marketplace.api.postgres.adapter.repository.*;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
+import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRankingRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.UserViewRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.ContactInformationRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.old.UserProfileInfoRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.project.domain.model.Contact;
 import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
@@ -31,8 +36,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     @Autowired
     OnboardingRepository onboardingRepository;
     @Autowired
-    ApplicationRepository applicationRepository;
-    @Autowired
     UserProfileInfoRepository userProfileInfoRepository;
     @Autowired
     ContactInformationRepository contactInformationRepository;
@@ -44,10 +47,6 @@ public class AllRepositoriesIT extends AbstractPostgresIT {
     UserRepository userRepository;
     @Autowired
     UserViewRepository userViewRepository;
-    @Autowired
-    PostgresUserAdapter postgresUserAdapter;
-    @Autowired
-    RewardRepository rewardRepository;
     @Autowired
     CustomProjectRankingRepository customProjectRankingRepository;
 

@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.accounting.domain.model.billingprofile;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -66,6 +67,7 @@ public abstract class BillingProfile {
             return Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }

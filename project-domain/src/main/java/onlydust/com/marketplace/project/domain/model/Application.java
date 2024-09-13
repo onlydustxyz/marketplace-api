@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
@@ -39,6 +40,7 @@ public class Application {
             return Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }

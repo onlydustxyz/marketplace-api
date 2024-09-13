@@ -14,7 +14,7 @@ public record RewardCreatedDTO(@NonNull String title,
     private static final String DESCRIPTION = "Good news! You just received a new reward for your contribution on <b>%s</b>:";
 
     public static RewardCreatedDTO fromEvent(String recipientLogin, RewardReceived rewardReceived, String environment) {
-        return new RewardCreatedDTO("Reward received", DESCRIPTION.formatted(rewardReceived.shortReward().getProjectName()), recipientLogin,
+        return new RewardCreatedDTO("Reward received", DESCRIPTION.formatted(rewardReceived.shortReward().projectName()), recipientLogin,
                 RewardDTO.from(rewardReceived.shortReward()),
                 new ButtonDTO("See details", getMarketplaceMyRewardsUrlFromEnvironment(environment)));
     }

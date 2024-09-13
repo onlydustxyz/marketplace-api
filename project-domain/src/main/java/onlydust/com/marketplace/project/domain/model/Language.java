@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.project.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -16,10 +17,14 @@ import java.util.stream.Collectors;
 @Value
 @Accessors(fluent = true)
 public class Language {
-    @NonNull Id id;
-    @NonNull String name;
-    @NonNull String slug;
-    @NonNull Set<String> fileExtensions;
+    @NonNull
+    Id id;
+    @NonNull
+    String name;
+    @NonNull
+    String slug;
+    @NonNull
+    Set<String> fileExtensions;
     URI logoUrl;
     URI bannerUrl;
 
@@ -44,6 +49,7 @@ public class Language {
             return Id.builder().uuid(uuid).build();
         }
 
+        @JsonCreator
         public static Id of(@NonNull final String uuid) {
             return Id.of(UUID.fromString(uuid));
         }
