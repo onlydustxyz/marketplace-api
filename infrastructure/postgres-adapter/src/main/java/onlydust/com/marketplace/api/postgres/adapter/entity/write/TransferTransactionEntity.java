@@ -5,11 +5,11 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.postgres.adapter.entity.enums.NetworkEnumEntity;
-import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmAccountAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmContractAddress;
-import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.*;
+import onlydust.com.marketplace.kernel.model.blockchain.aptos.AptosTransferTransaction;
 import onlydust.com.marketplace.kernel.model.blockchain.evm.EvmTransferTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.starknet.StarknetTransferTransaction;
+import onlydust.com.marketplace.kernel.model.blockchain.stellar.StellarTransferTransaction;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
@@ -68,17 +68,54 @@ public class TransferTransactionEntity {
 
     public Blockchain.TransferTransaction toDomain() {
         return switch (blockchain) {
-            case ETHEREUM, OPTIMISM -> new EvmTransferTransaction(
+            case SEPA -> throw internalServerError("SEPA transfer transactions are not supported");
+            case ETHEREUM -> new EvmTransferTransaction(
                     Blockchain.valueOf(blockchain.name()),
-                    new EvmTransaction.Hash(reference),
+                    Ethereum.transactionHash(reference),
                     timestamp,
                     Blockchain.Transaction.Status.CONFIRMED,
-                    new EvmAccountAddress(senderAddress),
-                    new EvmAccountAddress(recipientAddress),
+                    Ethereum.accountAddress(senderAddress),
+                    Ethereum.accountAddress(recipientAddress),
                     amount,
-                    contractAddress != null ? new EvmContractAddress(contractAddress) : null
+                    contractAddress != null ? Ethereum.contractAddress(contractAddress) : null
             );
-            default -> throw internalServerError("Unknown blockchain: " + blockchain);
+            case OPTIMISM -> new EvmTransferTransaction(
+                    Blockchain.valueOf(blockchain.name()),
+                    Optimism.transactionHash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    Optimism.accountAddress(senderAddress),
+                    Optimism.accountAddress(recipientAddress),
+                    amount,
+                    contractAddress != null ? Optimism.contractAddress(contractAddress) : null
+            );
+            case APTOS -> new AptosTransferTransaction(
+                    Aptos.transactionHash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    Aptos.accountAddress(senderAddress),
+                    Aptos.accountAddress(recipientAddress),
+                    amount,
+                    contractAddress != null ? Aptos.coinType(contractAddress) : null
+            );
+            case STARKNET -> new StarknetTransferTransaction(
+                    StarkNet.transactionHash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    StarkNet.accountAddress(senderAddress),
+                    StarkNet.accountAddress(recipientAddress),
+                    amount,
+                    contractAddress != null ? StarkNet.contractAddress(contractAddress) : null
+            );
+            case STELLAR -> new StellarTransferTransaction(
+                    Stellar.transactionHash(reference),
+                    timestamp,
+                    Blockchain.Transaction.Status.CONFIRMED,
+                    Stellar.accountId(senderAddress),
+                    Stellar.accountId(recipientAddress),
+                    amount,
+                    contractAddress != null ? Stellar.contractAddress(contractAddress) : null
+            );
         };
     }
 }
