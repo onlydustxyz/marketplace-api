@@ -23,11 +23,6 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
                              filter (where d.previous_project_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
                                                                                        cast(('1 ' || :timeGrouping) as interval)) as reactivated_project_count,
             
-                             count(distinct d.project_id)
-                             filter (where (d.next_project_contribution_timestamp is null
-                                 or d.next_project_contribution_timestamp >= date_trunc(:timeGrouping, d.timestamp) + cast(('2 ' || :timeGrouping) as interval))
-                                 and date_trunc(:timeGrouping, d.timestamp) < date_trunc(:timeGrouping, now()))                   as next_period_churned_project_count,
-            
                              count(distinct d.contribution_id)
                              filter ( where d.is_merged_pr )                                                                      as merged_pr_count
                       from bi.contribution_data_cross_projects d
@@ -73,7 +68,6 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
                    aps.active_project_count,
                    aps.new_project_count,
                    aps.reactivated_project_count,
-                   aps.next_period_churned_project_count,
                    aps.merged_pr_count,
                    apgs.total_granted_usd_amount,
                    aprs.total_rewarded_usd_amount

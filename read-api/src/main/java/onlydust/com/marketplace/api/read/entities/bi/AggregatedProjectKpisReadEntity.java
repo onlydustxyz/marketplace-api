@@ -31,7 +31,6 @@ public class AggregatedProjectKpisReadEntity {
     Integer activeProjectCount;
     Integer newProjectCount;
     Integer reactivatedProjectCount;
-    Integer nextPeriodChurnedProjectCount;
     Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
@@ -46,10 +45,6 @@ public class AggregatedProjectKpisReadEntity {
 
     Integer reactivatedProjectCount() {
         return Optional.ofNullable(reactivatedProjectCount).orElse(0);
-    }
-
-    Integer nextPeriodChurnedProjectCount() {
-        return Optional.ofNullable(nextPeriodChurnedProjectCount).orElse(0);
     }
 
     Integer mergedPrCount() {

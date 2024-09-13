@@ -23,11 +23,6 @@ public interface AggregatedContributorKpisReadRepository extends Repository<Aggr
                              filter (where d.previous_contributor_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
                                                                                            cast(('1 ' || :timeGrouping) as interval)) as reactivated_contributor_count,
             
-                             count(distinct d.contributor_id)
-                             filter (where (d.next_contributor_contribution_timestamp is null
-                                 or d.next_contributor_contribution_timestamp >= date_trunc(:timeGrouping, d.timestamp) + cast(('2 ' || :timeGrouping) as interval))
-                                 and date_trunc(:timeGrouping, d.timestamp) < date_trunc(:timeGrouping, now()))                       as next_period_churned_contributor_count,
-            
                              count(distinct d.contribution_id)
                              filter ( where d.is_merged_pr )                                                                          as merged_pr_count
                       from bi.contribution_data d
@@ -73,7 +68,6 @@ public interface AggregatedContributorKpisReadRepository extends Repository<Aggr
                    acs.active_contributor_count,
                    acs.new_contributor_count,
                    acs.reactivated_contributor_count,
-                   acs.next_period_churned_contributor_count,
                    acs.merged_pr_count,
                    apgs.total_granted_usd_amount,
                    aprs.total_rewarded_usd_amount

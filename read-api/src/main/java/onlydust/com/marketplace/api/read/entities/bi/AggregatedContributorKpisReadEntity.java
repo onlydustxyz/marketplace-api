@@ -31,7 +31,6 @@ public class AggregatedContributorKpisReadEntity {
     Integer activeContributorCount;
     Integer newContributorCount;
     Integer reactivatedContributorCount;
-    Integer nextPeriodChurnedContributorCount;
     Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
@@ -46,10 +45,6 @@ public class AggregatedContributorKpisReadEntity {
 
     Integer reactivatedContributorCount() {
         return Optional.ofNullable(reactivatedContributorCount).orElse(0);
-    }
-
-    Integer nextPeriodChurnedContributorCount() {
-        return Optional.ofNullable(nextPeriodChurnedContributorCount).orElse(0);
     }
 
     Integer mergedPrCount() {
