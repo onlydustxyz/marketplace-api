@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @Entity
 @NoArgsConstructor(force = true)
-@Getter
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
@@ -22,9 +21,11 @@ import java.util.Optional;
 public class AggregatedContributorKpisReadEntity {
     @Id
     @NonNull
+    @Getter
     ZonedDateTime timestamp;
 
     @NonNull
+    @Getter
     ZonedDateTime timestampOfPreviousPeriod;
 
     Integer activeContributorCount;
@@ -35,15 +36,44 @@ public class AggregatedContributorKpisReadEntity {
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
 
+    Integer activeContributorCount() {
+        return Optional.ofNullable(activeContributorCount).orElse(0);
+    }
+
+    Integer newContributorCount() {
+        return Optional.ofNullable(newContributorCount).orElse(0);
+    }
+
+    Integer reactivatedContributorCount() {
+        return Optional.ofNullable(reactivatedContributorCount).orElse(0);
+    }
+
+    Integer nextPeriodChurnedContributorCount() {
+        return Optional.ofNullable(nextPeriodChurnedContributorCount).orElse(0);
+    }
+
+    Integer mergedPrCount() {
+        return Optional.ofNullable(mergedPrCount).orElse(0);
+    }
+
+    BigDecimal totalGrantedUsdAmount() {
+        return Optional.ofNullable(totalGrantedUsdAmount).orElse(BigDecimal.ZERO);
+    }
+
+    BigDecimal totalRewardedUsdAmount() {
+        return Optional.ofNullable(totalRewardedUsdAmount).orElse(BigDecimal.ZERO);
+    }
+
     public BiContributorsStatsListItemResponse toDto(AggregatedContributorKpisReadEntity statsOfPreviousTimeGroup) {
         return new BiContributorsStatsListItemResponse()
                 .timestamp(timestamp)
-                .totalGranted(Optional.ofNullable(totalGrantedUsdAmount).orElse(BigDecimal.ZERO))
-                .totalRewarded(Optional.ofNullable(totalRewardedUsdAmount).orElse(BigDecimal.ZERO))
-                .mergedPrCount(Optional.ofNullable(mergedPrCount).orElse(0))
-                .newContributorCount(Optional.ofNullable(newContributorCount).orElse(0))
-                .activeContributorCount(Optional.ofNullable(activeContributorCount).orElse(0))
-                .reactivatedContributorCount(Optional.ofNullable(reactivatedContributorCount).orElse(0))
-                .churnedContributorCount(Optional.ofNullable(statsOfPreviousTimeGroup).flatMap(s -> Optional.ofNullable(s.nextPeriodChurnedContributorCount)).orElse(0));
+                .totalGranted(totalGrantedUsdAmount())
+                .totalRewarded(totalRewardedUsdAmount())
+                .mergedPrCount(mergedPrCount())
+                .newContributorCount(newContributorCount())
+                .activeContributorCount(activeContributorCount())
+                .reactivatedContributorCount(reactivatedContributorCount())
+                .churnedContributorCount(statsOfPreviousTimeGroup == null ? 0 :
+                        statsOfPreviousTimeGroup.activeContributorCount() - activeContributorCount() + newContributorCount() + reactivatedContributorCount());
     }
 }
