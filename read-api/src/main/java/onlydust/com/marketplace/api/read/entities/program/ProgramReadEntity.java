@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-import onlydust.com.backoffice.api.contract.model.MoneyResponse;
-import onlydust.com.backoffice.api.contract.model.ProgramDetailsResponse;
-import onlydust.com.backoffice.api.contract.model.ProgramLinkResponse;
-import onlydust.com.backoffice.api.contract.model.ProgramWithBudgetResponse;
+import onlydust.com.backoffice.api.contract.model.*;
 import onlydust.com.marketplace.api.contract.model.ProgramPageItemResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramResponse;
 import onlydust.com.marketplace.api.contract.model.ProgramShortResponse;
@@ -26,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static java.util.Comparator.comparing;
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 
 @Entity
@@ -158,6 +156,7 @@ public class ProgramReadEntity {
                 .logoUrl(logoUrl)
                 .projects(grantedProjects.stream()
                         .map(p -> p.toBoProjectWithBudgetResponse(id))
+                        .sorted(comparing(ProjectWithBudgetResponse::getName))
                         .toList());
     }
 }
