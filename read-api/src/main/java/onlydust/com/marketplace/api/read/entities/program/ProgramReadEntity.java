@@ -23,6 +23,7 @@ import org.hibernate.annotations.Immutable;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
@@ -76,7 +77,7 @@ public class ProgramReadEntity {
             joinColumns = @JoinColumn(name = "programId"),
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
-    List<ProjectReadEntity> grantedProjects;
+    Set<ProjectReadEntity> grantedProjects;
 
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()
