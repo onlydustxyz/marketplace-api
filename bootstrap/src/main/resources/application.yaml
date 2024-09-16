@@ -198,6 +198,10 @@ infrastructure:
     weekly-notifications-email-id: ${CUSTOMER_IO_WEEKLY_NOTIFICATIONS_EMAIL_ID}
     project-application-refused-email-id: ${CUSTOMER_IO_APPLICATION_REFUSED_EMAIL_ID}
     issue-created-email-id: ${CUSTOMER_IO_ISSUE_CREATED_EMAIL_ID}
+    funds-allocated-to-program-email-id: ${CUSTOMER_IO_FUNDS_ALLOCATED_TO_PROGRAM_EMAIL_ID}
+    funds-unallocated-from-program-email-id: ${CUSTOMER_IO_FUNDS_UNALLOCATED_FROM_PROGRAM_EMAIL_ID}
+    deposit-approved-email-id: ${CUSTOMER_IO_DEPOSIT_APPROVED_EMAIL_ID}
+    deposit-rejected-email-id: ${CUSTOMER_IO_DEPOSIT_REJECTED_EMAIL_ID}
     tracking-api-key: ${CUSTOMER_IO_TRACKING_API_KEY}
     tracking-site-id: ${CUSTOMER_IO_TRACKING_SITE_ID}
     tracking-base-uri: https://track-eu.customer.io/api/v1

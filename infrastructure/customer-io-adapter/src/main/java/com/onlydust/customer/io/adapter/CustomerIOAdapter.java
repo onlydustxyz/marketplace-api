@@ -12,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.accounting.domain.port.out.EmailStoragePort;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.GoodFirstIssueCreated;
+import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.NotificationSettings;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
@@ -60,6 +57,14 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort, 
             sendEmail(MailDTO.from(customerIOProperties, notification, applicationRefused));
         } else if (notification.data() instanceof GoodFirstIssueCreated goodFirstIssueCreated) {
             sendEmail(MailDTO.from(customerIOProperties, notification, goodFirstIssueCreated));
+        } else if (notification.data() instanceof FundsAllocatedToProgram fundsAllocatedToProgram) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, fundsAllocatedToProgram));
+        } else if (notification.data() instanceof FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, fundsUnallocatedFromProgram));
+        } else if (notification.data() instanceof DepositRejected depositRejected) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, depositRejected));
+        } else if (notification.data() instanceof DepositApproved depositApproved) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, depositApproved));
         }
     }
 

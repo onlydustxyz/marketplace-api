@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.bo;
 
+import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.SponsorRequest;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagBO;
@@ -22,12 +23,15 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static java.math.BigDecimal.TEN;
 import static onlydust.com.marketplace.accounting.domain.model.Deposit.Status.*;
 import static onlydust.com.marketplace.accounting.domain.model.Network.*;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.USDC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
 import static org.springframework.web.reactive.function.BodyInserters.fromResource;
 
@@ -825,12 +829,14 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     }
 
+    @SneakyThrows
     @Test
     @Order(8)
     void should_reject_deposit() {
         // Given
         final String jwt = pierre.jwt();
-        final var sponsorId = sponsorHelper.create(userAuthHelper.authenticateAntho()).id();
+        final var antho = userAuthHelper.authenticateAntho();
+        final var sponsorId = sponsorHelper.create(antho).id();
         final var depositId = depositHelper.create(sponsorId, ETHEREUM, USDC, TEN, PENDING);
 
         // When
@@ -850,6 +856,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .isNoContent();
         verify(notificationPort).push(any(), any(DepositRejected.class));
 
+        Thread.sleep(200);
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getDepositRejectedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(antho.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(antho.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Deposit refused")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("We regret to inform you that your deposit has been rejected" +
+                                                                                                 ". Please review the information provided and try again. If " +
+                                                                                                 "you need assistance, feel free to contact us."))))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review transaction details")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-admin.onlydust.com/financials/%s".formatted(sponsorId))))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(antho.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Deposit refused"))));
+
         // When
         client.get()
                 .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsorId), Map.of("pageIndex", "0", "pageSize", "100")))
@@ -864,12 +889,14 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
 
     }
 
+    @SneakyThrows
     @Test
     @Order(9)
     void should_approve_deposit() {
         // Given
         final String jwt = pierre.jwt();
-        final var sponsorId = sponsorHelper.create(userAuthHelper.authenticateAntho()).id();
+        final var antho = userAuthHelper.authenticateAntho();
+        final var sponsorId = sponsorHelper.create(antho).id();
         final var depositId = depositHelper.create(sponsorId, ETHEREUM, USDC, TEN, PENDING);
 
         // When
@@ -888,6 +915,25 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
                 .expectStatus()
                 .isNoContent();
         verify(notificationPort).push(any(), any(DepositApproved.class));
+
+        Thread.sleep(200);
+
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id", equalTo(customerIOProperties.getDepositApprovedEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(antho.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(antho.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Deposit approved")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("Your deposit has been successfully approved. The funds are " +
+                                                                                                 "now available in your account. You can view the details in " +
+                                                                                                 "your dashboard."))))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review transaction details")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-admin.onlydust.com/financials/%s".formatted(sponsorId))))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(antho.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Deposit approved"))));
 
         // When
         client.get()

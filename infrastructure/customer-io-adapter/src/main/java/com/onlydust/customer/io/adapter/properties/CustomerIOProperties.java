@@ -42,6 +42,14 @@ public class CustomerIOProperties {
     @NonNull
     Integer issueCreatedEmailId;
     @NonNull
+    Integer fundsAllocatedToProgramEmailId;
+    @NonNull
+    Integer fundsUnallocatedFromProgramEmailId;
+    @NonNull
+    Integer depositApprovedEmailId;
+    @NonNull
+    Integer depositRejectedEmailId;
+    @NonNull
     String trackingBaseUri;
     @NonNull
     String trackingSiteId;

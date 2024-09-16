@@ -74,6 +74,10 @@ infrastructure:
     weekly-notifications-email-id: 70
     project-application-refused-email-id: 80
     issue-created-email-id: 90
+    funds-allocated-to-program-email-id: 100
+    funds-unallocated-from-program-email-id: 110
+    deposit-approved-email-id: 120
+    deposit-rejected-email-id: 130
     marketing-topic-id: 3
 application:
   onlydust-wallets:
