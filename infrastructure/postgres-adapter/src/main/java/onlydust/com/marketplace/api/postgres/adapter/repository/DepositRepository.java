@@ -13,7 +13,8 @@ public interface DepositRepository extends JpaRepository<DepositEntity, UUID> {
             SELECT d
             FROM DepositEntity d
             JOIN FETCH d.transaction t
-            WHERE d.sponsorId = :sponsorId
+            WHERE d.sponsorId = :sponsorId AND
+                  d.status != 'DRAFT'
             ORDER BY t.timestamp DESC
             LIMIT 1
             """)
