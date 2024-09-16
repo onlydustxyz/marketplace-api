@@ -18,6 +18,7 @@ import onlydust.com.marketplace.api.contract.model.DepositSenderInformation;
 import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorStatPerCurrencyReadEntity;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -62,20 +63,20 @@ public class DepositReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     Deposit.BillingInformation billingInformation;
 
-    public DepositPageItemResponse toBoPageItemResponse() {
+    public DepositPageItemResponse toBoPageItemResponse(final MetaBlockExplorer blockExplorer) {
         return new DepositPageItemResponse()
                 .id(id)
                 .sponsor(sponsor.toBoResponse())
-                .transaction(transaction.toBoResponse())
+                .transaction(transaction.toBoResponse(blockExplorer))
                 .currency(currency.toBoShortResponse())
                 .status(map(status));
     }
 
-    public BoDepositResponse toBoResponse() {
+    public BoDepositResponse toBoResponse(final MetaBlockExplorer blockExplorer) {
         return new BoDepositResponse()
                 .id(id)
                 .sponsor(sponsor.toBoResponse())
-                .transaction(transaction.toBoResponse())
+                .transaction(transaction.toBoResponse(blockExplorer))
                 .currency(currency.toBoShortResponse())
                 .status(map(status))
                 .billingInformation(billingInformation == null ? null : new BoDepositBillingInformation()

@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.slack.AsyncSlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.port.output.*;
@@ -94,9 +95,10 @@ public class MarketplaceApiApplicationIT {
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort,
                                            final DepositStoragePort depositStoragePort,
-                                           final SponsorStoragePort sponsorStoragePort) {
+                                           final SponsorStoragePort sponsorStoragePort,
+                                           final MetaBlockExplorer blockExplorer) {
         return spy(new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
-                sponsorStoragePort));
+                sponsorStoragePort, blockExplorer));
     }
 
     @Bean

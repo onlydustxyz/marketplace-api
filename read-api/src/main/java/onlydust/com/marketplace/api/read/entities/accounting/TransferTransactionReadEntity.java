@@ -12,6 +12,7 @@ import onlydust.com.backoffice.api.contract.model.TransactionNetwork;
 import onlydust.com.backoffice.api.contract.model.TransferTransactionResponse;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -55,15 +56,15 @@ public class TransferTransactionReadEntity {
 
     String contractAddress;
 
-    private URI blockExplorerUrl() {
+    private URI blockExplorerUrl(final MetaBlockExplorer blockExplorer) {
         try {
             return switch (blockchain) {
                 case SEPA -> null;
-                case ETHEREUM -> Blockchain.ETHEREUM.getBlockExplorerUrl(reference);
-                case OPTIMISM -> Blockchain.OPTIMISM.getBlockExplorerUrl(reference);
-                case STARKNET -> Blockchain.STARKNET.getBlockExplorerUrl(reference);
-                case APTOS -> Blockchain.APTOS.getBlockExplorerUrl(reference);
-                case STELLAR -> Blockchain.STELLAR.getBlockExplorerUrl(reference);
+                case ETHEREUM -> blockExplorer.url(Blockchain.ETHEREUM, reference);
+                case OPTIMISM -> blockExplorer.url(Blockchain.OPTIMISM, reference);
+                case STARKNET -> blockExplorer.url(Blockchain.STARKNET, reference);
+                case APTOS -> blockExplorer.url(Blockchain.APTOS, reference);
+                case STELLAR -> blockExplorer.url(Blockchain.STELLAR, reference);
             };
         } catch (OnlyDustException e) {
             LOGGER.error("Error while generating block explorer URL for blockchain %s and reference %s".formatted(blockchain, reference), e);
@@ -71,13 +72,13 @@ public class TransferTransactionReadEntity {
         }
     }
 
-    public TransferTransactionResponse toBoResponse() {
+    public TransferTransactionResponse toBoResponse(final MetaBlockExplorer blockExplorer) {
         return new TransferTransactionResponse()
                 .id(id)
                 .network(blockchain)
                 .reference(reference)
                 .timestamp(timestamp)
                 .amount(amount)
-                .blockExplorerUrl(blockExplorerUrl());
+                .blockExplorerUrl(blockExplorerUrl(blockExplorer));
     }
 }

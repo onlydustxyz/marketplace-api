@@ -19,6 +19,7 @@ import onlydust.com.marketplace.api.posthog.adapters.PosthogApiClientAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarTransactionStorageAdapter;
 import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.port.output.*;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
@@ -109,13 +110,15 @@ public class ProjectConfiguration {
                                          final DateProvider dateProvider,
                                          final ProjectStoragePort projectStoragePort,
                                          final GithubSearchPort githubSearchPort,
-                                         final ImageStoragePort imageStoragePort) {
+                                         final ImageStoragePort imageStoragePort,
+                                         final MetaBlockExplorer blockExplorer) {
         return new UserService(
                 postgresUserAdapter,
                 dateProvider,
                 projectStoragePort,
                 githubSearchPort,
-                imageStoragePort);
+                imageStoragePort,
+                blockExplorer);
     }
 
     @Bean
