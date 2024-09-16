@@ -138,14 +138,6 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     }
 
     @NonNull
-    private WebTestClient.ResponseSpec getSponsor(SponsorId id) {
-        return client.get()
-                .uri(SPONSOR.formatted(id))
-                .header("Authorization", "Bearer " + user.jwt())
-                .exchange();
-    }
-
-    @NonNull
     private WebTestClient.ResponseSpec allocateTo(SponsorId sponsorId, ProgramId programId, Currency.Id currencyId, long amount) {
         reset(notificationPort);
         return client.post()

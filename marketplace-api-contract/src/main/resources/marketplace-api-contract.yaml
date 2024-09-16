@@ -6701,8 +6701,8 @@ components:
         - $ref: '#/components/schemas/SponsorLinkResponse'
         - type: object
           required:
-            - totalDeposited
             - totalAvailable
+            - totalAllocated
             - totalGranted
             - totalRewarded
           properties:
@@ -6711,9 +6711,9 @@ components:
               format: uri
               description: URL of sponsor's website
               example: 'https://ethereum.org'
-            totalDeposited:
-              $ref: '#/components/schemas/DetailedTotalMoney'
             totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalAllocated:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
               $ref: '#/components/schemas/DetailedTotalMoney'
