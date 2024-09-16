@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.slack.mapper.*;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
@@ -25,6 +26,8 @@ import onlydust.com.marketplace.project.domain.port.output.*;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 
 import java.util.Set;
+
+import static onlydust.com.marketplace.api.slack.mapper.DepositSubmittedOnSponsorMapper.mapToSlackBlock;
 
 @Slf4j
 @AllArgsConstructor
@@ -37,6 +40,7 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
     private final HackathonStoragePort hackathonStoragePort;
     private final DepositStoragePort depositStoragePort;
     private final SponsorStoragePort sponsorStoragePort;
+    private final MetaBlockExplorer blockExplorer;
 
     @Override
     public void onUserRegistration(Hackathon.Id hackathonId, UserId userId) {
@@ -131,10 +135,11 @@ public class SlackApiAdapter implements BillingProfileObserverPort, ProjectObser
                 .orElseThrow(() -> OnlyDustException.notFound("Deposit not found %s".formatted(depositId.value())));
         final Sponsor sponsor = sponsorStoragePort.get(deposit.sponsorId())
                 .orElseThrow(() -> OnlyDustException.notFound("Sponsor not found %s".formatted(deposit.sponsorId().value())));
+
         slackApiClient.sendNotification(
                 slackProperties.getFinanceChannel(),
                 "New deposit submitted on sponsor %s".formatted(sponsor.name()),
-                DepositSubmittedOnSponsorMapper.mapToSlackBlock(user, sponsor, deposit, slackProperties.getEnvironment())
+                mapToSlackBlock(user, sponsor, deposit, slackProperties.getEnvironment(), blockExplorer.url(deposit.transaction()))
         );
     }
 
