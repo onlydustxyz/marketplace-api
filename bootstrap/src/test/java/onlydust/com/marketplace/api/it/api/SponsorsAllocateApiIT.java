@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -25,6 +27,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     private ProgramId programId;
     private final static Currency.Id currencyId = Currency.Id.of("562bbf65-8a71-4d30-ad63-520c0d68ba27");
     private UserAuthHelper.AuthenticatedUser user;
+    private UserAuthHelper.AuthenticatedUser programLead;
 
     @Autowired
     private NotificationPort notificationPort;
@@ -32,7 +35,8 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setup() {
         user = userAuthHelper.authenticateAntho();
-        programId = programHelper.create(sponsorId, userAuthHelper.authenticateOlivier()).id();
+        programLead = userAuthHelper.authenticateOlivier();
+        programId = programHelper.create(sponsorId, programLead).id();
     }
 
     @Test
@@ -68,6 +72,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
 //        ;
     }
 
+    @SneakyThrows
     @Test
     @Order(3)
     void should_unallocate() {
@@ -84,6 +89,25 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
                 .isNoContent();
         verify(notificationPort).push(any(), any(FundsUnallocatedFromProgram.class));
 
+        Thread.sleep(200);
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getFundsUnallocatedFromProgramEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(user.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(user.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Allocation returned from program")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("An allocation has been returned to you from a program. The " +
+                                                                                                 "funds have been credited back to your account. You can " +
+                                                                                                 "review the details of this transaction dashboard."))))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review transaction details")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-admin.onlydust.com/financials/%s".formatted(sponsorId))))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(user.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Allocation returned from program"))));
+
         // TODO - add call to sponsor stats endpoint
         // Then
 //        getSponsor(sponsorId)
@@ -98,6 +122,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
 //        ;
     }
 
+    @SneakyThrows
     @Test
     @Order(4)
     void should_allocate() {
@@ -110,6 +135,25 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
                 .expectStatus()
                 .isNoContent();
         verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
+
+        Thread.sleep(200);
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getFundsAllocatedToProgramEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(programLead.user().getId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo(programLead.user().getGithubLogin())))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("New allocation received")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("We are pleased to inform you that a new allocation has been" +
+                                                                                                 " granted to you. You can now view the details of this " +
+                                                                                                 "allocation in your personal account."))))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review allocation")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-admin.onlydust.com/programs/%s".formatted(programId))))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo(programLead.user().getEmail())))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("New allocation received"))));
 
         // TODO - add call to sponsor stats endpoint
         // Then

@@ -6,6 +6,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -296,6 +297,8 @@ public class AbstractMarketplaceApiIT {
     protected GithubHelper githubHelper;
     @Autowired
     protected BillingProfileHelper billingProfileHelper;
+    @Autowired
+    CustomerIOProperties customerIOProperties;
 
     @BeforeAll
     static void beforeAll() throws IOException, InterruptedException {

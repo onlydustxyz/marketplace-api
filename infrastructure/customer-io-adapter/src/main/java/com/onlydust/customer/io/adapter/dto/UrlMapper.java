@@ -33,4 +33,13 @@ public interface UrlMapper {
     static String getMarketplaceMyApplicationsFromEnvironment(String environment) {
         return getMarketplaceFrontendUrlFromEnvironment(environment) + "applications";
     }
+
+    static String getMarketplaceAdminFrontendUrlFromEnvironment(String environment) {
+        return switch (environment) {
+            case "develop" -> "https://develop-admin.onlydust.com/";
+            case "staging" -> "https://staging-admin.onlydust.com/";
+            case "production" -> "https://admin.onlydust.com/";
+            default -> throw internalServerError("Invalid environment " + environment);
+        };
+    }
 }

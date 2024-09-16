@@ -7,10 +7,7 @@ import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfileChildrenKycVerification;
 import onlydust.com.marketplace.accounting.domain.notification.*;
 import onlydust.com.marketplace.kernel.model.UserId;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
-import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
-import onlydust.com.marketplace.project.domain.model.notification.CommitteeApplicationCreated;
-import onlydust.com.marketplace.project.domain.model.notification.GoodFirstIssueCreated;
+import onlydust.com.marketplace.project.domain.model.notification.*;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.model.SendableNotification;
 
@@ -181,6 +178,54 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 notification.recipient().email(),
                 issueCreatedDTO.title(),
                 issueCreatedDTO);
+    }
+
+    public static MailDTO<FundsAllocatedToProgramDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                           @NonNull SendableNotification notification,
+                                                           @NonNull FundsAllocatedToProgram fundsAllocatedToProgram) {
+        final var dto = FundsAllocatedToProgramDTO.from(notification.recipient().login(), fundsAllocatedToProgram,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getFundsAllocatedToProgramEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                notification.recipient().email(),
+                dto.title(),
+                dto);
+    }
+
+    public static MailDTO<FundsUnallocatedFromProgramDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                               @NonNull SendableNotification notification,
+                                                               @NonNull FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
+        final var dto = FundsUnallocatedFromProgramDTO.from(notification.recipient().login(), fundsUnallocatedFromProgram,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getFundsUnallocatedFromProgramEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                notification.recipient().email(),
+                dto.title(),
+                dto);
+    }
+
+    public static MailDTO<DepositApprovedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                   @NonNull SendableNotification notification,
+                                                   @NonNull DepositApproved depositApproved) {
+        final var dto = DepositApprovedDTO.from(notification.recipient().login(), depositApproved,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getDepositApprovedEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                notification.recipient().email(),
+                dto.title(),
+                dto);
+    }
+
+    public static MailDTO<DepositRejectedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                   @NonNull SendableNotification notification,
+                                                   @NonNull DepositRejected depositRejected) {
+        final var dto = DepositRejectedDTO.from(notification.recipient().login(), depositRejected,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getDepositRejectedEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                notification.recipient().email(),
+                dto.title(),
+                dto);
     }
 
     private static IdentifiersDTO mapIdentifiers(@NonNull String email, UserId id) {
