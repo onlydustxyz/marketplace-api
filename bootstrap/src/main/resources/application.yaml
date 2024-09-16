@@ -4,6 +4,7 @@ application:
     starknet: '0x038f2d2759AFF91584D696344A32B2352cAFFB7e57Cd6daCC9b1A0fF992f06c7'
     optimism: '0xaEF011B2374D723652796BF25a9FEE9e81C45a36'
     stellar: 'GCY2AHYGO4DBKMMNITVD7ZHYG5W2PEYFW7XOCJVUPI3GAOYNR5HVRN3O'
+
   web:
     cors:
       hosts: ${FRONTEND_CORS_HOSTS}
@@ -209,6 +210,8 @@ infrastructure:
   node-guardians:
     base-uri: ${NODE_GUARDIANS_BASE_URI}
     api-key: ${NODE_GUARDIANS_API_KEY}
+  block-explorer:
+    environment: ${BLOCKCHAIN_NETWORK}
 
 global:
   app-base-url: ${APP_BASE_URL}
