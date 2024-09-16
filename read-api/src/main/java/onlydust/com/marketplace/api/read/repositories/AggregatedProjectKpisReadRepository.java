@@ -13,23 +13,23 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
 
     @Query(value = """
             WITH aggregated_project_stats AS
-                     (SELECT date_trunc(:timeGrouping, d.timestamp)                                                               as timestamp,
-                             count(distinct d.project_id)                                                                         as active_project_count,
+                     (SELECT date_trunc(:timeGrouping, d.timestamp)                                                             as timestamp,
+                             count(distinct d.project_id)                                                                       as active_project_count,
             
                              count(distinct d.project_id)
-                             filter (where d.previous_project_contribution_timestamp is null)                                     as new_project_count,
+                             filter (where d.previous_project_contribution_timestamp is null)                                   as new_project_count,
             
                              count(distinct d.project_id)
                              filter (where d.previous_project_contribution_timestamp < date_trunc(:timeGrouping, d.timestamp) -
-                                                                                       cast(('1 ' || :timeGrouping) as interval)) as reactivated_project_count,
+                                                                                       cast(:timeGroupingInterval as interval)) as reactivated_project_count,
             
                              count(distinct d.contribution_id)
-                             filter ( where d.is_merged_pr )                                                                      as merged_pr_count
+                             filter ( where d.is_merged_pr )                                                                    as merged_pr_count
                       from bi.contribution_data_cross_projects d
                       where
                         -- We need to get one interval before fromDate to calculate churned project count
-                          d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval)
-                        and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(('1 ' || :timeGrouping) as interval)
+                          d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
+                        and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
                           or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
                           or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
@@ -40,7 +40,7 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
                              sum(d.usd_amount)                      as total_rewarded_usd_amount
                       from bi.reward_data d
                       where d.timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
-                        and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(('1 ' || :timeGrouping) as interval)
+                        and d.timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
                           or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
                           or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
@@ -51,17 +51,17 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
                              sum(d.usd_amount)                          as total_granted_usd_amount
                       from bi.daily_project_grants d
                       where d.day_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
-                        and d.day_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(('1 ' || :timeGrouping) as interval)
+                        and d.day_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null or d.program_id = any (cast(:programOrEcosystemIds as uuid[])))
                       group by 1),
             
                  all_timestamps_to_return AS
-                     (SELECT series.timestamp                                               as timestamp,
-                             (series.timestamp - cast(('1 ' || :timeGrouping) as interval)) as timestamp_of_previous_period
+                     (SELECT series.timestamp                                             as timestamp,
+                             (series.timestamp - cast(:timeGroupingInterval as interval)) as timestamp_of_previous_period
                       -- We need to get one interval before fromDate to calculate churned project count
-                      FROM (select generate_series(date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(('1 ' || :timeGrouping) as interval),
+                      FROM (select generate_series(date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval),
                                                    date_trunc(:timeGrouping, cast(:toDate as timestamptz)),
-                                                   cast(('1 ' || :timeGrouping) as interval)) as timestamp) series)
+                                                   cast(:timeGroupingInterval as interval)) as timestamp) series)
             
             SELECT allt.timestamp,
                    allt.timestamp_of_previous_period,
@@ -80,6 +80,7 @@ public interface AggregatedProjectKpisReadRepository extends Repository<Aggregat
                                ON allt.timestamp = aprs.timestamp
             """, nativeQuery = true)
     List<AggregatedProjectKpisReadEntity> findAll(@NonNull String timeGrouping,
+                                                  @NonNull String timeGroupingInterval,
                                                   @NonNull ZonedDateTime fromDate,
                                                   @NonNull ZonedDateTime toDate,
                                                   UUID[] programOrEcosystemIds);
