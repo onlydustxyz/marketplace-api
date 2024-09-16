@@ -73,8 +73,8 @@ public class SponsorReadEntity {
                 .name(name)
                 .url(url == null ? null : URI.create(url))
                 .logoUrl(logoUrl == null ? null : URI.create(logoUrl))
-                .totalDeposited(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::initialAllowance))
                 .totalAvailable(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalAvailable))
+                .totalAllocated(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalAllocated))
                 .totalGranted(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, SponsorStatPerCurrencyReadEntity::totalRewarded));
     }

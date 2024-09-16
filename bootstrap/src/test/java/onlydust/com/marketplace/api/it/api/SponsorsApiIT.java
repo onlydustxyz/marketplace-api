@@ -68,10 +68,10 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                     .expectBody()
                     .jsonPath("$.id").isEqualTo(sponsor.id().toString())
                     .jsonPath("$.name").isEqualTo(sponsor.name())
-                    .jsonPath("$.totalDeposited.totalUsdEquivalent").isEqualTo(0)
-                    .jsonPath("$.totalDeposited.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalAvailable.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalAvailable.totalPerCurrency").isEmpty()
+                    .jsonPath("$.totalAllocated.totalUsdEquivalent").isEqualTo(0)
+                    .jsonPath("$.totalAllocated.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalGranted.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalRewarded.totalUsdEquivalent").isEqualTo(0)
@@ -263,59 +263,12 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.name").isEqualTo(sponsor.name())
                         .jsonPath("$.logoUrl").isEqualTo(sponsor.logoUrl().toString())
                         .jsonPath("$.url").isEqualTo(sponsor.url().toString())
-                        .jsonPath("$.totalDeposited.totalPerCurrency[0].currency.code").isEqualTo("BTC")
                         .jsonPath("$.totalAvailable.totalPerCurrency[0].currency.code").isEqualTo("BTC")
+                        .jsonPath("$.totalAllocated.totalPerCurrency[0].currency.code").isEqualTo("BTC")
                         .jsonPath("$.totalGranted.totalPerCurrency[0].currency.code").isEqualTo("BTC")
                         .jsonPath("$.totalRewarded.totalPerCurrency[0].currency.code").isEqualTo("BTC")
                         .json("""
                                 {
-                                  "totalDeposited": {
-                                    "totalUsdEquivalent": 25625.81,
-                                    "totalPerCurrency": [
-                                      {
-                                        "amount": 1,
-                                        "prettyAmount": 1,
-                                        "currency": {
-                                          "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
-                                          "code": "BTC",
-                                          "name": "Bitcoin",
-                                          "logoUrl": null,
-                                          "decimals": 8
-                                        },
-                                        "usdEquivalent": null,
-                                        "usdConversionRate": null,
-                                        "ratio": null
-                                      },
-                                      {
-                                        "amount": 12,
-                                        "prettyAmount": 12,
-                                        "currency": {
-                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                          "code": "ETH",
-                                          "name": "Ether",
-                                          "logoUrl": null,
-                                          "decimals": 18
-                                        },
-                                        "usdEquivalent": 21383.81,
-                                        "usdConversionRate": 1781.983987,
-                                        "ratio": 83
-                                      },
-                                      {
-                                        "amount": 4200,
-                                        "prettyAmount": 4200,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 4242.00,
-                                        "usdConversionRate": 1.010001,
-                                        "ratio": 17
-                                      }
-                                    ]
-                                  },
                                   "totalAvailable": {
                                     "totalUsdEquivalent": 1212.00,
                                     "totalPerCurrency": [
@@ -360,6 +313,53 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                         "usdEquivalent": 0.00,
                                         "usdConversionRate": 1781.983987,
                                         "ratio": 0
+                                      }
+                                    ]
+                                  },
+                                  "totalAllocated": {
+                                    "totalUsdEquivalent": 24413.81,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 1,
+                                        "prettyAmount": 1,
+                                        "currency": {
+                                          "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                                          "code": "BTC",
+                                          "name": "Bitcoin",
+                                          "logoUrl": null,
+                                          "decimals": 8
+                                        },
+                                        "usdEquivalent": null,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      },
+                                      {
+                                        "amount": 12,
+                                        "prettyAmount": 12,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 21383.81,
+                                        "usdConversionRate": 1781.983987,
+                                        "ratio": 88
+                                      },
+                                      {
+                                        "amount": 3000,
+                                        "prettyAmount": 3000,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 3030.00,
+                                        "usdConversionRate": 1.010001,
+                                        "ratio": 12
                                       }
                                     ]
                                   },
