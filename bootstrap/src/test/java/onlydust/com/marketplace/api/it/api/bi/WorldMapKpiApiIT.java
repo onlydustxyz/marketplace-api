@@ -130,15 +130,15 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             [
                               {
-                                "countryCode": "FRA",
+                                "countryCode": "FR",
                                 "value": 3
                               },
                               {
-                                "countryCode": "GBR",
+                                "countryCode": "GB",
                                 "value": 3
                               },
                               {
-                                "countryCode": "MAR",
+                                "countryCode": "MA",
                                 "value": 2
                               }
                             ]
@@ -160,15 +160,15 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             [
                               {
-                                "countryCode": "FRA",
+                                "countryCode": "FR",
                                 "value": 1
                               },
                               {
-                                "countryCode": "GBR",
+                                "countryCode": "GB",
                                 "value": 2
                               },
                               {
-                                "countryCode": "MAR",
+                                "countryCode": "MA",
                                 "value": 1
                               }
                             ]
@@ -189,15 +189,15 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             [
                               {
-                                "countryCode": "FRA",
+                                "countryCode": "FR",
                                 "value": 2
                               },
                               {
-                                "countryCode": "GBR",
+                                "countryCode": "GB",
                                 "value": 3
                               },
                               {
-                                "countryCode": "MAR",
+                                "countryCode": "MA",
                                 "value": 1
                               }
                             ]

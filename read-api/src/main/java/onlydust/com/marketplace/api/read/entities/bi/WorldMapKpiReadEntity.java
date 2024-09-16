@@ -4,8 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
+import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.BiWorldMapItemResponse;
 import org.hibernate.annotations.Immutable;
 
@@ -18,13 +20,15 @@ import java.math.BigDecimal;
 @Immutable
 public class WorldMapKpiReadEntity {
     @Id
+    @NonNull
     String countryCode;
 
+    @NonNull
     BigDecimal value;
 
     public BiWorldMapItemResponse toListItemResponse() {
         return new BiWorldMapItemResponse()
-                .countryCode(countryCode)
+                .countryCode(Country.fromIso3(countryCode).iso2Code())
                 .value(value);
     }
 }
