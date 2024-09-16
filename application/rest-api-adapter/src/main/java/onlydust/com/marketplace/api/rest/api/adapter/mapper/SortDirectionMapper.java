@@ -2,14 +2,9 @@ package onlydust.com.marketplace.api.rest.api.adapter.mapper;
 
 import onlydust.com.marketplace.kernel.pagination.SortDirection;
 
-import static java.util.Objects.isNull;
-
 public interface SortDirectionMapper {
 
-    static SortDirection requestToDomain(final String direction) {
-        return isNull(direction) || direction.isEmpty() ? SortDirection.asc : switch (direction) {
-            case "DESC" -> SortDirection.desc;
-            default -> SortDirection.asc;
-        };
+    static SortDirection requestToDomain(final onlydust.com.marketplace.api.contract.model.SortDirection direction) {
+        return direction == onlydust.com.marketplace.api.contract.model.SortDirection.DESC ? SortDirection.desc : SortDirection.asc;
     }
 }

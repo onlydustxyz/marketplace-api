@@ -260,7 +260,7 @@ public class ProjectsRestApi implements ProjectsApi {
                                                                             String toDate,
                                                                             List<Long> contributorIds,
                                                                             ProjectContributionSort sort,
-                                                                            String direction,
+                                                                            SortDirection direction,
                                                                             Integer pageIndex,
                                                                             Integer pageSize) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();

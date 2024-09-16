@@ -525,3 +525,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000336_fix_bi_contribution_data_view.sql
   - include:
       file: db/changelog/changelogs/00000337_refactor_bi_contribution_data_view.sql
+  - include:
+      file: db/changelog/changelogs/00000337_bi_project_kpis.sql

@@ -22,3 +22,5 @@ REFRESH MATERIALIZED VIEW bi.contribution_data;
 REFRESH MATERIALIZED VIEW bi.contribution_data_cross_projects;
 REFRESH MATERIALIZED VIEW bi.reward_data;
 REFRESH MATERIALIZED VIEW bi.daily_project_grants;
+REFRESH MATERIALIZED VIEW bi.project_data_unions;
+REFRESH MATERIALIZED VIEW bi.project_global_data;
