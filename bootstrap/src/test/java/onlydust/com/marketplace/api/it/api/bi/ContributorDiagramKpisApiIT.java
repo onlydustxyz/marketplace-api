@@ -277,6 +277,34 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                               ]
                             }
                             """);
+
+            // When
+            client.get()
+                    .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-02", "toDate", "2021-01-02",
+                            "programOrEcosystemIds",
+                            String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "stats": [
+                                {
+                                  "timestamp": "2021-01-02T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 1,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 1,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 3
+                                }
+                              ]
+                            }
+                            """);
         }
 
         @Test

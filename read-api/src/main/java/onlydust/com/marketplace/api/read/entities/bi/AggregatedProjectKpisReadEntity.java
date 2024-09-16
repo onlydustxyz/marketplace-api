@@ -14,7 +14,6 @@ import java.util.Optional;
 
 @Entity
 @NoArgsConstructor(force = true)
-@Getter
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
@@ -22,28 +21,54 @@ import java.util.Optional;
 public class AggregatedProjectKpisReadEntity {
     @Id
     @NonNull
+    @Getter
     ZonedDateTime timestamp;
 
     @NonNull
+    @Getter
     ZonedDateTime timestampOfPreviousPeriod;
 
     Integer activeProjectCount;
     Integer newProjectCount;
     Integer reactivatedProjectCount;
-    Integer nextPeriodChurnedProjectCount;
     Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
 
+    Integer activeProjectCount() {
+        return Optional.ofNullable(activeProjectCount).orElse(0);
+    }
+
+    Integer newProjectCount() {
+        return Optional.ofNullable(newProjectCount).orElse(0);
+    }
+
+    Integer reactivatedProjectCount() {
+        return Optional.ofNullable(reactivatedProjectCount).orElse(0);
+    }
+
+    Integer mergedPrCount() {
+        return Optional.ofNullable(mergedPrCount).orElse(0);
+    }
+
+    BigDecimal totalGrantedUsdAmount() {
+        return Optional.ofNullable(totalGrantedUsdAmount).orElse(BigDecimal.ZERO);
+    }
+
+    BigDecimal totalRewardedUsdAmount() {
+        return Optional.ofNullable(totalRewardedUsdAmount).orElse(BigDecimal.ZERO);
+    }
+
     public BiProjectsStatsListItemResponse toDto(AggregatedProjectKpisReadEntity statsOfPreviousTimeGroup) {
         return new BiProjectsStatsListItemResponse()
                 .timestamp(timestamp)
-                .totalGranted(Optional.ofNullable(totalGrantedUsdAmount).orElse(BigDecimal.ZERO))
-                .totalRewarded(Optional.ofNullable(totalRewardedUsdAmount).orElse(BigDecimal.ZERO))
-                .mergedPrCount(Optional.ofNullable(mergedPrCount).orElse(0))
-                .newProjectCount(Optional.ofNullable(newProjectCount).orElse(0))
-                .activeProjectCount(Optional.ofNullable(activeProjectCount).orElse(0))
-                .reactivatedProjectCount(Optional.ofNullable(reactivatedProjectCount).orElse(0))
-                .churnedProjectCount(Optional.ofNullable(statsOfPreviousTimeGroup).flatMap(s -> Optional.ofNullable(s.nextPeriodChurnedProjectCount)).orElse(0));
+                .totalGranted(totalGrantedUsdAmount())
+                .totalRewarded(totalRewardedUsdAmount())
+                .mergedPrCount(mergedPrCount())
+                .newProjectCount(newProjectCount())
+                .activeProjectCount(activeProjectCount())
+                .reactivatedProjectCount(reactivatedProjectCount())
+                .churnedProjectCount(statsOfPreviousTimeGroup == null ? 0 :
+                        statsOfPreviousTimeGroup.activeProjectCount() - activeProjectCount() + newProjectCount() + reactivatedProjectCount());
     }
 }
