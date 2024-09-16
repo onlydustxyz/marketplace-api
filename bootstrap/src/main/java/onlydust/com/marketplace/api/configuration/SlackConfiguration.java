@@ -7,6 +7,7 @@ import onlydust.com.marketplace.api.slack.AsyncSlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiClient;
 import onlydust.com.marketplace.api.slack.SlackProperties;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.SponsorStoragePort;
@@ -42,8 +43,9 @@ public class SlackConfiguration {
                                            final ProjectStoragePort projectStoragePort,
                                            final HackathonStoragePort hackathonStoragePort,
                                            final DepositStoragePort depositStoragePort,
-                                           final SponsorStoragePort sponsorStoragePort) {
+                                           final SponsorStoragePort sponsorStoragePort,
+                                           final MetaBlockExplorer blockExplorer) {
         return new SlackApiAdapter(slackProperties, slackApiClient, userStoragePort, projectStoragePort, hackathonStoragePort, depositStoragePort,
-                sponsorStoragePort);
+                sponsorStoragePort, blockExplorer);
     }
 }

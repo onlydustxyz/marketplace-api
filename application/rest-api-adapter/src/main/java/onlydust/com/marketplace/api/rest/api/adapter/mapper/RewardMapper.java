@@ -120,7 +120,7 @@ public interface RewardMapper {
                 .iban(receiptView.getIban())
                 .walletAddress(receiptView.getWalletAddress())
                 .transactionReference(receiptView.getTransactionReference())
-                .transactionReferenceLink(receiptView.getTransactionReferenceUrl().orElse(null));
+                .transactionReferenceLink(receiptView.getTransactionReferenceUrl());
     }
 
     static RewardItemsPageResponse pageToResponse(final int pageIndex, Page<RewardItemView> page) {

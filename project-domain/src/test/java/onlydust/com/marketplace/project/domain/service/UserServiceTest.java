@@ -5,6 +5,7 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
@@ -45,6 +46,7 @@ public class UserServiceTest {
     private ProjectStoragePort projectStoragePort;
     private GithubSearchPort githubSearchPort;
     private ImageStoragePort imageStoragePort;
+    private MetaBlockExplorer metaBlockExplorer;
     private UserService userService;
 
     @BeforeEach
@@ -53,8 +55,9 @@ public class UserServiceTest {
         projectStoragePort = mock(ProjectStoragePort.class);
         githubSearchPort = mock(GithubSearchPort.class);
         imageStoragePort = mock(ImageStoragePort.class);
+        metaBlockExplorer = mock(MetaBlockExplorer.class);
 
-        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort);
+        userService = new UserService(userStoragePort, dateProvider, projectStoragePort, githubSearchPort, imageStoragePort, metaBlockExplorer);
     }
 
     @Test

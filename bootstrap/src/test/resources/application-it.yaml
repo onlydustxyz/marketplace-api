@@ -79,6 +79,8 @@ infrastructure:
     deposit-approved-email-id: 120
     deposit-rejected-email-id: 130
     marketing-topic-id: 3
+  block-explorer:
+    environment: mainnet
 application:
   onlydust-wallets:
     ethereum: '0xb060429d14266d06a8be63281205668be823604f'

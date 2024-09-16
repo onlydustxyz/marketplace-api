@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import onlydust.com.marketplace.kernel.pagination.Page;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.gateway.DateProvider;
@@ -42,6 +43,7 @@ public class UserService implements UserFacadePort {
     private final ProjectStoragePort projectStoragePort;
     private final GithubSearchPort githubSearchPort;
     private final ImageStoragePort imageStoragePort;
+    private final MetaBlockExplorer blockExplorer;
 
 
     @Override
@@ -151,10 +153,15 @@ public class UserService implements UserFacadePort {
     public RewardDetailsView getRewardByIdForRecipientIdAndAdministratedBillingProfileIds(UUID rewardId, Long recipientId,
                                                                                           List<UUID> companyAdminBillingProfileIds) {
         final RewardDetailsView reward = userStoragePort.findRewardById(rewardId);
+
         if (!reward.getTo().getGithubUserId().equals(recipientId) &&
             (isNull(reward.getBillingProfileId()) || !companyAdminBillingProfileIds.contains(reward.getBillingProfileId()))) {
             throw forbidden("Only recipient user or billing profile admin linked to this reward can read its details");
         }
+
+        Optional.ofNullable(reward.getReceipt())
+                .ifPresent(receipt -> receipt.setTransactionReferenceUrl(blockExplorer.url(receipt.getBlockchain(), receipt.getTransactionReference())));
+
         return reward;
     }
 

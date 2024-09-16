@@ -3,11 +3,11 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeSponsorReadApi;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.repositories.DepositReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
 import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
+import onlydust.com.marketplace.kernel.model.blockchain.MetaBlockExplorer;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,12 +32,13 @@ public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSpons
     private final SponsorReadRepository sponsorReadRepository;
     private final ProgramReadRepository programReadRepository;
     private final DepositReadRepository depositReadRepository;
+    private final MetaBlockExplorer blockExplorer;
 
     @Override
     public ResponseEntity<BoDepositResponse> getDepositDetails(UUID depositId) {
         final var deposit = depositReadRepository.findById(depositId)
                 .orElseThrow(() -> notFound("Deposit %s not found".formatted(depositId)));
-        return ok(deposit.toBoResponse());
+        return ok(deposit.toBoResponse(blockExplorer));
     }
 
     @Override
@@ -64,7 +65,7 @@ public class BackofficeSponsorsReadApiPostgresAdapter implements BackofficeSpons
         final var page = depositReadRepository.findAllBySponsorId(sponsorId, PageRequest.of(index, size, Sort.by("transaction.timestamp").descending()));
 
         final var response = new DepositPage()
-                .deposits(page.getContent().stream().map(DepositReadEntity::toBoPageItemResponse).toList())
+                .deposits(page.getContent().stream().map(d -> d.toBoPageItemResponse(blockExplorer)).toList())
                 .hasMore(hasMore(index, page.getTotalPages()))
                 .totalPageNumber(page.getTotalPages())
                 .totalItemNumber((int) page.getTotalElements())

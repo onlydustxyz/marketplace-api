@@ -1037,7 +1037,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                              "type": "CRYPTO",
                              "walletAddress": "0x66cb05df2d855fbae92cdb2dfac9a0b29c969a03998fa817735d27391b52b189",
                              "transactionReference": "0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f",
-                             "transactionReferenceLink": "https://aptoscan.com/transaction/0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f"
+                             "transactionReferenceLink": "https://aptoscan.com/transaction/0xffae983a8a8498980c4ecfd88eef5615037cad97ed1f1d7d727137421656cb2f?network=mainnet"
                            }
                          }
                         """
