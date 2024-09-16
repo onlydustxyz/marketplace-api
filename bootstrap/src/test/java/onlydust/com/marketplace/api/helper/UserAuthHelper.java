@@ -36,10 +36,14 @@ public class UserAuthHelper {
     Faker faker;
 
     public AuthenticatedUser create() {
+        return create(faker.internet().slug());
+    }
+
+    public AuthenticatedUser create(String login) {
         return signUpUser(
                 faker.random().nextLong(10000),
-                faker.internet().slug(),
-                faker.internet().avatar(),
+                login,
+                "https://avatars.githubusercontent.com/u/%s".formatted(login),
                 false);
     }
 

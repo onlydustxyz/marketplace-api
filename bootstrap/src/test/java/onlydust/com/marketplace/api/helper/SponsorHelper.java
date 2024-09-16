@@ -24,8 +24,12 @@ public class SponsorHelper {
     private final Faker faker = new Faker();
 
     public Sponsor create() {
+        return create(faker.lordOfTheRings().character() + " " + faker.random().nextLong());
+    }
+
+    public Sponsor create(String name) {
         return sponsorFacadePort.createSponsor(
-                faker.lordOfTheRings().character() + " " + faker.random().nextLong(),
+                name,
                 URI.create(faker.internet().url()),
                 URI.create(faker.internet().url()),
                 List.of());

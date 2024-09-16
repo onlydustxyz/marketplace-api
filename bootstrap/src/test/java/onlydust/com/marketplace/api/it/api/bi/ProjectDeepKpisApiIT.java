@@ -39,18 +39,18 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            final var antho = userAuthHelper.create();
-            final var pierre = userAuthHelper.create();
-            final var mehdi = userAuthHelper.create();
-            final var hayden = userAuthHelper.create();
-            final var abdel = userAuthHelper.create();
-            final var emma = userAuthHelper.create();
-            final var james = userAuthHelper.create();
+            final var antho = userAuthHelper.create("antho");
+            final var pierre = userAuthHelper.create("pierre");
+            final var mehdi = userAuthHelper.create("mehdi");
+            final var hayden = userAuthHelper.create("hayden");
+            final var abdel = userAuthHelper.create("abdel");
+            final var emma = userAuthHelper.create("emma");
+            final var james = userAuthHelper.create("james");
 
             starknet = ecosystemHelper.create("Starknet ecosystem").id();
             ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
 
-            final var starknetFoundation = sponsorHelper.create();
+            final var starknetFoundation = sponsorHelper.create("The Starknet Foundation");
             accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
 
             explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team").id();
@@ -58,7 +58,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             nethermind = programHelper.create(starknetFoundation.id(), "Nethermind").id();
             accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
-            final var ethFoundation = sponsorHelper.create();
+            final var ethFoundation = sponsorHelper.create("The Ethereum Foundation");
             accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
@@ -140,25 +140,206 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             {
                               "totalPageNumber": 1,
-                              "totalItemNumber": 3,
+                              "totalItemNumber": 6,
                               "hasMore": false,
                               "nextPageIndex": 0,
                               "projects": [
                                 {
                                   "project": {
+                                    "logoUrl": null
+                                  },
+                                  "projectLeads": [
+                                    {
+                                      "login": "mehdi",
+                                      "avatarUrl": "https://avatars.githubusercontent.com/u/mehdi"
+                                    }
+                                  ],
+                                  "categories": null,
+                                  "languages": null,
+                                  "ecosystems": [
+                                    {
+                                      "name": "Starknet ecosystem",
+                                      "slug": "starknet-ecosystem"
+                                    },
+                                    {
+                                      "name": "Ethereum ecosystem",
+                                      "slug": "ethereum-ecosystem"
+                                    }
+                                  ],
+                                  "programs": [
+                                    {
+                                      "name": "Starkware Exploration Team"
+                                    },
+                                    {
+                                      "name": "Ethereum Granting Program"
+                                    }
+                                  ],
+                                  "availableBudget": null,
+                                  "percentUsedBudget": null,
+                                  "totalGrantedUsdAmount": {
+                                    "value": 200,
+                                    "trend": "UP"
+                                  },
+                                  "totalRewardedUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "averageRewardUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "onboardedContributorCount": {
+                                    "value": 1,
+                                    "trend": "UP"
+                                  },
+                                  "activeContributorCount": {
+                                    "value": 1,
+                                    "trend": "UP"
+                                  },
+                                  "mergedPrCount": {
+                                    "value": 4,
+                                    "trend": "UP"
+                                  },
+                                  "rewardCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "contributionCount": {
+                                    "value": 4,
+                                    "trend": "UP"
+                                  }
+                                },
+                                {
+                                  "project": {
+                                    "logoUrl": null
+                                  },
+                                  "projectLeads": [
+                                    {
+                                      "login": "hayden",
+                                      "avatarUrl": "https://avatars.githubusercontent.com/u/hayden"
+                                    }
+                                  ],
+                                  "categories": null,
+                                  "languages": null,
+                                  "ecosystems": [
+                                    {
+                                      "name": "Starknet ecosystem",
+                                      "slug": "starknet-ecosystem"
+                                    }
+                                  ],
+                                  "programs": [
+                                    {
+                                      "name": "Starkware Exploration Team"
+                                    }
+                                  ],
+                                  "availableBudget": null,
+                                  "percentUsedBudget": null,
+                                  "totalGrantedUsdAmount": {
+                                    "value": 60.0,
+                                    "trend": "UP"
+                                  },
+                                  "totalRewardedUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "averageRewardUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "onboardedContributorCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "activeContributorCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "mergedPrCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "rewardCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "contributionCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  }
+                                },
+                                {
+                                  "project": {
+                                    "logoUrl": null
+                                  },
+                                  "projectLeads": [
+                                    {
+                                      "login": "pierre",
+                                      "avatarUrl": "https://avatars.githubusercontent.com/u/pierre"
+                                    }
+                                  ],
+                                  "categories": null,
+                                  "languages": null,
+                                  "ecosystems": null,
+                                  "programs": [
+                                    {
+                                      "name": "Nethermind"
+                                    },
+                                    {
+                                      "name": "Ethereum Granting Program"
+                                    }
+                                  ],
+                                  "availableBudget": null,
+                                  "percentUsedBudget": null,
+                                  "totalGrantedUsdAmount": {
+                                    "value": 250.0,
+                                    "trend": "UP"
+                                  },
+                                  "totalRewardedUsdAmount": {
+                                    "value": 5.0,
+                                    "trend": "UP"
+                                  },
+                                  "averageRewardUsdAmount": {
+                                    "value": 1.2500000000000000,
+                                    "trend": "UP"
+                                  },
+                                  "onboardedContributorCount": {
+                                    "value": 3,
+                                    "trend": "UP"
+                                  },
+                                  "activeContributorCount": {
+                                    "value": 4,
+                                    "trend": "UP"
+                                  },
+                                  "mergedPrCount": {
+                                    "value": 8,
+                                    "trend": "UP"
+                                  },
+                                  "rewardCount": {
+                                    "value": 4,
+                                    "trend": "UP"
+                                  },
+                                  "contributionCount": {
+                                    "value": 8,
+                                    "trend": "UP"
+                                  }
+                                },
+                                {
+                                  "project": {
                                     "slug": "pacos-project",
-                                    "name": "Paco's project",
+                                    "name": "Paco's project"
                                   },
                                   "projectLeads": null,
                                   "categories": null,
                                   "languages": [
                                     {
+                                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                       "slug": "javascript",
                                       "name": "Javascript",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                     },
                                     {
+                                      "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                       "slug": "solidity",
                                       "name": "Solidity",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
@@ -167,24 +348,28 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
+                                      "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
                                       "name": "Aztec",
                                       "url": "https://aztec.network/",
+                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
                                       "bannerUrl": null,
                                       "slug": "aztec"
                                     },
                                     {
+                                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
                                       "name": "Starknet",
                                       "url": "https://www.starknet.io/en",
+                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
                                       "bannerUrl": null,
                                       "slug": "starknet"
                                     }
                                   ],
                                   "programs": [
                                     {
-                                      "name": "Theodo",
+                                      "name": "Theodo"
                                     },
                                     {
-                                      "name": "No Sponsor",
+                                      "name": "No Sponsor"
                                     }
                                   ],
                                   "availableBudget": null,
@@ -224,20 +409,20 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 },
                                 {
                                   "project": {
-                                    "slug": "zero-title-11",
-                                    "name": "Zero title 11",
                                     "logoUrl": null
                                   },
                                   "projectLeads": null,
                                   "categories": null,
                                   "languages": [
                                     {
+                                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
                                       "slug": "javascript",
                                       "name": "Javascript",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
                                       "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
                                     },
                                     {
+                                      "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
                                       "slug": "solidity",
                                       "name": "Solidity",
                                       "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
@@ -247,18 +432,15 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "ecosystems": [
                                     {
                                       "name": "Starknet",
-                                      "url": "https://www.starknet.io/en",
-                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                                      "bannerUrl": null,
                                       "slug": "starknet"
                                     }
                                   ],
                                   "programs": [
                                     {
-                                      "name": "Theodo",
+                                      "name": "Theodo"
                                     },
                                     {
-                                      "name": "No Sponsor",
+                                      "name": "No Sponsor"
                                     }
                                   ],
                                   "availableBudget": null,
@@ -299,26 +481,30 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "project": {
                                     "slug": "zero-title-5",
-                                    "name": "Zero title 5",
+                                    "name": "Zero title 5"
                                   },
                                   "projectLeads": [
                                     {
                                       "githubUserId": 595505,
                                       "login": "ofux",
                                       "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
+                                      "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
                                     }
                                   ],
                                   "categories": null,
                                   "languages": [
                                     {
+                                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
                                       "slug": "rust",
                                       "name": "Rust",
+                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
+                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
                                     }
                                   ],
                                   "ecosystems": null,
                                   "programs": [
                                     {
-                                      "name": "No Sponsor",
+                                      "name": "No Sponsor"
                                     }
                                   ],
                                   "availableBudget": null,
