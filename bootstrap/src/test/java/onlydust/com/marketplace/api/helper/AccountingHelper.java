@@ -223,4 +223,8 @@ public class AccountingHelper {
     public void refund(ProjectId projectId, ProgramId programId, long amount, Currency.Id currencyId) {
         accountingFacadePort.ungrant(projectId, programId, PositiveAmount.of(amount), currencyId);
     }
+
+    public void approve(Deposit.Id depositId) {
+        accountingFacadePort.approveDeposit(depositId);
+    }
 }

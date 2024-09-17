@@ -5,7 +5,10 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.AllArgsConstructor;
 import onlydust.com.backoffice.api.contract.BackofficeAccountingManagementApi;
 import onlydust.com.backoffice.api.contract.model.*;
-import onlydust.com.marketplace.accounting.domain.model.*;
+import onlydust.com.marketplace.accounting.domain.model.Currency;
+import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Payment;
+import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
@@ -32,7 +35,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.map;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.BackOfficeMapper.mapTransactionNetwork;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.badRequest;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -50,62 +54,11 @@ public class BackofficeAccountingManagementRestApi implements BackofficeAccounti
     private final BlockchainFacadePort blockchainFacadePort;
 
     @Override
-    public ResponseEntity<AccountResponse> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
-        final var sponsorId = SponsorId.of(sponsorUuid);
-        final var currencyId = Currency.Id.of(createAccountRequest.getCurrencyId());
-        final var lockedUntil = createAccountRequest.getLockedUntil();
-        final var allowance = createAccountRequest.getAllowance() == null ? null : PositiveAmount.of(createAccountRequest.getAllowance());
-        final var transaction = createAccountRequest.getReceipt() == null ? null : mapReceiptToTransaction(createAccountRequest.getReceipt());
-
-        if (allowance == null && transaction == null)
-            throw badRequest("Either allowance or transaction must be set");
-
-        if (allowance != null && transaction != null)
-            throw badRequest("Both allowance and transaction cannot be set at the same time");
-
-        final var sponsorAccountStatement = transaction == null ?
-                accountingFacadePort.createSponsorAccountWithInitialAllowance(sponsorId, currencyId, lockedUntil, allowance) :
-                accountingFacadePort.createSponsorAccountWithInitialBalance(sponsorId, currencyId, lockedUntil, transaction);
-
-        return ok(mapAccountToResponse(sponsorAccountStatement));
-    }
-
-    @Override
-    public ResponseEntity<TransactionReceipt> registerTransactionReceipt(UUID accountId, RegisterTransactionReceiptRequest registerTransactionReceiptRequest) {
-        final var receipt = registerTransactionReceiptRequest.getReceipt();
-        final var sponsorAccountStatement = accountingFacadePort.fund(SponsorAccount.Id.of(accountId), mapReceiptToTransaction(receipt));
-        final var addedReceipt = sponsorAccountStatement.account().getTransactions().stream()
-                .filter(t -> t.reference().equals(receipt.getReference())).findFirst().orElseThrow();
-        return ok(mapTransactionToReceipt(sponsorAccountStatement.account(), addedReceipt));
-    }
-
-    @Override
-    public ResponseEntity<AccountResponse> removeTransactionReceipt(UUID accountId, UUID receiptId) {
-        final var sponsorAccountStatement = accountingFacadePort.delete(
-                SponsorAccount.Id.of(accountId),
-                SponsorAccount.Transaction.Id.of(receiptId));
-        return ok(mapAccountToResponse(sponsorAccountStatement));
-    }
-
-    @Override
-    public ResponseEntity<AccountResponse> updateAccountAllowance(UUID accountId, UpdateAccountAllowanceRequest updateAccountAllowanceRequest) {
-        final var sponsorAccountStatement = accountingFacadePort.increaseAllowance(SponsorAccount.Id.of(accountId),
-                Amount.of(updateAccountAllowanceRequest.getAllowance()));
-        return ok(mapAccountToResponse(sponsorAccountStatement));
-    }
-
-    @Override
-    public ResponseEntity<AccountResponse> updateAccountAttributes(UUID accountId, UpdateAccountRequest updateAccountRequest) {
-        final var sponsorAccountStatement = accountingFacadePort.updateSponsorAccount(SponsorAccount.Id.of(accountId), updateAccountRequest.getLockedUntil());
-        return ok(mapAccountToResponse(sponsorAccountStatement));
-    }
-
-    @Override
-    public ResponseEntity<Void> allocateBudgetToProgram(UUID sponsorId, AllocationRequest request) {
-        accountingFacadePort.allocate(SponsorId.of(sponsorId),
-                ProgramId.of(request.getProgramId()),
-                PositiveAmount.of(request.getAmount()),
-                Currency.Id.of(request.getCurrencyId()));
+    public ResponseEntity<Void> createSponsorAccount(UUID sponsorUuid, CreateAccountRequest createAccountRequest) {
+        accountingFacadePort.createSponsorAccountWithInitialAllowance(SponsorId.of(sponsorUuid),
+                Currency.Id.of(createAccountRequest.getCurrencyId()),
+                null,
+                PositiveAmount.of(createAccountRequest.getAllowance()));
 
         return noContent().build();
     }
