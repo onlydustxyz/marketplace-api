@@ -21,16 +21,16 @@ public class AggregatedContributorKpisReadRepository {
     private final static String SELECT_QUERY = """
             WITH aggregated_contributor_stats AS
                      (SELECT d.%s_timestamp                                                                               as timestamp,
-                             count(distinct d.contributor_id)                                                                as active_contributor_count,
+                             count(distinct d.contributor_id)                                                             as active_contributor_count,
             
                              count(distinct d.contributor_id)
-                             filter (where previous.timestamp is null)                                                       as new_contributor_count,
+                             filter (where previous.timestamp is null)                                                    as new_contributor_count,
             
                              count(distinct d.contributor_id)
                              filter (where previous.timestamp < d.%s_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_contributor_count,
             
                              count(d.contribution_id)
-                             filter ( where d.is_merged_pr )                                                                 as merged_pr_count
+                             filter ( where d.is_merged_pr )                                                              as merged_pr_count
                       from bi.contribution_data d
                                left join lateral ( select max(previous.%s_timestamp) as timestamp
                                                    from bi.contribution_data previous

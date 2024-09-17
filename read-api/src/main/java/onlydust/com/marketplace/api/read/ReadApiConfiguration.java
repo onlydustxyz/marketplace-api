@@ -42,4 +42,11 @@ public class ReadApiConfiguration {
     ) {
         return new AggregatedContributorKpisReadRepository(entityManager);
     }
+
+    @Bean
+    public AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository(
+            final EntityManager entityManager
+    ) {
+        return new AggregatedProjectKpisReadRepository(entityManager);
+    }
 }
