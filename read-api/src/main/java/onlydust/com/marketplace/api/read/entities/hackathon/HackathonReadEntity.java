@@ -12,7 +12,6 @@ import onlydust.com.backoffice.api.contract.model.HackathonStatus;
 import onlydust.com.backoffice.api.contract.model.HackathonsEvent;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.NamedLink;
 import org.hibernate.annotations.Immutable;
@@ -72,16 +71,6 @@ public class HackathonReadEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "public",
-            name = "hackathon_sponsors",
-            joinColumns = @JoinColumn(name = "hackathonId"),
-            inverseJoinColumns = @JoinColumn(name = "sponsorId")
-    )
-    @NonNull
-    Set<SponsorReadEntity> sponsors;
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            schema = "public",
             name = "hackathon_projects",
             joinColumns = @JoinColumn(name = "hackathonId"),
             inverseJoinColumns = @JoinColumn(name = "projectId")
@@ -126,10 +115,6 @@ public class HackathonReadEntity {
                         .value(link.getValue())
                         .url(link.getUrl())
                 ).toList())
-                .sponsors(sponsors.stream()
-                        .sorted(Comparator.comparing(SponsorReadEntity::name))
-                        .map(SponsorReadEntity::toLinkResponse)
-                        .toList())
                 .projects(projects.stream()
                         .map(ProjectLinkReadEntity::toShortResponse)
                         .sorted(Comparator.comparing(ProjectShortResponse::getName))
@@ -164,12 +149,6 @@ public class HackathonReadEntity {
                 .links(isNull(this.links) ? List.of() : this.links.stream().map(link -> new onlydust.com.backoffice.api.contract.model.SimpleLink()
                         .value(link.getValue())
                         .url(link.getUrl())
-                ).toList())
-                .sponsors(this.sponsors.stream().map(sponsor -> new onlydust.com.backoffice.api.contract.model.SponsorResponse()
-                        .id(sponsor.id())
-                        .name(sponsor.name())
-                        .url(sponsor.url())
-                        .logoUrl(sponsor.logoUrl())
                 ).toList())
                 .projects(projects.stream().map(ProjectLinkReadEntity::toBoLinkResponse).toList())
                 .events(events.stream()

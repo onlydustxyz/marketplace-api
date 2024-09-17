@@ -9772,7 +9772,6 @@ components:
             - totalBudget
             - communityLinks
             - links
-            - sponsors
             - projects
             - me
             - subscriberCount
@@ -9800,10 +9799,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SimpleLink'
-            sponsors:
-              type: array
-              items:
-                $ref: '#/components/schemas/SponsorLinkResponse'
             projects:
               type: array
               items:

@@ -65,10 +65,6 @@ public class HackathonEntity {
 
     @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
     @NonNull
-    Set<HackathonSponsorEntity> sponsors;
-
-    @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
-    @NonNull
     Set<HackathonProjectEntity> projects;
 
     @OneToMany(mappedBy = "hackathonId", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -89,9 +85,6 @@ public class HackathonEntity {
                 .githubLabels(hackathon.githubLabels().toArray(String[]::new))
                 .communityLinks(hackathon.communityLinks().stream().toList())
                 .links(hackathon.links().stream().toList())
-                .sponsors(hackathon.sponsorIds().stream()
-                        .map(sponsorId -> new HackathonSponsorEntity(hackathon.id().value(), sponsorId))
-                        .collect(Collectors.toSet()))
                 .projects(hackathon.projectIds().stream()
                         .map(projectId -> new HackathonProjectEntity(hackathon.id().value(), projectId))
                         .collect(Collectors.toSet()))
@@ -120,7 +113,6 @@ public class HackathonEntity {
         if (nonNull(links)) {
             hackathon.links().addAll(links);
         }
-        hackathon.sponsorIds().addAll(sponsors.stream().map(HackathonSponsorEntity::getSponsorId).toList());
         hackathon.projectIds().addAll(projects.stream().map(HackathonProjectEntity::getProjectId).toList());
         hackathon.events().addAll(events.stream().map(HackathonEventEntity::toDomain).toList());
         return hackathon;

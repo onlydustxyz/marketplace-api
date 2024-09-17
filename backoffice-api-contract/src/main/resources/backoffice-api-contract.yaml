@@ -4866,7 +4866,6 @@ components:
             - totalBudget
             - communityLinks
             - links
-            - sponsors
             - projects
           properties:
             description:
@@ -4883,10 +4882,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SimpleLink'
-            sponsors:
-              type: array
-              items:
-                $ref: '#/components/schemas/SponsorResponse'
             projects:
               type: array
               items:
@@ -4938,7 +4933,6 @@ components:
         - endDate
         - communityLinks
         - links
-        - sponsorIds
         - projectIds
       properties:
         status:
@@ -4969,10 +4963,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/SimpleLink'
-        sponsorIds:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorId'
         projectIds:
           type: array
           items:

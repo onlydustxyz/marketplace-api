@@ -49,8 +49,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon1.githubLabels().addAll(List.of("label1", "label2"));
         hackathon1.communityLinks().add(NamedLink.builder().url("https://www.foo.bar").value("Foo").build());
         hackathon1.links().add(NamedLink.builder().url("https://www.google.com").value("Google").build());
-        hackathon1.sponsorIds().addAll(List.of(UUID.fromString("0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa"),
-                UUID.fromString("85435c9b-da7f-4670-bf65-02b84c5da7f0")));
         hackathon1.projectIds().addAll(List.of(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"),
                 UUID.fromString("7ce1a761-2b7b-43ba-9eb5-17e95ef4aa54"),
                 UUID.fromString("c6940f66-d64e-4b29-9a7f-07abf5c3e0ed")));
@@ -94,7 +92,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
         hackathon1.githubLabels().add("label1");
         hackathon1.communityLinks().add(NamedLink.builder().url("https://www.foo.bar").value("Bar").build());
         hackathon3.links().add(NamedLink.builder().url("https://www.foo.org").value("Foo").build());
-        hackathon3.sponsorIds().add(UUID.fromString("4202fd03-f316-458f-a642-421c7b3c7026"));
         hackathon3.projectIds().add(UUID.fromString("8156fc5f-cec5-4f70-a0de-c368772edcd4"));
 
         hackathonStoragePort.save(hackathon1);
@@ -177,18 +174,6 @@ public class HackathonApiIT extends AbstractMarketplaceApiIT {
                             {
                               "url": "https://www.google.com",
                               "value": "Google"
-                            }
-                          ],
-                          "sponsors": [
-                            {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                            },
-                            {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
                             }
                           ],
                           "me": null,

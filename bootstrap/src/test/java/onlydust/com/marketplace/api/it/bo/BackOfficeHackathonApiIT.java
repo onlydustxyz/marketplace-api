@@ -112,7 +112,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "githubLabels": [],
                           "communityLinks": [],
                           "links": [],
-                          "sponsorIds": [],
                           "projectIds": [],
                           "events": []
                         }
@@ -222,7 +221,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "totalBudget": null,
                           "communityLinks": [],
                           "links": [],
-                          "sponsors": [],
                           "projects": [],
                           "events": []
                         }
@@ -262,10 +260,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "url": "https://www.facebook.com",
                               "value": "Facebook"
                             }
-                          ],
-                          "sponsorIds": [
-                            "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                            "85435c9b-da7f-4670-bf65-02b84c5da7f0"
                           ],
                           "projectIds": [
                             "00490be6-2c03-4720-993b-aea3e07edd81",
@@ -584,20 +578,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "value": "Facebook"
                             }
                           ],
-                          "sponsors": [
-                            {
-                              "id": "0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa",
-                              "name": "Red Bull",
-                              "url": "https://www.redbull.com/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/13218160580172982881.jpg"
-                            },
-                            {
-                              "id": "85435c9b-da7f-4670-bf65-02b84c5da7f0",
-                              "name": "AS Nancy Lorraine",
-                              "url": null,
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/951523516066154017.png"
-                            }
-                          ],
                           "projects": [
                             {
                               "id": "00490be6-2c03-4720-993b-aea3e07edd81",
@@ -681,9 +661,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                               "url": "https://www.bar.com",
                               "value": "Bar"
                             }
-                          ],
-                          "sponsorIds": [
-                            "44c6807c-48d1-4987-a0a6-ac63f958bdae"
                           ],
                           "projectIds": [
                             "2073b3b2-60f4-488c-8a0a-ab7121ed850c"
@@ -769,14 +746,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                             {
                               "url": "https://www.bar.com",
                               "value": "Bar"
-                            }
-                          ],
-                          "sponsors": [
-                            {
-                              "id": "44c6807c-48d1-4987-a0a6-ac63f958bdae",
-                              "name": "Coca Colax",
-                              "url": "https://www.coca-cola-france.fr/",
-                              "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/10299112926576087945.jpg"
                             }
                           ],
                           "projects": [
@@ -885,7 +854,6 @@ public class BackOfficeHackathonApiIT extends AbstractMarketplaceBackOfficeApiIT
                           "totalBudget": null,
                           "communityLinks": [],
                           "links": [],
-                          "sponsors": [],
                           "projects": []
                         }
                         """);
