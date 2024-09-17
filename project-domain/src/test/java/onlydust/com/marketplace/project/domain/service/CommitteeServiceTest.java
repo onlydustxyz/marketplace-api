@@ -278,7 +278,6 @@ public class CommitteeServiceTest {
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .projectQuestions(projectQuestions)
                 .votePerJury(1)
-                .sponsorId(UUID.randomUUID())
                 .projectApplications(Map.of(
                         ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of()),
                         ProjectId.random(), new Committee.Application(UserId.random(), ProjectId.random(), List.of())
@@ -293,7 +292,6 @@ public class CommitteeServiceTest {
                 .applicationEndDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()))
                 .projectQuestions(projectQuestions)
                 .votePerJury(2)
-                .sponsorId(UUID.randomUUID())
                 .build();
 
         when(committeeStoragePort.findById(existingCommittee.id())).thenReturn(Optional.of(existingCommittee));
@@ -310,7 +308,6 @@ public class CommitteeServiceTest {
         assertThat(updatedCommittee.status()).isEqualTo(existingCommittee.status());
         assertThat(updatedCommittee.applicationStartDate()).isEqualTo(committee.applicationStartDate());
         assertThat(updatedCommittee.applicationEndDate()).isEqualTo(committee.applicationEndDate());
-        assertThat(updatedCommittee.sponsorId()).isEqualTo(committee.sponsorId());
         assertThat(updatedCommittee.juryIds()).isEqualTo(committee.juryIds());
         assertThat(updatedCommittee.votePerJury()).isEqualTo(committee.votePerJury());
         assertThat(updatedCommittee.projectApplications()).isEqualTo(existingCommittee.projectApplications());

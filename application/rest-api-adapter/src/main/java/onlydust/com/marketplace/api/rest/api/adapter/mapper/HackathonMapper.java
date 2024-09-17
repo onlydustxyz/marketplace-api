@@ -35,7 +35,6 @@ public interface HackathonMapper {
                 .value(link.getValue())
                 .build()).toList());
 
-        hackathon.sponsorIds().addAll(request.getSponsorIds());
         hackathon.projectIds().addAll(request.getProjectIds());
         hackathon.events().addAll(request.getEvents().stream().map(event -> Hackathon.Event.builder()
                 .id(isNull(event.getId()) ? UUID.randomUUID() : event.getId())

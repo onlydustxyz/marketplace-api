@@ -529,3 +529,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000337_bi_project_kpis.sql
   - include:
       file: db/changelog/changelogs/00000338_refactor_bi_data_views.sql
+  - include:
+      file: db/changelog/changelogs/00000338_remove_committee_sponsor_id.sql

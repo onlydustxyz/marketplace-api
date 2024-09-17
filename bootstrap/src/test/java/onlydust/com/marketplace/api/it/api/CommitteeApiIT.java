@@ -320,8 +320,7 @@ public class CommitteeApiIT extends AbstractMarketplaceApiIT {
                           "name": "Mr. Needful",
                           "applicationStartDate": "2024-05-19T02:58:44.399Z",
                           "applicationEndDate": "2024-05-25T20:06:27.482Z",
-                          "status": "CLOSED",
-                          "sponsor": null
+                          "status": "CLOSED"
                         }
                         """);
     }
