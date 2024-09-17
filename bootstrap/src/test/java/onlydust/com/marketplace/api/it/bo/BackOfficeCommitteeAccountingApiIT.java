@@ -48,9 +48,6 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
     private static final UUID delugeId = UUID.fromString("ade75c25-b39f-4fdf-a03a-e2391c1bc371");
     private static final UUID starklingsId = UUID.fromString("6239cb20-eece-466a-80a0-742c1071dd3c");
 
-    // Sponsors
-    private static final UUID cocaColax = UUID.fromString("44c6807c-48d1-4987-a0a6-ac63f958bdae");
-
     // Currencies
     private static final UUID USDC = UUID.fromString("562bbf65-8a71-4d30-ad63-520c0d68ba27");
 
@@ -391,7 +388,6 @@ public class BackOfficeCommitteeAccountingApiIT extends AbstractMarketplaceBackO
         var committee = committeeFacadePort.createCommittee("My committee", ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(2));
 
         committee = committee.toBuilder()
-                .sponsorId(cocaColax)
                 .projectQuestions(IntStream.range(1, 10).mapToObj(i -> fakeProjectQuestion()).toList())
                 .juryIds(List.of(anthoId, olivierId, pacoId))
                 .juryCriteria(IntStream.range(1, 10).mapToObj(i1 -> fakeJuryCriteria()).toList())

@@ -10,7 +10,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CommitteeProject
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectInfosViewRepository;
 import onlydust.com.marketplace.api.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.api.read.repositories.CommitteeJuryVoteViewRepository;
 import onlydust.com.marketplace.api.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -62,7 +61,6 @@ public class ReadCommitteesApiPostgresAdapter implements ReadCommitteesApi {
                 .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
                 .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
                 .status(CommitteeStatus.valueOf(committee.status().name()))
-                .sponsor(SponsorMapper.mapNullabled(committee.sponsor()))
         );
     }
 

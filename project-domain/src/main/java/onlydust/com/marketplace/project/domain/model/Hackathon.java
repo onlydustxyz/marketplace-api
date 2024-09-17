@@ -41,8 +41,6 @@ public class Hackathon {
     @NonNull
     Set<NamedLink> links = new HashSet<>();
     @NonNull
-    Set<UUID> sponsorIds = new HashSet<>();
-    @NonNull
     Set<UUID> projectIds = new HashSet<>();
     @NonNull
     List<Event> events = new ArrayList<>();

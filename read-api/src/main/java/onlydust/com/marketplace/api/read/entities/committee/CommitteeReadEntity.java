@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.Accessors;
-import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.project.domain.model.Committee;
 import org.hibernate.annotations.Immutable;
 
@@ -40,9 +39,6 @@ public class CommitteeReadEntity {
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sponsorId", insertable = false, updatable = false)
-    SponsorReadEntity sponsor;
     Integer votePerJury;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY)

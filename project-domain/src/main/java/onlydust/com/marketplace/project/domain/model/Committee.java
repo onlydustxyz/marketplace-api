@@ -27,7 +27,6 @@ public class Committee {
     ZonedDateTime applicationEndDate;
     @NonNull
     Status status;
-    UUID sponsorId;
 
     @Builder.Default
     @NonNull
