@@ -26,10 +26,8 @@ import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 import static java.util.Objects.isNull;
@@ -39,62 +37,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMor
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BackOfficeMapper {
-
-    static AccountResponse mapAccountToResponse(final SponsorAccountStatement accountStatement) {
-        final var balance = mapAccountBalance(accountStatement);
-        final var account = accountStatement.account();
-
-        return new AccountResponse()
-                .id(account.id().value())
-                .sponsorId(account.sponsorId().value())
-                .lockedUntil(account.lockedUntil().map(d -> d.atZone(ZoneOffset.UTC)).orElse(null))
-                .receipts(account.getTransactions().stream().map(transaction -> mapTransactionToReceipt(account, transaction)).toList())
-                .currency(balance.getCurrency())
-                .initialBalance(balance.getInitialBalance())
-                .currentBalance(balance.getCurrentBalance())
-                .initialAllowance(balance.getInitialAllowance())
-                .currentAllowance(balance.getCurrentAllowance())
-                .debt(balance.getDebt())
-                .awaitingPaymentAmount(balance.getAwaitingPaymentAmount())
-                ;
-    }
-
-    static AccountBalance mapAccountBalance(final SponsorAccountStatement accountStatement) {
-        final var account = accountStatement.account();
-        return new AccountBalance()
-                .currency(toShortCurrency(account.currency()))
-                .initialBalance(account.initialBalance().getValue())
-                .currentBalance(account.balance().getValue())
-                .initialAllowance(accountStatement.initialAllowance().getValue())
-                .currentAllowance(accountStatement.allowance().getValue())
-                .debt(accountStatement.debt().getValue())
-                .awaitingPaymentAmount(accountStatement.awaitingPaymentAmount().getValue());
-    }
-
-    static TransactionReceipt mapTransactionToReceipt(final SponsorAccount sponsorAccount, final SponsorAccount.Transaction transaction) {
-        return new TransactionReceipt()
-                .id(transaction.id().value())
-                .reference(transaction.reference())
-                .network(sponsorAccount.network().map(BackOfficeMapper::mapNetwork).orElse(null))
-                .amount(transaction.type().isDebit() ?
-                        transaction.amount().getValue().negate() :
-                        transaction.amount().getValue())
-                .thirdPartyName(transaction.thirdPartyName())
-                .thirdPartyAccountNumber(transaction.thirdPartyAccountNumber());
-    }
-
-    static SponsorAccount.Transaction mapReceiptToTransaction(final TransactionReceipt transaction) {
-        final var negativeAmount = transaction.getAmount().compareTo(BigDecimal.ZERO) < 0;
-        return new SponsorAccount.Transaction(
-                ZonedDateTime.now(), // TODO add field in BO
-                negativeAmount ? SponsorAccount.Transaction.Type.WITHDRAW : SponsorAccount.Transaction.Type.DEPOSIT,
-                mapTransactionNetwork(transaction.getNetwork()),
-                transaction.getReference(),
-                PositiveAmount.of(negativeAmount ? transaction.getAmount().negate() : transaction.getAmount()),
-                transaction.getThirdPartyName(),
-                transaction.getThirdPartyAccountNumber());
-    }
-
     static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
         return new EcosystemPage()
                 .ecosystems(ecosystemViewPage.getContent().stream().map(ecosystemView -> new EcosystemPageItemResponse()
