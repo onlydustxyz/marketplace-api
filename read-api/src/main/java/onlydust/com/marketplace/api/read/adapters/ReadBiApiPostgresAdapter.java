@@ -3,7 +3,10 @@ package onlydust.com.marketplace.api.read.adapters;
 import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
-import onlydust.com.marketplace.api.read.entities.bi.*;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedContributorKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.AggregatedProjectKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.ProjectKpisReadEntity;
+import onlydust.com.marketplace.api.read.entities.bi.WorldMapKpiReadEntity;
 import onlydust.com.marketplace.api.read.repositories.AggregatedContributorKpisReadRepository;
 import onlydust.com.marketplace.api.read.repositories.AggregatedProjectKpisReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProjectKpisReadRepository;
@@ -62,19 +65,11 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                         sanitizedDate(toDate, ZonedDateTime.now()),
                         programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()
                 .collect(Collectors.toMap(AggregatedContributorKpisReadEntity::timestamp, Function.identity()));
-        final var mergedPrStatsPerTimestamp = aggregatedContributorKpisReadRepository.findMergedPrs(
-                        timeGrouping,
-                        timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
-                        sanitizedDate(fromDate, DEFAULT_FROM_DATE),
-                        sanitizedDate(toDate, ZonedDateTime.now()),
-                        programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()
-                .collect(Collectors.toMap(AggregatedMergedPrKpisReadEntity::timestamp, Function.identity()));
 
         final var mergedStats = statsPerTimestamp.keySet().stream().map(timestamp -> {
                     var stats = statsPerTimestamp.get(timestamp);
-                    var mergedPrStats = mergedPrStatsPerTimestamp.get(timestamp);
                     var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
-                    return stats.toDto(mergedPrStats, statsOfPreviousPeriod);
+                    return stats.toDto(statsOfPreviousPeriod);
                 })
                 .sorted(Comparator.comparing(BiContributorsStatsListItemResponse::getTimestamp))
                 .skip(1) // Skip the first element as it is the previous period used to compute churned contributor count
