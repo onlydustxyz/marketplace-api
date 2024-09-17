@@ -5107,8 +5107,6 @@ components:
           format: 'date-time'
         status:
           $ref: '#/components/schemas/CommitteeStatus'
-        sponsor:
-          $ref: '#/components/schemas/SponsorLinkResponse'
         juryCount:
           type: integer
         votePerJury:
@@ -5243,8 +5241,6 @@ components:
         applicationEndDate:
           type: string
           format: 'date-time'
-        sponsorId:
-          $ref: '#/components/schemas/SponsorId'
         votePerJury:
           type: integer
         juryMemberIds:

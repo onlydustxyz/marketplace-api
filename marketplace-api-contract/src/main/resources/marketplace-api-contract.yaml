@@ -9828,7 +9828,6 @@ components:
         - applicationStartDate
         - applicationEndDate
         - status
-        - sponsor
       properties:
         id:
           type: string
@@ -9843,8 +9842,6 @@ components:
           format: 'date-time'
         status:
           $ref: '#/components/schemas/CommitteeStatus'
-        sponsor:
-          $ref: '#/components/schemas/SponsorLinkResponse'
 
     CommitteeApplicationResponse:
       type: object

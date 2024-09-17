@@ -13,7 +13,6 @@ import onlydust.com.marketplace.api.read.entities.committee.CommitteeProjectAnsw
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
 import onlydust.com.marketplace.api.read.mapper.CommitteeMapper;
 import onlydust.com.marketplace.api.read.mapper.ProjectMapper;
-import onlydust.com.marketplace.api.read.mapper.SponsorMapper;
 import onlydust.com.marketplace.api.read.repositories.CommitteeBudgetAllocationsResponseEntityRepository;
 import onlydust.com.marketplace.api.read.repositories.CommitteeReadRepository;
 import onlydust.com.marketplace.kernel.mapper.DateMapper;
@@ -64,8 +63,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
         final Map<UUID, MoneyResponse> projectAllocations = committee.budgetAllocations().stream()
                 .collect(toMap(CommitteeBudgetAllocationReadEntity::projectId, a -> new MoneyResponse(a.amount(), a.currency().toDto())));
 
-        final List<ApplicationResponse> projectApplications = mostRecentAnswerPerProject.entrySet().stream()
-                .map(Map.Entry::getValue)
+        final List<ApplicationResponse> projectApplications = mostRecentAnswerPerProject.values().stream()
                 .map(a -> new ApplicationResponse()
                         .project(ProjectMapper.mapBO(a.project()))
                         .applicant(a.user().toLinkResponse())
@@ -94,7 +92,6 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .applicationStartDate(DateMapper.ofNullable(committee.applicationStartDate()))
                 .applicationEndDate(DateMapper.ofNullable(committee.applicationEndDate()))
                 .status(statusToResponse(committee.status()))
-                .sponsor(SponsorMapper.mapNullableBO(committee.sponsor()))
                 .votePerJury(committee.votePerJury())
                 .juryCount(isNull(committee.juries()) ? null : committee.juries().size())
                 .projectCount(projectApplications.size())
@@ -143,7 +140,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                 .toList();
 
         final var totalScore = juryVotes.stream()
-                .map(v -> v.getTotalScore())
+                .map(JuryVoteResponse::getTotalScore)
                 .filter(Objects::nonNull)
                 .mapToDouble(BigDecimal::doubleValue)
                 .average();
@@ -169,7 +166,7 @@ public class BackofficeCommitteesReadApiPostgresAdapter implements BackofficeCom
                         )
                         .toList()
                 )
-                .totalScore(totalScore == null ? null : CommitteeMapper.roundScore(totalScore))
+                .totalScore(roundScore(totalScore))
                 .juryVotes(juryVotes)
                 .allocation(allocation);
 

@@ -65,7 +65,6 @@ public class CommitteeService implements CommitteeFacadePort {
                 .name(committee.name())
                 .applicationStartDate(committee.applicationStartDate())
                 .applicationEndDate(committee.applicationEndDate())
-                .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
                 .juryIds(committee.juryIds())
                 .juryCriteria(committee.juryCriteria())
