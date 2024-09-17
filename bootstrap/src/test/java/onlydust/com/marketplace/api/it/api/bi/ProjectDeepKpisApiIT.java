@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.contract.model.BiProjectsPageResponse;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +15,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagBI
 public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
@@ -34,21 +40,39 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProgramId explorationTeam;
         private static ProgramId nethermind;
         private static ProgramId ethGrantingProgram;
+        private static UserAuthHelper.AuthenticatedUser antho;
+        private static UserAuthHelper.AuthenticatedUser pierre;
+        private static UserAuthHelper.AuthenticatedUser mehdi;
+        private static UserAuthHelper.AuthenticatedUser hayden;
+        private static UserAuthHelper.AuthenticatedUser abdel;
+        private static UserAuthHelper.AuthenticatedUser emma;
+        private static UserAuthHelper.AuthenticatedUser james;
+        private static ProjectCategory defi;
+        private static ProjectCategory gaming;
+
+        @AfterAll
+        @SneakyThrows
+        static void restore() {
+            restoreIndexerDump();
+        }
 
         @BeforeEach
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            final var antho = userAuthHelper.create("antho");
-            final var pierre = userAuthHelper.create("pierre");
-            final var mehdi = userAuthHelper.create("mehdi");
-            final var hayden = userAuthHelper.create("hayden");
-            final var abdel = userAuthHelper.create("abdel");
-            final var emma = userAuthHelper.create("emma");
-            final var james = userAuthHelper.create("james");
+            antho = userAuthHelper.create("antho");
+            pierre = userAuthHelper.create("pierre");
+            mehdi = userAuthHelper.create("mehdi");
+            hayden = userAuthHelper.create("hayden");
+            abdel = userAuthHelper.create("abdel");
+            emma = userAuthHelper.create("emma");
+            james = userAuthHelper.create("james");
 
             starknet = ecosystemHelper.create("Starknet ecosystem").id();
             ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
+
+            defi = projectHelper.createCategory("DeFi");
+            gaming = projectHelper.createCategory("Gaming");
 
             final var starknetFoundation = sponsorHelper.create("The Starknet Foundation");
             accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
@@ -64,6 +88,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
 
             final var onlyDust = projectHelper.create(pierre, "OnlyDust");
+            projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH));
 
@@ -71,6 +96,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
             final var bridge = projectHelper.create(mehdi, "Bridge", List.of(starknet, ethereum));
+            projectHelper.addCategory(bridge, gaming.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH));
             at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 100, STRK));
 
@@ -118,12 +144,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, abdel.githubUserId(), 5, STRK));
 
             projectFacadePort.refreshStats();
-        }
-
-        @AfterAll
-        @SneakyThrows
-        static void restore() {
-            restoreIndexerDump();
         }
 
         @Test
@@ -545,6 +565,52 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               ]
                             }
                             """);
+        }
+
+        private void test_projects_stats(String queryParam, Map<String, Consumer<BiProjectsPageResponse>> possibleQueryParamValues) {
+            final var queryParams = new HashMap<String, String>();
+            queryParams.put("pageIndex", "0");
+            queryParams.put("pageSize", "100");
+            queryParams.put("fromDate", "2021-01-01");
+            queryParams.put("toDate", "2021-01-10");
+            for (String possibleQueryParamValue : possibleQueryParamValues.keySet()) {
+                queryParams.put(queryParam, possibleQueryParamValue);
+                possibleQueryParamValues.get(possibleQueryParamValue).accept(client.get()
+                        .uri(getApiURI(BI_PROJECTS, queryParams))
+                        .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                        .exchange()
+                        .expectStatus()
+                        .is2xxSuccessful()
+                        .expectBody(BiProjectsPageResponse.class).returnResult().getResponseBody());
+                queryParams.remove(queryParam);
+            }
+        }
+
+        @Test
+        public void should_get_projects_stats_with_filters() {
+//            List<UUID> projectLeadIds,
+//            List<UUID> categoryIds,
+//            List<UUID> languageIds,
+//            List<UUID> ecosystemIds,
+//            DecimalNumberKpiFilter availableBudgetUsdAmount,
+//            NumberKpiFilter percentUsedBudget,
+//            DecimalNumberKpiFilter totalGrantedUsdAmount,
+//            DecimalNumberKpiFilter averageRewardUsdAmount,
+//            DecimalNumberKpiFilter totalRewardedUsdAmount,
+//            NumberKpiFilter onboardedContributorCount,
+//            NumberKpiFilter activeContributorCount,
+//            NumberKpiFilter mergedPrCount,
+//            NumberKpiFilter rewardCount,
+//            NumberKpiFilter contributionCount,
+//            ProjectKpiSortEnum sort,
+
+            test_projects_stats("projectLeadIds", Map.of(
+                    mehdi.userId().toString(), response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads()).contains(mehdi))
+            ));
+            test_projects_stats("categoryIds", Map.of(
+                    gaming.id().toString(), body -> body.jsonPath("$.projects.length()")
+                            .value(val -> body.jsonPath("$.projects[?(@.categories[?(@.name == 'Gaming')])].length()").isEqualTo(val))
+            ));
         }
     }
 }
