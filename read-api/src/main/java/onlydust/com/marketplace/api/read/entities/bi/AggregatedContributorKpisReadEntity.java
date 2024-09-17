@@ -31,7 +31,6 @@ public class AggregatedContributorKpisReadEntity {
     Integer activeContributorCount;
     Integer newContributorCount;
     Integer reactivatedContributorCount;
-    Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
 
@@ -47,10 +46,6 @@ public class AggregatedContributorKpisReadEntity {
         return Optional.ofNullable(reactivatedContributorCount).orElse(0);
     }
 
-    Integer mergedPrCount() {
-        return Optional.ofNullable(mergedPrCount).orElse(0);
-    }
-
     BigDecimal totalGrantedUsdAmount() {
         return Optional.ofNullable(totalGrantedUsdAmount).orElse(BigDecimal.ZERO);
     }
@@ -59,12 +54,13 @@ public class AggregatedContributorKpisReadEntity {
         return Optional.ofNullable(totalRewardedUsdAmount).orElse(BigDecimal.ZERO);
     }
 
-    public BiContributorsStatsListItemResponse toDto(AggregatedContributorKpisReadEntity statsOfPreviousTimeGroup) {
+    public BiContributorsStatsListItemResponse toDto(AggregatedMergedPrKpisReadEntity mergedPrStats,
+                                                     AggregatedContributorKpisReadEntity statsOfPreviousTimeGroup) {
         return new BiContributorsStatsListItemResponse()
                 .timestamp(timestamp)
                 .totalGranted(totalGrantedUsdAmount())
                 .totalRewarded(totalRewardedUsdAmount())
-                .mergedPrCount(mergedPrCount())
+                .mergedPrCount(mergedPrStats == null ? 0 : mergedPrStats.mergedPrCount())
                 .newContributorCount(newContributorCount())
                 .activeContributorCount(activeContributorCount())
                 .reactivatedContributorCount(reactivatedContributorCount())
