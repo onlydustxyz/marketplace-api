@@ -4,9 +4,34 @@ DROP MATERIALIZED VIEW bi.contribution_data_cross_projects;
 DROP MATERIALIZED VIEW bi.contribution_data;
 DROP MATERIALIZED VIEW bi.reward_data;
 DROP MATERIALIZED VIEW bi.daily_project_grants;
+DROP VIEW bi_internal.exploded_rewards;
+DROP VIEW bi_internal.exploded_contributions;
 
 
 CREATE MATERIALIZED VIEW bi.contribution_data AS
+WITH exploded_contributions AS
+         (select c.id                            as contribution_id,
+                 c.contributor_id                as contributor_id,
+                 c.created_at                    as timestamp,
+                 projects.id                     as project_id,
+                 ppc.project_category_id         as project_category_id,
+                 lfe.language_id                 as language_id,
+                 pe.ecosystem_id                 as ecosystem_id,
+                 pp.program_id                   as program_id,
+                 c.type = 'PULL_REQUEST'         as is_merged_pr,
+                 c.created_at = first.created_at as is_first_contribution_on_onlydust
+          from completed_contributions c
+                   cross join unnest(c.project_ids) as projects(id)
+                   join (select cc.contributor_id, min(cc.created_at) as created_at
+                         from completed_contributions cc
+                         group by cc.contributor_id) first
+                        on first.contributor_id = c.contributor_id
+                   left join projects_ecosystems pe on pe.project_id = projects.id
+                   left join programs_projects pp on pp.project_id = projects.id
+                   left join projects_project_categories ppc on ppc.project_id = projects.id
+                   left join lateral ( select distinct lfe_1.language_id
+                                       from language_file_extensions lfe_1
+                                       where lfe_1.extension = any (c.main_file_extensions)) lfe on true)
 SELECT c.*,
        language_names.value || ' ' ||
        ecosystem_names.value || ' ' ||
@@ -36,7 +61,7 @@ FROM (with registered_users as (select u.id             as id,
              array_agg(distinct c.program_id)          as program_ids,
              array_agg(distinct c.project_id)          as project_ids,
              array_agg(distinct c.project_category_id) as project_category_ids
-      from bi_internal.exploded_contributions c
+      from exploded_contributions c
                left join registered_users ru on ru.github_user_id = c.contributor_id
       group by c.contribution_id,
                c.contributor_id,
@@ -96,35 +121,32 @@ create index bi_contribution_data_proj_contributor_id_year_timestamp_idx on bi.c
 
 
 
-CREATE OR REPLACE VIEW bi_internal.exploded_rewards AS
-SELECT r.id                      as reward_id,
-       r.requested_at            as timestamp,
-       r.recipient_id            as contributor_id,
-       r.project_id              as project_id,
-       r.currency_id             as currency_id,
-       rsd.amount_usd_equivalent as usd_amount,
-       ppc.project_category_id   as project_category_id,
-       lfe.language_id           as language_id,
-       pe.ecosystem_id           as ecosystem_id,
-       pp.program_id             as program_id
-FROM rewards r
-         JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
-         LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
-         LEFT JOIN programs_projects pp ON pp.project_id = r.project_id
-         LEFT JOIN projects_project_categories ppc ON ppc.project_id = r.project_id
-
-         LEFT JOIN reward_items ri ON ri.reward_id = r.id
-         LEFT JOIN completed_contributions c
-                   ON ri.type = c.type::text::contribution_type
-                       AND ri.number = c.github_number
-                       AND r.recipient_id = c.contributor_id
-         LEFT JOIN LATERAL ( SELECT DISTINCT lfe_1.language_id
-                             FROM language_file_extensions lfe_1
-                             WHERE lfe_1.extension = ANY (c.main_file_extensions)) lfe ON true
-;
-
-
 CREATE MATERIALIZED VIEW bi.reward_data AS
+WITH exploded_rewards AS
+         (SELECT r.id                      as reward_id,
+                 r.requested_at            as timestamp,
+                 r.recipient_id            as contributor_id,
+                 r.project_id              as project_id,
+                 r.currency_id             as currency_id,
+                 rsd.amount_usd_equivalent as usd_amount,
+                 ppc.project_category_id   as project_category_id,
+                 lfe.language_id           as language_id,
+                 pe.ecosystem_id           as ecosystem_id,
+                 pp.program_id             as program_id
+          FROM rewards r
+                   JOIN accounting.reward_status_data rsd ON rsd.reward_id = r.id
+                   LEFT JOIN projects_ecosystems pe ON pe.project_id = r.project_id
+                   LEFT JOIN programs_projects pp ON pp.project_id = r.project_id
+                   LEFT JOIN projects_project_categories ppc ON ppc.project_id = r.project_id
+
+                   LEFT JOIN reward_items ri ON ri.reward_id = r.id
+                   LEFT JOIN completed_contributions c
+                             ON ri.type = c.type::text::contribution_type
+                                 AND ri.number = c.github_number
+                                 AND r.recipient_id = c.contributor_id
+                   LEFT JOIN LATERAL ( SELECT DISTINCT lfe_1.language_id
+                                       FROM language_file_extensions lfe_1
+                                       WHERE lfe_1.extension = ANY (c.main_file_extensions)) lfe ON true)
 SELECT c.*,
        language_names.value || ' ' ||
        ecosystem_names.value || ' ' ||
@@ -147,12 +169,13 @@ FROM (select r.reward_id                               as reward_id,
              array_agg(distinct r.ecosystem_id)        as ecosystem_ids,
              array_agg(distinct r.program_id)          as program_ids,
              array_agg(distinct r.project_category_id) as project_category_ids
-      from bi_internal.exploded_rewards r
+      from exploded_rewards r
       group by r.reward_id,
                r.timestamp,
                r.contributor_id,
                r.project_id,
-               r.usd_amount) c
+               r.usd_amount,
+               r.currency_id) c
          left join lateral (select cur.name || ' ' || cur.code as value from currencies cur where cur.id = c.currency_id) as currency_search on true
          left join lateral (select string_agg(l.name, ' ') as value from languages l where l.id = any (c.language_ids)) as language_names on true
          left join lateral (select string_agg(e.name, ' ') as value from ecosystems e where e.id = any (c.ecosystem_ids)) as ecosystem_names on true
@@ -172,14 +195,14 @@ create index bi_reward_data_year_timestamp_idx on bi.reward_data (year_timestamp
 
 
 
-CREATE MATERIALIZED VIEW bi.daily_project_grants(project_id, program_id, day_timestamp, usd_amount) AS
+CREATE MATERIALIZED VIEW bi.daily_project_grants AS
 SELECT c.*,
        currency_search.value as search
-FROM (select abt.project_id,
-             abt.program_id,
-             abt.currency_id,
+FROM (select abt.project_id                   as project_id,
+             abt.program_id                   as program_id,
+             abt.currency_id                  as currency_id,
              date_trunc('day', abt.timestamp) as day_timestamp,
-             sum(abt.usd_amount)
+             sum(abt.usd_amount)              as usd_amount
       from (SELECT abt.project_id,
                    abt.program_id,
                    abt.currency_id,
@@ -196,8 +219,8 @@ FROM (select abt.project_id,
       group by 1, 2, 3, 4) c
          left join lateral (select cur.name || ' ' || cur.code as value from currencies cur where cur.id = c.currency_id) as currency_search on true
 ;
-create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, program_id, day_timestamp);
-create unique index bi_daily_project_grants_pk_inv on bi.daily_project_grants (day_timestamp, program_id, project_id);
+create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, program_id, currency_id, day_timestamp);
+create unique index bi_daily_project_grants_pk_inv on bi.daily_project_grants (day_timestamp, currency_id, program_id, project_id);
 
 
 

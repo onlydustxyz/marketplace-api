@@ -2,6 +2,8 @@ package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.api.contract.model.BiProjectsPageResponse;
+import onlydust.com.marketplace.api.contract.model.EcosystemResponse;
+import onlydust.com.marketplace.api.contract.model.RegisteredUserResponse;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
@@ -174,7 +176,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "avatarUrl": "https://avatars.githubusercontent.com/u/mehdi"
                                     }
                                   ],
-                                  "categories": null,
+                                  "categories": [
+                                    {
+                                      "slug": "gaming",
+                                      "name": "Gaming"
+                                    }
+                                  ],
                                   "languages": null,
                                   "ecosystems": [
                                     {
@@ -297,7 +304,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "avatarUrl": "https://avatars.githubusercontent.com/u/pierre"
                                     }
                                   ],
-                                  "categories": null,
+                                  "categories": [
+                                    {
+                                      "slug": "defi",
+                                      "name": "DeFi"
+                                    }
+                                  ],
                                   "languages": null,
                                   "ecosystems": null,
                                   "programs": [
@@ -588,6 +600,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         public void should_get_projects_stats_with_filters() {
+            // TODO: test all filters:
 //            List<UUID> projectLeadIds,
 //            List<UUID> categoryIds,
 //            List<UUID> languageIds,
@@ -605,11 +618,14 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 //            ProjectKpiSortEnum sort,
 
             test_projects_stats("projectLeadIds", Map.of(
-                    mehdi.userId().toString(), response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads()).contains(mehdi))
+                    mehdi.userId().toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))
+                            .contains(mehdi.githubUserId().value()))
             ));
-            test_projects_stats("categoryIds", Map.of(
-                    gaming.id().toString(), body -> body.jsonPath("$.projects.length()")
-                            .value(val -> body.jsonPath("$.projects[?(@.categories[?(@.name == 'Gaming')])].length()").isEqualTo(val))
+            test_projects_stats("search", Map.of(
+                    "aztec",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemResponse::getName).toList())
+                            .contains("Aztec"))
             ));
         }
     }

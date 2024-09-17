@@ -61,6 +61,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                     and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
                     and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
                     and (coalesce(:ecosystemIds) is null or d.ecosystem_ids && cast(:ecosystemIds as uuid[]))
+                    and (coalesce(:search) is null or d.search ilike '%' || :search || '%')
                   group by d.project_id) d
             
                      JOIN bi.project_global_data pgd on pgd.project_id = d.project_id
@@ -84,6 +85,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                           and (coalesce(:categoryIds) is null or previous_period.project_category_ids && cast(:categoryIds as uuid[]))
                                           and (coalesce(:languageIds) is null or previous_period.language_ids && cast(:languageIds as uuid[]))
                                           and (coalesce(:ecosystemIds) is null or previous_period.ecosystem_ids && cast(:ecosystemIds as uuid[]))
+                                          and (coalesce(:search) is null or previous_period.search ilike '%' || :search || '%')
                                         group by previous_period.project_id ) previous_period ON true
             
             WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget >= :availableBudgetUsdAmountMin)
@@ -139,6 +141,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                             and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
                             and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
                             and (coalesce(:ecosystemIds) is null or d.ecosystem_ids && cast(:ecosystemIds as uuid[]))
+                            and (coalesce(:search) is null or d.search ilike '%' || :search || '%')
                           group by d.project_id) d
                     
                     WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget >= :availableBudgetUsdAmountMin)
@@ -177,6 +180,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         @NonNull ZonedDateTime toDate,
                                         @NonNull ZonedDateTime fromDatePreviousPeriod,
                                         @NonNull ZonedDateTime toDatePreviousPeriod,
+                                        String search,
                                         UUID[] projectLeadIds,
                                         UUID[] categoryIds,
                                         UUID[] languageIds,

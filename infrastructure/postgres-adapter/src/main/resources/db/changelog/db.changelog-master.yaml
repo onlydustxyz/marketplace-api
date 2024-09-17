@@ -539,3 +539,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000341_add_rejected_deposits.sql
   - include:
       file: db/changelog/changelogs/00000342_update_program_stats.sql
+  - include:
+      file: db/changelog/changelogs/00000339_refactor_bi_data_views_to_search.sql
