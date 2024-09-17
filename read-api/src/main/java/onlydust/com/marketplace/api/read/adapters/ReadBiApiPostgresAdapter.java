@@ -59,7 +59,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<BiContributorsStatsListResponse> getBIContributorsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
                                                                                   List<UUID> programOrEcosystemIds) {
         final var statsPerTimestamp = aggregatedContributorKpisReadRepository.findAll(
-                        timeGrouping.name(),
+                        timeGrouping,
+                        timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         sanitizedDate(fromDate, DEFAULT_FROM_DATE),
                         sanitizedDate(toDate, ZonedDateTime.now()),
                         programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()
@@ -146,7 +147,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     public ResponseEntity<BiProjectsStatsListResponse> getBIProjectsStats(TimeGroupingEnum timeGrouping, String fromDate, String toDate,
                                                                           List<UUID> programOrEcosystemIds) {
         final var statsPerTimestamp = aggregatedProjectKpisReadRepository.findAll(
-                        timeGrouping.name(),
+                        timeGrouping,
+                        timeGrouping == TimeGroupingEnum.QUARTER ? "3 MONTHS" : "1 %s".formatted(timeGrouping.name()),
                         sanitizedDate(fromDate, DEFAULT_FROM_DATE),
                         sanitizedDate(toDate, ZonedDateTime.now()),
                         programOrEcosystemIds == null ? null : programOrEcosystemIds.toArray(UUID[]::new)).stream()

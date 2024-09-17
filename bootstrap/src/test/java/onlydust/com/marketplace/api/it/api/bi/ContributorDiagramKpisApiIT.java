@@ -127,6 +127,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
             at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
             at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
+            at("2021-01-05T00:00:06Z", () -> githubHelper.createPullRequest(marketplace_frontend, emma));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
             at("2021-01-07T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
@@ -218,10 +219,10 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "timestamp": "2021-01-05T00:00:00Z",
                                   "totalGranted": 200,
                                   "totalRewarded": 0,
-                                  "mergedPrCount": 1,
+                                  "mergedPrCount": 2,
                                   "newContributorCount": 0,
-                                  "activeContributorCount": 1,
-                                  "reactivatedContributorCount": 1,
+                                  "activeContributorCount": 2,
+                                  "reactivatedContributorCount": 2,
                                   "churnedContributorCount": 1
                                 },
                                 {
@@ -231,7 +232,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "mergedPrCount": 1,
                                   "newContributorCount": 0,
                                   "activeContributorCount": 1,
-                                  "reactivatedContributorCount": 1,
+                                  "reactivatedContributorCount": 0,
                                   "churnedContributorCount": 1
                                 },
                                 {
@@ -308,6 +309,127 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        public void should_get_aggregate_contributor_stats_daily_for_ethereum_ecosystem() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
+                            "programOrEcosystemIds",
+                            String.join(",", Stream.of(ethereum).map(UUID::toString).toList()))))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "stats": [
+                                {
+                                  "timestamp": "2021-01-01T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 2,
+                                  "newContributorCount": 1,
+                                  "activeContributorCount": 1,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-02T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 1
+                                },
+                                {
+                                  "timestamp": "2021-01-03T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-04T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-05T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-06T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 1,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 1,
+                                  "reactivatedContributorCount": 1,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-07T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 1,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 1,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-08T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 1
+                                },
+                                {
+                                  "timestamp": "2021-01-09T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                },
+                                {
+                                  "timestamp": "2021-01-10T00:00:00Z",
+                                  "totalGranted": 0,
+                                  "totalRewarded": 0,
+                                  "mergedPrCount": 0,
+                                  "newContributorCount": 0,
+                                  "activeContributorCount": 0,
+                                  "reactivatedContributorCount": 0,
+                                  "churnedContributorCount": 0
+                                }
+                              ]
+                            }
+                            """);
+        }
+
+        @Test
         public void should_get_aggregate_contributor_stats_weekly_for_diagram_between_dates() {
             // When
             client.get()
@@ -337,7 +459,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "timestamp": "2021-01-04T00:00:00Z",
                                   "totalGranted": 260.0,
                                   "totalRewarded": 0,
-                                  "mergedPrCount": 4,
+                                  "mergedPrCount": 5,
                                   "newContributorCount": 0,
                                   "activeContributorCount": 3,
                                   "reactivatedContributorCount": 0,
