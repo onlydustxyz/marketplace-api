@@ -14,6 +14,8 @@ import java.util.Optional;
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
 @Builder(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class OnGithubIssueAssignedTrackingEvent extends Event {
     @NonNull
     Long issueId;

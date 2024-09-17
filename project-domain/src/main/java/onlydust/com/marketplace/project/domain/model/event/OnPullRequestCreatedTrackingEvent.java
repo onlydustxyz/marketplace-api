@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class OnPullRequestCreatedTrackingEvent extends Event {
     @NonNull
     Long pullRequestId;

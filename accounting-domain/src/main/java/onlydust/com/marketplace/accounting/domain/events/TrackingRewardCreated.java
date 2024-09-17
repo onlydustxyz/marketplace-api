@@ -1,10 +1,7 @@
 package onlydust.com.marketplace.accounting.domain.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.Accessors;
 import onlydust.com.marketplace.kernel.model.Event;
 import onlydust.com.marketplace.kernel.model.EventType;
@@ -20,6 +17,7 @@ import java.util.UUID;
 @Accessors(fluent = true)
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @EventType("TrackingRewardCreated")
+@NoArgsConstructor(force = true)
 public class TrackingRewardCreated extends Event {
     @NonNull
     ProjectId projectId;

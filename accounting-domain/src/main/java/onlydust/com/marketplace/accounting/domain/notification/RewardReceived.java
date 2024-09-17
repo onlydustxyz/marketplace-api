@@ -15,6 +15,7 @@ import onlydust.com.marketplace.kernel.model.notification.NotificationType;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @NotificationType("RewardReceived")
 @Builder
+@NoArgsConstructor(force = true)
 public class RewardReceived extends NotificationData {
     @NonNull
     Integer contributionCount;

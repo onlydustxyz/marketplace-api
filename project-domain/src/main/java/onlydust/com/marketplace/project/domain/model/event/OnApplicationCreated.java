@@ -18,6 +18,8 @@ import java.time.ZonedDateTime;
 @Accessors(fluent = true)
 @EventType("OnApplicationCreated")
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class OnApplicationCreated extends Event {
     @NonNull
     Application.Id applicationId;
