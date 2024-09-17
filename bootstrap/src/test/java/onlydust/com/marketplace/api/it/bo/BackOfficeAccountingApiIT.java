@@ -2,8 +2,10 @@ package onlydust.com.marketplace.api.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import onlydust.com.backoffice.api.contract.model.AccountResponse;
+import onlydust.com.backoffice.api.contract.model.CreateAccountRequest;
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
+import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.PayoutInfo;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.VerificationStatus;
@@ -36,7 +38,6 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.testcontainers.shaded.org.apache.commons.lang3.mutable.MutableObject;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
@@ -48,7 +49,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static onlydust.com.backoffice.api.contract.model.BillingProfileType.INDIVIDUAL;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -58,7 +58,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiIT {
     static final SponsorId COCA_COLAX = SponsorId.of("44c6807c-48d1-4987-a0a6-ac63f958bdae");
-    static final SponsorId THEODO = SponsorId.of("2639563e-4437-4bde-a4f4-654977c0cb39");
     static final SponsorId REDBULL = SponsorId.of("0d66ba03-cecb-45a4-ab7d-98f0cc18a3aa");
 
     static final ProjectId BRETZEL = ProjectId.of("7d04163c-4187-4313-8066-61504d34fc56");
@@ -113,7 +112,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
     void should_allocate_budget_to_program_and_get_refunded_of_unspent_budget() {
         // When
         final var response = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
+                .uri(getApiURI(SPONSORS_BY_ID_ACCOUNTS.formatted(COCA_COLAX)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
                 .bodyValue("""
@@ -125,71 +124,12 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 // Then
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult()
-                .getResponseBody();
-
-        final var accountId = response.getId();
-        assertThat(response.getId()).isNotNull();
-        assertThat(response.getSponsorId()).isEqualTo(COCA_COLAX.value());
-        assertThat(response.getCurrency().getId()).isEqualTo(STRK.value());
-        assertThat(response.getInitialAllowance()).isEqualTo(BigDecimal.valueOf(100));
-        assertThat(response.getCurrentAllowance()).isEqualTo(BigDecimal.valueOf(100));
-        assertThat(response.getInitialBalance()).isEqualTo(BigDecimal.ZERO);
-        assertThat(response.getCurrentBalance()).isEqualTo(BigDecimal.ZERO);
-        assertThat(response.getDebt()).isEqualTo(BigDecimal.valueOf(100));
-        assertThat(response.getLockedUntil()).isNull();
-        assertThat(response.getAwaitingPaymentAmount()).isEqualTo(BigDecimal.ZERO);
-
-        // When
-        client.post()
-                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.reference").isEqualTo("0x01")
-                .jsonPath("$.amount").isEqualTo(100)
-                .jsonPath("$.network").isEqualTo("ETHEREUM")
-                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
-        ;
+                .isNoContent();
 
         // When
         reset(notificationPort);
-        client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(COCA_COLAX)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "programId": "%s",
-                            "amount": 90,
-                            "currencyId": "%s"
-                        }
-                        """.formatted(program.id(), STRK))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isNoContent();
-
+        accountingHelper.allocate(COCA_COLAX, program.id(), 90, STRK);
         accountingHelper.grant(program.id(), BRETZEL, 80, STRK);
-
 
         // When
         client.post()
@@ -225,299 +165,6 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isNoContent();
-
-        // When
-        client.post()
-                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "receipt": {
-                                "reference": "0x02",
-                                "amount": -30,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.reference").isEqualTo("0x02")
-                .jsonPath("$.amount").isEqualTo(-30)
-                .jsonPath("$.network").isEqualTo("ETHEREUM")
-                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
-        ;
-
-        client.post()
-                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_RECEIPTS.formatted(accountId)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "receipt": {
-                                "reference": "0x02",
-                                "amount": -30,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.reference").isEqualTo("0x02")
-                .jsonPath("$.amount").isEqualTo(-30)
-                .jsonPath("$.network").isEqualTo("ETHEREUM")
-                .jsonPath("$.thirdPartyName").isEqualTo("Coca Cola LTD")
-                .jsonPath("$.thirdPartyAccountNumber").isEqualTo("coca.cola.eth")
-        ;
-
-
-        // When
-        client.put()
-                .uri(getApiURI(POST_SPONSOR_ACCOUNTS_ALLOWANCE.formatted(accountId)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "allowance": -40
-                        }
-                        """)
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.initialBalance").isEqualTo(40)
-                .jsonPath("$.currentBalance").isEqualTo(40)
-                .jsonPath("$.initialAllowance").isEqualTo(60)
-                .jsonPath("$.currentAllowance").isEqualTo(20)
-                .jsonPath("$.debt").isEqualTo(20)
-                .jsonPath("$.awaitingPaymentAmount").isEqualTo(0)
-        ;
-
-    }
-
-    @Test
-    void should_get_list_of_sponsor_accounts() {
-        // Given
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                             "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """.formatted(STRK))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "allowance": 200
-                        }
-                        """.formatted(BTC))
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        // When
-        final var currency1 = new MutableObject<String>();
-        final var currency2 = new MutableObject<String>();
-
-        client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(THEODO)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                // Then
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.accounts.size()").isEqualTo(2)
-                .jsonPath("$.accounts[0].currency.code").value(currency1::setValue)
-                .jsonPath("$.accounts[1].currency.code").value(currency2::setValue)
-                .json("""
-                        {
-                          "accounts": [
-                            {
-                              "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "currency": {
-                                "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
-                                "code": "STRK",
-                                "name": "StarkNet Token",
-                                "logoUrl": null,
-                                "decimals": 18
-                              },
-                              "initialBalance": 100,
-                              "currentBalance": 100,
-                              "initialAllowance": 100,
-                              "currentAllowance": 100,
-                              "debt": 0,
-                              "awaitingPaymentAmount": 0,
-                              "lockedUntil": null,
-                              "receipts": [
-                                {
-                                  "reference": "0x01",
-                                  "amount": 100,
-                                  "network": "ETHEREUM",
-                                  "thirdPartyName": "Coca Cola LTD",
-                                  "thirdPartyAccountNumber": "coca.cola.eth"
-                                }
-                              ]
-                            },
-                            {
-                              "sponsorId": "2639563e-4437-4bde-a4f4-654977c0cb39",
-                              "currency": {
-                                "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
-                                "code": "BTC",
-                                "name": "Bitcoin",
-                                "logoUrl": null,
-                                "decimals": 8
-                              },
-                              "currentBalance": 0,
-                              "currentAllowance": 200,
-                              "awaitingPaymentAmount": 0,
-                              "lockedUntil": null,
-                              "receipts": []
-                            }
-                          ]
-                        }
-                        """);
-
-        assertThat(currency1.getValue().compareToIgnoreCase(currency2.getValue())).isLessThan(0);
-    }
-
-    @Test
-    void should_delete_transaction_registered_by_mistake() {
-        // Given
-        final var account = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "receipt": {
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "reference": "0x01",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """.formatted(STRK))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult().getResponseBody();
-
-        // When
-        client.delete()
-                .uri(getApiURI(DELETE_SPONSOR_ACCOUNTS_RECEIPTS.formatted(account.getId(), account.getReceipts().get(0).getId())))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .exchange()
-                // Then
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.initialBalance").isEqualTo(0)
-                .jsonPath("$.currentBalance").isEqualTo(0)
-                .jsonPath("$.initialAllowance").isEqualTo(100)
-                .jsonPath("$.currentAllowance").isEqualTo(100)
-                .jsonPath("$.debt").isEqualTo(100)
-                .jsonPath("$.receipts.size()").isEqualTo(0)
-        ;
-    }
-
-    @Test
-    void should_update_sponsor_account() {
-        // Given
-        final var response = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(COCA_COLAX)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "lockedUntil": "2024-01-31T00:00:00Z",
-                            "receipt": {
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "reference": "0x01",
-                                "thirdPartyName": "Coca Cola LTD",
-                                "thirdPartyAccountNumber": "coca.cola.eth"
-                            }
-                        }
-                        """.formatted(STRK))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult().getResponseBody();
-
-        assertThat(response.getLockedUntil().toString()).isEqualTo("2024-01-31T00:00Z");
-
-        // When
-        client.patch()
-                .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "lockedUntil": "2024-03-31T00:00:00Z"
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.lockedUntil").isEqualTo("2024-03-31T00:00:00Z")
-        ;
-
-        // When
-        client.patch()
-                .uri(getApiURI(PATCH_SPONSOR_ACCOUNTS.formatted(response.getId())))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "lockedUntil": null
-                        }
-                        """)
-                .exchange()
-                // Then
-                .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.lockedUntil").isEqualTo(null)
-        ;
     }
 
     @Test
@@ -527,44 +174,20 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var ofux = userAuthHelper.authenticateOlivier();
 
         client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(SPONSORS_BY_ID_ACCOUNTS.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "ETHEREUM",
-                                "thirdPartyName": "RedBull",
-                                "thirdPartyAccountNumber": "red-bull.eth"
-                            }
-                        }
-                        """.formatted(USDC))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult()
-                .getResponseBody().getId();
-
-        // Given
-        client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "programId": "%s",
-                            "amount": 100,
-                            "currencyId": "%s"
-                        }
-                        """.formatted(program.id(), USDC))
+                .bodyValue(new CreateAccountRequest()
+                        .allowance(BigDecimal.valueOf(100))
+                        .currencyId(USDC.value()))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
+        // Given
+        final var depositId = depositHelper.create(REDBULL, Network.ETHEREUM, USDC, BigDecimal.valueOf(40), Deposit.Status.PENDING);
+        accountingHelper.approve(depositId);
+        accountingHelper.allocate(REDBULL, program.id(), 100, USDC);
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
@@ -599,18 +222,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // Then
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(USDC.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
         // When
@@ -692,18 +316,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 );
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(USDC.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(10)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
         ;
     }
 
@@ -730,45 +355,21 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .expectStatus()
                 .isOk();
 
-        final var accountId = client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "STARKNET",
-                                "thirdPartyName": "RedBull",
-                                "thirdPartyAccountNumber": "red-bull.stark"
-                            }
-                        }
-                        """.formatted(USDC))
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(AccountResponse.class)
-                .returnResult()
-                .getResponseBody().getId();
-
-        // Given
         client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
+                .uri(getApiURI(SPONSORS_BY_ID_ACCOUNTS.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "programId": "%s",
-                            "amount": 100,
-                            "currencyId": "%s"
-                        }
-                        """.formatted(program.id(), USDC))
+                .bodyValue(new CreateAccountRequest()
+                        .allowance(BigDecimal.valueOf(100))
+                        .currencyId(USDC.value()))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
+        // Given
+        final var depositId = depositHelper.create(REDBULL, Network.STARKNET, USDC, BigDecimal.valueOf(40), Deposit.Status.PENDING);
+        accountingHelper.approve(depositId);
+        accountingHelper.allocate(REDBULL, program.id(), 100, USDC);
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
@@ -803,18 +404,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // Then
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(USDC.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
         // When
@@ -891,18 +493,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 );
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(USDC.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(10)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
         ;
     }
 
@@ -913,41 +516,20 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         final var ofux = userAuthHelper.authenticateOlivier();
 
         client.post()
-                .uri(getApiURI(POST_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(SPONSORS_BY_ID_ACCOUNTS.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "currencyId": "%s",
-                            "receipt": {
-                                "reference": "0x01",
-                                "amount": 100,
-                                "network": "APTOS",
-                                "thirdPartyName": "RedBull",
-                                "thirdPartyAccountNumber": "0xc4f5e07ce1de7369e5a408b9b153f32b5eb99e6b9b1c1a33549aba8f19fc3cc1"
-                            }
-                        }
-                        """.formatted(APT))
-                .exchange()
-                .expectStatus()
-                .isOk();
-
-        // Given
-        client.post()
-                .uri(getApiURI(SPONSORS_BY_ID_ALLOCATE.formatted(REDBULL)))
-                .header("Authorization", "Bearer " + camille.jwt())
-                .contentType(APPLICATION_JSON)
-                .bodyValue("""
-                        {
-                            "programId": "%s",
-                            "amount": 100,
-                            "currencyId": "%s"
-                        }
-                        """.formatted(program.id(), APT))
+                .bodyValue(new CreateAccountRequest()
+                        .allowance(BigDecimal.valueOf(100))
+                        .currencyId(APT.value()))
                 .exchange()
                 .expectStatus()
                 .isNoContent();
 
+        // Given
+        final var depositId = depositHelper.create(REDBULL, Network.APTOS, APT, BigDecimal.valueOf(40), Deposit.Status.PENDING);
+        accountingHelper.approve(depositId);
+        accountingHelper.allocate(REDBULL, program.id(), 100, APT);
         accountingHelper.grant(program.id(), KAAPER, 100, APT);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
@@ -982,18 +564,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
         // Then
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(30)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(APT.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(30)
         ;
 
         // When
@@ -1044,18 +627,19 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 );
 
         client.get()
-                .uri(getApiURI(GET_SPONSORS_ACCOUNTS.formatted(REDBULL)))
+                .uri(getApiURI(GET_SPONSOR.formatted(REDBULL)))
                 .header("Authorization", "Bearer " + camille.jwt())
                 .exchange()
                 .expectStatus()
                 .isOk()
                 .expectBody()
-                .jsonPath("$.accounts[0].initialBalance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentBalance").isEqualTo(70)
-                .jsonPath("$.accounts[0].initialAllowance").isEqualTo(100)
-                .jsonPath("$.accounts[0].currentAllowance").isEqualTo(0)
-                .jsonPath("$.accounts[0].debt").isEqualTo(0)
-                .jsonPath("$.accounts[0].awaitingPaymentAmount").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].currency.id").isEqualTo(APT.toString())
+                .jsonPath("$.availableBudgets[0].initialBalance").isEqualTo(40)
+                .jsonPath("$.availableBudgets[0].currentBalance").isEqualTo(10)
+                .jsonPath("$.availableBudgets[0].initialAllowance").isEqualTo(100)
+                .jsonPath("$.availableBudgets[0].currentAllowance").isEqualTo(0)
+                .jsonPath("$.availableBudgets[0].debt").isEqualTo(60)
+                .jsonPath("$.availableBudgets[0].awaitingPaymentAmount").isEqualTo(0)
         ;
     }
 
