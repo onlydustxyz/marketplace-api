@@ -68,7 +68,6 @@ public interface BackOfficeCommitteeMapper {
                 .name(updateCommitteeRequest.getName())
                 .applicationStartDate(updateCommitteeRequest.getApplicationStartDate())
                 .applicationEndDate(updateCommitteeRequest.getApplicationEndDate())
-                .sponsorId(updateCommitteeRequest.getSponsorId())
                 .votePerJury(updateCommitteeRequest.getVotePerJury())
                 .build();
         committee.projectQuestions().addAll(updateCommitteeRequest.getProjectQuestions().stream()

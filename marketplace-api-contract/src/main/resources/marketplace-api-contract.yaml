@@ -9772,7 +9772,6 @@ components:
             - totalBudget
             - communityLinks
             - links
-            - sponsors
             - projects
             - me
             - subscriberCount
@@ -9800,10 +9799,6 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SimpleLink'
-            sponsors:
-              type: array
-              items:
-                $ref: '#/components/schemas/SponsorLinkResponse'
             projects:
               type: array
               items:
@@ -9828,7 +9823,6 @@ components:
         - applicationStartDate
         - applicationEndDate
         - status
-        - sponsor
       properties:
         id:
           type: string
@@ -9843,8 +9837,6 @@ components:
           format: 'date-time'
         status:
           $ref: '#/components/schemas/CommitteeStatus'
-        sponsor:
-          $ref: '#/components/schemas/SponsorLinkResponse'
 
     CommitteeApplicationResponse:
       type: object

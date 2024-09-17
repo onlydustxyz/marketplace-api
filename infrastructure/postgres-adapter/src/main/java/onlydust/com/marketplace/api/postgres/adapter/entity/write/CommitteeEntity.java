@@ -41,7 +41,6 @@ public class CommitteeEntity {
 
     @Column(insertable = false, updatable = false)
     Date techCreatedAt;
-    UUID sponsorId;
     Integer votePerJury;
 
     @OneToMany(mappedBy = "committee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -65,7 +64,6 @@ public class CommitteeEntity {
                 .applicationEndDate(Date.from(committee.applicationEndDate().toInstant()))
                 .applicationStartDate(Date.from(committee.applicationStartDate().toInstant()))
                 .status(committee.status())
-                .sponsorId(committee.sponsorId())
                 .votePerJury(committee.votePerJury())
                 .projectQuestions(new ArrayList<>())
                 .projectAnswers(new HashSet<>())
@@ -96,7 +94,6 @@ public class CommitteeEntity {
                 .applicationEndDate(ZonedDateTime.ofInstant(applicationEndDate.toInstant(), ZoneOffset.UTC))
                 .status(status)
                 .votePerJury(this.votePerJury)
-                .sponsorId(sponsorId)
                 .projectQuestions(Optional.ofNullable(projectQuestions).orElse(List.of()).stream()
                         .map(CommitteeProjectQuestionEntity::toDomain)
                         .collect(toList()))
