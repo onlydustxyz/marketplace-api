@@ -19,6 +19,7 @@ import java.util.UUID;
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 @NotificationType("DepositApproved")
 @Builder
+@NoArgsConstructor(force = true)
 public class DepositApproved extends NotificationData {
     @NonNull
     UUID depositId;

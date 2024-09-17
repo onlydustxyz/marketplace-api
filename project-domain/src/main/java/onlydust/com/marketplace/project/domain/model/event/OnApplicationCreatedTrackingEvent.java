@@ -15,6 +15,8 @@ import java.util.Optional;
 @Builder(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode(callSuper = true)
 @Accessors(fluent = true)
+@AllArgsConstructor
+@NoArgsConstructor(force = true)
 public class OnApplicationCreatedTrackingEvent extends Event {
     @NonNull
     Application.Id applicationId;

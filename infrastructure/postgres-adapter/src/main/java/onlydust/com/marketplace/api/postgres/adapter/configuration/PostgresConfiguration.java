@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.postgres.adapter.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import lombok.NonNull;
 import onlydust.com.marketplace.accounting.domain.port.out.BillingProfileStoragePort;
@@ -13,8 +14,11 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import org.hibernate.cfg.AvailableSettings;
+import org.hibernate.type.format.jackson.JacksonJsonFormatMapper;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernatePropertiesCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -425,5 +429,11 @@ public class PostgresConfiguration {
             final AccountBookRepository accountBookRepository,
             final AccountBookTransactionRepository accountBookTransactionRepository) {
         return new PostgresAccountBookStorageAdapter(accountBookRepository, accountBookTransactionRepository);
+    }
+
+    @Bean
+    HibernatePropertiesCustomizer jsonFormatMapperCustomizer(ObjectMapper objectMapper) {
+        return (properties) -> properties.put(AvailableSettings.JSON_FORMAT_MAPPER,
+                new JacksonJsonFormatMapper(objectMapper));
     }
 }
