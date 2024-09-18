@@ -360,7 +360,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "activeContributorCount": {
-                                    "value": 4,
+                                    "value": 3,
                                     "trend": "UP"
                                   },
                                   "mergedPrCount": {
@@ -420,10 +420,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 //            NumberKpiFilter contributionCount,
 //            ProjectKpiSortEnum sort,
 
-            test_projects_stats(Map.of("totalGrantedUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
-                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
-                            .isEqualTo(BigDecimal.valueOf(2000))), true
-            );
             test_projects_stats("search", "gaming",
                     response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
                             .contains("Gaming")), true
@@ -452,7 +448,14 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemLinkResponse::getName).toList())
                             .contains("Starknet ecosystem")), true
             );
-
+            test_projects_stats(Map.of("totalGrantedUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
+            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
         }
     }
 }

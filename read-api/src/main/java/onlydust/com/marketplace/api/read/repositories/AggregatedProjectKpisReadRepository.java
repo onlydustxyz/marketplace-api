@@ -60,11 +60,11 @@ public class AggregatedProjectKpisReadRepository {
                       group by 1),
             
                  aggregated_project_grants_stats AS
-                     (SELECT date_trunc(:timeGrouping, d.day_timestamp) as timestamp,
-                             sum(d.usd_amount)                          as total_granted_usd_amount
-                      from bi.daily_project_grants d
-                      where d.day_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
-                        and d.day_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
+                     (SELECT d.%s_timestamp    as timestamp,
+                             sum(d.usd_amount) as total_granted_usd_amount
+                      from bi.project_grants_data d
+                      where d.%s_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
+                        and d.%s_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null or d.program_id = any (cast(:programOrEcosystemIds as uuid[])))
                       group by 1),
             

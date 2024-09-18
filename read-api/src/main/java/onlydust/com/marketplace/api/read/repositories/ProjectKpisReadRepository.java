@@ -43,54 +43,10 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    coalesce(previous_period.merged_pr_count, 0)             as previous_period_merged_pr_count,
                    coalesce(previous_period.active_contributor_count, 0)    as previous_period_active_contributor_count,
                    coalesce(previous_period.onboarded_contributor_count, 0) as previous_period_onboarded_contributor_count
-            FROM (SELECT d.project_id                                                                          as project_id,
-                         sum(d.granted_usd_amount) - sum(d.rewarded_usd_amount)                                as available_budget,
-                         sum(d.granted_usd_amount) / greatest(sum(d.rewarded_usd_amount), 1)                   as percent_spent_budget,
-                         sum(d.granted_usd_amount)                                                             as total_granted_usd_amount,
-                         count(d.contribution_id)                                                              as contribution_count,
-                         count(d.reward_id)                                                                    as reward_count,
-                         sum(d.rewarded_usd_amount)                                                            as total_rewarded_usd_amount,
-                         avg(d.rewarded_usd_amount)                                                            as average_reward_usd_amount,
-                         count(d.contribution_id) filter ( where d.is_merged_pr is true )                      as merged_pr_count,
-                         count(distinct d.contributor_id)                                                      as active_contributor_count,
-                         count(distinct d.contributor_id) filter ( where d.is_first_contribution_on_onlydust ) as onboarded_contributor_count
-                  from bi.project_data_unions d
-                  where d.timestamp >= :fromDate
-                    and d.timestamp < :toDate
-                    and (d.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
-                         d.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
-                    and (coalesce(:projectLeadIds) is null or d.project_lead_ids && cast(:projectLeadIds as uuid[]))
-                    and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
-                    and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
-                    and (coalesce(:ecosystemIds) is null or d.ecosystem_ids && cast(:ecosystemIds as uuid[]))
-                    and (coalesce(:search) is null or d.search ilike '%' || :search || '%')
-                  group by d.project_id) d
             
+            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
                      JOIN bi.project_global_data pgd on pgd.project_id = d.project_id
-            
-                     LEFT JOIN LATERAL (SELECT previous_period.project_id                                                                                        as project_id,
-                                               sum(previous_period.granted_usd_amount) - sum(previous_period.rewarded_usd_amount)                                as available_budget,
-                                               sum(previous_period.granted_usd_amount) / greatest(sum(previous_period.rewarded_usd_amount), 1)                   as percent_spent_budget,
-                                               sum(previous_period.granted_usd_amount)                                                                           as total_granted_usd_amount,
-                                               count(previous_period.contribution_id)                                                                            as contribution_count,
-                                               count(previous_period.reward_id)                                                                                  as reward_count,
-                                               sum(previous_period.rewarded_usd_amount)                                                                          as total_rewarded_usd_amount,
-                                               avg(previous_period.rewarded_usd_amount)                                                                          as average_reward_usd_amount,
-                                               count(previous_period.contribution_id) filter ( where previous_period.is_merged_pr is true )                      as merged_pr_count,
-                                               count(distinct previous_period.contributor_id)                                                                    as active_contributor_count,
-                                               count(distinct previous_period.contributor_id) filter ( where previous_period.is_first_contribution_on_onlydust ) as onboarded_contributor_count
-                                        from bi.project_data_unions previous_period
-                                        where previous_period.project_id = d.project_id
-                                          and previous_period.timestamp >= :fromDatePreviousPeriod
-                                          and previous_period.timestamp < :toDatePreviousPeriod
-                                          and (previous_period.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
-                                               previous_period.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
-                                          and (coalesce(:projectLeadIds) is null or previous_period.project_lead_ids && cast(:projectLeadIds as uuid[]))
-                                          and (coalesce(:categoryIds) is null or previous_period.project_category_ids && cast(:categoryIds as uuid[]))
-                                          and (coalesce(:languageIds) is null or previous_period.language_ids && cast(:languageIds as uuid[]))
-                                          and (coalesce(:ecosystemIds) is null or previous_period.ecosystem_ids && cast(:ecosystemIds as uuid[]))
-                                          and (coalesce(:search) is null or previous_period.search ilike '%' || :search || '%')
-                                        group by previous_period.project_id ) previous_period ON true
+                     LEFT JOIN LATERAL (select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) ) previous_period ON true
             
             WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget >= :availableBudgetUsdAmountMin)
               and (coalesce(:availableBudgetUsdAmountEq) is null or d.available_budget = :availableBudgetUsdAmountEq)
@@ -127,29 +83,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
             """,
             countQuery = """
                     SELECT count(d.project_id)
-                    FROM (SELECT d.project_id                                                                          as project_id,
-                                 sum(d.granted_usd_amount) - sum(d.rewarded_usd_amount)                                as available_budget,
-                                 sum(d.granted_usd_amount) / greatest(sum(d.rewarded_usd_amount), 1)                   as percent_spent_budget,
-                                 sum(d.granted_usd_amount)                                                             as total_granted_usd_amount,
-                                 count(d.contribution_id)                                                              as contribution_count,
-                                 count(d.reward_id)                                                                    as reward_count,
-                                 sum(d.rewarded_usd_amount)                                                            as total_rewarded_usd_amount,
-                                 avg(d.rewarded_usd_amount)                                                            as average_reward_usd_amount,
-                                 count(d.contribution_id) filter ( where d.is_merged_pr is true )                      as merged_pr_count,
-                                 count(distinct d.contributor_id)                                                      as active_contributor_count,
-                                 count(distinct d.contributor_id) filter ( where d.is_first_contribution_on_onlydust ) as onboarded_contributor_count
-                          from bi.project_data_unions d
-                          where d.timestamp >= :fromDate
-                            and d.timestamp < :toDate
-                            and (d.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
-                                 d.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
-                            and (coalesce(:projectLeadIds) is null or d.project_lead_ids && cast(:projectLeadIds as uuid[]))
-                            and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
-                            and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
-                            and (coalesce(:ecosystemIds) is null or d.ecosystem_ids && cast(:ecosystemIds as uuid[]))
-                            and (coalesce(:search) is null or d.search ilike '%' || :search || '%')
-                          group by d.project_id) d
-                    
+                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
                     WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget >= :availableBudgetUsdAmountMin)
                       and (coalesce(:availableBudgetUsdAmountEq) is null or d.available_budget = :availableBudgetUsdAmountEq)
                       and (coalesce(:availableBudgetUsdAmountMax) is null or d.available_budget <= :availableBudgetUsdAmountMax)
@@ -180,6 +114,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                       and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
                       and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
                       and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
+                    ORDER BY ?#{#pageable}
                     """,
             nativeQuery = true)
     Page<ProjectKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,

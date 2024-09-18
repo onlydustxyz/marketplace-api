@@ -43,6 +43,8 @@ public class ProjectKpisReadEntity {
     //    @NonNull
     //    Set<ProjectStatPerCurrencyReadEntity> globalStatsPerCurrency;
 
+    BigDecimal availableBudget;
+    BigDecimal percentSpentBudget;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
     BigDecimal averageRewardUsdAmount;
@@ -52,6 +54,8 @@ public class ProjectKpisReadEntity {
     Integer rewardCount;
     Integer contributionCount;
 
+    BigDecimal previousPeriodAvailableBudget;
+    BigDecimal previousPeriodPercentSpentBudget;
     BigDecimal previousPeriodTotalGrantedUsdAmount;
     BigDecimal previousPeriodTotalRewardedUsdAmount;
     BigDecimal previousPeriodAverageRewardUsdAmount;
