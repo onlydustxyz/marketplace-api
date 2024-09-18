@@ -3598,7 +3598,7 @@ paths:
       security:
         - { }
       tags:
-        - Ecosystems
+        - ReadEcosystems
       summary: Get all ecosystems
       operationId: getAllEcosystems
       parameters:
@@ -5662,7 +5662,7 @@ components:
               type: array
               description: List of ecosystems on which the user contributed
               items:
-                $ref: '#/components/schemas/EcosystemResponse'
+                $ref: '#/components/schemas/EcosystemLinkResponse'
 
     UserRankCategory:
       type: string
@@ -5850,7 +5850,7 @@ components:
             - ecosystem
           properties:
             ecosystem:
-              $ref: '#/components/schemas/EcosystemResponse'
+              $ref: '#/components/schemas/EcosystemLinkResponse'
 
     UserProfileSubStats:
       type: object
@@ -6553,14 +6553,15 @@ components:
             totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
 
-    EcosystemResponse:
+    EcosystemLinkResponse:
       type: object
       required:
         - id
         - name
+        - slug
         - url
         - logoUrl
-        - slug
+        - hidden
       properties:
         id:
           $ref: '#/components/schemas/EcosystemId'
@@ -6585,6 +6586,8 @@ components:
           example: 'https://onlydust-app-images.s3.eu-west-1.amazonaws.com/8506434858363286425.png'
         slug:
           $ref: '#/components/schemas/EcosystemSlug'
+        hidden:
+          type: boolean
 
     EcosystemShortResponse:
       type: object
@@ -6771,7 +6774,7 @@ components:
             ecosystems:
               type: array
               items:
-                $ref: '#/components/schemas/EcosystemResponse'
+                $ref: '#/components/schemas/EcosystemLinkResponse'
             categories:
               type: array
               items:
@@ -6831,7 +6834,7 @@ components:
         ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/EcosystemResponse'
+            $ref: '#/components/schemas/EcosystemLinkResponse'
         languages:
           type: array
           items:
@@ -6926,7 +6929,7 @@ components:
         ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/EcosystemResponse'
+            $ref: '#/components/schemas/EcosystemLinkResponse'
         categories:
           type: array
           items:
@@ -7824,6 +7827,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/SponsorLinkResponse'
+            ecosystems:
+              type: array
+              items:
+                $ref: '#/components/schemas/EcosystemLinkResponse'
             hasCompletedVerificationInformation:
               type: boolean
             hasCompletedOnboarding:
@@ -9270,7 +9277,7 @@ components:
             ecosystems:
               type: array
               items:
-                $ref: '#/components/schemas/EcosystemResponse'
+                $ref: '#/components/schemas/EcosystemLinkResponse'
 
     EcosystemPageV2:
       allOf:
@@ -10859,7 +10866,7 @@ components:
         ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/EcosystemResponse'
+            $ref: '#/components/schemas/EcosystemLinkResponse'
         programs:
           type: array
           items:
@@ -10929,7 +10936,7 @@ components:
         ecosystems:
           type: array
           items:
-            $ref: '#/components/schemas/EcosystemResponse'
+            $ref: '#/components/schemas/EcosystemLinkResponse'
         countryCode:
           type: string
           format: iso-country-code

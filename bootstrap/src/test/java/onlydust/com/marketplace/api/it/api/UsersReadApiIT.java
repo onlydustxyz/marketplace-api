@@ -269,7 +269,8 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "url": "https://www.availproject.org/",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12011103528231014365.png",
                                 "bannerUrl": null,
-                                "slug": "avail"
+                                "slug": "avail",
+                                "hidden": true
                               }
                             },
                             {
@@ -293,7 +294,8 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "url": "https://www.starknet.io/en",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
                                 "bannerUrl": null,
-                                "slug": "starknet"
+                                "slug": "starknet",
+                                "hidden": false
                               }
                             },
                             {
@@ -317,7 +319,8 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                                 "url": "https://aztec.network/",
                                 "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
                                 "bannerUrl": null,
-                                "slug": "aztec"
+                                "slug": "aztec",
+                                "hidden": false
                               }
                             }
                           ]

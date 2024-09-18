@@ -41,7 +41,8 @@ public interface PublicUserProfileResponseV2EntityRepository extends Repository<
                                         'url', e.url,
                                         'logoUrl', e.logo_url,
                                         'bannerUrl', e.banner_url,
-                                        'slug', e.slug
+                                        'slug', e.slug,
+                                        'hidden', e.hidden
                                         )) as ecosystems
                                    from ecosystems e
                                    where e.id in (select stats_pe.ecosystem_id

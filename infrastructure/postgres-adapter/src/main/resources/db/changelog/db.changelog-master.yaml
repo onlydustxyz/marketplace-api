@@ -531,3 +531,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000338_refactor_bi_data_views.sql
   - include:
       file: db/changelog/changelogs/00000338_remove_committee_sponsor_id.sql
+  - include:
+      file: db/changelog/changelogs/00000339_add_ecosystem_leads.sql

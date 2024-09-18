@@ -102,13 +102,14 @@ public class PublicUserProfileResponseV2Entity {
                         .contributionCount(Optional.ofNullable(contributionCount).orElse(0))
                         .rewardCount(Optional.ofNullable(rewardCount).orElse(0)))
                 .ecosystems(isNull(ecosystems) ? List.of() : ecosystems.stream()
-                        .map(ecosystem -> new EcosystemResponse()
+                        .map(ecosystem -> new EcosystemLinkResponse()
                                 .id(ecosystem.id())
                                 .name(ecosystem.name())
                                 .url(ecosystem.url())
                                 .logoUrl(ecosystem.logoUrl())
-                                .bannerUrl(ecosystem.bannerUrl())
                                 .slug(ecosystem.slug())
+                                .bannerUrl(ecosystem.bannerUrl())
+                                .hidden(ecosystem.hidden())
                         ).toList());
     }
 
@@ -133,6 +134,6 @@ public class PublicUserProfileResponseV2Entity {
                 .toList();
     }
 
-    record Ecosystem(UUID id, String name, String url, String logoUrl, String bannerUrl, String slug) {
+    record Ecosystem(UUID id, String name, String url, String logoUrl, String bannerUrl, String slug, Boolean hidden) {
     }
 }
