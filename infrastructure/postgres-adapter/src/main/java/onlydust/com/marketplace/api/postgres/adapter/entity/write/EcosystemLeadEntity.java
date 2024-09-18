@@ -13,22 +13,22 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@Table(name = "sponsor_leads", schema = "public")
-@IdClass(SponsorLeadEntity.PrimaryKey.class)
-public class SponsorLeadEntity {
+@Table(name = "ecosystem_leads", schema = "public")
+@IdClass(EcosystemLeadEntity.PrimaryKey.class)
+public class EcosystemLeadEntity {
     @Id
     @Column(nullable = false, updatable = false)
     UUID userId;
 
     @Id
     @Column(nullable = false, updatable = false)
-    UUID sponsorId;
+    UUID ecosystemId;
 
     @EqualsAndHashCode
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PrimaryKey implements Serializable {
         UUID userId;
-        UUID sponsorId;
+        UUID ecosystemId;
     }
 }

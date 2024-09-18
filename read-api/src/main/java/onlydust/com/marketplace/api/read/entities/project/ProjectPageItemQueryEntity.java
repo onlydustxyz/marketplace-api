@@ -88,12 +88,13 @@ public class ProjectPageItemQueryEntity {
                 .remainingUsdBudget(isProjectLead ? projectLeadInfo.getRemainingUsdBudget() : null)
                 .repoCount(this.repoCount)
                 .tags(isNull(this.tags) ? List.of() : this.tags.stream().map(Tag::name).map(ProjectTag::valueOf).toList())
-                .ecosystems(isNull(this.ecosystems) ? List.of() : this.ecosystems.stream().map(ecosystem -> new EcosystemResponse()
+                .ecosystems(isNull(this.ecosystems) ? List.of() : this.ecosystems.stream().map(ecosystem -> new EcosystemLinkResponse()
                         .id(ecosystem.id)
                         .logoUrl(ecosystem.logoUrl)
                         .name(ecosystem.name)
                         .slug(ecosystem.slug)
                         .url(ecosystem.url)
+                        .hidden(ecosystem.hidden)
                 ).toList())
                 .leaders(isNull(this.projectLeads) ? List.of() : this.projectLeads.stream().map(projectLead -> new RegisteredUserResponse()
                         .id(projectLead.id)
@@ -138,14 +139,17 @@ public class ProjectPageItemQueryEntity {
         String name;
         @JsonProperty("slug")
         String slug;
+        @JsonProperty("hidden")
+        Boolean hidden;
 
-        public EcosystemResponse toDto() {
-            return new EcosystemResponse()
+        public EcosystemLinkResponse toDto() {
+            return new EcosystemLinkResponse()
                     .id(id)
                     .name(name)
                     .slug(slug)
                     .logoUrl(logoUrl)
-                    .url(url);
+                    .url(url)
+                    .hidden(hidden);
         }
     }
 

@@ -9,7 +9,6 @@ import onlydust.com.marketplace.api.postgres.adapter.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BatchPaymentRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.backoffice.BoEcosystemRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.*;
 import onlydust.com.marketplace.project.domain.port.input.TechnologyStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
@@ -219,10 +218,8 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresBackofficeAdapter postgresBackofficeAdapter(final BoEcosystemRepository boEcosystemRepository,
-                                                               final EcosystemRepository ecosystemRepository,
-                                                               final ProjectRepository projectRepository) {
-        return new PostgresBackofficeAdapter(boEcosystemRepository, ecosystemRepository, projectRepository);
+    public PostgresBackofficeAdapter postgresBackofficeAdapter(final ProjectRepository projectRepository) {
+        return new PostgresBackofficeAdapter(projectRepository);
     }
 
     @Bean

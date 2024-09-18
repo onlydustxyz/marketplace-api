@@ -23,5 +23,4 @@ public record Sponsor(@NonNull SponsorId id,
                 .leads(leads)
                 .build();
     }
-
 }

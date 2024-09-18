@@ -3,7 +3,6 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProjectProjectCategoryEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategoryRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectCategorySuggestionRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectRepository;
 import onlydust.com.marketplace.api.suites.tags.TagProject;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +17,6 @@ import java.util.UUID;
 @TagProject
 public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
     @Autowired
-    ProjectCategorySuggestionRepository projectCategorySuggestionRepository;
-    @Autowired
     ProjectCategoryRepository projectCategoryRepository;
     @Autowired
     ProjectRepository projectRepository;
@@ -27,7 +24,9 @@ public class EcosystemReadApiIT extends AbstractMarketplaceApiIT {
     @BeforeEach
     void setUp() {
         final var categoryAI = new ProjectCategoryEntity(UUID.fromString("b151c7e4-1493-4927-bb0f-8647ec98a9c5"), "ai", "AI", "AI is cool", "brain", Set.of());
-        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is important", "lock",
+        final var categorySecurity = new ProjectCategoryEntity(UUID.fromString("7a1c0dcb-2079-487c-adaa-88d425bf13ea"), "security", "Security", "Security is " +
+                                                                                                                                                "important",
+                "lock",
                 Set.of());
         projectCategoryRepository.saveAll(List.of(
                 categorySecurity,

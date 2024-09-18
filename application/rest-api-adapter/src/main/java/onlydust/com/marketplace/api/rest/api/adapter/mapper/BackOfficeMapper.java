@@ -20,10 +20,8 @@ import onlydust.com.marketplace.kernel.model.UuidWrapper;
 import onlydust.com.marketplace.kernel.model.bank.BankAccount;
 import onlydust.com.marketplace.kernel.model.blockchain.Blockchain;
 import onlydust.com.marketplace.kernel.pagination.Page;
-import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.model.Language;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
-import onlydust.com.marketplace.project.domain.view.backoffice.EcosystemView;
 import onlydust.com.marketplace.project.domain.view.backoffice.ProjectView;
 
 import java.net.URI;
@@ -37,21 +35,6 @@ import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMor
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 
 public interface BackOfficeMapper {
-    static EcosystemPage mapEcosystemPageToContract(final Page<EcosystemView> ecosystemViewPage, int pageIndex) {
-        return new EcosystemPage()
-                .ecosystems(ecosystemViewPage.getContent().stream().map(ecosystemView -> new EcosystemPageItemResponse()
-                        .id(ecosystemView.getId())
-                        .name(ecosystemView.getName())
-                        .url(ecosystemView.getUrl())
-                        .logoUrl(ecosystemView.getLogoUrl())
-                        .projectIds(ecosystemView.getProjectIds())
-                ).toList())
-                .totalPageNumber(ecosystemViewPage.getTotalPageNumber())
-                .totalItemNumber(ecosystemViewPage.getTotalItemNumber())
-                .hasMore(hasMore(pageIndex, ecosystemViewPage.getTotalPageNumber()))
-                .nextPageIndex(nextPageIndex(pageIndex, ecosystemViewPage.getTotalPageNumber()));
-    }
-
     static ShortCurrencyResponse toShortCurrency(final Currency currency) {
         return new ShortCurrencyResponse()
                 .id(currency.id().value())
@@ -376,27 +359,6 @@ public interface BackOfficeMapper {
             case FIAT -> CurrencyType.FIAT;
             case CRYPTO -> CurrencyType.CRYPTO;
         };
-    }
-
-    static Ecosystem mapEcosystemToDomain(final EcosystemRequest ecosystemRequest) {
-        return Ecosystem.builder()
-                .name(ecosystemRequest.getName())
-                .url(ecosystemRequest.getUrl())
-                .logoUrl(ecosystemRequest.getLogoUrl())
-                .description(ecosystemRequest.getDescription())
-                .hidden(ecosystemRequest.getHidden())
-                .build();
-    }
-
-    static EcosystemResponse mapEcosystemToResponse(final Ecosystem ecosystem) {
-        return new EcosystemResponse()
-                .id(ecosystem.id())
-                .slug(ecosystem.slug())
-                .url(ecosystem.url())
-                .name(ecosystem.name())
-                .logoUrl(ecosystem.logoUrl())
-                .description(ecosystem.description())
-                .hidden(ecosystem.hidden());
     }
 
     static Network mapTransactionNetwork(final @NonNull TransactionNetwork network) {

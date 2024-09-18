@@ -1053,17 +1053,16 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
   /bo/v1/ecosystems:
     get:
       security:
         - bearerAuth: [ ]
       tags:
-        - Backoffice
+        - BackofficeEcosystemRead
       summary: Get ecosystem page
-      operationId: getEcosystemPage
+      operationId: getEcosystems
       description: |
-        Get ecosystem page
+        Get ecosystems
       parameters:
         - in: query
           name: pageIndex
@@ -1076,23 +1075,9 @@ paths:
           schema:
             type: integer
         - in: query
-          name: projectIds
-          required: false
+          name: search
           schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
-        - in: query
-          name: ecosystemIds
-          required: false
-          schema:
-            type: array
-            items:
-              type: string
-              format: uuid
-          style: form
+            type: string
       responses:
         "200":
           description: 'Ecosystem page'
@@ -1108,9 +1093,9 @@ paths:
       security:
         - bearerAuth: [ ]
       tags:
-        - Backoffice
+        - BackofficeEcosystemManagement
       summary: Create ecosystem
-      operationId: postEcosystem
+      operationId: createEcosystem
       description: |
         Create ecosystem
       requestBody:
@@ -1124,11 +1109,111 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/components/schemas/EcosystemCreateResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/ecosystems/{ecosystemId}:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeEcosystemRead
+      summary: Get ecosystem data
+      operationId: getEcosystem
+      description: |
+        Get ecosystem data
+      parameters:
+        - in: path
+          name: ecosystemId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemId'
+      responses:
+        "200":
+          description: 'Ecosystem data'
+          content:
+            application/json:
+              schema:
                 $ref: '#/components/schemas/EcosystemResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
           $ref: '#/components/responses/InternalServerError'
+
+    put:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeEcosystemManagement
+      summary: Modify ecosystem data
+      operationId: updateEcosystem
+      description: Modify ecosystem data
+      parameters:
+        - in: path
+          name: ecosystemId
+          required: true
+          schema:
+            $ref: '#/components/schemas/EcosystemId'
+      requestBody:
+        description: Ecosystem data to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EcosystemRequest'
+      responses:
+        "204":
+          description: 'Ecosystem updated'
+        "400":
+          $ref: '#/components/responses/BadRequestError'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /bo/v1/ecosystems/logos:
+    post:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - BackofficeEcosystemManagement
+      summary: Upload a ecosystem logo
+      operationId: uploadEcosystemLogo
+      requestBody:
+        content:
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/svg+xml:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: 'Image uploaded'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadImageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
 
   # BackofficeBannerManagement ===============================================================
   /bo/v1/banners:
@@ -2921,6 +3006,51 @@ components:
         email:
           type: string
 
+    EcosystemRequest:
+      type: object
+      required:
+        - name
+        - url
+        - logoUrl
+        - description
+        - hidden
+        - leads
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
+        description:
+          type: string
+        hidden:
+          type: boolean
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+
+    EcosystemLinkResponse:
+      type: object
+      required:
+        - id
+        - slug
+        - name
+        - url
+        - logoUrl
+      properties:
+        id:
+          $ref: '#/components/schemas/EcosystemId'
+        slug:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+        logoUrl:
+          type: string
+
     EcosystemPage:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -2934,60 +3064,37 @@ components:
                 $ref: '#/components/schemas/EcosystemPageItemResponse'
 
     EcosystemPageItemResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        url:
-          type: string
-        logoUrl:
-          type: string
-        projectIds:
-          type: array
-          items:
-            type: string
-            format: uuid
+      allOf:
+        - $ref: '#/components/schemas/EcosystemLinkResponse'
+        - type: object
+          required:
+            - hidden
+            - leads
+          properties:
+            hidden:
+              type: boolean
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserLinkResponse'
 
-    EcosystemRequest:
+    EcosystemCreateResponse:
       type: object
       required:
-        - name
-        - logoUrl
-        - description
-        - hidden
-      properties:
-        name:
-          type: string
-        url:
-          type: string
-        logoUrl:
-          type: string
-        description:
-          type: string
-        hidden:
-          type: boolean
-
-    EcosystemResponse:
-      type: object
+        - id
       properties:
         id:
-          type: string
-          format: uuid
-        slug:
-          type: string
-        name:
-          type: string
-        url:
-          type: string
-        logoUrl:
-          type: string
-        description:
-          type: string
-        hidden:
-          type: boolean
+          $ref: '#/components/schemas/EcosystemId'
+
+    EcosystemResponse:
+      allOf:
+        - $ref: '#/components/schemas/EcosystemPageItemResponse'
+        - type: object
+          required:
+            - description
+          properties:
+            description:
+              type: string
 
     UpdateInvoiceStatusRequest:
       type: object

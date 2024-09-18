@@ -11,6 +11,7 @@ import onlydust.com.backoffice.api.contract.model.UserResponse;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.BillingProfileReadEntity;
+import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonRegistrationReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
@@ -100,6 +101,16 @@ public class AllUserReadEntity {
     )
     @NonNull
     Set<SponsorReadEntity> sponsors;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ecosystem_leads",
+            schema = "public",
+            joinColumns = @JoinColumn(name = "userId", referencedColumnName = "userId"),
+            inverseJoinColumns = @JoinColumn(name = "ecosystemId")
+    )
+    @NonNull
+    Set<EcosystemReadEntity> ecosystems;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
