@@ -4,16 +4,20 @@ import onlydust.com.marketplace.api.read.entities.user.UserProfileProjectEarning
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public interface UserProfileProjectEarningsEntityRepository extends Repository<UserProfileProjectEarningsEntity, String> {
     @Query(value = """
-            SELECT stats.project_id as project_id,
-                   stats.usd_total  as total_earned_usd
-            FROM received_rewards_stats_per_project_per_user stats
-            WHERE stats.recipient_id = :githubUserId
-              AND (:ecosystemId IS NULL OR :ecosystemId = ANY (stats.ecosystem_ids))
+            select r.project_id       as project_id,
+                   sum(r.usd_amount)  as total_earned_usd
+            from bi.reward_data r
+            where r.contributor_id = :githubUserId and
+                  (:ecosystemId is null or :ecosystemId = any (r.ecosystem_ids)) and
+                  (cast(:fromDate as text) is null or r.timestamp >= :fromDate) and
+                  (cast(:toDate as text) is null or r.timestamp < cast(:toDate as timestamptz) + interval '1 day')
+            group by r.project_id
             """, nativeQuery = true)
-    List<UserProfileProjectEarningsEntity> findByContributorIdAndEcosystem(Long githubUserId, UUID ecosystemId);
+    List<UserProfileProjectEarningsEntity> findByContributorIdAndEcosystem(Long githubUserId, UUID ecosystemId, ZonedDateTime fromDate, ZonedDateTime toDate);
 }

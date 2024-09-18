@@ -1,0 +1,1 @@
+drop materialized view received_rewards_stats_per_project_per_user;

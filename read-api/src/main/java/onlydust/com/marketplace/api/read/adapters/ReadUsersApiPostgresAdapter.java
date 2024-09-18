@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -38,7 +39,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     }
 
     @Override
-    public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem) {
+    public ResponseEntity<UserProfileStatsV2> getUserProfileStats(Long githubId, UUID ecosystem, String fromDate, String toDate) {
 
         final var workDistribution = ecosystem != null ?
                 userWorkDistributionEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem) :
@@ -48,7 +49,10 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
                 userWeeklyStatsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem) :
                 userWeeklyStatsEntityRepository.findByContributorId(githubId);
 
-        final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorIdAndEcosystem(githubId, ecosystem);
+        final var perProjectsStats = userProfileProjectEarningsEntityRepository.findByContributorIdAndEcosystem(githubId,
+                ecosystem,
+                parseZonedNullable(fromDate),
+                parseZonedNullable(toDate));
 
         return ok(new UserProfileStatsV2()
                 .earnings(new UserProfileStatsV2Earnings()
