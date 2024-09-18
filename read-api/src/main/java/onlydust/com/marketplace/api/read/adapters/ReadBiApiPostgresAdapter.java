@@ -43,16 +43,9 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
     private final ProjectKpisReadRepository projectKpisReadRepository;
 
-
     @Override
-    public ResponseEntity<BiContributorsPageResponse> getBIContributors(Integer pageIndex, Integer pageSize, SortDirection direction, String fromDate,
-                                                                        String toDate, List<UUID> programOrEcosystemIds, String search,
-                                                                        ContributorTypeEnum contributorType, List<UUID> categoryIds, List<UUID> languageIds,
-                                                                        List<UUID> ecosystemIds, List<String> countryCodes,
-                                                                        DecimalNumberKpiFilter totalRewardedUsdAmount, NumberKpiFilter contributionCount,
-                                                                        NumberKpiFilter mergedPrCount, NumberKpiFilter rewardCount) {
-        return ReadBiApi.super.getBIContributors(pageIndex, pageSize, direction, fromDate, toDate, programOrEcosystemIds, search, contributorType,
-                categoryIds, languageIds, ecosystemIds, countryCodes, totalRewardedUsdAmount, contributionCount, mergedPrCount, rewardCount);
+    public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams queryParams) {
+        return ReadBiApi.super.getBIContributors(queryParams);
     }
 
     @Override
@@ -78,20 +71,24 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         return ok(new BiContributorsStatsListResponse().stats(mergedStats));
     }
 
-    @Override
-    public ResponseEntity<BiProjectsPageResponse> getBIProjects(Integer pageIndex, Integer pageSize, SortDirection direction,
-                                                                String fromDate, String toDate,
-                                                                List<UUID> programOrEcosystemIds, String search, List<UUID> projectLeadIds,
-                                                                List<UUID> categoryIds, List<UUID> languageIds, List<UUID> ecosystemIds,
-                                                                DecimalNumberKpiFilter availableBudgetUsdAmount, NumberKpiFilter percentUsedBudget,
-                                                                DecimalNumberKpiFilter totalGrantedUsdAmount, DecimalNumberKpiFilter averageRewardUsdAmount,
-                                                                DecimalNumberKpiFilter totalRewardedUsdAmount, NumberKpiFilter onboardedContributorCount,
-                                                                NumberKpiFilter activeContributorCount, NumberKpiFilter mergedPrCount,
-                                                                NumberKpiFilter rewardCount, NumberKpiFilter contributionCount,
-                                                                ProjectKpiSortEnum sort) {
+    public record QueryParams(Integer pageIndex, Integer pageSize, SortDirection direction,
+                              String fromDate, String toDate,
+                              List<UUID> programOrEcosystemIds, String search, List<UUID> projectLeadIds,
+                              List<UUID> categoryIds, List<UUID> languageIds, List<UUID> ecosystemIds,
+                              DecimalNumberKpiFilter availableBudgetUsdAmount, NumberKpiFilter percentUsedBudget,
+                              DecimalNumberKpiFilter totalGrantedUsdAmount, DecimalNumberKpiFilter averageRewardUsdAmount,
+                              DecimalNumberKpiFilter totalRewardedUsdAmount, NumberKpiFilter onboardedContributorCount,
+                              NumberKpiFilter activeContributorCount, NumberKpiFilter mergedPrCount,
+                              NumberKpiFilter rewardCount, NumberKpiFilter contributionCount,
+                              ProjectKpiSortEnum sort) {
+    }
 
-        final var sanitizedFromDate = sanitizedDate(fromDate, DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(toDate, ZonedDateTime.now());
+
+    @Override
+    public ResponseEntity<BiProjectsPageResponse> getBIProjects(BiProjectsQueryParams q) {
+
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         final var page = projectKpisReadRepository.findAll(
@@ -99,49 +96,49 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
-                programOrEcosystemIds == null ? new UUID[0] : programOrEcosystemIds.toArray(UUID[]::new),
-                search,
-                projectLeadIds == null ? null : projectLeadIds.toArray(UUID[]::new),
-                categoryIds == null ? null : categoryIds.toArray(UUID[]::new),
-                languageIds == null ? null : languageIds.toArray(UUID[]::new),
-                ecosystemIds == null ? null : ecosystemIds.toArray(UUID[]::new),
-                availableBudgetUsdAmount.getGte(),
-                availableBudgetUsdAmount.getEq(),
-                availableBudgetUsdAmount.getLte(),
-                percentUsedBudget.getGte(),
-                percentUsedBudget.getEq(),
-                percentUsedBudget.getLte(),
-                totalGrantedUsdAmount.getGte(),
-                totalGrantedUsdAmount.getEq(),
-                totalGrantedUsdAmount.getLte(),
-                averageRewardUsdAmount.getGte(),
-                averageRewardUsdAmount.getEq(),
-                averageRewardUsdAmount.getLte(),
-                totalRewardedUsdAmount.getGte(),
-                totalRewardedUsdAmount.getEq(),
-                totalRewardedUsdAmount.getLte(),
-                onboardedContributorCount.getGte(),
-                onboardedContributorCount.getEq(),
-                onboardedContributorCount.getLte(),
-                activeContributorCount.getGte(),
-                activeContributorCount.getEq(),
-                activeContributorCount.getLte(),
-                mergedPrCount.getGte(),
-                mergedPrCount.getEq(),
-                mergedPrCount.getLte(),
-                rewardCount.getGte(),
-                rewardCount.getEq(),
-                rewardCount.getLte(),
-                contributionCount.getGte(),
-                contributionCount.getEq(),
-                contributionCount.getLte(),
-                PageRequest.of(pageIndex, pageSize, Sort.by(direction == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
-                        ProjectKpisReadRepository.getSortProperty(sort)))
+                q.getProgramOrEcosystemIds() == null ? new UUID[0] : q.getProgramOrEcosystemIds().toArray(UUID[]::new),
+                q.getSearch(),
+                q.getProjectLeadIds() == null ? null : q.getProjectLeadIds().toArray(UUID[]::new),
+                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
+                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );
         return ok(new BiProjectsPageResponse()
                 .projects(page.stream().map(ProjectKpisReadEntity::toDto).toList())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .hasMore(hasMore(q.getPageIndex(), page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages()));
     }

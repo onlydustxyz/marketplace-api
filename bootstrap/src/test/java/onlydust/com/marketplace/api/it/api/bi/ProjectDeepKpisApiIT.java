@@ -381,27 +381,28 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
-        private void test_projects_stats(String queryParam, boolean assertNotEmpty, Map<String, Consumer<BiProjectsPageResponse>> possibleQueryParamValues) {
+        private void test_projects_stats(String queryParam, String value, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {
+            test_projects_stats(Map.of(queryParam, value), asserter, assertNotEmpty);
+        }
+
+        private void test_projects_stats(Map<String, String> queryParamsWithValues, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {
             final var queryParams = new HashMap<String, String>();
             queryParams.put("pageIndex", "0");
             queryParams.put("pageSize", "100");
             queryParams.put("fromDate", "2021-01-01");
             queryParams.put("toDate", "2021-01-10");
             queryParams.put("programOrEcosystemIds", allProgramOrEcosystemIds);
-            for (String possibleQueryParamValue : possibleQueryParamValues.keySet()) {
-                queryParams.put(queryParam, possibleQueryParamValue);
-                final var response = client.get()
-                        .uri(getApiURI(BI_PROJECTS, queryParams))
-                        .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
-                        .exchange()
-                        .expectStatus()
-                        .is2xxSuccessful()
-                        .expectBody(BiProjectsPageResponse.class).returnResult().getResponseBody();
-                if (assertNotEmpty)
-                    assertThat(response.getProjects()).isNotEmpty();
-                possibleQueryParamValues.get(possibleQueryParamValue).accept(response);
-                queryParams.remove(queryParam);
-            }
+            queryParams.putAll(queryParamsWithValues);
+            final var response = client.get()
+                    .uri(getApiURI(BI_PROJECTS, queryParams))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiProjectsPageResponse.class).returnResult().getResponseBody();
+            if (assertNotEmpty)
+                assertThat(response.getProjects()).isNotEmpty();
+            asserter.accept(response);
         }
 
         @Test
@@ -419,47 +420,39 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 //            NumberKpiFilter contributionCount,
 //            ProjectKpiSortEnum sort,
 
-
-            test_projects_stats("search", true, Map.of(
-                    "gaming",
+            test_projects_stats(Map.of("totalGrantedUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
+            test_projects_stats("search", "gaming",
                     response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
-                            .contains("Gaming")),
-                    "strk",
+                            .contains("Gaming")), true
+            );
+            test_projects_stats("search", "strk",
                     response -> {
                         // Madara got a grant in STRK and OnlyDust has STRK rewards and a grant in STRK
                         assertThat(response.getProjects()).hasSize(2);
                         assertThat(response.getProjects().get(0).getProject().getName()).contains("Madara");
                         assertThat(response.getProjects().get(1).getProject().getName()).contains("OnlyDust");
-                    }
-            ));
-            test_projects_stats("projectLeadIds", true, Map.of(
-                    mehdi.userId().toString(),
-                    response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))
-                            .contains(mehdi.githubUserId().value()))
-            ));
-            test_projects_stats("categoryIds", true, Map.of(
-                    gaming.id().toString(),
-                    response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
-                            .contains("Gaming"))
-            ));
-            test_projects_stats("languageIds", true, Map.of(
-                    "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
-                    response -> response.getProjects().forEach(project -> assertThat(project.getLanguages().stream().map(LanguageResponse::getName).toList())
-                            .contains("Cairo"))
-            ));
-            test_projects_stats("ecosystemIds", true, Map.of(
-                    starknet.toString(),
-                    response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemResponse::getName).toList())
-                            .contains("Starknet ecosystem"))
-            ));
-            test_projects_stats("totalGrantedUsdAmount", true, Map.of(
-                    "gte,1800,lte,2200",
-                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
-                            .isEqualTo(BigDecimal.valueOf(2000))),
-                    "eq,2000",
-                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
-                            .isEqualTo(BigDecimal.valueOf(2000))))
+                    }, true
             );
+            test_projects_stats("projectLeadIds", mehdi.userId().toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))
+                            .contains(mehdi.githubUserId().value())), true
+            );
+            test_projects_stats("categoryIds", gaming.id().toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
+                            .contains("Gaming")), true
+            );
+            test_projects_stats("languageIds", "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getLanguages().stream().map(LanguageResponse::getName).toList())
+                            .contains("Cairo")), true
+            );
+            test_projects_stats("ecosystemIds", starknet.toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemLinkResponse::getName).toList())
+                            .contains("Starknet ecosystem")), true
+            );
+
         }
     }
 }
