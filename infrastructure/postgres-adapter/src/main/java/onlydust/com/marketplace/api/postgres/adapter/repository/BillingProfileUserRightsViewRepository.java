@@ -12,6 +12,7 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
     @Query(nativeQuery = true, value = """
             select u.id                                                 as user_id,
                    bpu.role                                             as user_role,
+                   bp.type                                              as billing_profile_type,
                    (select count(*)
                     from rewards r
                              join accounting.reward_statuses rs on rs.reward_id = r.id and rs.status >= 'PROCESSING'
@@ -32,6 +33,7 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
             from iam.users u
                      left join accounting.billing_profiles_user_invitations bpui
                                on bpui.github_user_id = u.github_user_id and bpui.billing_profile_id = :billingProfileId
+                     left join accounting.billing_profiles bp on bpui.billing_profile_id = bp.id
                      left join accounting.billing_profiles_users bpu
                                on bpu.user_id = u.id and bpu.billing_profile_id = :billingProfileId
                      left join iam.users u_by on u_by.id = bpui.invited_by

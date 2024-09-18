@@ -1685,6 +1685,30 @@ class BillingProfileServiceTest {
         verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
     }
 
+
+    @Test
+    void should_not_delete_individual_billing_profile() {
+        // Given
+        final BillingProfile.Id billingProfileId = BillingProfile.Id.random();
+        final UserId userId = UserId.random();
+
+        // When
+        when(billingProfileStoragePort.getUserRightsForBillingProfile(billingProfileId, userId))
+                .thenReturn(Optional.of(BillingProfileUserRightsView.builder()
+                        .role(BillingProfile.User.Role.ADMIN)
+                        .billingProfileType(BillingProfile.Type.INDIVIDUAL)
+                        .billingProfileProcessingRewardsCount(0L)
+                        .build()));
+
+
+        // Then
+        assertThatThrownBy(() -> billingProfileService.deleteBillingProfile(userId, billingProfileId))
+                // Then
+                .isInstanceOf(OnlyDustException.class)
+                .hasMessage("User %s cannot delete billing profile %s".formatted(userId.value(), billingProfileId.value()));
+        verify(billingProfileStoragePort, never()).deleteBillingProfile(billingProfileId);
+    }
+
     @Test
     void should_not_delete_billing_profile_given_linked_rewards() {
         // Given
