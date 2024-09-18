@@ -1,9 +1,7 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
-import onlydust.com.marketplace.api.contract.model.BiProjectsPageResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
-import onlydust.com.marketplace.api.contract.model.RegisteredUserResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
@@ -66,6 +64,9 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
+            currencyHelper.setQuote("2020-12-31T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.5));
+            currencyHelper.setQuote("2020-12-31T00:00:00Z", ETH, USD, BigDecimal.valueOf(2));
+
             antho = userAuthHelper.create("antho");
             pierre = userAuthHelper.create("pierre");
             mehdi = userAuthHelper.create("mehdi");
@@ -90,9 +91,9 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
             final var ethFoundation = sponsorHelper.create("The Ethereum Foundation");
-            accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
+            accountingHelper.createSponsorAccount(ethFoundation.id(), 10_000, ETH);
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
-            accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
+            accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
             final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
             projectHelper.addCategory(onlyDust, defi.id());
@@ -104,8 +105,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum));
             projectHelper.addCategory(bridge, gaming.id());
-            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH));
-            at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 100, STRK));
+            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 1_000, ETH));
+            at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 10, STRK));
 
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
@@ -117,17 +118,17 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var madara_app = githubHelper.createRepo(madara);
 
 
-            at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
+            at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
             at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
-            at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
+            at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
+            at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
             at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
-            at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
+            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
+            at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
             at("2021-01-07T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
@@ -139,9 +140,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-13T00:00:06Z", () -> githubHelper.createPullRequest(madara_app, emma));
             at("2021-02-21T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-28T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
-
-            currencyHelper.setQuote("2020-12-31T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.5));
-            currencyHelper.setQuote("2020-12-31T00:00:00Z", ETH, USD, BigDecimal.valueOf(2));
 
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK));
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, STRK));
@@ -167,11 +165,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .is2xxSuccessful()
                     .expectBody()
                     .jsonPath("$.projects[0].project.name").<String>value(name -> assertThat(name).contains("Bridge"))
-                    .jsonPath("$.projects[1].project.name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.projects[1].project.name").<String>value(name -> assertThat(name).contains("Madara"))
+                    .jsonPath("$.projects[2].project.name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .json("""
                             {
                               "totalPageNumber": 1,
-                              "totalItemNumber": 2,
+                              "totalItemNumber": 3,
                               "hasMore": false,
                               "nextPageIndex": 0,
                               "projects": [
@@ -187,7 +186,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Gaming"
                                     }
                                   ],
-                                  "languages": null,
+                                  "languages": [
+                                    {
+                                      "slug": "cairo",
+                                      "name": "Cairo"
+                                    }
+                                  ],
                                   "ecosystems": [
                                     {
                                       "name": "Universe ecosystem"
@@ -210,8 +214,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "availableBudget": null,
                                   "percentUsedBudget": null,
                                   "totalGrantedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
+                                    "value": 2000,
+                                    "trend": "UP"
                                   },
                                   "totalRewardedUsdAmount": {
                                     "value": 0,
@@ -245,6 +249,62 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                 {
                                   "projectLeads": [
                                     {
+                                      "login": "hayden"
+                                    }
+                                  ],
+                                  "categories": null,
+                                  "languages": null,
+                                  "ecosystems": [
+                                    {
+                                      "name": "Universe ecosystem"
+                                    },
+                                    {
+                                      "name": "Starknet ecosystem"
+                                    }
+                                  ],
+                                  "programs": [
+                                    {
+                                      "name": "Starkware Exploration Team"
+                                    }
+                                  ],
+                                  "availableBudget": null,
+                                  "percentUsedBudget": null,
+                                  "totalGrantedUsdAmount": {
+                                    "value": 60.0,
+                                    "trend": "UP"
+                                  },
+                                  "totalRewardedUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "averageRewardUsdAmount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "onboardedContributorCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "activeContributorCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "mergedPrCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "rewardCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "contributionCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  }
+                                },
+                                {
+                                  "projectLeads": [
+                                    {
                                       "login": "pierre"
                                     }
                                   ],
@@ -254,7 +314,20 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "DeFi"
                                     }
                                   ],
-                                  "languages": null,
+                                  "languages": [
+                                    {
+                                      "slug": "rust",
+                                      "name": "Rust"
+                                    },
+                                    {
+                                      "slug": "java",
+                                      "name": "Java"
+                                    },
+                                    {
+                                      "slug": "typescript",
+                                      "name": "Typescript"
+                                    }
+                                  ],
                                   "ecosystems": [
                                     {
                                       "name": "Universe ecosystem"
@@ -271,8 +344,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "availableBudget": null,
                                   "percentUsedBudget": null,
                                   "totalGrantedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
+                                    "value": 250.0,
+                                    "trend": "UP"
                                   },
                                   "totalRewardedUsdAmount": {
                                     "value": 5.0,
@@ -334,10 +407,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         @Test
         public void should_get_projects_stats_with_filters() {
             // TODO: test all filters:
-//            List<UUID> projectLeadIds,
-//            List<UUID> categoryIds,
-//            List<UUID> languageIds,
-//            List<UUID> ecosystemIds,
 //            DecimalNumberKpiFilter availableBudgetUsdAmount,
 //            NumberKpiFilter percentUsedBudget,
 //            DecimalNumberKpiFilter totalGrantedUsdAmount,
@@ -350,16 +419,47 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 //            NumberKpiFilter contributionCount,
 //            ProjectKpiSortEnum sort,
 
+
+            test_projects_stats("search", true, Map.of(
+                    "gaming",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
+                            .contains("Gaming")),
+                    "strk",
+                    response -> {
+                        // Madara got a grant in STRK and OnlyDust has STRK rewards and a grant in STRK
+                        assertThat(response.getProjects()).hasSize(2);
+                        assertThat(response.getProjects().get(0).getProject().getName()).contains("Madara");
+                        assertThat(response.getProjects().get(1).getProject().getName()).contains("OnlyDust");
+                    }
+            ));
             test_projects_stats("projectLeadIds", true, Map.of(
                     mehdi.userId().toString(),
                     response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))
                             .contains(mehdi.githubUserId().value()))
             ));
-            test_projects_stats("search", true, Map.of(
-                    "gaming",
+            test_projects_stats("categoryIds", true, Map.of(
+                    gaming.id().toString(),
                     response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
                             .contains("Gaming"))
             ));
+            test_projects_stats("languageIds", true, Map.of(
+                    "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getLanguages().stream().map(LanguageResponse::getName).toList())
+                            .contains("Cairo"))
+            ));
+            test_projects_stats("ecosystemIds", true, Map.of(
+                    starknet.toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemResponse::getName).toList())
+                            .contains("Starknet ecosystem"))
+            ));
+            test_projects_stats("totalGrantedUsdAmount", true, Map.of(
+                    "gte,1800,lte,2200",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))),
+                    "eq,2000",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))))
+            );
         }
     }
 }

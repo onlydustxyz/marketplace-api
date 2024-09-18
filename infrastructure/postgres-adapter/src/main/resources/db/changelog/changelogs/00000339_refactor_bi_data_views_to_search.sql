@@ -219,10 +219,13 @@ create index bi_reward_data_year_timestamp_idx on bi.reward_data (year_timestamp
 
 CREATE MATERIALIZED VIEW bi.daily_project_grants AS
 SELECT c.*,
-       coalesce(ecosystem_names.value, '') || ' ' ||
-       coalesce(program_names.value, '') || ' ' ||
-       coalesce(project_names.value, '') || ' ' ||
-       coalesce(project_category_names.value, '') || ' ' ||
+       ecosystems.ids                      as ecosystem_ids,
+       programs.ids                        as program_ids,
+       project_categories.ids              as project_category_ids,
+       coalesce(ecosystems.names, '') || ' ' ||
+       coalesce(programs.names, '') || ' ' ||
+       coalesce(projects.names, '') || ' ' ||
+       coalesce(project_categories.names, '') || ' ' ||
        coalesce(currency_search.value, '') as search
 FROM (select abt.project_id                   as project_id,
              abt.program_id                   as program_id,
@@ -247,21 +250,21 @@ FROM (select abt.project_id                   as project_id,
          left join lateral (select cur.name || ' ' || cur.code as value
                             from currencies cur
                             where cur.id = c.currency_id) as currency_search on true
-         left join lateral (select string_agg(e.name, ' ') as value
+         left join lateral (select array_agg(e.id) as ids, string_agg(e.name, ' ') as names
                             from projects_ecosystems pe
                                      join ecosystems e on e.id = pe.ecosystem_id
-                            where pe.project_id = c.project_id) as ecosystem_names on true
-         left join lateral (select string_agg(p.name, ' ') as value
+                            where pe.project_id = c.project_id) as ecosystems on true
+         left join lateral (select array_agg(p.id) as ids, string_agg(p.name, ' ') as names
                             from programs_projects pp
                                      join programs p on p.id = pp.program_id
-                            where pp.project_id = c.project_id) as program_names on true
-         left join lateral (select string_agg(p.name, ' ') as value
+                            where pp.project_id = c.project_id) as programs on true
+         left join lateral (select array_agg(p.id) as ids, string_agg(p.name, ' ') as names
                             from projects p
-                            where p.id = c.project_id) as project_names on true
-         left join lateral (select string_agg(pc.name, ' ') as value
+                            where p.id = c.project_id) as projects on true
+         left join lateral (select array_agg(pc.id) as ids, string_agg(pc.name, ' ') as names
                             from projects_project_categories ppc
                                      join project_categories pc on pc.id = ppc.project_category_id
-                            where ppc.project_id = c.project_id) as project_category_names on true
+                            where ppc.project_id = c.project_id) as project_categories on true
 ;
 create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, day_timestamp, program_id, currency_id);
 create index bi_daily_project_grants_idx on bi.daily_project_grants (day_timestamp, project_id);
@@ -309,20 +312,20 @@ FROM (SELECT d.project_id                           as project_id,
 
       UNION
 
-      SELECT d.project_id         as project_id,
-             d.day_timestamp      as timestamp,
-             NULL                 as contributor_id,
-             d.search             as search,
-             '{}'                 as language_ids,
-             '{}'                 as ecosystem_ids,
-             array [d.program_id] as program_ids,
-             '{}'                 as project_category_ids,
-             NULL                 as contribution_id,
-             NULL                 as is_merged_pr,
-             NULL                 as is_first_contribution_on_onlydust,
-             NULL                 as reward_id,
-             NULL                 as rewarded_usd_amount,
-             d.usd_amount         as granted_usd_amount
+      SELECT d.project_id           as project_id,
+             d.day_timestamp        as timestamp,
+             NULL                   as contributor_id,
+             d.search               as search,
+             NULL                   as language_ids,
+             d.ecosystem_ids        as ecosystem_ids,
+             d.program_ids          as program_ids,
+             d.project_category_ids as project_category_ids,
+             NULL                   as contribution_id,
+             NULL                   as is_merged_pr,
+             NULL                   as is_first_contribution_on_onlydust,
+             NULL                   as reward_id,
+             NULL                   as rewarded_usd_amount,
+             d.usd_amount           as granted_usd_amount
       from bi.daily_project_grants d) data;
 
 CREATE UNIQUE INDEX bi_project_data_unions_pk ON bi.project_data_unions (project_id, timestamp, contribution_id, reward_id, granted_usd_amount);
