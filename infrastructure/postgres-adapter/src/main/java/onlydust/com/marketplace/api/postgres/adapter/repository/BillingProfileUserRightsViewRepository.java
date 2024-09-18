@@ -33,9 +33,9 @@ public interface BillingProfileUserRightsViewRepository extends JpaRepository<Bi
             from iam.users u
                      left join accounting.billing_profiles_user_invitations bpui
                                on bpui.github_user_id = u.github_user_id and bpui.billing_profile_id = :billingProfileId
-                     left join accounting.billing_profiles bp on bpui.billing_profile_id = bp.id
                      left join accounting.billing_profiles_users bpu
                                on bpu.user_id = u.id and bpu.billing_profile_id = :billingProfileId
+                     left join accounting.billing_profiles bp on bpu.billing_profile_id = bp.id
                      left join iam.users u_by on u_by.id = bpui.invited_by
             where u.id = :userId
             """)
