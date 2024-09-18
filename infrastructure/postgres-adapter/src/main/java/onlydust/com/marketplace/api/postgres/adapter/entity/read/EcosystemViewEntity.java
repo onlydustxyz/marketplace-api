@@ -32,4 +32,6 @@ public class EcosystemViewEntity {
     String bannerUrl;
     @NonNull
     String slug;
+    @NonNull
+    Boolean hidden;
 }

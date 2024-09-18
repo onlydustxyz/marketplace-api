@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.NotificationSettingsChannelEntity;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
+import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
@@ -95,7 +96,8 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
                 .lastName(user.profile().map(UserProfileInfoReadEntity::lastName).orElse(null))
                 .missingPayoutPreference(hasMissingPayoutPreferences)
                 .programs(user.programs().stream().map(ProgramReadEntity::toLinkResponse).sorted(Comparator.comparing(ProgramLinkResponse::getName)).toList())
-                .sponsors(user.sponsors().stream().map(SponsorReadEntity::toLinkResponse).sorted(Comparator.comparing(SponsorLinkResponse::getName)).toList());
+                .sponsors(user.sponsors().stream().map(SponsorReadEntity::toLinkResponse).sorted(Comparator.comparing(SponsorLinkResponse::getName)).toList())
+                .ecosystems(user.ecosystems().stream().map(EcosystemReadEntity::toLinkResponse).sorted(Comparator.comparing(EcosystemLinkResponse::getName)).toList());
 
         return ok(response);
     }
