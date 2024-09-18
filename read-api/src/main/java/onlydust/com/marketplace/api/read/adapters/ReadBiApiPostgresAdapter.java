@@ -45,14 +45,14 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
 
     @Override
-    public ResponseEntity<BiContributorsPageResponse> getBIContributors(Integer pageIndex, Integer pageSize, TimeGroupingEnum timeGrouping,
-                                                                        SortDirection direction, String fromDate, String toDate,
+    public ResponseEntity<BiContributorsPageResponse> getBIContributors(Integer pageIndex, Integer pageSize, SortDirection direction, String fromDate,
+                                                                        String toDate, List<UUID> programOrEcosystemIds, String search,
                                                                         ContributorTypeEnum contributorType, List<UUID> categoryIds, List<UUID> languageIds,
                                                                         List<UUID> ecosystemIds, List<String> countryCodes,
                                                                         DecimalNumberKpiFilter totalRewardedUsdAmount, NumberKpiFilter contributionCount,
                                                                         NumberKpiFilter mergedPrCount, NumberKpiFilter rewardCount) {
-        return ReadBiApi.super.getBIContributors(pageIndex, pageSize, timeGrouping, direction, fromDate, toDate, contributorType, categoryIds, languageIds,
-                ecosystemIds, countryCodes, totalRewardedUsdAmount, contributionCount, mergedPrCount, rewardCount);
+        return ReadBiApi.super.getBIContributors(pageIndex, pageSize, direction, fromDate, toDate, programOrEcosystemIds, search, contributorType,
+                categoryIds, languageIds, ecosystemIds, countryCodes, totalRewardedUsdAmount, contributionCount, mergedPrCount, rewardCount);
     }
 
     @Override
@@ -80,7 +80,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     @Override
     public ResponseEntity<BiProjectsPageResponse> getBIProjects(Integer pageIndex, Integer pageSize, SortDirection direction,
-                                                                String fromDate, String toDate, String search, List<UUID> projectLeadIds,
+                                                                String fromDate, String toDate,
+                                                                List<UUID> programOrEcosystemIds, String search, List<UUID> projectLeadIds,
                                                                 List<UUID> categoryIds, List<UUID> languageIds, List<UUID> ecosystemIds,
                                                                 DecimalNumberKpiFilter availableBudgetUsdAmount, NumberKpiFilter percentUsedBudget,
                                                                 DecimalNumberKpiFilter totalGrantedUsdAmount, DecimalNumberKpiFilter averageRewardUsdAmount,
@@ -98,6 +99,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
+                programOrEcosystemIds == null ? new UUID[0] : programOrEcosystemIds.toArray(UUID[]::new),
                 search,
                 projectLeadIds == null ? null : projectLeadIds.toArray(UUID[]::new),
                 categoryIds == null ? null : categoryIds.toArray(UUID[]::new),

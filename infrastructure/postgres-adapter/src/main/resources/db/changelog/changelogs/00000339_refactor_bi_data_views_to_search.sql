@@ -4,8 +4,12 @@ DROP MATERIALIZED VIEW bi.contribution_data_cross_projects;
 DROP MATERIALIZED VIEW bi.contribution_data;
 DROP MATERIALIZED VIEW bi.reward_data;
 DROP MATERIALIZED VIEW bi.daily_project_grants;
+DROP MATERIALIZED VIEW bi_internal.contribution_contributor_timestamps;
+DROP MATERIALIZED VIEW bi_internal.contribution_project_timestamps;
 DROP VIEW bi_internal.exploded_rewards;
 DROP VIEW bi_internal.exploded_contributions;
+DROP SCHEMA bi_internal;
+
 
 
 CREATE MATERIALIZED VIEW bi.contribution_data AS
@@ -33,11 +37,11 @@ WITH exploded_contributions AS
                                        from language_file_extensions lfe_1
                                        where lfe_1.extension = any (c.main_file_extensions)) lfe on true)
 SELECT c.*,
-       language_names.value || ' ' ||
-       ecosystem_names.value || ' ' ||
-       program_names.value || ' ' ||
-       project_names.value || ' ' ||
-       project_category_names.value as search
+       coalesce(language_names.value, '') || ' ' ||
+       coalesce(ecosystem_names.value, '') || ' ' ||
+       coalesce(program_names.value, '') || ' ' ||
+       coalesce(project_names.value, '') || ' ' ||
+       coalesce(project_category_names.value, '') as search
 FROM (with registered_users as (select u.id             as id,
                                        u.github_user_id as github_user_id,
                                        kyc.country      as country
@@ -156,12 +160,12 @@ WITH exploded_rewards AS
                                        FROM language_file_extensions lfe_1
                                        WHERE lfe_1.extension = ANY (c.main_file_extensions)) lfe ON true)
 SELECT c.*,
-       language_names.value || ' ' ||
-       ecosystem_names.value || ' ' ||
-       program_names.value || ' ' ||
-       project_names.value || ' ' ||
-       project_category_names.value || ' ' ||
-       currency_search.value as search
+       coalesce(language_names.value, '') || ' ' ||
+       coalesce(ecosystem_names.value, '') || ' ' ||
+       coalesce(program_names.value, '') || ' ' ||
+       coalesce(project_names.value, '') || ' ' ||
+       coalesce(project_category_names.value, '') || ' ' ||
+       coalesce(currency_search.value, '') as search
 FROM (select r.reward_id                               as reward_id,
              r.timestamp                               as timestamp,
              date_trunc('day', r.timestamp)            as day_timestamp,
@@ -215,7 +219,11 @@ create index bi_reward_data_year_timestamp_idx on bi.reward_data (year_timestamp
 
 CREATE MATERIALIZED VIEW bi.daily_project_grants AS
 SELECT c.*,
-       currency_search.value as search
+       coalesce(ecosystem_names.value, '') || ' ' ||
+       coalesce(program_names.value, '') || ' ' ||
+       coalesce(project_names.value, '') || ' ' ||
+       coalesce(project_category_names.value, '') || ' ' ||
+       coalesce(currency_search.value, '') as search
 FROM (select abt.project_id                   as project_id,
              abt.program_id                   as program_id,
              abt.currency_id                  as currency_id,
@@ -239,9 +247,25 @@ FROM (select abt.project_id                   as project_id,
          left join lateral (select cur.name || ' ' || cur.code as value
                             from currencies cur
                             where cur.id = c.currency_id) as currency_search on true
+         left join lateral (select string_agg(e.name, ' ') as value
+                            from projects_ecosystems pe
+                                     join ecosystems e on e.id = pe.ecosystem_id
+                            where pe.project_id = c.project_id) as ecosystem_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from programs_projects pp
+                                     join programs p on p.id = pp.program_id
+                            where pp.project_id = c.project_id) as program_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from projects p
+                            where p.id = c.project_id) as project_names on true
+         left join lateral (select string_agg(pc.name, ' ') as value
+                            from projects_project_categories ppc
+                                     join project_categories pc on pc.id = ppc.project_category_id
+                            where ppc.project_id = c.project_id) as project_category_names on true
 ;
-create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, program_id, currency_id, day_timestamp);
-create unique index bi_daily_project_grants_pk_inv on bi.daily_project_grants (day_timestamp, currency_id, program_id, project_id);
+create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, day_timestamp, program_id, currency_id);
+create index bi_daily_project_grants_idx on bi.daily_project_grants (day_timestamp, project_id);
+create index bi_daily_project_grants_idx_inv on bi.daily_project_grants (project_id, day_timestamp);
 
 
 
@@ -302,11 +326,7 @@ FROM (SELECT d.project_id                           as project_id,
       from bi.daily_project_grants d) data;
 
 CREATE UNIQUE INDEX bi_project_data_unions_pk ON bi.project_data_unions (project_id, timestamp, contribution_id, reward_id, granted_usd_amount);
-CREATE INDEX bi_project_data_unions_idx_1 ON bi.project_data_unions (timestamp, project_lead_ids, project_category_ids,
-                                                                     language_ids, ecosystem_ids, search, project_id);
-CREATE INDEX bi_project_data_unions_idx_2 ON bi.project_data_unions (project_id, timestamp, project_lead_ids,
-                                                                     project_category_ids, language_ids, ecosystem_ids,
-                                                                     search);
+CREATE UNIQUE INDEX bi_project_data_unions_uidx ON bi.project_data_unions (timestamp, contribution_id, reward_id, granted_usd_amount, project_id);
 
 
 

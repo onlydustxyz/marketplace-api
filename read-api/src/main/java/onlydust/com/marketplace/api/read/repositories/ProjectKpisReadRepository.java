@@ -57,6 +57,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                   from bi.project_data_unions d
                   where d.timestamp >= :fromDate
                     and d.timestamp < :toDate
+                    and (d.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
+                         d.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
                     and (coalesce(:projectLeadIds) is null or d.project_lead_ids && cast(:projectLeadIds as uuid[]))
                     and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
                     and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
@@ -81,6 +83,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         where previous_period.project_id = d.project_id
                                           and previous_period.timestamp >= :fromDatePreviousPeriod
                                           and previous_period.timestamp < :toDatePreviousPeriod
+                                          and (previous_period.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
+                                               previous_period.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
                                           and (coalesce(:projectLeadIds) is null or previous_period.project_lead_ids && cast(:projectLeadIds as uuid[]))
                                           and (coalesce(:categoryIds) is null or previous_period.project_category_ids && cast(:categoryIds as uuid[]))
                                           and (coalesce(:languageIds) is null or previous_period.language_ids && cast(:languageIds as uuid[]))
@@ -137,6 +141,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                           from bi.project_data_unions d
                           where d.timestamp >= :fromDate
                             and d.timestamp < :toDate
+                            and (d.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
+                                 d.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
                             and (coalesce(:projectLeadIds) is null or d.project_lead_ids && cast(:projectLeadIds as uuid[]))
                             and (coalesce(:categoryIds) is null or d.project_category_ids && cast(:categoryIds as uuid[]))
                             and (coalesce(:languageIds) is null or d.language_ids && cast(:languageIds as uuid[]))
@@ -180,6 +186,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         @NonNull ZonedDateTime toDate,
                                         @NonNull ZonedDateTime fromDatePreviousPeriod,
                                         @NonNull ZonedDateTime toDatePreviousPeriod,
+                                        @NonNull UUID[] programOrEcosystemIds,
                                         String search,
                                         UUID[] projectLeadIds,
                                         UUID[] categoryIds,
