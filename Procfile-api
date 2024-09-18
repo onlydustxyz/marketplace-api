@@ -1,3 +1,4 @@
 web: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=api
 jobs: ./heroku/start-dyno-with-datadog-apm.sh -Dspring.profiles.active=jobs
 cli: java -Dspring.profiles.active=local,cli -Ddd.service=marketplace-cli -jar bootstrap/target/marketplace-api.jar
+liquibase: java -Dspring.profiles.active=local,cli,liquibase -Ddd.service=marketplace-cli -jar bootstrap/target/marketplace-api.jar
