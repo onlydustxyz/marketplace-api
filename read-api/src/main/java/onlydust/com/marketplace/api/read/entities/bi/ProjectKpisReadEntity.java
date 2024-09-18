@@ -35,7 +35,7 @@ public class ProjectKpisReadEntity {
     @JdbcTypeCode(SqlTypes.JSON)
     List<LanguageResponse> languages;
     @JdbcTypeCode(SqlTypes.JSON)
-    List<EcosystemResponse> ecosystems;
+    List<EcosystemLinkResponse> ecosystems;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProgramLinkResponse> programs;
 

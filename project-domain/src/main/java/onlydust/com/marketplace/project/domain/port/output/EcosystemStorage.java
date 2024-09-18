@@ -1,8 +1,13 @@
 package onlydust.com.marketplace.project.domain.port.output;
 
-import onlydust.com.marketplace.kernel.pagination.Page;
+import lombok.NonNull;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 
+import java.util.Optional;
+import java.util.UUID;
+
 public interface EcosystemStorage {
-    Page<Ecosystem> findAll(int pageIndex, int pageSize);
+    void save(@NonNull Ecosystem ecosystem);
+
+    Optional<Ecosystem> get(@NonNull UUID ecosystemId);
 }

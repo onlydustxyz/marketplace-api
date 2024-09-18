@@ -339,8 +339,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage) {
-        return new EcosystemService(ecosystemStorage);
+    public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage,
+                                                   final ImageStoragePort imageStoragePort) {
+        return new EcosystemService(ecosystemStorage, imageStoragePort);
     }
 
     @Bean

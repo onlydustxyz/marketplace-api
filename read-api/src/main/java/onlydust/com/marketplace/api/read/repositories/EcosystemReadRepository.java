@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface EcosystemReadRepository extends Repository<EcosystemReadEntity, UUID> {
     @Query("""
-            SELECT e 
+            SELECT e
             FROM EcosystemReadEntity e
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner
@@ -21,7 +21,14 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
     Optional<EcosystemReadEntity> findBySlug(String slug);
 
     @Query("""
-            SELECT e 
+            SELECT e
+            FROM EcosystemReadEntity e
+            WHERE e.id = :id
+            """)
+    Optional<EcosystemReadEntity> findById(UUID id);
+
+    @Query("""
+            SELECT e
             FROM EcosystemReadEntity e
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner
@@ -30,7 +37,15 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
     Page<EcosystemReadEntity> findAll(Boolean hidden, Pageable pageable);
 
     @Query("""
-            SELECT e 
+            SELECT e
+            FROM EcosystemReadEntity e
+            LEFT JOIN FETCH e.leads
+            WHERE :search is null or lower(e.name) LIKE lower(concat('%', cast(:search as String), '%'))
+            """)
+    Page<EcosystemReadEntity> findAllByName(String search, Pageable pageable);
+
+    @Query("""
+            SELECT e
             FROM EcosystemReadEntity e
             JOIN FETCH e.mdBanner
             JOIN FETCH e.xlBanner

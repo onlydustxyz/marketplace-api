@@ -25,6 +25,8 @@ import java.util.Optional;
 import static onlydust.com.marketplace.api.postgres.adapter.mapper.PaginationMapper.getPostgresOffsetFromPagination;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
 
@@ -66,6 +68,23 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
         return response.getTotalPageNumber() > 1 ?
                 ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
                 ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<EcosystemPage> getAllEcosystems(Integer pageIndex, Integer pageSize) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = ecosystemReadRepository.findAll(null, PageRequest.of(index, size, Sort.by("name")));
+
+        final var response = new EcosystemPage()
+                .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toLinkResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return status(response.getHasMore() ? PARTIAL_CONTENT : OK).body(response);
     }
 
     @Override
