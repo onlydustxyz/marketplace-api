@@ -70,10 +70,18 @@ FROM (with registered_users as (select u.id             as id,
                c.is_merged_pr,
                ru.id,
                ru.country) c
-         left join lateral (select string_agg(l.name, ' ') as value from languages l where l.id = any (c.language_ids)) as language_names on true
-         left join lateral (select string_agg(e.name, ' ') as value from ecosystems e where e.id = any (c.ecosystem_ids)) as ecosystem_names on true
-         left join lateral (select string_agg(p.name, ' ') as value from programs p where p.id = any (c.program_ids)) as program_names on true
-         left join lateral (select string_agg(p.name, ' ') as value from projects p where p.id = any (c.program_ids)) as project_names on true
+         left join lateral (select string_agg(l.name, ' ') as value
+                            from languages l
+                            where l.id = any (c.language_ids)) as language_names on true
+         left join lateral (select string_agg(e.name, ' ') as value
+                            from ecosystems e
+                            where e.id = any (c.ecosystem_ids)) as ecosystem_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from programs p
+                            where p.id = any (c.program_ids)) as program_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from projects p
+                            where p.id = any (c.program_ids)) as project_names on true
          left join lateral (select string_agg(p.name, ' ') as value
                             from project_categories p
                             where p.id = any (c.project_category_ids)) as project_category_names on true
@@ -176,11 +184,21 @@ FROM (select r.reward_id                               as reward_id,
                r.project_id,
                r.usd_amount,
                r.currency_id) c
-         left join lateral (select cur.name || ' ' || cur.code as value from currencies cur where cur.id = c.currency_id) as currency_search on true
-         left join lateral (select string_agg(l.name, ' ') as value from languages l where l.id = any (c.language_ids)) as language_names on true
-         left join lateral (select string_agg(e.name, ' ') as value from ecosystems e where e.id = any (c.ecosystem_ids)) as ecosystem_names on true
-         left join lateral (select string_agg(p.name, ' ') as value from programs p where p.id = any (c.program_ids)) as program_names on true
-         left join lateral (select string_agg(p.name, ' ') as value from projects p where p.id = any (c.program_ids)) as project_names on true
+         left join lateral (select cur.name || ' ' || cur.code as value
+                            from currencies cur
+                            where cur.id = c.currency_id) as currency_search on true
+         left join lateral (select string_agg(l.name, ' ') as value
+                            from languages l
+                            where l.id = any (c.language_ids)) as language_names on true
+         left join lateral (select string_agg(e.name, ' ') as value
+                            from ecosystems e
+                            where e.id = any (c.ecosystem_ids)) as ecosystem_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from programs p
+                            where p.id = any (c.program_ids)) as program_names on true
+         left join lateral (select string_agg(p.name, ' ') as value
+                            from projects p
+                            where p.id = any (c.program_ids)) as project_names on true
          left join lateral (select string_agg(p.name, ' ') as value
                             from project_categories p
                             where p.id = any (c.project_category_ids)) as project_category_names on true;
@@ -211,13 +229,16 @@ FROM (select abt.project_id                   as project_id,
                        ELSE abt.amount * hq.usd_conversion_rate * -1 END as usd_amount,
                    abt.timestamp
             FROM accounting.account_book_transactions abt
-                     JOIN LATERAL (select accounting.usd_quote_at(abt.currency_id, abt.timestamp) as usd_conversion_rate) hq ON true
+                     JOIN LATERAL (select accounting.usd_quote_at(abt.currency_id, abt.timestamp) as usd_conversion_rate) hq
+                          ON true
             WHERE abt.project_id IS NOT NULL
               AND (abt.type = 'TRANSFER' OR abt.type = 'REFUND')
               AND abt.reward_id IS NULL
               AND abt.payment_id IS NULL) abt
       group by 1, 2, 3, 4) c
-         left join lateral (select cur.name || ' ' || cur.code as value from currencies cur where cur.id = c.currency_id) as currency_search on true
+         left join lateral (select cur.name || ' ' || cur.code as value
+                            from currencies cur
+                            where cur.id = c.currency_id) as currency_search on true
 ;
 create unique index bi_daily_project_grants_pk on bi.daily_project_grants (project_id, program_id, currency_id, day_timestamp);
 create unique index bi_daily_project_grants_pk_inv on bi.daily_project_grants (day_timestamp, currency_id, program_id, project_id);
@@ -281,6 +302,11 @@ FROM (SELECT d.project_id                           as project_id,
       from bi.daily_project_grants d) data;
 
 CREATE UNIQUE INDEX bi_project_data_unions_pk ON bi.project_data_unions (project_id, timestamp, contribution_id, reward_id, granted_usd_amount);
+CREATE INDEX bi_project_data_unions_idx_1 ON bi.project_data_unions (timestamp, project_lead_ids, project_category_ids,
+                                                                     language_ids, ecosystem_ids, search, project_id);
+CREATE INDEX bi_project_data_unions_idx_2 ON bi.project_data_unions (project_id, timestamp, project_lead_ids,
+                                                                     project_category_ids, language_ids, ecosystem_ids,
+                                                                     search);
 
 
 
