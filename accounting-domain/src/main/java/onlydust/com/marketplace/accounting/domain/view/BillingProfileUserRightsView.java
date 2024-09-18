@@ -9,6 +9,7 @@ import java.time.ZonedDateTime;
 
 @Builder
 public record BillingProfileUserRightsView(BillingProfile.User.Role role,
+                                           BillingProfile.Type billingProfileType,
                                            Long billingProfileProcessingRewardsCount,
                                            Long userProcessingRewardsCount,
                                            InvitationView invitation,
@@ -19,7 +20,7 @@ public record BillingProfileUserRightsView(BillingProfile.User.Role role,
     }
 
     public Boolean canDelete() {
-        return this.billingProfileProcessingRewardsCount == 0 && this.role == BillingProfile.User.Role.ADMIN;
+        return this.billingProfileProcessingRewardsCount == 0 && this.role == BillingProfile.User.Role.ADMIN && this.billingProfileType != BillingProfile.Type.INDIVIDUAL;
     }
 
     public Boolean canLeave() {

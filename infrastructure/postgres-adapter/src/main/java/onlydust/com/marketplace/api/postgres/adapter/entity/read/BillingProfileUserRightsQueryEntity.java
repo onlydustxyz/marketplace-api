@@ -25,6 +25,10 @@ public class BillingProfileUserRightsQueryEntity {
     @Column(columnDefinition = "billing_profile_role")
     @JdbcType(PostgreSQLEnumJdbcType.class)
     BillingProfile.User.Role userRole;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "billing_profile_type")
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    BillingProfile.Type billingProfileType;
     Long billingProfileProcessingRewardsCount;
     Long userProcessingRewardsCount;
     @Enumerated(EnumType.STRING)
@@ -43,6 +47,7 @@ public class BillingProfileUserRightsQueryEntity {
                 .billingProfileProcessingRewardsCount(this.billingProfileProcessingRewardsCount)
                 .userProcessingRewardsCount(this.userProcessingRewardsCount)
                 .role(this.userRole)
+                .billingProfileType(this.billingProfileType)
                 .invitation(Objects.isNull(this.invitedByGithubUserId) ? null : BillingProfileUserRightsView.InvitationView.builder()
                         .githubUserId(GithubUserId.of(this.invitedByGithubUserId))
                         .githubAvatarUrl(this.invitedByGithubAvatarUrl)
