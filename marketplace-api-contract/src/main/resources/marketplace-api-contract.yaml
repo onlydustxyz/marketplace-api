@@ -1520,6 +1520,8 @@ paths:
           name: ecosystem
           schema:
             $ref: '#/components/schemas/EcosystemId'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
       responses:
         "200":
           description: 'User profile stats'
