@@ -1929,4 +1929,47 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
                         }
                         """);
     }
+
+    @Test
+    void should_filter_users_stats_per_date() {
+        // Given
+        final var user = userAuthHelper.authenticateAntho().user();
+
+        // When
+        client.get()
+                .uri(getApiURI(USER_STATS.formatted(user.getGithubUserId()), Map.of(
+                        "fromDate", "2023-01-01",
+                        "toDate", "2023-06-01"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "earnings": {
+                            "totalEarnedUsd": 898785.00,
+                            "perProject": [
+                              {
+                                "projectName": "kaaper 3",
+                                "totalEarnedUsd": 2525.00
+                              },
+                              {
+                                "projectName": "Pizzeria Yoshi !",
+                                "totalEarnedUsd": 4260.00
+                              },
+                              {
+                                "projectName": "Marketplace 2",
+                                "totalEarnedUsd": 890990.00
+                              },
+                              {
+                                "projectName": "oscar's awesome project",
+                                "totalEarnedUsd": 1010.00
+                              }
+                            ]
+                          }
+                        }
+                        """);
+    }
 }
