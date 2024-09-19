@@ -124,10 +124,9 @@ public class AllTransactionReadEntity {
 
     private ProgramTransactionType programTransactionType() {
         return switch (type) {
-            case MINT, TRANSFER -> project == null ? ProgramTransactionType.RECEIVED : ProgramTransactionType.GRANTED;
-            case REFUND, BURN -> project == null ? ProgramTransactionType.RETURNED : ProgramTransactionType.GRANTED;
-            case DEPOSIT, SPEND, WITHDRAW ->
-                    throw new IllegalStateException("DEPOSIT, SPEND, WITHDRAW transaction types are not allowed for program transactions");
+            case TRANSFER -> project == null ? ProgramTransactionType.ALLOCATED : ProgramTransactionType.GRANTED;
+            case REFUND -> project == null ? ProgramTransactionType.UNALLOCATED : ProgramTransactionType.UNGRANTED;
+            default -> throw new IllegalStateException("%s transaction types are not allowed for program transactions".formatted(type));
         };
     }
 
@@ -135,9 +134,9 @@ public class AllTransactionReadEntity {
         return switch (type) {
             case MINT, DEPOSIT -> SponsorTransactionType.DEPOSITED;
             case TRANSFER -> SponsorTransactionType.ALLOCATED;
-            case REFUND -> SponsorTransactionType.RETURNED;
-            case WITHDRAW -> throw new NotImplementedException("WITHDRAW transaction type is not implemented");
-            case BURN, SPEND -> throw new IllegalStateException("BURN, SPEND transaction types are not allowed for program transactions");
+            case REFUND -> SponsorTransactionType.UNALLOCATED;
+            case BURN, WITHDRAW -> throw new NotImplementedException("%s transaction type is not implemented".formatted(type));
+            default -> throw new IllegalStateException("%s transaction types are not allowed for sponsor transactions".formatted(type));
         };
     }
 
@@ -168,8 +167,9 @@ public class AllTransactionReadEntity {
     private SponsorDepositTransactionStatus depositStatus() {
         return isNull(depositStatus) ? null : switch (depositStatus) {
             case PENDING -> SponsorDepositTransactionStatus.PENDING;
+            case REJECTED -> SponsorDepositTransactionStatus.REJECTED;
             case COMPLETED -> SponsorDepositTransactionStatus.COMPLETED;
-            case DRAFT, REJECTED -> throw new IllegalStateException("DRAFT, REJECTED deposit status are not allowed here");
+            case DRAFT -> throw new IllegalStateException("DRAFT, REJECTED deposit status are not allowed here");
         };
     }
 

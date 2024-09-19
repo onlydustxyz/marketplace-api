@@ -249,9 +249,7 @@ public class BackOfficeSponsorApiIT extends AbstractMarketplaceBackOfficeApiIT {
     @Order(4)
     void should_update_sponsor() {
         final String jwt = pierre.jwt();
-        final var sponsor = sponsorHelper.create();
-        sponsorHelper.addLead(sponsor.id(), userAuthHelper.authenticatePierre());
-        sponsorHelper.addLead(sponsor.id(), userAuthHelper.authenticateOlivier());
+        final var sponsor = sponsorHelper.create(userAuthHelper.authenticatePierre(), userAuthHelper.authenticateOlivier());
 
         // When
         client.put()

@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DepositMapper.toPreviewResponse;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.NetworkMapper.map;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
 import static org.springframework.http.ResponseEntity.noContent;
@@ -60,16 +59,13 @@ public class SponsorsRestApi implements SponsorsApi {
     public ResponseEntity<PreviewDepositResponse> previewDeposit(UUID sponsorId, PreviewDepositRequest request) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
-        final var sponsor = sponsorFacadePort.findById(authenticatedUser.id(), SponsorId.of(sponsorId))
-                .orElseThrow(() -> notFound("Sponsor %s not found".formatted(sponsorId)));
-
-        final var deposit = accountingFacadePort.previewDeposit(SponsorId.of(sponsorId),
+        final var deposit = accountingFacadePort.previewDeposit(
+                authenticatedUser.id(),
+                SponsorId.of(sponsorId),
                 map(request.getNetwork()),
                 request.getTransactionReference());
 
-        final var currentBalance = accountingFacadePort.getSponsorBalance(deposit.sponsorId(), deposit.currency());
-
-        return ok(toPreviewResponse(deposit, sponsor, currentBalance));
+        return ok(new PreviewDepositResponse().id(deposit.id().value()));
     }
 
     @Override

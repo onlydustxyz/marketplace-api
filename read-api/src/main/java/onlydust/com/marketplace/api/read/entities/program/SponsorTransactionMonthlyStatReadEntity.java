@@ -36,7 +36,7 @@ public class SponsorTransactionMonthlyStatReadEntity implements ProgramTransacti
     CurrencyReadEntity currency;
 
     @NonNull
-    BigDecimal totalAvailable;
+    BigDecimal totalDeposited;
 
     @NonNull
     BigDecimal totalAllocated;

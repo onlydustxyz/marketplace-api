@@ -82,7 +82,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").value(depositId::setValue)
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -199,6 +208,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_of_usdc_on_ethereum() {
             // Given
             onlyDustWallets.setEthereum("0x8371e21f595dbf98caffdcef665ebcaccb983cb1");
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -216,7 +226,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -272,6 +291,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_of_eth_on_optimism() {
             // Given
             onlyDustWallets.setOptimism("0xb060429d14266d06a8be63281205668be823604f");
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -289,7 +309,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -345,6 +374,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_of_op_on_optimism() {
             // Given
             onlyDustWallets.setOptimism("0x1c9d4522e258138f36b4b356bb8afc6be013f902");
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -362,7 +392,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -419,6 +458,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             // Given
             onlyDustWallets.setStarknet("0x039b01fbac905c359757a65ae41b75d5c4b0f16a0f0e8dd9aca1506da545eef8");
             currencyHelper.addERC20Support(Blockchain.STARKNET, Currency.Code.USDC);
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -436,7 +476,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -494,7 +543,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_update_deposit() {
             // Given
-            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
+            final var deposit = depositHelper.preview(caller.userId(), sponsor.id(), Network.ETHEREUM);
 
             // When
             client.put()
@@ -528,6 +577,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             verify(slackApiAdapter).onDepositSubmittedByUser(UserId.of(caller.user().getId()), deposit.id());
 
             // When another preview is made, the latest billing information should be returned
+            final var depositId = new MutableObject<String>();
+
             client.post()
                     .uri(getApiURI(SPONSOR_DEPOSITS.formatted(sponsor.id())))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
@@ -543,7 +594,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -551,7 +611,8 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                                 "accountNumber": "0x1f9090aae28b8a3dceadf281b0f12828e676c326",
                                 "transactionReference": "0x0999888777"
                               },
-                              "billingInformation": {
+                              "billingInformation": null,
+                              "latestBillingInformation": {
                                 "companyName": "TechCorp Solutions",
                                 "companyAddress": "123 Innovation Street, Tech City, TC 12345",
                                 "companyCountry": "United States",
@@ -570,7 +631,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_with_same_transaction_reference() {
             // Given
             onlyDustWallets.setEthereum("0xb060429d14266d06a8be63281205668be823604f");
-            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM, "0x111112222233333");
+            final var deposit = depositHelper.preview(caller.userId(), sponsor.id(), Network.ETHEREUM, "0x111112222233333");
 
             // When
             client.post()
@@ -596,6 +657,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             // Given
             onlyDustWallets.setAptos("0xa35864ccdb3abcb64c144da4511c66457f743ee0ddf95c1b5bbfabaf67e6ac73");
             currencyHelper.addERC20Support(Blockchain.APTOS, Currency.Code.APT);
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -613,7 +675,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -670,6 +741,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             // Given
             onlyDustWallets.setAptos("0xa35864ccdb3abcb64c144da4511c66457f743ee0ddf95c1b5bbfabaf67e6ac73");
             currencyHelper.addERC20Support(Blockchain.APTOS, Currency.Code.USDC);
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -687,7 +759,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -744,6 +825,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
             // Given
             onlyDustWallets.setStellar("GD2VXOJ7SJS6GYWT3LIKS5KWBXYTZGIJ5TBLP5TGIKBPPWRALCZMGXEF");
             currencyHelper.addNativeCryptoSupport(Currency.Code.XLM);
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -761,7 +843,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -814,6 +905,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         void should_preview_a_deposit_of_usdc_on_stellar() {
             // Given
             onlyDustWallets.setStellar("GD2VXOJ7SJS6GYWT3LIKS5KWBXYTZGIJ5TBLP5TGIKBPPWRALCZMGXEF");
+            final var depositId = new MutableObject<String>();
 
             // When
             client.post()
@@ -831,7 +923,16 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .jsonPath("$.id").isNotEmpty()
+                    .jsonPath("$.id").value(depositId::setValue);
+
+            client.get()
+                    .uri(getApiURI(DEPOSIT_BY_ID.formatted(depositId)))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
                     .jsonPath("$.senderInformation.name").isEqualTo(sponsor.name())
                     .json("""
                             {
@@ -887,10 +988,12 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class GivenNotMySponsor {
         Sponsor sponsor;
+        UserAuthHelper.AuthenticatedUser sponsorLead;
 
         @BeforeEach
         void setUp() {
-            sponsor = sponsorHelper.create();
+            sponsorLead = userAuthHelper.create();
+            sponsor = sponsorHelper.create(sponsorLead);
         }
 
         @Test
@@ -915,7 +1018,7 @@ public class DepositsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_be_unauthorized_to_update_a_deposit() {
             // Given
-            final var deposit = depositHelper.preview(sponsor.id(), Network.ETHEREUM);
+            final var deposit = depositHelper.preview(sponsorLead.userId(), sponsor.id(), Network.ETHEREUM);
 
             // When
             client.put()

@@ -171,7 +171,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 DateMapper.parseNullable(toDate),
                 search,
                 types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
-                PageRequest.of(index, size, Sort.by("timestamp"))
+                PageRequest.of(index, size, Sort.by("timestamp").descending())
         );
     }
 
@@ -197,7 +197,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
         final var response = new ProgramTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new ProgramTransactionStatResponse()
                                         .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                        .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalAvailable))
+                                        .totalReceived(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalReceived))
                                         .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalGranted))
                                         .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalRewarded))
                                         .transactionCount(e.getValue().stream().mapToInt(ProgramTransactionMonthlyStatReadEntity::transactionCount).sum())

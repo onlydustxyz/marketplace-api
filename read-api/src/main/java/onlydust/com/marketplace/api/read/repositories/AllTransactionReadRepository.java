@@ -25,9 +25,10 @@ public interface AllTransactionReadRepository extends Repository<AllTransactionR
                 (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
                 (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate) AND
                 (COALESCE(:types, NULL) IS NULL OR (
-                    'GRANTED' in (:types) and CAST(t.type AS String) in ('TRANSFER', 'REFUND') and t.project is not null or
-                    'RECEIVED' in (:types) and CAST(t.type AS String) = 'TRANSFER' and t.project is null or
-                    'RETURNED' in (:types) and CAST(t.type AS String) = 'REFUND' and t.project is null
+                    'GRANTED' in (:types) and CAST(t.type AS String) = 'TRANSFER' and t.project is not null or
+                    'UNGRANTED' in (:types) and CAST(t.type AS String) = 'REFUND' and t.project is not null or
+                    'ALLOCATED' in (:types) and CAST(t.type AS String) = 'TRANSFER' and t.project is null or
+                    'UNALLOCATED' in (:types) and CAST(t.type AS String) = 'REFUND' and t.project is null
                 ))
             """)
     Page<AllTransactionReadEntity> findAllForProgram(UUID programId,
@@ -53,7 +54,7 @@ public interface AllTransactionReadRepository extends Repository<AllTransactionR
                 (COALESCE(:types, NULL) IS NULL OR (
                     'DEPOSITED' in (:types) and CAST(t.type AS String) = 'DEPOSIT' and t.program is null or
                     'ALLOCATED' in (:types) and CAST(t.type AS String) = 'TRANSFER' and t.program is not null or
-                    'RETURNED' in (:types) and CAST(t.type AS String) = 'REFUND' and t.program is not null
+                    'UNALLOCATED' in (:types) and CAST(t.type AS String) = 'REFUND' and t.program is not null
                 ))
             """)
     Page<AllTransactionReadEntity> findAllForSponsor(UUID sponsorId,

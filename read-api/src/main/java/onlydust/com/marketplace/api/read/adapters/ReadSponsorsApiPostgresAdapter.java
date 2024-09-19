@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
@@ -36,6 +37,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
@@ -65,7 +67,12 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
             throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
-        return ok(deposit.toResponse());
+        final var latestBillingInformation = depositReadRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
+                .map(DepositReadEntity::billingInformationResponse)
+                .orElse(null);
+
+        return ok(deposit.toResponse()
+                .latestBillingInformation(latestBillingInformation));
     }
 
     @Override
@@ -147,7 +154,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
         return allTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate), search, types == null ? null : types.stream().map(SponsorTransactionType::name).toList(),
-                PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp"), Sort.Order.by("depositStatus").nullsLast())));
+                PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp").with(DESC), Sort.Order.by("depositStatus").nullsLast())));
     }
 
     @Override
@@ -169,7 +176,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var response = new SponsorTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new SponsorTransactionStatResponse()
                                 .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAvailable))
+                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalDeposited))
                                 .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAllocated))
                                 .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalGranted))
                                 .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalRewarded))

@@ -6,7 +6,6 @@ import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.port.out.DepositStoragePort;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.DepositEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.DepositRepository;
-import onlydust.com.marketplace.kernel.model.SponsorId;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -24,12 +23,6 @@ public class PostgresDepositStorage implements DepositStoragePort {
     @Override
     public Optional<Deposit> find(Deposit.Id depositId) {
         return depositRepository.findById(depositId.value()).map(DepositEntity::toDomain);
-    }
-
-    @Override
-    public Optional<Deposit.BillingInformation> findLatestBillingInformation(@NonNull SponsorId sponsorId) {
-        return depositRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
-                .map(DepositEntity::billingInformation);
     }
 
     @Override

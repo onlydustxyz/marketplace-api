@@ -6257,28 +6257,16 @@ components:
           $ref: '#/components/schemas/DepositSenderInformation'
         billingInformation:
           $ref: '#/components/schemas/DepositBillingInformation'
+        latestBillingInformation:
+          $ref: '#/components/schemas/DepositBillingInformation'
 
     PreviewDepositResponse:
       type: object
       required:
         - id
-        - amount
-        - currentBalance
-        - finalBalance
-        - senderInformation
       properties:
         id:
           $ref: '#/components/schemas/DepositId'
-        amount:
-          $ref: '#/components/schemas/Money'
-        currentBalance:
-          $ref: '#/components/schemas/Money'
-        finalBalance:
-          $ref: '#/components/schemas/Money'
-        senderInformation:
-          $ref: '#/components/schemas/DepositSenderInformation'
-        billingInformation:
-          $ref: '#/components/schemas/DepositBillingInformation'
 
     UpdateDepositRequest:
       type: object
@@ -6455,7 +6443,7 @@ components:
       type: object
       required:
         - date
-        - totalAvailable
+        - totalReceived
         - totalGranted
         - totalRewarded
         - transactionCount
@@ -6464,7 +6452,7 @@ components:
           type: string
           format: date
           description: Date of the transactions
-        totalAvailable:
+        totalReceived:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'
@@ -6489,7 +6477,7 @@ components:
       type: object
       required:
         - date
-        - totalAvailable
+        - totalDeposited
         - totalAllocated
         - totalGranted
         - totalRewarded
@@ -6499,7 +6487,7 @@ components:
           type: string
           format: date
           description: Date of the transactions
-        totalAvailable:
+        totalDeposited:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalAllocated:
           $ref: '#/components/schemas/DetailedTotalMoney'
@@ -9627,20 +9615,22 @@ components:
       type: string
       enum:
         - GRANTED
-        - RECEIVED
-        - RETURNED
+        - UNGRANTED
+        - ALLOCATED
+        - UNALLOCATED
 
     SponsorTransactionType:
       type: string
       enum:
         - DEPOSITED
         - ALLOCATED
-        - RETURNED
+        - UNALLOCATED
 
     SponsorDepositTransactionStatus:
       type: string
       enum:
         - PENDING
+        - REJECTED
         - COMPLETED
 
     SponsorAccountTransactionType:

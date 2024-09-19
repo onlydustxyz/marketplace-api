@@ -108,16 +108,20 @@ public class DepositReadEntity {
                         .name(sponsor.name())
                         .accountNumber(transaction.senderAddress())
                         .transactionReference(transaction.reference()))
-                .billingInformation(billingInformation == null ? null : new DepositBillingInformation()
-                        .companyName(billingInformation.companyName())
-                        .companyAddress(billingInformation.companyAddress())
-                        .companyCountry(billingInformation.companyCountry())
-                        .companyId(billingInformation.companyId())
-                        .vatNumber(billingInformation.vatNumber())
-                        .billingEmail(billingInformation.billingEmail())
-                        .firstName(billingInformation.firstName())
-                        .lastName(billingInformation.lastName())
-                        .email(billingInformation.email()));
+                .billingInformation(billingInformationResponse());
+    }
+
+    public DepositBillingInformation billingInformationResponse() {
+        return billingInformation == null ? null : new DepositBillingInformation()
+                .companyName(billingInformation.companyName())
+                .companyAddress(billingInformation.companyAddress())
+                .companyCountry(billingInformation.companyCountry())
+                .companyId(billingInformation.companyId())
+                .vatNumber(billingInformation.vatNumber())
+                .billingEmail(billingInformation.billingEmail())
+                .firstName(billingInformation.firstName())
+                .lastName(billingInformation.lastName())
+                .email(billingInformation.email());
     }
 
     private DepositStatus map(onlydust.com.marketplace.api.contract.model.DepositStatus status) {

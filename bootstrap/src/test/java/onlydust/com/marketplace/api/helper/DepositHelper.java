@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.port.in.AccountingFacadePort;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.kernel.model.SponsorId;
+import onlydust.com.marketplace.kernel.model.UserId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +24,12 @@ public class DepositHelper {
 
     private final Faker faker = new Faker();
 
-    public Deposit preview(SponsorId sponsorId, Network network) {
-        return preview(sponsorId, network, "0x" + faker.random().hex());
+    public Deposit preview(UserId userId, SponsorId sponsorId, Network network) {
+        return preview(userId, sponsorId, network, "0x" + faker.random().hex());
     }
 
-    public Deposit preview(SponsorId sponsorId, Network network, String transactionReference) {
-        return accountingFacadePort.previewDeposit(sponsorId, network, transactionReference);
+    public Deposit preview(UserId userId, SponsorId sponsorId, Network network, String transactionReference) {
+        return accountingFacadePort.previewDeposit(userId, sponsorId, network, transactionReference);
     }
 
     public Deposit.Id create(SponsorId sponsorId, Network network, Currency.Id currencyId, BigDecimal amount) {
