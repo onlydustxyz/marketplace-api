@@ -41,6 +41,7 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
             FROM EcosystemReadEntity e
             LEFT JOIN FETCH e.leads
             WHERE :search is null or lower(e.name) LIKE lower(concat('%', cast(:search as String), '%'))
+            ORDER BY e.name
             """)
     Page<EcosystemReadEntity> findAllByName(String search, Pageable pageable);
 
