@@ -169,7 +169,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         final var response = new SponsorTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new SponsorTransactionStatResponse()
                                 .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                .totalAvailable(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAvailable))
+                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalDeposited))
                                 .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAllocated))
                                 .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalGranted))
                                 .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalRewarded))

@@ -6489,7 +6489,7 @@ components:
       type: object
       required:
         - date
-        - totalAvailable
+        - totalDeposited
         - totalAllocated
         - totalGranted
         - totalRewarded
@@ -6499,7 +6499,7 @@ components:
           type: string
           format: date
           description: Date of the transactions
-        totalAvailable:
+        totalDeposited:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalAllocated:
           $ref: '#/components/schemas/DetailedTotalMoney'
