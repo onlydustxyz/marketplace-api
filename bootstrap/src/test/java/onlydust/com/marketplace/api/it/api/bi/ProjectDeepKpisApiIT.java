@@ -164,6 +164,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
+                    .consumeWith(System.out::println)
                     .jsonPath("$.projects[0].project.name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.projects[1].project.name").<String>value(name -> assertThat(name).contains("Madara"))
                     .jsonPath("$.projects[2].project.name").<String>value(name -> assertThat(name).contains("OnlyDust"))
@@ -194,21 +195,21 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
-                                      "name": "Universe ecosystem"
+                                      "name": "Ethereum ecosystem"
                                     },
                                     {
                                       "name": "Starknet ecosystem"
                                     },
                                     {
-                                      "name": "Ethereum ecosystem"
+                                      "name": "Universe ecosystem"
                                     }
                                   ],
                                   "programs": [
                                     {
-                                      "name": "Starkware Exploration Team"
+                                      "name": "Ethereum Granting Program"
                                     },
                                     {
-                                      "name": "Ethereum Granting Program"
+                                      "name": "Starkware Exploration Team"
                                     }
                                   ],
                                   "availableBudget": null,
@@ -256,10 +257,10 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "languages": null,
                                   "ecosystems": [
                                     {
-                                      "name": "Universe ecosystem"
+                                      "name": "Starknet ecosystem"
                                     },
                                     {
-                                      "name": "Starknet ecosystem"
+                                      "name": "Universe ecosystem"
                                     }
                                   ],
                                   "programs": [
@@ -316,12 +317,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "languages": [
                                     {
-                                      "slug": "rust",
-                                      "name": "Rust"
-                                    },
-                                    {
                                       "slug": "java",
                                       "name": "Java"
+                                    },
+                                    {
+                                      "slug": "rust",
+                                      "name": "Rust"
                                     },
                                     {
                                       "slug": "typescript",
@@ -335,10 +336,10 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "programs": [
                                     {
-                                      "name": "Nethermind"
+                                      "name": "Ethereum Granting Program"
                                     },
                                     {
-                                      "name": "Ethereum Granting Program"
+                                      "name": "Nethermind"
                                     }
                                   ],
                                   "availableBudget": null,
@@ -424,11 +425,10 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
                             .contains("Gaming")), true
             );
-            test_projects_stats("search", "strk",
+            test_projects_stats("search", "eth",
                     response -> {
-                        // Madara got a grant in STRK and OnlyDust has STRK rewards and a grant in STRK
                         assertThat(response.getProjects()).hasSize(2);
-                        assertThat(response.getProjects().get(0).getProject().getName()).contains("Madara");
+                        assertThat(response.getProjects().get(0).getProject().getName()).contains("Bridge");
                         assertThat(response.getProjects().get(1).getProject().getName()).contains("OnlyDust");
                     }, true
             );

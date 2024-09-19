@@ -53,8 +53,4 @@ public class LanguageService implements LanguageFacadePort {
         return languageStorage.getKnownExtensions();
     }
 
-    @Override
-    public void updateProjectsLanguages() {
-        languageStorage.updateProjectsLanguages();
-    }
 }

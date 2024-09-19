@@ -15,7 +15,6 @@ REFRESH MATERIALIZED VIEW top_project_recommendations;
 REFRESH MATERIALIZED VIEW bi.project_contribution_stats;
 REFRESH MATERIALIZED VIEW bi.project_reward_stats;
 REFRESH MATERIALIZED VIEW bi.contribution_data;
-REFRESH MATERIALIZED VIEW bi.contribution_data_cross_projects;
 REFRESH MATERIALIZED VIEW bi.reward_data;
 REFRESH MATERIALIZED VIEW bi.project_grants_data;
 REFRESH MATERIALIZED VIEW bi.project_global_data;

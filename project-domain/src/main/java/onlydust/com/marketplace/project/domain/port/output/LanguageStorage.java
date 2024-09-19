@@ -14,6 +14,4 @@ public interface LanguageStorage {
     boolean exists(Language.Id id);
 
     Map<String, Optional<Language>> getKnownExtensions();
-
-    void updateProjectsLanguages();
 }
