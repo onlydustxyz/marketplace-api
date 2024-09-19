@@ -6455,7 +6455,7 @@ components:
       type: object
       required:
         - date
-        - totalAvailable
+        - totalReceived
         - totalGranted
         - totalRewarded
         - transactionCount
@@ -6464,7 +6464,7 @@ components:
           type: string
           format: date
           description: Date of the transactions
-        totalAvailable:
+        totalReceived:
           $ref: '#/components/schemas/DetailedTotalMoney'
         totalGranted:
           $ref: '#/components/schemas/DetailedTotalMoney'

@@ -41,7 +41,7 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
     CurrencyReadEntity currency;
 
     @NonNull
-    BigDecimal totalAvailable;
+    BigDecimal totalReceived;
 
     @NonNull
     BigDecimal totalGranted;
