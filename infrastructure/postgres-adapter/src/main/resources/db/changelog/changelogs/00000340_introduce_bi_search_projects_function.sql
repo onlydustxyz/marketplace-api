@@ -117,6 +117,7 @@ FROM (SELECT d.project_id                                                       
                    d.ecosystem_ids && programOrEcosystemIds)
               and (projectLeadIds is null or d.project_lead_ids && projectLeadIds)
               and (categoryIds is null or d.project_category_ids && categoryIds)
+              and (languageIds is null or d.language_ids && languageIds)
               and (ecosystemIds is null or d.ecosystem_ids && ecosystemIds)
               and (searchQuery is null or d.search ilike '%' || searchQuery || '%')
             group by d.project_id, d.currency_id) d

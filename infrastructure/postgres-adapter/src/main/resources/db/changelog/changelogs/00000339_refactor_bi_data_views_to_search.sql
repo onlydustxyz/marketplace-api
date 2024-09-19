@@ -50,23 +50,23 @@ FROM (with registered_users as (select u.id             as id,
                                 from iam.users u
                                          join accounting.billing_profiles_users bpu on bpu.user_id = u.id
                                          join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
-      select c.contribution_id                         as contribution_id,
-             c.contributor_id                          as contributor_id,
-             ru.id                                     as contributor_user_id,
-             ru.country                                as contributor_country,
-             c.timestamp                               as timestamp,
-             date_trunc('day', c.timestamp)            as day_timestamp,
-             date_trunc('week', c.timestamp)           as week_timestamp,
-             date_trunc('month', c.timestamp)          as month_timestamp,
-             date_trunc('quarter', c.timestamp)        as quarter_timestamp,
-             date_trunc('year', c.timestamp)           as year_timestamp,
-             c.is_first_contribution_on_onlydust       as is_first_contribution_on_onlydust,
-             c.is_merged_pr                            as is_merged_pr,
-             array_agg(distinct c.language_id)         as language_ids,
-             array_agg(distinct c.ecosystem_id)        as ecosystem_ids,
-             array_agg(distinct c.program_id)          as program_ids,
-             array_agg(distinct c.project_id)          as project_ids,
-             array_agg(distinct c.project_category_id) as project_category_ids
+      select c.contribution_id                                                                            as contribution_id,
+             c.contributor_id                                                                             as contributor_id,
+             ru.id                                                                                        as contributor_user_id,
+             ru.country                                                                                   as contributor_country,
+             c.timestamp                                                                                  as timestamp,
+             date_trunc('day', c.timestamp)                                                               as day_timestamp,
+             date_trunc('week', c.timestamp)                                                              as week_timestamp,
+             date_trunc('month', c.timestamp)                                                             as month_timestamp,
+             date_trunc('quarter', c.timestamp)                                                           as quarter_timestamp,
+             date_trunc('year', c.timestamp)                                                              as year_timestamp,
+             c.is_first_contribution_on_onlydust                                                          as is_first_contribution_on_onlydust,
+             c.is_merged_pr                                                                               as is_merged_pr,
+             array_agg(distinct c.language_id) filter ( where c.language_id is not null )                 as language_ids,
+             array_agg(distinct c.ecosystem_id) filter ( where c.ecosystem_id is not null )               as ecosystem_ids,
+             array_agg(distinct c.program_id) filter ( where c.program_id is not null )                   as program_ids,
+             array_agg(distinct c.project_id) filter ( where c.project_id is not null )                   as project_ids,
+             array_agg(distinct c.project_category_id) filter ( where c.project_category_id is not null ) as project_category_ids
       from exploded_contributions c
                left join registered_users ru on ru.github_user_id = c.contributor_id
       group by c.contribution_id,
@@ -176,22 +176,22 @@ SELECT c.*,
        coalesce(project_category_names.value, '') || ' ' ||
        coalesce(currency_search.value, '') || ' ' ||
        coalesce(project_leads.names, '') as search
-FROM (select r.reward_id                               as reward_id,
-             r.timestamp                               as timestamp,
-             date_trunc('day', r.timestamp)            as day_timestamp,
-             date_trunc('week', r.timestamp)           as week_timestamp,
-             date_trunc('month', r.timestamp)          as month_timestamp,
-             date_trunc('quarter', r.timestamp)        as quarter_timestamp,
-             date_trunc('year', r.timestamp)           as year_timestamp,
-             r.contributor_id                          as contributor_id,
-             r.project_id                              as project_id,
-             r.usd_amount                              as usd_amount,
-             r.amount                                  as amount,
-             r.currency_id                             as currency_id,
-             array_agg(distinct r.language_id)         as language_ids,
-             array_agg(distinct r.ecosystem_id)        as ecosystem_ids,
-             array_agg(distinct r.program_id)          as program_ids,
-             array_agg(distinct r.project_category_id) as project_category_ids
+FROM (select r.reward_id                                                                                  as reward_id,
+             r.timestamp                                                                                  as timestamp,
+             date_trunc('day', r.timestamp)                                                               as day_timestamp,
+             date_trunc('week', r.timestamp)                                                              as week_timestamp,
+             date_trunc('month', r.timestamp)                                                             as month_timestamp,
+             date_trunc('quarter', r.timestamp)                                                           as quarter_timestamp,
+             date_trunc('year', r.timestamp)                                                              as year_timestamp,
+             r.contributor_id                                                                             as contributor_id,
+             r.project_id                                                                                 as project_id,
+             r.usd_amount                                                                                 as usd_amount,
+             r.amount                                                                                     as amount,
+             r.currency_id                                                                                as currency_id,
+             array_agg(distinct r.language_id) filter ( where r.language_id is not null )                 as language_ids,
+             array_agg(distinct r.ecosystem_id) filter ( where r.ecosystem_id is not null )               as ecosystem_ids,
+             array_agg(distinct r.program_id) filter ( where r.program_id is not null )                   as program_ids,
+             array_agg(distinct r.project_category_id) filter ( where r.project_category_id is not null ) as project_category_ids
       from exploded_rewards r
       group by r.reward_id,
                r.timestamp,
@@ -214,7 +214,7 @@ FROM (select r.reward_id                               as reward_id,
                             where p.id = any (c.program_ids)) as program_names on true
          left join lateral (select string_agg(p.name, ' ') as value
                             from projects p
-                            where p.id = any (c.program_ids)) as project_names on true
+                            where p.id = c.project_id) as project_names on true
          left join lateral (select string_agg(p.name, ' ') as value
                             from project_categories p
                             where p.id = any (c.project_category_ids)) as project_category_names on true
@@ -253,6 +253,8 @@ SELECT abt.project_id,
        programs.ids                                          as program_ids,
        project_categories.ids                                as project_category_ids,
        project_leads.ids                                     as project_lead_ids,
+       languages.ids                                         as language_ids,
+       coalesce(languages.names, '') || ' ' ||
        coalesce(ecosystems.names, '') || ' ' ||
        coalesce(programs.names, '') || ' ' ||
        coalesce(projects.names, '') || ' ' ||
@@ -284,6 +286,10 @@ FROM accounting.account_book_transactions abt
                             from project_leads pl
                                      join iam.users u on u.id = pl.user_id
                             where pl.project_id = abt.project_id) as project_leads on true
+         left join lateral (select array_agg(l.id) as ids, string_agg(l.name, ' ') as names
+                            from project_languages pl
+                                     join languages l on l.id = pl.language_id
+                            where pl.project_id = abt.project_id) as languages on true
 WHERE abt.project_id IS NOT NULL
   AND (abt.type = 'TRANSFER' OR abt.type = 'REFUND')
   AND abt.reward_id IS NULL
@@ -358,7 +364,7 @@ FROM (SELECT d.project_id,
             select d.project_id, d.project_lead_ids, d.project_category_ids, d.language_ids, d.ecosystem_ids, d.program_ids
             from bi.reward_data d
             UNION
-            select d.project_id, d.project_lead_ids, d.project_category_ids, '{}'::uuid[] as language_ids, d.ecosystem_ids, d.program_ids
+            select d.project_id, d.project_lead_ids, d.project_category_ids, d.language_ids, d.ecosystem_ids, d.program_ids
             from bi.project_grants_data d) d
       GROUP BY d.project_id) d
          JOIN projects p ON p.id = d.project_id;
