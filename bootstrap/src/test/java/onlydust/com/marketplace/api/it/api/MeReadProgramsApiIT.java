@@ -135,14 +135,14 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.allocate(sponsorId, programId, 12, ETH);
 
             accountingHelper.grant(programId, project1Id, 500, USDC);
-            accountingHelper.refund(project1Id, programId, 200, USDC);
+            accountingHelper.ungrant(project1Id, programId, 200, USDC);
             accountingHelper.grant(programId, project1Id, 2, ETH);
 
             accountingHelper.grant(programId, project2Id, 200, USDC);
             accountingHelper.grant(programId, project2Id, 3, ETH);
 
             accountingHelper.grant(programId, project3Id, 3, ETH);
-            accountingHelper.refund(project3Id, programId, 3, ETH);
+            accountingHelper.ungrant(project3Id, programId, 3, ETH);
 
             final var reward1 = rewardHelper.create(project1Id, projectLead, recipientId, 200, USDC);
             final var reward2 = rewardHelper.create(project1Id, projectLead, recipientId, 1, ETH);

@@ -444,7 +444,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
 
                 at("2024-06-23T00:00:00Z", () -> {
                     accountingHelper.grant(anotherProgram.id(), project2Id, 400, USDC);
-                    accountingHelper.refund(project1Id, program.id(), 200, USDC);
+                    accountingHelper.ungrant(project1Id, program.id(), 200, USDC);
                 });
 
                 final var reward1 = at("2024-07-11T00:00:00Z", () -> rewardHelper.create(project1Id, projectLead, recipientId, 400, USDC));
@@ -1235,11 +1235,14 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.APRIL).findFirst().orElseThrow().getTransactionCount()).isEqualTo(3);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MAY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
-                    case RECEIVED -> {
+                    case UNGRANTED -> {
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JUNE).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
+                    }
+                    case ALLOCATED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
-                    case RETURNED -> {
+                    case UNALLOCATED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
                 }
@@ -1273,7 +1276,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                   "transactions": [
                                     {
                                       "date": "2024-01-01T00:00:00Z",
-                                      "type": "RECEIVED",
+                                      "type": "ALLOCATED",
                                       "amount": {
                                         "amount": 2200,
                                         "prettyAmount": 2200,
@@ -1290,7 +1293,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-01-15T00:00:00Z",
-                                      "type": "RETURNED",
+                                      "type": "UNALLOCATED",
                                       "amount": {
                                         "amount": 700,
                                         "prettyAmount": 700,
@@ -1307,7 +1310,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                     },
                                     {
                                       "date": "2024-02-03T00:00:00Z",
-                                      "type": "RECEIVED",
+                                      "type": "ALLOCATED",
                                       "amount": {
                                         "amount": 12,
                                         "prettyAmount": 12,
@@ -1438,9 +1441,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .isOk()
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
-                            case GRANTED -> 5;
-                            case RECEIVED -> 2;
-                            case RETURNED -> 1;
+                            case GRANTED -> 4;
+                            case UNGRANTED -> 1;
+                            case ALLOCATED -> 2;
+                            case UNALLOCATED -> 1;
                         })
                         .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
             }

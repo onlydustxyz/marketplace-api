@@ -9627,15 +9627,16 @@ components:
       type: string
       enum:
         - GRANTED
-        - RECEIVED
-        - RETURNED
+        - UNGRANTED
+        - ALLOCATED
+        - UNALLOCATED
 
     SponsorTransactionType:
       type: string
       enum:
         - DEPOSITED
         - ALLOCATED
-        - RETURNED
+        - UNALLOCATED
 
     SponsorDepositTransactionStatus:
       type: string

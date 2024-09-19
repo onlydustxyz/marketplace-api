@@ -46,7 +46,7 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
               and (coalesce(:types) is null or (
                 ('DEPOSITED' in (:types) and tx.type = 'DEPOSIT' and tx.deposit_status = 'COMPLETED') or
                 ('ALLOCATED' in (:types) and tx.type = 'TRANSFER' and tx.program_id is not null and project_id is null) or
-                ('RETURNED' in (:types) and tx.type = 'REFUND' and tx.program_id is not null and project_id is null)
+                ('UNALLOCATED' in (:types) and tx.type = 'REFUND' and tx.program_id is not null and project_id is null)
                 ))
             group by d.sponsor_id,
                      d.currency_id,

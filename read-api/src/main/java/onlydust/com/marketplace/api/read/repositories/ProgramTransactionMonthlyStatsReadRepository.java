@@ -41,8 +41,9 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
             where (cast(:search as text) is null or p.name ilike '%' || :search || '%' or pgm.name ilike '%' || :search || '%')
               and (coalesce(:types) is null or (
                 ('GRANTED' in (:types) and abt.type = 'TRANSFER' and abt.project_id is not null and abt.reward_id is null) or
-                ('RECEIVED' in (:types) and abt.type = 'TRANSFER' and abt.project_id is null) or
-                ('RETURNED' in (:types) and abt.type = 'REFUND' and abt.project_id is null)
+                ('UNGRANTED' in (:types) and abt.type = 'REFUND' and abt.project_id is not null and abt.reward_id is null) or
+                ('ALLOCATED' in (:types) and abt.type = 'TRANSFER' and abt.project_id is null) or
+                ('UNALLOCATED' in (:types) and abt.type = 'REFUND' and abt.project_id is null)
                 ))
             group by d.program_id,
                      d.currency_id,
