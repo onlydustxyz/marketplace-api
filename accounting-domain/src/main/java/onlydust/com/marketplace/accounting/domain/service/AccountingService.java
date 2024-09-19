@@ -465,16 +465,15 @@ public class AccountingService implements AccountingFacadePort {
     }
 
     @Override
-    public Deposit previewDeposit(final @NonNull SponsorId sponsorId, final @NonNull Network network, final @NonNull String transactionReference) {
+    public Deposit previewDeposit(final @NonNull UserId userId, final @NonNull SponsorId sponsorId, final @NonNull Network network,
+                                  final @NonNull String transactionReference) {
+        if (!permissionPort.isUserSponsorLead(userId, sponsorId))
+            throw forbidden("User %s is not allowed to create deposits for sponsor %s".formatted(userId, sponsorId));
+
         final var blockchain = network.blockchain()
                 .orElseThrow(() -> badRequest("Network %s is not associated with a blockchain".formatted(network)));
 
-        final var deposit = tryCreateDeposit(sponsorId, blockchain, transactionReference);
-
-        final var latestBillingInformation = depositStoragePort.findLatestBillingInformation(sponsorId);
-        return deposit.toBuilder()
-                .billingInformation(latestBillingInformation.orElse(null))
-                .build();
+        return tryCreateDeposit(sponsorId, blockchain, transactionReference);
     }
 
     private Deposit tryCreateDeposit(final @NonNull SponsorId sponsorId, final @NonNull Blockchain blockchain, final @NonNull String transactionReference) {
@@ -522,16 +521,6 @@ public class AccountingService implements AccountingFacadePort {
         }
 
         throw badRequest("Transaction %s is not a transfer transaction".formatted(transaction.reference()));
-    }
-
-    @Override
-    public Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency) {
-        final var accountBookState = getAccountBook(currency.id()).state();
-
-        return sponsorAccountStorage.find(sponsorId, currency.id()).stream()
-                .map(sponsorAccount -> accountBookState.balanceOf(AccountId.of(sponsorAccount.id())))
-                .reduce(PositiveAmount::add)
-                .orElse(PositiveAmount.ZERO);
     }
 
     @Override

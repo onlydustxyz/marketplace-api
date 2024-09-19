@@ -13,17 +13,6 @@ public interface DepositRepository extends JpaRepository<DepositEntity, UUID> {
             SELECT d
             FROM DepositEntity d
             JOIN FETCH d.transaction t
-            WHERE d.sponsorId = :sponsorId AND
-                  d.status != 'DRAFT'
-            ORDER BY t.timestamp DESC
-            LIMIT 1
-            """)
-    Optional<DepositEntity> findBySponsorIdOrderByTimestampDesc(UUID sponsorId);
-
-    @Query("""
-            SELECT d
-            FROM DepositEntity d
-            JOIN FETCH d.transaction t
             WHERE t.reference = :transactionReference
             """)
     Optional<DepositEntity> findByTransactionReference(@NonNull String transactionReference);

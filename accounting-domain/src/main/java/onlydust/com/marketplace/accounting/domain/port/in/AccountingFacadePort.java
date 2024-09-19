@@ -58,13 +58,11 @@ public interface AccountingFacadePort {
 
     Map<SponsorAccount, PositiveAmount> transferredAmountPerOrigin(RewardId id, Currency.Id currencyId);
 
-    Deposit previewDeposit(SponsorId sponsorId, Network network, String transactionReference);
-
-    Amount getSponsorBalance(@NonNull SponsorId sponsorId, @NonNull Currency currency);
+    Deposit previewDeposit(UserId userId, SponsorId sponsorId, Network network, String transactionReference);
 
     void submitDeposit(UserId userId, Deposit.Id depositId, Deposit.BillingInformation billingInformation);
 
     void rejectDeposit(Deposit.Id depositId);
-    
+
     void approveDeposit(Deposit.Id depositId);
 }

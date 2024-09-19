@@ -1695,17 +1695,28 @@ public class AccountingServiceTest {
     @Nested
     class Deposits {
         final SponsorId sponsorId = SponsorId.random();
+        final UserId userId = UserId.random();
 
         @BeforeEach
         void setup() {
             when(blockchainFacadePort.sanitizedTransactionReference(any(), anyString())).thenAnswer(i -> i.getArgument(1));
+            when(permissionPort.isUserSponsorLead(userId, sponsorId)).thenReturn(true);
         }
 
         @Test
         void should_reject_non_supported_networks() {
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.SEPA, "REF 123465"))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.SEPA, "REF 123465"))
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Network SEPA is not associated with a blockchain");
+        }
+
+        @Test
+        void should_reject_when_user_not_sponsor_lead() {
+            when(permissionPort.isUserSponsorLead(userId, sponsorId)).thenReturn(false);
+
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.SEPA, "REF 123465"))
+                    .isInstanceOf(OnlyDustException.class)
+                    .hasMessage("User %s is not allowed to create deposits for sponsor %s".formatted(userId, sponsorId));
         }
 
         @Test
@@ -1719,7 +1730,7 @@ public class AccountingServiceTest {
                     .thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transactionReference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transactionReference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction %s not found on blockchain Ethereum".formatted(transactionReference));
@@ -1736,7 +1747,7 @@ public class AccountingServiceTest {
                     .thenReturn(Optional.of(transaction));
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction %s is not a transfer transaction".formatted(transaction.reference));
@@ -1754,7 +1765,7 @@ public class AccountingServiceTest {
                     .thenReturn(Optional.of(transaction));
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction %s is not confirmed on blockchain ETHEREUM".formatted(transaction.reference));
@@ -1773,7 +1784,7 @@ public class AccountingServiceTest {
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction's (%s) blockchain (ETHEREUM) is not supported for deposits".formatted(transaction.reference));
@@ -1792,7 +1803,7 @@ public class AccountingServiceTest {
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress + "42"));
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction's (%s) recipient (%s) is not equal to the OnlyDust wallet (%s) expected on blockchain ETHEREUM".formatted(transaction.reference, transaction.recipientAddress, transaction.recipientAddress + "42"));
@@ -1812,7 +1823,7 @@ public class AccountingServiceTest {
             when(currencyStorage.findByCode(Currency.Code.ETH)).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Native currency not supported on blockchain Ethereum");
@@ -1832,7 +1843,7 @@ public class AccountingServiceTest {
             when(currencyStorage.findByCode(Currency.Code.ETH)).thenReturn(Optional.of(Currencies.ETH));
 
             // When
-            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+            final var deposit = accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference);
 
             // Then
             assertThat(deposit.id()).isNotNull();
@@ -1859,7 +1870,7 @@ public class AccountingServiceTest {
             when(currencyStorage.findByErc20(Blockchain.ETHEREUM, transaction.address)).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Currency %s not supported on blockchain Ethereum".formatted(transaction.address));
@@ -1880,7 +1891,7 @@ public class AccountingServiceTest {
                     .thenReturn(Optional.of(Currencies.USDC));
 
             // When
-            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+            final var deposit = accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference);
 
             // Then
             assertThat(deposit.id()).isNotNull();
@@ -1903,7 +1914,7 @@ public class AccountingServiceTest {
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
 
             // When
-            final var deposit = accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference);
+            final var deposit = accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference);
 
             // Then
             assertThat(deposit).isEqualTo(existingDeposit);
@@ -1919,7 +1930,7 @@ public class AccountingServiceTest {
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.empty());
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction %s already exists".formatted(transaction.reference));
@@ -1938,7 +1949,7 @@ public class AccountingServiceTest {
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
 
             // When
-            assertThatThrownBy(() -> accountingService.previewDeposit(sponsorId, Network.ETHEREUM, transaction.reference))
+            assertThatThrownBy(() -> accountingService.previewDeposit(userId, sponsorId, Network.ETHEREUM, transaction.reference))
                     // Then
                     .isInstanceOf(OnlyDustException.class)
                     .hasMessage("Transaction %s already exists".formatted(transaction.reference));

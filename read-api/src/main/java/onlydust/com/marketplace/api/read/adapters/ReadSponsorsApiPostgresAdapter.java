@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
+import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
@@ -66,7 +67,12 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), sponsorId))
             throw unauthorized("User %s is not admin of sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
-        return ok(deposit.toResponse());
+        final var latestBillingInformation = depositReadRepository.findBySponsorIdOrderByTimestampDesc(sponsorId.value())
+                .map(DepositReadEntity::billingInformationResponse)
+                .orElse(null);
+
+        return ok(deposit.toResponse()
+                .latestBillingInformation(latestBillingInformation));
     }
 
     @Override

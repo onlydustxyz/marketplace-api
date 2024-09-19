@@ -18,4 +18,15 @@ public interface DepositReadRepository extends Repository<DepositReadEntity, UUI
     Page<DepositReadEntity> findAllBySponsorId(UUID sponsorId, Pageable pageable);
 
     Optional<DepositReadEntity> findById(UUID depositId);
+
+    @Query("""
+            SELECT d
+            FROM DepositReadEntity d
+            JOIN d.transaction t
+            WHERE d.sponsor.id = :sponsorId AND
+                  d.status != 'DRAFT'
+            ORDER BY t.timestamp DESC
+            LIMIT 1
+            """)
+    Optional<DepositReadEntity> findBySponsorIdOrderByTimestampDesc(UUID sponsorId);
 }

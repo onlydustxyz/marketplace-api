@@ -6257,28 +6257,16 @@ components:
           $ref: '#/components/schemas/DepositSenderInformation'
         billingInformation:
           $ref: '#/components/schemas/DepositBillingInformation'
+        latestBillingInformation:
+          $ref: '#/components/schemas/DepositBillingInformation'
 
     PreviewDepositResponse:
       type: object
       required:
         - id
-        - amount
-        - currentBalance
-        - finalBalance
-        - senderInformation
       properties:
         id:
           $ref: '#/components/schemas/DepositId'
-        amount:
-          $ref: '#/components/schemas/Money'
-        currentBalance:
-          $ref: '#/components/schemas/Money'
-        finalBalance:
-          $ref: '#/components/schemas/Money'
-        senderInformation:
-          $ref: '#/components/schemas/DepositSenderInformation'
-        billingInformation:
-          $ref: '#/components/schemas/DepositBillingInformation'
 
     UpdateDepositRequest:
       type: object

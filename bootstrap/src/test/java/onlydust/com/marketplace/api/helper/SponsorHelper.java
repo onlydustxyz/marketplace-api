@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
-import onlydust.com.marketplace.api.postgres.adapter.repository.old.SponsorRepository;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.SponsorFacadePort;
@@ -18,8 +17,6 @@ public class SponsorHelper {
     private DatabaseHelper databaseHelper;
     @Autowired
     private SponsorFacadePort sponsorFacadePort;
-    @Autowired
-    private SponsorRepository sponsorRepository;
 
     private final Faker faker = new Faker();
 
