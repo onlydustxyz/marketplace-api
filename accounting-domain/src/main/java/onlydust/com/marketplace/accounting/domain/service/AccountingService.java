@@ -479,7 +479,7 @@ public class AccountingService implements AccountingFacadePort {
     private Deposit tryCreateDeposit(final @NonNull SponsorId sponsorId, final @NonNull Blockchain blockchain, final @NonNull String transactionReference) {
         final var sanitizedTransactionReference = blockchainFacadePort.sanitizedTransactionReference(blockchain, transactionReference);
 
-        if (transactionStoragePort.exists(sanitizedTransactionReference)) {
+        if (transactionStoragePort.exists(blockchain, sanitizedTransactionReference)) {
             final var existingDeposit = depositStoragePort.findByTransactionReference(sanitizedTransactionReference);
             if (existingDeposit.isPresent() && existingDeposit.get().status() == Deposit.Status.DRAFT) {
                 return existingDeposit.get();

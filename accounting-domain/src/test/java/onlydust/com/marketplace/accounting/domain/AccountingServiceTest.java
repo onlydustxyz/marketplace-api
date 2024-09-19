@@ -1724,7 +1724,7 @@ public class AccountingServiceTest {
             // Given
             final var transactionReference = faker.crypto().sha256();
 
-            when(transactionStoragePort.exists(transactionReference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transactionReference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transactionReference))
                     .thenReturn(Optional.empty());
@@ -1741,7 +1741,7 @@ public class AccountingServiceTest {
             // Given
             final var transaction = Transaction.fake();
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1759,7 +1759,7 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeNative(status);
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1776,7 +1776,7 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeNative(Blockchain.Transaction.Status.CONFIRMED);
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1795,7 +1795,7 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeNative(Blockchain.Transaction.Status.CONFIRMED);
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1815,7 +1815,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeNative();
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1835,7 +1835,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeNative();
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1862,7 +1862,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeErc20();
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1882,7 +1882,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeErc20();
             when(onlyDustWallets.get(Blockchain.ETHEREUM)).thenReturn(Optional.of(transaction.recipientAddress));
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(false);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(false);
 
             when(blockchainFacadePort.getTransaction(Blockchain.ETHEREUM, transaction.reference))
                     .thenReturn(Optional.of(transaction));
@@ -1910,7 +1910,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeErc20();
             final var existingDeposit = Deposit.preview(sponsorId, transaction, Currencies.USDC);
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(true);
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
 
             // When
@@ -1926,7 +1926,7 @@ public class AccountingServiceTest {
             // Given
             final var transaction = TransferTransaction.fakeErc20();
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(true);
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.empty());
 
             // When
@@ -1945,7 +1945,7 @@ public class AccountingServiceTest {
             final var transaction = TransferTransaction.fakeErc20();
             final var existingDeposit = Deposit.preview(sponsorId, transaction, Currencies.USDC).toBuilder().status(Deposit.Status.PENDING).build();
 
-            when(transactionStoragePort.exists(transaction.reference)).thenReturn(true);
+            when(transactionStoragePort.exists(Blockchain.ETHEREUM, transaction.reference)).thenReturn(true);
             when(depositStoragePort.findByTransactionReference(transaction.reference)).thenReturn(Optional.of(existingDeposit));
 
             // When
