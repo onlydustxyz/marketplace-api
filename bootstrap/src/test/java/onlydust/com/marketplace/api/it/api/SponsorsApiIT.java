@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
+import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Network;
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.SponsorTransactionStatListResponse;
@@ -8,7 +9,6 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Program;
-import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,7 +166,6 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
         @Nested
         class GivenSomeTransactions {
             private static Program program;
-            private static Project project1;
             private static ProjectId project2Id;
 
             private static final AtomicBoolean setupDone = new AtomicBoolean();
@@ -179,7 +178,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 program = programHelper.create(sponsor.id(), "My program " + faker.random().nextLong());
                 final var projectLead = userAuthHelper.create();
                 final var project1Id = projectHelper.create(projectLead, "p1");
-                project1 = projectHelper.get(project1Id);
+                final var project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
                 projectHelper.addRepo(project2Id, 498695724L);
                 final var anotherProgram = programHelper.create(sponsor.id());
@@ -189,6 +188,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 at("2023-12-31T00:00:00Z", () -> {
                     depositHelper.create(sponsor.id(), Network.ETHEREUM, USDC, BigDecimal.valueOf(1_000_000));
                     depositHelper.create(sponsor.id(), Network.ETHEREUM, ETH, BigDecimal.valueOf(100));
+                    depositHelper.create(sponsor.id(), Network.ETHEREUM, ETH, BigDecimal.valueOf(200), Deposit.Status.REJECTED);
                 });
 
                 at("2024-01-01T00:00:00Z", () -> {
@@ -608,7 +608,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                           }
                                         ]
                                       },
-                                      "transactionCount": 2
+                                      "transactionCount": 3
                                     }
                                 """))
                         .jsonPath("$.stats[?(@.date == '2024-01-01')]").value(jsonObjectEquals("""
@@ -1992,13 +1992,13 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .is2xxSuccessful()
                         .expectBody()
-                        .jsonPath("$.transactions[2].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[3].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[4].program.id").isEqualTo(program.id().toString())
+                        .jsonPath("$.transactions[5].program.id").isEqualTo(program.id().toString())
                         .json("""
                                 {
                                   "totalPageNumber": 1,
-                                  "totalItemNumber": 7,
+                                  "totalItemNumber": 8,
                                   "hasMore": false,
                                   "nextPageIndex": 0,
                                   "transactions": [
@@ -2039,6 +2039,25 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                         "usdConversionRate": 1781.983987
                                       },
                                       "depositStatus": "COMPLETED"
+                                    },
+                                    {
+                                      "date": "2023-12-31T00:00:00Z",
+                                      "type": "DEPOSITED",
+                                      "program": null,
+                                      "amount": {
+                                        "amount": 200,
+                                        "prettyAmount": 200,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 356396.80,
+                                        "usdConversionRate": 1781.983987
+                                      },
+                                      "depositStatus": "REJECTED"
                                     },
                                     {
                                       "date": "2024-01-01T00:00:00Z",
@@ -2193,7 +2212,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .isOk()
                         .expectBody()
                         .jsonPath("$.transactions.size()").isEqualTo(switch (type) {
-                            case DEPOSITED -> 2;
+                            case DEPOSITED -> 3;
                             case ALLOCATED -> 4;
                             case UNALLOCATED -> 1;
                         })
@@ -2215,7 +2234,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .returnResult().getResponseBody();
 
                 final var lines = csv.split("\\R");
-                assertThat(lines.length).isEqualTo(8);
+                assertThat(lines.length).isEqualTo(9);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,deposit_status,program_id,amount,currency,usd_amount");
             }
         }

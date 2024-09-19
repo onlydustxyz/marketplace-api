@@ -9642,6 +9642,7 @@ components:
       type: string
       enum:
         - PENDING
+        - REJECTED
         - COMPLETED
 
     SponsorAccountTransactionType:

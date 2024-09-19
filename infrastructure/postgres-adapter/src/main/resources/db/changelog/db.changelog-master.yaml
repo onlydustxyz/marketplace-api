@@ -533,3 +533,7 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000338_remove_committee_sponsor_id.sql
   - include:
       file: db/changelog/changelogs/00000339_add_ecosystem_leads.sql
+  - include:
+      file: db/changelog/changelogs/00000340_remove_unused_view.sql
+  - include:
+      file: db/changelog/changelogs/00000341_add_rejected_deposits.sql

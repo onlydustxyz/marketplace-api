@@ -167,8 +167,9 @@ public class AllTransactionReadEntity {
     private SponsorDepositTransactionStatus depositStatus() {
         return isNull(depositStatus) ? null : switch (depositStatus) {
             case PENDING -> SponsorDepositTransactionStatus.PENDING;
+            case REJECTED -> SponsorDepositTransactionStatus.REJECTED;
             case COMPLETED -> SponsorDepositTransactionStatus.COMPLETED;
-            case DRAFT, REJECTED -> throw new IllegalStateException("DRAFT, REJECTED deposit status are not allowed here");
+            case DRAFT -> throw new IllegalStateException("DRAFT, REJECTED deposit status are not allowed here");
         };
     }
 
