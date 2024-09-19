@@ -36,6 +36,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.data.domain.Sort.Direction.DESC;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
@@ -147,7 +148,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
         return allTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate), search, types == null ? null : types.stream().map(SponsorTransactionType::name).toList(),
-                PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp"), Sort.Order.by("depositStatus").nullsLast())));
+                PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp").with(DESC), Sort.Order.by("depositStatus").nullsLast())));
     }
 
     @Override

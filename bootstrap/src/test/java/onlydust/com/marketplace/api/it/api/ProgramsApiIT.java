@@ -1262,9 +1262,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .isEqualTo(HttpStatus.PARTIAL_CONTENT)
                         .expectBody()
-                        .jsonPath("$.transactions[0].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
-                        .jsonPath("$.transactions[1].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
-                        .jsonPath("$.transactions[2].thirdParty.sponsor.id").isEqualTo(sponsor.id().toString())
+                        .jsonPath("$.transactions[0].thirdParty.project.id").isEqualTo(project1.getId().toString())
+                        .jsonPath("$.transactions[1].thirdParty.project.id").isEqualTo(project2Id.toString())
+                        .jsonPath("$.transactions[2].thirdParty.project.id").isEqualTo(project2Id.toString())
                         .jsonPath("$.transactions[3].thirdParty.project.id").isEqualTo(project1.getId().toString())
                         .jsonPath("$.transactions[4].thirdParty.project.id").isEqualTo(project1.getId().toString())
                         .json("""
@@ -1275,11 +1275,11 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                   "nextPageIndex": 1,
                                   "transactions": [
                                     {
-                                      "date": "2024-01-01T00:00:00Z",
-                                      "type": "ALLOCATED",
+                                      "date": "2024-06-23T00:00:00Z",
+                                      "type": "UNGRANTED",
                                       "amount": {
-                                        "amount": 2200,
-                                        "prettyAmount": 2200,
+                                        "amount": 200,
+                                        "prettyAmount": 200,
                                         "currency": {
                                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                           "code": "USDC",
@@ -1287,33 +1287,16 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                           "decimals": 6
                                         },
-                                        "usdEquivalent": 2222.00,
+                                        "usdEquivalent": 202.00,
                                         "usdConversionRate": 1.010001
                                       }
                                     },
                                     {
-                                      "date": "2024-01-15T00:00:00Z",
-                                      "type": "UNALLOCATED",
+                                      "date": "2024-05-23T00:00:00Z",
+                                      "type": "GRANTED",
                                       "amount": {
-                                        "amount": 700,
-                                        "prettyAmount": 700,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 707.00,
-                                        "usdConversionRate": 1.010001
-                                      }
-                                    },
-                                    {
-                                      "date": "2024-02-03T00:00:00Z",
-                                      "type": "ALLOCATED",
-                                      "amount": {
-                                        "amount": 12,
-                                        "prettyAmount": 12,
+                                        "amount": 3,
+                                        "prettyAmount": 3,
                                         "currency": {
                                           "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                           "code": "ETH",
@@ -1321,16 +1304,16 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 21383.81,
+                                        "usdEquivalent": 5345.95,
                                         "usdConversionRate": 1781.983987
                                       }
                                     },
                                     {
-                                      "date": "2024-04-23T00:00:00Z",
+                                      "date": "2024-04-24T00:00:00Z",
                                       "type": "GRANTED",
                                       "amount": {
-                                        "amount": 500,
-                                        "prettyAmount": 500,
+                                        "amount": 200,
+                                        "prettyAmount": 200,
                                         "currency": {
                                           "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                           "code": "USDC",
@@ -1338,7 +1321,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                           "decimals": 6
                                         },
-                                        "usdEquivalent": 505.00,
+                                        "usdEquivalent": 202.00,
                                         "usdConversionRate": 1.010001
                                       }
                                     },
@@ -1357,6 +1340,23 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         },
                                         "usdEquivalent": 3563.97,
                                         "usdConversionRate": 1781.983987
+                                      }
+                                    },
+                                    {
+                                      "date": "2024-04-23T00:00:00Z",
+                                      "type": "GRANTED",
+                                      "amount": {
+                                        "amount": 500,
+                                        "prettyAmount": 500,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 505.00,
+                                        "usdConversionRate": 1.010001
                                       }
                                     }
                                   ]

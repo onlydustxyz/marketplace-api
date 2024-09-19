@@ -166,6 +166,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
         @Nested
         class GivenSomeTransactions {
             private static Program program;
+            private static Program anotherProgram;
             private static ProjectId project2Id;
 
             private static final AtomicBoolean setupDone = new AtomicBoolean();
@@ -181,7 +182,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 final var project1 = projectHelper.get(project1Id);
                 project2Id = projectHelper.create(projectLead, "p2");
                 projectHelper.addRepo(project2Id, 498695724L);
-                final var anotherProgram = programHelper.create(sponsor.id());
+                anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
@@ -1992,9 +1993,11 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .expectStatus()
                         .is2xxSuccessful()
                         .expectBody()
+                        .jsonPath("$.transactions[0].program.id").isEqualTo(anotherProgram.id().toString())
+                        .jsonPath("$.transactions[1].program.id").isEqualTo(anotherProgram.id().toString())
+                        .jsonPath("$.transactions[2].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[3].program.id").isEqualTo(program.id().toString())
                         .jsonPath("$.transactions[4].program.id").isEqualTo(program.id().toString())
-                        .jsonPath("$.transactions[5].program.id").isEqualTo(program.id().toString())
                         .json("""
                                 {
                                   "totalPageNumber": 1,
@@ -2002,6 +2005,96 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                   "hasMore": false,
                                   "nextPageIndex": 0,
                                   "transactions": [
+                                    {
+                                      "date": "2024-03-12T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 1,
+                                        "prettyAmount": 1,
+                                        "currency": {
+                                          "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
+                                          "code": "BTC",
+                                          "name": "Bitcoin",
+                                          "logoUrl": null,
+                                          "decimals": 8
+                                        },
+                                        "usdEquivalent": null,
+                                        "usdConversionRate": null
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-02-04T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 1500,
+                                        "prettyAmount": 1500,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 1515.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-02-01T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 12,
+                                        "prettyAmount": 12,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 21383.81,
+                                        "usdConversionRate": 1781.983987
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-01-15T00:00:00Z",
+                                      "type": "UNALLOCATED",
+                                      "amount": {
+                                        "amount": 700,
+                                        "prettyAmount": 700,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 707.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
+                                    {
+                                      "date": "2024-01-01T00:00:00Z",
+                                      "type": "ALLOCATED",
+                                      "amount": {
+                                        "amount": 2200,
+                                        "prettyAmount": 2200,
+                                        "currency": {
+                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                          "code": "USDC",
+                                          "name": "USD Coin",
+                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                          "decimals": 6
+                                        },
+                                        "usdEquivalent": 2222.00,
+                                        "usdConversionRate": 1.010001
+                                      },
+                                      "depositStatus": null
+                                    },
                                     {
                                       "date": "2023-12-31T00:00:00Z",
                                       "type": "DEPOSITED",
@@ -2058,96 +2151,6 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                         "usdConversionRate": 1781.983987
                                       },
                                       "depositStatus": "REJECTED"
-                                    },
-                                    {
-                                      "date": "2024-01-01T00:00:00Z",
-                                      "type": "ALLOCATED",
-                                      "amount": {
-                                        "amount": 2200,
-                                        "prettyAmount": 2200,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 2222.00,
-                                        "usdConversionRate": 1.010001
-                                      },
-                                      "depositStatus": null
-                                    },
-                                    {
-                                      "date": "2024-01-15T00:00:00Z",
-                                      "type": "UNALLOCATED",
-                                      "amount": {
-                                        "amount": 700,
-                                        "prettyAmount": 700,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 707.00,
-                                        "usdConversionRate": 1.010001
-                                      },
-                                      "depositStatus": null
-                                    },
-                                    {
-                                      "date": "2024-02-01T00:00:00Z",
-                                      "type": "ALLOCATED",
-                                      "amount": {
-                                        "amount": 12,
-                                        "prettyAmount": 12,
-                                        "currency": {
-                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                          "code": "ETH",
-                                          "name": "Ether",
-                                          "logoUrl": null,
-                                          "decimals": 18
-                                        },
-                                        "usdEquivalent": 21383.81,
-                                        "usdConversionRate": 1781.983987
-                                      },
-                                      "depositStatus": null
-                                    },
-                                    {
-                                      "date": "2024-02-04T00:00:00Z",
-                                      "type": "ALLOCATED",
-                                      "amount": {
-                                        "amount": 1500,
-                                        "prettyAmount": 1500,
-                                        "currency": {
-                                          "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                          "code": "USDC",
-                                          "name": "USD Coin",
-                                          "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                          "decimals": 6
-                                        },
-                                        "usdEquivalent": 1515.00,
-                                        "usdConversionRate": 1.010001
-                                      },
-                                      "depositStatus": null
-                                    },
-                                    {
-                                      "date": "2024-03-12T00:00:00Z",
-                                      "type": "ALLOCATED",
-                                      "amount": {
-                                        "amount": 1,
-                                        "prettyAmount": 1,
-                                        "currency": {
-                                          "id": "3f6e1c98-8659-493a-b941-943a803bd91f",
-                                          "code": "BTC",
-                                          "name": "Bitcoin",
-                                          "logoUrl": null,
-                                          "decimals": 8
-                                        },
-                                        "usdEquivalent": null,
-                                        "usdConversionRate": null
-                                      },
-                                      "depositStatus": null
                                     }
                                   ]
                                 }
