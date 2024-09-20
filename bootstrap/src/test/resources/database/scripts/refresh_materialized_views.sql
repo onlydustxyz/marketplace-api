@@ -16,7 +16,6 @@ REFRESH MATERIALIZED VIEW bi_internal.contribution_project_timestamps;
 REFRESH MATERIALIZED VIEW bi_internal.contribution_contributor_timestamps;
 REFRESH MATERIALIZED VIEW bi.project_contribution_stats;
 REFRESH MATERIALIZED VIEW bi.project_reward_stats;
-REFRESH MATERIALIZED VIEW bi.program_contribution_stats;
 REFRESH MATERIALIZED VIEW bi.contribution_data;
 REFRESH MATERIALIZED VIEW bi.contribution_data_cross_projects;
 REFRESH MATERIALIZED VIEW bi.reward_data;

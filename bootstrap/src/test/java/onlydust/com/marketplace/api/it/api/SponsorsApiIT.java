@@ -1768,7 +1768,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "leads": [],
                                       "projectCount": 2,
-                                      "userCount": 10,
+                                      "userCount": 19,
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 13483.89,
                                         "totalPerCurrency": [
@@ -1872,7 +1872,7 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                     {
                                       "leads": [],
                                       "projectCount": 2,
-                                      "userCount": 10,
+                                      "userCount": 19,
                                       "totalAvailable": {
                                         "totalUsdEquivalent": 606.00,
                                         "totalPerCurrency": [
