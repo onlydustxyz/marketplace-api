@@ -33,11 +33,13 @@ public interface ProgramTransactionMonthlyStatsReadRepository extends Repository
                    coalesce(sum(amount) filter ( where type = 'TRANSFER' and reward_id is not null and payment_id is null), 0)
                        - coalesce(sum(amount) filter ( where type = 'REFUND' and reward_id is not null and payment_id is null), 0)  as total_rewarded,
             
-                   count(*) filter ( where abt.reward_id is null )                                                                  as transaction_count
+                   count(distinct abt.id) filter ( where abt.reward_id is null )                                                    as transaction_count
             from data d
-                     left join accounting.account_book_transactions abt on d.program_id = abt.program_id and d.currency_id = abt.currency_id and d.date = date_trunc('month', abt.timestamp, 'UTC')
+                     join programs pgm on pgm.id = d.program_id
+                     left join accounting.account_book_transactions abt on d.program_id = abt.program_id and
+                                                                           d.currency_id = abt.currency_id and
+                                                                           d.date = date_trunc('month', abt.timestamp, 'UTC')
                      left join projects p on p.id = abt.project_id
-                     join programs pgm on pgm.id = abt.program_id
             where (cast(:search as text) is null or p.name ilike '%' || :search || '%' or pgm.name ilike '%' || :search || '%')
               and (coalesce(:types) is null or (
                 ('GRANTED' in (:types) and abt.type = 'TRANSFER' and abt.project_id is not null and abt.reward_id is null) or
