@@ -15,10 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -435,7 +432,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "averageRewardUsdAmount": {
-                                    "value": 1.2500000000000000,
+                                    "value": 1.25,
                                     "trend": "UP"
                                   },
                                   "onboardedContributorCount": {
@@ -490,19 +487,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         public void should_get_projects_stats_with_filters() {
-            // TODO: test all filters:
-//            DecimalNumberKpiFilter availableBudgetUsdAmount,
-//            NumberKpiFilter percentUsedBudget,
-//            DecimalNumberKpiFilter totalGrantedUsdAmount,
-//            DecimalNumberKpiFilter averageRewardUsdAmount,
-//            DecimalNumberKpiFilter totalRewardedUsdAmount,
-//            NumberKpiFilter onboardedContributorCount,
-//            NumberKpiFilter activeContributorCount,
-//            NumberKpiFilter mergedPrCount,
-//            NumberKpiFilter rewardCount,
-//            NumberKpiFilter contributionCount,
-//            ProjectKpiSortEnum sort,
-
             test_projects_stats("search", "gaming",
                     response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
                             .contains("Gaming")), true
@@ -537,6 +521,49 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "90", "availableBudgetUsdAmount.lte", "95"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getAvailableBudget().getTotalUsdEquivalent())
                             .isEqualTo(BigDecimal.valueOf(92.5))), true
+            );
+            test_projects_stats(Map.of("percentUsedBudget.gte", "0.01"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getPercentUsedBudget())
+                            .isEqualTo(BigDecimal.valueOf(0.08))), true
+            );
+            test_projects_stats(Map.of("totalGrantedUsdAmount.eq", "2000"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
+            test_projects_stats(Map.of("totalRewardedUsdAmount.lte", "5"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalRewardedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(5.0))), true
+            );
+            test_projects_stats(Map.of("averageRewardUsdAmount.gte", "1.25", "averageRewardUsdAmount.lte", "2"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getAverageRewardUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(1.25))), true
+            );
+            test_projects_stats(Map.of("onboardedContributorCount.eq", "3"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getOnboardedContributorCount().getValue())
+                            .isEqualTo(3)), true
+            );
+            test_projects_stats(Map.of("activeContributorCount.eq", "1"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getActiveContributorCount().getValue())
+                            .isEqualTo(1)), true
+            );
+            test_projects_stats(Map.of("mergedPrCount.eq", "8"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getMergedPrCount().getValue())
+                            .isEqualTo(8)), true
+            );
+            test_projects_stats(Map.of("rewardCount.eq", "4"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getRewardCount().getValue())
+                            .isEqualTo(4)), true
+            );
+            test_projects_stats(Map.of("contributionCount.eq", "8"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getContributionCount().getValue())
+                            .isEqualTo(8)), true
+            );
+        }
+
+        @Test
+        public void should_get_projects_stats_ordered() {
+            test_projects_stats(Map.of("sort", "MERGED_PR_COUNT", "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getMergedPrCount().getValue())), true
             );
         }
     }

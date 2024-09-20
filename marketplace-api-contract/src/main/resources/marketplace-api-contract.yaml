@@ -10717,7 +10717,7 @@ components:
         availableBudgetUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         percentUsedBudget:
-          $ref: '#/components/schemas/NumberKpiFilter'
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
         totalGrantedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         averageRewardUsdAmount:
