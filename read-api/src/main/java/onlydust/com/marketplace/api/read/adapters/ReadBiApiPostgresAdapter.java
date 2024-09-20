@@ -91,7 +91,6 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
-        final var start = System.currentTimeMillis();
         final var page = projectKpisReadRepository.findAll(
                 sanitizedFromDate,
                 sanitizedToDate,
@@ -136,9 +135,6 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );
-        final var end = System.currentTimeMillis();
-        System.out.println("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Time to fetch projects: " + (end - start) + "ms " +
-                           "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 
         return ok(new BiProjectsPageResponse()
                 .projects(page.stream().map(ProjectKpisReadEntity::toDto).toList())

@@ -112,7 +112,7 @@ create index bi_reward_data_quarter_timestamp_idx on bi.reward_data (quarter_tim
 create index bi_reward_data_year_timestamp_idx on bi.reward_data (year_timestamp, program_ids, ecosystem_ids);
 
 
-refresh materialized view bi.daily_project_grants;
+
 CREATE MATERIALIZED VIEW bi.project_data_unions AS
 SELECT *,
        (select array_agg(pl.user_id) from project_leads pl where pl.project_id = data.project_id) as project_lead_ids
