@@ -188,16 +188,16 @@ SELECT p.id                                                                     
                           'name', p.name,
                           'logoUrl', p.logo_url)                                                                  as project,
        p.name                                                                                                     as project_name,
-       min(budgets.available_budget_usd)                                                                          as available_budget_usd,
-       min(budgets.percent_spent_budget_usd)                                                                      as percent_spent_budget_usd,
-       coalesce(jsonb_agg(distinct jsonb_build_object('available_budget_usd', budgets.available_budget_usd,
-                                                      'percent_spent_budget_usd', budgets.percent_spent_budget_usd,
-                                                      'available_budget_per_currency', budgets.available_budget_per_currency,
-                                                      'percent_spent_budget_per_currency', budgets.percent_spent_budget_per_currency,
-                                                      'granted_amount_usd', budgets.granted_amount_usd,
-                                                      'granted_amount_per_currency', budgets.granted_amount_per_currency,
-                                                      'rewarded_amount_usd', budgets.rewarded_amount_usd,
-                                                      'rewarded_amount_per_currency', budgets.rewarded_amount_per_currency))
+       max(budgets.available_budget_usd)                                                                          as available_budget_usd,
+       max(budgets.percent_spent_budget_usd)                                                                      as percent_spent_budget_usd,
+       coalesce(jsonb_agg(distinct jsonb_build_object('availableBudgetUsd', budgets.available_budget_usd,
+                                                      'percentSpentBudgetUsd', budgets.percent_spent_budget_usd,
+                                                      'availableBudgetPerCurrency', budgets.available_budget_per_currency,
+                                                      'percentSpentBudgetPerCurrency', budgets.percent_spent_budget_per_currency,
+                                                      'grantedAmountUsd', budgets.granted_amount_usd,
+                                                      'grantedAmountPerCurrency', budgets.granted_amount_per_currency,
+                                                      'rewardedAmountUsd', budgets.rewarded_amount_usd,
+                                                      'rewardedAmountPerCurrency', budgets.rewarded_amount_per_currency))
                 filter ( where budgets.project_id is not null ), '[]'::jsonb) -> 0                                as budget,
        array_agg(distinct u.id) filter ( where u.id is not null )                                                 as project_lead_ids,
        array_agg(distinct pc.id) filter ( where pc.id is not null )                                               as project_category_ids,
@@ -258,33 +258,56 @@ FROM projects p
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
-         LEFT JOIN LATERAL ( select coalesce(gd.project_id, rd.project_id)                                     as project_id,
-                                    coalesce(sum(gd.usd_amount), 0)                                            as granted_amount_usd,
-                                    coalesce(sum(rd.usd_amount), 0)                                            as rewarded_amount_usd,
-                                    coalesce(sum(gd.usd_amount) - sum(rd.usd_amount), 0)                       as available_budget_usd,
-                                    coalesce(sum(rd.usd_amount) / greatest(sum(gd.usd_amount), 1), 0)          as percent_spent_budget_usd,
-                                    jsonb_agg(jsonb_build_object('currency_id', gd.currency_id, 'amount', gd.amount))
-                                    filter ( where gd.currency_id is not null )                                as granted_amount_per_currency,
-                                    jsonb_agg(jsonb_build_object('currency_id', rd.currency_id, 'amount', rd.amount))
-                                    filter ( where rd.currency_id is not null )                                as rewarded_amount_per_currency,
-                                    jsonb_agg(jsonb_build_object('currency_id', gd.currency_id, 'amount', gd.amount - rd.amount))
-                                    filter ( where rd.currency_id is not null and gd.currency_id is not null ) as available_budget_per_currency,
-                                    jsonb_agg(jsonb_build_object('currency_id', rd.currency_id, 'amount', rd.amount / greatest(gd.amount, 1)))
-                                    filter ( where rd.currency_id is not null and gd.currency_id is not null ) as percent_spent_budget_per_currency
-                             from (select gd.project_id,
-                                          gd.currency_id,
-                                          sum(gd.usd_amount) as usd_amount,
-                                          sum(gd.amount)     as amount
-                                   from bi.project_grants_data gd
-                                   group by gd.project_id, gd.currency_id) gd
+         LEFT JOIN LATERAL ( select gd.project_id                                                                  as project_id,
+                                    coalesce(sum(gd.usd_amount), 0)                                                as granted_amount_usd,
+                                    coalesce(sum(rd.usd_amount), 0)                                                as rewarded_amount_usd,
+                                    sum(coalesce(gd.usd_amount, 0)) - sum(coalesce(rd.usd_amount, 0))              as available_budget_usd,
+                                    sum(coalesce(rd.usd_amount, 0)) / greatest(sum(coalesce(gd.usd_amount, 0)), 1) as percent_spent_budget_usd,
 
-                                      full join (select rd.project_id,
-                                                        rd.currency_id,
-                                                        sum(rd.usd_amount) as usd_amount,
-                                                        sum(rd.amount)     as amount
+                                    jsonb_agg(jsonb_build_object('currency', gd.currency,
+                                                                 'amount', gd.amount,
+                                                                 'usdAmount', gd.usd_amount))                      as granted_amount_per_currency,
+
+                                    jsonb_agg(jsonb_build_object('currency', rd.currency,
+                                                                 'amount', rd.amount,
+                                                                 'usdAmount', rd.usd_amount))
+                                    filter ( where rd.currency_id is not null )                                    as rewarded_amount_per_currency,
+
+                                    jsonb_agg(jsonb_build_object('currency', gd.currency,
+                                                                 'amount', coalesce(gd.amount, 0) - coalesce(rd.amount, 0),
+                                                                 'usdAmount', coalesce(gd.usd_amount, 0) -
+                                                                              coalesce(rd.usd_amount, 0)))         as available_budget_per_currency,
+
+                                    jsonb_agg(jsonb_build_object('currency', gd.currency,
+                                                                 'amount', coalesce(gd.amount, 0) / coalesce(rd.amount, 1),
+                                                                 'usdAmount', coalesce(gd.usd_amount, 0) /
+                                                                              coalesce(rd.usd_amount, 1)))         as percent_spent_budget_per_currency
+                             from (select gd.project_id                             as project_id,
+                                          c.id                                      as currency_id,
+                                          jsonb_build_object('id', c.id,
+                                                             'code', c.code,
+                                                             'name', c.name,
+                                                             'decimals', c.decimals,
+                                                             'logoUrl', c.logo_url) as currency,
+                                          sum(gd.usd_amount)                        as usd_amount,
+                                          sum(gd.amount)                            as amount
+                                   from bi.project_grants_data gd
+                                            join currencies c on c.id = gd.currency_id
+                                   group by gd.project_id, c.id) gd
+
+                                      left join (select rd.project_id                             as project_id,
+                                                        c.id                                      as currency_id,
+                                                        jsonb_build_object('id', c.id,
+                                                                           'code', c.code,
+                                                                           'name', c.name,
+                                                                           'decimals', c.decimals,
+                                                                           'logoUrl', c.logo_url) as currency,
+                                                        sum(rd.usd_amount)                        as usd_amount,
+                                                        sum(rd.amount)                            as amount
                                                  from bi.reward_data rd
-                                                 group by rd.project_id, rd.currency_id) rd on gd.project_id = rd.project_id and gd.currency_id = rd.currency_id
-                             group by gd.project_id, rd.project_id ) budgets on budgets.project_id = p.id
+                                                          join currencies c on c.id = rd.currency_id
+                                                 group by rd.project_id, c.id) rd on gd.project_id = rd.project_id and gd.currency_id = rd.currency_id
+                             group by gd.project_id ) budgets on budgets.project_id = p.id
 GROUP BY p.id;
 
 

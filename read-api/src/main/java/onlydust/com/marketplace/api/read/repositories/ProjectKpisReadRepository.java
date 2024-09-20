@@ -31,7 +31,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
     }
 
     @Query(value = """
-            SELECT d.project_id,
+            SELECT -- /// global data /// --
+                   d.project_id,
                    d.project_name,
                    d.project,
                    d.leads,
@@ -40,8 +41,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    d.ecosystems,
                    d.programs,
                    d.budget,
-                   coalesce(d.available_budget_usd, 0)                      as available_budget,
-                   coalesce(d.percent_spent_budget_usd, 0)                  as percent_spent_budget,
+                   d.available_budget_usd                                   as available_budget,
+                   d.percent_spent_budget_usd                               as percent_spent_budget,
+                   -- /// filtered & computed data /// --
                    coalesce(d.total_granted_usd_amount, 0)                  as total_granted_usd_amount,
                    coalesce(d.contribution_count, 0)                        as contribution_count,
                    coalesce(d.reward_count, 0)                              as reward_count,
@@ -50,8 +52,6 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    coalesce(d.merged_pr_count, 0)                           as merged_pr_count,
                    coalesce(d.active_contributor_count, 0)                  as active_contributor_count,
                    coalesce(d.onboarded_contributor_count, 0)               as onboarded_contributor_count,
-                   coalesce(previous_period.available_budget_usd, 0)        as previous_period_available_budget,
-                   coalesce(previous_period.percent_spent_budget_usd, 0)    as previous_period_percent_spent_budget,
                    coalesce(previous_period.total_granted_usd_amount, 0)    as previous_period_total_granted_usd_amount,
                    coalesce(previous_period.contribution_count, 0)          as previous_period_contribution_count,
                    coalesce(previous_period.reward_count, 0)                as previous_period_reward_count,

@@ -98,7 +98,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
             projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
-            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH));
+            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
 
             final var marketplace_api = githubHelper.createRepo(onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
@@ -212,8 +212,40 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Starkware Exploration Team"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 2005.0,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 1000,
+                                        "prettyAmount": 1000,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 2000,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      },
+                                      {
+                                        "amount": 10,
+                                        "prettyAmount": 10,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 5.0,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.00,
                                   "totalGrantedUsdAmount": {
                                     "value": 2000,
                                     "trend": "UP"
@@ -268,8 +300,26 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Starkware Exploration Team"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 60.0,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 120,
+                                        "prettyAmount": 120,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 60.0,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.00,
                                   "totalGrantedUsdAmount": {
                                     "value": 60.0,
                                     "trend": "UP"
@@ -342,10 +392,42 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Nethermind"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 92.5,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 25,
+                                        "prettyAmount": 25,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 50,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      },
+                                      {
+                                        "amount": 85,
+                                        "prettyAmount": 85,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 42.5,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.08,
                                   "totalGrantedUsdAmount": {
-                                    "value": 250.0,
+                                    "value": 100.0,
                                     "trend": "UP"
                                   },
                                   "totalRewardedUsdAmount": {
@@ -452,9 +534,9 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
                             .isEqualTo(BigDecimal.valueOf(2000))), true
             );
-            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
-                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
-                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "90", "availableBudgetUsdAmount.lte", "95"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getAvailableBudget().getTotalUsdEquivalent())
+                            .isEqualTo(BigDecimal.valueOf(92.5))), true
             );
         }
     }
