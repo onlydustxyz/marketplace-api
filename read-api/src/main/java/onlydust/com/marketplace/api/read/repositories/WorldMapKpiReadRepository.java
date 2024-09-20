@@ -14,13 +14,13 @@ public interface WorldMapKpiReadRepository extends JpaRepository<WorldMapKpiRead
             select
                 cd.contributor_country            as country_code,
                 count(distinct cd.contributor_id) as value
-            from bi.contribution_data cd
-            where cd.contributor_country is not null and
-                (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
+            from bi.project_global_data p
+                join bi.contribution_data cd on cd.project_id = p.project_id and (cast(:fromDate as text) is null or cd.timestamp >= to_date(cast(:fromDate as text), 'YYYY-MM-DD'))
                 and (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) < to_date(cast(:toDate as text), 'YYYY-MM-DD'))
-                and (coalesce(:programOrEcosystemIds) is null or
-                     cd.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
-                     cd.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
+                                       and cd.contributor_country is not null
+            where (coalesce(:programOrEcosystemIds) is null or
+                     p.program_ids && cast(array[:programOrEcosystemIds] as uuid[]) or
+                     p.ecosystem_ids && cast(array[:programOrEcosystemIds] as uuid[]))
             group by cd.contributor_country
             order by cd.contributor_country
             """, nativeQuery = true)
