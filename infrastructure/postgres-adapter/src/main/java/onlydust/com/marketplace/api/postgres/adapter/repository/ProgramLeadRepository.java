@@ -4,6 +4,7 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProgramLeadEnt
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,5 +33,5 @@ public interface ProgramLeadRepository extends JpaRepository<ProgramLeadEntity, 
             from program_leads pl
             where pl.program_id = :programId
             """, nativeQuery = true)
-    Optional<ProgramLeadEntity> findByProgramId(UUID programId);
+    List<ProgramLeadEntity> findByProgramId(UUID programId);
 }
