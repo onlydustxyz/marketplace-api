@@ -37,12 +37,14 @@ public interface SponsorTransactionMonthlyStatsReadRepository extends Repository
                    coalesce(sum(amount) filter ( where type = 'TRANSFER' and reward_id is not null and payment_id is null ), 0)
                        - coalesce(sum(amount) filter ( where type = 'REFUND' and reward_id is not null and payment_id is null ), 0)  as total_rewarded,
             
-                   count(*) filter ( where tx.project_id is null )                                                                   as transaction_count
+                   count(distinct tx.id) filter ( where tx.project_id is null )                                                      as transaction_count
             from data d
-                     left join accounting.all_transactions tx on d.sponsor_id = tx.sponsor_id and d.currency_id = tx.currency_id and d.date = date_trunc('month', tx.timestamp, 'UTC')
+                     left join accounting.all_transactions tx on d.sponsor_id = tx.sponsor_id and
+                                                                 d.currency_id = tx.currency_id and
+                                                                 d.date = date_trunc('month', tx.timestamp, 'UTC') and
+                                                                 tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND')
                      left join programs pgm on pgm.id = tx.program_id
-            where tx.type in ('DEPOSIT', 'WITHDRAW', 'TRANSFER', 'REFUND')
-              and (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
+            where (cast(:search as text) is null or (pgm.name ilike '%' || :search || '%' and project_id is null))
               and (coalesce(:types) is null or (
                 ('DEPOSITED' in (:types) and tx.type = 'DEPOSIT' and tx.deposit_status = 'COMPLETED') or
                 ('ALLOCATED' in (:types) and tx.type = 'TRANSFER' and tx.program_id is not null and project_id is null) or
