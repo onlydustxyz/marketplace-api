@@ -188,8 +188,17 @@ SELECT p.id                                                                     
                           'name', p.name,
                           'logoUrl', p.logo_url)                                                                  as project,
        p.name                                                                                                     as project_name,
-       0                                                                                                          as available_budget_usd,
-       0                                                                                                          as percent_spent_budget_usd,
+       min(budgets.available_budget_usd)                                                                          as available_budget_usd,
+       min(budgets.percent_spent_budget_usd)                                                                      as percent_spent_budget_usd,
+       coalesce(jsonb_agg(distinct jsonb_build_object('available_budget_usd', budgets.available_budget_usd,
+                                                      'percent_spent_budget_usd', budgets.percent_spent_budget_usd,
+                                                      'available_budget_per_currency', budgets.available_budget_per_currency,
+                                                      'percent_spent_budget_per_currency', budgets.percent_spent_budget_per_currency,
+                                                      'granted_amount_usd', budgets.granted_amount_usd,
+                                                      'granted_amount_per_currency', budgets.granted_amount_per_currency,
+                                                      'rewarded_amount_usd', budgets.rewarded_amount_usd,
+                                                      'rewarded_amount_per_currency', budgets.rewarded_amount_per_currency))
+                filter ( where budgets.project_id is not null ), '[]'::jsonb) -> 0                                as budget,
        array_agg(distinct u.id) filter ( where u.id is not null )                                                 as project_lead_ids,
        array_agg(distinct pc.id) filter ( where pc.id is not null )                                               as project_category_ids,
        array_agg(distinct l.id) filter ( where l.id is not null )                                                 as language_ids,
@@ -249,6 +258,33 @@ FROM projects p
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
+         LEFT JOIN LATERAL ( select coalesce(gd.project_id, rd.project_id)                                     as project_id,
+                                    coalesce(sum(gd.usd_amount), 0)                                            as granted_amount_usd,
+                                    coalesce(sum(rd.usd_amount), 0)                                            as rewarded_amount_usd,
+                                    coalesce(sum(gd.usd_amount) - sum(rd.usd_amount), 0)                       as available_budget_usd,
+                                    coalesce(sum(rd.usd_amount) / greatest(sum(gd.usd_amount), 1), 0)          as percent_spent_budget_usd,
+                                    jsonb_agg(jsonb_build_object('currency_id', gd.currency_id, 'amount', gd.amount))
+                                    filter ( where gd.currency_id is not null )                                as granted_amount_per_currency,
+                                    jsonb_agg(jsonb_build_object('currency_id', rd.currency_id, 'amount', rd.amount))
+                                    filter ( where rd.currency_id is not null )                                as rewarded_amount_per_currency,
+                                    jsonb_agg(jsonb_build_object('currency_id', gd.currency_id, 'amount', gd.amount - rd.amount))
+                                    filter ( where rd.currency_id is not null and gd.currency_id is not null ) as available_budget_per_currency,
+                                    jsonb_agg(jsonb_build_object('currency_id', rd.currency_id, 'amount', rd.amount / greatest(gd.amount, 1)))
+                                    filter ( where rd.currency_id is not null and gd.currency_id is not null ) as percent_spent_budget_per_currency
+                             from (select gd.project_id,
+                                          gd.currency_id,
+                                          sum(gd.usd_amount) as usd_amount,
+                                          sum(gd.amount)     as amount
+                                   from bi.project_grants_data gd
+                                   group by gd.project_id, gd.currency_id) gd
+
+                                      full join (select rd.project_id,
+                                                        rd.currency_id,
+                                                        sum(rd.usd_amount) as usd_amount,
+                                                        sum(rd.amount)     as amount
+                                                 from bi.reward_data rd
+                                                 group by rd.project_id, rd.currency_id) rd on gd.project_id = rd.project_id and gd.currency_id = rd.currency_id
+                             group by gd.project_id, rd.project_id ) budgets on budgets.project_id = p.id
 GROUP BY p.id;
 
 
