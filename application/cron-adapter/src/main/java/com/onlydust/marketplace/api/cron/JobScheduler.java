@@ -124,12 +124,6 @@ public class JobScheduler {
         userFacadePort.historizeUserRanks();
     }
 
-    @Scheduled(fixedDelayString = "${application.cron.update-projects-languages}")
-    public void updateProjectLanguages() {
-        LOGGER.info("Update projects languages");
-        languageFacadePort.updateProjectsLanguages();
-    }
-
     @Scheduled(cron = "${application.cron.refresh-project-recommendations-cron-expression}")
     public void refreshProjectRecommendations() {
         LOGGER.info("Refresh project recommendations");

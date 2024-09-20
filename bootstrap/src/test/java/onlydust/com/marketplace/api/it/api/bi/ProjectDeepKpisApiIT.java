@@ -1,9 +1,12 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.contract.model.*;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,14 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @TagBI
 public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
@@ -29,26 +33,51 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class ActiveContributors {
         private static final AtomicBoolean setupDone = new AtomicBoolean();
+        private static UUID universe;
         private static UUID starknet;
         private static UUID ethereum;
         private static ProgramId explorationTeam;
         private static ProgramId nethermind;
         private static ProgramId ethGrantingProgram;
+        private static UserAuthHelper.AuthenticatedUser antho;
+        private static UserAuthHelper.AuthenticatedUser pierre;
+        private static UserAuthHelper.AuthenticatedUser mehdi;
+        private static UserAuthHelper.AuthenticatedUser hayden;
+        private static UserAuthHelper.AuthenticatedUser abdel;
+        private static UserAuthHelper.AuthenticatedUser emma;
+        private static UserAuthHelper.AuthenticatedUser james;
+        private static ProjectCategory defi;
+        private static ProjectCategory gaming;
+
+        private static String allProgramOrEcosystemIds;
+
+        @AfterAll
+        @SneakyThrows
+        static void restore() {
+            restoreIndexerDump();
+        }
 
         @BeforeEach
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            final var antho = userAuthHelper.create("antho");
-            final var pierre = userAuthHelper.create("pierre");
-            final var mehdi = userAuthHelper.create("mehdi");
-            final var hayden = userAuthHelper.create("hayden");
-            final var abdel = userAuthHelper.create("abdel");
-            final var emma = userAuthHelper.create("emma");
-            final var james = userAuthHelper.create("james");
+            currencyHelper.setQuote("2020-12-31T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.5));
+            currencyHelper.setQuote("2020-12-31T00:00:00Z", ETH, USD, BigDecimal.valueOf(2));
 
+            antho = userAuthHelper.create("antho");
+            pierre = userAuthHelper.create("pierre");
+            mehdi = userAuthHelper.create("mehdi");
+            hayden = userAuthHelper.create("hayden");
+            abdel = userAuthHelper.create("abdel");
+            emma = userAuthHelper.create("emma");
+            james = userAuthHelper.create("james");
+
+            universe = ecosystemHelper.create("Universe ecosystem").id();
             starknet = ecosystemHelper.create("Starknet ecosystem").id();
             ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
+
+            defi = projectHelper.createCategory("DeFi");
+            gaming = projectHelper.createCategory("Gaming");
 
             final var starknetFoundation = sponsorHelper.create("The Starknet Foundation");
             accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
@@ -59,42 +88,44 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
             final var ethFoundation = sponsorHelper.create("The Ethereum Foundation");
-            accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
+            accountingHelper.createSponsorAccount(ethFoundation.id(), 10_000, ETH);
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
-            accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
+            accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            final var onlyDust = projectHelper.create(pierre, "OnlyDust");
+            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
-            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH));
+            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
 
             final var marketplace_api = githubHelper.createRepo(onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(starknet, ethereum));
-            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH));
-            at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 100, STRK));
+            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum));
+            projectHelper.addCategory(bridge, gaming.id());
+            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 1_000, ETH));
+            at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 10, STRK));
 
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
 
-            final var madara = projectHelper.create(hayden, "Madara", List.of(starknet));
+            final var madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet));
             at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
 
             final var madara_contracts = githubHelper.createRepo(madara);
             final var madara_app = githubHelper.createRepo(madara);
 
 
-            at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
+            at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
             at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
-            at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
+            at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
+            at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
             at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho));
-            at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
-            at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden));
+            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
+            at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+            at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
             at("2021-01-07T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
@@ -107,9 +138,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-21T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-28T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
-            currencyHelper.setQuote("2020-12-31T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.5));
-            currencyHelper.setQuote("2020-12-31T00:00:00Z", ETH, USD, BigDecimal.valueOf(2));
-
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK));
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, STRK));
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 3, STRK));
@@ -117,67 +145,106 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, abdel.githubUserId(), 5, STRK));
 
+            allProgramOrEcosystemIds = String.join(",", Stream.of(universe).map(UUID::toString).toList());
             projectFacadePort.refreshStats();
-        }
-
-        @AfterAll
-        @SneakyThrows
-        static void restore() {
-            restoreIndexerDump();
         }
 
         @Test
         public void should_get_projects_stats_between_dates() {
             // When
             client.get()
-                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0", "pageSize", "100", "fromDate", "2021-01-01", "toDate", "2021-01-10")))
+                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0", "pageSize", "100", "fromDate", "2021-01-01", "toDate", "2021-01-10",
+                            "programOrEcosystemIds", allProgramOrEcosystemIds)))
                     .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
                     // Then
                     .exchange()
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
+                    .consumeWith(System.out::println)
+                    .jsonPath("$.projects[0].project.name").<String>value(name -> assertThat(name).contains("Bridge"))
+                    .jsonPath("$.projects[1].project.name").<String>value(name -> assertThat(name).contains("Madara"))
+                    .jsonPath("$.projects[2].project.name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .json("""
                             {
                               "totalPageNumber": 1,
-                              "totalItemNumber": 6,
+                              "totalItemNumber": 3,
                               "hasMore": false,
                               "nextPageIndex": 0,
                               "projects": [
                                 {
-                                  "project": {
-                                    "logoUrl": null
-                                  },
                                   "projectLeads": [
                                     {
-                                      "login": "mehdi",
-                                      "avatarUrl": "https://avatars.githubusercontent.com/u/mehdi"
+                                      "login": "mehdi"
                                     }
                                   ],
-                                  "categories": null,
-                                  "languages": null,
+                                  "categories": [
+                                    {
+                                      "slug": "gaming",
+                                      "name": "Gaming"
+                                    }
+                                  ],
+                                  "languages": [
+                                    {
+                                      "slug": "cairo",
+                                      "name": "Cairo"
+                                    }
+                                  ],
                                   "ecosystems": [
                                     {
-                                      "name": "Starknet ecosystem",
-                                      "slug": "starknet-ecosystem"
+                                      "name": "Ethereum ecosystem"
                                     },
                                     {
-                                      "name": "Ethereum ecosystem",
-                                      "slug": "ethereum-ecosystem"
+                                      "name": "Starknet ecosystem"
+                                    },
+                                    {
+                                      "name": "Universe ecosystem"
                                     }
                                   ],
                                   "programs": [
                                     {
-                                      "name": "Starkware Exploration Team"
+                                      "name": "Ethereum Granting Program"
                                     },
                                     {
-                                      "name": "Ethereum Granting Program"
+                                      "name": "Starkware Exploration Team"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 2005.0,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 1000,
+                                        "prettyAmount": 1000,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 2000,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      },
+                                      {
+                                        "amount": 10,
+                                        "prettyAmount": 10,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 5.0,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.00,
                                   "totalGrantedUsdAmount": {
-                                    "value": 200,
+                                    "value": 2000,
                                     "trend": "UP"
                                   },
                                   "totalRewardedUsdAmount": {
@@ -210,21 +277,19 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   }
                                 },
                                 {
-                                  "project": {
-                                    "logoUrl": null
-                                  },
                                   "projectLeads": [
                                     {
-                                      "login": "hayden",
-                                      "avatarUrl": "https://avatars.githubusercontent.com/u/hayden"
+                                      "login": "hayden"
                                     }
                                   ],
                                   "categories": null,
                                   "languages": null,
                                   "ecosystems": [
                                     {
-                                      "name": "Starknet ecosystem",
-                                      "slug": "starknet-ecosystem"
+                                      "name": "Starknet ecosystem"
+                                    },
+                                    {
+                                      "name": "Universe ecosystem"
                                     }
                                   ],
                                   "programs": [
@@ -232,8 +297,26 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       "name": "Starkware Exploration Team"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 60.0,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 120,
+                                        "prettyAmount": 120,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 60.0,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.00,
                                   "totalGrantedUsdAmount": {
                                     "value": 60.0,
                                     "trend": "UP"
@@ -268,30 +351,80 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   }
                                 },
                                 {
-                                  "project": {
-                                    "logoUrl": null
-                                  },
                                   "projectLeads": [
                                     {
-                                      "login": "pierre",
-                                      "avatarUrl": "https://avatars.githubusercontent.com/u/pierre"
+                                      "login": "pierre"
                                     }
                                   ],
-                                  "categories": null,
-                                  "languages": null,
-                                  "ecosystems": null,
-                                  "programs": [
+                                  "categories": [
                                     {
-                                      "name": "Nethermind"
+                                      "slug": "defi",
+                                      "name": "DeFi"
+                                    }
+                                  ],
+                                  "languages": [
+                                    {
+                                      "slug": "java",
+                                      "name": "Java"
                                     },
                                     {
-                                      "name": "Ethereum Granting Program"
+                                      "slug": "rust",
+                                      "name": "Rust"
+                                    },
+                                    {
+                                      "slug": "typescript",
+                                      "name": "Typescript"
                                     }
                                   ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
+                                  "ecosystems": [
+                                    {
+                                      "name": "Universe ecosystem"
+                                    }
+                                  ],
+                                  "programs": [
+                                    {
+                                      "name": "Ethereum Granting Program"
+                                    },
+                                    {
+                                      "name": "Nethermind"
+                                    }
+                                  ],
+                                  "availableBudget": {
+                                    "totalUsdEquivalent": 92.5,
+                                    "totalPerCurrency": [
+                                      {
+                                        "amount": 25,
+                                        "prettyAmount": 25,
+                                        "currency": {
+                                          "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                          "code": "ETH",
+                                          "name": "Ether",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 50,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      },
+                                      {
+                                        "amount": 85,
+                                        "prettyAmount": 85,
+                                        "currency": {
+                                          "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
+                                          "code": "STRK",
+                                          "name": "StarkNet Token",
+                                          "logoUrl": null,
+                                          "decimals": 18
+                                        },
+                                        "usdEquivalent": 42.5,
+                                        "usdConversionRate": null,
+                                        "ratio": null
+                                      }
+                                    ]
+                                  },
+                                  "percentUsedBudget": 0.08,
                                   "totalGrantedUsdAmount": {
-                                    "value": 250.0,
+                                    "value": 100.0,
                                     "trend": "UP"
                                   },
                                   "totalRewardedUsdAmount": {
@@ -299,7 +432,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "averageRewardUsdAmount": {
-                                    "value": 1.2500000000000000,
+                                    "value": 1.25,
                                     "trend": "UP"
                                   },
                                   "onboardedContributorCount": {
@@ -307,7 +440,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "trend": "UP"
                                   },
                                   "activeContributorCount": {
-                                    "value": 4,
+                                    "value": 3,
                                     "trend": "UP"
                                   },
                                   "mergedPrCount": {
@@ -321,230 +454,117 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "contributionCount": {
                                     "value": 8,
                                     "trend": "UP"
-                                  }
-                                },
-                                {
-                                  "project": {
-                                    "slug": "pacos-project",
-                                    "name": "Paco's project"
-                                  },
-                                  "projectLeads": null,
-                                  "categories": null,
-                                  "languages": [
-                                    {
-                                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                      "slug": "javascript",
-                                      "name": "Javascript",
-                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                    },
-                                    {
-                                      "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                                      "slug": "solidity",
-                                      "name": "Solidity",
-                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                                    }
-                                  ],
-                                  "ecosystems": [
-                                    {
-                                      "id": "ed314d31-f5f2-40e5-9cfc-a962b35c572e",
-                                      "name": "Aztec",
-                                      "url": "https://aztec.network/",
-                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/2431172990485257518.jpg",
-                                      "bannerUrl": null,
-                                      "slug": "aztec"
-                                    },
-                                    {
-                                      "id": "99b6c284-f9bb-4f89-8ce7-03771465ef8e",
-                                      "name": "Starknet",
-                                      "url": "https://www.starknet.io/en",
-                                      "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/12429671188779981103.png",
-                                      "bannerUrl": null,
-                                      "slug": "starknet"
-                                    }
-                                  ],
-                                  "programs": [
-                                    {
-                                      "name": "Theodo"
-                                    },
-                                    {
-                                      "name": "No Sponsor"
-                                    }
-                                  ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
-                                  "totalGrantedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "averageRewardUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "onboardedContributorCount": {
-                                    "value": 1,
-                                    "trend": "DOWN"
-                                  },
-                                  "activeContributorCount": {
-                                    "value": 3,
-                                    "trend": "DOWN"
-                                  },
-                                  "mergedPrCount": {
-                                    "value": 9,
-                                    "trend": "UP"
-                                  },
-                                  "rewardCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "contributionCount": {
-                                    "value": 13,
-                                    "trend": "UP"
-                                  }
-                                },
-                                {
-                                  "project": {
-                                    "logoUrl": null
-                                  },
-                                  "projectLeads": null,
-                                  "categories": null,
-                                  "languages": [
-                                    {
-                                      "id": "1109d0a2-1143-4915-a9c1-69e8be6c1bea",
-                                      "slug": "javascript",
-                                      "name": "Javascript",
-                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-javascript.png",
-                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-javascript.png"
-                                    },
-                                    {
-                                      "id": "d69b6d3e-f583-4c98-92d0-99a56f6f884a",
-                                      "slug": "solidity",
-                                      "name": "Solidity",
-                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-solidity.png",
-                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-solidity.png"
-                                    }
-                                  ],
-                                  "ecosystems": [
-                                    {
-                                      "name": "Starknet",
-                                      "slug": "starknet"
-                                    }
-                                  ],
-                                  "programs": [
-                                    {
-                                      "name": "Theodo"
-                                    },
-                                    {
-                                      "name": "No Sponsor"
-                                    }
-                                  ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
-                                  "totalGrantedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "averageRewardUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "onboardedContributorCount": {
-                                    "value": 1,
-                                    "trend": "UP"
-                                  },
-                                  "activeContributorCount": {
-                                    "value": 3,
-                                    "trend": "DOWN"
-                                  },
-                                  "mergedPrCount": {
-                                    "value": 9,
-                                    "trend": "UP"
-                                  },
-                                  "rewardCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "contributionCount": {
-                                    "value": 13,
-                                    "trend": "UP"
-                                  }
-                                },
-                                {
-                                  "project": {
-                                    "slug": "zero-title-5",
-                                    "name": "Zero title 5"
-                                  },
-                                  "projectLeads": [
-                                    {
-                                      "githubUserId": 595505,
-                                      "login": "ofux",
-                                      "avatarUrl": "https://avatars.githubusercontent.com/u/595505?v=4",
-                                      "id": "e461c019-ba23-4671-9b6c-3a5a18748af9"
-                                    }
-                                  ],
-                                  "categories": null,
-                                  "languages": [
-                                    {
-                                      "id": "ca600cac-0f45-44e9-a6e8-25e21b0c6887",
-                                      "slug": "rust",
-                                      "name": "Rust",
-                                      "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-rust.png",
-                                      "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-rust.png"
-                                    }
-                                  ],
-                                  "ecosystems": null,
-                                  "programs": [
-                                    {
-                                      "name": "No Sponsor"
-                                    }
-                                  ],
-                                  "availableBudget": null,
-                                  "percentUsedBudget": null,
-                                  "totalGrantedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "averageRewardUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "onboardedContributorCount": {
-                                    "value": 2,
-                                    "trend": "UP"
-                                  },
-                                  "activeContributorCount": {
-                                    "value": 5,
-                                    "trend": "DOWN"
-                                  },
-                                  "mergedPrCount": {
-                                    "value": 6,
-                                    "trend": "DOWN"
-                                  },
-                                  "rewardCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "contributionCount": {
-                                    "value": 8,
-                                    "trend": "DOWN"
                                   }
                                 }
                               ]
                             }
                             """);
+        }
+
+        private void test_projects_stats(String queryParam, String value, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {
+            test_projects_stats(Map.of(queryParam, value), asserter, assertNotEmpty);
+        }
+
+        private void test_projects_stats(Map<String, String> queryParamsWithValues, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {
+            final var queryParams = new HashMap<String, String>();
+            queryParams.put("pageIndex", "0");
+            queryParams.put("pageSize", "100");
+            queryParams.put("fromDate", "2021-01-01");
+            queryParams.put("toDate", "2021-01-10");
+            queryParams.put("programOrEcosystemIds", allProgramOrEcosystemIds);
+            queryParams.putAll(queryParamsWithValues);
+            final var response = client.get()
+                    .uri(getApiURI(BI_PROJECTS, queryParams))
+                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(BiProjectsPageResponse.class).returnResult().getResponseBody();
+            if (assertNotEmpty)
+                assertThat(response.getProjects()).isNotEmpty();
+            asserter.accept(response);
+        }
+
+        @Test
+        public void should_get_projects_stats_with_filters() {
+            test_projects_stats("search", "gaming",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
+                            .contains("Gaming")), true
+            );
+            test_projects_stats("search", "eth",
+                    response -> {
+                        assertThat(response.getProjects()).hasSize(2);
+                        assertThat(response.getProjects().get(0).getProject().getName()).contains("Bridge");
+                        assertThat(response.getProjects().get(1).getProject().getName()).contains("OnlyDust");
+                    }, true
+            );
+            test_projects_stats("projectLeadIds", mehdi.userId().toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))
+                            .contains(mehdi.githubUserId().value())), true
+            );
+            test_projects_stats("categoryIds", gaming.id().toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
+                            .contains("Gaming")), true
+            );
+            test_projects_stats("languageIds", "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                    response -> response.getProjects().forEach(project -> assertThat(project.getLanguages().stream().map(LanguageResponse::getName).toList())
+                            .contains("Cairo")), true
+            );
+            test_projects_stats("ecosystemIds", starknet.toString(),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getEcosystems().stream().map(EcosystemLinkResponse::getName).toList())
+                            .contains("Starknet ecosystem")), true
+            );
+            test_projects_stats(Map.of("totalGrantedUsdAmount.gte", "1800", "totalGrantedUsdAmount.lte", "2200"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
+            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "90", "availableBudgetUsdAmount.lte", "95"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getAvailableBudget().getTotalUsdEquivalent())
+                            .isEqualTo(BigDecimal.valueOf(92.5))), true
+            );
+            test_projects_stats(Map.of("percentUsedBudget.gte", "0.01"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getPercentUsedBudget())
+                            .isEqualTo(BigDecimal.valueOf(0.08))), true
+            );
+            test_projects_stats(Map.of("totalGrantedUsdAmount.eq", "2000"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(2000))), true
+            );
+            test_projects_stats(Map.of("totalRewardedUsdAmount.lte", "5"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getTotalRewardedUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(5.0))), true
+            );
+            test_projects_stats(Map.of("averageRewardUsdAmount.gte", "1.25", "averageRewardUsdAmount.lte", "2"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getAverageRewardUsdAmount().getValue())
+                            .isEqualTo(BigDecimal.valueOf(1.25))), true
+            );
+            test_projects_stats(Map.of("onboardedContributorCount.eq", "3"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getOnboardedContributorCount().getValue())
+                            .isEqualTo(3)), true
+            );
+            test_projects_stats(Map.of("activeContributorCount.eq", "1"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getActiveContributorCount().getValue())
+                            .isEqualTo(1)), true
+            );
+            test_projects_stats(Map.of("mergedPrCount.eq", "8"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getMergedPrCount().getValue())
+                            .isEqualTo(8)), true
+            );
+            test_projects_stats(Map.of("rewardCount.eq", "4"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getRewardCount().getValue())
+                            .isEqualTo(4)), true
+            );
+            test_projects_stats(Map.of("contributionCount.eq", "8"),
+                    response -> response.getProjects().forEach(project -> assertThat(project.getContributionCount().getValue())
+                            .isEqualTo(8)), true
+            );
+        }
+
+        @Test
+        public void should_get_projects_stats_ordered() {
+            test_projects_stats(Map.of("sort", "MERGED_PR_COUNT", "sortDirection", "ASC"),
+                    response -> assertThat(response.getProjects()).isSortedAccordingTo(Comparator.comparing(p -> p.getMergedPrCount().getValue())), true
+            );
         }
     }
 }

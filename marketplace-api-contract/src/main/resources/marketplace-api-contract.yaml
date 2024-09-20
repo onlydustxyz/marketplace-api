@@ -63,29 +63,10 @@ paths:
       summary: Get projects BI
       operationId: getBIProjects
       parameters:
-        - $ref: '#/components/parameters/pageIndexParam'
-        - $ref: '#/components/parameters/pageSizeParam'
-        - $ref: '#/components/parameters/sortDirectionParam'
-        - $ref: '#/components/parameters/fromDateParam'
-        - $ref: '#/components/parameters/toDateParam'
-        - $ref: '#/components/parameters/projectLeadIdsParam'
-        - $ref: '#/components/parameters/categoryIdsParam'
-        - $ref: '#/components/parameters/languageIdsParam'
-        - $ref: '#/components/parameters/ecosystemIdsParam'
-        - $ref: '#/components/parameters/availableBudgetUsdAmountParam'
-        - $ref: '#/components/parameters/percentUsedBudgetParam'
-        - $ref: '#/components/parameters/totalGrantedUsdAmountParam'
-        - $ref: '#/components/parameters/averageRewardUsdAmountParam'
-        - $ref: '#/components/parameters/totalRewardedUsdAmountParam'
-        - $ref: '#/components/parameters/onboardedContributorCountParam'
-        - $ref: '#/components/parameters/activeContributorCountParam'
-        - $ref: '#/components/parameters/mergedPrCountParam'
-        - $ref: '#/components/parameters/rewardCountParam'
-        - $ref: '#/components/parameters/contributionCountParam'
-        - name: sort
+        - name: queryParams
           in: query
           schema:
-            $ref: '#/components/schemas/ProjectKpiSortEnum'
+            $ref: '#/components/schemas/BiProjectsQueryParams'
       responses:
         "200":
           description: 'Projects BI page'
@@ -103,21 +84,10 @@ paths:
       summary: Get contributors BI
       operationId: getBIContributors
       parameters:
-        - $ref: '#/components/parameters/pageIndexParam'
-        - $ref: '#/components/parameters/pageSizeParam'
-        - $ref: '#/components/parameters/sortDirectionParam'
-        - $ref: '#/components/parameters/fromDateParam'
-        - $ref: '#/components/parameters/toDateParam'
-        - $ref: '#/components/parameters/timeGroupingParam'
-        - $ref: '#/components/parameters/contributorTypeParam'
-        - $ref: '#/components/parameters/categoryIdsParam'
-        - $ref: '#/components/parameters/languageIdsParam'
-        - $ref: '#/components/parameters/ecosystemIdsParam'
-        - $ref: '#/components/parameters/countryCodesParam'
-        - $ref: '#/components/parameters/totalRewardedUsdAmountParam'
-        - $ref: '#/components/parameters/contributionCountParam'
-        - $ref: '#/components/parameters/mergedPrCountParam'
-        - $ref: '#/components/parameters/rewardCountParam'
+        - name: queryParams
+          in: query
+          schema:
+            $ref: '#/components/schemas/BiContributorsQueryParams'
       responses:
         "200":
           description: 'Contributors BI page'
@@ -4916,52 +4886,6 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/TimeGroupingEnum'
-    contributorTypeParam:
-      name: contributorType
-      in: query
-      required: false
-      schema:
-        $ref: '#/components/schemas/ContributorTypeEnum'
-    projectIdsParam:
-      name: projectIds
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/ProjectId'
-    projectLeadIdsParam:
-      name: projectLeadIds
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/UserId'
-    categoryIdsParam:
-      name: categoryIds
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/ProjectCategoryId'
-    languageIdsParam:
-      name: languageIds
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/LanguageId'
-    ecosystemIdsParam:
-      name: ecosystemIds
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          $ref: '#/components/schemas/EcosystemId'
     programOrEcosystemIdsParam:
       name: programOrEcosystemIds
       in: query
@@ -4971,106 +4895,6 @@ components:
         items:
           type: string
           format: uuid
-    countryCodesParam:
-      name: countryCodes
-      in: query
-      required: false
-      schema:
-        type: array
-        items:
-          type: string
-          format: iso-country-code
-    contributionCountParam:
-      name: contributionCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    prCountParam:
-      name: prCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    issueCountParam:
-      name: issueCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    codeReviewCountParam:
-      name: codeReviewCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    mergedPrCountParam:
-      name: mergedPrCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    rewardCountParam:
-      name: rewardCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    onboardedContributorCountParam:
-      name: onboardedContributorCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    activeContributorCountParam:
-      name: activeContributorCount
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
-    availableBudgetUsdAmountParam:
-      name: availableBudgetUsdAmount
-      in: query
-      required: false
-      example: 'gte,100.0,lte,300.0'
-      schema:
-        $ref: '#/components/schemas/DecimalNumberKpiFilter'
-    totalRewardedUsdAmountParam:
-      name: totalRewardedUsdAmount
-      in: query
-      required: false
-      example: 'gte,100.0,lte,300.0'
-      schema:
-        $ref: '#/components/schemas/DecimalNumberKpiFilter'
-    averageRewardUsdAmountParam:
-      name: averageRewardUsdAmount
-      in: query
-      required: false
-      example: 'gte,100.0,lte,300.0'
-      schema:
-        $ref: '#/components/schemas/DecimalNumberKpiFilter'
-    totalGrantedUsdAmountParam:
-      name: totalGrantedUsdAmount
-      in: query
-      required: false
-      example: 'gte,100.0,lte,300.0'
-      schema:
-        $ref: '#/components/schemas/DecimalNumberKpiFilter'
-    percentUsedBudgetParam:
-      name: percentUsedBudget
-      in: query
-      required: false
-      example: 'gte,100,lte,300'
-      schema:
-        $ref: '#/components/schemas/NumberKpiFilter'
 
 
   responses:
@@ -10838,6 +10662,79 @@ components:
         churnedProjectCount:
           type: integer
 
+
+    FromDateParam:
+      type: string
+      pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+
+    ToDateParam:
+      type: string
+      pattern: '^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$'
+
+    BiProjectsQueryParams:
+      type: object
+      required:
+        - pageIndex
+        - pageSize
+      properties:
+        pageIndex:
+          type: integer
+          default: 0
+        pageSize:
+          type: integer
+          default: 5
+        sort:
+          $ref: '#/components/schemas/ProjectKpiSortEnum'
+        sortDirection:
+          $ref: '#/components/schemas/SortDirection'
+        fromDate:
+          $ref: '#/components/schemas/FromDateParam'
+        toDate:
+          $ref: '#/components/schemas/ToDateParam'
+        programOrEcosystemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        search:
+          type: string
+        projectLeadIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserId'
+        categoryIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryId'
+        languageIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageId'
+        ecosystemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemId'
+        availableBudgetUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        percentUsedBudget:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        totalGrantedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        averageRewardUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        totalRewardedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        onboardedContributorCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        activeContributorCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        mergedPrCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        rewardCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        contributionCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+
     BiProjectsPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -10913,6 +10810,59 @@ components:
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
 
+
+    BiContributorsQueryParams:
+      type: object
+      required:
+        - pageIndex
+        - pageSize
+      properties:
+        pageIndex:
+          type: integer
+          default: 0
+        pageSize:
+          type: integer
+          default: 5
+        sortDirection:
+          $ref: '#/components/schemas/SortDirection'
+        fromDate:
+          $ref: '#/components/schemas/FromDateParam'
+        toDate:
+          $ref: '#/components/schemas/ToDateParam'
+        programOrEcosystemIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        search:
+          type: string
+        contributorType:
+          $ref: '#/components/schemas/ContributorTypeEnum'
+        categoryIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectCategoryId'
+        languageIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageId'
+        ecosystemIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/EcosystemId'
+        countryCodes:
+          type: array
+          items:
+            type: string
+            format: iso-country-code
+        totalRewardedUsdAmount:
+          $ref: '#/components/schemas/DecimalNumberKpiFilter'
+        contributionCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        mergedPrCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        rewardCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
 
     BiContributorsPageResponse:
       allOf:

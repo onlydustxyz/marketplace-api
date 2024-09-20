@@ -20,51 +20,54 @@ public class AggregatedProjectKpisReadRepository {
     @Language("PostgreSQL")
     private final static String SELECT_QUERY = """
             WITH aggregated_project_stats AS
-                     (SELECT d.%s_timestamp                                                                               as timestamp,
+                     (SELECT d.#timeGrouping#_timestamp                                                                               as timestamp,
                              count(distinct d.project_id)                                                                 as active_project_count,
             
                              count(distinct d.project_id)
                              filter (where previous.timestamp is null)                                                    as new_project_count,
             
                              count(distinct d.project_id)
-                             filter (where previous.timestamp < d.%s_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_project_count,
+                             filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_project_count,
             
                              count(distinct d.contribution_id)
-                             filter ( where d.is_merged_pr )                                                              as merged_pr_count
-                      from bi.contribution_data_cross_projects d
-                               left join lateral ( select max(previous.%s_timestamp) as timestamp
-                                                   from bi.contribution_data_cross_projects previous
+                             filter ( where d.is_merged_pr = 1 )                                                              as merged_pr_count
+                      from bi.contribution_data d
+                               join bi.project_global_data p on d.project_id = p.project_id
+                               left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
+                                                   from bi.contribution_data previous
+                                                        join bi.project_global_data p on previous.project_id = p.project_id
                                                    where previous.project_id = d.project_id
-                                                     and previous.%s_timestamp < d.%s_timestamp
+                                                     and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
                                                      and (coalesce(:programOrEcosystemIds) is null
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.program_ids
-                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.ecosystem_ids)) previous on true
+                                                       or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
+                                                       or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)) previous on true
                       where
                         -- We need to get one interval before fromDate to calculate churned project count
-                          d.%s_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
-                        and d.%s_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
+                          d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
+                        and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                          or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
+                          or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_rewards_stats AS
-                     (SELECT d.%s_timestamp    as timestamp,
+                     (SELECT d.#timeGrouping#_timestamp    as timestamp,
                              sum(d.usd_amount) as total_rewarded_usd_amount
                       from bi.reward_data d
-                      where d.%s_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
-                        and d.%s_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
+                            join bi.project_global_data p on d.project_id = p.project_id
+                      where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
+                        and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
+                          or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
+                          or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_grants_stats AS
-                     (SELECT date_trunc(:timeGrouping, d.day_timestamp) as timestamp,
-                             sum(d.usd_amount)                          as total_granted_usd_amount
-                      from bi.daily_project_grants d
-                      where d.day_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
-                        and d.day_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
+                     (SELECT d.#timeGrouping#_timestamp    as timestamp,
+                             sum(d.usd_amount) as total_granted_usd_amount
+                      from bi.project_grants_data d
+                      where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
+                        and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null or d.program_id = any (cast(:programOrEcosystemIds as uuid[])))
                       group by 1),
             
@@ -99,9 +102,8 @@ public class AggregatedProjectKpisReadRepository {
                                                          @NonNull ZonedDateTime toDate,
                                                          UUID[] programOrEcosystemIds) {
         final var timestampColumnPrefix = timeGrouping.name().toLowerCase();
-        final var query = entityManager.createNativeQuery(String.format(SELECT_QUERY, timestampColumnPrefix, timestampColumnPrefix, timestampColumnPrefix,
-                timestampColumnPrefix, timestampColumnPrefix, timestampColumnPrefix, timestampColumnPrefix, timestampColumnPrefix, timestampColumnPrefix,
-                timestampColumnPrefix), AggregatedProjectKpisReadEntity.class);
+        final var query = entityManager.createNativeQuery(SELECT_QUERY.replaceAll("#timeGrouping#", timestampColumnPrefix),
+                AggregatedProjectKpisReadEntity.class);
         query.setParameter("timeGrouping", timeGrouping.name());
         query.setParameter("timeGroupingInterval", timeGroupingInterval);
         query.setParameter("fromDate", fromDate);

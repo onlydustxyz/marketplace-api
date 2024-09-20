@@ -45,10 +45,4 @@ public class PostgresLanguageAdapter implements LanguageStorage {
         languageExtensionRepository.findAllIndexed().forEach(e -> knownExtensions.putIfAbsent(e, Optional.empty()));
         return knownExtensions;
     }
-
-    @Override
-    @Transactional
-    public void updateProjectsLanguages() {
-        languageRepository.updateProjectLanguages();
-    }
 }

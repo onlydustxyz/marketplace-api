@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -106,6 +107,10 @@ public class GithubHelper {
     }
 
     public void createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
+        createPullRequest(repo, contributor, null);
+    }
+
+    public void createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
         final var prNumber = faker.random().nextInt(1000);
         final var parameters = new HashMap<String, Object>();
         parameters.put("id", faker.random().hex());
@@ -125,6 +130,7 @@ public class GithubHelper {
         parameters.put("contributorLogin", contributor.user().getGithubLogin());
         parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
         parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
+        parameters.put("mainFileExtensions", mainFileExtensions == null ? null : mainFileExtensions.toArray(String[]::new));
 
         databaseHelper.executeQuery("""
                 insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
@@ -134,8 +140,8 @@ public class GithubHelper {
                 insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count)
                 values (:prId, :repoId, :githubNumber, :githubTitle, 'MERGED', :createdAt, :completedAt, :completedAt, :contributorId, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', 1);
                 
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state) 
-                values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED') 
+                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', :mainFileExtensions);
                 """, parameters);
     }
 
