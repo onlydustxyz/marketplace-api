@@ -117,7 +117,7 @@ public class BackOfficeEcosystemsApiIT extends AbstractMarketplaceBackOfficeApiI
         final EcosystemRequest ecosystemRequest = new EcosystemRequest()
                 .logoUrl(faker.internet().url())
                 .url(faker.internet().url())
-                .name(faker.rickAndMorty().character())
+                .name("Z" + faker.rickAndMorty().character())
                 .description(faker.rickAndMorty().quote())
                 .hidden(false);
 
