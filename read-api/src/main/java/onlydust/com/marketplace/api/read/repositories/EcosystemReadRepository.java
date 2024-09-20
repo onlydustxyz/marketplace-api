@@ -30,8 +30,8 @@ public interface EcosystemReadRepository extends Repository<EcosystemReadEntity,
     @Query("""
             SELECT e
             FROM EcosystemReadEntity e
-            JOIN FETCH e.mdBanner
-            JOIN FETCH e.xlBanner
+            LEFT JOIN FETCH e.mdBanner
+            LEFT JOIN FETCH e.xlBanner
             WHERE (:hidden IS NULL OR e.hidden = :hidden)
             """)
     Page<EcosystemReadEntity> findAll(Boolean hidden, Pageable pageable);
