@@ -112,6 +112,11 @@ public class RewardStatusUpdater implements AccountingObserverPort, BillingProfi
     }
 
     @Override
+    public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        
+    }
+
+    @Override
     public void onBillingProfileExternalVerificationRequested(@NonNull BillingProfileChildrenKycVerification billingProfileChildrenKycVerification) {
     }
 }

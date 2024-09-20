@@ -5,6 +5,7 @@ import onlydust.com.marketplace.accounting.domain.model.Currency;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 
 import java.math.BigDecimal;
@@ -18,4 +19,6 @@ public interface ProjectServicePort {
     void onDepositRejected(@NonNull Deposit.Id id, @NonNull SponsorId sponsorId, BigDecimal amount, Currency.Id currencyId, ZonedDateTime timestamp);
 
     void onDepositApproved(@NonNull Deposit.Id id, @NonNull SponsorId sponsorId, BigDecimal amount, Currency.Id currencyId, ZonedDateTime timestamp);
+
+    void onFundsRefundedByProject(@NonNull ProgramId programId, @NonNull ProjectId projectId, @NonNull PositiveAmount amount, @NonNull Currency.Id currencyId);
 }

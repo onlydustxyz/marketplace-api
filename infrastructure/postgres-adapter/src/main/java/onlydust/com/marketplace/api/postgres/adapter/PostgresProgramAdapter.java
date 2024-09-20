@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.postgres.adapter;
 
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.ProgramLeadEntity;
 import onlydust.com.marketplace.api.postgres.adapter.entity.write.old.ProgramEntity;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProgramLeadRepository;
@@ -12,6 +13,7 @@ import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.port.output.ProgramStoragePort;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -51,5 +53,13 @@ public class PostgresProgramAdapter implements ProgramStoragePort {
     public Optional<Program> findById(ProgramId programId) {
         return programRepository.findById(programId.value())
                 .map(ProgramEntity::toDomain);
+    }
+
+    @Override
+    public List<UserId> findProgramLeads(@NonNull ProgramId programId) {
+        return programLeadRepository.findByProgramId(programId.value()).stream()
+                .map(ProgramLeadEntity::userId)
+                .map(UserId::of)
+                .toList();
     }
 }

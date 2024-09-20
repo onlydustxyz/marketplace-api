@@ -69,6 +69,19 @@ public class ProjectNotifier implements CommitteeObserverPort, ProgramObserverPo
     }
 
     @Override
+    public void onFundsRefundedByProject(@NonNull ProgramId programId, @NonNull ProjectId projectId, @NonNull BigDecimal amount, @NonNull UUID currencyId) {
+        final var programLeads = programStoragePort.findProgramLeads(programId);
+
+        programLeads.forEach(leadId -> notificationPort.push(leadId,
+                FundsUngrantedFromProject.builder()
+                        .programId(programId)
+                        .projectId(projectId)
+                        .amount(amount)
+                        .currencyId(currencyId)
+                        .build()));
+    }
+
+    @Override
     public void onDepositRejected(@NonNull UUID depositId, @NonNull SponsorId sponsorId, @NonNull BigDecimal amount, @NonNull UUID currencyId,
                                   @NonNull ZonedDateTime timestamp) {
         final var sponsorLeads = sponsorStoragePort.findSponsorLeads(sponsorId);

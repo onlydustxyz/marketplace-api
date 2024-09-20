@@ -26,4 +26,11 @@ public interface ProgramLeadRepository extends JpaRepository<ProgramLeadEntity, 
               and p.slug = :projectSlug
             """, nativeQuery = true)
     Optional<ProgramLeadEntity> findByProjectSlug(UUID userId, String projectSlug);
+
+    @Query(value = """
+            select pl.*
+            from program_leads pl
+            where pl.program_id = :programId
+            """, nativeQuery = true)
+    Optional<ProgramLeadEntity> findByProgramId(UUID programId);
 }

@@ -78,6 +78,7 @@ infrastructure:
     funds-unallocated-from-program-email-id: 110
     deposit-approved-email-id: 120
     deposit-rejected-email-id: 130
+    funds-ungranted-from-project-email-id: 140
     marketing-topic-id: 3
   block-explorer:
     environment: mainnet

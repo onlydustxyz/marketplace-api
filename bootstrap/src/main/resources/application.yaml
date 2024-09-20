@@ -201,6 +201,7 @@ infrastructure:
     issue-created-email-id: ${CUSTOMER_IO_ISSUE_CREATED_EMAIL_ID}
     funds-allocated-to-program-email-id: ${CUSTOMER_IO_FUNDS_ALLOCATED_TO_PROGRAM_EMAIL_ID}
     funds-unallocated-from-program-email-id: ${CUSTOMER_IO_FUNDS_UNALLOCATED_FROM_PROGRAM_EMAIL_ID}
+    funds-ungranted-from-project-email-id: ${CUSTOMER_IO_FUNDS_UNGRANTED_FROM_PROJECT_EMAIL_ID}
     deposit-approved-email-id: ${CUSTOMER_IO_DEPOSIT_APPROVED_EMAIL_ID}
     deposit-rejected-email-id: ${CUSTOMER_IO_DEPOSIT_REJECTED_EMAIL_ID}
     tracking-api-key: ${CUSTOMER_IO_TRACKING_API_KEY}

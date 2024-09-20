@@ -143,6 +143,12 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .timestamp(ZonedDateTime.of(2023, 3, 2, 0, 0, 0, 0, UTC))
                 .depositId(UUID.fromString("a216c7ad-1875-49a2-a8a8-c65b2d6d06aa"))
                 .build());
+        notificationService.push(hayden.userId(), FundsUngrantedFromProject.builder()
+                .amount(BigDecimal.valueOf(99))
+                .currencyId(CurrencyHelper.STRK.value())
+                .programId(program.id())
+                .projectId(bretzel)
+                .build());
 
         // When
         client.get()
@@ -161,13 +167,47 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                           ".id").isEqualTo(sponsor.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.program.id").isEqualTo(program.id().toString())
                 .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM')].data.programLeadFundsAllocatedToProgram.sponsor.id").isEqualTo(sponsor.id().toString())
+                .jsonPath("$.notifications[?(@.type == 'PROGRAM_LEAD_FUNDS_UNGRANTED_FROM_PROJECT')].data.programLeadFundsUngrantedFromProject.program.id").isEqualTo(program.id().toString())
+                .consumeWith(System.out::println)
                 .json("""
                         {
                           "totalPageNumber": 1,
-                          "totalItemNumber": 15,
+                          "totalItemNumber": 16,
                           "hasMore": false,
                           "nextPageIndex": 0,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "PROGRAM_LEAD_FUNDS_UNGRANTED_FROM_PROJECT",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": null,
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUngrantedFromProject": {
+                                  "project": {
+                                    "id": "7d04163c-4187-4313-8066-61504d34fc56",
+                                    "slug": "bretzel",
+                                    "name": "Bretzel",
+                                    "logoUrl": "https://onlydust-app-images.s3.eu-west-1.amazonaws.com/5003677688814069549.png"
+                                  },
+                                  "amount": 99,
+                                  "currencyCode": "STRK"
+                                },
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "SPONSOR_LEAD_DEPOSIT_APPROVED",
@@ -579,10 +619,36 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .json("""
                         {
                           "totalPageNumber": 2,
-                          "totalItemNumber": 5,
+                          "totalItemNumber": 6,
                           "hasMore": false,
                           "nextPageIndex": 1,
                           "notifications": [
+                            {
+                              "status": "UNREAD",
+                              "type": "CONTRIBUTOR_REWARDS_PAID",
+                              "data": {
+                                "maintainerApplicationToReview": null,
+                                "maintainerCommitteeApplicationCreated": null,
+                                "contributorInvoiceRejected": null,
+                                "contributorRewardCanceled": null,
+                                "contributorRewardReceived": null,
+                                "contributorRewardsPaid": {
+                                  "numberOfRewardPaid": 2,
+                                  "totalAmountDollarsEquivalent": 49.0
+                                },
+                                "contributorProjectApplicationAccepted": null,
+                                "contributorProjectApplicationRefused": null,
+                                "contributorProjectGoodFirstIssueCreated": null,
+                                "globalBillingProfileReminder": null,
+                                "globalBillingProfileVerificationRejected": null,
+                                "globalBillingProfileVerificationClosed": null,
+                                "programLeadFundsAllocatedToProgram": null,
+                                "programLeadFundsUngrantedFromProject": null,
+                                "sponsorLeadFundsUnallocatedFromProgram": null,
+                                "sponsorLeadDepositApproved": null,
+                                "sponsorLeadDepositRejected": null
+                              }
+                            },
                             {
                               "status": "UNREAD",
                               "type": "CONTRIBUTOR_REWARD_RECEIVED",
@@ -755,7 +821,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 15
+                              "count": 16
                             }
                         """);
 
@@ -770,7 +836,7 @@ public class MeNotificationsIT extends AbstractMarketplaceApiIT {
                 .expectBody()
                 .json("""
                             {
-                              "count": 15
+                              "count": 16
                             }
                         """);
 

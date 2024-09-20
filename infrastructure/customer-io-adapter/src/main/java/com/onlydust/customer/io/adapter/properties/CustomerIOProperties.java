@@ -46,6 +46,8 @@ public class CustomerIOProperties {
     @NonNull
     Integer fundsUnallocatedFromProgramEmailId;
     @NonNull
+    Integer fundsUngrantedFromProjectEmailId;
+    @NonNull
     Integer depositApprovedEmailId;
     @NonNull
     Integer depositRejectedEmailId;

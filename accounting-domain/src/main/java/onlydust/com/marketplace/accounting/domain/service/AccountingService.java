@@ -102,7 +102,6 @@ public class AccountingService implements AccountingFacadePort {
     @Override
     public void grant(ProgramId from, ProjectId to, PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = transfer(from, to, amount, currencyId);
-
         onAllowanceUpdated(to, currencyId, accountBookState);
     }
 
@@ -110,6 +109,7 @@ public class AccountingService implements AccountingFacadePort {
     public void ungrant(ProjectId from, ProgramId to, @NonNull PositiveAmount amount, Currency.Id currencyId) {
         final var accountBookState = refund(from, to, amount, currencyId);
         onAllowanceUpdated(from, currencyId, accountBookState);
+        accountingObserver.onFundsRefundedByProject(from, to, amount, currencyId);
     }
 
     @Override

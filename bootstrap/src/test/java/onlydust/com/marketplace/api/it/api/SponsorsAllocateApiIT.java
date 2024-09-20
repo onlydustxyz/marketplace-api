@@ -101,7 +101,7 @@ public class SponsorsAllocateApiIT extends AbstractMarketplaceApiIT {
                         .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Allocation returned from program")))
                         .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("An allocation has been returned to you from a program. The " +
                                                                                                  "funds have been credited back to your account. You can " +
-                                                                                                 "review the details of this transaction dashboard."))))
+                                                                                                 "review the details of this transaction on your dashboard."))))
                         .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review transaction details")))
                         .withRequestBody(matchingJsonPath("$.message_data.button.link",
                                 equalTo("https://develop-admin.onlydust.com/financials/%s".formatted(sponsorId))))

@@ -204,6 +204,19 @@ public record MailDTO<MessageData>(@NonNull @JsonProperty("transactional_message
                 dto);
     }
 
+
+    public static MailDTO<FundsUngrantedFromProjectDTO> from(@NonNull CustomerIOProperties customerIOProperties,
+                                                             @NonNull SendableNotification notification,
+                                                             @NonNull FundsUngrantedFromProject fundsUngrantedFromProject) {
+        final var dto = FundsUngrantedFromProjectDTO.from(notification.recipient().login(), fundsUngrantedFromProject,
+                customerIOProperties.getEnvironment());
+        return new MailDTO<>(customerIOProperties.getFundsUngrantedFromProjectEmailId().toString(),
+                mapIdentifiers(notification.recipient()),
+                notification.recipient().email(),
+                dto.title(),
+                dto);
+    }
+
     public static MailDTO<DepositApprovedDTO> from(@NonNull CustomerIOProperties customerIOProperties,
                                                    @NonNull SendableNotification notification,
                                                    @NonNull DepositApproved depositApproved) {

@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.bo;
 
 import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import onlydust.com.backoffice.api.contract.model.CreateAccountRequest;
 import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.Invoice;
@@ -33,6 +34,7 @@ import onlydust.com.marketplace.kernel.model.blockchain.StarkNet;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.notification.FundsAllocatedToProgram;
+import onlydust.com.marketplace.project.domain.model.notification.FundsUngrantedFromProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -45,12 +47,14 @@ import java.net.URL;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.backoffice.api.contract.model.BillingProfileType.INDIVIDUAL;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -96,6 +100,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
 
     UserAuthHelper.AuthenticatedBackofficeUser camille;
     Program program;
+    UserAuthHelper.AuthenticatedUser programLead;
 
     @BeforeEach
     void setup() {
@@ -105,9 +110,11 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         sponsorAccountRepository.deleteAll();
         accountBookProvider.evictAll();
         camille = userAuthHelper.authenticateCamille();
-        program = programHelper.create(sponsorHelper.create().id(), userAuthHelper.authenticateOlivier());
+        programLead = userAuthHelper.authenticateOlivier();
+        program = programHelper.create(sponsorHelper.create().id(), programLead);
     }
 
+    @SneakyThrows
     @Test
     void should_allocate_budget_to_program_and_get_refunded_of_unspent_budget() {
         // When
@@ -130,6 +137,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         reset(notificationPort);
         accountingHelper.allocate(COCA_COLAX, program.id(), 90, STRK);
         accountingHelper.grant(program.id(), BRETZEL, 80, STRK);
+        verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
 
         // When
         client.post()
@@ -147,7 +155,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isNoContent();
-        verify(notificationPort).push(any(), any(FundsAllocatedToProgram.class));
+        verify(notificationPort).push(any(), any(FundsUngrantedFromProject.class));
 
         // When
         client.post()
@@ -165,6 +173,25 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
                 .exchange()
                 .expectStatus()
                 .isNoContent();
+
+        Thread.sleep(200);
+        customerIOWireMockServer.verify(1,
+                postRequestedFor(urlEqualTo("/send/email"))
+                        .withHeader("Content-Type", equalTo("application/json"))
+                        .withHeader("Authorization", equalTo("Bearer %s".formatted(customerIOProperties.getApiKey())))
+                        .withRequestBody(matchingJsonPath("$.transactional_message_id",
+                                equalTo(customerIOProperties.getFundsUngrantedFromProjectEmailId().toString())))
+                        .withRequestBody(matchingJsonPath("$.identifiers.id", equalTo(programLead.userId().toString())))
+                        .withRequestBody(matchingJsonPath("$.message_data.username", equalTo("ofux")))
+                        .withRequestBody(matchingJsonPath("$.message_data.title", equalTo("Grant returned from project")))
+                        .withRequestBody(matchingJsonPath("$.message_data.description", equalTo(("A grant has been returned to you from a project. The " +
+                                                                                                 "funds have been credited back to your account. You can " +
+                                                                                                 "review the details of this transaction on your dashboard."))))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.text", equalTo("Review transaction details")))
+                        .withRequestBody(matchingJsonPath("$.message_data.button.link",
+                                equalTo("https://develop-admin.onlydust.com/programs/%s".formatted(program.id()))))
+                        .withRequestBody(matchingJsonPath("$.to", equalTo("abuisset@gmail.com")))
+                        .withRequestBody(matchingJsonPath("$.subject", equalTo("Grant returned from project"))));
     }
 
     @Test
@@ -191,7 +218,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -373,7 +400,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, USDC);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));
@@ -533,7 +560,7 @@ public class BackOfficeAccountingApiIT extends AbstractMarketplaceBackOfficeApiI
         accountingHelper.grant(program.id(), KAAPER, 100, APT);
 
         indexerApiWireMockServer.stubFor(WireMock.put(
-                        WireMock.urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
+                        urlEqualTo("/api/v1/users/%d".formatted(ofux.user().getGithubUserId())))
                 .withHeader("Content-Type", equalTo("application/json"))
                 .withHeader("Api-Key", equalTo("some-indexer-api-key"))
                 .willReturn(ResponseDefinitionBuilder.okForEmptyJson()));

@@ -10447,6 +10447,8 @@ components:
               $ref: '#/components/schemas/NotificationGlobalBillingProfileVerificationClosed'
             programLeadFundsAllocatedToProgram:
               $ref: '#/components/schemas/NotificationProgramLeadFundsAllocatedToProgram'
+            programLeadFundsUngrantedFromProject:
+              $ref: '#/components/schemas/NotificationProgramLeadFundsUngrantedFromProject'
             sponsorLeadFundsUnallocatedFromProgram:
               $ref: '#/components/schemas/NotificationSponsorLeadFundsUnallocatedFromProgram'
             sponsorLeadDepositApproved:
@@ -10484,6 +10486,7 @@ components:
         - GLOBAL_BILLING_PROFILE_VERIFICATION_REJECTED
         - GLOBAL_BILLING_PROFILE_VERIFICATION_CLOSED
         - PROGRAM_LEAD_FUNDS_ALLOCATED_TO_PROGRAM
+        - PROGRAM_LEAD_FUNDS_UNGRANTED_FROM_PROJECT
         - SPONSOR_LEAD_FUNDS_UNALLOCATED_FROM_PROGRAM
         - SPONSOR_LEAD_DEPOSIT_APPROVED
         - SPONSOR_LEAD_DEPOSIT_REJECTED
@@ -10692,6 +10695,23 @@ components:
           $ref: '#/components/schemas/ProgramLinkResponse'
         sponsor:
           $ref: '#/components/schemas/SponsorLinkResponse'
+        amount:
+          type: number
+        currencyCode:
+          type: string
+
+    NotificationProgramLeadFundsUngrantedFromProject:
+      type: object
+      required:
+        - program
+        - project
+        - amount
+        - currencyCode
+      properties:
+        program:
+          $ref: '#/components/schemas/ProgramLinkResponse'
+        project:
+          $ref: '#/components/schemas/ProjectLinkResponse'
         amount:
           type: number
         currencyCode:

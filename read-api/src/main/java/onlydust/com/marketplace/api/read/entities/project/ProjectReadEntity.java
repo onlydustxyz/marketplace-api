@@ -290,4 +290,12 @@ public class ProjectReadEntity {
                                 .amount(s.totalAvailable()))
                         .toList());
     }
+
+    public ProjectLinkResponse toLinkResponse() {
+        return new ProjectLinkResponse()
+                .id(id)
+                .name(name)
+                .slug(slug)
+                .logoUrl(logoUrl);
+    }
 }

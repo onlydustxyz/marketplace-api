@@ -6,10 +6,7 @@ import onlydust.com.marketplace.accounting.domain.notification.dto.ShortReward;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
-import onlydust.com.marketplace.api.read.repositories.CurrencyReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProjectLinkReadRepository;
-import onlydust.com.marketplace.api.read.repositories.SponsorReadRepository;
+import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.project.domain.model.notification.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +19,7 @@ public class NotificationMapper {
     final ProjectLinkReadRepository projectLinkReadRepository;
     final SponsorReadRepository sponsorReadRepository;
     final ProgramReadRepository programReadRepository;
+    final ProjectReadRepository projectReadRepository;
     final CurrencyReadRepository currencyReadRepository;
 
     public NotificationPageItemResponse toNotificationPageItemResponse(final NotificationReadEntity entity) {
@@ -57,6 +55,8 @@ public class NotificationMapper {
             notificationType = map(fundsAllocatedToProgram, responseData);
         } else if (notification instanceof FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
             notificationType = map(fundsUnallocatedFromProgram, responseData);
+        } else if (notification instanceof FundsUngrantedFromProject fundsUngrantedFromProject) {
+            notificationType = map(fundsUngrantedFromProject, responseData);
         } else if (notification instanceof DepositRejected depositRejected) {
             notificationType = map(depositRejected, responseData);
         } else if (notification instanceof DepositApproved depositApproved) {
@@ -143,6 +143,26 @@ public class NotificationMapper {
                 program.toLinkResponse(),
                 sponsor.toLinkResponse(),
                 fundsAllocatedToProgram.amount(),
+                currency.code()
+        ));
+        return notificationType;
+    }
+
+    private @NotNull NotificationType map(FundsUngrantedFromProject fundsUngrantedFromProject,
+                                          NotificationPageItemResponseData notificationPageItemResponseData) {
+        NotificationType notificationType;
+        notificationType = NotificationType.PROGRAM_LEAD_FUNDS_UNGRANTED_FROM_PROJECT;
+        final var program = programReadRepository.findById(fundsUngrantedFromProject.programId().value())
+                .orElseThrow(() -> internalServerError("Program %s doesn't exist".formatted(fundsUngrantedFromProject.programId())));
+        final var project = projectReadRepository.findById(fundsUngrantedFromProject.projectId().value())
+                .orElseThrow(() -> internalServerError("Project %s doesn't exist".formatted(fundsUngrantedFromProject.projectId())));
+        final var currency = currencyReadRepository.findById(fundsUngrantedFromProject.currencyId())
+                .orElseThrow(() -> internalServerError("Currency %s doesn't exist".formatted(fundsUngrantedFromProject.currencyId())));
+
+        notificationPageItemResponseData.setProgramLeadFundsUngrantedFromProject(new NotificationProgramLeadFundsUngrantedFromProject(
+                program.toLinkResponse(),
+                project.toLinkResponse(),
+                fundsUngrantedFromProject.amount(),
                 currency.code()
         ));
         return notificationType;
