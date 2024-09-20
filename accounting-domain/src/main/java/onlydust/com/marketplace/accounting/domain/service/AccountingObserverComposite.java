@@ -65,4 +65,9 @@ public class AccountingObserverComposite implements AccountingObserverPort {
     public void onFundsRefundedByProgram(ProgramId from, SponsorId to, PositiveAmount amount, Currency.Id currencyId) {
         observers.forEach(o -> o.onFundsRefundedByProgram(from, to, amount, currencyId));
     }
+
+    @Override
+    public void onFundsRefundedByProject(ProjectId from, ProgramId to, PositiveAmount amount, Currency.Id currencyId) {
+        observers.forEach(o -> o.onFundsRefundedByProject(from, to, amount, currencyId));
+    }
 }

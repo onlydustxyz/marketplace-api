@@ -7,6 +7,7 @@ import onlydust.com.marketplace.accounting.domain.model.Deposit;
 import onlydust.com.marketplace.accounting.domain.model.PositiveAmount;
 import onlydust.com.marketplace.accounting.domain.port.out.ProjectServicePort;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.ProjectNotifier;
 
@@ -49,5 +50,13 @@ public class ProjectServiceAdapter implements ProjectServicePort {
                                   @NonNull Currency.Id currencyId,
                                   @NonNull ZonedDateTime timestamp) {
         projectNotifier.onDepositApproved(id.value(), sponsorId, amount, currencyId.value(), timestamp);
+    }
+
+    @Override
+    public void onFundsRefundedByProject(@NonNull ProgramId programId,
+                                         @NonNull ProjectId projectId,
+                                         @NonNull PositiveAmount amount,
+                                         @NonNull Currency.Id currencyId) {
+        projectNotifier.onFundsRefundedByProject(programId, projectId, amount.getValue(), currencyId.value());
     }
 }

@@ -26,12 +26,14 @@ public class ReadApiConfiguration {
             final ProjectLinkReadRepository projectLinkReadRepository,
             final SponsorReadRepository sponsorReadRepository,
             final ProgramReadRepository programReadRepository,
+            final ProjectReadRepository projectReadRepository,
             final CurrencyReadRepository currencyReadRepository
     ) {
         return new NotificationMapper(
                 projectLinkReadRepository,
                 sponsorReadRepository,
                 programReadRepository,
+                projectReadRepository,
                 currencyReadRepository
         );
     }

@@ -61,6 +61,8 @@ public class CustomerIOAdapter implements NotificationSender, EmailStoragePort, 
             sendEmail(MailDTO.from(customerIOProperties, notification, fundsAllocatedToProgram));
         } else if (notification.data() instanceof FundsUnallocatedFromProgram fundsUnallocatedFromProgram) {
             sendEmail(MailDTO.from(customerIOProperties, notification, fundsUnallocatedFromProgram));
+        } else if (notification.data() instanceof FundsUngrantedFromProject fundsUngrantedFromProject) {
+            sendEmail(MailDTO.from(customerIOProperties, notification, fundsUngrantedFromProject));
         } else if (notification.data() instanceof DepositRejected depositRejected) {
             sendEmail(MailDTO.from(customerIOProperties, notification, depositRejected));
         } else if (notification.data() instanceof DepositApproved depositApproved) {

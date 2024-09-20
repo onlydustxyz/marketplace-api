@@ -11,7 +11,7 @@ public record FundsUnallocatedFromProgramDTO(
 ) {
 
     private static final String DESCRIPTION = "An allocation has been returned to you from a program. The funds have been credited back to your account. " +
-                                              "You can review the details of this transaction dashboard.";
+                                              "You can review the details of this transaction on your dashboard.";
 
     public static FundsUnallocatedFromProgramDTO from(final String recipientLogin, final FundsUnallocatedFromProgram fundsUnallocatedFromProgram,
                                                       final String environment) {
