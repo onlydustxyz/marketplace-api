@@ -30,5 +30,7 @@ public class ProgramStatReadEntity {
 
     int grantedProjectCount;
 
-    int userCountOfGrantedProjects;
+    int userCount;
+
+    int rewardCount;
 }

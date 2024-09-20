@@ -94,7 +94,10 @@ public class ProgramReadEntity {
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
-                .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
+                .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded))
+                .projectCount(stats.grantedProjectCount())
+                .contributorCount(stats.userCount())
+                .rewardCount(stats.rewardCount());
     }
 
     public ProgramPageItemResponse toPageItemResponse() {
@@ -143,7 +146,7 @@ public class ProgramReadEntity {
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
                 .projectCount(stats.grantedProjectCount())
-                .userCount(stats.userCountOfGrantedProjects())
+                .userCount(stats.userCount())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));

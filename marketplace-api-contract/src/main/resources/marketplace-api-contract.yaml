@@ -6421,6 +6421,9 @@ components:
             - totalAvailable
             - totalGranted
             - totalRewarded
+            - projectCount
+            - contributorCount
+            - rewardCount
           properties:
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
@@ -6428,6 +6431,12 @@ components:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalRewarded:
               $ref: '#/components/schemas/DetailedTotalMoney'
+            projectCount:
+              type: integer
+            contributorCount:
+              type: integer
+            rewardCount:
+              type: integer
 
     ProgramTransactionStatListResponse:
       type: object

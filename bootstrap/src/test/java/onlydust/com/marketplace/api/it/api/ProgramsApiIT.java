@@ -276,6 +276,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.totalGranted.totalPerCurrency").isEmpty()
                     .jsonPath("$.totalRewarded.totalUsdEquivalent").isEqualTo(0)
                     .jsonPath("$.totalRewarded.totalPerCurrency").isEmpty()
+                    .jsonPath("$.projectCount").isEqualTo(0)
+                    .jsonPath("$.contributorCount").isEqualTo(0)
+                    .jsonPath("$.rewardCount").isEqualTo(0)
             ;
 
             // When
@@ -580,7 +583,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                         "ratio": 7
                                       }
                                     ]
-                                  }
+                                  },
+                                  "projectCount": 2,
+                                  "contributorCount": 1,
+                                  "rewardCount": 4
                                 }
                                 """)
                 ;
