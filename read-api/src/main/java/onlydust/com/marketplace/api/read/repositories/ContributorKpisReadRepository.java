@@ -28,12 +28,12 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             SELECT -- /// global data /// --
                    d.contributor_id,
                    d.contributor_login,
+                   d.contributor_country,
                    d.contributor,
                    d.projects,
                    d.categories,
                    d.languages,
                    d.ecosystems,
-                   d.country_code,
                    -- /// filtered & computed data /// --
                    coalesce(d.total_rewarded_usd_amount, 0)                 as total_rewarded_usd_amount,
                    coalesce(d.merged_pr_count, 0)                           as merged_pr_count,
