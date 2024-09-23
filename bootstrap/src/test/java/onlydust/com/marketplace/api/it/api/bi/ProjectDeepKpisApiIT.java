@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -463,6 +464,28 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                               ]
                             }
                             """);
+        }
+
+        @Test
+        public void should_export_projects_stats_between_dates() {
+            // When
+            final var csv = client.get()
+                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0",
+                            "pageSize", "100",
+                            "fromDate", "2021-01-01",
+                            "toDate", "2021-01-10")))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    .accept(MediaType.valueOf("text/csv"))
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody(String.class)
+                    .returnResult().getResponseBody();
+
+            final var lines = Objects.requireNonNull(csv).split("\\R");
+            assertThat(lines).hasSize(4);
+            assertThat(lines[0]).isEqualTo("project;leads;categories;languages;ecosystems;programs;available_budget_usd_amount;available_budgets;percent_used_budget;total_granted_usd_amount;total_rewarded_usd_amount;average_reward_usd_amount;onboarded_contributor_count;active_contributor_count;merged_pr_count;reward_count;contribution_count");
         }
 
         private void test_projects_stats(String queryParam, String value, Consumer<BiProjectsPageResponse> asserter, boolean assertNotEmpty) {

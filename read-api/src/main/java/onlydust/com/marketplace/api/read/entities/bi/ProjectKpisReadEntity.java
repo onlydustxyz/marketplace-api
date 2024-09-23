@@ -6,18 +6,22 @@ import lombok.*;
 import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.api.contract.model.*;
+import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_EVEN;
+import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
@@ -34,7 +38,7 @@ public class ProjectKpisReadEntity {
     UUID projectId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    ProjectLinkResponse project;
+    @NonNull ProjectLinkResponse project;
     @JdbcTypeCode(SqlTypes.JSON)
     List<RegisteredUserResponse> leads;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -119,6 +123,31 @@ public class ProjectKpisReadEntity {
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
                 ;
+    }
+
+    public void toCsv(CSVPrinter csv) throws IOException {
+        csv.printRecord(
+                project.getName(),
+                leads == null ? null : leads.stream().map(RegisteredUserResponse::getLogin).sorted().collect(joining(",")),
+                categories == null ? null : categories.stream().map(ProjectCategoryResponse::getName).sorted().collect(joining(",")),
+                languages == null ? null : languages.stream().map(LanguageResponse::getName).sorted().collect(joining(",")),
+                ecosystems == null ? null : ecosystems.stream().map(EcosystemLinkResponse::getName).sorted().collect(joining(",")),
+                programs == null ? null : programs.stream().map(ProgramLinkResponse::getName).sorted().collect(joining(",")),
+                prettyUsd(availableBudget),
+                budget == null || budget.availableBudgetPerCurrency == null ? null : budget.availableBudgetPerCurrency.stream()
+                        .map(a -> a.amount + " " + a.currency.getCode())
+                        .sorted()
+                        .collect(joining(",")),
+                percentSpentBudget == null ? null : percentSpentBudget.setScale(2, HALF_EVEN),
+                prettyUsd(totalGrantedUsdAmount),
+                prettyUsd(totalRewardedUsdAmount),
+                prettyUsd(averageRewardUsdAmount),
+                onboardedContributorCount,
+                activeContributorCount,
+                mergedPrCount,
+                rewardCount,
+                contributionCount
+        );
     }
 
     public record Budget(

@@ -11,13 +11,19 @@ import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -28,9 +34,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -48,38 +58,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
     @Override
     public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams q) {
-
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
-        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
-
-        final var page = contributorKpisReadRepository.findAll(
-                sanitizedFromDate,
-                sanitizedToDate,
-                fromDateOfPreviousPeriod,
-                sanitizedFromDate,
-                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
-                q.getSearch(),
-                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
-                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
-                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
-                q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
-                q.getContributorRoles() == null ? null : q.getContributorRoles().stream().map(Enum::name).toArray(String[]::new),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
-                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
-                        ContributorKpisReadRepository.getSortProperty(q.getSort())))
-        );
+        final var page = findContributors(q);
 
         return ok(new BiContributorsPageResponse()
                 .contributors(page.stream().map(ContributorKpisReadEntity::toDto).toList())
@@ -87,6 +66,41 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages()));
+    }
+
+    @GetMapping(
+            value = "/api/v1/bi/contributors",
+            produces = "text/csv"
+    )
+    public ResponseEntity<String> exportBIContributors(BiContributorsQueryParams q) {
+
+        final var page = findContributors(q);
+        final var format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(';')
+                .build();
+        final var sw = new StringWriter();
+
+        try (final var printer = new CSVPrinter(sw, format)) {
+            printer.printRecord("contributor",
+                    "projects",
+                    "categories",
+                    "languages",
+                    "ecosystems",
+                    "country",
+                    "total_rewarded_usd_amount",
+                    "merged_pr_count",
+                    "reward_count",
+                    "contribution_count");
+            for (final var transaction : page.getContent())
+                transaction.toCsv(printer);
+        } catch (final IOException e) {
+            throw internalServerError("Error while exporting to CSV", e);
+        }
+
+        final var csv = sw.toString();
+
+        return status(hasMore(q.getPageIndex(), page.getTotalPages()) ? PARTIAL_CONTENT : OK)
+                .body(csv);
     }
 
     @Override
@@ -115,54 +129,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     @Override
     public ResponseEntity<BiProjectsPageResponse> getBIProjects(BiProjectsQueryParams q) {
 
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
-        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
-
-        final var page = projectKpisReadRepository.findAll(
-                sanitizedFromDate,
-                sanitizedToDate,
-                fromDateOfPreviousPeriod,
-                sanitizedFromDate,
-                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
-                q.getSearch(),
-                q.getProjectLeadIds() == null ? null : q.getProjectLeadIds().toArray(UUID[]::new),
-                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
-                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
-                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
-                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
-                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
-                        ProjectKpisReadRepository.getSortProperty(q.getSort())))
-        );
+        final var page = findProjects(q);
 
         return ok(new BiProjectsPageResponse()
                 .projects(page.stream().map(ProjectKpisReadEntity::toDto).toList())
@@ -170,6 +137,48 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 .nextPageIndex(nextPageIndex(q.getPageIndex(), page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())
                 .totalPageNumber(page.getTotalPages()));
+    }
+
+    @GetMapping(
+            value = "/api/v1/bi/projects",
+            produces = "text/csv"
+    )
+    public ResponseEntity<String> exportBIProjects(BiProjectsQueryParams q) {
+
+        final var page = findProjects(q);
+        final var format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(';')
+                .build();
+        final var sw = new StringWriter();
+
+        try (final var printer = new CSVPrinter(sw, format)) {
+            printer.printRecord("project",
+                    "leads",
+                    "categories",
+                    "languages",
+                    "ecosystems",
+                    "programs",
+                    "available_budget_usd_amount",
+                    "available_budgets",
+                    "percent_used_budget",
+                    "total_granted_usd_amount",
+                    "total_rewarded_usd_amount",
+                    "average_reward_usd_amount",
+                    "onboarded_contributor_count",
+                    "active_contributor_count",
+                    "merged_pr_count",
+                    "reward_count",
+                    "contribution_count");
+            for (final var transaction : page.getContent())
+                transaction.toCsv(printer);
+        } catch (final IOException e) {
+            throw internalServerError("Error while exporting to CSV", e);
+        }
+
+        final var csv = sw.toString();
+
+        return status(hasMore(q.getPageIndex(), page.getTotalPages()) ? PARTIAL_CONTENT : OK)
+                .body(csv);
     }
 
     @Override
@@ -232,5 +241,92 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         return Optional.ofNullable(programOrEcosystemIds)
                 .map(l -> l.stream().filter(userProgramOrEcosystemIds::contains).toArray(UUID[]::new))
                 .orElse(userProgramOrEcosystemIds.toArray(UUID[]::new));
+    }
+
+    private Page<ContributorKpisReadEntity> findContributors(BiContributorsQueryParams q) {
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
+
+        final var page = contributorKpisReadRepository.findAll(
+                sanitizedFromDate,
+                sanitizedToDate,
+                fromDateOfPreviousPeriod,
+                sanitizedFromDate,
+                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                q.getSearch(),
+                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
+                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
+                q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
+                q.getContributorRoles() == null ? null : q.getContributorRoles().stream().map(Enum::name).toArray(String[]::new),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        ContributorKpisReadRepository.getSortProperty(q.getSort())))
+        );
+        return page;
+    }
+
+    private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
+
+        final var page = projectKpisReadRepository.findAll(
+                sanitizedFromDate,
+                sanitizedToDate,
+                fromDateOfPreviousPeriod,
+                sanitizedFromDate,
+                getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                q.getSearch(),
+                q.getProjectLeadIds() == null ? null : q.getProjectLeadIds().toArray(UUID[]::new),
+                q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
+                q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
+                q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getAvailableBudgetUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getPercentUsedBudget()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalGrantedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getAverageRewardUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getOnboardedContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getActiveContributorCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getMergedPrCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
+                PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        ProjectKpisReadRepository.getSortProperty(q.getSort())))
+        );
+        return page;
     }
 }

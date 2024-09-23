@@ -7,14 +7,18 @@ import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.model.*;
+import org.apache.commons.csv.CSVPrinter;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
 @Entity
@@ -30,7 +34,7 @@ public class ContributorKpisReadEntity {
     Long contributorId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    ContributorResponse contributor;
+    @NonNull ContributorResponse contributor;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLinkResponse> projects;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -80,5 +84,20 @@ public class ContributorKpisReadEntity {
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
                 ;
+    }
+
+    public void toCsv(CSVPrinter csv) throws IOException {
+        csv.printRecord(
+                contributor.getLogin(),
+                projects == null ? null : projects.stream().map(ProjectLinkResponse::getName).sorted().collect(joining(",")),
+                categories == null ? null : categories.stream().map(ProjectCategoryResponse::getName).sorted().collect(joining(",")),
+                languages == null ? null : languages.stream().map(LanguageResponse::getName).sorted().collect(joining(",")),
+                ecosystems == null ? null : ecosystems.stream().map(EcosystemLinkResponse::getName).sorted().collect(joining(",")),
+                contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code(),
+                prettyUsd(totalRewardedUsdAmount),
+                mergedPrCount,
+                rewardCount,
+                contributionCount
+        );
     }
 }
