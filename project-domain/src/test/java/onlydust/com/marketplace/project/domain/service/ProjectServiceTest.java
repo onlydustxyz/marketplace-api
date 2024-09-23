@@ -409,7 +409,7 @@ public class ProjectServiceTest {
     void should_add_rewardable_issue_with_trailing_slash() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort,
-                mock(ContributionStoragePort.class), mock(SponsorStoragePort.class), mock(ProgramStoragePort.class));
+                mock(ContributionStoragePort.class), mock(SponsorStoragePort.class), mock(ProgramStoragePort.class), mock(EcosystemStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),
@@ -481,7 +481,7 @@ public class ProjectServiceTest {
     void should_add_rewardable_pull_request_with_trailing_slash() {
         final ProjectStoragePort projectStoragePort = mock(ProjectStoragePort.class);
         final PermissionService permissionService = new PermissionService(projectStoragePort,
-                mock(ContributionStoragePort.class), mock(SponsorStoragePort.class), mock(ProgramStoragePort.class));
+                mock(ContributionStoragePort.class), mock(SponsorStoragePort.class), mock(ProgramStoragePort.class), mock(EcosystemStoragePort.class));
         final IndexerPort indexerPort = mock(IndexerPort.class);
         final ProjectService projectService = new ProjectService(mock(ProjectObserverPort.class), projectStoragePort,
                 mock(ImageStoragePort.class),

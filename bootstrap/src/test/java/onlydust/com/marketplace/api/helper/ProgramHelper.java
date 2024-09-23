@@ -45,6 +45,13 @@ public class ProgramHelper {
     }
 
     @Transactional
+    public Program create(SponsorId sponsorId, String name, UserAuthHelper.AuthenticatedUser lead) {
+        final var program = create(sponsorId, name);
+        addLead(program.id(), lead);
+        return program;
+    }
+
+    @Transactional
     public Program create(SponsorId sponsorId, UserAuthHelper.AuthenticatedUser lead) {
         final var program = create(sponsorId);
         addLead(program.id(), lead);

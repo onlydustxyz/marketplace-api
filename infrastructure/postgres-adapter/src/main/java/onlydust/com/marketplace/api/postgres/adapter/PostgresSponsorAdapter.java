@@ -36,6 +36,14 @@ public class PostgresSponsorAdapter implements SponsorStoragePort, AccountingSpo
     }
 
     @Override
+    public List<SponsorId> getSponsorLedIdsForUser(UserId userId) {
+        return sponsorLeadRepository.findByUserId(userId.value()).stream()
+                .map(SponsorLeadEntity::getSponsorId)
+                .map(SponsorId::of)
+                .toList();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Optional<Sponsor> get(SponsorId sponsorId) {
         return sponsorRepository.findById(sponsorId.value())
