@@ -11,11 +11,13 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.HALF_EVEN;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.pretty;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
 
@@ -95,8 +97,8 @@ public class ProjectKpisReadEntity {
                         .totalPerCurrency(budget == null || budget.availableBudgetPerCurrency == null ? null :
                                 budget.availableBudgetPerCurrency.stream()
                                         .map(a -> {
-                                                    final var conversionRate = a.usdAmount == null ? BigDecimal.ONE :
-                                                            a.usdAmount.divide(a.amount, 2, RoundingMode.HALF_EVEN);
+                                                    final var conversionRate = (a.usdAmount == null || a.amount.equals(ZERO)) ? ONE :
+                                                            a.usdAmount.divide(a.amount, 2, HALF_EVEN);
                                                     return new DetailedTotalMoneyTotalPerCurrencyInner()
                                                             .currency(a.currency)
                                                             .amount(a.amount)
@@ -107,7 +109,7 @@ public class ProjectKpisReadEntity {
                                         .sorted(Comparator.comparing(m -> m.getCurrency().getCode()))
                                         .toList())
                 )
-                .percentUsedBudget(percentSpentBudget == null ? null : percentSpentBudget.setScale(2, RoundingMode.HALF_EVEN))
+                .percentUsedBudget(percentSpentBudget == null ? null : percentSpentBudget.setScale(2, HALF_EVEN))
                 .totalGrantedUsdAmount(toDecimalNumberKpi(prettyUsd(totalGrantedUsdAmount), prettyUsd(previousPeriodTotalGrantedUsdAmount)))
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .averageRewardUsdAmount(toDecimalNumberKpi(prettyUsd(averageRewardUsdAmount), prettyUsd(previousPeriodAverageRewardUsdAmount)))
