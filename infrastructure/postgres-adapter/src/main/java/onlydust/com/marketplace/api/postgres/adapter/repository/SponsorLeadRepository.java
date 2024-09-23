@@ -19,4 +19,6 @@ public interface SponsorLeadRepository extends JpaRepository<SponsorLeadEntity, 
     Optional<SponsorLeadEntity> findByUserIdAndProgramId(UUID userId, UUID programId);
 
     List<SponsorLeadEntity> findBySponsorId(UUID sponsorId);
+
+    List<SponsorLeadEntity> findByUserId(UUID userId);
 }

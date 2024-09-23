@@ -6,7 +6,7 @@ import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.ImageStoragePort;
 import onlydust.com.marketplace.project.domain.model.Ecosystem;
 import onlydust.com.marketplace.project.domain.port.input.EcosystemFacadePort;
-import onlydust.com.marketplace.project.domain.port.output.EcosystemStorage;
+import onlydust.com.marketplace.project.domain.port.output.EcosystemStoragePort;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -18,7 +18,7 @@ import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFou
 
 @AllArgsConstructor
 public class EcosystemService implements EcosystemFacadePort {
-    private final EcosystemStorage ecosystemStorage;
+    private final EcosystemStoragePort ecosystemStoragePort;
     private final ImageStoragePort imageStoragePort;
 
     @Override
@@ -34,7 +34,7 @@ public class EcosystemService implements EcosystemFacadePort {
                 description,
                 hidden,
                 leads);
-        ecosystemStorage.save(ecosystem);
+        ecosystemStoragePort.save(ecosystem);
         return ecosystem;
     }
 
@@ -46,10 +46,10 @@ public class EcosystemService implements EcosystemFacadePort {
                                 @NonNull String description,
                                 @NonNull Boolean hidden,
                                 @NonNull List<UserId> leads) {
-        final var ecosystem = ecosystemStorage.get(ecosystemId)
+        final var ecosystem = ecosystemStoragePort.get(ecosystemId)
                 .orElseThrow(() -> notFound("Ecosystem %s not found".formatted(ecosystemId)));
 
-        ecosystemStorage.save(ecosystem.toBuilder()
+        ecosystemStoragePort.save(ecosystem.toBuilder()
                 .name(name)
                 .url(URI.create(url))
                 .logoUrl(URI.create(logoUrl))

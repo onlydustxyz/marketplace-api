@@ -62,4 +62,12 @@ public class PostgresProgramAdapter implements ProgramStoragePort {
                 .map(UserId::of)
                 .toList();
     }
+
+    @Override
+    public List<ProgramId> getProgramLedIdsForUser(UserId userId) {
+        return programLeadRepository.findByUserId(userId.value()).stream()
+                .map(ProgramLeadEntity::programId)
+                .map(ProgramId::of)
+                .toList();
+    }
 }

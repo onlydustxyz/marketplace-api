@@ -18,4 +18,6 @@ public interface SponsorStoragePort {
     void save(Sponsor sponsor);
 
     boolean isAdminOfProgramSponsor(UserId userId, ProgramId programId);
+
+    List<SponsorId> getSponsorLedIdsForUser(UserId userId);
 }

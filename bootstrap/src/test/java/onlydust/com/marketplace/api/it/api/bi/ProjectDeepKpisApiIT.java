@@ -39,6 +39,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProgramId explorationTeam;
         private static ProgramId nethermind;
         private static ProgramId ethGrantingProgram;
+        private static UserAuthHelper.AuthenticatedUser caller;
         private static UserAuthHelper.AuthenticatedUser antho;
         private static UserAuthHelper.AuthenticatedUser pierre;
         private static UserAuthHelper.AuthenticatedUser mehdi;
@@ -64,6 +65,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             currencyHelper.setQuote("2020-12-31T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.5));
             currencyHelper.setQuote("2020-12-31T00:00:00Z", ETH, USD, BigDecimal.valueOf(2));
 
+            caller = userAuthHelper.create("olivier");
             antho = userAuthHelper.create("antho");
             pierre = userAuthHelper.create("pierre");
             mehdi = userAuthHelper.create("mehdi");
@@ -72,7 +74,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             emma = userAuthHelper.create("emma");
             james = userAuthHelper.create("james");
 
-            universe = ecosystemHelper.create("Universe ecosystem").id();
+            universe = ecosystemHelper.create("Universe ecosystem", caller).id();
             starknet = ecosystemHelper.create("Starknet ecosystem").id();
             ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
 
@@ -153,9 +155,11 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         public void should_get_projects_stats_between_dates() {
             // When
             client.get()
-                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0", "pageSize", "100", "fromDate", "2021-01-01", "toDate", "2021-01-10",
-                            "programOrEcosystemIds", allProgramOrEcosystemIds)))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0",
+                            "pageSize", "100",
+                            "fromDate", "2021-01-01",
+                            "toDate", "2021-01-10")))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -475,7 +479,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             queryParams.putAll(queryParamsWithValues);
             final var response = client.get()
                     .uri(getApiURI(BI_PROJECTS, queryParams))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     .exchange()
                     .expectStatus()
                     .is2xxSuccessful()

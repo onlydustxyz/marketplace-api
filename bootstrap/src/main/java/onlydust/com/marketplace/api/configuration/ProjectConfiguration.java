@@ -161,8 +161,9 @@ public class ProjectConfiguration {
     PermissionService permissionService(final ProjectStoragePort projectStoragePort,
                                         final ContributionStoragePort contributionStoragePort,
                                         final SponsorStoragePort sponsorStoragePort,
-                                        final ProgramStoragePort programStoragePort) {
-        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort, programStoragePort);
+                                        final ProgramStoragePort programStoragePort,
+                                        final EcosystemStoragePort ecosystemStoragePort) {
+        return new PermissionService(projectStoragePort, contributionStoragePort, sponsorStoragePort, programStoragePort, ecosystemStoragePort);
     }
 
     @Bean
@@ -339,9 +340,9 @@ public class ProjectConfiguration {
     }
 
     @Bean
-    public EcosystemFacadePort ecosystemFacadePort(final EcosystemStorage ecosystemStorage,
+    public EcosystemFacadePort ecosystemFacadePort(final EcosystemStoragePort ecosystemStoragePort,
                                                    final ImageStoragePort imageStoragePort) {
-        return new EcosystemService(ecosystemStorage, imageStoragePort);
+        return new EcosystemService(ecosystemStoragePort, imageStoragePort);
     }
 
     @Bean

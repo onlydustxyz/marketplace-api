@@ -336,8 +336,9 @@ public class PostgresConfiguration {
     }
 
     @Bean
-    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository) {
-        return new PostgresEcosystemAdapter(ecosystemRepository);
+    public PostgresEcosystemAdapter postgresEcosystemAdapter(final EcosystemRepository ecosystemRepository,
+                                                             final EcosystemLeadRepository ecosystemLeadRepository) {
+        return new PostgresEcosystemAdapter(ecosystemRepository, ecosystemLeadRepository);
     }
 
     @Bean

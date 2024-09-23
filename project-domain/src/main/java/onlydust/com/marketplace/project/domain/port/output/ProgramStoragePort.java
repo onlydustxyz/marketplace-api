@@ -21,4 +21,6 @@ public interface ProgramStoragePort {
     Optional<Program> findById(ProgramId programId);
 
     List<UserId> findProgramLeads(@NonNull ProgramId programId);
+
+    List<ProgramId> getProgramLedIdsForUser(UserId userId);
 }

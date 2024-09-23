@@ -2,6 +2,7 @@ package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -22,6 +23,7 @@ import static java.util.stream.Collectors.joining;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.ETH;
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
+import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 
 @TagBI
 public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
@@ -31,6 +33,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
     @Nested
     class ActiveContributors {
         private static final AtomicBoolean setupDone = new AtomicBoolean();
+        private static UserAuthHelper.AuthenticatedUser caller;
         private static UUID starknet;
         private static UUID ethereum;
         private static ProgramId explorationTeam;
@@ -41,15 +44,16 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            starknet = ecosystemHelper.create("Starknet ecosystem").id();
-            ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
+            caller = userAuthHelper.create();
+            starknet = ecosystemHelper.create("Starknet ecosystem", caller).id();
+            ethereum = ecosystemHelper.create("Ethereum ecosystem", caller).id();
 
             final var starknetFoundation = sponsorHelper.create();
             accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
 
             explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team").id();
             accountingHelper.allocate(starknetFoundation.id(), explorationTeam, 7_000, STRK);
-            nethermind = programHelper.create(starknetFoundation.id(), "Nethermind").id();
+            nethermind = programHelper.create(starknetFoundation.id(), "Nethermind", caller).id();
             accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
             final var ethFoundation = sponsorHelper.create();
@@ -123,6 +127,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_WORLD_MAP, Map.of(
                             "kpi", "ACTIVE_CONTRIBUTORS"
                     )))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -131,7 +136,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             [
                               {
                                 "countryCode": "FR",
-                                "value": 3
+                                "value": 2
                               },
                               {
                                 "countryCode": "GB",
@@ -153,6 +158,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             "fromDate", "2021-01-01",
                             "toDate", "2021-01-31"
                     )))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     .exchange()
                     .expectStatus()
                     .isOk()
@@ -182,6 +188,7 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
                             "kpi", "ACTIVE_CONTRIBUTORS",
                             "programOrEcosystemIds", Stream.of(nethermind, ethereum).map(Object::toString).collect(joining(","))
                     )))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     .exchange()
                     .expectStatus()
                     .isOk()

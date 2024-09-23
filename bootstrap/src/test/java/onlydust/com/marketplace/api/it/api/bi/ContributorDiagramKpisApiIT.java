@@ -1,6 +1,7 @@
 package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
+import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
@@ -26,13 +27,19 @@ import static onlydust.com.marketplace.api.rest.api.adapter.authentication.Authe
 public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
+    UserAuthHelper.AuthenticatedUser caller;
+
+    @BeforeEach
+    void setup() {
+        caller = userAuthHelper.authenticateOlivier();
+    }
 
     @Test
     public void should_get_aggregate_contributor_stats_for_diagram() {
         // When
         client.get()
                 .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "WEEK")))
-                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                .header("Authorization", BEARER_PREFIX + caller.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -46,7 +53,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
         // When
         client.get()
                 .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2022-01-01", "toDate", "2022-12-31")))
-                .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                .header("Authorization", BEARER_PREFIX + caller.jwt())
                 // Then
                 .exchange()
                 .expectStatus()
@@ -79,20 +86,20 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             final var emma = userAuthHelper.create();
             final var james = userAuthHelper.create();
 
-            starknet = ecosystemHelper.create("Starknet ecosystem").id();
-            ethereum = ecosystemHelper.create("Ethereum ecosystem").id();
+            starknet = ecosystemHelper.create("Starknet ecosystem", caller).id();
+            ethereum = ecosystemHelper.create("Ethereum ecosystem", caller).id();
 
             final var starknetFoundation = sponsorHelper.create();
             accountingHelper.createSponsorAccount(starknetFoundation.id(), 10_000, STRK);
 
-            explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team").id();
+            explorationTeam = programHelper.create(starknetFoundation.id(), "Starkware Exploration Team", caller).id();
             accountingHelper.allocate(starknetFoundation.id(), explorationTeam, 7_000, STRK);
-            nethermind = programHelper.create(starknetFoundation.id(), "Nethermind").id();
+            nethermind = programHelper.create(starknetFoundation.id(), "Nethermind", caller).id();
             accountingHelper.allocate(starknetFoundation.id(), nethermind, 3_000, STRK);
 
             final var ethFoundation = sponsorHelper.create();
             accountingHelper.createSponsorAccount(ethFoundation.id(), 1_000, ETH);
-            ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
+            ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program", caller).id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
 
             final var onlyDust = projectHelper.create(pierre, "OnlyDust");
@@ -166,7 +173,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
                             "programOrEcosystemIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -284,7 +291,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-02", "toDate", "2021-01-02",
                             "programOrEcosystemIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -315,7 +322,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "DAY", "fromDate", "2021-01-01", "toDate", "2021-01-10",
                             "programOrEcosystemIds",
                             String.join(",", Stream.of(ethereum).map(UUID::toString).toList()))))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
@@ -436,7 +443,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_STATS_CONTRIBUTORS, Map.of("timeGrouping", "WEEK", "fromDate", "2021-01-01", "toDate", "2021-01-10",
                             "programOrEcosystemIds",
                             String.join(",", Stream.of(explorationTeam, nethermind, ethGrantingProgram).map(ProgramId::toString).toList()))))
-                    .header("Authorization", BEARER_PREFIX + userAuthHelper.authenticateOlivier().jwt())
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
                     .expectStatus()
