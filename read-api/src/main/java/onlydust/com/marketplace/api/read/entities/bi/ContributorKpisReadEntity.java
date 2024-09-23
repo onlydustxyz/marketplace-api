@@ -39,7 +39,7 @@ public class ContributorKpisReadEntity {
     List<LanguageResponse> languages;
     @JdbcTypeCode(SqlTypes.JSON)
     List<EcosystemLinkResponse> ecosystems;
-    String countryCode;
+    String contributorCountry;
 
     BigDecimal totalRewardedUsdAmount;
     Integer mergedPrCount;
@@ -74,7 +74,7 @@ public class ContributorKpisReadEntity {
                 .categories(categories == null ? null : categories.stream().sorted(comparing(ProjectCategoryResponse::getName)).toList())
                 .languages(languages == null ? null : languages.stream().sorted(comparing(LanguageResponse::getName)).toList())
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
-                .countryCode(countryCode == null ? null : Country.fromIso3(countryCode).iso2Code())
+                .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
                 .mergedPrCount(toNumberKpi(mergedPrCount, previousPeriodMergedPrCount))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))

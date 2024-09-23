@@ -1,5 +1,9 @@
 CREATE MATERIALIZED VIEW bi.contributor_global_data AS
-WITH project_programs AS (select distinct abt.program_id,
+WITH user_contries as (select bpu.user_id as user_id,
+                              kyc.country as country
+                       from accounting.billing_profiles_users bpu
+                                join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id),
+     project_programs AS (select distinct abt.program_id,
                                           abt.project_id
                           from accounting.account_book_transactions abt
                           where abt.project_id is not null
@@ -38,6 +42,7 @@ WITH project_programs AS (select distinct abt.program_id,
           where abt.project_id is not null)
 SELECT u.github_user_id                                                                                    as contributor_id,
        u.login                                                                                             as contributor_login,
+       uc.country                                                                                          as contributor_country,
        jsonb_build_object('githubUserId', u.github_user_id,
                           'login', u.login,
                           'avatarUrl', u.avatar_url,
@@ -80,8 +85,6 @@ SELECT u.github_user_id                                                         
                                              'url', e.url))
        filter ( where e.id is not null )                                                                   as ecosystems,
 
-       kyc.country                                                                                         as country_code,
-
        concat(coalesce(string_agg(distinct u.login, ' '), ''), ' ',
               coalesce(string_agg(distinct p.name, ' '), ''), ' ',
               coalesce(string_agg(distinct p.slug, ' '), ''), ' ',
@@ -92,6 +95,7 @@ SELECT u.github_user_id                                                         
               coalesce(string_agg(distinct currencies.code, ' '), ''), ' ',
               coalesce(string_agg(distinct prog.name, ' '), ''))                                           as search
 FROM iam.all_users u
+         LEFT JOIN user_contries uc on uc.user_id = u.user_id
          LEFT JOIN project_users pu on pu.github_user_id = u.github_user_id
          LEFT JOIN projects p on p.id = pu.project_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
@@ -104,9 +108,7 @@ FROM iam.all_users u
          LEFT JOIN project_categories pc ON pc.id = ppc.project_category_id
          LEFT JOIN rewards r on r.recipient_id = u.github_user_id
          LEFT JOIN currencies on r.currency_id = currencies.id
-         LEFT JOIN accounting.billing_profiles_users bpu on bpu.user_id = u.user_id
-         LEFT JOIN accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id
-GROUP BY u.github_user_id, u.login, u.avatar_url, u.user_id, kyc.country;
+GROUP BY u.github_user_id, u.login, u.avatar_url, u.user_id, uc.country;
 
 
 CREATE UNIQUE INDEX bi_contributor_global_data_pk ON bi.contributor_global_data (contributor_id);
@@ -125,13 +127,13 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
             (
                 contributor_id            bigint,
                 contributor_login         text,
+                contributor_country       text,
                 contributor               jsonb,
                 first_project_name        text,
                 projects                  jsonb,
                 categories                jsonb,
                 languages                 jsonb,
                 ecosystems                jsonb,
-                country_code              text,
                 total_rewarded_usd_amount numeric,
                 merged_pr_count           bigint,
                 reward_count              bigint,
@@ -141,13 +143,13 @@ AS
 $$
 SELECT c.contributor_id                  as contributor_id,
        c.contributor_login               as contributor_login,
+       c.contributor_country             as contributor_country,
        c.contributor                     as contributor,
        c.first_project_name              as first_project_name,
        c.projects                        as projects,
        c.categories                      as categories,
        c.languages                       as languages,
        c.ecosystems                      as ecosystems,
-       c.country_code                    as country_code,
        sum(rd.total_rewarded_usd_amount) as total_rewarded_usd_amount,
        sum(cd.merged_pr_count)           as merged_pr_count,
        sum(rd.reward_count)              as reward_count,
@@ -175,13 +177,13 @@ WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEco
   and (ecosystemIds is null or c.ecosystem_ids && ecosystemIds)
   and (categoryIds is null or c.project_category_ids && categoryIds)
   and (languageIds is null or c.language_ids && languageIds)
-  and (countryCodes is null or c.country_code = any (countryCodes))
+  and (countryCodes is null or c.contributor_country = any (countryCodes))
   and (searchQuery is null or c.search ilike '%' || searchQuery || '%')
   and (contributorRoles is null or c.roles && contributorRoles)
   and (cd.contributor_id is not null or rd.contributor_id is not null or
        array ['MAINTAINER', 'PROGRAM_LEAD'] && c.roles)
 
 GROUP BY c.contributor_id, c.contributor_login, c.contributor, c.first_project_name, c.projects, c.ecosystems,
-         c.languages, c.categories, c.country_code;
+         c.languages, c.categories, c.contributor_country;
 $$
     LANGUAGE SQL;
