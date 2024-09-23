@@ -545,3 +545,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000343_introduce_bi_search_projects_function.sql
   - include:
       file: db/changelog/changelogs/00000344_add_missing_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000345_introduce_bi_search_contributors_function.sql

@@ -32,6 +32,10 @@ public class Country {
         return COUNTRY_NAME_MAPPED_TO_ISO3_CODE.containsKey(iso3Code) ? Optional.of(Country.fromIso3(iso3Code)) : Optional.empty();
     }
 
+    public static Country fromIso2(String iso2Code) {
+        return Country.fromIso3(new Locale("", iso2Code).getISO3Country());
+    }
+
     public @NonNull String iso2Code() {
         return ISO3_TO_ISO2_CODES.get(iso3Code);
     }

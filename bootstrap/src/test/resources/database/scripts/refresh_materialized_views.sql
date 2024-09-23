@@ -18,3 +18,4 @@ REFRESH MATERIALIZED VIEW bi.contribution_data;
 REFRESH MATERIALIZED VIEW bi.reward_data;
 REFRESH MATERIALIZED VIEW bi.project_grants_data;
 REFRESH MATERIALIZED VIEW bi.project_global_data;
+REFRESH MATERIALIZED VIEW bi.contributor_global_data;
