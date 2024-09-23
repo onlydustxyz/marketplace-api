@@ -4167,6 +4167,19 @@ paths:
           schema:
             type: string
           description: Search by project or sponsor name
+        - in: query
+          name: showEmpty
+          schema:
+            default: true
+            type: boolean
+        - in: query
+          name: sort
+          schema:
+            $ref: '#/components/schemas/ProgramTransactionStatsSort'
+        - in: query
+          name: sortDirection
+          schema:
+            $ref: '#/components/schemas/SortDirection'
       responses:
         "200":
           description: 'Program transactions stats grouped by month'
@@ -4306,6 +4319,19 @@ paths:
           schema:
             type: string
           description: Search by program name
+        - in: query
+          name: showEmpty
+          schema:
+            default: true
+            type: boolean
+        - in: query
+          name: sort
+          schema:
+            $ref: '#/components/schemas/SponsorTransactionStatsSort'
+        - in: query
+          name: sortDirection
+          schema:
+            $ref: '#/components/schemas/SortDirection'
       responses:
         "200":
           description: 'Sponsor transactions stats grouped by month'
@@ -9922,6 +9948,18 @@ components:
         - CONTRIBUTION
         - AMOUNT
         - STATUS
+
+    SponsorTransactionStatsSort:
+      type: string
+      default: DATE
+      enum:
+        - DATE
+
+    ProgramTransactionStatsSort:
+      type: string
+      default: DATE
+      enum:
+        - DATE
 
     RecommendedProjectsPageResponse:
       allOf:

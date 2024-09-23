@@ -33,6 +33,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
@@ -180,11 +181,18 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                           String fromDate,
                                                                                           String toDate,
                                                                                           List<ProgramTransactionType> types,
-                                                                                          String search) {
+                                                                                          String search,
+                                                                                          Boolean showEmpty,
+                                                                                          ProgramTransactionStatsSort sort,
+                                                                                          SortDirection sortDirection) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
+
+        final var comparison = switch (sort) {
+            default -> comparing(ProgramTransactionStatResponse::getDate);
+        };
 
         final var stats = programTransactionMonthlyStatsReadRepository.findAll(
                         programId,
@@ -202,7 +210,8 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                         .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalRewarded))
                                         .transactionCount(e.getValue().stream().mapToInt(ProgramTransactionMonthlyStatReadEntity::transactionCount).sum())
                                 )
-                                .sorted(comparing(ProgramTransactionStatResponse::getDate))
+                                .filter(s -> !FALSE.equals(showEmpty) || s.getTransactionCount() > 0)
+                                .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
                                 .toList()
                 );
 

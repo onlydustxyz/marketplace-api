@@ -32,6 +32,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
@@ -159,7 +160,10 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
     @Override
     public ResponseEntity<SponsorTransactionStatListResponse> getSponsorTransactionsStats(UUID sponsorId, String fromDate, String toDate,
-                                                                                          List<SponsorTransactionType> types, String search) {
+                                                                                          List<SponsorTransactionType> types, String search,
+                                                                                          Boolean showEmpty, SponsorTransactionStatsSort sort,
+                                                                                          SortDirection sortDirection
+    ) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
@@ -173,6 +177,10 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                 .stream()
                 .collect(groupingBy(SponsorTransactionMonthlyStatReadEntity::date));
 
+        final var comparison = switch (sort) {
+            default -> comparing(SponsorTransactionStatResponse::getDate);
+        };
+
         final var response = new SponsorTransactionStatListResponse()
                 .stats(stats.entrySet().stream().map(e -> new SponsorTransactionStatResponse()
                                 .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
@@ -181,7 +189,8 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                 .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalGranted))
                                 .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalRewarded))
                                 .transactionCount(e.getValue().stream().mapToInt(SponsorTransactionMonthlyStatReadEntity::transactionCount).sum()))
-                        .sorted(comparing(SponsorTransactionStatResponse::getDate))
+                        .filter(r -> !FALSE.equals(showEmpty) || r.getTransactionCount() > 0)
+                        .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
                         .toList());
 
         return ok(response);
