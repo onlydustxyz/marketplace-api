@@ -2053,6 +2053,17 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                                     }
                                 """))
                 ;
+
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_STATS_TRANSACTIONS.formatted(sponsor.id()), Map.of("showEmpty", "false")))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.stats[?(@.date == '2024-04-01')]").doesNotExist();
             }
 
             @Test
@@ -2075,6 +2086,28 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
                         .jsonPath("$.stats[1].transactionCount").isEqualTo(0)
                         .jsonPath("$.stats[2].date").isEqualTo("2024-06-01")
+                        .jsonPath("$.stats[2].transactionCount").isEqualTo(0)
+                ;
+
+                // When
+                client.get()
+                        .uri(getApiURI(SPONSOR_STATS_TRANSACTIONS.formatted(sponsor.id()), Map.of(
+                                "fromDate", "2024-04-01",
+                                "toDate", "2024-06-01",
+                                "sortDirection", "DESC"
+                        )))
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                        .exchange()
+                        // Then
+                        .expectStatus()
+                        .isOk()
+                        .expectBody()
+                        .jsonPath("$.stats.size()").isEqualTo(3)
+                        .jsonPath("$.stats[0].date").isEqualTo("2024-06-01")
+                        .jsonPath("$.stats[0].transactionCount").isEqualTo(0)
+                        .jsonPath("$.stats[1].date").isEqualTo("2024-05-01")
+                        .jsonPath("$.stats[1].transactionCount").isEqualTo(0)
+                        .jsonPath("$.stats[2].date").isEqualTo("2024-04-01")
                         .jsonPath("$.stats[2].transactionCount").isEqualTo(0)
                 ;
             }
