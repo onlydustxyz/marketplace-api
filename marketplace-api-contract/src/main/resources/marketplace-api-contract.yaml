@@ -9435,7 +9435,7 @@ components:
         - QUARTER
         - YEAR
 
-    ContributorTypeEnum:
+    ContributorRoleEnum:
       type: string
       enum:
         - MAINTAINER
@@ -9460,6 +9460,15 @@ components:
         - ACTIVE_CONTRIBUTOR_COUNT
         - MERGED_PR_COUNT
         - REWARD_COUNT
+        - CONTRIBUTION_COUNT
+
+    ContributorKpiSortEnum:
+      type: string
+      enum:
+        - CONTRIBUTOR_LOGIN
+        - PROJECT_NAME
+        - TOTAL_REWARDED_USD_AMOUNT
+        - MERGED_PR_COUNT
         - CONTRIBUTION_COUNT
 
     TransactionType:
@@ -10861,6 +10870,8 @@ components:
         pageSize:
           type: integer
           default: 5
+        sort:
+          $ref: '#/components/schemas/ContributorKpiSortEnum'
         sortDirection:
           $ref: '#/components/schemas/SortDirection'
         fromDate:
@@ -10874,8 +10885,10 @@ components:
             format: uuid
         search:
           type: string
-        contributorType:
-          $ref: '#/components/schemas/ContributorTypeEnum'
+        contributorRoles:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorRoleEnum'
         categoryIds:
           type: array
           items:

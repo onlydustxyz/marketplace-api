@@ -48,6 +48,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, UUID>, J
             REFRESH MATERIALIZED VIEW CONCURRENTLY bi.reward_data;
             REFRESH MATERIALIZED VIEW CONCURRENTLY bi.project_grants_data;
             REFRESH MATERIALIZED VIEW CONCURRENTLY bi.project_global_data;
+            REFRESH MATERIALIZED VIEW CONCURRENTLY bi.contributor_global_data;
             """)
     void refreshStats();
 }
