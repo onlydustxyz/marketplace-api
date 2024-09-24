@@ -248,7 +248,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
-        final var page = contributorKpisReadRepository.findAll(
+        return contributorKpisReadRepository.findAll(
                 sanitizedFromDate,
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
@@ -275,7 +275,6 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ContributorKpisReadRepository.getSortProperty(q.getSort())))
         );
-        return page;
     }
 
     private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
@@ -283,7 +282,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
         final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
-        final var page = projectKpisReadRepository.findAll(
+        return projectKpisReadRepository.findAll(
                 sanitizedFromDate,
                 sanitizedToDate,
                 fromDateOfPreviousPeriod,
@@ -327,6 +326,5 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );
-        return page;
     }
 }

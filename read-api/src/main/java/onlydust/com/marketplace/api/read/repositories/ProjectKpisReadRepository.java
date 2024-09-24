@@ -96,8 +96,6 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
               and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
               and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
               and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-            ORDER BY ?#{#pageable}
-            
             """,
             countQuery = """
                     SELECT count(d.project_id)
@@ -132,7 +130,6 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                       and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
                       and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
                       and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-                    ORDER BY ?#{#pageable}
                     """,
             nativeQuery = true)
     Page<ProjectKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
