@@ -19,8 +19,8 @@ public class ReadProjectCategoriesApiPostgresAdapter implements ReadProjectCateg
     ProjectCategoryReadRepository projectCategoryReadRepository;
 
     @Override
-    public ResponseEntity<ProjectCategoriesResponse> getAllProjectCategories() {
-        final var categories = projectCategoryReadRepository.findAll(Sort.by("name").ascending());
+    public ResponseEntity<ProjectCategoriesResponse> getAllProjectCategories(String search) {
+        final var categories = projectCategoryReadRepository.findAllByNameContainingIgnoreCase(search == null ? "" : search, Sort.by("name"));
         return ResponseEntity.ok(new ProjectCategoriesResponse().categories(categories.stream().map(ProjectCategoryReadEntity::toDto).toList()));
     }
 }

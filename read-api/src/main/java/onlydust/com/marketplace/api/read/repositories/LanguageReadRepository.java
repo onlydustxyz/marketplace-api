@@ -3,6 +3,7 @@ package onlydust.com.marketplace.api.read.repositories;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
@@ -30,6 +31,8 @@ public interface LanguageReadRepository extends Repository<LanguageReadEntity, U
             WHERE hp.hackathon_id = :hackathonId
             """, nativeQuery = true)
     List<LanguageReadEntity> findAllByHackathonId(UUID hackathonId);
+
+    List<LanguageReadEntity> findAllByNameContainingIgnoreCase(String search, Sort sort);
 
     @Query(value = """
             SELECT DISTINCT l.*

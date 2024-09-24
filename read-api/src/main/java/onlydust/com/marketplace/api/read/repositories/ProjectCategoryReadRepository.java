@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface ProjectCategoryReadRepository extends Repository<ProjectCategoryReadEntity, UUID> {
     Optional<ProjectCategoryReadEntity> findById(UUID Id);
 
-    List<ProjectCategoryReadEntity> findAll(Sort sort);
+    List<ProjectCategoryReadEntity> findAllByNameContainingIgnoreCase(String search, Sort sort);
 
     @Query("""
             SELECT DISTINCT pc
