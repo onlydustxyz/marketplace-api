@@ -32,34 +32,31 @@ public class AggregatedProjectKpisReadRepository {
                              count(d.contribution_id)
                              filter ( where d.is_merged_pr = 1 )                                                              as merged_pr_count
                       from bi.contribution_data d
-                               join bi.project_global_data p on d.project_id = p.project_id
                                left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
                                                    from bi.contribution_data previous
-                                                        join bi.project_global_data p on previous.project_id = p.project_id
                                                    where previous.project_id = d.project_id
                                                      and previous.#timeGrouping#_timestamp < d.#timeGrouping#_timestamp
                                                      and (coalesce(:programOrEcosystemIds) is null
-                                                       or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
-                                                       or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)) previous on true
+                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.program_ids
+                                                       or cast(:programOrEcosystemIds as uuid[]) && previous.ecosystem_ids)) previous on true
                       where
                         -- We need to get one interval before fromDate to calculate churned project count
                           d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz)) - cast(:timeGroupingInterval as interval)
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)
+                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
+                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_rewards_stats AS
                      (SELECT d.#timeGrouping#_timestamp    as timestamp,
                              sum(d.usd_amount) as total_rewarded_usd_amount
                       from bi.reward_data d
-                            join bi.project_global_data p on d.project_id = p.project_id
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
-                          or cast(:programOrEcosystemIds as uuid[]) && p.program_ids
-                          or cast(:programOrEcosystemIds as uuid[]) && p.ecosystem_ids)
+                          or cast(:programOrEcosystemIds as uuid[]) && d.program_ids
+                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  aggregated_project_grants_stats AS
@@ -68,7 +65,9 @@ public class AggregatedProjectKpisReadRepository {
                       from bi.project_grants_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
-                        and (coalesce(:programOrEcosystemIds) is null or d.program_id = any (cast(:programOrEcosystemIds as uuid[])))
+                        and (coalesce(:programOrEcosystemIds) is null
+                          or d.program_id = any (cast(:programOrEcosystemIds as uuid[]))
+                          or cast(:programOrEcosystemIds as uuid[]) && d.ecosystem_ids)
                       group by 1),
             
                  all_timestamps_to_return AS

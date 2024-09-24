@@ -333,7 +333,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                               "stats": [
                                 {
                                   "timestamp": "2021-01-01T00:00:00Z",
-                                  "totalGranted": 0,
+                                  "totalGranted": 200,
                                   "totalRewarded": 0,
                                   "mergedPrCount": 2,
                                   "newContributorCount": 1,
