@@ -4779,6 +4779,12 @@ paths:
       operationId: getAllProjectCategories
       description: |
         Get all project categories
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by category name
       responses:
         "200":
           description: 'List of project categories'
@@ -4799,6 +4805,12 @@ paths:
       operationId: getAllLanguages
       description: |
         Get all supported languages
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by language name
       responses:
         "200":
           description: 'List of supported languages'

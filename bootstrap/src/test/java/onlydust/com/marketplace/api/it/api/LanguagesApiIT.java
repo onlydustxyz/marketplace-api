@@ -4,6 +4,8 @@ package onlydust.com.marketplace.api.it.api;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 public class LanguagesApiIT extends AbstractMarketplaceApiIT {
 
     @Test
@@ -126,6 +128,33 @@ public class LanguagesApiIT extends AbstractMarketplaceApiIT {
                               "name": "C#",
                               "logoUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-logo-c-sharp.png",
                               "bannerUrl": "https://od-metadata-assets-develop.s3.eu-west-1.amazonaws.com/languages-banner-c-sharp.png"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_search_languages_by_name() {
+        // Given
+        final UserAuthHelper.AuthenticatedUser authenticatedUser = userAuthHelper.authenticateOlivier();
+
+        // When
+        client.get()
+                .uri(getApiURI(LANGUAGES, Map.of("search", "java")))
+                .header("Authorization", "Bearer " + authenticatedUser.jwt())
+                // Then
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .json("""
+                        {
+                          "languages": [
+                            {
+                              "name": "Javascript"
+                            },
+                            {
+                              "name": "Java"
                             }
                           ]
                         }
