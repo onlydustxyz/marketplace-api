@@ -29,7 +29,7 @@ public class AggregatedProjectKpisReadRepository {
                              count(distinct d.project_id)
                              filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_project_count,
             
-                             count(distinct d.contribution_id)
+                             count(d.contribution_id)
                              filter ( where d.is_merged_pr = 1 )                                                              as merged_pr_count
                       from bi.contribution_data d
                                join bi.project_global_data p on d.project_id = p.project_id
