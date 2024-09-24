@@ -25,25 +25,6 @@ public class GithubHelper {
 
     @Autowired
     ProjectHelper projectHelper;
-
-    @Value
-    @AllArgsConstructor(staticName = "of")
-    @EqualsAndHashCode
-    @Accessors(fluent = true)
-    public static class PullRequestId {
-        static final Faker faker = new Faker();
-        Long value;
-
-        public static PullRequestId random() {
-            return of(faker.random().nextLong());
-        }
-
-        @Override
-        public String toString() {
-            return value.toString();
-        }
-    }
-
     @Autowired
     DatabaseHelper databaseHelper;
 
@@ -110,7 +91,8 @@ public class GithubHelper {
         createPullRequest(repo, contributor, null);
     }
 
-    public void createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
+    public long createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
+        final var prId = faker.random().nextLong();
         final var prNumber = faker.random().nextInt(1000);
         final var parameters = new HashMap<String, Object>();
         parameters.put("id", faker.random().hex());
@@ -118,7 +100,7 @@ public class GithubHelper {
         parameters.put("repoOwnerLogin", repo.getOwner());
         parameters.put("repoName", repo.getName());
         parameters.put("repoHtmlUrl", repo.getHtmlUrl());
-        parameters.put("prId", faker.random().nextLong());
+        parameters.put("prId", prId);
         parameters.put("createdAt", CurrentDateProvider.now());
         parameters.put("completedAt", CurrentDateProvider.now().plusDays(1));
         parameters.put("githubNumber", prNumber);
@@ -143,10 +125,16 @@ public class GithubHelper {
                 insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', :mainFileExtensions);
                 """, parameters);
+        return prId;
+    }
+
+    public Long createIssue(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor) {
+        return createIssue(repo.getId(), CurrentDateProvider.now(), CurrentDateProvider.now().plusDays(1), "COMPLETED", contributor);
     }
 
     public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
         final var parameters = new HashMap<String, Object>();
+        parameters.put("id", faker.random().hex());
         parameters.put("repoId", repoId);
         parameters.put("number", faker.random().nextInt(10));
         parameters.put("title", faker.lorem().sentence());
@@ -175,16 +163,19 @@ public class GithubHelper {
                         limit 1
                         """, Map.of()
         );
-        parameters.put("id", nextIssueId);
+        parameters.put("issueId", nextIssueId);
 
         databaseHelper.executeQuery(
                 """
-                                INSERT INTO indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
-                                VALUES (:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
-                                ON CONFLICT DO NOTHING;
+                        INSERT INTO indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
+                        VALUES (:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
+                        ON CONFLICT DO NOTHING;
                         
-                                INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
-                                VALUES (:id, :repoId, :number, :title, cast(:status as indexer_exp.github_issue_status), :createdAt, :closedAt, :authorId, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :authorLogin, :authorHtmlUrl, :authorAvatarUrl);
+                        INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
+                        VALUES (:issueId, :repoId, :number, :title, cast(:status as indexer_exp.github_issue_status), :createdAt, :closedAt, :authorId, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :authorLogin, :authorHtmlUrl, :authorAvatarUrl);
+                        
+                        insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                        values (:id, :repoId, :contributorId, 'ISSUE', 'COMPLETED', :issueId, :createdAt, :closedAt, :number, 'COMPLETED', :title, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
                         """,
                 parameters
         );
@@ -233,5 +224,59 @@ public class GithubHelper {
                         """, parameters
         );
     }
+
+    public void createCodeReview(GithubRepo repo, Long prId, UserAuthHelper.AuthenticatedUser contributor) {
+        final var prNumber = faker.random().nextInt(1000);
+        final var parameters = new HashMap<String, Object>();
+        parameters.put("id", faker.random().hex());
+        parameters.put("repoId", repo.getId());
+        parameters.put("repoOwnerLogin", repo.getOwner());
+        parameters.put("repoName", repo.getName());
+        parameters.put("repoHtmlUrl", repo.getHtmlUrl());
+        parameters.put("codeReviewId", faker.random().nextLong());
+        parameters.put("prId", prId);
+        parameters.put("createdAt", CurrentDateProvider.now());
+        parameters.put("completedAt", CurrentDateProvider.now().plusDays(1));
+        parameters.put("githubNumber", prNumber);
+        parameters.put("githubTitle", faker.lorem().sentence());
+        parameters.put("githubHtmlUrl", "https://github.com/%s/%s/pull/%d".formatted(repo.getOwner(), repo.getName(), prNumber));
+        parameters.put("githubBody", faker.lorem().paragraph());
+        parameters.put("githubCommentsCount", faker.random().nextInt(10));
+        parameters.put("contributorId", contributor.user().getGithubUserId());
+        parameters.put("contributorLogin", contributor.user().getGithubLogin());
+        parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
+        parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
+
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
+                values(:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
+                on conflict do nothing;
+                
+                insert into indexer_exp.github_code_reviews(id, pull_request_id, author_id, state, requested_at, submitted_at, number, title, html_url, body, comments_count, repo_owner_login, repo_name, repo_id, repo_html_url, author_login, author_html_url, author_avatar_url)
+                values (:codeReviewId, :prId, :contributorId, 'APPROVED', :createdAt, :completedAt, :githubNumber, :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoId, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl);
+                
+                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, code_review_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                values (:id, :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
+                """, parameters);
+    }
+
+    @Value
+    @AllArgsConstructor(staticName = "of")
+    @EqualsAndHashCode
+    @Accessors(fluent = true)
+    public static class PullRequestId {
+        static final Faker faker = new Faker();
+        Long value;
+
+        public static PullRequestId random() {
+            return of(faker.random().nextLong());
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+    }
+
 
 }

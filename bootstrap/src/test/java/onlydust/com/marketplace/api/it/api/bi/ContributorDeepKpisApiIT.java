@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -130,14 +131,16 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
-            at("2021-01-01T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi));
+            at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
             at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
-            at("2021-01-03T00:00:03Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
+
+            final MutableObject<Long> prId = new MutableObject<>();
+            at("2021-01-02T00:00:00Z", () -> prId.setValue(githubHelper.createPullRequest(marketplace_api, antho, List.of("rs"))));
+            at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId.getValue(), mehdi));
             at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
@@ -220,13 +223,21 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 1.5,
                                     "trend": "UP"
                                   },
-                                  "mergedPrCount": {
-                                    "value": 2,
-                                    "trend": "UP"
-                                  },
                                   "rewardCount": {
                                     "value": 2,
                                     "trend": "UP"
+                                  },
+                                  "issueCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "prCount": {
+                                    "value": 2,
+                                    "trend": "UP"
+                                  },
+                                  "codeReviewCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "contributionCount": {
                                     "value": 2,
@@ -263,11 +274,19 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
-                                  "mergedPrCount": {
+                                  "rewardCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "issueCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "prCount": {
                                     "value": 4,
                                     "trend": "UP"
                                   },
-                                  "rewardCount": {
+                                  "codeReviewCount": {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
@@ -303,11 +322,19 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
-                                  "mergedPrCount": {
+                                  "rewardCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "issueCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "prCount": {
                                     "value": 2,
                                     "trend": "UP"
                                   },
-                                  "rewardCount": {
+                                  "codeReviewCount": {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
@@ -345,13 +372,21 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 3.5,
                                     "trend": "UP"
                                   },
-                                  "mergedPrCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
                                   "rewardCount": {
                                     "value": 2,
                                     "trend": "UP"
+                                  },
+                                  "issueCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "prCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "codeReviewCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
                                   },
                                   "contributionCount": {
                                     "value": 0,
@@ -391,13 +426,21 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
-                                  "mergedPrCount": {
-                                    "value": 4,
-                                    "trend": "UP"
-                                  },
                                   "rewardCount": {
                                     "value": 0,
                                     "trend": "STABLE"
+                                  },
+                                  "issueCount": {
+                                    "value": 1,
+                                    "trend": "UP"
+                                  },
+                                  "prCount": {
+                                    "value": 2,
+                                    "trend": "UP"
+                                  },
+                                  "codeReviewCount": {
+                                    "value": 1,
+                                    "trend": "UP"
                                   },
                                   "contributionCount": {
                                     "value": 4,
@@ -424,11 +467,19 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
-                                  "mergedPrCount": {
+                                  "rewardCount": {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
-                                  "rewardCount": {
+                                  "issueCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "prCount": {
+                                    "value": 0,
+                                    "trend": "STABLE"
+                                  },
+                                  "codeReviewCount": {
                                     "value": 0,
                                     "trend": "STABLE"
                                   },
@@ -461,7 +512,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
             final var lines = Objects.requireNonNull(csv).split("\\R");
             assertThat(lines).hasSize(7);
-            assertThat(lines[0]).isEqualTo("contributor;projects;categories;languages;ecosystems;country;total_rewarded_usd_amount;merged_pr_count;reward_count;contribution_count");
+            assertThat(lines[0]).isEqualTo("contributor;projects;categories;languages;ecosystems;country;total_rewarded_usd_amount;" +
+                                           "reward_count;issue_count;pr_count;code_review_count;contribution_count");
         }
 
         private void test_contributors_stats(String queryParam, String value, Consumer<BiContributorsPageResponse> asserter, boolean assertNotEmpty) {
@@ -529,9 +581,17 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
                             .isLessThanOrEqualTo(BigDecimal.valueOf(3.0))), true
             );
-            test_contributors_stats(Map.of("mergedPrCount.gte", "3"),
-                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getMergedPrCount().getValue())
-                            .isGreaterThanOrEqualTo(3)), true
+            test_contributors_stats(Map.of("issueCount.eq", "1"),
+                    response -> response.getContributors().forEach(project -> assertThat(project.getIssueCount().getValue())
+                            .isEqualTo(1)), true
+            );
+            test_contributors_stats(Map.of("prCount.eq", "2"),
+                    response -> response.getContributors().forEach(project -> assertThat(project.getPrCount().getValue())
+                            .isEqualTo(2)), true
+            );
+            test_contributors_stats(Map.of("codeReviewCount.eq", "1"),
+                    response -> response.getContributors().forEach(project -> assertThat(project.getCodeReviewCount().getValue())
+                            .isEqualTo(1)), true
             );
             test_contributors_stats(Map.of("rewardCount.eq", "2"),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getRewardCount().getValue())
@@ -545,8 +605,8 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         public void should_get_contributors_stats_ordered() {
-            test_contributors_stats(Map.of("sort", "MERGED_PR_COUNT", "sortDirection", "ASC"),
-                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getMergedPrCount().getValue())), true
+            test_contributors_stats(Map.of("sort", "PR_COUNT", "sortDirection", "ASC"),
+                    response -> assertThat(response.getContributors()).isSortedAccordingTo(comparing(c -> c.getPrCount().getValue())), true
             );
         }
     }

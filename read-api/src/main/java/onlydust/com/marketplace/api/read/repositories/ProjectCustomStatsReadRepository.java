@@ -11,8 +11,7 @@ import java.util.UUID;
 public interface ProjectCustomStatsReadRepository extends Repository<ProjectCustomStatReadEntity, UUID> {
     @Query(value = """
             select :projectId                                            as project_id,
-                   count(distinct cd.contribution_id)
-                   filter ( where cd.is_merged_pr = 1 )                  as merged_pr_count,
+                   sum(cd.is_pr)                                         as merged_pr_count,
                    count(distinct cd.contributor_id)                     as active_contributor_count,
                    count(distinct cd.contributor_id)
                    filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count

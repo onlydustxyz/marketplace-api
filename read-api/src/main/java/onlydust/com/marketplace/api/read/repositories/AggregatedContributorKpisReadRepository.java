@@ -18,7 +18,7 @@ public class AggregatedContributorKpisReadRepository {
     @Language("PostgreSQL")
     private final static String SELECT_QUERY = """
             WITH aggregated_contributor_stats AS
-                     (SELECT d.#timeGrouping#_timestamp                                                                               as timestamp,
+                     (SELECT d.#timeGrouping#_timestamp                                                                   as timestamp,
                              count(distinct d.contributor_id)                                                             as active_contributor_count,
             
                              count(distinct d.contributor_id)
@@ -27,8 +27,7 @@ public class AggregatedContributorKpisReadRepository {
                              count(distinct d.contributor_id)
                              filter (where previous.timestamp < d.#timeGrouping#_timestamp - cast(:timeGroupingInterval as interval)) as reactivated_contributor_count,
             
-                             count(d.contribution_id)
-                             filter ( where d.is_merged_pr = 1 )                                                              as merged_pr_count
+                             sum(d.is_pr)                                                                                 as merged_pr_count
                       from bi.contribution_data d
                                left join lateral ( select max(previous.#timeGrouping#_timestamp) as timestamp
                                                    from bi.contribution_data previous

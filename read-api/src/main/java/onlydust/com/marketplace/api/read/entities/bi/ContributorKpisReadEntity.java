@@ -15,7 +15,6 @@ import org.hibernate.type.SqlTypes;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.joining;
@@ -34,7 +33,8 @@ public class ContributorKpisReadEntity {
     Long contributorId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @NonNull ContributorResponse contributor;
+    @NonNull
+    ContributorResponse contributor;
     @JdbcTypeCode(SqlTypes.JSON)
     List<ProjectLinkResponse> projects;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -46,14 +46,18 @@ public class ContributorKpisReadEntity {
     String contributorCountry;
 
     BigDecimal totalRewardedUsdAmount;
-    Integer mergedPrCount;
     Integer rewardCount;
     Integer contributionCount;
+    Integer issueCount;
+    Integer prCount;
+    Integer codeReviewCount;
 
     BigDecimal previousPeriodTotalRewardedUsdAmount;
-    Integer previousPeriodMergedPrCount;
     Integer previousPeriodRewardCount;
     Integer previousPeriodContributionCount;
+    Integer previousPeriodIssueCount;
+    Integer previousPeriodPrCount;
+    Integer previousPeriodCodeReviewCount;
 
     private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
@@ -80,9 +84,11 @@ public class ContributorKpisReadEntity {
                 .ecosystems(ecosystems == null ? null : ecosystems.stream().sorted(comparing(EcosystemLinkResponse::getName)).toList())
                 .countryCode(contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code())
                 .totalRewardedUsdAmount(toDecimalNumberKpi(prettyUsd(totalRewardedUsdAmount), prettyUsd(previousPeriodTotalRewardedUsdAmount)))
-                .mergedPrCount(toNumberKpi(mergedPrCount, previousPeriodMergedPrCount))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
+                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
+                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
+                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
                 ;
     }
 
@@ -95,8 +101,10 @@ public class ContributorKpisReadEntity {
                 ecosystems == null ? null : ecosystems.stream().map(EcosystemLinkResponse::getName).sorted().collect(joining(",")),
                 contributorCountry == null ? null : Country.fromIso3(contributorCountry).iso2Code(),
                 prettyUsd(totalRewardedUsdAmount),
-                mergedPrCount,
                 rewardCount,
+                issueCount,
+                prCount,
+                codeReviewCount,
                 contributionCount
         );
     }

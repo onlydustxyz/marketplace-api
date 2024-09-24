@@ -16,7 +16,6 @@ import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
@@ -38,7 +37,8 @@ public class ProjectKpisReadEntity {
     UUID projectId;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @NonNull ProjectLinkResponse project;
+    @NonNull
+    ProjectLinkResponse project;
     @JdbcTypeCode(SqlTypes.JSON)
     List<RegisteredUserResponse> leads;
     @JdbcTypeCode(SqlTypes.JSON)
@@ -59,18 +59,22 @@ public class ProjectKpisReadEntity {
     BigDecimal averageRewardUsdAmount;
     Integer onboardedContributorCount;
     Integer activeContributorCount;
-    Integer mergedPrCount;
     Integer rewardCount;
     Integer contributionCount;
+    Integer issueCount;
+    Integer prCount;
+    Integer codeReviewCount;
 
     BigDecimal previousPeriodTotalGrantedUsdAmount;
     BigDecimal previousPeriodTotalRewardedUsdAmount;
     BigDecimal previousPeriodAverageRewardUsdAmount;
     Integer previousPeriodOnboardedContributorCount;
     Integer previousPeriodActiveContributorCount;
-    Integer previousPeriodMergedPrCount;
     Integer previousPeriodRewardCount;
     Integer previousPeriodContributionCount;
+    Integer previousPeriodIssueCount;
+    Integer previousPeriodPrCount;
+    Integer previousPeriodCodeReviewCount;
 
     private static DecimalNumberKpi toDecimalNumberKpi(BigDecimal value, BigDecimal valueOfPreviousPeriod) {
         return new DecimalNumberKpi().value(value)
@@ -119,9 +123,11 @@ public class ProjectKpisReadEntity {
                 .averageRewardUsdAmount(toDecimalNumberKpi(prettyUsd(averageRewardUsdAmount), prettyUsd(previousPeriodAverageRewardUsdAmount)))
                 .onboardedContributorCount(toNumberKpi(onboardedContributorCount, previousPeriodOnboardedContributorCount))
                 .activeContributorCount(toNumberKpi(activeContributorCount, previousPeriodActiveContributorCount))
-                .mergedPrCount(toNumberKpi(mergedPrCount, previousPeriodMergedPrCount))
                 .rewardCount(toNumberKpi(rewardCount, previousPeriodRewardCount))
                 .contributionCount(toNumberKpi(contributionCount, previousPeriodContributionCount))
+                .issueCount(toNumberKpi(issueCount, previousPeriodIssueCount))
+                .prCount(toNumberKpi(prCount, previousPeriodPrCount))
+                .codeReviewCount(toNumberKpi(codeReviewCount, previousPeriodCodeReviewCount))
                 ;
     }
 
@@ -144,8 +150,10 @@ public class ProjectKpisReadEntity {
                 prettyUsd(averageRewardUsdAmount),
                 onboardedContributorCount,
                 activeContributorCount,
-                mergedPrCount,
                 rewardCount,
+                issueCount,
+                prCount,
+                codeReviewCount,
                 contributionCount
         );
     }
