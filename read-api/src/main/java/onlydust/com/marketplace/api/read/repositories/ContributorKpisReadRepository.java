@@ -61,7 +61,6 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
               and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
               and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
               and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-            ORDER BY ?#{#pageable}
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
@@ -78,7 +77,6 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                       and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
                       and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
                       and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-                    ORDER BY ?#{#pageable}
                     """,
             nativeQuery = true)
     Page<ContributorKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
