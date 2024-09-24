@@ -78,13 +78,13 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
         synchronized void setup() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            final var antho = userAuthHelper.create();
-            final var pierre = userAuthHelper.create();
-            final var mehdi = userAuthHelper.create();
-            final var hayden = userAuthHelper.create();
-            final var abdel = userAuthHelper.create();
-            final var emma = userAuthHelper.create();
-            final var james = userAuthHelper.create();
+            final var antho = userAuthHelper.create("antho-foo");
+            final var pierre = userAuthHelper.create("pierre-foo");
+            final var mehdi = userAuthHelper.create("mehdi-foo");
+            final var hayden = userAuthHelper.create("hayden-foo");
+            final var abdel = userAuthHelper.create("abdel-foo");
+            final var emma = userAuthHelper.create("emma-foo");
+            final var james = userAuthHelper.create("james-foo");
 
             starknet = ecosystemHelper.create("Starknet ecosystem", caller).id();
             ethereum = ecosystemHelper.create("Ethereum ecosystem", caller).id();
@@ -333,7 +333,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                               "stats": [
                                 {
                                   "timestamp": "2021-01-01T00:00:00Z",
-                                  "totalGranted": 0,
+                                  "totalGranted": 200,
                                   "totalRewarded": 0,
                                   "mergedPrCount": 2,
                                   "newContributorCount": 1,

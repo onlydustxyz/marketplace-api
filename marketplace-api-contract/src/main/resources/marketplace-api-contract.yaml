@@ -9470,8 +9470,10 @@ components:
         - TOTAL_REWARDED_USD_AMOUNT
         - ONBOARDED_CONTRIBUTOR_COUNT
         - ACTIVE_CONTRIBUTOR_COUNT
-        - MERGED_PR_COUNT
         - REWARD_COUNT
+        - ISSUE_COUNT
+        - PR_COUNT
+        - CODE_REVIEW_COUNT
         - CONTRIBUTION_COUNT
 
     ContributorKpiSortEnum:
@@ -9480,7 +9482,9 @@ components:
         - CONTRIBUTOR_LOGIN
         - PROJECT_NAME
         - TOTAL_REWARDED_USD_AMOUNT
-        - MERGED_PR_COUNT
+        - ISSUE_COUNT
+        - PR_COUNT
+        - CODE_REVIEW_COUNT
         - CONTRIBUTION_COUNT
 
     TransactionType:
@@ -10787,9 +10791,13 @@ components:
           $ref: '#/components/schemas/NumberKpiFilter'
         activeContributorCount:
           $ref: '#/components/schemas/NumberKpiFilter'
-        mergedPrCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         rewardCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        issueCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        prCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        codeReviewCount:
           $ref: '#/components/schemas/NumberKpiFilter'
         contributionCount:
           $ref: '#/components/schemas/NumberKpiFilter'
@@ -10822,8 +10830,10 @@ components:
         - averageRewardUsdAmount
         - onboardedContributorCount
         - activeContributorCount
-        - mergedPrCount
         - rewardCount
+        - issueCount
+        - prCount
+        - codeReviewCount
         - contributionCount
       properties:
         project:
@@ -10862,9 +10872,13 @@ components:
           $ref: '#/components/schemas/NumberKpi'
         activeContributorCount:
           $ref: '#/components/schemas/NumberKpi'
-        mergedPrCount:
-          $ref: '#/components/schemas/NumberKpi'
         rewardCount:
+          $ref: '#/components/schemas/NumberKpi'
+        issueCount:
+          $ref: '#/components/schemas/NumberKpi'
+        prCount:
+          $ref: '#/components/schemas/NumberKpi'
+        codeReviewCount:
           $ref: '#/components/schemas/NumberKpi'
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
@@ -10920,11 +10934,15 @@ components:
             format: iso-country-code
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
-        contributionCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        mergedPrCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         rewardCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        issueCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        prCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        codeReviewCount:
+          $ref: '#/components/schemas/NumberKpiFilter'
+        contributionCount:
           $ref: '#/components/schemas/NumberKpiFilter'
 
     BiContributorsPageResponse:
@@ -10949,8 +10967,10 @@ components:
         - ecosystems
         - countryCode
         - totalRewardedUsdAmount
-        - mergedPrCount
         - rewardCount
+        - issueCount
+        - prCount
+        - codeReviewCount
         - contributionCount
       properties:
         contributor:
@@ -10976,9 +10996,13 @@ components:
           format: iso-country-code
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpi'
-        mergedPrCount:
-          $ref: '#/components/schemas/NumberKpi'
         rewardCount:
+          $ref: '#/components/schemas/NumberKpi'
+        issueCount:
+          $ref: '#/components/schemas/NumberKpi'
+        prCount:
+          $ref: '#/components/schemas/NumberKpi'
+        codeReviewCount:
           $ref: '#/components/schemas/NumberKpi'
         contributionCount:
           $ref: '#/components/schemas/NumberKpi'
