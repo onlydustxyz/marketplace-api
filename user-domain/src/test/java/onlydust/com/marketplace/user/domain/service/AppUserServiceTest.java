@@ -7,6 +7,7 @@ import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.model.github.GithubUserIdentity;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
+import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import onlydust.com.marketplace.user.domain.port.output.GithubOAuthAppPort;
@@ -110,7 +111,14 @@ class AppUserServiceTest {
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.tryCreateUser(any())).thenReturn(AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build());
+        when(userStoragePort.tryCreateUser(any())).thenReturn(
+                new CreatedUser(AuthenticatedUser.builder()
+                        .id(UserId.random())
+                        .avatarUrl(githubUserIdentity.avatarUrl())
+                        .githubUserId(githubUserIdentity.githubUserId())
+                        .login(githubUserIdentity.login())
+                        .roles(List.of(AuthenticatedUser.Role.USER))
+                        .build(), true));
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then

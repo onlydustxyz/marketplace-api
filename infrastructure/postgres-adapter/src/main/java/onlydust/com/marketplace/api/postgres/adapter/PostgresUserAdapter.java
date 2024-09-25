@@ -28,6 +28,7 @@ import onlydust.com.marketplace.project.domain.port.output.UserStoragePort;
 import onlydust.com.marketplace.project.domain.view.GithubUserWithTelegramView;
 import onlydust.com.marketplace.project.domain.view.RewardDetailsView;
 import onlydust.com.marketplace.project.domain.view.RewardItemView;
+import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 import onlydust.com.marketplace.user.domain.port.output.AppUserStoragePort;
 import org.jetbrains.annotations.NotNull;
@@ -87,8 +88,9 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public AuthenticatedUser tryCreateUser(AuthenticatedUser user) {
-        return mapCreatedUserToDomain(tryInsertAndGetUser(user));
+    public CreatedUser tryCreateUser(AuthenticatedUser user) {
+        final var actualUser = tryInsertAndGetUser(user);
+        return new CreatedUser(mapCreatedUserToDomain(actualUser), actualUser.getId().equals(user.id().value()));
     }
 
     private UserEntity tryInsertAndGetUser(AuthenticatedUser user) {
