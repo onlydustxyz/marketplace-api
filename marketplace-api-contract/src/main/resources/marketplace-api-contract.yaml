@@ -1618,11 +1618,7 @@ paths:
           description: Filter my projects
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Full text search
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: tags
           description: Filter on project tags
@@ -2021,11 +2017,7 @@ paths:
             When null, issues are not filtered by this field.
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Filter by title (case-insensitive search by title)
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: sort
           description: Sort order
@@ -2532,11 +2524,7 @@ paths:
             $ref: '#/components/schemas/GithubUserId'
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
-        - in: query
-          name: search
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: type
           schema:
@@ -3576,6 +3564,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Page of ecosystem'
@@ -3806,19 +3795,9 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SponsorId'
-        - in: query
-          name: pageIndex
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Sponsor programs page'
@@ -4067,19 +4046,9 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProgramId'
-        - in: query
-          name: pageIndex
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project name
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Program projects page'
@@ -4162,11 +4131,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProgramTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project or sponsor name
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
           schema:
@@ -4235,11 +4200,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProgramTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project or sponsor name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'The program transactions'
@@ -4314,11 +4275,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SponsorTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
           schema:
@@ -4387,11 +4344,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SponsorTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'The sponsor transactions'
@@ -4598,11 +4551,7 @@ paths:
             When null, issues are not filtered by this field.
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Filter by title (case-insensitive search by title)
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of hackathon issue counts per project'
@@ -4780,11 +4729,7 @@ paths:
       description: |
         Get all project categories
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by category name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of project categories'
@@ -4806,11 +4751,7 @@ paths:
       description: |
         Get all supported languages
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by language name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of supported languages'
@@ -4818,6 +4759,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LanguagesResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+
+  /api/v1/countries:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadCountries
+      summary: Get all contributor countries
+      operationId: getAllCountries
+      description: |
+        Get all contributor countries
+      parameters:
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        "200":
+          description: 'List of contributor countries'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountriesResponse'
         "500":
           $ref: '#/components/responses/InternalServerError'
 
@@ -4899,6 +4863,12 @@ components:
       schema:
         type: integer
         default: 5
+    searchParam:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
     sortDirectionParam:
       name: direction
       in: query
@@ -5161,6 +5131,12 @@ components:
     LanguageSlug:
       type: string
       description: OnlyDust language slug
+
+    CountryCode:
+      type: string
+      format: iso3166-1-alpha-2
+      description: ISO 3166-1 alpha-2 country code
+      example: FR
 
     RewardId:
       type: string
@@ -6616,6 +6592,24 @@ components:
           format: url
           description: Direct URL to language's banner image
           example: 'https://rust.org/banner.png'
+
+    CountriesResponse:
+      type: object
+      required:
+        - countries
+      properties:
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryResponse'
+
+    CountryResponse:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          $ref: '#/components/schemas/CountryCode'
 
     ProjectPageResponse:
       allOf:
@@ -8943,8 +8937,8 @@ components:
               deprecated: true
               type: string
             countryCode:
-              type: string
-              format: iso-country-code
+              $ref: '#/components/schemas/CountryCode'
+
         companyBillingProfile:
           type: object
           required:
@@ -8968,8 +8962,7 @@ components:
               deprecated: true
               type: string
             countryCode:
-              type: string
-              format: iso-country-code
+              $ref: '#/components/schemas/CountryCode'
         destinationAccounts:
           $ref: '#/components/schemas/DestinationAccountResponse'
         rewards:
@@ -10930,8 +10923,7 @@ components:
         countryCodes:
           type: array
           items:
-            type: string
-            format: iso-country-code
+            $ref: '#/components/schemas/CountryCode'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
@@ -10992,8 +10984,7 @@ components:
           items:
             $ref: '#/components/schemas/EcosystemLinkResponse'
         countryCode:
-          type: string
-          format: iso-country-code
+          $ref: '#/components/schemas/CountryCode'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpi'
         rewardCount:
@@ -11019,8 +11010,7 @@ components:
         - value
       properties:
         countryCode:
-          type: string
-          format: iso-country-code
+          $ref: '#/components/schemas/CountryCode'
         value:
           type: number
           format: int64

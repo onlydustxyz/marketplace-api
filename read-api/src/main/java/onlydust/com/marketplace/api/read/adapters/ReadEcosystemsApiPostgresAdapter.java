@@ -71,11 +71,11 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     }
 
     @Override
-    public ResponseEntity<EcosystemPage> getAllEcosystems(Integer pageIndex, Integer pageSize) {
+    public ResponseEntity<EcosystemPage> getAllEcosystems(Integer pageIndex, Integer pageSize, String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
 
-        final var page = ecosystemReadRepository.findAll(null, PageRequest.of(index, size, Sort.by("name")));
+        final var page = ecosystemReadRepository.findAll(null, search, PageRequest.of(index, size, Sort.by("name")));
 
         final var response = new EcosystemPage()
                 .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toLinkResponse).toList())
@@ -148,7 +148,7 @@ public class ReadEcosystemsApiPostgresAdapter implements ReadEcosystemsApi {
     public ResponseEntity<EcosystemPageV2> getEcosystemsPage(Boolean featured, Boolean hidden, Integer pageIndex, Integer pageSize) {
         final var page = featured ?
                 ecosystemReadRepository.findAllFeatured(hidden, PageRequest.of(pageIndex, pageSize, Sort.by("featuredRank"))) :
-                ecosystemReadRepository.findAll(hidden, PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
+                ecosystemReadRepository.findAll(hidden, null, PageRequest.of(pageIndex, pageSize, Sort.by("slug")));
 
         final var response = new EcosystemPageV2()
                 .ecosystems(page.getContent().stream().map(EcosystemReadEntity::toPageItemResponse).toList()
