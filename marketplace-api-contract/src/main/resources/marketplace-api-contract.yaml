@@ -10908,6 +10908,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContributorRoleEnum'
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
         categoryIds:
           type: array
           items:

@@ -2,14 +2,12 @@ package onlydust.com.marketplace.api.it.api.bi;
 
 import lombok.SneakyThrows;
 import onlydust.com.marketplace.accounting.domain.model.Country;
-import onlydust.com.marketplace.api.contract.model.BiContributorsPageResponse;
-import onlydust.com.marketplace.api.contract.model.EcosystemLinkResponse;
-import onlydust.com.marketplace.api.contract.model.LanguageResponse;
-import onlydust.com.marketplace.api.contract.model.ProjectCategoryResponse;
+import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -56,6 +54,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static UserAuthHelper.AuthenticatedUser james;
         private static ProjectCategory defi;
         private static ProjectCategory gaming;
+        private static ProjectId onlyDust;
 
         private static String allProgramOrEcosystemIds;
 
@@ -107,7 +106,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
             projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
@@ -552,6 +551,11 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                         assertThat(response.getContributors().get(0).getContributor().getLogin()).contains("hayden");
                         assertThat(response.getContributors().get(1).getContributor().getLogin()).contains("mehdi");
                     }, true
+            );
+            test_contributors_stats("projectIds", onlyDust.toString(),
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
+                            .extracting(ProjectLinkResponse::getName)
+                            .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty()), true
             );
             test_contributors_stats("categoryIds", gaming.id().toString(),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getCategories().stream().map(ProjectCategoryResponse::getName).toList())
