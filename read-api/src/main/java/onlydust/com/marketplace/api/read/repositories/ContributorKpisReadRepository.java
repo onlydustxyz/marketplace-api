@@ -76,7 +76,7 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, :contributorRoles, :search) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, :contributorRoles, :search) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
