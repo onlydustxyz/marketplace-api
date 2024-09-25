@@ -93,6 +93,38 @@ public class EcosystemsApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_search_ecosystem_by_name() {
+        // Given
+        final String jwt = userAuthHelper.authenticatePierre().jwt();
+
+        // When
+        client.get()
+                .uri(getApiURI(GET_ALL_ECOSYSTEMS, Map.of("pageIndex", "0", "pageSize", "50", "search", "et")))
+                .header("Authorization", "Bearer " + jwt)
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "totalPageNumber": 1,
+                          "totalItemNumber": 2,
+                          "hasMore": false,
+                          "nextPageIndex": 0,
+                          "ecosystems": [
+                            {
+                              "name": "Ethereum"
+                            },
+                            {
+                              "name": "Starknet"
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_return_unauthorized_given_not_authenticated_user() {
         // When
         client.get()

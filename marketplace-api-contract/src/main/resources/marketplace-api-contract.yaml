@@ -1618,11 +1618,7 @@ paths:
           description: Filter my projects
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Full text search
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: tags
           description: Filter on project tags
@@ -2021,11 +2017,7 @@ paths:
             When null, issues are not filtered by this field.
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Filter by title (case-insensitive search by title)
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: sort
           description: Sort order
@@ -2532,11 +2524,7 @@ paths:
             $ref: '#/components/schemas/GithubUserId'
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
-        - in: query
-          name: search
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: type
           schema:
@@ -3576,6 +3564,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Page of ecosystem'
@@ -3806,19 +3795,9 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/SponsorId'
-        - in: query
-          name: pageIndex
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Sponsor programs page'
@@ -4067,19 +4046,9 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/ProgramId'
-        - in: query
-          name: pageIndex
-          schema:
-            type: integer
-        - in: query
-          name: pageSize
-          schema:
-            type: integer
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project name
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'Program projects page'
@@ -4162,11 +4131,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProgramTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project or sponsor name
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
           schema:
@@ -4235,11 +4200,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ProgramTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by project or sponsor name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'The program transactions'
@@ -4314,11 +4275,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SponsorTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
           schema:
@@ -4387,11 +4344,7 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/SponsorTransactionType'
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by program name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'The sponsor transactions'
@@ -4598,11 +4551,7 @@ paths:
             When null, issues are not filtered by this field.
           schema:
             type: boolean
-        - in: query
-          name: search
-          description: Filter by title (case-insensitive search by title)
-          schema:
-            type: string
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of hackathon issue counts per project'
@@ -4780,11 +4729,7 @@ paths:
       description: |
         Get all project categories
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by category name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of project categories'
@@ -4806,11 +4751,7 @@ paths:
       description: |
         Get all supported languages
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by language name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of supported languages'
@@ -4833,11 +4774,7 @@ paths:
       description: |
         Get all contributor countries
       parameters:
-        - in: query
-          name: search
-          schema:
-            type: string
-          description: Search by country name
+        - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
           description: 'List of contributor countries'
@@ -4926,6 +4863,12 @@ components:
       schema:
         type: integer
         default: 5
+    searchParam:
+      name: search
+      in: query
+      required: false
+      schema:
+        type: string
     sortDirectionParam:
       name: direction
       in: query
