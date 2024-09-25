@@ -4821,6 +4821,33 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+
+  /api/v1/countries:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadCountries
+      summary: Get all contributor countries
+      operationId: getAllCountries
+      description: |
+        Get all contributor countries
+      parameters:
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search by country name
+      responses:
+        "200":
+          description: 'List of contributor countries'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountriesResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/public-activity:
     get:
       security:
@@ -5161,6 +5188,12 @@ components:
     LanguageSlug:
       type: string
       description: OnlyDust language slug
+
+    CountryCode:
+      type: string
+      format: iso3166-1-alpha-2
+      description: ISO 3166-1 alpha-2 country code
+      example: FR
 
     RewardId:
       type: string
@@ -6616,6 +6649,24 @@ components:
           format: url
           description: Direct URL to language's banner image
           example: 'https://rust.org/banner.png'
+
+    CountriesResponse:
+      type: object
+      required:
+        - countries
+      properties:
+        countries:
+          type: array
+          items:
+            $ref: '#/components/schemas/CountryResponse'
+
+    CountryResponse:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          $ref: '#/components/schemas/CountryCode'
 
     ProjectPageResponse:
       allOf:
@@ -8943,8 +8994,8 @@ components:
               deprecated: true
               type: string
             countryCode:
-              type: string
-              format: iso-country-code
+              $ref: '#/components/schemas/CountryCode'
+
         companyBillingProfile:
           type: object
           required:
@@ -8968,8 +9019,7 @@ components:
               deprecated: true
               type: string
             countryCode:
-              type: string
-              format: iso-country-code
+              $ref: '#/components/schemas/CountryCode'
         destinationAccounts:
           $ref: '#/components/schemas/DestinationAccountResponse'
         rewards:
@@ -10930,8 +10980,7 @@ components:
         countryCodes:
           type: array
           items:
-            type: string
-            format: iso-country-code
+            $ref: '#/components/schemas/CountryCode'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
@@ -10992,8 +11041,7 @@ components:
           items:
             $ref: '#/components/schemas/EcosystemLinkResponse'
         countryCode:
-          type: string
-          format: iso-country-code
+          $ref: '#/components/schemas/CountryCode'
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpi'
         rewardCount:
@@ -11019,8 +11067,7 @@ components:
         - value
       properties:
         countryCode:
-          type: string
-          format: iso-country-code
+          $ref: '#/components/schemas/CountryCode'
         value:
           type: number
           format: int64
