@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.old.ApplicationR
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.OnboardingRepository;
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -178,13 +179,13 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_support_concurrent_calls_to_createUser() throws InterruptedException {
+    void should_support_concurrent_calls_to_tryCreateUser() throws InterruptedException {
         final int numberOfThreads = 5;
         final int numberOfIterationPerThread = 50;
         final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         final CountDownLatch latch = new CountDownLatch(numberOfThreads);
         final var thrown = new ConcurrentLinkedQueue<Throwable>();
-        final var retrievedGithubUsers = new ConcurrentLinkedQueue<AuthenticatedUser>();
+        final var retrievedGithubUsers = new ConcurrentLinkedQueue<CreatedUser>();
 
         final var githubUserId = faker.number().randomNumber(10, true);
 
@@ -212,7 +213,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                             .build();
                     for (int i = 0; i < numberOfIterationPerThread; i++) {
                         try {
-                            final var u = postgresUserAdapter.createUser(user);
+                            final var u = postgresUserAdapter.tryCreateUser(user);
                             retrievedGithubUsers.add(u);
                         } catch (Exception e) {
                             thrown.add(e);
@@ -230,15 +231,16 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
         // Then
         assertThat(thrown).isEmpty();
         assertThat(retrievedGithubUsers).hasSize(numberOfThreads * numberOfIterationPerThread);
-        final var userId = retrievedGithubUsers.stream().findFirst().get().id();
+        final var userId = retrievedGithubUsers.stream().findFirst().get().user().id();
         retrievedGithubUsers.forEach(u -> {
-            assertThat(u.githubUserId()).isEqualTo(githubUserId);
-            assertThat(u.login()).isEqualTo(userData.login());
-            assertThat(u.avatarUrl()).isEqualTo(userData.avatarUrl());
-            assertThat(u.email()).isEqualTo(userData.email());
-            assertThat(u.roles()).containsExactlyElementsOf(userData.roles());
-            assertThat(u.id()).isEqualTo(userId);
+            assertThat(u.user().githubUserId()).isEqualTo(githubUserId);
+            assertThat(u.user().login()).isEqualTo(userData.login());
+            assertThat(u.user().avatarUrl()).isEqualTo(userData.avatarUrl());
+            assertThat(u.user().email()).isEqualTo(userData.email());
+            assertThat(u.user().roles()).containsExactlyElementsOf(userData.roles());
+            assertThat(u.user().id()).isEqualTo(userId);
         });
+        assertThat(retrievedGithubUsers.stream().filter(CreatedUser::isNew).toList()).hasSize(1);
     }
 
     @Test

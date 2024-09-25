@@ -2,6 +2,7 @@ package onlydust.com.marketplace.user.domain.port.output;
 
 import onlydust.com.marketplace.kernel.model.AuthenticatedUser;
 import onlydust.com.marketplace.kernel.model.UserId;
+import onlydust.com.marketplace.user.domain.model.CreatedUser;
 import onlydust.com.marketplace.user.domain.model.NotificationRecipient;
 
 import java.util.Date;
@@ -19,5 +20,5 @@ public interface AppUserStoragePort {
 
     void updateUserLastSeenAt(UserId userId, Date lastSeenAt);
 
-    AuthenticatedUser createUser(AuthenticatedUser user);
+    CreatedUser tryCreateUser(AuthenticatedUser user);
 }

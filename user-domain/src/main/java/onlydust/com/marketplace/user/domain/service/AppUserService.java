@@ -29,42 +29,39 @@ public class AppUserService implements AppUserFacadePort {
     private final IndexerPort indexerPort;
     private final UserObserverPort userObserverPort;
 
-
     @Override
     @Transactional
     public AuthenticatedUser getUserByGithubIdentity(GithubUserIdentity githubUserIdentity, boolean readOnly) {
-        return appUserStoragePort
-                .getRegisteredUserByGithubId(githubUserIdentity.githubUserId())
-                .map(user -> {
-                    if (!readOnly)
-                        appUserStoragePort.updateUserLastSeenAt(user.id(), new Date());
+        return appUserStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId()).map(user -> {
+            if (!readOnly) appUserStoragePort.updateUserLastSeenAt(user.id(), new Date());
 
-                    return user;
-                })
-                .orElseGet(() -> {
-                    if (readOnly) {
-                        throw notFound("User %d not found".formatted(githubUserIdentity.githubUserId()));
-                    }
+            return user;
+        }).orElseGet(() -> {
+            if (readOnly) {
+                throw notFound("User %d not found".formatted(githubUserIdentity.githubUserId()));
+            }
 
-                    final var user = appUserStoragePort.createUser(AuthenticatedUser.builder()
-                            .id(UserId.random())
-                            .roles(List.of(AuthenticatedUser.Role.USER))
-                            .githubUserId(githubUserIdentity.githubUserId())
-                            .avatarUrl(githubUserIdentity.avatarUrl())
-                            .login(githubUserIdentity.login())
-                            .email(githubUserIdentity.email())
-                            .build());
+            final var createdUser = appUserStoragePort.tryCreateUser(AuthenticatedUser.builder()
+                    .id(UserId.random())
+                    .roles(List.of(AuthenticatedUser.Role.USER))
+                    .githubUserId(githubUserIdentity.githubUserId())
+                    .avatarUrl(githubUserIdentity.avatarUrl())
+                    .login(githubUserIdentity.login())
+                    .email(githubUserIdentity.email()).build());
 
-                    userObserverPort.onUserSignedUp(user);
-                    return user;
-                });
+            if (createdUser.isNew()) {
+                userObserverPort.onUserSignedUp(createdUser.user());
+            }
+            return createdUser.user();
+        });
     }
 
     @Override
     @Transactional
     public void resetAndReplaceUser(UserId appUserId, String newGithubLogin, String githubOAuthAppId, String githubOAuthAppSecret) {
-        final Long currentGithubUserId = appUserStoragePort.getGithubUserId(appUserId)
-                .orElseThrow(() -> OnlyDustException.internalServerError("User %s github id not found".formatted(appUserId)));
+        final Long currentGithubUserId = appUserStoragePort.getGithubUserId(appUserId).orElseThrow(() -> OnlyDustException.internalServerError(("User %s " +
+                                                                                                                                                "github id " +
+                                                                                                                                                "not found").formatted(appUserId)));
         final List<GithubUserIdentity> githubUserIdentities = githubUserStoragePort.searchUsers(newGithubLogin);
         if (githubUserIdentities.isEmpty()) {
             throw OnlyDustException.internalServerError("Github user %s not found".formatted(newGithubLogin));
