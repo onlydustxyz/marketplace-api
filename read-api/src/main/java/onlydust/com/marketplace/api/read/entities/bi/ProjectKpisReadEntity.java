@@ -105,7 +105,7 @@ public class ProjectKpisReadEntity {
                         .totalPerCurrency(budget == null || budget.availableBudgetPerCurrency == null ? null :
                                 budget.availableBudgetPerCurrency.stream()
                                         .map(a -> {
-                                                    final var conversionRate = (a.usdAmount == null || a.amount.equals(ZERO)) ? ONE :
+                                                    final var conversionRate = (a.usdAmount == null || a.amount.compareTo(ZERO) == 0) ? ONE :
                                                             a.usdAmount.divide(a.amount, 2, HALF_EVEN);
                                                     return new DetailedTotalMoneyTotalPerCurrencyInner()
                                                             .currency(a.currency)
