@@ -549,3 +549,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000345_introduce_bi_search_contributors_function.sql
   - include:
       file: db/changelog/changelogs/00000346_fix_bi_perf.sql
+  - include:
+      file: db/changelog/changelogs/00000347_bi_contributors_add_projectIds_filter.sql
