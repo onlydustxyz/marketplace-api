@@ -493,6 +493,30 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         }
 
         @Test
+        public void should_get_projects_stats_with_pagination() {
+            // When
+            client.get()
+                    .uri(getApiURI(BI_PROJECTS, Map.of("pageIndex", "0",
+                            "pageSize", "2",
+                            "fromDate", "2021-01-01",
+                            "toDate", "2021-01-10")))
+                    .header("Authorization", BEARER_PREFIX + caller.jwt())
+                    // Then
+                    .exchange()
+                    .expectStatus()
+                    .is2xxSuccessful()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 2,
+                              "totalItemNumber": 3,
+                              "hasMore": true,
+                              "nextPageIndex": 1
+                            }
+                            """);
+        }
+
+        @Test
         public void should_export_projects_stats_between_dates() {
             // When
             final var csv = client.get()
