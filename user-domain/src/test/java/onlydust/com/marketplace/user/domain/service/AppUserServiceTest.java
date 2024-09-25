@@ -110,7 +110,7 @@ class AppUserServiceTest {
 
         // When
         when(userStoragePort.getRegisteredUserByGithubId(githubUserIdentity.githubUserId())).thenReturn(Optional.empty());
-        when(userStoragePort.createUser(any())).thenReturn(AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build());
+        when(userStoragePort.tryCreateUser(any())).thenReturn(AuthenticatedUser.builder().id(UserId.random()).avatarUrl(githubUserIdentity.avatarUrl()).githubUserId(githubUserIdentity.githubUserId()).login(githubUserIdentity.login()).roles(List.of(AuthenticatedUser.Role.USER)).build());
         final AuthenticatedUser userByGithubIdentity = userService.getUserByGithubIdentity(githubUserIdentity, false);
 
         // Then

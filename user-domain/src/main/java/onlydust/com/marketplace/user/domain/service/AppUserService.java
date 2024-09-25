@@ -46,8 +46,9 @@ public class AppUserService implements AppUserFacadePort {
                         throw notFound("User %d not found".formatted(githubUserIdentity.githubUserId()));
                     }
 
-                    final var user = appUserStoragePort.createUser(AuthenticatedUser.builder()
-                            .id(UserId.random())
+                    final var newUserId = UserId.random();
+                    final var user = appUserStoragePort.tryCreateUser(AuthenticatedUser.builder()
+                            .id(newUserId)
                             .roles(List.of(AuthenticatedUser.Role.USER))
                             .githubUserId(githubUserIdentity.githubUserId())
                             .avatarUrl(githubUserIdentity.avatarUrl())
@@ -55,9 +56,15 @@ public class AppUserService implements AppUserFacadePort {
                             .email(githubUserIdentity.email())
                             .build());
 
-                    userObserverPort.onUserSignedUp(user);
+                    if (userHadNeverBeenInsertedBefore(user, newUserId)) {
+                        userObserverPort.onUserSignedUp(user);
+                    }
                     return user;
                 });
+    }
+
+    private static boolean userHadNeverBeenInsertedBefore(AuthenticatedUser user, UserId expectedUserId) {
+        return user.id().equals(expectedUserId);
     }
 
     @Override

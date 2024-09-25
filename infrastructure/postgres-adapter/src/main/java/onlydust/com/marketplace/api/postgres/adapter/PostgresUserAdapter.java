@@ -87,11 +87,11 @@ public class PostgresUserAdapter implements UserStoragePort, AppUserStoragePort 
 
     @Override
     @Transactional
-    public AuthenticatedUser createUser(AuthenticatedUser user) {
-        return mapCreatedUserToDomain(tryCreateUser(user));
+    public AuthenticatedUser tryCreateUser(AuthenticatedUser user) {
+        return mapCreatedUserToDomain(tryInsertAndGetUser(user));
     }
 
-    private UserEntity tryCreateUser(AuthenticatedUser user) {
+    private UserEntity tryInsertAndGetUser(AuthenticatedUser user) {
         userRepository.tryInsert(mapUserToEntity(user));
         userRepository.flush();
         return userRepository.findByGithubUserId(user.githubUserId()).orElseThrow();

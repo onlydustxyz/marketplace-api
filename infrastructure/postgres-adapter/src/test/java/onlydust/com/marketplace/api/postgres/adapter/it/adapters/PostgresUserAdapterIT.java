@@ -178,7 +178,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
     }
 
     @Test
-    void should_support_concurrent_calls_to_createUser() throws InterruptedException {
+    void should_support_concurrent_calls_to_tryCreateUser() throws InterruptedException {
         final int numberOfThreads = 5;
         final int numberOfIterationPerThread = 50;
         final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
@@ -212,7 +212,7 @@ class PostgresUserAdapterIT extends AbstractPostgresIT {
                             .build();
                     for (int i = 0; i < numberOfIterationPerThread; i++) {
                         try {
-                            final var u = postgresUserAdapter.createUser(user);
+                            final var u = postgresUserAdapter.tryCreateUser(user);
                             retrievedGithubUsers.add(u);
                         } catch (Exception e) {
                             thrown.add(e);

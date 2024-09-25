@@ -6,11 +6,6 @@ import java.util.concurrent.Executors;
 
 public class ConcurrentTesting {
 
-    @FunctionalInterface
-    public interface Runnable {
-        public abstract void run(int threadId);
-    }
-
     public static void runConcurrently(int numberOfThreads, Runnable task) throws InterruptedException {
         final ExecutorService service = Executors.newFixedThreadPool(numberOfThreads);
         final CountDownLatch startLatch = new CountDownLatch(1);
@@ -52,5 +47,30 @@ public class ConcurrentTesting {
         }
         startLatch.countDown();
         endLatch.await();
+    }
+
+    @FunctionalInterface
+    public interface Runnable {
+        public abstract void run(int threadId);
+    }
+
+    public static class MutableObject<T> {
+        private T value;
+
+        public synchronized T getValue() {
+            return value;
+        }
+
+        public synchronized void setValue(T value) {
+            this.value = value;
+        }
+
+        public synchronized boolean nullOrSetValue(T value) {
+            if (this.value == null) {
+                this.value = value;
+                return true;
+            }
+            return value.equals(this.value);
+        }
     }
 }

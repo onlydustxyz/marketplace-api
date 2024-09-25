@@ -19,5 +19,5 @@ public interface AppUserStoragePort {
 
     void updateUserLastSeenAt(UserId userId, Date lastSeenAt);
 
-    AuthenticatedUser createUser(AuthenticatedUser user);
+    AuthenticatedUser tryCreateUser(AuthenticatedUser user);
 }
