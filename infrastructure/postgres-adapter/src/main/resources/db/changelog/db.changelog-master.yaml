@@ -551,3 +551,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000346_fix_bi_perf.sql
   - include:
       file: db/changelog/changelogs/00000347_bi_contributors_add_projectIds_filter.sql
+  - include:
+      file: db/changelog/changelogs/00000348_add_missing_indexes.sql
