@@ -63,9 +63,7 @@ public class UserProfileInfoEntity {
     @Column(columnDefinition = "uuid[]")
     UUID[] preferredCategoryIds;
 
-    @Column(nullable = false)
     String contactEmail;
-
 
     public UserProfileInfoEntity update(final UUID userId, UserProfile userProfile) {
         final Set<ContactInformationEntity> contactInformation = mapContactInformationsToEntity(UserId.of(userId), userProfile.contacts());
