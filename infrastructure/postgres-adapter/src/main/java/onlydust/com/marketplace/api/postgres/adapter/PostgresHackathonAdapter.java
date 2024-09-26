@@ -7,7 +7,6 @@ import onlydust.com.marketplace.api.postgres.adapter.entity.write.HackathonRegis
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRegistrationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.HackathonRepository;
 import onlydust.com.marketplace.kernel.model.UserId;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
 import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,12 +54,6 @@ public class PostgresHackathonAdapter implements HackathonStoragePort {
     @Transactional
     public void registerUser(UserId userId, Hackathon.Id hackathonId) {
         hackathonRegistrationRepository.saveAndFlush(new HackathonRegistrationEntity(hackathonId.value(), userId.value()));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<Hackathon> findUpcomingHackathonByIssueId(GithubIssue.@NonNull Id issueId) {
-        return hackathonRepository.findUpcomingHackathonByIssueId(issueId.value()).map(HackathonEntity::toDomain);
     }
 
     @Override

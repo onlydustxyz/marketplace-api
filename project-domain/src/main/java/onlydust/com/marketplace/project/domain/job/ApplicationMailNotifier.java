@@ -5,8 +5,6 @@ import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationAccepted;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationRefused;
 import onlydust.com.marketplace.project.domain.model.notification.ApplicationToReview;
@@ -61,10 +59,6 @@ public class ApplicationMailNotifier implements ApplicationObserverPort {
                     .issue(NotificationIssue.of(issue))
                     .build());
         });
-    }
-
-    @Override
-    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
 
     @Override
