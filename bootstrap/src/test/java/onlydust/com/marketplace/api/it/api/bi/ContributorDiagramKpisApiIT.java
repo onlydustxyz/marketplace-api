@@ -188,7 +188,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 3.0,
                                   "mergedPrCount": 6,
                                   "newContributorCount": 4,
-                                  "activeContributorCount": 4,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 0,
                                   "churnedContributorCount": 0
                                 },
@@ -208,7 +208,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 2.0,
                                   "mergedPrCount": 1,
                                   "newContributorCount": 0,
-                                  "activeContributorCount": 1,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 1,
                                   "churnedContributorCount": 1
                                 },
@@ -228,7 +228,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 0,
                                   "mergedPrCount": 2,
                                   "newContributorCount": 0,
-                                  "activeContributorCount": 2,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 2,
                                   "churnedContributorCount": 1
                                 },
@@ -337,7 +337,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 0,
                                   "mergedPrCount": 2,
                                   "newContributorCount": 1,
-                                  "activeContributorCount": 1,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 0,
                                   "churnedContributorCount": 0
                                 },
@@ -387,7 +387,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 0,
                                   "mergedPrCount": 1,
                                   "newContributorCount": 0,
-                                  "activeContributorCount": 1,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 1,
                                   "churnedContributorCount": 0
                                 },
@@ -458,7 +458,7 @@ public class ContributorDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 5.0,
                                   "mergedPrCount": 8,
                                   "newContributorCount": 4,
-                                  "activeContributorCount": 4,
+                                  "activeContributorCount": 0,
                                   "reactivatedContributorCount": 0,
                                   "churnedContributorCount": 0
                                 },

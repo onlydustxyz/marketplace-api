@@ -187,7 +187,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 3.0,
                                   "mergedPrCount": 6,
                                   "newProjectCount": 2,
-                                  "activeProjectCount": 2,
+                                  "activeProjectCount": 0,
                                   "reactivatedProjectCount": 0,
                                   "churnedProjectCount": 0
                                 },
@@ -237,7 +237,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 0,
                                   "mergedPrCount": 1,
                                   "newProjectCount": 0,
-                                  "activeProjectCount": 1,
+                                  "activeProjectCount": 0,
                                   "reactivatedProjectCount": 1,
                                   "churnedProjectCount": 1
                                 },
@@ -336,7 +336,7 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
                                   "totalRewarded": 5.0,
                                   "mergedPrCount": 8,
                                   "newProjectCount": 2,
-                                  "activeProjectCount": 2,
+                                  "activeProjectCount": 0,
                                   "reactivatedProjectCount": 0,
                                   "churnedProjectCount": 0
                                 },

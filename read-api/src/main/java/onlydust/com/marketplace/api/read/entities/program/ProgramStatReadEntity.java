@@ -24,7 +24,7 @@ public class ProgramStatReadEntity {
     UUID programId;
 
     @NonNull
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "programId", insertable = false, updatable = false)
     ProgramReadEntity program;
 

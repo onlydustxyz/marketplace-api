@@ -28,15 +28,15 @@ public class AggregatedContributorKpisReadEntity {
     @Getter
     ZonedDateTime timestampOfPreviousPeriod;
 
-    Integer activeContributorCount;
+    Integer totalContributorCount;
     Integer newContributorCount;
     Integer reactivatedContributorCount;
     Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
 
-    Integer activeContributorCount() {
-        return Optional.ofNullable(activeContributorCount).orElse(0);
+    Integer totalContributorCount() {
+        return Optional.ofNullable(totalContributorCount).orElse(0);
     }
 
     Integer newContributorCount() {
@@ -66,9 +66,9 @@ public class AggregatedContributorKpisReadEntity {
                 .totalRewarded(totalRewardedUsdAmount())
                 .mergedPrCount(mergedPrCount())
                 .newContributorCount(newContributorCount())
-                .activeContributorCount(activeContributorCount())
+                .activeContributorCount(totalContributorCount() - newContributorCount() - reactivatedContributorCount())
                 .reactivatedContributorCount(reactivatedContributorCount())
                 .churnedContributorCount(statsOfPreviousTimeGroup == null ? 0 :
-                        statsOfPreviousTimeGroup.activeContributorCount() - activeContributorCount() + newContributorCount() + reactivatedContributorCount());
+                        statsOfPreviousTimeGroup.totalContributorCount() - totalContributorCount() + newContributorCount() + reactivatedContributorCount());
     }
 }

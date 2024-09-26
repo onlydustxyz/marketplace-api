@@ -21,7 +21,7 @@ public class AggregatedProjectKpisReadRepository {
     private final static String SELECT_QUERY = """
             WITH aggregated_project_stats AS
                      (SELECT d.#timeGrouping#_timestamp                                                                   as timestamp,
-                             count(distinct d.project_id)                                                                 as active_project_count,
+                             count(distinct d.project_id)                                                                 as total_project_count,
             
                              count(distinct d.project_id)
                              filter (where previous.timestamp is null)                                                    as new_project_count,
@@ -79,7 +79,7 @@ public class AggregatedProjectKpisReadRepository {
             
             SELECT allt.timestamp,
                    allt.timestamp_of_previous_period,
-                   aps.active_project_count,
+                   aps.total_project_count,
                    aps.new_project_count,
                    aps.reactivated_project_count,
                    aps.merged_pr_count,
