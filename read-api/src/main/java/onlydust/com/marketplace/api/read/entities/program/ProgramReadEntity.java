@@ -59,9 +59,9 @@ public class ProgramReadEntity {
     @OrderBy("login")
     List<AllUserReadEntity> leads;
 
-    @OneToOne(optional = false, mappedBy = "program")
+    @OneToMany(mappedBy = "program")
     @NonNull
-    ProgramStatReadEntity stats;
+    List<ProgramStatReadEntity> stats;
 
     @OneToMany(mappedBy = "programId")
     @NonNull
@@ -76,6 +76,10 @@ public class ProgramReadEntity {
             inverseJoinColumns = @JoinColumn(name = "projectId")
     )
     Set<ProjectReadEntity> grantedProjects;
+
+    public ProgramStatReadEntity stats() {
+        return stats.get(0);
+    }
 
     public ProgramShortResponse toShortResponse() {
         return new ProgramShortResponse()
@@ -95,9 +99,9 @@ public class ProgramReadEntity {
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded))
-                .projectCount(stats.grantedProjectCount())
-                .contributorCount(stats.userCount())
-                .rewardCount(stats.rewardCount());
+                .projectCount(stats().grantedProjectCount())
+                .contributorCount(stats().userCount())
+                .rewardCount(stats().rewardCount());
     }
 
     public ProgramPageItemResponse toPageItemResponse() {
@@ -107,7 +111,7 @@ public class ProgramReadEntity {
                 .url(Optional.ofNullable(url).map(URI::create).orElse(null))
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
-                .projectCount(stats.grantedProjectCount())
+                .projectCount(stats().grantedProjectCount())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalRewarded(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalRewarded));
@@ -145,8 +149,8 @@ public class ProgramReadEntity {
                 .name(name)
                 .logoUrl(Optional.ofNullable(logoUrl).map(URI::create).orElse(null))
                 .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
-                .projectCount(stats.grantedProjectCount())
-                .userCount(stats.userCount())
+                .projectCount(stats().grantedProjectCount())
+                .userCount(stats().userCount())
                 .totalAvailable(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAvailable))
                 .totalGranted(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalGranted))
                 .totalReceived(map(statsPerCurrency, ProgramStatPerCurrencyReadEntity::totalAllocated));
