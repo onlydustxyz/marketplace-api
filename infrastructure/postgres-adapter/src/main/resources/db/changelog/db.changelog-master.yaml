@@ -556,4 +556,4 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelogs/00000349_make_contact_email_nullable.sql
   - include:
-      file: db/changelog/changelogs/00000349_improve_perf.sql
+      file: db/changelog/changelogs/00000350_improve_perf.sql
