@@ -553,3 +553,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000347_bi_contributors_add_projectIds_filter.sql
   - include:
       file: db/changelog/changelogs/00000348_add_missing_indexes.sql
+  - include:
+      file: db/changelog/changelogs/00000349_make_contact_email_nullable.sql

@@ -196,7 +196,7 @@ public class UserProfileUpdateApiIT extends AbstractMarketplaceApiIT {
                           "joiningReason": "CONTRIBUTOR",
                           "preferredLanguages": null,
                           "preferredCategories": null,
-                          "contactEmail": "fake@test.scam"
+                          "contactEmail": null
                         }
                         """)
                 .exchange()
