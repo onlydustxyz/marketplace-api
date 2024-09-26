@@ -71,12 +71,14 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                                                                               List<GithubIssueStatus> statuses,
                                                                               Boolean isAssigned,
                                                                               Boolean isApplied,
+                                                                              Boolean isAvailable,
                                                                               Boolean isGoodFirstIssue,
                                                                               String search) {
         final var hackathonProjectIssues = hackathonProjectIssuesReadRepository.findAll(hackathonId,
                 isNull(statuses) ? null : statuses.stream().distinct().map(GithubIssueStatus::name).toArray(String[]::new),
                 isAssigned,
                 isApplied,
+                isAvailable,
                 isGoodFirstIssue,
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search);

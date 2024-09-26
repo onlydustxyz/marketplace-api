@@ -390,6 +390,106 @@ public class ProjectGetPublicIssuesApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_get_available_issues_of_cal_dot_com_within_hackathon() {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAvailable", "true"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(GithubIssuePageResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getIssues()).hasSize(3);
+        assertThat(response.getIssues()).allMatch(i -> i.getStatus() == GithubIssueStatus.OPEN && i.getAssignees().isEmpty());
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "isAvailable", "true"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "name": "Cal.com"
+                              },
+                              "issueCount": 3
+                            },
+                            {
+                              "project": {
+                                "name": "Pizzeria Yoshi !"
+                              },
+                              "issueCount": 2
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_unavailable_issues_of_cal_dot_com_within_hackathon() {
+        // When
+        final var response = client.get()
+                .uri(getApiURI(PROJECT_PUBLIC_ISSUES.formatted(CAL_DOT_COM), Map.of(
+                        "pageIndex", "0",
+                        "pageSize", "5",
+                        "hackathonId", "e06aeec6-cec6-40e1-86cb-e741e0dacf25",
+                        "isAvailable", "false"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody(GithubIssuePageResponse.class)
+                .returnResult().getResponseBody();
+
+        assertThat(response).isNotNull();
+        assertThat(response.getTotalItemNumber()).isEqualTo(10);
+        assertThat(response.getIssues()).allMatch(i -> i.getStatus() != GithubIssueStatus.OPEN || !i.getAssignees().isEmpty());
+
+        client.get()
+                .uri(getApiURI(HACKATHON_BY_ID_PROJECT_ISSUES.formatted("e06aeec6-cec6-40e1-86cb-e741e0dacf25"), Map.of(
+                        "isAvailable", "false"
+                )))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .json("""
+                        {
+                          "projects": [
+                            {
+                              "project": {
+                                "name": "Cal.com"
+                              },
+                              "issueCount": 10
+                            },
+                            {
+                              "project": {
+                                "name": "Pizzeria Yoshi !"
+                              },
+                              "issueCount": 126
+                            }
+                          ]
+                        }
+                        """);
+    }
+
+    @Test
     void should_get_not_applied_issues_of_cal_dot_com_within_hackathon() {
         // When
         client.get()

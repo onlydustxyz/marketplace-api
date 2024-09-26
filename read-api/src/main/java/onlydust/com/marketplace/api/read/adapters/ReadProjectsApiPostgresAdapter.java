@@ -201,7 +201,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<GithubIssuePageResponse> getProjectGoodFirstIssues(UUID projectId, Integer pageIndex, Integer pageSize) {
         final var caller = authenticatedAppUserService.tryGetAuthenticatedUser();
-        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, false,
+        final var page = projectGithubIssueItemReadRepository.findIssuesOf(projectId, new String[]{OPEN.name()}, false, null, true, true, false,
                 null, null, null, PageRequest.of(pageIndex, pageSize, Sort.by("i.created_at").descending()));
         return ok(new GithubIssuePageResponse()
                 .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
@@ -220,6 +220,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                           List<GithubIssueStatus> statuses,
                                                                           Boolean isAssigned,
                                                                           Boolean isApplied,
+                                                                          Boolean isAvailable,
                                                                           Boolean isGoodFirstIssue,
                                                                           Boolean isIncludedInAnyHackathon,
                                                                           String search,
@@ -230,6 +231,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 isNull(statuses) ? null : statuses.stream().distinct().map(Enum::name).toArray(String[]::new),
                 isAssigned,
                 isApplied,
+                isAvailable,
                 isGoodFirstIssue,
                 isIncludedInAnyHackathon,
                 hackathonId,
