@@ -56,6 +56,10 @@ application:
     ecosystem-id: ${NODE_GUARDIANS_BOOST_ECOSYSTEM_ID}
   automated-rewards:
     project-lead-id: ${OD_BOT_PROJECT_LEAD_ID}
+  cache:
+    no-cache: ${API_CACHE_NO_CACHE}
+    time-divisor: ${API_CACHE_TIME_DIVISOR}
+    default-stale-while-revalidate-seconds: ${API_CACHE_DEFAULT_STALE_WHILE_REVALIDATE_SECONDS}
 
 spring:
   autoconfigure:
