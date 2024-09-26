@@ -1,7 +1,6 @@
 package onlydust.com.marketplace.api.it.api;
 
 import com.onlydust.customer.io.adapter.properties.CustomerIOProperties;
-import jakarta.persistence.EntityManager;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationCreateResponse;
 import onlydust.com.marketplace.api.contract.model.ProjectApplicationUpdateRequest;
@@ -16,8 +15,6 @@ import onlydust.com.marketplace.kernel.jobs.OutboxConsumerJob;
 import onlydust.com.marketplace.kernel.model.event.OnGithubCommentCreated;
 import onlydust.com.marketplace.kernel.model.event.OnGithubIssueDeleted;
 import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.HackathonStoragePort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,8 +30,6 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticationFilter.BEARER_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @TagMe
@@ -544,43 +539,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                         }
                         """)));
 
-        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
-                .withHeader("Authorization", matching("Bearer .*"))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
-                                    "permissions": {
-                                        "issues": "write"
-                                    }
-                                }
-                                """)
-                ));
-
-        final var expectedComment = """
-                Hey @AnthonyBuisset!\\n\
-                Thanks for showing interest.\\n\
-                We've created an application for you to contribute to Bretzel.\\n\
-                Go check it out on [OnlyDust](https://local-app.onlydust.com/p/bretzel)!\\n\
-                """;
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/466482535/issues/7/comments"))
-                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
-                .withRequestBody(equalToJson("""
-                        {
-                            "body": "%s"
-                        }
-                        """.formatted(expectedComment)))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)
-                ));
-
         // When
         indexingEventsOutboxJob.run();
 
@@ -596,9 +554,7 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
         assertThat(application.problemSolvingApproach()).isNull();
 
         indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
-        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/466482535/issues/7/comments")));
         verify(slackApiAdapter).onApplicationCreated(any(Application.class));
-        verify(slackApiAdapter, never()).onHackathonExternalApplicationDetected(any(GithubIssue.class), anyLong(), any(Hackathon.class));
 
         trackingOutboxJob.run();
 
@@ -613,283 +569,6 @@ public class MeProjectApplicationIT extends AbstractMarketplaceApiIT {
                 .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
                 .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(antho.user().getGithubUserId().toString())))
                 .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("GITHUB")))
-        );
-    }
-
-    @Test
-    void should_detect_github_application_on_past_odhack_issue() {
-        // Given
-        final var commentId = faker.number().randomNumber(10, true);
-        final Long issueId = 1976463263L;
-        final var repoId = 466482535L;
-        final var antho = userAuthHelper.authenticateAntho();
-        final var commentBody = faker.lorem().sentence();
-
-        final var startDate = ZonedDateTime.now().minusDays(20); // <----- hackathon was in the past
-        final var hackathon1 = Hackathon.builder()
-                .id(Hackathon.Id.of("200cfa00-b1f9-45f4-96f4-0e53874a327e"))
-                .title("Hackathon of the past")
-                .startDate(startDate)
-                .endDate(startDate.plusDays(1))
-                .status(Hackathon.Status.PUBLISHED)
-                .build();
-        hackathon1.githubLabels().add("Hackathon-Of-The-Past");
-        hackathon1.projectIds().add(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"));
-        hackathonStoragePort.save(hackathon1);
-
-        final EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("""
-                INSERT INTO indexer_exp.github_labels (id, name) VALUES (987654111, 'Hackathon-Of-The-Past');
-                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1976463263, 987654111);
-                DELETE FROM indexer_exp.github_issues_assignees WHERE issue_id = 1976463263;
-                """).executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
-
-        indexingEventRepository.saveEvent(OnGithubCommentCreated.builder()
-                .id(commentId)
-                .issueId(issueId)
-                .repoId(repoId)
-                .authorId(antho.user().getGithubUserId())
-                .createdAt(ZonedDateTime.now().minusSeconds(2))
-                .body(commentBody)
-                .build());
-        indexingEventRepository.flush();
-
-        langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
-                .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
-                .withRequestBody(matchingJsonPath("model", equalTo("gpt-4o-2024-08-06")))
-                .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
-                .withRequestBody(matchingJsonPath("temperature", equalTo("0.0")))
-                .willReturn(okJson("""
-                        {
-                          "id": "chatcmpl-A4Npk7YEDyndqpn2WLKqNmBNMBBd0",
-                          "object": "chat.completion",
-                          "created": 1725608292,
-                          "model": "gpt-4o-2024-08-06",
-                          "choices": [
-                            {
-                              "index": 0,
-                              "message": {
-                                "role": "assistant",
-                                "content": "true",
-                                "refusal": null
-                              },
-                              "logprobs": null,
-                              "finish_reason": "stop"
-                            }
-                          ],
-                          "usage": {
-                            "prompt_tokens": 208,
-                            "completion_tokens": 1,
-                            "total_tokens": 209
-                          },
-                          "system_fingerprint": "fp_8e1177b306"
-                        }
-                        """)));
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
-                .withHeader("Authorization", matching("Bearer .*"))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
-                                    "permissions": {
-                                        "issues": "write"
-                                    }
-                                }
-                                """)
-                ));
-
-        final var expectedComment = """
-                Hey @AnthonyBuisset!\\n\
-                Thanks for showing interest.\\n\
-                We've created an application for you to contribute to Bretzel.\\n\
-                Go check it out on [OnlyDust](https://local-app.onlydust.com/p/bretzel)!\\n\
-                """;
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/466482535/issues/13/comments"))
-                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
-                .withRequestBody(equalToJson("""
-                        {
-                            "body": "%s"
-                        }
-                        """.formatted(expectedComment)))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)
-                ));
-
-        // When
-        indexingEventsOutboxJob.run();
-
-        // Then
-        final var applications = applicationRepository.findAllByCommentId(commentId);
-        assertThat(applications).hasSize(1);
-        final var application = applications.get(0);
-        assertThat(application.projectId()).isEqualTo(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"));
-        assertThat(application.issueId()).isEqualTo(issueId);
-        assertThat(application.applicantId()).isEqualTo(antho.user().getGithubUserId());
-        assertThat(application.origin()).isEqualTo(Application.Origin.GITHUB);
-        assertThat(application.motivations()).isEqualTo(commentBody);
-        assertThat(application.problemSolvingApproach()).isNull();
-
-        indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
-        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/466482535/issues/13/comments")));
-        verify(slackApiAdapter).onApplicationCreated(any(Application.class));
-        verify(slackApiAdapter, never()).onHackathonExternalApplicationDetected(any(GithubIssue.class), anyLong(), any(Hackathon.class));
-
-        trackingOutboxJob.run();
-
-        posthogWireMockServer.verify(1, postRequestedFor(urlEqualTo("/capture/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
-                .withRequestBody(matchingJsonPath("$.event", equalTo("issue_applied")))
-                .withRequestBody(matchingJsonPath("$.distinct_id", equalTo(antho.user().getId().toString())))
-                .withRequestBody(matchingJsonPath("$.properties['$lib']", equalTo(posthogProperties.getUserAgent())))
-                .withRequestBody(matchingJsonPath("$.properties['application_id']", equalTo(application.id().toString())))
-                .withRequestBody(matchingJsonPath("$.properties['project_id']", equalTo(application.projectId().toString())))
-                .withRequestBody(matchingJsonPath("$.properties['issue_id']", equalTo(issueId.toString())))
-                .withRequestBody(matchingJsonPath("$.properties['applicant_github_id']", equalTo(antho.user().getGithubUserId().toString())))
-                .withRequestBody(matchingJsonPath("$.properties['origin']", equalTo("GITHUB")))
-        );
-    }
-
-    @Test
-    void should_detect_github_application_on_odhack_issue() {
-        // Given
-        final var commentId = faker.number().randomNumber(10, true);
-        final Long issueId = 1914185678L;
-        final var repoId = 466482535L;
-        final var antho = userAuthHelper.authenticateAntho();
-        final var commentBody = faker.lorem().sentence();
-
-        final var startDate = ZonedDateTime.now();
-        final var hackathon1 = Hackathon.builder()
-                .id(Hackathon.Id.of("200cfa00-b1f9-45f4-96f4-0e53874a327e"))
-                .title("Hackathon 1")
-                .startDate(startDate)
-                .endDate(startDate.plusDays(1))
-                .status(Hackathon.Status.PUBLISHED)
-                .build();
-        hackathon1.githubLabels().add("Hackathon-1");
-        hackathon1.projectIds().add(UUID.fromString("7d04163c-4187-4313-8066-61504d34fc56"));
-        hackathonStoragePort.save(hackathon1);
-
-        final EntityManager em = entityManagerFactory.createEntityManager();
-        em.getTransaction().begin();
-        em.createNativeQuery("""
-                INSERT INTO indexer_exp.github_labels (id, name) VALUES (987654321, 'Hackathon-1');
-                INSERT INTO indexer_exp.github_issues_labels (issue_id, label_id) VALUES (1914185678, 987654321);
-                DELETE FROM indexer_exp.github_issues_assignees WHERE issue_id = 1914185678;
-                """).executeUpdate();
-        em.flush();
-        em.getTransaction().commit();
-        em.close();
-
-        indexingEventRepository.saveEvent(OnGithubCommentCreated.builder()
-                .id(commentId)
-                .issueId(issueId)
-                .repoId(repoId)
-                .authorId(antho.user().getGithubUserId())
-                .createdAt(ZonedDateTime.now().minusSeconds(2))
-                .body(commentBody)
-                .build());
-        indexingEventRepository.flush();
-
-        langchainWireMockServer.stubFor(post(urlEqualTo("/chat/completions"))
-                .withHeader("Authorization", equalTo("Bearer OPENAI_API_KEY"))
-                .withRequestBody(matchingJsonPath("model", equalTo("gpt-4o-2024-08-06")))
-                .withRequestBody(matchingJsonPath("messages[?(@.role == 'user')].content", containing(commentBody)))
-                .withRequestBody(matchingJsonPath("temperature", equalTo("0.0")))
-                .willReturn(okJson("""
-                        {
-                          "id": "chatcmpl-A4Npk7YEDyndqpn2WLKqNmBNMBBd0",
-                          "object": "chat.completion",
-                          "created": 1725608292,
-                          "model": "gpt-4o-2024-08-06",
-                          "choices": [
-                            {
-                              "index": 0,
-                              "message": {
-                                "role": "assistant",
-                                "content": "true",
-                                "refusal": null
-                              },
-                              "logprobs": null,
-                              "finish_reason": "stop"
-                            }
-                          ],
-                          "usage": {
-                            "prompt_tokens": 208,
-                            "completion_tokens": 1,
-                            "total_tokens": 209
-                          },
-                          "system_fingerprint": "fp_8e1177b306"
-                        }
-                        """)));
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/app/installations/44637372/access_tokens"))
-                .withHeader("Authorization", matching("Bearer .*"))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "token": "GITHUB_APP_PERSONAL_ACCESS_TOKEN",
-                                    "permissions": {
-                                        "issues": "write"
-                                    }
-                                }
-                                """)
-                ));
-
-        final var expectedComment = """
-                Hi @AnthonyBuisset!\\n\
-                Maintainers during the Hackathon 1 will be tracking applications via [OnlyDust](https://local-app.onlydust.com/hackathons/hackathon-1).\\n\
-                Therefore, in order for you to have a chance at being assigned to this issue, please [apply directly here](https://local-app.onlydust.com/hackathons/hackathon-1), or else your application may not be considered.\\n\
-                """;
-
-        githubWireMockServer.stubFor(post(urlEqualTo("/repositories/466482535/issues/1/comments"))
-                .withHeader("Authorization", matching("Bearer GITHUB_APP_PERSONAL_ACCESS_TOKEN"))
-                .withRequestBody(equalToJson("""
-                        {
-                            "body": "%s"
-                        }
-                        """.formatted(expectedComment)))
-                .willReturn(aResponse()
-                        .withStatus(201)
-                        .withBody("""
-                                {
-                                    "id": 123456789
-                                }
-                                """)
-                ));
-
-        // When
-        indexingEventsOutboxJob.run();
-
-        // Then
-        final var applications = applicationRepository.findAllByCommentId(commentId);
-        assertThat(applications).hasSize(0);
-
-        indexerApiWireMockServer.verify(putRequestedFor(urlEqualTo("/api/v1/users/" + antho.user().getGithubUserId())));
-        githubWireMockServer.verify(postRequestedFor(urlEqualTo("/repositories/466482535/issues/1/comments")));
-        verify(slackApiAdapter, never()).onApplicationCreated(any(Application.class));
-        verify(slackApiAdapter).onHackathonExternalApplicationDetected(any(GithubIssue.class), anyLong(), any(Hackathon.class));
-
-        trackingOutboxJob.run();
-
-        posthogWireMockServer.verify(0, postRequestedFor(urlEqualTo("/capture/"))
-                .withHeader("Content-Type", equalTo("application/json"))
-                .withRequestBody(matchingJsonPath("$.api_key", equalTo(posthogProperties.getApiKey())))
-                .withRequestBody(matchingJsonPath("$.event", equalTo("issue_applied")))
         );
     }
 

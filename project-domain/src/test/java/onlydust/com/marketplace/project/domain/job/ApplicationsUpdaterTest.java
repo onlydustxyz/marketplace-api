@@ -8,7 +8,6 @@ import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.project.domain.model.Application;
 import onlydust.com.marketplace.project.domain.model.GithubComment;
 import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.port.output.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -33,10 +31,9 @@ class ApplicationsUpdaterTest {
     final IndexerPort indexerPort = mock(IndexerPort.class);
     final GithubStoragePort githubStoragePort = mock(GithubStoragePort.class);
     final ApplicationObserverPort applicationObserverPort = mock(ApplicationObserverPort.class);
-    final HackathonStoragePort hackathonStoragePort = mock(HackathonStoragePort.class);
     final ApplicationsUpdater applicationsUpdater = new ApplicationsUpdater(projectStoragePort, projectApplicationStoragePort, llmPort,
             indexerPort, githubStoragePort,
-            applicationObserverPort, hackathonStoragePort);
+            applicationObserverPort);
 
     final Faker faker = new Faker();
 
@@ -164,22 +161,6 @@ class ApplicationsUpdaterTest {
             verifyNoInteractions(applicationObserverPort);
             verifyNoInteractions(indexerPort);
             verifyNoInteractions(llmPort);
-        }
-
-        @Test
-        void should_not_create_application_if_issue_is_within_hackathon() {
-            // Given
-            when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
-            when(hackathonStoragePort.findUpcomingHackathonByIssueId(GithubIssue.Id.of(event.issueId()))).thenReturn(Optional.of(new Hackathon("title",
-                    List.of("label"), ZonedDateTime.now(), ZonedDateTime.now())));
-
-            // When
-            applicationsUpdater.process(event);
-
-            // Then
-            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
-            verify(applicationObserverPort).onHackathonExternalApplicationDetected(any(), any(), any());
-            verify(indexerPort).indexUser(event.authorId());
         }
 
         @Test
@@ -315,25 +296,6 @@ class ApplicationsUpdaterTest {
             verify(indexerPort).indexUser(event.authorId());
 
             Arrays.stream(applications).forEach(application -> verify(applicationObserverPort).onApplicationCreated(application));
-        }
-
-        @Test
-        void should_not_create_application_if_issue_is_within_hackathon() {
-            // Given
-            when(projectApplicationStoragePort.findApplications(event.authorId(), GithubIssue.Id.of(event.issueId()))).thenReturn(List.of());
-            when(projectStoragePort.findProjectIdsByRepoId(event.repoId())).thenReturn(List.of(projectId1, projectId2));
-            when(llmPort.isCommentShowingInterestToContribute(event.body())).thenReturn(true);
-            when(hackathonStoragePort.findUpcomingHackathonByIssueId(GithubIssue.Id.of(event.issueId()))).thenReturn(Optional.of(new Hackathon("title",
-                    List.of("label"), ZonedDateTime.now(), ZonedDateTime.now())));
-
-            // When
-            applicationsUpdater.process(event);
-
-            // Then
-            verify(projectApplicationStoragePort, never()).save(any(Application[].class));
-            verify(projectApplicationStoragePort, never()).deleteApplications(any(Application.Id[].class));
-            verify(applicationObserverPort).onHackathonExternalApplicationDetected(any(), any(), any());
-            verify(indexerPort).indexUser(event.authorId());
         }
 
         @Test

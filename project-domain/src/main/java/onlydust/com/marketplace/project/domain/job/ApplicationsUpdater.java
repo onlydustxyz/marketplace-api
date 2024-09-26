@@ -32,7 +32,6 @@ public class ApplicationsUpdater implements OutboxConsumer {
     private final IndexerPort indexerPort;
     private final GithubStoragePort githubStoragePort;
     private final ApplicationObserverPort applicationObserverPort;
-    private final HackathonStoragePort hackathonStoragePort;
 
     @Override
     public void process(Event event) {
@@ -104,12 +103,7 @@ public class ApplicationsUpdater implements OutboxConsumer {
 
         if (llmPort.isCommentShowingInterestToContribute(cleanComment)) {
             indexerPort.indexUser(comment.authorId());
-            final var issueHackathon = hackathonStoragePort.findUpcomingHackathonByIssueId(comment.issueId());
-            if (issueHackathon.isPresent()) {
-                applicationObserverPort.onHackathonExternalApplicationDetected(issue, comment.authorId(), issueHackathon.get());
-            } else {
-                saveGithubApplications(comment, projectIds);
-            }
+            saveGithubApplications(comment, projectIds);
         }
     }
 

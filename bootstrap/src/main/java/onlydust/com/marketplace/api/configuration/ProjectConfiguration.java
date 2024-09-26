@@ -25,7 +25,6 @@ import onlydust.com.marketplace.project.domain.gateway.DateProvider;
 import onlydust.com.marketplace.project.domain.job.*;
 import onlydust.com.marketplace.project.domain.model.GlobalConfig;
 import onlydust.com.marketplace.project.domain.observer.ApplicationObserverComposite;
-import onlydust.com.marketplace.project.domain.observer.GithubIssueCommenter;
 import onlydust.com.marketplace.project.domain.observer.HackathonObserverComposite;
 import onlydust.com.marketplace.project.domain.observer.ProjectObserverComposite;
 import onlydust.com.marketplace.project.domain.port.input.*;
@@ -222,32 +221,14 @@ public class ProjectConfiguration {
                                               final IndexerPort indexerPort,
                                               final GithubStoragePort githubStoragePort,
                                               final ApplicationObserverPort applicationObservers,
-                                              final LangchainLLMAdapter langchainLLMAdapter,
-                                              final HackathonStoragePort hackathonStoragePort) {
+                                              final LangchainLLMAdapter langchainLLMAdapter) {
         return new SkippedOnFailureOutboxConsumer(new RetriedOutboxConsumer(
                 new ApplicationsUpdater(projectStoragePort,
                         projectApplicationStoragePort,
                         langchainLLMAdapter,
                         indexerPort,
                         githubStoragePort,
-                        applicationObservers,
-                        hackathonStoragePort)));
-    }
-
-    @Bean
-    GithubIssueCommenter githubIssueCommenter(final UserStoragePort userStoragePort,
-                                              final ProjectStoragePort projectStoragePort,
-                                              final GithubStoragePort githubStoragePort,
-                                              final GithubAppService githubAppService,
-                                              final GithubApiPort githubApiPort,
-                                              final GlobalConfig globalConfig) {
-        return new GithubIssueCommenter(
-                userStoragePort,
-                projectStoragePort,
-                githubStoragePort,
-                githubAppService,
-                githubApiPort,
-                globalConfig);
+                        applicationObservers)));
     }
 
     @Bean
@@ -304,10 +285,9 @@ public class ProjectConfiguration {
 
     @Bean
     public ApplicationObserverPort applicationObservers(final SlackApiAdapter slackApiAdapter,
-                                                        final GithubIssueCommenter githubIssueCommenter,
                                                         final OutboxProjectService outboxProjectService,
                                                         final ApplicationMailNotifier applicationMailNotifier) {
-        return new ApplicationObserverComposite(slackApiAdapter, githubIssueCommenter, outboxProjectService, applicationMailNotifier);
+        return new ApplicationObserverComposite(slackApiAdapter, outboxProjectService, applicationMailNotifier);
     }
 
     @Bean

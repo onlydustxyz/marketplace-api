@@ -5,8 +5,6 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.port.output.OutboxPort;
 import onlydust.com.marketplace.project.domain.model.Application;
-import onlydust.com.marketplace.project.domain.model.GithubIssue;
-import onlydust.com.marketplace.project.domain.model.Hackathon;
 import onlydust.com.marketplace.project.domain.model.event.OnApplicationCreated;
 import onlydust.com.marketplace.project.domain.model.event.ProjectLinkedReposChanged;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
@@ -43,10 +41,6 @@ public class OutboxProjectService implements ProjectObserverPort, ApplicationObs
 
     @Override
     public void onApplicationAccepted(Application application, UserId projectLeadId) {
-    }
-
-    @Override
-    public void onHackathonExternalApplicationDetected(GithubIssue issue, Long applicantId, Hackathon hackathon) {
     }
 
     @Override
