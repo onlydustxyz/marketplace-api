@@ -28,15 +28,15 @@ public class AggregatedProjectKpisReadEntity {
     @Getter
     ZonedDateTime timestampOfPreviousPeriod;
 
-    Integer activeProjectCount;
+    Integer totalProjectCount;
     Integer newProjectCount;
     Integer reactivatedProjectCount;
     Integer mergedPrCount;
     BigDecimal totalGrantedUsdAmount;
     BigDecimal totalRewardedUsdAmount;
 
-    Integer activeProjectCount() {
-        return Optional.ofNullable(activeProjectCount).orElse(0);
+    Integer totalProjectCount() {
+        return Optional.ofNullable(totalProjectCount).orElse(0);
     }
 
     Integer newProjectCount() {
@@ -66,9 +66,9 @@ public class AggregatedProjectKpisReadEntity {
                 .totalRewarded(totalRewardedUsdAmount())
                 .mergedPrCount(mergedPrCount())
                 .newProjectCount(newProjectCount())
-                .activeProjectCount(activeProjectCount())
+                .activeProjectCount(totalProjectCount() - newProjectCount() - reactivatedProjectCount())
                 .reactivatedProjectCount(reactivatedProjectCount())
                 .churnedProjectCount(statsOfPreviousTimeGroup == null ? 0 :
-                        statsOfPreviousTimeGroup.activeProjectCount() - activeProjectCount() + newProjectCount() + reactivatedProjectCount());
+                        statsOfPreviousTimeGroup.totalProjectCount() - totalProjectCount() + newProjectCount() + reactivatedProjectCount());
     }
 }

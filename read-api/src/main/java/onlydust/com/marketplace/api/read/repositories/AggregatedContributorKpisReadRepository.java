@@ -19,7 +19,7 @@ public class AggregatedContributorKpisReadRepository {
     private final static String SELECT_QUERY = """
             WITH aggregated_contributor_stats AS
                      (SELECT d.#timeGrouping#_timestamp                                                                   as timestamp,
-                             count(distinct d.contributor_id)                                                             as active_contributor_count,
+                             count(distinct d.contributor_id)                                                             as total_contributor_count,
             
                              count(distinct d.contributor_id)
                              filter (where previous.timestamp is null)                                                    as new_contributor_count,
@@ -78,7 +78,7 @@ public class AggregatedContributorKpisReadRepository {
             
             SELECT allt.timestamp,
                    allt.timestamp_of_previous_period,
-                   acs.active_contributor_count,
+                   acs.total_contributor_count,
                    acs.new_contributor_count,
                    acs.reactivated_contributor_count,
                    acs.merged_pr_count,

@@ -68,7 +68,7 @@ with project_users as (select pc.project_id, pc.github_user_id as contributor_id
                                 join iam.users u on u.id = pl.user_id)
 select p.id                                           as program_id,
        coalesce(count(distinct s.project_id), 0)      as granted_project_count,
-       coalesce(sum(s.reward_count), 0)               aS reward_count,
+       coalesce(sum(s.reward_count)::bigint, 0)       as reward_count,
        coalesce(count(distinct pu.contributor_id), 0) as user_count
 from programs p
          left join bi.program_stats_per_currency_per_project s on p.id = s.program_id and s.total_granted > 0
