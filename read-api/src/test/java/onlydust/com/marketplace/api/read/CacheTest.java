@@ -28,9 +28,9 @@ class CacheTest {
         assertThat(cache.forEverybody(maxAgeSeconds, TimeUnit.SECONDS).getHeaderValue())
                 .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.empty(), maxAgeSeconds, TimeUnit.SECONDS).getHeaderValue())
-                .isEqualTo(("max-age=%d, stale-while-revalidate=10").formatted(expectedSeconds));
+                .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.of(AuthenticatedUser.builder().build()), maxAgeSeconds, TimeUnit.SECONDS).getHeaderValue())
-                .isEqualTo("private");
+                .isEqualTo("max-age=%d, private".formatted(expectedSeconds));
     }
 
     @ParameterizedTest
@@ -48,9 +48,9 @@ class CacheTest {
         assertThat(cache.forEverybody(maxAgeMinutes, TimeUnit.MINUTES).getHeaderValue())
                 .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.empty(), maxAgeMinutes, TimeUnit.MINUTES).getHeaderValue())
-                .isEqualTo(("max-age=%d, stale-while-revalidate=10").formatted(expectedSeconds));
+                .isEqualTo("max-age=%d, stale-while-revalidate=10".formatted(expectedSeconds));
         assertThat(cache.whenAnonymous(Optional.of(AuthenticatedUser.builder().build()), maxAgeMinutes, TimeUnit.MINUTES).getHeaderValue())
-                .isEqualTo("private");
+                .isEqualTo("max-age=%d, private".formatted(expectedSeconds));
     }
 
     @Test
@@ -58,6 +58,8 @@ class CacheTest {
         final var cache = new Cache(1L, true, 10);
         assertThat(cache.maxAge(20, TimeUnit.SECONDS).getHeaderValue()).isEqualTo("no-store");
         assertThat(cache.forEverybody(20, TimeUnit.SECONDS).getHeaderValue()).isEqualTo("no-store");
+        assertThat(cache.whenAnonymous(Optional.empty(), 20, TimeUnit.MINUTES).getHeaderValue()).isEqualTo("no-store");
+        assertThat(cache.whenAnonymous(Optional.of(AuthenticatedUser.builder().build()), 20, TimeUnit.MINUTES).getHeaderValue()).isEqualTo("no-store");
     }
 
     @Test
