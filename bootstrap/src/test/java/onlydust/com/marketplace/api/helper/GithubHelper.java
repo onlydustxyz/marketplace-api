@@ -1,11 +1,7 @@
 package onlydust.com.marketplace.api.helper;
 
 import com.github.javafaker.Faker;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.Value;
-import lombok.experimental.Accessors;
 import onlydust.com.marketplace.accounting.domain.service.CurrentDateProvider;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.GithubAccount;
@@ -29,9 +25,13 @@ public class GithubHelper {
     DatabaseHelper databaseHelper;
 
     public GithubAccount createAccount() {
+        return createAccount(faker.random().nextLong());
+    }
+
+    public GithubAccount createAccount(Long id) {
         final var login = faker.name().username();
         final var account = GithubAccount.builder()
-                .id(faker.random().nextLong())
+                .id(id)
                 .login(login)
                 .avatarUrl(faker.internet().avatar())
                 .htmlUrl("https://github.com/" + login)
@@ -39,7 +39,8 @@ public class GithubHelper {
 
         databaseHelper.executeQuery("""
                 insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
-                values(:id, :login, 'USER', :htmlUrl, :avatarUrl, null, null, null, null, null, null, null);
+                values(:id, :login, 'USER', :htmlUrl, :avatarUrl, null, null, null, null, null, null, null)
+                on conflict do nothing;
                 """, Map.of(
                 "id", account.getId(),
                 "login", account.getLogin(),
@@ -125,6 +126,9 @@ public class GithubHelper {
                 insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', :mainFileExtensions);
                 """, parameters);
+
+        addRepoContributorFromPullRequest(prId, contributor.user().getGithubUserId());
+
         return prId;
     }
 
@@ -214,9 +218,13 @@ public class GithubHelper {
     }
 
     public void assignIssueToContributor(Long issueId, Long contributorId) {
+        createAccount(contributorId);
+
         final var parameters = new HashMap<String, Object>();
         parameters.put("contributorId", contributorId);
         parameters.put("issueId", issueId);
+
+        addRepoContributorFromIssue(issueId, contributorId);
 
         databaseHelper.executeQuery(
                 """
@@ -225,10 +233,51 @@ public class GithubHelper {
         );
     }
 
+    private void addRepoContributorFromIssue(Long issueId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
+                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                from indexer_exp.contributions c
+                where c.issue_id = :issueId
+                on conflict (repo_id, contributor_id) do update set
+                    completed_contribution_count = repos_contributors.completed_contribution_count + excluded.completed_contribution_count,
+                    total_contribution_count = repos_contributors.total_contribution_count + excluded.total_contribution_count;
+                """, Map.of("issueId", issueId,
+                "contributorId", contributorId));
+    }
+
+    private void addRepoContributorFromCodeReview(String codeReviewId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
+                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                from indexer_exp.contributions c
+                where c.code_review_id = :codeReviewId
+                on conflict (repo_id, contributor_id) do update set
+                    completed_contribution_count = repos_contributors.completed_contribution_count + excluded.completed_contribution_count,
+                    total_contribution_count = repos_contributors.total_contribution_count + excluded.total_contribution_count;
+                """, Map.of("codeReviewId", codeReviewId,
+                "contributorId", contributorId));
+    }
+
+    private void addRepoContributorFromPullRequest(Long pullRequestId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
+                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                from indexer_exp.contributions c
+                where c.pull_request_id = :pullRequestId
+                on conflict (repo_id, contributor_id) do update set
+                    completed_contribution_count = repos_contributors.completed_contribution_count + excluded.completed_contribution_count,
+                    total_contribution_count = repos_contributors.total_contribution_count + excluded.total_contribution_count;
+                """, Map.of("pullRequestId", pullRequestId,
+                "contributorId", contributorId));
+    }
+
     public void createCodeReview(GithubRepo repo, Long prId, UserAuthHelper.AuthenticatedUser contributor) {
+        final var id = faker.random().hex();
         final var prNumber = faker.random().nextInt(1000);
         final var parameters = new HashMap<String, Object>();
-        parameters.put("id", faker.random().hex());
+
+        parameters.put("id", id);
         parameters.put("repoId", repo.getId());
         parameters.put("repoOwnerLogin", repo.getOwner());
         parameters.put("repoName", repo.getName());
@@ -258,25 +307,7 @@ public class GithubHelper {
                 insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, code_review_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
                 values (:id, :repoId, :contributorId, 'CODE_REVIEW', 'COMPLETED', :codeReviewId, :createdAt, :completedAt, :githubNumber, 'APPROVED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
                 """, parameters);
+
+        addRepoContributorFromCodeReview(id, contributor.user().getGithubUserId());
     }
-
-    @Value
-    @AllArgsConstructor(staticName = "of")
-    @EqualsAndHashCode
-    @Accessors(fluent = true)
-    public static class PullRequestId {
-        static final Faker faker = new Faker();
-        Long value;
-
-        public static PullRequestId random() {
-            return of(faker.random().nextLong());
-        }
-
-        @Override
-        public String toString() {
-            return value.toString();
-        }
-    }
-
-
 }

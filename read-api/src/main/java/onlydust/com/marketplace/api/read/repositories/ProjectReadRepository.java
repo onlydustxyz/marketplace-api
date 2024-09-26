@@ -33,4 +33,14 @@ public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUI
             where p.id = :projectId
             """)
     Optional<ProjectReadEntity> findStatsById(UUID projectId);
+
+    @Query(value = """
+            SELECT distinct p
+            FROM ProjectReadEntity p
+            LEFT JOIN FETCH p.globalStatsPerCurrency spc
+            LEFT JOIN FETCH spc.currency c
+            LEFT JOIN FETCH c.latestUsdQuote
+            JOIN p.leads l WITH l.userId = :leadId
+            """)
+    Page<ProjectReadEntity> findAllByLead(final UUID leadId, final Pageable pageable);
 }

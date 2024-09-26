@@ -8,10 +8,7 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.billing_profile.AllBillingProfileUserReadEntity;
 import onlydust.com.marketplace.api.read.entities.ecosystem.EcosystemReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ApplicationReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectCategoryReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
-import onlydust.com.marketplace.api.read.entities.project.PublicProjectReadEntity;
+import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.NotificationSettingsForProjectReadEntity;
@@ -67,6 +64,7 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
     private final NotificationReadRepository notificationReadRepository;
     private final NotificationSettingsChannelReadRepository notificationSettingsChannelReadRepository;
     private final ProgramReadRepository programReadRepository;
+    private final ProjectReadRepository projectReadRepository;
 
     @Override
     public ResponseEntity<GetMeResponse> getMe() {
@@ -194,6 +192,22 @@ public class ReadMeApiPostgresAdapter implements ReadMeApi {
 
         final var response = new ProgramPageResponse()
                 .programs(page.getContent().stream().map(ProgramReadEntity::toPageItemResponse).toList())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
+                .totalItemNumber((int) page.getTotalElements())
+                .totalPageNumber(page.getTotalPages());
+
+        return response.getHasMore() ? status(HttpStatus.PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @Override
+    public ResponseEntity<MyProjectsPageResponse> getMyProjects(Integer pageIndex, Integer pageSize) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+        final var page = projectReadRepository.findAllByLead(authenticatedUser.id().value(),
+                PageRequest.of(sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), Sort.by("name").ascending()));
+
+        final var response = new MyProjectsPageResponse()
+                .projects(page.getContent().stream().map(ProjectReadEntity::toMyProjectsPageItemResponse).toList())
                 .hasMore(hasMore(pageIndex, page.getTotalPages()))
                 .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages()))
                 .totalItemNumber((int) page.getTotalElements())

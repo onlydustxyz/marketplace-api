@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramStatPerCurrencyPerProjectReadEntity;
 import onlydust.com.marketplace.api.read.entities.user.AllUserReadEntity;
+import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import org.hibernate.annotations.Immutable;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
@@ -34,6 +35,7 @@ import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 import static onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper.map;
 import static onlydust.com.marketplace.kernel.mapper.AmountMapper.prettyUsd;
+import static org.hibernate.Hibernate.size;
 
 
 @Entity
@@ -128,7 +130,6 @@ public class ProjectReadEntity {
     )
     Set<ProgramReadEntity> programs;
 
-
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
     Set<ProjectsGoodFirstIssuesReadEntity> goodFirstIssues;
 
@@ -161,6 +162,15 @@ public class ProjectReadEntity {
     @OneToMany(mappedBy = "projectId", fetch = FetchType.LAZY)
     @NonNull
     Set<ProgramStatPerCurrencyPerProjectReadEntity> perProgramStatsPerCurrency;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            schema = "public",
+            name = "projects_pending_contributors",
+            joinColumns = @JoinColumn(name = "projectId"),
+            inverseJoinColumns = @JoinColumn(name = "githubUserId", referencedColumnName = "githubUserId")
+    )
+    Set<AllUserReadEntity> pendingContributors;
 
     public List<GithubOrganizationResponse> organizations(final boolean includeAllAvailableRepos) {
         final var organizationEntities = new HashMap<Long, GithubAccountViewEntity>();
@@ -297,5 +307,22 @@ public class ProjectReadEntity {
                 .name(name)
                 .slug(slug)
                 .logoUrl(logoUrl);
+    }
+
+    public MyProjectsPageItemResponse toMyProjectsPageItemResponse() {
+        return new MyProjectsPageItemResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .logoUrl(logoUrl)
+                .shortDescription(shortDescription)
+                .visibility(visibility)
+                .languages(languages.stream().map(LanguageReadEntity::toDto).toList())
+                .leads(leads.stream().map(AllUserReadEntity::toRegisteredUserResponse).toList())
+                .contributorCount(size(pendingContributors))
+                .totalAvailable(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalRewarded))
+                ;
     }
 }
