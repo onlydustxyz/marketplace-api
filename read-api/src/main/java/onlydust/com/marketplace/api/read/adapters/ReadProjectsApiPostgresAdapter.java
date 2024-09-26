@@ -98,7 +98,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok()
-                .cacheControl(cache.maxAgeWithDefaultStale(5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(user, 5, TimeUnit.MINUTES))
                 .body(user.map(u -> getProjectsForAuthenticatedUser(u.id().value(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
                                 categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
                         .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs,
@@ -186,7 +186,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
         return ok()
-                .cacheControl(cache.maxAgeWithDefaultStale(5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -202,7 +202,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
         return ok()
-                .cacheControl(cache.maxAgeWithDefaultStale(5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -249,14 +249,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CREATED_AT -> "i.created_at";
                     case CLOSED_AT -> "i.closed_at";
                 })));
-        return ok()
-                .cacheControl(cache.maxAge(10, TimeUnit.SECONDS).mustRevalidate())
-                .body(new GithubIssuePageResponse()
-                        .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
-                        .totalPageNumber(page.getTotalPages())
-                        .totalItemNumber((int) page.getTotalElements())
-                        .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                        .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+        return ok(new GithubIssuePageResponse()
+                .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
     private ProjectResponse getProjectDetails(ProjectReadEntity project, AuthenticatedUser caller, final Boolean includeAllAvailableRepos) {

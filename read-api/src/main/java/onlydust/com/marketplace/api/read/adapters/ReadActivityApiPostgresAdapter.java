@@ -30,7 +30,7 @@ public class ReadActivityApiPostgresAdapter implements ReadActivityApi {
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var page = recentPublicActivityReadRepository.findLastActivity(PageRequest.of(sanitizedPageIndex, sanitizePageSize));
         return ResponseEntity.ok()
-                .cacheControl(cache.maxAgeWithDefaultStale(10, TimeUnit.SECONDS))
+                .cacheControl(cache.forEverybody(10, TimeUnit.SECONDS))
                 .body(new PublicActivityPageResponse()
                         .activities(page.getContent().stream().map(RecentPublicActivityReadEntity::toDto).toList())
                         .totalPageNumber(page.getTotalPages())
