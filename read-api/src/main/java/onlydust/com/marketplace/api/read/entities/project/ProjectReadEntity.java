@@ -122,7 +122,7 @@ public class ProjectReadEntity {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             schema = "public",
-            name = "programs_projects",
+            name = "active_programs_projects",
             joinColumns = @JoinColumn(name = "projectId"),
             inverseJoinColumns = @JoinColumn(name = "programId")
     )

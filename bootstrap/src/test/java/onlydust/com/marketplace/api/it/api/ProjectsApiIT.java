@@ -14,6 +14,7 @@ import onlydust.com.marketplace.api.suites.tags.TagProject;
 import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Project;
+import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,9 @@ import static onlydust.com.marketplace.api.helper.CurrencyHelper.STRK;
 @TagProject
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ProjectsApiIT extends AbstractMarketplaceApiIT {
+    @Autowired
+    ProjectFacadePort projectFacadePort;
+    
     private final static String CAL_DOT_COM = "1bdddf7d-46e1-4a3f-b8a3-85e85a6df59e";
 
     private final static ProjectId B_CONSEIL = ProjectId.of("27ca7e18-9e71-468f-8825-c64fe6b79d66");
@@ -825,6 +829,7 @@ public class ProjectsApiIT extends AbstractMarketplaceApiIT {
         accountingHelper.createSponsorAccount(sponsor.id(), 100, STRK);
         accountingHelper.allocate(sponsor.id(), program.id(), 100, STRK);
         accountingHelper.grant(program.id(), projectId, 100, STRK);
+        projectFacadePort.refreshStats();
 
         // When
         client.get().uri(getApiURI(PROJECTS_GET_BY_SLUG + "/" + slug)).exchange()
