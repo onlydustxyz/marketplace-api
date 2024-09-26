@@ -20,6 +20,7 @@ public interface HackathonProjectIssuesReadRepository extends Repository<Hackath
                      JOIN project_github_repos pgr ON pgr.github_repo_id = i.repo_id
                      JOIN projects p ON p.id = pgr.project_id
                      JOIN hackathon_issues h ON h.issue_id = i.id
+                     JOIN indexer_exp.github_accounts author_account on i.author_id = author_account.id
                      LEFT JOIN repo_languages rl ON rl.repo_id = i.repo_id
                      LEFT JOIN indexer_exp.github_issues_assignees gia ON gia.issue_id = i.id
                      LEFT JOIN indexer_exp.github_issues_labels gil ON i.id = gil.issue_id
@@ -33,6 +34,9 @@ public interface HackathonProjectIssuesReadRepository extends Repository<Hackath
               AND (:isApplied IS NULL
                 OR :isApplied = TRUE AND a.id IS NOT NULL
                 OR :isApplied = FALSE AND a.id IS NULL)
+              AND (:isAvailable IS NULL
+                OR :isAvailable = TRUE AND i.status = 'OPEN' AND gia.user_id IS NULL
+                OR :isAvailable = FALSE AND (i.status != 'OPEN' OR gia.user_id IS NOT NULL))
               AND (:isGoodFirstIssue IS NULL
                 OR :isGoodFirstIssue = TRUE AND gl.name ILIKE '%good%first%issue%'
                 OR :isGoodFirstIssue = FALSE AND gl.name NOT ILIKE '%good%first%issue%')
@@ -44,6 +48,7 @@ public interface HackathonProjectIssuesReadRepository extends Repository<Hackath
                                                    String[] statuses,
                                                    Boolean isAssigned,
                                                    Boolean isApplied,
+                                                   Boolean isAvailable,
                                                    Boolean isGoodFirstIssue,
                                                    UUID[] languageIds,
                                                    String search);

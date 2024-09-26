@@ -2002,6 +2002,14 @@ paths:
           schema:
             type: boolean
         - in: query
+          name: isAvailable
+          description: |
+            When true, only issues that are available for applications are returned.
+            When false, only issues that are not available for applications are returned.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
+        - in: query
           name: isGoodFirstIssue
           description: |
             When true, only issues that are tagged as good first issues.
@@ -4540,6 +4548,14 @@ paths:
           description: |
             When true, only issues that have been applied to are returned.
             When false, only issues that have not been applied to are returned.
+            When null, issues are not filtered by this field.
+          schema:
+            type: boolean
+        - in: query
+          name: isAvailable
+          description: |
+            When true, only issues that are available to applications are returned.
+            When false, only issues that are not available to applications are returned.
             When null, issues are not filtered by this field.
           schema:
             type: boolean

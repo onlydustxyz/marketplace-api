@@ -85,6 +85,9 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
               AND (:isApplied IS NULL
                 OR :isApplied = TRUE AND applications.applications IS NOT NULL
                 OR :isApplied = FALSE AND applications.applications IS NULL)
+              AND (:isAvailable IS NULL
+                OR :isAvailable = TRUE AND i.status = 'OPEN' AND assignees.users IS NULL
+                OR :isAvailable = FALSE AND (i.status != 'OPEN' OR assignees.users IS NOT NULL))
               AND (:isGoodFirstIssue IS NULL
                 OR :isGoodFirstIssue = TRUE AND cast(labels.strings as text) ILIKE '%good%first%issue%'
                 OR :isGoodFirstIssue = FALSE AND cast(labels.strings as text) NOT ILIKE '%good%first%issue%')
@@ -100,6 +103,7 @@ public interface ProjectGithubIssueItemReadRepository extends Repository<Project
                                                         String[] statuses,
                                                         Boolean isAssigned,
                                                         Boolean isApplied,
+                                                        Boolean isAvailable,
                                                         Boolean isGoodFirstIssue,
                                                         Boolean isIncludedInAnyHackathon,
                                                         UUID hackathonId,
