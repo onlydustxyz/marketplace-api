@@ -17,6 +17,7 @@ import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
+import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.exception.OnlyDustException;
@@ -40,6 +41,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -61,6 +63,7 @@ import static org.springframework.http.ResponseEntity.ok;
 public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private static final int TOP_CONTRIBUTOR_COUNT = 3;
 
+    private final Cache cache;
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final PermissionService permissionService;
     private final ProjectGithubIssueItemReadRepository projectGithubIssueItemReadRepository;
@@ -94,11 +97,12 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String tagsJsonPath = getTagsJsonPath(isNull(tags) ? null : tags.stream().map(Enum::name).toList());
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
-        return ResponseEntity.ok(user.map(u -> getProjectsForAuthenticatedUser(u.id().value(), mine, search, ecosystemsJsonPath, tagsJsonPath,
-                        languagesJsonPath,
-                        categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
-                .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs, hasGoodFirstIssues,
-                        sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort)));
+        return ResponseEntity.ok()
+                .cacheControl(cache.whenAnonymous(user, 5, TimeUnit.MINUTES))
+                .body(user.map(u -> getProjectsForAuthenticatedUser(u.id().value(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
+                                categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
+                        .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs,
+                                hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort)));
     }
 
     private ProjectPageResponse getProjectsForAuthenticatedUser(UUID userId,
@@ -181,7 +185,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var project = projectReadRepository.findById(projectId)
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
-        return ok(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
+        return ok()
+                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
+                .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override
@@ -195,7 +201,9 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final var project = projectReadRepository.findBySlug(slug)
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
-        return ok(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
+        return ok()
+                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
+                .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
     @Override

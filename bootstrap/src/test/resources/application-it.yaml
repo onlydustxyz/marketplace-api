@@ -117,6 +117,11 @@ application:
     ecosystem-id: d6513cd0-824b-4608-ab71-8d57bab6525e # Random value must be overridden in ITs
   automated-rewards:
     project-lead-id: ed648549-39ba-4d73-b67a-5356780a2855  # Random value must be overridden in ITs
+  cache:
+    no-cache: false
+    time-divisor: 1
+    default-stale-while-revalidate-seconds: 10
+
 spring:
   main:
     allow-bean-definition-overriding: true
