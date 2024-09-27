@@ -400,9 +400,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                 if (setupDone.compareAndExchange(false, true)) return;
 
                 final var projectLead = userAuthHelper.create();
-                final var project1Id = projectHelper.create(projectLead, "p1");
+                final var project1Id = projectHelper.create(projectLead, "p1").getLeft();
                 project1 = projectHelper.get(project1Id);
-                project2Id = projectHelper.create(projectLead, "p2");
+                project2Id = projectHelper.create(projectLead, "p2").getLeft();
                 final var anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();
                 final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
@@ -2219,7 +2219,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
         @Test
         void should_be_unauthorized_to_grant_project() {
             // Given
-            final var projectId = projectHelper.create(caller, "p0");
+            final var projectId = projectHelper.create(caller, "p0").getLeft();
 
             // When
             client.post()

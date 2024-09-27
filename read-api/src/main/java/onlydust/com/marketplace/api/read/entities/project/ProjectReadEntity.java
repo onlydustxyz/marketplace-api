@@ -325,4 +325,15 @@ public class ProjectReadEntity {
                 .totalRewarded(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalRewarded))
                 ;
     }
+
+    public ProjectFinancialResponse toFinancialResponse() {
+        return new ProjectFinancialResponse()
+                .id(id)
+                .slug(slug)
+                .name(name)
+                .totalAvailable(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalAvailable))
+                .totalGranted(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalGranted))
+                .totalRewarded(DetailedTotalMoneyMapper.map(globalStatsPerCurrency, ProjectStatPerCurrencyReadEntity::totalRewarded))
+                ;
+    }
 }

@@ -122,9 +122,9 @@ public class MeReadProgramsApiIT extends AbstractMarketplaceApiIT {
             final var programId = ProgramId.of(program.id().value());
 
             final var projectLead = userAuthHelper.create();
-            final var project1Id = projectHelper.create(projectLead);
-            final var project2Id = projectHelper.create(projectLead);
-            final var project3Id = projectHelper.create(projectLead);
+            final var project1Id = projectHelper.create(projectLead).getLeft();
+            final var project2Id = projectHelper.create(projectLead).getLeft();
+            final var project3Id = projectHelper.create(projectLead).getLeft();
             final var recipient = userAuthHelper.create();
             final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 

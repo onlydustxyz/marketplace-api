@@ -44,8 +44,8 @@ public class GoodFirstIssueCreatedNotifierJobIT extends AbstractMarketplaceApiIT
         final UserAuthHelper.AuthenticatedUser user2 = userAuthHelper.create();
         final UserId recipientId2 = UserId.of(user2.user().getId());
         final UserAuthHelper.AuthenticatedUser dummyContributor = userAuthHelper.create();
-        final ProjectId projectId1 = projectHelper.create(user1, faker.rickAndMorty().character());
-        final ProjectId projectId2 = projectHelper.create(user2, faker.lordOfTheRings().character());
+        final ProjectId projectId1 = projectHelper.create(user1, faker.rickAndMorty().character()).getLeft();
+        final ProjectId projectId2 = projectHelper.create(user2, faker.lordOfTheRings().character()).getLeft();
         final GithubRepo repo1 = githubHelper.createRepo();
         final GithubRepo repo2 = githubHelper.createRepo();
         projectHelper.addRepo(projectId1, repo1.getId());

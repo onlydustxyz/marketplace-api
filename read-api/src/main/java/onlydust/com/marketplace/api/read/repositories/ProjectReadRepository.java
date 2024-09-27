@@ -34,6 +34,14 @@ public interface ProjectReadRepository extends Repository<ProjectReadEntity, UUI
             """)
     Optional<ProjectReadEntity> findStatsById(UUID projectId);
 
+    @Query("""
+            select p
+            from ProjectReadEntity p
+            left join fetch p.globalStatsPerCurrency
+            where p.slug = :projectSlug
+            """)
+    Optional<ProjectReadEntity> findStatsBySlug(String projectSlug);
+
     @Query(value = """
             SELECT distinct p
             FROM ProjectReadEntity p

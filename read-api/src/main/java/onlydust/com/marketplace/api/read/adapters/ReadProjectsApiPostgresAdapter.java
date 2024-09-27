@@ -14,7 +14,6 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewR
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
-import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
 import onlydust.com.marketplace.api.read.mapper.UserMapper;
 import onlydust.com.marketplace.api.read.properties.Cache;
@@ -50,6 +49,7 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
@@ -398,19 +398,30 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     @Override
     public ResponseEntity<ProjectStatsResponse> getProjectStats(UUID projectId, String fromDate, String toDate) {
         final var customStats = projectCustomStatsReadRepository.findById(projectId,
-                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
-                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate));
-
-        final var project = projectReadRepository.findStatsById(projectId)
-                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
+                parseNullable(fromDate),
+                parseNullable(toDate));
 
         return ok(new ProjectStatsResponse()
                 .activeContributorCount(customStats.map(ProjectCustomStatReadEntity::activeContributorCount).orElse(0))
                 .mergedPrCount(customStats.map(ProjectCustomStatReadEntity::mergedPrCount).orElse(0))
                 .onboardedContributorCount(customStats.map(ProjectCustomStatReadEntity::onboardedContributorCount).orElse(0))
-                .totalGranted(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalGranted))
-                .totalRewarded(DetailedTotalMoneyMapper.map(project.globalStatsPerCurrency(), ProjectStatPerCurrencyReadEntity::totalRewarded))
         );
+    }
+
+    @Override
+    public ResponseEntity<ProjectFinancialResponse> getProjectFinancialDetails(UUID projectId) {
+        final var project = projectReadRepository.findStatsById(projectId)
+                .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
+
+        return ok(project.toFinancialResponse());
+    }
+
+    @Override
+    public ResponseEntity<ProjectFinancialResponse> getProjectFinancialDetailsBySlug(String projectSlug) {
+        final var project = projectReadRepository.findStatsBySlug(projectSlug)
+                .orElseThrow(() -> notFound(format("Project %s not found", projectSlug)));
+
+        return ok(project.toFinancialResponse());
     }
 
     @Override

@@ -2195,6 +2195,66 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/financial:
+    get:
+      tags:
+        - ReadProjects
+      summary: Get project financial details
+      operationId: getProjectFinancialDetails
+      description: |
+        Get the financial details of the project
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Project financial details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectFinancialResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/slug/{projectSlug}/financial:
+    get:
+      tags:
+        - ReadProjects
+      summary: Get project financial details by slug
+      operationId: getProjectFinancialDetailsBySlug
+      description: |
+        Get the financial details of the project
+      parameters:
+        - in: path
+          name: projectSlug
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectSlug'
+      responses:
+        "200":
+          description: 'Project financial details'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectFinancialResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/issues/{issueId}:
     get:
       security:
@@ -8250,8 +8310,6 @@ components:
         - activeContributorCount
         - onboardedContributorCount
         - mergedPrCount
-        - totalGranted
-        - totalRewarded
       properties:
         activeContributorCount:
           type: integer
@@ -8259,10 +8317,22 @@ components:
           type: integer
         mergedPrCount:
           type: integer
-        totalGranted:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        totalRewarded:
-          $ref: '#/components/schemas/DetailedTotalMoney'
+
+    ProjectFinancialResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectLinkResponse'
+        - type: object
+          required:
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
 
     ProjectBudgetsResponse:
       type: object
