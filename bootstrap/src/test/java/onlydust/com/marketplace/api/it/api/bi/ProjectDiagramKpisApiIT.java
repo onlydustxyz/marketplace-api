@@ -102,21 +102,21 @@ public class ProjectDiagramKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program", caller).id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
 
-            final var onlyDust = projectHelper.create(pierre, "OnlyDust");
+            final var onlyDust = projectHelper.create(pierre, "OnlyDust").getLeft();
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH));
 
             final var marketplace_api = githubHelper.createRepo(onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(starknet, ethereum));
+            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(starknet, ethereum)).getLeft();
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH));
             at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 100, STRK));
 
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
 
-            final var madara = projectHelper.create(hayden, "Madara", List.of(starknet));
+            final var madara = projectHelper.create(hayden, "Madara", List.of(starknet)).getLeft();
             at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
 
             final var madara_contracts = githubHelper.createRepo(madara);

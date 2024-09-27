@@ -9,6 +9,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectVisibility;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectCategoryStoragePort;
 import onlydust.com.marketplace.project.domain.port.output.ProjectStoragePort;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,25 +30,24 @@ public class ProjectHelper {
 
     private final Faker faker = new Faker();
 
-    public ProjectId create(UserAuthHelper.AuthenticatedUser lead) {
+    public Pair<ProjectId, String> create(UserAuthHelper.AuthenticatedUser lead) {
         return create(lead, faker.funnyName().name(), List.of());
     }
 
-    public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name) {
+    public Pair<ProjectId, String> create(UserAuthHelper.AuthenticatedUser lead, String name) {
         return create(lead, name, List.of());
     }
 
-    public ProjectId create(UserAuthHelper.AuthenticatedUser lead, String name, List<UUID> ecosystemIds) {
+    public Pair<ProjectId, String> create(UserAuthHelper.AuthenticatedUser lead, String name, List<UUID> ecosystemIds) {
         return projectFacadePort.createProject(lead.userId(),
-                        CreateProjectCommand.builder()
-                                .firstProjectLeaderId(lead.userId())
-                                .name(name + " " + faker.random().nextLong())
-                                .shortDescription(faker.lorem().sentence())
-                                .longDescription(faker.lorem().paragraph())
-                                .isLookingForContributors(faker.bool().bool())
-                                .ecosystemIds(ecosystemIds)
-                                .build())
-                .getLeft();
+                CreateProjectCommand.builder()
+                        .firstProjectLeaderId(lead.userId())
+                        .name(name + " " + faker.random().nextLong())
+                        .shortDescription(faker.lorem().sentence())
+                        .longDescription(faker.lorem().paragraph())
+                        .isLookingForContributors(faker.bool().bool())
+                        .ecosystemIds(ecosystemIds)
+                        .build());
     }
 
 

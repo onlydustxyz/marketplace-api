@@ -178,9 +178,9 @@ public class SponsorsApiIT extends AbstractMarketplaceApiIT {
                 sponsor = sponsorHelper.create(caller);
                 program = programHelper.create(sponsor.id(), "My program " + faker.random().nextLong());
                 final var projectLead = userAuthHelper.create();
-                final var project1Id = projectHelper.create(projectLead, "p1");
+                final var project1Id = projectHelper.create(projectLead, "p1").getLeft();
                 final var project1 = projectHelper.get(project1Id);
-                project2Id = projectHelper.create(projectLead, "p2");
+                project2Id = projectHelper.create(projectLead, "p2").getLeft();
                 projectHelper.addRepo(project2Id, 498695724L);
                 anotherProgram = programHelper.create(sponsor.id());
                 final var recipient = userAuthHelper.create();

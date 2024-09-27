@@ -96,7 +96,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe)).getLeft();
             projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
@@ -104,7 +104,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var marketplace_api = githubHelper.createRepo(onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum));
+            final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum)).getLeft();
             projectHelper.addCategory(bridge, gaming.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, bridge, 1_000, ETH));
             at("2021-02-05T00:00:00Z", () -> accountingHelper.grant(explorationTeam, bridge, 10, STRK));
@@ -112,7 +112,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
 
-            final var madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet));
+            final var madara = projectHelper.create(hayden, "Madara", List.of(universe, starknet)).getLeft();
             at("2021-01-06T00:00:00Z", () -> accountingHelper.grant(explorationTeam, madara, 120, STRK));
 
             final var madara_contracts = githubHelper.createRepo(madara);

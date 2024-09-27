@@ -61,21 +61,21 @@ public class WorldMapKpiApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 300, ETH);
 
-            final var onlyDust = projectHelper.create(userAuthHelper.authenticatePierre(), "OnlyDust");
+            final var onlyDust = projectHelper.create(userAuthHelper.authenticatePierre(), "OnlyDust").getLeft();
             accountingHelper.grant(nethermind, onlyDust, 100, STRK);
             accountingHelper.grant(ethGrantingProgram, onlyDust, 100, ETH);
 
             final var marketplace_api = githubHelper.createRepo(onlyDust);
             final var marketplace_frontend = githubHelper.createRepo(onlyDust);
 
-            final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge", List.of(starknet, ethereum));
+            final var bridge = projectHelper.create(userAuthHelper.create(), "Bridge", List.of(starknet, ethereum)).getLeft();
             accountingHelper.grant(ethGrantingProgram, bridge, 100, ETH);
             accountingHelper.grant(explorationTeam, bridge, 100, STRK);
 
             final var bridge_api = githubHelper.createRepo(bridge);
             final var bridge_frontend = githubHelper.createRepo(bridge);
 
-            final var madara = projectHelper.create(userAuthHelper.create(), "Madara", List.of(starknet));
+            final var madara = projectHelper.create(userAuthHelper.create(), "Madara", List.of(starknet)).getLeft();
             accountingHelper.grant(explorationTeam, madara, 100, STRK);
 
             final var madara_contracts = githubHelper.createRepo(madara);

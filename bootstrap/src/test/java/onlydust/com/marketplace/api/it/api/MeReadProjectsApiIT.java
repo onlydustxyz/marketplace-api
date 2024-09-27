@@ -65,7 +65,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
 
         @BeforeEach
         void setUp() {
-            projectIds = LongStream.range(1, 14).mapToObj(i -> projectHelper.create(caller)).collect(toSet());
+            projectIds = LongStream.range(1, 14).mapToObj(i -> projectHelper.create(caller).getLeft()).collect(toSet());
         }
 
         @Test
@@ -110,7 +110,7 @@ public class MeReadProjectsApiIT extends AbstractMarketplaceApiIT {
             final var programId = ProgramId.of(program.id().value());
 
             final var projectLead = caller;
-            projectId = projectHelper.create(projectLead);
+            projectId = projectHelper.create(projectLead).getLeft();
             final var recipient = userAuthHelper.create();
             final var recipientId = GithubUserId.of(recipient.user().getGithubUserId());
 
