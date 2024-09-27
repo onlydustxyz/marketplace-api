@@ -6,6 +6,7 @@ import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.it.api.AbstractMarketplaceApiIT;
 import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -51,6 +52,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static UserAuthHelper.AuthenticatedUser james;
         private static ProjectCategory defi;
         private static ProjectCategory gaming;
+        private static ProjectId onlyDustId;
+        private static String onlyDustSlug;
 
         private static String allProgramOrEcosystemIds;
 
@@ -96,13 +99,15 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe)).getLeft();
-            projectHelper.addCategory(onlyDust, defi.id());
-            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
-            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
+            final var onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            onlyDustId = onlyDust.getLeft();
+            onlyDustSlug = onlyDust.getRight();
+            projectHelper.addCategory(onlyDustId, defi.id());
+            at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDustId, 100, STRK));
+            at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDustId, 25, ETH));
 
-            final var marketplace_api = githubHelper.createRepo(onlyDust);
-            final var marketplace_frontend = githubHelper.createRepo(onlyDust);
+            final var marketplace_api = githubHelper.createRepo(onlyDustId);
+            final var marketplace_frontend = githubHelper.createRepo(onlyDustId);
 
             final var bridge = projectHelper.create(mehdi, "Bridge", List.of(universe, starknet, ethereum)).getLeft();
             projectHelper.addCategory(bridge, gaming.id());
@@ -143,12 +148,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-21T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-28T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
-            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK));
-            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, STRK));
-            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 3, STRK));
-            at("2021-01-03T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 4, STRK));
+            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, antho.githubUserId(), 1, STRK));
+            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, antho.githubUserId(), 2, STRK));
+            at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, james.githubUserId(), 3, STRK));
+            at("2021-01-03T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, james.githubUserId(), 4, STRK));
 
-            at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, abdel.githubUserId(), 5, STRK));
+            at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, abdel.githubUserId(), 5, STRK));
 
             allProgramOrEcosystemIds = String.join(",", Stream.of(universe).map(UUID::toString).toList());
             projectFacadePort.refreshStats();
@@ -577,6 +582,16 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                         assertThat(response.getProjects().get(0).getProject().getName()).contains("Bridge");
                         assertThat(response.getProjects().get(1).getProject().getName()).contains("OnlyDust");
                     }, true
+            );
+            test_projects_stats("projectIds", onlyDustId.toString(),
+                    response -> assertThat(response.getProjects())
+                            .hasSize(1)
+                            .extracting(BiProjectsPageItemResponse::getProject).extracting(ProjectLinkResponse::getId).contains(onlyDustId.value()), true
+            );
+            test_projects_stats("projectSlugs", onlyDustSlug,
+                    response -> assertThat(response.getProjects())
+                            .hasSize(1)
+                            .extracting(BiProjectsPageItemResponse::getProject).extracting(ProjectLinkResponse::getId).contains(onlyDustId.value()), true
             );
             test_projects_stats("projectLeadIds", mehdi.userId().toString(),
                     response -> response.getProjects().forEach(project -> assertThat(project.getProjectLeads().stream().map(RegisteredUserResponse::getGithubUserId))

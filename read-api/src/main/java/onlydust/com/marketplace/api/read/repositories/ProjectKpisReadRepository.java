@@ -67,9 +67,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    coalesce(previous_period.active_contributor_count, 0)    as previous_period_active_contributor_count,
                    coalesce(previous_period.onboarded_contributor_count, 0) as previous_period_onboarded_contributor_count
             
-            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
+            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
                      LEFT JOIN (
-                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) 
+                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) 
                          ) previous_period ON previous_period.project_id = d.project_id
             
             WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
@@ -111,7 +111,7 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
             """,
             countQuery = """
                     SELECT count(d.project_id)
-                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
+                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
                     WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
                       and (coalesce(:availableBudgetUsdAmountEq) is null or d.available_budget_usd = :availableBudgetUsdAmountEq)
                       and (coalesce(:availableBudgetUsdAmountMax) is null or d.available_budget_usd <= :availableBudgetUsdAmountMax)
@@ -156,6 +156,8 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         @NonNull ZonedDateTime toDatePreviousPeriod,
                                         @NonNull UUID[] programOrEcosystemIds,
                                         String search,
+                                        UUID[] projectIds,
+                                        String[] projectSlugs,
                                         UUID[] projectLeadIds,
                                         UUID[] categoryIds,
                                         UUID[] languageIds,

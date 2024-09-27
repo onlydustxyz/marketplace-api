@@ -10988,6 +10988,14 @@ components:
             format: uuid
         search:
           type: string
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+        projectSlugs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSlug'
         projectLeadIds:
           type: array
           items:

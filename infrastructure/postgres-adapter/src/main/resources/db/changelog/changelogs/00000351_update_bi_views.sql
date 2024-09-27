@@ -245,6 +245,7 @@ WITH project_programs AS (select distinct abt.program_id,
                           where abt.project_id is not null
                             and abt.reward_id is null)
 SELECT p.id                                                                                                       as project_id,
+       p.slug                                                                                                     as project_slug,
        p.created_at                                                                                               as created_at,
        jsonb_build_object('id', p.id,
                           'slug', p.slug,
@@ -500,6 +501,8 @@ CREATE UNIQUE INDEX bi_contributor_global_data_pk ON bi.contributor_global_data 
 CREATE FUNCTION bi.select_projects(fromDate timestamptz,
                                    toDate timestamptz,
                                    programOrEcosystemIds uuid[],
+                                   projectIds uuid[],
+                                   projectSlugs text[],
                                    projectLeadIds uuid[],
                                    categoryIds uuid[],
                                    languageIds uuid[],
@@ -584,21 +587,15 @@ FROM bi.project_global_data p
                       and gd.timestamp < toDate
                     group by gd.project_id) gd on gd.project_id = p.project_id
 
-WHERE (p.program_ids && programOrEcosystemIds
-    or p.ecosystem_ids && programOrEcosystemIds)
-  and (ecosystemIds is null
-    or p.ecosystem_ids && ecosystemIds)
-  and (projectLeadIds is null
-    or p.project_lead_ids && projectLeadIds)
-  and (categoryIds is null
-    or p.project_category_ids && categoryIds)
-  and (languageIds is null
-    or p.language_ids && languageIds)
-  and (searchQuery is null
-    or p.search ilike '%' || searchQuery || '%')
-  and (cd.project_id is not null
-    or rd.project_id is not null
-    or gd.project_id is not null)
+WHERE (p.program_ids && programOrEcosystemIds or p.ecosystem_ids && programOrEcosystemIds)
+  and (ecosystemIds is null or p.ecosystem_ids && ecosystemIds)
+  and (projectIds is null or p.project_id = any (projectIds))
+  and (projectSlugs is null or p.project_slug = any (projectSlugs))
+  and (projectLeadIds is null or p.project_lead_ids && projectLeadIds)
+  and (categoryIds is null or p.project_category_ids && categoryIds)
+  and (languageIds is null or p.language_ids && languageIds)
+  and (searchQuery is null or p.search ilike '%' || searchQuery || '%')
+  and (cd.project_id is not null or rd.project_id is not null or gd.project_id is not null)
 
 GROUP BY p.project_id, p.project_name, p.project, p.programs, p.ecosystems, p.languages, p.categories,
          p.leads, p.budget, p.available_budget_usd, p.percent_spent_budget_usd
