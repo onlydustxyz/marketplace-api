@@ -12,8 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.concurrent.TimeUnit;
-
+import static onlydust.com.marketplace.api.read.properties.Cache.S;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 
 @RestController
@@ -30,7 +29,7 @@ public class ReadActivityApiPostgresAdapter implements ReadActivityApi {
         final int sanitizePageSize = sanitizePageSize(pageSize);
         final var page = recentPublicActivityReadRepository.findLastActivity(PageRequest.of(sanitizedPageIndex, sanitizePageSize));
         return ResponseEntity.ok()
-                .cacheControl(cache.forEverybody(10, TimeUnit.SECONDS))
+                .cacheControl(cache.forEverybody(S))
                 .body(new PublicActivityPageResponse()
                         .activities(page.getContent().stream().map(RecentPublicActivityReadEntity::toDto).toList())
                         .totalPageNumber(page.getTotalPages())

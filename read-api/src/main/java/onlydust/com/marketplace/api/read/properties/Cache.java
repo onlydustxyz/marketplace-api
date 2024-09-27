@@ -10,6 +10,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static java.lang.Math.min;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +19,12 @@ public class Cache {
     private long timeDivisor = 1L;
     private boolean noCache = false;
     private long defaultStaleWhileRevalidateSeconds = 10L;
+
+    public static final Duration XS = Duration.ofSeconds(5);
+    public static final Duration S = Duration.ofSeconds(30);
+    public static final Duration M = Duration.ofMinutes(5);
+    public static final Duration L = Duration.ofMinutes(20);
+    public static final Duration XL = Duration.ofHours(1);
 
     /**
      * Add 'max-age' and 'stale-while-revalidate' headers when the user is anonymous, otherwise add 'max-age' and 'private' headers.
@@ -36,6 +44,22 @@ public class Cache {
     }
 
     /**
+     * Add 'max-age' and 'stale-while-revalidate' headers when the user is anonymous, otherwise add 'max-age' and 'private' headers.
+     * The 'private' header indicates that all or part of the response message is intended for a single user
+     * and MUST NOT be cached by a shared cache.
+     *
+     * @param user     authenticated user (empty if anonymous)
+     * @param duration max-age duration
+     * @return CacheControl
+     */
+    public CacheControl whenAnonymous(Optional<AuthenticatedUser> user, Duration duration) {
+        if (user.isEmpty()) {
+            return forEverybody(duration);
+        }
+        return sanitize(maxAge(duration).cachePrivate());
+    }
+
+    /**
      * Add 'max-age' and 'stale-while-revalidate' headers.
      *
      * @param maxAge max-age value
@@ -44,18 +68,26 @@ public class Cache {
      */
     public CacheControl forEverybody(long maxAge, TimeUnit unit) {
         return sanitize(maxAge(maxAge, unit)
-                .staleWhileRevalidate(Duration.ofSeconds(defaultStaleWhileRevalidateSeconds)));
+                .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, unit.toSeconds(maxAge)))));
     }
 
     /**
-     * Add 'max-age' header.
+     * Add 'max-age' and 'stale-while-revalidate' headers.
      *
-     * @param maxAge max-age value
-     * @param unit   time unit
+     * @param duration max-age duration
      * @return CacheControl
      */
+    public CacheControl forEverybody(Duration duration) {
+        return sanitize(maxAge(duration)
+                .staleWhileRevalidate(Duration.ofSeconds(min(defaultStaleWhileRevalidateSeconds, duration.getSeconds()))));
+    }
+
     private CacheControl maxAge(long maxAge, TimeUnit unit) {
-        return CacheControl.maxAge(Duration.ofSeconds(unit.toSeconds(maxAge)).dividedBy(timeDivisor));
+        return maxAge(Duration.ofSeconds(unit.toSeconds(maxAge)));
+    }
+
+    private CacheControl maxAge(Duration duration) {
+        return CacheControl.maxAge(duration.dividedBy(timeDivisor));
     }
 
     private CacheControl sanitize(CacheControl cacheControl) {
