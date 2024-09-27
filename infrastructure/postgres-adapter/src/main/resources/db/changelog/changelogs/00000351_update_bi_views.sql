@@ -606,6 +606,7 @@ $$
 CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        toDate timestamptz,
                                        programOrEcosystemIds uuid[],
+                                       contributorIds bigint[],
                                        projectIds uuid[],
                                        projectSlugs text[],
                                        categoryIds uuid[],
@@ -670,6 +671,7 @@ FROM bi.contributor_global_data c
                     group by rd.contributor_id) rd on rd.contributor_id = c.contributor_id
 
 WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEcosystemIds)
+  and (contributorIds is null or c.contributor_id = any (contributorIds))
   and (projectIds is null or c.project_ids && projectIds)
   and (projectSlugs is null or c.project_slugs && projectSlugs)
   and (ecosystemIds is null or c.ecosystem_ids && ecosystemIds)

@@ -579,6 +579,12 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                         assertThat(response.getContributors().get(1).getContributor().getLogin()).contains("mehdi");
                     }, true
             );
+            test_contributors_stats("contributorIds", mehdi.githubUserId().toString(),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributor)
+                            .extracting(ContributorResponse::getGithubUserId)
+                            .contains(mehdi.githubUserId().value()), true);
             test_contributors_stats("projectIds", onlyDust.toString(),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                             .extracting(ProjectLinkResponse::getName)

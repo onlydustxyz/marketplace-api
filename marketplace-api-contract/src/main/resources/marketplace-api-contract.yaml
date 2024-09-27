@@ -11150,6 +11150,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ContributorRoleEnum'
+        contributorIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/GithubUserId'
         projectIds:
           type: array
           items:
