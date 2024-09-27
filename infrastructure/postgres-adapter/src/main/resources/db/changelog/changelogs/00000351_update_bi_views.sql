@@ -396,31 +396,7 @@ WITH user_contries as (select bpu.user_id as user_id,
                         union
                         select cd.contributor_id       as contributor_id,
                                unnest(cd.language_ids) as language_id
-                        from bi.contribution_data cd),
-     project_users as
-         (select pl.project_id    as project_id,
-                 u.github_user_id as github_user_id,
-                 'MAINTAINER'     as role
-          from project_leads pl
-                   join iam.users u on pl.user_id = u.id
-          union
-          select cd.project_id     as project_id,
-                 cd.contributor_id as github_user_id,
-                 'CONTRIBUTOR'     as role
-          from bi.contribution_data cd
-          union
-          select r.project_id   as project_id,
-                 r.recipient_id as github_user_id,
-                 'CONTRIBUTOR'  as role
-          from rewards r
-          union
-          select abt.project_id   as project_id,
-                 u.github_user_id as github_user_id,
-                 'PROGRAM_LEAD'   as role
-          from accounting.account_book_transactions abt
-                   join program_leads pl on pl.program_id = abt.program_id
-                   join iam.users u on pl.user_id = u.id
-          where abt.project_id is not null)
+                        from bi.contribution_data cd)
 SELECT u.github_user_id                                                                                    as contributor_id,
        u.login                                                                                             as contributor_login,
        uc.country                                                                                          as contributor_country,
@@ -432,8 +408,6 @@ SELECT u.github_user_id                                                         
                           u.user_id)                                                                       as contributor,
 
        min(p.name)                                                                                         as first_project_name,
-
-       array_agg(distinct pu.role)                                                                         as roles,
 
        jsonb_agg(distinct jsonb_build_object('id', p.id,
                                              'slug', p.slug,
@@ -479,8 +453,8 @@ SELECT u.github_user_id                                                         
               coalesce(string_agg(distinct prog.name, ' '), ''))                                           as search
 FROM iam.all_users u
          LEFT JOIN user_contries uc on uc.user_id = u.user_id
-         LEFT JOIN project_users pu on pu.github_user_id = u.github_user_id
-         LEFT JOIN projects p on p.id = pu.project_id
+         LEFT JOIN bi.contribution_data cd on cd.contributor_id = u.github_user_id
+         LEFT JOIN projects p on p.id = cd.project_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
          LEFT JOIN project_programs pp ON pp.project_id = p.id
@@ -613,7 +587,6 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        languageIds uuid[],
                                        ecosystemIds uuid[],
                                        countryCodes text[],
-                                       contributorRoles text[],
                                        searchQuery text)
     RETURNS TABLE
             (
@@ -679,9 +652,7 @@ WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEco
   and (languageIds is null or c.language_ids && languageIds)
   and (countryCodes is null or c.contributor_country = any (countryCodes))
   and (searchQuery is null or c.search ilike '%' || searchQuery || '%')
-  and (contributorRoles is null or c.roles && contributorRoles)
-  and (cd.contributor_id is not null or rd.contributor_id is not null or
-       array ['MAINTAINER', 'PROGRAM_LEAD'] && c.roles)
+  and (cd.contributor_id is not null or rd.contributor_id is not null)
 
 GROUP BY c.contributor_id, c.contributor_login, c.contributor, c.first_project_name, c.projects, c.ecosystems,
          c.languages, c.categories, c.contributor_country;

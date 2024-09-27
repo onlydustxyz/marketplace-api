@@ -9667,13 +9667,6 @@ components:
         - QUARTER
         - YEAR
 
-    ContributorRoleEnum:
-      type: string
-      enum:
-        - MAINTAINER
-        - CONTRIBUTOR
-        - PROGRAM_LEAD
-
     WorldMapKpiEnum:
       type: string
       enum:
@@ -11146,10 +11139,6 @@ components:
             format: uuid
         search:
           type: string
-        contributorRoles:
-          type: array
-          items:
-            $ref: '#/components/schemas/ContributorRoleEnum'
         contributorIds:
           type: array
           items:

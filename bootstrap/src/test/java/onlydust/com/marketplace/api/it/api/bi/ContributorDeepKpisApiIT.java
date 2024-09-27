@@ -185,16 +185,13 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[1].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.contributors[1].projects[1].name").<String>value(name -> assertThat(name).contains("Madara"))
-                    .jsonPath("$.contributors[2].projects[0].name").<String>value(name -> assertThat(name).contains("Madara"))
-                    .jsonPath("$.contributors[2].projects[1].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.contributors[2].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[3].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
-                    .jsonPath("$.contributors[4].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
-                    .jsonPath("$.contributors[4].projects[1].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
-                    .jsonPath("$.contributors[5].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.contributors[4].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .json("""
                             {
                               "totalPageNumber": 1,
-                              "totalItemNumber": 6,
+                              "totalItemNumber": 5,
                               "hasMore": false,
                               "nextPageIndex": 0,
                               "contributors": [
@@ -262,7 +259,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
-                                      "name": "Ethereum ecosystem"
+                                      "slug": "ethereum-ecosystem"
                                     },
                                     {
                                       "slug": "starknet-ecosystem"
@@ -313,9 +310,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
-                                      "slug": "starknet-ecosystem"
-                                    },
-                                    {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
@@ -350,9 +344,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "login": "james"
                                   },
                                   "categories": [
-                                    {
-                                      "slug": "defi"
-                                    },
                                     {
                                       "slug": "gaming"
                                     }
@@ -402,9 +393,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "categories": [
                                     {
                                       "slug": "defi"
-                                    },
-                                    {
-                                      "slug": "gaming"
                                     }
                                   ],
                                   "languages": [
@@ -413,12 +401,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "ecosystems": [
-                                    {
-                                      "slug": "ethereum-ecosystem"
-                                    },
-                                    {
-                                      "slug": "starknet-ecosystem"
-                                    },
                                     {
                                       "slug": "universe-ecosystem"
                                     }
@@ -448,47 +430,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 4,
                                     "trend": "UP"
                                   }
-                                },
-                                {
-                                  "contributor": {
-                                    "login": "pierre"
-                                  },
-                                  "categories": [
-                                    {
-                                      "slug": "defi"
-                                    }
-                                  ],
-                                  "languages": null,
-                                  "ecosystems": [
-                                    {
-                                      "slug": "universe-ecosystem"
-                                    }
-                                  ],
-                                  "countryCode": null,
-                                  "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "rewardCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "issueCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "prCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "codeReviewCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "contributionCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  }
                                 }
                               ]
                             }
@@ -512,7 +453,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             {
                               "totalPageNumber": 3,
-                              "totalItemNumber": 6,
+                              "totalItemNumber": 5,
                               "hasMore": true,
                               "nextPageIndex": 1
                             }
@@ -537,7 +478,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .returnResult().getResponseBody();
 
             final var lines = Objects.requireNonNull(csv).split("\\R");
-            assertThat(lines).hasSize(7);
+            assertThat(lines).hasSize(6);
             assertThat(lines[0]).isEqualTo("contributor;projects;categories;languages;ecosystems;country;total_rewarded_usd_amount;" +
                                            "reward_count;issue_count;pr_count;code_review_count;contribution_count");
         }
@@ -610,14 +551,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             test_contributors_stats("countryCodes", "GB",
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getCountryCode())
                             .isEqualTo("GB")), true
-            );
-            test_contributors_stats("contributorRoles", "MAINTAINER",
-                    response -> {
-                        assertThat(response.getContributors()).hasSize(3);
-                        assertThat(response.getContributors().get(0).getContributor().getLogin()).contains("hayden");
-                        assertThat(response.getContributors().get(1).getContributor().getLogin()).contains("mehdi");
-                        assertThat(response.getContributors().get(2).getContributor().getLogin()).contains("pierre");
-                    }, true
             );
             test_contributors_stats(Map.of("totalRewardedUsdAmount.lte", "3"),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
