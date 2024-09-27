@@ -417,6 +417,14 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     @Override
+    public ResponseEntity<ProjectFinancialResponse> getProjectFinancialDetailsBySlug(String projectSlug) {
+        final var project = projectReadRepository.findStatsBySlug(projectSlug)
+                .orElseThrow(() -> notFound(format("Project %s not found", projectSlug)));
+
+        return ok(project.toFinancialResponse());
+    }
+
+    @Override
     public ResponseEntity<ContributorsPageResponse> getProjectContributors(UUID projectId,
                                                                            Integer pageIndex,
                                                                            Integer pageSize,
