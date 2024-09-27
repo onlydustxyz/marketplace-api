@@ -566,12 +566,10 @@ FROM bi.project_global_data p
                            count(distinct cd.contributor_id) filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count
                     from bi.contribution_data cd
                     where cd.timestamp >= fromDate
-                      and cd.timestamp
-                        < toDate
-                      and (languageIds is null
-                        or cd.language_ids && languageIds)
+                      and cd.timestamp < toDate
                     group by cd.project_id) cd
                    on cd.project_id = p.project_id
+
          LEFT JOIN (select rd.project_id,
                            count(rd.reward_id)             as reward_count,
                            coalesce(sum(rd.usd_amount), 0) as total_rewarded_usd_amount,
@@ -580,6 +578,7 @@ FROM bi.project_global_data p
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
                     group by rd.project_id) rd on rd.project_id = p.project_id
+
          LEFT JOIN (select gd.project_id,
                            coalesce(sum(gd.usd_amount), 0) as total_granted_usd_amount
                     from bi.project_grants_data gd
@@ -660,7 +659,6 @@ FROM bi.contributor_global_data c
                     from bi.contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
-                      and (languageIds is null or cd.language_ids && languageIds)
                     group by cd.contributor_id) cd on cd.contributor_id = c.contributor_id
 
          LEFT JOIN (select rd.contributor_id,
