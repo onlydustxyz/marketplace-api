@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static onlydust.com.marketplace.api.helper.CurrencyHelper.*;
 import static onlydust.com.marketplace.api.helper.DateHelper.at;
@@ -20,20 +21,25 @@ import static onlydust.com.marketplace.api.helper.DateHelper.at;
 
 @TagBI
 public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
-    ProjectId projectId;
+    private static ProjectId projectId;
 
     @Autowired
     ProjectFacadePort projectFacadePort;
 
+    private static final AtomicBoolean setupDone = new AtomicBoolean();
+
     @BeforeEach
     void setUp() {
+        if (setupDone.compareAndExchange(false, true)) return;
+
         final var sponsor = sponsorHelper.create();
         final var sponsorId = SponsorId.of(sponsor.id().value());
         final var program = programHelper.create(sponsorId, userAuthHelper.create());
         final var programId = ProgramId.of(program.id().value());
 
         final var projectLead = userAuthHelper.create();
-        projectId = projectHelper.create(projectLead);
+        final var project = projectHelper.create(projectLead);
+        projectId = project.getLeft();
         final var newUser = userAuthHelper.create();
         final var oldUser = userAuthHelper.create();
         final var recipientId = GithubUserId.of(newUser.user().getGithubUserId());
@@ -98,7 +104,25 @@ public class ProjectGetStatsApiIT extends AbstractMarketplaceApiIT {
                         {
                           "activeContributorCount": 2,
                           "onboardedContributorCount": 1,
-                          "mergedPrCount": 2,
+                          "mergedPrCount": 2
+                        }
+                        """);
+    }
+
+    @Test
+    void should_get_project_financial_details() {
+        client.get()
+                .uri(getApiURI(PROJECT_FINANCIAL.formatted(projectId)))
+                .exchange()
+                // Then
+                .expectStatus()
+                .isOk()
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(projectId.toString())
+                .jsonPath("$.slug").isNotEmpty()
+                .jsonPath("$.name").isNotEmpty()
+                .json("""
+                        {
                           "totalGranted": {
                             "totalUsdEquivalent": 4573.97,
                             "totalPerCurrency": [
