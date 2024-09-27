@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Entity
@@ -75,7 +76,7 @@ public class UserEntity {
 
     public NotificationRecipient toNotificationRecipient() {
         return new NotificationRecipient(UserId.of(id),
-                userProfileInfo != null && !userProfileInfo.getContactEmail().isEmpty() ? userProfileInfo.getContactEmail() : email,
+                Optional.ofNullable(userProfileInfo).flatMap(UserProfileInfoEntity::contactEmail).filter(e -> !e.isEmpty()).orElse(email),
                 githubLogin);
     }
 }
