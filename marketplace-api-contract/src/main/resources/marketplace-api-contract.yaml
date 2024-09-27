@@ -470,6 +470,31 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/me/projects:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadMe
+      summary: Get my leaded projects
+      operationId: getMyProjects
+      description: |
+        Get the list of projects the user is leading
+      parameters:
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+      responses:
+        "200":
+          description: 'Projects'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProjectsPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/me/profile:
     get:
       security:
@@ -6217,6 +6242,42 @@ components:
               type: integer
               description: Number of projects in the program
               example: 42
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalGranted:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+            totalRewarded:
+              $ref: '#/components/schemas/DetailedTotalMoney'
+
+    MyProjectsPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - projects
+          properties:
+            projects:
+              type: array
+              items:
+                $ref: '#/components/schemas/MyProjectsPageItemResponse'
+
+    MyProjectsPageItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectShortResponse'
+        - type: object
+          required:
+            - leads
+            - contributorCount
+            - totalAvailable
+            - totalGranted
+            - totalRewarded
+          properties:
+            leads:
+              type: array
+              items:
+                $ref: '#/components/schemas/RegisteredUserResponse'
+            contributorCount:
+              type: integer
             totalAvailable:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
