@@ -8293,9 +8293,12 @@ components:
         - $ref: '#/components/schemas/ProjectLinkResponse'
         - type: object
           required:
+            - totalAvailable
             - totalGranted
             - totalRewarded
           properties:
+            totalAvailable:
+              $ref: '#/components/schemas/DetailedTotalMoney'
             totalGranted:
               $ref: '#/components/schemas/DetailedTotalMoney'
             totalRewarded:
