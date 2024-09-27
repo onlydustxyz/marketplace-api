@@ -11,6 +11,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.dialect.PostgreSQLEnumJdbcType;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -63,7 +64,12 @@ public class UserProfileInfoEntity {
     @Column(columnDefinition = "uuid[]")
     UUID[] preferredCategoryIds;
 
+    @Getter(AccessLevel.NONE)
     String contactEmail;
+
+    public Optional<String> contactEmail() {
+        return Optional.ofNullable(contactEmail);
+    }
 
     public UserProfileInfoEntity update(final UUID userId, UserProfile userProfile) {
         final Set<ContactInformationEntity> contactInformation = mapContactInformationsToEntity(UserId.of(userId), userProfile.contacts());
