@@ -11167,6 +11167,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CountryCode'
+        contributionStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionStatus'
+          default: [ 'COMPLETED' ]
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:

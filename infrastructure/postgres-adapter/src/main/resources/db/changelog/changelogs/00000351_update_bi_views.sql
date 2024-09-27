@@ -27,11 +27,10 @@ DROP MATERIALIZED VIEW IF EXISTS bi.project_grants_data;
 
 
 CREATE MATERIALIZED VIEW bi.contribution_data AS
-WITH completed_contributions AS (select distinct on (c.id) c.*,
-                                                           pgr.project_id as project_id
-                                 from indexer_exp.contributions c
-                                          join project_github_repos pgr on pgr.github_repo_id = c.repo_id
-                                 where c.status = 'COMPLETED'),
+WITH project_contributions AS (select distinct on (c.id) c.*,
+                                                         pgr.project_id as project_id
+                               from indexer_exp.contributions c
+                                        join project_github_repos pgr on pgr.github_repo_id = c.repo_id),
      project_programs AS (select distinct abt.program_id,
                                           abt.project_id
                           from accounting.account_book_transactions abt
@@ -51,6 +50,7 @@ FROM (with registered_users as (select u.id             as id,
              ru.id                                                                            as contributor_user_id,
              ru.country                                                                       as contributor_country,
              c.created_at                                                                     as timestamp,
+             c.status                                                                         as contribution_status,
              date_trunc('day', c.created_at)                                                  as day_timestamp,
              date_trunc('week', c.created_at)                                                 as week_timestamp,
              date_trunc('month', c.created_at)                                                as month_timestamp,
@@ -63,9 +63,9 @@ FROM (with registered_users as (select u.id             as id,
              array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null ) as language_ids,
              array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ) as ecosystem_ids,
              array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )     as program_ids
-      from completed_contributions c
+      from project_contributions c
                join (select cc.contributor_id, min(cc.created_at) as created_at
-                     from completed_contributions cc
+                     from project_contributions cc
                      group by cc.contributor_id) first
                     on first.contributor_id = c.contributor_id
                left join lateral ( select distinct lfe_1.language_id
@@ -79,6 +79,7 @@ FROM (with registered_users as (select u.id             as id,
                c.contributor_id,
                c.created_at,
                c.type,
+               c.status,
                first.created_at,
                ru.id,
                ru.country) c
@@ -587,6 +588,7 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        languageIds uuid[],
                                        ecosystemIds uuid[],
                                        countryCodes text[],
+                                       contributionStatuses indexer_exp.contribution_status[],
                                        searchQuery text)
     RETURNS TABLE
             (
@@ -633,6 +635,7 @@ FROM bi.contributor_global_data c
                     from bi.contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
+                      and (contributionStatuses is null or cd.contribution_status = any (contributionStatuses))
                     group by cd.contributor_id) cd on cd.contributor_id = c.contributor_id
 
          LEFT JOIN (select rd.contributor_id,

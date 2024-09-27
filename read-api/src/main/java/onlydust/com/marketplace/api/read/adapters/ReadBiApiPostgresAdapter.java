@@ -266,6 +266,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
                 q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
                 q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
+                q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
