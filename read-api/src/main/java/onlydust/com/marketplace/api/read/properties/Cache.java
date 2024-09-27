@@ -32,7 +32,7 @@ public class Cache {
         if (user.isEmpty()) {
             return forEverybody(maxAge, unit);
         }
-        return sanitize(CacheControl.maxAge(maxAge, unit).cachePrivate());
+        return sanitize(maxAge(maxAge, unit).cachePrivate());
     }
 
     /**
@@ -43,7 +43,7 @@ public class Cache {
      * @return CacheControl
      */
     public CacheControl forEverybody(long maxAge, TimeUnit unit) {
-        return sanitize(CacheControl.maxAge(maxAge, unit)
+        return sanitize(maxAge(maxAge, unit)
                 .staleWhileRevalidate(Duration.ofSeconds(defaultStaleWhileRevalidateSeconds)));
     }
 
@@ -54,8 +54,8 @@ public class Cache {
      * @param unit   time unit
      * @return CacheControl
      */
-    public CacheControl maxAge(long maxAge, TimeUnit unit) {
-        return sanitize(CacheControl.maxAge(maxAge, unit));
+    private CacheControl maxAge(long maxAge, TimeUnit unit) {
+        return CacheControl.maxAge(Duration.ofSeconds(unit.toSeconds(maxAge)).dividedBy(timeDivisor));
     }
 
     private CacheControl sanitize(CacheControl cacheControl) {
