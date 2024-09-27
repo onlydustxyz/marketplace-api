@@ -11146,6 +11146,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProjectId'
+        projectSlugs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSlug'
         categoryIds:
           type: array
           items:

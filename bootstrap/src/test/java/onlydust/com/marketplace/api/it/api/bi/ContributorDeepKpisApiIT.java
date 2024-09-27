@@ -55,6 +55,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProjectCategory defi;
         private static ProjectCategory gaming;
         private static ProjectId onlyDust;
+        private static String onlyDustSlug;
 
         private static String allProgramOrEcosystemIds;
 
@@ -106,7 +107,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe)).getLeft();
+            final var od = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            onlyDust = od.getLeft();
+            onlyDustSlug = od.getRight();
             projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
@@ -492,7 +495,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                             """);
         }
 
-
         @Test
         public void should_get_contributors_stats_with_pagination() {
             // When
@@ -578,6 +580,11 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     }, true
             );
             test_contributors_stats("projectIds", onlyDust.toString(),
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
+                            .extracting(ProjectLinkResponse::getName)
+                            .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty()), true
+            );
+            test_contributors_stats("projectSlugs", onlyDustSlug,
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                             .extracting(ProjectLinkResponse::getName)
                             .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty()), true

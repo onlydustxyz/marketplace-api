@@ -440,6 +440,7 @@ SELECT u.github_user_id                                                         
                                              'logoUrl', p.logo_url)) filter ( where p.id is not null )     as projects,
 
        array_agg(distinct p.id) filter ( where p.id is not null )                                          as project_ids,
+       array_agg(distinct p.slug) filter ( where p.slug is not null )                                      as project_slugs,
        array_agg(distinct pc.id) filter ( where pc.id is not null )                                        as project_category_ids,
        array_agg(distinct l.id) filter ( where l.id is not null )                                          as language_ids,
        array_agg(distinct e.id) filter ( where e.id is not null )                                          as ecosystem_ids,
@@ -610,6 +611,7 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        toDate timestamptz,
                                        programOrEcosystemIds uuid[],
                                        projectIds uuid[],
+                                       projectSlugs text[],
                                        categoryIds uuid[],
                                        languageIds uuid[],
                                        ecosystemIds uuid[],
@@ -674,6 +676,7 @@ FROM bi.contributor_global_data c
 
 WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEcosystemIds)
   and (projectIds is null or c.project_ids && projectIds)
+  and (projectSlugs is null or c.project_slugs && projectSlugs)
   and (ecosystemIds is null or c.ecosystem_ids && ecosystemIds)
   and (categoryIds is null or c.project_category_ids && categoryIds)
   and (languageIds is null or c.language_ids && languageIds)
