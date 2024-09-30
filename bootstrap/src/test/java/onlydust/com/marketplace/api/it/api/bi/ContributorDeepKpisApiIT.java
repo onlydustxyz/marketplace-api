@@ -174,7 +174,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
-                            "toDate", "2021-01-10")))
+                            "toDate", "2021-01-07")))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()

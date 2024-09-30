@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Transactional(readOnly = true)
 @Profile("api")
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
-    private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2022-12-01T00:00:00Z");
+    private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
     private final AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository;
     private final AggregatedContributorKpisReadRepository aggregatedContributorKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
@@ -248,8 +249,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     }
 
     private Page<ContributorKpisReadEntity> findContributors(BiContributorsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return contributorKpisReadRepository.findAll(
@@ -292,8 +293,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     }
 
     private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return projectKpisReadRepository.findAll(
