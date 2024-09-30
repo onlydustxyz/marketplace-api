@@ -555,15 +555,15 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
                             .isLessThanOrEqualTo(BigDecimal.valueOf(3.0))), true
             );
-            test_contributors_stats(Map.of("issueCount.eq", "1"),
+            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "ISSUE"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getIssueCount().getValue())
                             .isEqualTo(1)), true
             );
-            test_contributors_stats(Map.of("prCount.eq", "2"),
+            test_contributors_stats(Map.of("contributionCount.eq", "2", "contributionCount.types", "PULL_REQUEST"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getPrCount().getValue())
                             .isEqualTo(2)), true
             );
-            test_contributors_stats(Map.of("codeReviewCount.eq", "1"),
+            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "CODE_REVIEW"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getCodeReviewCount().getValue())
                             .isEqualTo(1)), true
             );
@@ -571,7 +571,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getRewardCount().getValue())
                             .isEqualTo(2)), true
             );
-            test_contributors_stats(Map.of("contributionCount.eq", "4"),
+            test_contributors_stats(Map.of("contributionCount.eq", "4", "contributionCount.types", "ISSUE,PULL_REQUEST,CODE_REVIEW"),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getContributionCount().getValue())
                             .isEqualTo(4)), true
             );

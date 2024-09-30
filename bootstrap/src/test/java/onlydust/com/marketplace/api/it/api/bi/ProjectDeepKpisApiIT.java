@@ -640,15 +640,15 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getActiveContributorCount().getValue())
                             .isEqualTo(1)), true
             );
-            test_projects_stats(Map.of("issueCount.eq", "1"),
+            test_projects_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "ISSUE"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getIssueCount().getValue())
                             .isEqualTo(1)), true
             );
-            test_projects_stats(Map.of("prCount.eq", "6"),
+            test_projects_stats(Map.of("contributionCount.eq", "6", "contributionCount.types", "PULL_REQUEST"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getPrCount().getValue())
                             .isEqualTo(6)), true
             );
-            test_projects_stats(Map.of("codeReviewCount.eq", "1"),
+            test_projects_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "CODE_REVIEW"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getCodeReviewCount().getValue())
                             .isEqualTo(1)), true
             );
@@ -656,7 +656,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getRewardCount().getValue())
                             .isEqualTo(4)), true
             );
-            test_projects_stats(Map.of("contributionCount.eq", "8"),
+            test_projects_stats(Map.of("contributionCount.eq", "8", "contributionCount.types", "ISSUE,PULL_REQUEST,CODE_REVIEW"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getContributionCount().getValue())
                             .isEqualTo(8)), true
             );

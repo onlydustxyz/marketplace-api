@@ -11024,14 +11024,15 @@ components:
           $ref: '#/components/schemas/NumberKpiFilter'
         rewardCount:
           $ref: '#/components/schemas/NumberKpiFilter'
-        issueCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        prCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        codeReviewCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         contributionCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
+          allOf:
+            - $ref: '#/components/schemas/NumberKpiFilter'
+            - type: object
+              properties:
+                types:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ContributionType'
 
     BiProjectsPageResponse:
       allOf:
@@ -11182,14 +11183,17 @@ components:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
           $ref: '#/components/schemas/NumberKpiFilter'
-        issueCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        prCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        codeReviewCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         contributionCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
+          allOf:
+            - $ref: '#/components/schemas/NumberKpiFilter'
+            - type: object
+              required:
+                - types
+              properties:
+                types:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ContributionType'
 
     BiContributorsPageResponse:
       allOf:
