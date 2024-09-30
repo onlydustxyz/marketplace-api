@@ -1944,6 +1944,48 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/transactions:
+    get:
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - ReadProjects
+      summary: Get project transactions
+      operationId: getProjectTransactions
+      description: |
+        Get project transactions.
+        Use Accept: text/csv header to get the response in CSV format.
+        Only project leaders can access this information.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - $ref: '#/components/parameters/pageIndexParam'
+        - $ref: '#/components/parameters/pageSizeParam'
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - in: query
+          name: types
+          description: Transaction types filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ProjectTransactionType'
+        - $ref: '#/components/parameters/searchParam'
+      responses:
+        "200":
+          description: 'The project transactions'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectTransactionPageResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/{projectId}/good-first-issues:
     get:
       deprecated: true
@@ -9450,6 +9492,44 @@ components:
         amount:
           $ref: '#/components/schemas/Money'
 
+    ProjectTransactionPageResponse:
+      allOf:
+        - $ref: '#/components/schemas/PageResponse'
+        - type: object
+          required:
+            - transactions
+          properties:
+            transactions:
+              type: array
+              items:
+                $ref: '#/components/schemas/ProjectTransactionPageItemResponse'
+
+    ProjectTransactionPageItemResponse:
+      type: object
+      required:
+        - id
+        - date
+        - type
+        - thirdParty
+        - amount
+      properties:
+        id:
+          $ref: '#/components/schemas/TransactionId'
+        date:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/ProjectTransactionType'
+        thirdParty:
+          type: object
+          properties:
+            program:
+              $ref: '#/components/schemas/ProgramLinkResponse'
+            contributor:
+              $ref: '#/components/schemas/ContributorResponse'
+        amount:
+          $ref: '#/components/schemas/Money'
+
     ProgramProjectsPageResponse:
       allOf:
         - $ref: '#/components/schemas/PageResponse'
@@ -9642,6 +9722,13 @@ components:
         - UNGRANTED
         - ALLOCATED
         - UNALLOCATED
+
+    ProjectTransactionType:
+      type: string
+      enum:
+        - REWARDED
+        - GRANTED
+        - UNGRANTED
 
     SponsorTransactionType:
       type: string

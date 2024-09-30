@@ -15,6 +15,33 @@ public interface AllTransactionReadRepository extends Repository<AllTransactionR
     @Query(value = """
             SELECT t
             FROM AllTransactionReadEntity t
+            JOIN FETCH t.currency
+            JOIN FETCH t.program
+            LEFT JOIN FETCH t.reward r
+            LEFT JOIN r.recipient rr
+            WHERE
+                t.project.id = :projectId AND
+                t.payment IS NULL AND
+                (t.rewardId IS NULL OR t.rewardId IS NOT NULL AND r.id IS NOT NULL) AND
+                (:search IS NULL OR rr.login ilike '%' || CAST(:search AS String) || '%' OR t.project.name ilike '%' || CAST(:search AS String) || '%') AND
+                (CAST(:fromDate AS String) IS NULL OR t.timestamp >= :fromDate) AND
+                (CAST(:toDate AS String) IS NULL OR DATE_TRUNC('DAY', t.timestamp) <= :toDate) AND
+                (COALESCE(:types, NULL) IS NULL OR (
+                    'REWARDED' in (:types) and CAST(t.type AS String) = 'TRANSFER' and t.rewardId is not null or
+                    'GRANTED' in (:types) and CAST(t.type AS String) = 'TRANSFER'  and t.rewardId is null or
+                    'UNGRANTED' in (:types) and CAST(t.type AS String) = 'REFUND'  and t.rewardId is null
+                ))
+            """)
+    Page<AllTransactionReadEntity> findAllForProject(UUID projectId,
+                                                     Date fromDate,
+                                                     Date toDate,
+                                                     String search,
+                                                     List<String> types,
+                                                     Pageable pageable);
+
+    @Query(value = """
+            SELECT t
+            FROM AllTransactionReadEntity t
             JOIN FETCH t.sponsor
             JOIN FETCH t.currency
             LEFT JOIN FETCH t.project p
