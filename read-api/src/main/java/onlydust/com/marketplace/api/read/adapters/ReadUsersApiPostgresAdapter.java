@@ -19,6 +19,8 @@ import java.util.UUID;
 import static onlydust.com.marketplace.api.read.properties.Cache.M;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static org.springframework.data.domain.Sort.Order.asc;
+import static org.springframework.data.domain.Sort.Order.desc;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -99,7 +101,7 @@ public class ReadUsersApiPostgresAdapter implements ReadUsersApi {
     @Override
     public ResponseEntity<UserProfileLanguagePage> getUserProfileStatsPerLanguages(Long githubId, Integer pageIndex, Integer pageSize) {
         final var page = userProfileLanguagePageItemEntityRepository.findByContributorId(githubId, PageRequest.of(pageIndex, pageSize,
-                Sort.by(Sort.Direction.DESC, "contribution_count", "total_earned_usd")));
+                Sort.by(desc("contribution_count"), desc("total_earned_usd"), asc("language_name"))));
         return ok()
                 .cacheControl(cache.forEverybody(M))
                 .body(new UserProfileLanguagePage()
