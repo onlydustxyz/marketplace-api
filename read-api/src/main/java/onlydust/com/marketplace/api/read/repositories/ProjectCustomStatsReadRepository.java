@@ -15,7 +15,7 @@ public interface ProjectCustomStatsReadRepository extends Repository<ProjectCust
                    count(distinct cd.contributor_id)                     as active_contributor_count,
                    count(distinct cd.contributor_id)
                    filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count
-            from bi.contribution_data cd
+            from bi.m_contribution_data cd
             where :projectId = cd.project_id
               and (cast(:fromDate as text) is null or cd.timestamp >= :fromDate)
               and (cast(:toDate as text) is null or date_trunc('day', cd.timestamp) <= :toDate)

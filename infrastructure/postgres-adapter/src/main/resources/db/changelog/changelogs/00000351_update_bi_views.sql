@@ -30,7 +30,7 @@ $$
 SELECT amount * accounting.usd_quote_at(currency_id, at);
 $$ LANGUAGE SQL;
 
-CREATE MATERIALIZED VIEW bi.contribution_data AS
+CREATE MATERIALIZED VIEW bi.m_contribution_data AS
 WITH project_contributions AS (select distinct on (c.id) c.*,
                                                          pgr.project_id as project_id,
                                                          p.slug         as project_slug
@@ -98,37 +98,37 @@ FROM (with registered_users as (select u.id             as id,
                             where l.id = any (c.language_ids)) as language_names on true
 ;
 
-create unique index bi_contribution_data_pk on bi.contribution_data (contribution_id);
+create unique index bi_contribution_data_pk on bi.m_contribution_data (contribution_id);
 
-create index bi_contribution_data_project_id_timestamp_idx on bi.contribution_data (project_id, timestamp);
-create index bi_contribution_data_project_id_day_timestamp_idx on bi.contribution_data (project_id, day_timestamp);
-create index bi_contribution_data_project_id_week_timestamp_idx on bi.contribution_data (project_id, week_timestamp);
-create index bi_contribution_data_project_id_month_timestamp_idx on bi.contribution_data (project_id, month_timestamp);
-create index bi_contribution_data_project_id_quarter_timestamp_idx on bi.contribution_data (project_id, quarter_timestamp);
-create index bi_contribution_data_project_id_year_timestamp_idx on bi.contribution_data (project_id, year_timestamp);
-create index bi_contribution_data_project_id_timestamp_idx_inv on bi.contribution_data (timestamp, project_id);
-create index bi_contribution_data_project_id_day_timestamp_idx_inv on bi.contribution_data (day_timestamp, project_id);
-create index bi_contribution_data_project_id_week_timestamp_idx_inv on bi.contribution_data (week_timestamp, project_id);
-create index bi_contribution_data_project_id_month_timestamp_idx_inv on bi.contribution_data (month_timestamp, project_id);
-create index bi_contribution_data_project_id_quarter_timestamp_idx_inv on bi.contribution_data (quarter_timestamp, project_id);
-create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.contribution_data (year_timestamp, project_id);
+create index bi_contribution_data_project_id_timestamp_idx on bi.m_contribution_data (project_id, timestamp);
+create index bi_contribution_data_project_id_day_timestamp_idx on bi.m_contribution_data (project_id, day_timestamp);
+create index bi_contribution_data_project_id_week_timestamp_idx on bi.m_contribution_data (project_id, week_timestamp);
+create index bi_contribution_data_project_id_month_timestamp_idx on bi.m_contribution_data (project_id, month_timestamp);
+create index bi_contribution_data_project_id_quarter_timestamp_idx on bi.m_contribution_data (project_id, quarter_timestamp);
+create index bi_contribution_data_project_id_year_timestamp_idx on bi.m_contribution_data (project_id, year_timestamp);
+create index bi_contribution_data_project_id_timestamp_idx_inv on bi.m_contribution_data (timestamp, project_id);
+create index bi_contribution_data_project_id_day_timestamp_idx_inv on bi.m_contribution_data (day_timestamp, project_id);
+create index bi_contribution_data_project_id_week_timestamp_idx_inv on bi.m_contribution_data (week_timestamp, project_id);
+create index bi_contribution_data_project_id_month_timestamp_idx_inv on bi.m_contribution_data (month_timestamp, project_id);
+create index bi_contribution_data_project_id_quarter_timestamp_idx_inv on bi.m_contribution_data (quarter_timestamp, project_id);
+create index bi_contribution_data_project_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, project_id);
 
-create index bi_contribution_data_contributor_id_timestamp_idx on bi.contribution_data (contributor_id, timestamp);
-create index bi_contribution_data_contributor_id_day_timestamp_idx on bi.contribution_data (contributor_id, day_timestamp);
-create index bi_contribution_data_contributor_id_week_timestamp_idx on bi.contribution_data (contributor_id, week_timestamp);
-create index bi_contribution_data_contributor_id_month_timestamp_idx on bi.contribution_data (contributor_id, month_timestamp);
-create index bi_contribution_data_contributor_id_quarter_timestamp_idx on bi.contribution_data (contributor_id, quarter_timestamp);
-create index bi_contribution_data_contributor_id_year_timestamp_idx on bi.contribution_data (contributor_id, year_timestamp);
-create index bi_contribution_data_contributor_id_timestamp_idx_inv on bi.contribution_data (timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_day_timestamp_idx_inv on bi.contribution_data (day_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_week_timestamp_idx_inv on bi.contribution_data (week_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.contribution_data (month_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.contribution_data (quarter_timestamp, contributor_id);
-create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.contribution_data (year_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_timestamp_idx on bi.m_contribution_data (contributor_id, timestamp);
+create index bi_contribution_data_contributor_id_day_timestamp_idx on bi.m_contribution_data (contributor_id, day_timestamp);
+create index bi_contribution_data_contributor_id_week_timestamp_idx on bi.m_contribution_data (contributor_id, week_timestamp);
+create index bi_contribution_data_contributor_id_month_timestamp_idx on bi.m_contribution_data (contributor_id, month_timestamp);
+create index bi_contribution_data_contributor_id_quarter_timestamp_idx on bi.m_contribution_data (contributor_id, quarter_timestamp);
+create index bi_contribution_data_contributor_id_year_timestamp_idx on bi.m_contribution_data (contributor_id, year_timestamp);
+create index bi_contribution_data_contributor_id_timestamp_idx_inv on bi.m_contribution_data (timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_day_timestamp_idx_inv on bi.m_contribution_data (day_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_week_timestamp_idx_inv on bi.m_contribution_data (week_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_month_timestamp_idx_inv on bi.m_contribution_data (month_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_quarter_timestamp_idx_inv on bi.m_contribution_data (quarter_timestamp, contributor_id);
+create index bi_contribution_data_contributor_id_year_timestamp_idx_inv on bi.m_contribution_data (year_timestamp, contributor_id);
 
 
 
-CREATE MATERIALIZED VIEW bi.reward_data AS
+CREATE MATERIALIZED VIEW bi.m_reward_data AS
 WITH project_programs AS (select distinct abt.program_id,
                                           abt.project_id
                           from accounting.account_book_transactions abt
@@ -178,37 +178,37 @@ FROM (select r.id                                                               
                             from currencies cur
                             where cur.id = r.currency_id) as currency_search on true;
 
-create unique index bi_reward_data_pk on bi.reward_data (reward_id);
+create unique index bi_reward_data_pk on bi.m_reward_data (reward_id);
 
-create index if not exists bi_reward_data_project_id_day_timestamp_idx on bi.reward_data (project_id, timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_day_timestamp_idx on bi.reward_data (project_id, day_timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_week_timestamp_idx on bi.reward_data (project_id, week_timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_month_timestamp_idx on bi.reward_data (project_id, month_timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_quarter_timestamp_idx on bi.reward_data (project_id, quarter_timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_year_timestamp_idx on bi.reward_data (project_id, year_timestamp, currency_id);
-create index if not exists bi_reward_data_project_id_day_timestamp_idx_inv on bi.reward_data (timestamp, project_id, currency_id);
-create index if not exists bi_reward_data_project_id_day_timestamp_idx_inv on bi.reward_data (day_timestamp, project_id, currency_id);
-create index if not exists bi_reward_data_project_id_week_timestamp_idx_inv on bi.reward_data (week_timestamp, project_id, currency_id);
-create index if not exists bi_reward_data_project_id_month_timestamp_idx_inv on bi.reward_data (month_timestamp, project_id, currency_id);
-create index if not exists bi_reward_data_project_id_quarter_timestamp_idx_inv on bi.reward_data (quarter_timestamp, project_id, currency_id);
-create index if not exists bi_reward_data_project_id_year_timestamp_idx_inv on bi.reward_data (year_timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_day_timestamp_idx on bi.m_reward_data (project_id, timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_day_timestamp_idx on bi.m_reward_data (project_id, day_timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_week_timestamp_idx on bi.m_reward_data (project_id, week_timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_month_timestamp_idx on bi.m_reward_data (project_id, month_timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_quarter_timestamp_idx on bi.m_reward_data (project_id, quarter_timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_year_timestamp_idx on bi.m_reward_data (project_id, year_timestamp, currency_id);
+create index if not exists bi_reward_data_project_id_day_timestamp_idx_inv on bi.m_reward_data (timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_day_timestamp_idx_inv on bi.m_reward_data (day_timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_week_timestamp_idx_inv on bi.m_reward_data (week_timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_month_timestamp_idx_inv on bi.m_reward_data (month_timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_quarter_timestamp_idx_inv on bi.m_reward_data (quarter_timestamp, project_id, currency_id);
+create index if not exists bi_reward_data_project_id_year_timestamp_idx_inv on bi.m_reward_data (year_timestamp, project_id, currency_id);
 
-create index if not exists bi_reward_data_contributor_id_day_timestamp_idx on bi.reward_data (contributor_id, timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_day_timestamp_idx on bi.reward_data (contributor_id, day_timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_week_timestamp_idx on bi.reward_data (contributor_id, week_timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_month_timestamp_idx on bi.reward_data (contributor_id, month_timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_quarter_timestamp_idx on bi.reward_data (contributor_id, quarter_timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_year_timestamp_idx on bi.reward_data (contributor_id, year_timestamp, currency_id);
-create index if not exists bi_reward_data_contributor_id_day_timestamp_idx_inv on bi.reward_data (timestamp, contributor_id, currency_id);
-create index if not exists bi_reward_data_contributor_id_day_timestamp_idx_inv on bi.reward_data (day_timestamp, contributor_id, currency_id);
-create index if not exists bi_reward_data_contributor_id_week_timestamp_idx_inv on bi.reward_data (week_timestamp, contributor_id, currency_id);
-create index if not exists bi_reward_data_contributor_id_month_timestamp_idx_inv on bi.reward_data (month_timestamp, contributor_id, currency_id);
-create index if not exists bi_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.reward_data (quarter_timestamp, contributor_id, currency_id);
-create index if not exists bi_reward_data_contributor_id_year_timestamp_idx_inv on bi.reward_data (year_timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_day_timestamp_idx on bi.m_reward_data (contributor_id, timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_day_timestamp_idx on bi.m_reward_data (contributor_id, day_timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_week_timestamp_idx on bi.m_reward_data (contributor_id, week_timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_month_timestamp_idx on bi.m_reward_data (contributor_id, month_timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_quarter_timestamp_idx on bi.m_reward_data (contributor_id, quarter_timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_year_timestamp_idx on bi.m_reward_data (contributor_id, year_timestamp, currency_id);
+create index if not exists bi_reward_data_contributor_id_day_timestamp_idx_inv on bi.m_reward_data (timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_day_timestamp_idx_inv on bi.m_reward_data (day_timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_week_timestamp_idx_inv on bi.m_reward_data (week_timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_month_timestamp_idx_inv on bi.m_reward_data (month_timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.m_reward_data (quarter_timestamp, contributor_id, currency_id);
+create index if not exists bi_reward_data_contributor_id_year_timestamp_idx_inv on bi.m_reward_data (year_timestamp, contributor_id, currency_id);
 
 
 
-CREATE MATERIALIZED VIEW bi.project_grants_data AS
+CREATE MATERIALIZED VIEW bi.m_project_grants_data AS
 SELECT abt.project_id,
        abt.program_id,
        abt.currency_id,
@@ -245,24 +245,24 @@ GROUP BY abt.project_id,
          prog.name
 ;
 
-create unique index bi_project_grants_data_pk on bi.project_grants_data (project_id, timestamp, program_id, currency_id);
+create unique index bi_project_grants_data_pk on bi.m_project_grants_data (project_id, timestamp, program_id, currency_id);
 
-create index bi_project_grants_data_timestamp_idx on bi.project_grants_data (timestamp, project_id);
-create index bi_project_grants_data_day_timestamp_idx on bi.project_grants_data (day_timestamp, project_id);
-create index bi_project_grants_data_week_timestamp_idx on bi.project_grants_data (week_timestamp, project_id);
-create index bi_project_grants_data_month_timestamp_idx on bi.project_grants_data (month_timestamp, project_id);
-create index bi_project_grants_data_quarter_timestamp_idx on bi.project_grants_data (quarter_timestamp, project_id);
-create index bi_project_grants_data_year_timestamp_idx on bi.project_grants_data (year_timestamp, project_id);
-create index bi_project_grants_data_timestamp_idx_inv on bi.project_grants_data (project_id, timestamp);
-create index bi_project_grants_data_day_timestamp_idx_inv on bi.project_grants_data (project_id, day_timestamp);
-create index bi_project_grants_data_week_timestamp_idx_inv on bi.project_grants_data (project_id, week_timestamp);
-create index bi_project_grants_data_month_timestamp_idx_inv on bi.project_grants_data (project_id, month_timestamp);
-create index bi_project_grants_data_quarter_timestamp_idx_inv on bi.project_grants_data (project_id, quarter_timestamp);
-create index bi_project_grants_data_year_timestamp_idx_inv on bi.project_grants_data (project_id, year_timestamp);
+create index bi_project_grants_data_timestamp_idx on bi.m_project_grants_data (timestamp, project_id);
+create index bi_project_grants_data_day_timestamp_idx on bi.m_project_grants_data (day_timestamp, project_id);
+create index bi_project_grants_data_week_timestamp_idx on bi.m_project_grants_data (week_timestamp, project_id);
+create index bi_project_grants_data_month_timestamp_idx on bi.m_project_grants_data (month_timestamp, project_id);
+create index bi_project_grants_data_quarter_timestamp_idx on bi.m_project_grants_data (quarter_timestamp, project_id);
+create index bi_project_grants_data_year_timestamp_idx on bi.m_project_grants_data (year_timestamp, project_id);
+create index bi_project_grants_data_timestamp_idx_inv on bi.m_project_grants_data (project_id, timestamp);
+create index bi_project_grants_data_day_timestamp_idx_inv on bi.m_project_grants_data (project_id, day_timestamp);
+create index bi_project_grants_data_week_timestamp_idx_inv on bi.m_project_grants_data (project_id, week_timestamp);
+create index bi_project_grants_data_month_timestamp_idx_inv on bi.m_project_grants_data (project_id, month_timestamp);
+create index bi_project_grants_data_quarter_timestamp_idx_inv on bi.m_project_grants_data (project_id, quarter_timestamp);
+create index bi_project_grants_data_year_timestamp_idx_inv on bi.m_project_grants_data (project_id, year_timestamp);
 
 
 
-CREATE MATERIALIZED VIEW bi.project_global_data AS
+CREATE MATERIALIZED VIEW bi.m_project_global_data AS
 WITH project_programs AS (select distinct abt.program_id,
                                           abt.project_id
                           from accounting.account_book_transactions abt
@@ -341,8 +341,8 @@ FROM projects p
          LEFT JOIN project_leads pleads ON pleads.project_id = p.id
          LEFT JOIN iam.users u ON u.id = pleads.user_id
          LEFT JOIN LATERAL (select distinct c.name, c.code
-                            from bi.reward_data rd
-                                     full outer join bi.project_grants_data gd on gd.project_id = rd.project_id
+                            from bi.m_reward_data rd
+                                     full outer join bi.m_project_grants_data gd on gd.project_id = rd.project_id
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
@@ -383,7 +383,7 @@ FROM projects p
                                                             'logoUrl', c.logo_url)                 as currency,
                                          sum(gd.amount)                                            as amount,
                                          accounting.usd_equivalent_at(sum(gd.amount), c.id, now()) as current_usd_amount
-                                  from bi.project_grants_data gd
+                                  from bi.m_project_grants_data gd
                                            join currencies c on c.id = gd.currency_id
                                   group by gd.project_id, c.id) gd
 
@@ -397,18 +397,18 @@ FROM projects p
                                                        sum(rd.usd_amount)                                        as usd_amount,
                                                        sum(rd.amount)                                            as amount,
                                                        accounting.usd_equivalent_at(sum(rd.amount), c.id, now()) as current_usd_amount
-                                                from bi.reward_data rd
+                                                from bi.m_reward_data rd
                                                          join currencies c on c.id = rd.currency_id
                                                 group by rd.project_id, c.id) rd on gd.project_id = rd.project_id and gd.currency_id = rd.currency_id
                             group by gd.project_id ) budgets on budgets.project_id = p.id
 GROUP BY p.id;
 
 
-CREATE UNIQUE INDEX bi_project_global_data_pk ON bi.project_global_data (project_id);
+CREATE UNIQUE INDEX bi_project_global_data_pk ON bi.m_project_global_data (project_id);
 
 
 
-CREATE MATERIALIZED VIEW bi.contributor_global_data AS
+CREATE MATERIALIZED VIEW bi.m_contributor_global_data AS
 WITH user_contries as (select bpu.user_id as user_id,
                               kyc.country as country
                        from accounting.billing_profiles_users bpu
@@ -425,7 +425,7 @@ WITH user_contries as (select bpu.user_id as user_id,
                         union
                         select cd.contributor_id       as contributor_id,
                                unnest(cd.language_ids) as language_id
-                        from bi.contribution_data cd)
+                        from bi.m_contribution_data cd)
 SELECT u.github_user_id                                                                                    as contributor_id,
        u.login                                                                                             as contributor_login,
        uc.country                                                                                          as contributor_country,
@@ -482,7 +482,7 @@ SELECT u.github_user_id                                                         
               coalesce(string_agg(distinct prog.name, ' '), ''))                                           as search
 FROM iam.all_users u
          LEFT JOIN user_contries uc on uc.user_id = u.user_id
-         LEFT JOIN bi.contribution_data cd on cd.contributor_id = u.github_user_id
+         LEFT JOIN bi.m_contribution_data cd on cd.contributor_id = u.github_user_id
          LEFT JOIN projects p on p.id = cd.project_id
          LEFT JOIN projects_ecosystems pe ON pe.project_id = p.id
          LEFT JOIN ecosystems e ON e.id = pe.ecosystem_id
@@ -497,7 +497,7 @@ FROM iam.all_users u
 GROUP BY u.github_user_id, u.login, u.avatar_url, u.user_id, uc.country;
 
 
-CREATE UNIQUE INDEX bi_contributor_global_data_pk ON bi.contributor_global_data (contributor_id);
+CREATE UNIQUE INDEX bi_contributor_global_data_pk ON bi.m_contributor_global_data (contributor_id);
 
 
 
@@ -559,7 +559,7 @@ SELECT p.project_id                        as project_id,
        sum(rd.average_reward_usd_amount)   as average_reward_usd_amount,
        sum(cd.active_contributor_count)    as active_contributor_count,
        sum(cd.onboarded_contributor_count) as onboarded_contributor_count
-FROM bi.project_global_data p
+FROM bi.m_project_global_data p
 
          LEFT JOIN (select cd.project_id,
                            count(cd.contribution_id)                                                               as contribution_count,
@@ -568,7 +568,7 @@ FROM bi.project_global_data p
                            coalesce(sum(cd.is_code_review), 0)                                                     as code_review_count,
                            count(distinct cd.contributor_id)                                                       as active_contributor_count,
                            count(distinct cd.contributor_id) filter ( where cd.is_first_contribution_on_onlydust ) as onboarded_contributor_count
-                    from bi.contribution_data cd
+                    from bi.m_contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
                       and (not showFilteredKpis or languageIds is null or cd.language_ids && languageIds)
@@ -579,7 +579,7 @@ FROM bi.project_global_data p
                            count(rd.reward_id)             as reward_count,
                            coalesce(sum(rd.usd_amount), 0) as total_rewarded_usd_amount,
                            coalesce(avg(rd.usd_amount), 0) as average_reward_usd_amount
-                    from bi.reward_data rd
+                    from bi.m_reward_data rd
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
                       and (not showFilteredKpis or projectLeadIds is null or rd.requestor_id = any (projectLeadIds))
@@ -588,7 +588,7 @@ FROM bi.project_global_data p
 
          LEFT JOIN (select gd.project_id,
                            coalesce(sum(gd.usd_amount), 0) as total_granted_usd_amount
-                    from bi.project_grants_data gd
+                    from bi.m_project_grants_data gd
                     where gd.timestamp >= fromDate
                       and gd.timestamp < toDate
                     group by gd.project_id) gd on gd.project_id = p.project_id
@@ -658,14 +658,14 @@ SELECT c.contributor_id                  as contributor_id,
        sum(cd.pr_count)                  as pr_count,
        sum(cd.code_review_count)         as code_review_count,
        sum(cd.contribution_count)        as contribution_count
-FROM bi.contributor_global_data c
+FROM bi.m_contributor_global_data c
 
          LEFT JOIN (select cd.contributor_id,
                            count(cd.contribution_id)           as contribution_count,
                            coalesce(sum(cd.is_issue), 0)       as issue_count,
                            coalesce(sum(cd.is_pr), 0)          as pr_count,
                            coalesce(sum(cd.is_code_review), 0) as code_review_count
-                    from bi.contribution_data cd
+                    from bi.m_contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
                       and (cd.program_ids && programOrEcosystemIds or cd.ecosystem_ids && programOrEcosystemIds)
@@ -680,7 +680,7 @@ FROM bi.contributor_global_data c
          LEFT JOIN (select rd.contributor_id,
                            count(rd.reward_id)             as reward_count,
                            coalesce(sum(rd.usd_amount), 0) as total_rewarded_usd_amount
-                    from bi.reward_data rd
+                    from bi.m_reward_data rd
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
                       and (rd.program_ids && programOrEcosystemIds or rd.ecosystem_ids && programOrEcosystemIds)
