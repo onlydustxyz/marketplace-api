@@ -29,11 +29,18 @@ public class GithubHelper {
     }
 
     public GithubAccount createAccount(Long id) {
-        final var login = faker.name().username();
+        return createAccount(id, faker.name().username(), faker.internet().avatar());
+    }
+
+    public GithubAccount createAccount(UserAuthHelper.AuthenticatedUser contributor) {
+        return createAccount(contributor.user().getGithubUserId(), contributor.user().getGithubLogin(), contributor.user().getGithubAvatarUrl());
+    }
+
+    public GithubAccount createAccount(Long id, String login, String avatarUrl) {
         final var account = GithubAccount.builder()
                 .id(id)
                 .login(login)
-                .avatarUrl(faker.internet().avatar())
+                .avatarUrl(avatarUrl)
                 .htmlUrl("https://github.com/" + login)
                 .build();
 
@@ -95,13 +102,13 @@ public class GithubHelper {
     public long createPullRequest(GithubRepo repo, UserAuthHelper.AuthenticatedUser contributor, List<String> mainFileExtensions) {
         final var prId = faker.random().nextLong();
         final var prNumber = faker.random().nextInt(1000);
+
+        createAccount(contributor);
+
         final var parameters = new HashMap<String, Object>();
-        parameters.put("id", faker.random().hex());
-        parameters.put("repoId", repo.getId());
-        parameters.put("repoOwnerLogin", repo.getOwner());
-        parameters.put("repoName", repo.getName());
-        parameters.put("repoHtmlUrl", repo.getHtmlUrl());
         parameters.put("prId", prId);
+        parameters.put("repoId", repo.getId());
+        parameters.put("contributorId", contributor.user().getGithubUserId());
         parameters.put("createdAt", CurrentDateProvider.now());
         parameters.put("completedAt", CurrentDateProvider.now().plusDays(1));
         parameters.put("githubNumber", prNumber);
@@ -109,25 +116,37 @@ public class GithubHelper {
         parameters.put("githubHtmlUrl", "https://github.com/%s/%s/pull/%d".formatted(repo.getOwner(), repo.getName(), prNumber));
         parameters.put("githubBody", faker.lorem().paragraph());
         parameters.put("githubCommentsCount", faker.random().nextInt(10));
-        parameters.put("contributorId", contributor.user().getGithubUserId());
-        parameters.put("contributorLogin", contributor.user().getGithubLogin());
-        parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
-        parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
-        parameters.put("mainFileExtensions", mainFileExtensions == null ? null : mainFileExtensions.toArray(String[]::new));
+        parameters.put("mainFileExtensions", mainFileExtensions == null ? new String[]{} : mainFileExtensions.toArray(String[]::new));
 
         databaseHelper.executeQuery("""
-                insert into indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
-                values(:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
-                on conflict do nothing;
-                
-                insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count)
-                values (:prId, :repoId, :githubNumber, :githubTitle, 'MERGED', :createdAt, :completedAt, :completedAt, :contributorId, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', 1);
-                
-                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
-                values (:id, :repoId, :contributorId, 'PULL_REQUEST', 'COMPLETED', :prId, :createdAt, :completedAt, :githubNumber, 'MERGED', :githubTitle, :githubHtmlUrl, :githubBody, :githubCommentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', :mainFileExtensions);
+                insert into indexer_exp.github_pull_requests(id, repo_id, number, title, status, created_at, closed_at, merged_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url, review_state, commit_count, main_file_extensions)
+                select :prId,
+                       gr.id,
+                       :githubNumber,
+                       :githubTitle,
+                       'MERGED',
+                       :createdAt,
+                       :completedAt,
+                       :completedAt,
+                       ga.id,
+                       :githubHtmlUrl,
+                       :githubBody,
+                       :githubCommentsCount,
+                       gr.owner_login,
+                       gr.name,
+                       gr.html_url,
+                       ga.login,
+                       ga.html_url,
+                       ga.avatar_url,
+                       'APPROVED',
+                       1,
+                       :mainFileExtensions
+                from indexer_exp.github_accounts ga
+                join indexer_exp.github_repos gr on gr.id = :repoId
+                where ga.id = :contributorId
                 """, parameters);
 
-        addRepoContributorFromPullRequest(prId, contributor.user().getGithubUserId());
+        createContributionFromPullRequest(prId, contributor.user().getGithubUserId());
 
         return prId;
     }
@@ -138,7 +157,6 @@ public class GithubHelper {
 
     public Long createIssue(Long repoId, ZonedDateTime createdAt, ZonedDateTime closedAt, String status, UserAuthHelper.AuthenticatedUser contributor) {
         final var parameters = new HashMap<String, Object>();
-        parameters.put("id", faker.random().hex());
         parameters.put("repoId", repoId);
         parameters.put("number", faker.random().nextInt(10));
         parameters.put("title", faker.lorem().sentence());
@@ -149,16 +167,6 @@ public class GithubHelper {
         parameters.put("closedAt", closedAt);
         parameters.put("authorId", contributor.user().getGithubUserId());
         parameters.put("htmlUrl", faker.internet().url());
-        parameters.put("repoOwnerLogin", faker.lorem().word());
-        parameters.put("repoName", faker.lorem().word());
-        parameters.put("repoHtmlUrl", faker.internet().url());
-        parameters.put("authorLogin", faker.rickAndMorty().character());
-        parameters.put("authorHtmlUrl", faker.internet().url());
-        parameters.put("authorAvatarUrl", faker.internet().url());
-        parameters.put("contributorId", contributor.user().getGithubUserId());
-        parameters.put("contributorLogin", contributor.user().getGithubLogin());
-        parameters.put("contributorHtmlUrl", "https://github.com/" + contributor.user().getGithubLogin());
-        parameters.put("contributorAvatarUrl", contributor.user().getGithubAvatarUrl());
 
         final Long nextIssueId = databaseHelper.<Long>executeReadQuery(
                 """
@@ -169,20 +177,35 @@ public class GithubHelper {
         );
         parameters.put("issueId", nextIssueId);
 
+        createAccount(contributor);
+
         databaseHelper.executeQuery(
                 """
-                        INSERT INTO indexer_exp.github_accounts(id, login, type, html_url, avatar_url, name, bio, location, website, twitter, linkedin, telegram)
-                        VALUES (:contributorId, :contributorLogin, 'USER', :contributorHtmlUrl, :contributorAvatarUrl, null, null, null, null, null, null, null)
-                        ON CONFLICT DO NOTHING;
-                        
                         INSERT INTO indexer_exp.github_issues (id, repo_id, number, title, status, created_at, closed_at, author_id, html_url, body, comments_count, repo_owner_login, repo_name, repo_html_url, author_login, author_html_url, author_avatar_url)
-                        VALUES (:issueId, :repoId, :number, :title, cast(:status as indexer_exp.github_issue_status), :createdAt, :closedAt, :authorId, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :authorLogin, :authorHtmlUrl, :authorAvatarUrl);
-                        
-                        insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
-                        values (:id, :repoId, :contributorId, 'ISSUE', 'COMPLETED', :issueId, :createdAt, :closedAt, :number, 'COMPLETED', :title, :htmlUrl, :body, :commentsCount, :repoOwnerLogin, :repoName, :repoHtmlUrl, :contributorId, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, :contributorLogin, :contributorHtmlUrl, :contributorAvatarUrl, 'APPROVED', null);
+                        SELECT  :issueId,
+                                gr.id,
+                                :number,
+                                :title,
+                                cast(:status as indexer_exp.github_issue_status),
+                                :createdAt,
+                                :closedAt,
+                                ga.id,
+                                :htmlUrl,
+                                :body,
+                                :commentsCount,
+                                gr.owner_login,
+                                gr.name,
+                                gr.html_url,
+                                ga.login,
+                                ga.html_url,
+                                ga.avatar_url
+                        FROM indexer_exp.github_accounts ga
+                        JOIN indexer_exp.github_repos gr ON gr.id = :repoId
+                        WHERE ga.id = :authorId
                         """,
                 parameters
         );
+
         return nextIssueId;
     }
 
@@ -220,23 +243,102 @@ public class GithubHelper {
     public void assignIssueToContributor(Long issueId, Long contributorId) {
         createAccount(contributorId);
 
-        final var parameters = new HashMap<String, Object>();
-        parameters.put("contributorId", contributorId);
-        parameters.put("issueId", issueId);
-
-        addRepoContributorFromIssue(issueId, contributorId);
-
         databaseHelper.executeQuery(
                 """
-                        INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (:issueId, :contributorId);
-                        """, parameters
+                        INSERT INTO indexer_exp.github_issues_assignees (issue_id, user_id) VALUES (:issueId, :contributorId)
+                        ON CONFLICT DO NOTHING;
+                        """, Map.of(
+                        "contributorId", contributorId,
+                        "issueId", issueId)
         );
+
+        createContributionFromIssue(issueId, contributorId);
+    }
+
+    private void createContributionFromPullRequest(Long prId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, pull_request_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                select  :contributionId,
+                        gpr.repo_id,
+                        ga.id,
+                        'PULL_REQUEST',
+                        'COMPLETED',
+                        gpr.id,
+                        gpr.created_at,
+                        gpr.closed_at,
+                        gpr.number,
+                        'MERGED',
+                        gpr.title,
+                        gpr.html_url,
+                        gpr.body,
+                        gpr.comments_count,
+                        gpr.repo_owner_login,
+                        gpr.repo_name,
+                        gpr.repo_html_url,
+                        gpr.author_id,
+                        gpr.author_login,
+                        gpr.author_html_url,
+                        gpr.author_avatar_url,
+                        ga.login,
+                        ga.html_url,
+                        ga.avatar_url,
+                        'APPROVED',
+                        gpr.main_file_extensions
+                from indexer_exp.github_pull_requests gpr
+                join indexer_exp.github_accounts ga on ga.id = :contributorId
+                where gpr.id = :prId
+                on conflict do nothing;
+                """, Map.of("contributionId", faker.random().hex(),
+                "prId", prId,
+                "contributorId", contributorId));
+
+        addRepoContributorFromPullRequest(prId, contributorId);
+    }
+
+    private void createContributionFromIssue(Long issueId, Long contributorId) {
+        databaseHelper.executeQuery("""
+                      insert into indexer_exp.contributions(id, repo_id, contributor_id, type, status, issue_id, created_at, completed_at, github_number, github_status, github_title, github_html_url, github_body, github_comments_count, repo_owner_login, repo_name, repo_html_url, github_author_id, github_author_login, github_author_html_url, github_author_avatar_url, contributor_login, contributor_html_url, contributor_avatar_url, pr_review_state, main_file_extensions)
+                        select  :contributionId,
+                                gi.repo_id,
+                                ga.id,
+                                'ISSUE',
+                                'COMPLETED',
+                                gi.id,
+                                gi.created_at,
+                                gi.closed_at,
+                                gi.number,
+                                'COMPLETED',
+                                gi.title,
+                                gi.html_url,
+                                gi.body,
+                                gi.comments_count,
+                                gi.repo_owner_login,
+                                gi.repo_name,
+                                gi.repo_html_url,
+                                ga.id,
+                                ga.login,
+                                ga.html_url,
+                                ga.avatar_url,
+                                ga.login,
+                                ga.html_url,
+                                ga.avatar_url,
+                                'APPROVED',
+                                null
+                        from indexer_exp.github_issues gi
+                        join indexer_exp.github_accounts ga on ga.id = :contributorId
+                        where gi.id = :issueId
+                        on conflict do nothing;
+                """, Map.of("contributionId", faker.random().hex(),
+                "issueId", issueId,
+                "contributorId", contributorId));
+
+        addRepoContributorFromIssue(issueId, contributorId);
     }
 
     private void addRepoContributorFromIssue(Long issueId, Long contributorId) {
         databaseHelper.executeQuery("""
                 insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
-                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                select distinct repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
                 from indexer_exp.contributions c
                 where c.issue_id = :issueId
                 on conflict (repo_id, contributor_id) do update set
@@ -249,7 +351,7 @@ public class GithubHelper {
     private void addRepoContributorFromCodeReview(String codeReviewId, Long contributorId) {
         databaseHelper.executeQuery("""
                 insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
-                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                select distinct repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
                 from indexer_exp.contributions c
                 where c.code_review_id = :codeReviewId
                 on conflict (repo_id, contributor_id) do update set
@@ -262,7 +364,7 @@ public class GithubHelper {
     private void addRepoContributorFromPullRequest(Long pullRequestId, Long contributorId) {
         databaseHelper.executeQuery("""
                 insert into indexer_exp.repos_contributors(repo_id, contributor_id, completed_contribution_count, total_contribution_count)
-                select repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
+                select distinct repo_id, :contributorId, case when c.status = 'COMPLETED' THEN 1 ELSE 0 END, 1
                 from indexer_exp.contributions c
                 where c.pull_request_id = :pullRequestId
                 on conflict (repo_id, contributor_id) do update set
