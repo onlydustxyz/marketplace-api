@@ -11,6 +11,7 @@ import onlydust.com.marketplace.api.contract.model.HackathonsListResponse;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonItemReadEntity;
 import onlydust.com.marketplace.api.read.entities.hackathon.HackathonProjectIssuesReadEntity;
+import onlydust.com.marketplace.api.read.properties.Cache;
 import onlydust.com.marketplace.api.read.repositories.HackathonItemReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonProjectIssuesReadRepository;
 import onlydust.com.marketplace.api.read.repositories.HackathonReadRepository;
@@ -29,6 +30,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static java.util.Objects.isNull;
+import static onlydust.com.marketplace.api.read.properties.Cache.S;
+import static onlydust.com.marketplace.api.read.properties.Cache.XS;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
@@ -38,6 +41,7 @@ import static org.springframework.http.ResponseEntity.ok;
 @Transactional(readOnly = true)
 public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
 
+    private final Cache cache;
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final HackathonReadRepository hackathonReadRepository;
     private final HackathonProjectIssuesReadRepository hackathonProjectIssuesReadRepository;
@@ -62,7 +66,9 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                 .stream()
                 .map(HackathonItemReadEntity::toHackathonsListItemResponse)
                 .forEach(hackathonsListResponse::addHackathonsItem);
-        return ok(hackathonsListResponse);
+        return ok()
+                .cacheControl(cache.forEverybody(S))
+                .body(hackathonsListResponse);
     }
 
     @Override
@@ -83,12 +89,14 @@ public class ReadHackathonsApiPostgresAdapter implements ReadHackathonsApi {
                 isNull(languageIds) ? null : languageIds.stream().distinct().toArray(UUID[]::new),
                 search);
         final var languageEntities = languageReadRepository.findAllByHackathonId(hackathonId);
-        return ok(new HackathonProjectsIssuesResponse()
-                .languages(languageEntities.stream()
-                        .map(LanguageReadEntity::toDto)
-                        .toList())
-                .projects(hackathonProjectIssues.stream()
-                        .map(HackathonProjectIssuesReadEntity::toDto)
-                        .toList()));
+        return ok()
+                .cacheControl(cache.forEverybody(XS))
+                .body(new HackathonProjectsIssuesResponse()
+                        .languages(languageEntities.stream()
+                                .map(LanguageReadEntity::toDto)
+                                .toList())
+                        .projects(hackathonProjectIssues.stream()
+                                .map(HackathonProjectIssuesReadEntity::toDto)
+                                .toList()));
     }
 }

@@ -40,7 +40,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -49,6 +48,7 @@ import static java.util.Objects.isNull;
 import static java.util.stream.Collectors.toSet;
 import static onlydust.com.marketplace.api.contract.model.GithubIssueStatus.OPEN;
 import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItemQueryEntity.*;
+import static onlydust.com.marketplace.api.read.properties.Cache.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
@@ -98,7 +98,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
         final String languagesJsonPath = getLanguagesJsonPath(languageSlugs);
 
         return ResponseEntity.ok()
-                .cacheControl(cache.whenAnonymous(user, 5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(user, M))
                 .body(user.map(u -> getProjectsForAuthenticatedUser(u.id().value(), mine, search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath,
                                 categorySlugs, hasGoodFirstIssues, sanitizePageIndex(pageIndex), sanitizePageSize(pageSize), sort))
                         .orElseGet(() -> getProjectsForAnonymousUser(search, ecosystemsJsonPath, tagsJsonPath, languagesJsonPath, categorySlugs,
@@ -186,7 +186,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", projectId)));
 
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(caller, M))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -202,7 +202,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .orElseThrow(() -> notFound(format("Project %s not found", slug)));
 
         return ok()
-                .cacheControl(cache.whenAnonymous(caller, 5, TimeUnit.MINUTES))
+                .cacheControl(cache.whenAnonymous(caller, M))
                 .body(getProjectDetails(project, caller.orElse(null), includeAllAvailableRepos));
     }
 
@@ -249,12 +249,14 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                     case CREATED_AT -> "i.created_at";
                     case CLOSED_AT -> "i.closed_at";
                 })));
-        return ok(new GithubIssuePageResponse()
-                .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
-                .totalPageNumber(page.getTotalPages())
-                .totalItemNumber((int) page.getTotalElements())
-                .hasMore(hasMore(pageIndex, page.getTotalPages()))
-                .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
+        return ok()
+                .cacheControl(cache.whenAnonymous(caller, XS))
+                .body(new GithubIssuePageResponse()
+                        .issues(page.stream().map(i -> i.toPageItemResponse(caller.map(AuthenticatedUser::githubUserId).orElse(null))).toList())
+                        .totalPageNumber(page.getTotalPages())
+                        .totalItemNumber((int) page.getTotalElements())
+                        .hasMore(hasMore(pageIndex, page.getTotalPages()))
+                        .nextPageIndex(nextPageIndex(pageIndex, page.getTotalPages())));
     }
 
     private ProjectResponse getProjectDetails(ProjectReadEntity project, AuthenticatedUser caller, final Boolean includeAllAvailableRepos) {
@@ -466,7 +468,11 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .nextPageIndex(nextPageIndex(pageIndex, contributors.getTotalPages()));
 
         return response.getTotalPageNumber() > 1 ?
-                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response) :
-                ResponseEntity.ok(response);
+                ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .body(response) :
+                ResponseEntity.ok()
+                        .cacheControl(cache.whenAnonymous(authenticatedUser, S))
+                        .body(response);
     }
 }
