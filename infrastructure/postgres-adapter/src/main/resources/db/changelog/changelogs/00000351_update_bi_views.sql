@@ -28,9 +28,11 @@ DROP MATERIALIZED VIEW IF EXISTS bi.project_grants_data;
 
 CREATE MATERIALIZED VIEW bi.contribution_data AS
 WITH project_contributions AS (select distinct on (c.id) c.*,
-                                                         pgr.project_id as project_id
+                                                         pgr.project_id as project_id,
+                                                         p.slug         as project_slug
                                from indexer_exp.contributions c
-                                        join project_github_repos pgr on pgr.github_repo_id = c.repo_id),
+                                        join project_github_repos pgr on pgr.github_repo_id = c.repo_id
+                                        join projects p on p.id = pgr.project_id),
      project_programs AS (select distinct abt.program_id,
                                           abt.project_id
                           from accounting.account_book_transactions abt
@@ -44,25 +46,27 @@ FROM (with registered_users as (select u.id             as id,
                                 from iam.users u
                                          join accounting.billing_profiles_users bpu on bpu.user_id = u.id
                                          join accounting.kyc on kyc.billing_profile_id = bpu.billing_profile_id)
-      select c.id                                                                             as contribution_id,
-             c.project_id                                                                     as project_id,
-             c.contributor_id                                                                 as contributor_id,
-             ru.id                                                                            as contributor_user_id,
-             ru.country                                                                       as contributor_country,
-             c.created_at                                                                     as timestamp,
-             c.status                                                                         as contribution_status,
-             date_trunc('day', c.created_at)                                                  as day_timestamp,
-             date_trunc('week', c.created_at)                                                 as week_timestamp,
-             date_trunc('month', c.created_at)                                                as month_timestamp,
-             date_trunc('quarter', c.created_at)                                              as quarter_timestamp,
-             date_trunc('year', c.created_at)                                                 as year_timestamp,
-             c.created_at = first.created_at                                                  as is_first_contribution_on_onlydust,
-             (c.type = 'ISSUE')::int                                                          as is_issue,
-             (c.type = 'PULL_REQUEST')::int                                                   as is_pr,
-             (c.type = 'CODE_REVIEW')::int                                                    as is_code_review,
-             array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null ) as language_ids,
-             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ) as ecosystem_ids,
-             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )     as program_ids
+      select c.id                                                                                             as contribution_id,
+             c.project_id                                                                                     as project_id,
+             c.project_slug                                                                                   as project_slug,
+             c.contributor_id                                                                                 as contributor_id,
+             ru.id                                                                                            as contributor_user_id,
+             ru.country                                                                                       as contributor_country,
+             c.created_at                                                                                     as timestamp,
+             c.status                                                                                         as contribution_status,
+             date_trunc('day', c.created_at)                                                                  as day_timestamp,
+             date_trunc('week', c.created_at)                                                                 as week_timestamp,
+             date_trunc('month', c.created_at)                                                                as month_timestamp,
+             date_trunc('quarter', c.created_at)                                                              as quarter_timestamp,
+             date_trunc('year', c.created_at)                                                                 as year_timestamp,
+             c.created_at = first.created_at                                                                  as is_first_contribution_on_onlydust,
+             (c.type = 'ISSUE')::int                                                                          as is_issue,
+             (c.type = 'PULL_REQUEST')::int                                                                   as is_pr,
+             (c.type = 'CODE_REVIEW')::int                                                                    as is_code_review,
+             array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
+             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
+             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
+             array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids
       from project_contributions c
                join (select cc.contributor_id, min(cc.created_at) as created_at
                      from project_contributions cc
@@ -73,9 +77,11 @@ FROM (with registered_users as (select u.id             as id,
                                    where lfe_1.extension = any (c.main_file_extensions)) lfe on true
                left join projects_ecosystems pe on pe.project_id = c.project_id
                left join project_programs pp on pp.project_id = c.project_id
+               left join projects_project_categories ppc on ppc.project_id = c.project_id
                left join registered_users ru on ru.github_user_id = c.contributor_id
       group by c.id,
                c.project_id,
+               c.project_slug,
                c.contributor_id,
                c.created_at,
                c.type,
@@ -126,31 +132,43 @@ WITH project_programs AS (select distinct abt.program_id,
                             and abt.reward_id is null)
 SELECT r.*,
        coalesce(currency_search.value, '') as search
-FROM (select r.id                                                                             as reward_id,
-             r.requested_at                                                                   as timestamp,
-             date_trunc('day', r.requested_at)                                                as day_timestamp,
-             date_trunc('week', r.requested_at)                                               as week_timestamp,
-             date_trunc('month', r.requested_at)                                              as month_timestamp,
-             date_trunc('quarter', r.requested_at)                                            as quarter_timestamp,
-             date_trunc('year', r.requested_at)                                               as year_timestamp,
-             r.recipient_id                                                                   as contributor_id,
-             r.project_id                                                                     as project_id,
-             rsd.amount_usd_equivalent                                                        as usd_amount,
-             r.amount                                                                         as amount,
-             r.currency_id                                                                    as currency_id,
-             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null ) as ecosystem_ids,
-             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )     as program_ids
+FROM (select r.id                                                                                             as reward_id,
+             r.requested_at                                                                                   as timestamp,
+             date_trunc('day', r.requested_at)                                                                as day_timestamp,
+             date_trunc('week', r.requested_at)                                                               as week_timestamp,
+             date_trunc('month', r.requested_at)                                                              as month_timestamp,
+             date_trunc('quarter', r.requested_at)                                                            as quarter_timestamp,
+             date_trunc('year', r.requested_at)                                                               as year_timestamp,
+             r.recipient_id                                                                                   as contributor_id,
+             r.project_id                                                                                     as project_id,
+             p.slug                                                                                           as project_slug,
+             rsd.amount_usd_equivalent                                                                        as usd_amount,
+             r.amount                                                                                         as amount,
+             r.currency_id                                                                                    as currency_id,
+             array_agg(distinct pe.ecosystem_id) filter ( where pe.ecosystem_id is not null )                 as ecosystem_ids,
+             array_agg(distinct pp.program_id) filter ( where pp.program_id is not null )                     as program_ids,
+             array_agg(distinct lfe.language_id) filter ( where lfe.language_id is not null )                 as language_ids,
+             array_agg(distinct ppc.project_category_id) filter ( where ppc.project_category_id is not null ) as project_category_ids
       from rewards r
                join accounting.reward_status_data rsd ON rsd.reward_id = r.id
+               join projects p on p.id = r.project_id
                left join projects_ecosystems pe on pe.project_id = r.project_id
                left join project_programs pp on pp.project_id = r.project_id
+               left join projects_project_categories ppc on ppc.project_id = r.project_id
+               left join reward_items ri on r.id = ri.reward_id
+               left join indexer_exp.contributions c on c.contributor_id = ri.recipient_id and
+                                                        c.repo_id = ri.repo_id and
+                                                        c.github_number = ri.number and
+                                                        c.type::text::contribution_type = ri.type
+               left join language_file_extensions lfe on lfe.extension = any (c.main_file_extensions)
       group by r.id,
                r.requested_at,
                r.recipient_id,
                r.project_id,
                rsd.amount_usd_equivalent,
                r.amount,
-               r.currency_id) r
+               r.currency_id,
+               p.slug) r
          left join lateral (select cur.name || ' ' || cur.code as value
                             from currencies cur
                             where cur.id = r.currency_id) as currency_search on true;
@@ -589,7 +607,8 @@ CREATE FUNCTION bi.select_contributors(fromDate timestamptz,
                                        ecosystemIds uuid[],
                                        countryCodes text[],
                                        contributionStatuses indexer_exp.contribution_status[],
-                                       searchQuery text)
+                                       searchQuery text,
+                                       filteredKpis boolean)
     RETURNS TABLE
             (
                 contributor_id            bigint,
@@ -635,7 +654,13 @@ FROM bi.contributor_global_data c
                     from bi.contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
+                      and (cd.program_ids && programOrEcosystemIds or cd.ecosystem_ids && programOrEcosystemIds)
                       and (contributionStatuses is null or cd.contribution_status = any (contributionStatuses))
+                      and (not filteredKpis or projectIds is null or cd.project_id = any (projectIds))
+                      and (not filteredKpis or projectSlugs is null or cd.project_slug = any (projectSlugs))
+                      and (not filteredKpis or ecosystemIds is null or cd.ecosystem_ids && ecosystemIds)
+                      and (not filteredKpis or categoryIds is null or cd.project_category_ids && categoryIds)
+                      and (not filteredKpis or languageIds is null or cd.language_ids && languageIds)
                     group by cd.contributor_id) cd on cd.contributor_id = c.contributor_id
 
          LEFT JOIN (select rd.contributor_id,
@@ -644,6 +669,12 @@ FROM bi.contributor_global_data c
                     from bi.reward_data rd
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
+                      and (rd.program_ids && programOrEcosystemIds or rd.ecosystem_ids && programOrEcosystemIds)
+                      and (not filteredKpis or projectIds is null or rd.project_id = any (projectIds))
+                      and (not filteredKpis or projectSlugs is null or rd.project_slug = any (projectSlugs))
+                      and (not filteredKpis or ecosystemIds is null or rd.ecosystem_ids && ecosystemIds)
+                      and (not filteredKpis or categoryIds is null or rd.project_category_ids && categoryIds)
+                      and (not filteredKpis or languageIds is null or rd.language_ids && languageIds)
                     group by rd.contributor_id) rd on rd.contributor_id = c.contributor_id
 
 WHERE (c.program_ids && programOrEcosystemIds or c.ecosystem_ids && programOrEcosystemIds)

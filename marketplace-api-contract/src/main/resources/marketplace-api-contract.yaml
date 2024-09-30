@@ -11139,6 +11139,9 @@ components:
             format: uuid
         search:
           type: string
+        showFilteredKpis:
+          type: boolean
+          default: false
         contributorIds:
           type: array
           items:

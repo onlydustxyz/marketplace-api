@@ -576,6 +576,22 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getContributionCount().getValue())
                             .isEqualTo(4)), true
             );
+            test_contributors_stats(Map.of("contributorIds", mehdi.githubUserId().toString(),
+                            "languageIds", "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                            "showFilteredKpis", "true"),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(2), true);
+            test_contributors_stats(Map.of("contributorIds", mehdi.githubUserId().toString(),
+                            "languageIds", "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                            "showFilteredKpis", "false"),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(4), true);
         }
 
         @Test
