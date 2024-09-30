@@ -27,6 +27,8 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -36,8 +38,13 @@ import org.springframework.data.jpa.domain.JpaSort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -55,6 +62,7 @@ import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.pa
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.springframework.http.ResponseEntity.status;
@@ -502,6 +510,39 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
 
         return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    @GetMapping(
+            value = "/api/v1/projects/{projectId}/transactions",
+            produces = "text/csv"
+    )
+    @Transactional(readOnly = true)
+    public ResponseEntity<String> exportProjectTransactions(@PathVariable UUID projectId,
+                                                            @RequestParam(required = false) Integer pageIndex,
+                                                            @RequestParam(required = false) Integer pageSize,
+                                                            @RequestParam(required = false) String fromDate,
+                                                            @RequestParam(required = false) String toDate,
+                                                            @RequestParam(required = false) List<ProjectTransactionType> types,
+                                                            @RequestParam(required = false) String search) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = findAccountBookTransactions(projectId, fromDate, toDate, types, search, index, size);
+        final var format = CSVFormat.DEFAULT.builder().build();
+        final var sw = new StringWriter();
+
+        try (final var printer = new CSVPrinter(sw, format)) {
+            printer.printRecord("id", "timestamp", "transaction_type", "contributor_id", "program_id", "amount", "currency", "usd_amount");
+            for (final var transaction : page.getContent())
+                transaction.toProjectCsv(printer);
+        } catch (final IOException e) {
+            throw internalServerError("Error while exporting transactions to CSV", e);
+        }
+
+        final var csv = sw.toString();
+
+        return status(hasMore(index, page.getTotalPages()) ? PARTIAL_CONTENT : OK)
+                .body(csv);
     }
 
     private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID projectId, String fromDate, String toDate,

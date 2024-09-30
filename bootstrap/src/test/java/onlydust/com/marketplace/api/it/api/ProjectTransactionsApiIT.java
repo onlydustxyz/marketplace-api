@@ -318,7 +318,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
                         .returnResult().getResponseBody();
 
                 final var lines = csv.split("\\R");
-                assertThat(lines.length).isEqualTo(9);
+                assertThat(lines.length).isEqualTo(6);
                 assertThat(lines[0]).isEqualTo("id,timestamp,transaction_type,contributor_id,program_id,amount,currency,usd_amount");
             }
 

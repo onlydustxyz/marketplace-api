@@ -216,6 +216,19 @@ public class AllTransactionReadEntity {
         };
     }
 
+    public void toProjectCsv(CSVPrinter csv) throws IOException {
+        final var amount = toMoney(this.amount);
+        csv.printRecord(id,
+                timestamp,
+                projectTransactionType().name(),
+                projectTransactionThirdParty().getContributor() == null ? null : projectTransactionThirdParty().getContributor().getId(),
+                projectTransactionThirdParty().getProgram() == null ? null : projectTransactionThirdParty().getProgram().getId(),
+                amount.getAmount(),
+                amount.getCurrency().getCode(),
+                amount.getUsdEquivalent()
+        );
+    }
+
     public enum Type {
         /**
          * Deposit made by a sponsor
