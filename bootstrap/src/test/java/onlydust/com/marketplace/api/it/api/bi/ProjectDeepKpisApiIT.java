@@ -155,6 +155,12 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDustId, pierre, abdel.githubUserId(), 5, STRK));
 
             allProgramOrEcosystemIds = String.join(",", Stream.of(universe).map(UUID::toString).toList());
+
+            // Change the "current" usd quotes of STRK and ETH so that the available budget is affected
+            currencyHelper.setQuote("2024-09-01T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.25));
+            currencyHelper.setQuote("2024-09-01T00:00:00Z", ETH, USD, BigDecimal.valueOf(3));
+
+            at("2024-09-02T00:00:00Z", () -> accountingHelper.ungrant(madara, explorationTeam, 10, STRK));
             projectFacadePort.refreshStats();
         }
 
@@ -172,7 +178,6 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .is2xxSuccessful()
                     .expectBody()
-                    .consumeWith(System.out::println)
                     .jsonPath("$.projects[0].project.name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.projects[1].project.name").<String>value(name -> assertThat(name).contains("Madara"))
                     .jsonPath("$.projects[2].project.name").<String>value(name -> assertThat(name).contains("OnlyDust"))
@@ -221,7 +226,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "availableBudget": {
-                                    "totalUsdEquivalent": 2005.0,
+                                    "totalUsdEquivalent": 3002.50,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 1000,
@@ -233,7 +238,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 2000,
+                                        "usdEquivalent": 3000,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       },
@@ -247,7 +252,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 5.0,
+                                        "usdEquivalent": 2.5,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       }
@@ -317,11 +322,11 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "availableBudget": {
-                                    "totalUsdEquivalent": 60.0,
+                                    "totalUsdEquivalent": 27.50,
                                     "totalPerCurrency": [
                                       {
-                                        "amount": 120,
-                                        "prettyAmount": 120,
+                                        "amount": 110,
+                                        "prettyAmount": 110,
                                         "currency": {
                                           "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                           "code": "STRK",
@@ -329,7 +334,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 60.0,
+                                        "usdEquivalent": 27.50,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       }
@@ -417,7 +422,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "availableBudget": {
-                                    "totalUsdEquivalent": 92.5,
+                                    "totalUsdEquivalent": 96.25,
                                     "totalPerCurrency": [
                                       {
                                         "amount": 25,
@@ -429,7 +434,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 50,
+                                        "usdEquivalent": 75,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       },
@@ -443,13 +448,13 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 42.5,
+                                        "usdEquivalent": 21.25,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       }
                                     ]
                                   },
-                                  "percentUsedBudget": 0.08,
+                                  "percentUsedBudget": 0.04,
                                   "totalGrantedUsdAmount": {
                                     "value": 100.0,
                                     "trend": "UP"
@@ -612,13 +617,13 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
                             .isEqualTo(BigDecimal.valueOf(2000))), true
             );
-            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "90", "availableBudgetUsdAmount.lte", "95"),
+            test_projects_stats(Map.of("availableBudgetUsdAmount.gte", "90", "availableBudgetUsdAmount.lte", "100"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getAvailableBudget().getTotalUsdEquivalent())
-                            .isEqualTo(BigDecimal.valueOf(92.5))), true
+                            .isEqualTo(BigDecimal.valueOf(96.25))), true
             );
-            test_projects_stats(Map.of("percentUsedBudget.gte", "0.01"),
+            test_projects_stats(Map.of("percentUsedBudget.gte", "0.001"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getPercentUsedBudget())
-                            .isEqualTo(BigDecimal.valueOf(0.08))), true
+                            .isEqualTo(BigDecimal.valueOf(0.04))), true
             );
             test_projects_stats(Map.of("totalGrantedUsdAmount.eq", "2000"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
