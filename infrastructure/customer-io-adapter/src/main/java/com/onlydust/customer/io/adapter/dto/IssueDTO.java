@@ -4,7 +4,7 @@ import lombok.NonNull;
 
 public record IssueDTO(
         @NonNull String title,
-        @NonNull String description,
+        String description,
         @NonNull String repository,
         @NonNull String detailsUrl
 ) {
