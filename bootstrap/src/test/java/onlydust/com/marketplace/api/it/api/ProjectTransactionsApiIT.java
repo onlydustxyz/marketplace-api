@@ -57,7 +57,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
 
             sponsor = sponsorHelper.create(programLead);
             program = programHelper.create(sponsor.id(), programLead);
-            projectId = projectHelper.create(caller);
+            projectId = projectHelper.create(caller).getKey();
         }
 
         @Test
@@ -117,7 +117,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
                 contributor1 = userAuthHelper.create();
                 contributor2 = userAuthHelper.create();
 
-                final var anotherProject = projectHelper.create(caller);
+                final var anotherProject = projectHelper.create(caller).getKey();
 
                 at("2024-01-01T00:00:00Z", () -> {
                     accountingHelper.createSponsorAccount(sponsor.id(), 2_200, USDC);
@@ -399,7 +399,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
         synchronized void setUp() {
             if (setupDone.compareAndExchange(false, true)) return;
 
-            projectId = projectHelper.create(caller);
+            projectId = projectHelper.create(caller).getKey();
         }
 
 
