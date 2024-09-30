@@ -155,6 +155,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             // Change the "current" usd quotes of STRK and ETH so that the available budget is affected
             currencyHelper.setQuote("2024-09-01T00:00:00Z", STRK, USD, BigDecimal.valueOf(0.25));
             currencyHelper.setQuote("2024-09-01T00:00:00Z", ETH, USD, BigDecimal.valueOf(3));
+
+            at("2024-09-02T00:00:00Z", () -> accountingHelper.ungrant(madara, explorationTeam, 10, STRK));
             projectFacadePort.refreshStats();
         }
 
@@ -317,11 +319,11 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "availableBudget": {
-                                    "totalUsdEquivalent": 30.00,
+                                    "totalUsdEquivalent": 27.50,
                                     "totalPerCurrency": [
                                       {
-                                        "amount": 120,
-                                        "prettyAmount": 120,
+                                        "amount": 110,
+                                        "prettyAmount": 110,
                                         "currency": {
                                           "id": "81b7e948-954f-4718-bad3-b70a0edd27e1",
                                           "code": "STRK",
@@ -329,7 +331,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                           "logoUrl": null,
                                           "decimals": 18
                                         },
-                                        "usdEquivalent": 30.00,
+                                        "usdEquivalent": 27.50,
                                         "usdConversionRate": null,
                                         "ratio": null
                                       }
@@ -449,7 +451,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                       }
                                     ]
                                   },
-                                  "percentUsedBudget": 0.01,
+                                  "percentUsedBudget": 0.04,
                                   "totalGrantedUsdAmount": {
                                     "value": 100.0,
                                     "trend": "UP"
@@ -608,7 +610,7 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             );
             test_projects_stats(Map.of("percentUsedBudget.gte", "0.001"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getPercentUsedBudget())
-                            .isEqualTo(BigDecimal.valueOf(0.01))), true
+                            .isEqualTo(BigDecimal.valueOf(0.04))), true
             );
             test_projects_stats(Map.of("totalGrantedUsdAmount.eq", "2000"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getTotalGrantedUsdAmount().getValue())
