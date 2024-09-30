@@ -302,6 +302,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
                 getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                q.getShowFilteredKpis(),
                 q.getSearch(),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
                 q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),

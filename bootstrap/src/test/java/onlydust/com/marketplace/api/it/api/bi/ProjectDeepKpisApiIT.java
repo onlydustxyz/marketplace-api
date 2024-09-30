@@ -9,7 +9,6 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -132,9 +131,8 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
             at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
-            final MutableObject<Long> prId = new MutableObject<>();
-            at("2021-01-02T00:00:00Z", () -> prId.setValue(githubHelper.createPullRequest(marketplace_api, antho, List.of("rs"))));
-            at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId.getValue(), mehdi));
+            final var prId = at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
+            at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId, mehdi));
             at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
@@ -661,6 +659,20 @@ public class ProjectDeepKpisApiIT extends AbstractMarketplaceApiIT {
             test_projects_stats(Map.of("contributionCount.eq", "8"),
                     response -> response.getProjects().forEach(project -> assertThat(project.getContributionCount().getValue())
                             .isEqualTo(8)), true
+            );
+            test_projects_stats(Map.of("languageIds", "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                            "showFilteredKpis", "true"),
+                    response -> assertThat(response.getProjects())
+                            .extracting(BiProjectsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(1), true
+            );
+            test_projects_stats(Map.of("languageIds", "f57d0866-89f3-4613-aaa2-32f4f4ecc972",
+                            "showFilteredKpis", "false"),
+                    response -> assertThat(response.getProjects())
+                            .extracting(BiProjectsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(4), true
             );
         }
 

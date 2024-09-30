@@ -140,6 +140,7 @@ FROM (select r.id                                                               
              date_trunc('quarter', r.requested_at)                                                            as quarter_timestamp,
              date_trunc('year', r.requested_at)                                                               as year_timestamp,
              r.recipient_id                                                                                   as contributor_id,
+             r.requestor_id                                                                                   as requestor_id,
              r.project_id                                                                                     as project_id,
              p.slug                                                                                           as project_slug,
              rsd.amount_usd_equivalent                                                                        as usd_amount,
@@ -500,7 +501,8 @@ CREATE FUNCTION bi.select_projects(fromDate timestamptz,
                                    categoryIds uuid[],
                                    languageIds uuid[],
                                    ecosystemIds uuid[],
-                                   searchQuery text)
+                                   searchQuery text,
+                                   showFilteredKpis boolean)
     RETURNS TABLE
             (
                 project_id                  uuid,
@@ -560,6 +562,7 @@ FROM bi.project_global_data p
                     from bi.contribution_data cd
                     where cd.timestamp >= fromDate
                       and cd.timestamp < toDate
+                      and (not showFilteredKpis or languageIds is null or cd.language_ids && languageIds)
                     group by cd.project_id) cd
                    on cd.project_id = p.project_id
 
@@ -570,6 +573,8 @@ FROM bi.project_global_data p
                     from bi.reward_data rd
                     where rd.timestamp >= fromDate
                       and rd.timestamp < toDate
+                      and (not showFilteredKpis or projectLeadIds is null or rd.requestor_id = any (projectLeadIds))
+                      and (not showFilteredKpis or languageIds is null or rd.language_ids && languageIds)
                     group by rd.project_id) rd on rd.project_id = p.project_id
 
          LEFT JOIN (select gd.project_id,

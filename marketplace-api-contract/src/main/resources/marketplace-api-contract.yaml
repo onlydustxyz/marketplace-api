@@ -10979,6 +10979,9 @@ components:
           items:
             type: string
             format: uuid
+        showFilteredKpis:
+          type: boolean
+          default: false
         search:
           type: string
         projectIds:
