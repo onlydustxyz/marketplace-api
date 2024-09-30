@@ -50,9 +50,9 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                    coalesce(previous_period.pr_count, 0)                    as previous_period_pr_count,
                    coalesce(previous_period.code_review_count, 0)           as previous_period_code_review_count
             
-            FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, :contributorRoles, :search) d
+            FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectIds, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, :contributorRoles, :search)
+                            select * from bi.select_contributors(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis)
                          ) previous_period ON previous_period.contributor_id = d.contributor_id
             
             WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
@@ -61,40 +61,46 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
               and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
               and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
               and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-              and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
-              and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
-              and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-              and (coalesce(:issueCountMin) is null or d.issue_count >= :issueCountMin)
-              and (coalesce(:issueCountEq) is null or d.issue_count = :issueCountEq)
-              and (coalesce(:issueCountMax) is null or d.issue_count <= :issueCountMax)
-              and (coalesce(:prCountMin) is null or d.pr_count >= :prCountMin)
-              and (coalesce(:prCountEq) is null or d.pr_count = :prCountEq)
-              and (coalesce(:prCountMax) is null or d.pr_count <= :prCountMax)
-              and (coalesce(:codeReviewCountMin) is null or d.code_review_count >= :codeReviewCountMin)
-              and (coalesce(:codeReviewCountEq) is null or d.code_review_count = :codeReviewCountEq)
-              and (coalesce(:codeReviewCountMax) is null or d.code_review_count <= :codeReviewCountMax)
+              and (coalesce(:contributionCountMin) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) >= :contributionCountMin)
+              and (coalesce(:contributionCountEq) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) = :contributionCountEq)
+              and (coalesce(:contributionCountMax) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) <= :contributionCountMax)
             """,
             countQuery = """
                     SELECT count(d.contributor_id)
-                    FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, :contributorRoles, :search) d
+                    FROM bi.select_contributors(:fromDate, :toDate, :programOrEcosystemIds, :contributorIds, :projectIds, :projectSlugs, :categoryIds, :languageIds, :ecosystemIds, :countryCodes, cast(:contributionStatuses as indexer_exp.contribution_status[]), :search, :showFilteredKpis) d
                     WHERE (coalesce(:totalRewardedUsdAmountMin) is null or d.total_rewarded_usd_amount >= :totalRewardedUsdAmountMin)
                       and (coalesce(:totalRewardedUsdAmountEq) is null or d.total_rewarded_usd_amount = :totalRewardedUsdAmountEq)
                       and (coalesce(:totalRewardedUsdAmountMax) is null or d.total_rewarded_usd_amount <= :totalRewardedUsdAmountMax)
                       and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
                       and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
                       and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-                      and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
-                      and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
-                      and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-                      and (coalesce(:issueCountMin) is null or d.issue_count >= :issueCountMin)
-                      and (coalesce(:issueCountEq) is null or d.issue_count = :issueCountEq)
-                      and (coalesce(:issueCountMax) is null or d.issue_count <= :issueCountMax)
-                      and (coalesce(:prCountMin) is null or d.pr_count >= :prCountMin)
-                      and (coalesce(:prCountEq) is null or d.pr_count = :prCountEq)
-                      and (coalesce(:prCountMax) is null or d.pr_count <= :prCountMax)
-                      and (coalesce(:codeReviewCountMin) is null or d.code_review_count >= :codeReviewCountMin)
-                      and (coalesce(:codeReviewCountEq) is null or d.code_review_count = :codeReviewCountEq)
-                      and (coalesce(:codeReviewCountMax) is null or d.code_review_count <= :codeReviewCountMax)
+                      and (coalesce(:contributionCountMin) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) >= :contributionCountMin)
+                      and (coalesce(:contributionCountEq) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) = :contributionCountEq)
+                      and (coalesce(:contributionCountMax) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) <= :contributionCountMax)
                     """,
             nativeQuery = true)
     Page<ContributorKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
@@ -102,30 +108,25 @@ public interface ContributorKpisReadRepository extends Repository<ContributorKpi
                                             @NonNull ZonedDateTime fromDatePreviousPeriod,
                                             @NonNull ZonedDateTime toDatePreviousPeriod,
                                             @NonNull UUID[] programOrEcosystemIds,
+                                            @NonNull Boolean showFilteredKpis,
                                             String search,
+                                            Long[] contributorIds,
                                             UUID[] projectIds,
+                                            String[] projectSlugs,
                                             UUID[] categoryIds,
                                             UUID[] languageIds,
                                             UUID[] ecosystemIds,
                                             String[] countryCodes,
-                                            String[] contributorRoles,
+                                            String[] contributionStatuses,
                                             BigDecimal totalRewardedUsdAmountMin,
                                             BigDecimal totalRewardedUsdAmountEq,
                                             BigDecimal totalRewardedUsdAmountMax,
                                             Integer rewardCountMin,
                                             Integer rewardCountEq,
                                             Integer rewardCountMax,
-                                            Integer issueCountMin,
-                                            Integer issueCountEq,
-                                            Integer issueCountMax,
-                                            Integer prCountMin,
-                                            Integer prCountEq,
-                                            Integer prCountMax,
-                                            Integer codeReviewCountMin,
-                                            Integer codeReviewCountEq,
-                                            Integer codeReviewCountMax,
                                             Integer contributionCountMin,
                                             Integer contributionCountEq,
                                             Integer contributionCountMax,
+                                            String[] contributionTypes,
                                             Pageable pageable);
 }

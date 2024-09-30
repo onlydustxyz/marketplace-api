@@ -67,9 +67,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                    coalesce(previous_period.active_contributor_count, 0)    as previous_period_active_contributor_count,
                    coalesce(previous_period.onboarded_contributor_count, 0) as previous_period_onboarded_contributor_count
             
-            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
+            FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
                      LEFT JOIN (
-                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) 
+                            select * from bi.select_projects(:fromDatePreviousPeriod, :toDatePreviousPeriod, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) 
                          ) previous_period ON previous_period.project_id = d.project_id
             
             WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
@@ -96,22 +96,25 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
               and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
               and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
               and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-              and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
-              and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
-              and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-              and (coalesce(:issueCountMin) is null or d.issue_count >= :issueCountMin)
-              and (coalesce(:issueCountEq) is null or d.issue_count = :issueCountEq)
-              and (coalesce(:issueCountMax) is null or d.issue_count <= :issueCountMax)
-              and (coalesce(:prCountMin) is null or d.pr_count >= :prCountMin)
-              and (coalesce(:prCountEq) is null or d.pr_count = :prCountEq)
-              and (coalesce(:prCountMax) is null or d.pr_count <= :prCountMax)
-              and (coalesce(:codeReviewCountMin) is null or d.code_review_count >= :codeReviewCountMin)
-              and (coalesce(:codeReviewCountEq) is null or d.code_review_count = :codeReviewCountEq)
-              and (coalesce(:codeReviewCountMax) is null or d.code_review_count <= :codeReviewCountMax)
+              and (coalesce(:contributionCountMin) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) >= :contributionCountMin)
+              and (coalesce(:contributionCountEq) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) = :contributionCountEq)
+              and (coalesce(:contributionCountMax) is null or (
+                  case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                  case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                  case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+              ) <= :contributionCountMin)
             """,
             countQuery = """
                     SELECT count(d.project_id)
-                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search) d
+                    FROM bi.select_projects(:fromDate, :toDate, :programOrEcosystemIds, :projectIds, :projectSlugs, :projectLeadIds, :categoryIds, :languageIds, :ecosystemIds, :search, :showFilteredKpis) d
                     WHERE (coalesce(:availableBudgetUsdAmountMin) is null or d.available_budget_usd >= :availableBudgetUsdAmountMin)
                       and (coalesce(:availableBudgetUsdAmountEq) is null or d.available_budget_usd = :availableBudgetUsdAmountEq)
                       and (coalesce(:availableBudgetUsdAmountMax) is null or d.available_budget_usd <= :availableBudgetUsdAmountMax)
@@ -136,18 +139,21 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                       and (coalesce(:rewardCountMin) is null or d.reward_count >= :rewardCountMin)
                       and (coalesce(:rewardCountEq) is null or d.reward_count = :rewardCountEq)
                       and (coalesce(:rewardCountMax) is null or d.reward_count <= :rewardCountMax)
-                      and (coalesce(:contributionCountMin) is null or d.contribution_count >= :contributionCountMin)
-                      and (coalesce(:contributionCountEq) is null or d.contribution_count = :contributionCountEq)
-                      and (coalesce(:contributionCountMax) is null or d.contribution_count <= :contributionCountMax)
-                      and (coalesce(:issueCountMin) is null or d.issue_count >= :issueCountMin)
-                      and (coalesce(:issueCountEq) is null or d.issue_count = :issueCountEq)
-                      and (coalesce(:issueCountMax) is null or d.issue_count <= :issueCountMax)
-                      and (coalesce(:prCountMin) is null or d.pr_count >= :prCountMin)
-                      and (coalesce(:prCountEq) is null or d.pr_count = :prCountEq)
-                      and (coalesce(:prCountMax) is null or d.pr_count <= :prCountMax)
-                      and (coalesce(:codeReviewCountMin) is null or d.code_review_count >= :codeReviewCountMin)
-                      and (coalesce(:codeReviewCountEq) is null or d.code_review_count = :codeReviewCountEq)
-                      and (coalesce(:codeReviewCountMax) is null or d.code_review_count <= :codeReviewCountMax)
+                      and (coalesce(:contributionCountMin) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) >= :contributionCountMin)
+                      and (coalesce(:contributionCountEq) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) = :contributionCountEq)
+                      and (coalesce(:contributionCountMax) is null or (
+                          case when 'ISSUE' = any(:contributionTypes) then d.issue_count else 0 end +
+                          case when 'PULL_REQUEST' = any(:contributionTypes) then d.pr_count else 0 end +
+                          case when 'CODE_REVIEW' = any(:contributionTypes) then d.code_review_count else 0 end
+                      ) <= :contributionCountMax)
                     """,
             nativeQuery = true)
     Page<ProjectKpisReadEntity> findAll(@NonNull ZonedDateTime fromDate,
@@ -155,7 +161,10 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         @NonNull ZonedDateTime fromDatePreviousPeriod,
                                         @NonNull ZonedDateTime toDatePreviousPeriod,
                                         @NonNull UUID[] programOrEcosystemIds,
+                                        @NonNull Boolean showFilteredKpis,
                                         String search,
+                                        UUID[] projectIds,
+                                        String[] projectSlugs,
                                         UUID[] projectLeadIds,
                                         UUID[] categoryIds,
                                         UUID[] languageIds,
@@ -184,17 +193,9 @@ public interface ProjectKpisReadRepository extends Repository<ProjectKpisReadEnt
                                         Integer rewardCountMin,
                                         Integer rewardCountEq,
                                         Integer rewardCountMax,
-                                        Integer issueCountMin,
-                                        Integer issueCountEq,
-                                        Integer issueCountMax,
-                                        Integer prCountMin,
-                                        Integer prCountEq,
-                                        Integer prCountMax,
-                                        Integer codeReviewCountMin,
-                                        Integer codeReviewCountEq,
-                                        Integer codeReviewCountMax,
                                         Integer contributionCountMin,
                                         Integer contributionCountEq,
                                         Integer contributionCountMax,
+                                        String[] contributionTypes,
                                         Pageable pageable);
 }

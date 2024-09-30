@@ -9667,13 +9667,6 @@ components:
         - QUARTER
         - YEAR
 
-    ContributorRoleEnum:
-      type: string
-      enum:
-        - MAINTAINER
-        - CONTRIBUTOR
-        - PROGRAM_LEAD
-
     WorldMapKpiEnum:
       type: string
       enum:
@@ -10986,8 +10979,19 @@ components:
           items:
             type: string
             format: uuid
+        showFilteredKpis:
+          type: boolean
+          default: false
         search:
           type: string
+        projectIds:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectId'
+        projectSlugs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSlug'
         projectLeadIds:
           type: array
           items:
@@ -11020,14 +11024,15 @@ components:
           $ref: '#/components/schemas/NumberKpiFilter'
         rewardCount:
           $ref: '#/components/schemas/NumberKpiFilter'
-        issueCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        prCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        codeReviewCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         contributionCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
+          allOf:
+            - $ref: '#/components/schemas/NumberKpiFilter'
+            - type: object
+              properties:
+                types:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ContributionType'
 
     BiProjectsPageResponse:
       allOf:
@@ -11138,14 +11143,21 @@ components:
             format: uuid
         search:
           type: string
-        contributorRoles:
+        showFilteredKpis:
+          type: boolean
+          default: false
+        contributorIds:
           type: array
           items:
-            $ref: '#/components/schemas/ContributorRoleEnum'
+            $ref: '#/components/schemas/GithubUserId'
         projectIds:
           type: array
           items:
             $ref: '#/components/schemas/ProjectId'
+        projectSlugs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectSlug'
         categoryIds:
           type: array
           items:
@@ -11162,18 +11174,26 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CountryCode'
+        contributionStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributionStatus'
+          default: [ 'COMPLETED' ]
         totalRewardedUsdAmount:
           $ref: '#/components/schemas/DecimalNumberKpiFilter'
         rewardCount:
           $ref: '#/components/schemas/NumberKpiFilter'
-        issueCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        prCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
-        codeReviewCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
         contributionCount:
-          $ref: '#/components/schemas/NumberKpiFilter'
+          allOf:
+            - $ref: '#/components/schemas/NumberKpiFilter'
+            - type: object
+              required:
+                - types
+              properties:
+                types:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ContributionType'
 
     BiContributorsPageResponse:
       allOf:

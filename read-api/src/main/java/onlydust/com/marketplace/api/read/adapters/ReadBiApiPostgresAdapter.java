@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Transactional(readOnly = true)
 @Profile("api")
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
-    private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2022-12-01T00:00:00Z");
+    private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
     private final AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository;
     private final AggregatedContributorKpisReadRepository aggregatedContributorKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
@@ -248,8 +249,8 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     }
 
     private Page<ContributorKpisReadEntity> findContributors(BiContributorsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return contributorKpisReadRepository.findAll(
@@ -258,39 +259,34 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
                 getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                q.getShowFilteredKpis(),
                 q.getSearch(),
+                q.getContributorIds() == null ? null : q.getContributorIds().toArray(Long[]::new),
                 q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
                 q.getEcosystemIds() == null ? null : q.getEcosystemIds().toArray(UUID[]::new),
                 q.getCountryCodes() == null ? null : q.getCountryCodes().stream().map(c -> Country.fromIso2(c).iso3Code()).toArray(String[]::new),
-                q.getContributorRoles() == null ? null : q.getContributorRoles().stream().map(Enum::name).toArray(String[]::new),
+                q.getContributionStatuses() == null ? null : q.getContributionStatuses().stream().map(Enum::name).toArray(String[]::new),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getTotalRewardedUsdAmount()).map(DecimalNumberKpiFilter::getLte).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiContributorsQueryParamsContributionCount::getLte).orElse(null),
+                q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ContributorKpisReadRepository.getSortProperty(q.getSort())))
         );
     }
 
     private Page<ProjectKpisReadEntity> findProjects(BiProjectsQueryParams q) {
-        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE);
-        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now());
+        final var sanitizedFromDate = sanitizedDate(q.getFromDate(), DEFAULT_FROM_DATE).truncatedTo(ChronoUnit.DAYS);
+        final var sanitizedToDate = sanitizedDate(q.getToDate(), ZonedDateTime.now()).truncatedTo(ChronoUnit.DAYS).plusDays(1);
         final var fromDateOfPreviousPeriod = sanitizedFromDate.minusSeconds(sanitizedToDate.toEpochSecond() - sanitizedFromDate.toEpochSecond());
 
         return projectKpisReadRepository.findAll(
@@ -299,7 +295,10 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 fromDateOfPreviousPeriod,
                 sanitizedFromDate,
                 getFilteredProgramOrEcosystemIds(q.getProgramOrEcosystemIds()),
+                q.getShowFilteredKpis(),
                 q.getSearch(),
+                q.getProjectIds() == null ? null : q.getProjectIds().toArray(UUID[]::new),
+                q.getProjectSlugs() == null ? null : q.getProjectSlugs().toArray(String[]::new),
                 q.getProjectLeadIds() == null ? null : q.getProjectLeadIds().toArray(UUID[]::new),
                 q.getCategoryIds() == null ? null : q.getCategoryIds().toArray(UUID[]::new),
                 q.getLanguageIds() == null ? null : q.getLanguageIds().toArray(UUID[]::new),
@@ -328,18 +327,10 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getGte).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getEq).orElse(null),
                 Optional.ofNullable(q.getRewardCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getIssueCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getPrCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getCodeReviewCount()).map(NumberKpiFilter::getLte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getGte).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getEq).orElse(null),
-                Optional.ofNullable(q.getContributionCount()).map(NumberKpiFilter::getLte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiProjectsQueryParamsContributionCount::getGte).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiProjectsQueryParamsContributionCount::getEq).orElse(null),
+                Optional.ofNullable(q.getContributionCount()).map(BiProjectsQueryParamsContributionCount::getLte).orElse(null),
+                q.getContributionCount() == null ? null : q.getContributionCount().getTypes().stream().map(Enum::name).toArray(String[]::new),
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );

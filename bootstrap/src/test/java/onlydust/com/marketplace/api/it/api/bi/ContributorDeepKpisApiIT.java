@@ -10,7 +10,6 @@ import onlydust.com.marketplace.kernel.model.ProgramId;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectCategory;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -55,6 +54,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
         private static ProjectCategory defi;
         private static ProjectCategory gaming;
         private static ProjectId onlyDust;
+        private static String onlyDustSlug;
 
         private static String allProgramOrEcosystemIds;
 
@@ -106,7 +106,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             ethGrantingProgram = programHelper.create(ethFoundation.id(), "Ethereum Granting Program").id();
             accountingHelper.allocate(ethFoundation.id(), ethGrantingProgram, 3_000, ETH);
 
-            onlyDust = projectHelper.create(pierre, "OnlyDust", List.of(universe)).getLeft();
+            final var od = projectHelper.create(pierre, "OnlyDust", List.of(universe));
+            onlyDust = od.getLeft();
+            onlyDustSlug = od.getRight();
             projectHelper.addCategory(onlyDust, defi.id());
             at("2021-01-01T00:00:00Z", () -> accountingHelper.grant(nethermind, onlyDust, 100, STRK));
             at("2021-01-05T00:00:00Z", () -> accountingHelper.grant(ethGrantingProgram, onlyDust, 25, ETH));
@@ -130,18 +132,18 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
 
 
             at("2021-01-01T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("java")));
-            at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
+            final var issueId = at("2021-01-01T00:00:03Z", () -> githubHelper.createIssue(marketplace_frontend, mehdi));
+            githubHelper.assignIssueToContributor(issueId, mehdi.user().getGithubUserId());
             at("2021-01-01T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
             at("2021-01-01T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-01T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma, List.of("cairo")));
             at("2021-01-01T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
 
-            final MutableObject<Long> prId = new MutableObject<>();
-            at("2021-01-02T00:00:00Z", () -> prId.setValue(githubHelper.createPullRequest(marketplace_api, antho, List.of("rs"))));
-            at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId.getValue(), mehdi));
+            at("2021-01-02T00:00:00Z", () -> githubHelper.createPullRequest(marketplace_api, antho, List.of("rs")));
+            final var prId = at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
+            at("2021-01-03T00:00:03Z", () -> githubHelper.createCodeReview(marketplace_frontend, prId, mehdi));
             at("2021-01-04T00:00:04Z", () -> githubHelper.createPullRequest(marketplace_frontend, mehdi, List.of("ts")));
-            at("2021-01-05T00:00:05Z", () -> githubHelper.createPullRequest(marketplace_frontend, hayden, List.of("ts")));
             at("2021-01-06T00:00:07Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
             at("2021-01-07T00:00:09Z", () -> githubHelper.createPullRequest(bridge_frontend, emma));
 
@@ -172,7 +174,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .uri(getApiURI(BI_CONTRIBUTORS, Map.of("pageIndex", "0",
                             "pageSize", "100",
                             "fromDate", "2021-01-01",
-                            "toDate", "2021-01-10")))
+                            "toDate", "2021-01-07")))
                     .header("Authorization", BEARER_PREFIX + caller.jwt())
                     // Then
                     .exchange()
@@ -182,16 +184,13 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .jsonPath("$.contributors[0].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[1].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
                     .jsonPath("$.contributors[1].projects[1].name").<String>value(name -> assertThat(name).contains("Madara"))
-                    .jsonPath("$.contributors[2].projects[0].name").<String>value(name -> assertThat(name).contains("Madara"))
-                    .jsonPath("$.contributors[2].projects[1].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.contributors[2].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .jsonPath("$.contributors[3].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
-                    .jsonPath("$.contributors[4].projects[0].name").<String>value(name -> assertThat(name).contains("Bridge"))
-                    .jsonPath("$.contributors[4].projects[1].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
-                    .jsonPath("$.contributors[5].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
+                    .jsonPath("$.contributors[4].projects[0].name").<String>value(name -> assertThat(name).contains("OnlyDust"))
                     .json("""
                             {
                               "totalPageNumber": 1,
-                              "totalItemNumber": 6,
+                              "totalItemNumber": 5,
                               "hasMore": false,
                               "nextPageIndex": 0,
                               "contributors": [
@@ -259,7 +258,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
-                                      "name": "Ethereum ecosystem"
+                                      "slug": "ethereum-ecosystem"
                                     },
                                     {
                                       "slug": "starknet-ecosystem"
@@ -310,9 +309,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   ],
                                   "ecosystems": [
                                     {
-                                      "slug": "starknet-ecosystem"
-                                    },
-                                    {
                                       "slug": "universe-ecosystem"
                                     }
                                   ],
@@ -347,9 +343,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "login": "james"
                                   },
                                   "categories": [
-                                    {
-                                      "slug": "defi"
-                                    },
                                     {
                                       "slug": "gaming"
                                     }
@@ -399,9 +392,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                   "categories": [
                                     {
                                       "slug": "defi"
-                                    },
-                                    {
-                                      "slug": "gaming"
                                     }
                                   ],
                                   "languages": [
@@ -410,12 +400,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     }
                                   ],
                                   "ecosystems": [
-                                    {
-                                      "slug": "ethereum-ecosystem"
-                                    },
-                                    {
-                                      "slug": "starknet-ecosystem"
-                                    },
                                     {
                                       "slug": "universe-ecosystem"
                                     }
@@ -445,53 +429,11 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                                     "value": 4,
                                     "trend": "UP"
                                   }
-                                },
-                                {
-                                  "contributor": {
-                                    "login": "pierre"
-                                  },
-                                  "categories": [
-                                    {
-                                      "slug": "defi"
-                                    }
-                                  ],
-                                  "languages": null,
-                                  "ecosystems": [
-                                    {
-                                      "slug": "universe-ecosystem"
-                                    }
-                                  ],
-                                  "countryCode": null,
-                                  "totalRewardedUsdAmount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "rewardCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "issueCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "prCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "codeReviewCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  },
-                                  "contributionCount": {
-                                    "value": 0,
-                                    "trend": "STABLE"
-                                  }
                                 }
                               ]
                             }
                             """);
         }
-
 
         @Test
         public void should_get_contributors_stats_with_pagination() {
@@ -510,7 +452,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .json("""
                             {
                               "totalPageNumber": 3,
-                              "totalItemNumber": 6,
+                              "totalItemNumber": 5,
                               "hasMore": true,
                               "nextPageIndex": 1
                             }
@@ -535,7 +477,7 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     .returnResult().getResponseBody();
 
             final var lines = Objects.requireNonNull(csv).split("\\R");
-            assertThat(lines).hasSize(7);
+            assertThat(lines).hasSize(6);
             assertThat(lines[0]).isEqualTo("contributor;projects;categories;languages;ecosystems;country;total_rewarded_usd_amount;" +
                                            "reward_count;issue_count;pr_count;code_review_count;contribution_count");
         }
@@ -577,7 +519,18 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                         assertThat(response.getContributors().get(1).getContributor().getLogin()).contains("mehdi");
                     }, true
             );
+            test_contributors_stats("contributorIds", mehdi.githubUserId().toString(),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributor)
+                            .extracting(ContributorResponse::getGithubUserId)
+                            .contains(mehdi.githubUserId().value()), true);
             test_contributors_stats("projectIds", onlyDust.toString(),
+                    response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
+                            .extracting(ProjectLinkResponse::getName)
+                            .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty()), true
+            );
+            test_contributors_stats("projectSlugs", onlyDustSlug,
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getProjects())
                             .extracting(ProjectLinkResponse::getName)
                             .filteredOn(name -> name.contains("OnlyDust")).isNotEmpty()), true
@@ -598,27 +551,19 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getCountryCode())
                             .isEqualTo("GB")), true
             );
-            test_contributors_stats("contributorRoles", "MAINTAINER",
-                    response -> {
-                        assertThat(response.getContributors()).hasSize(3);
-                        assertThat(response.getContributors().get(0).getContributor().getLogin()).contains("hayden");
-                        assertThat(response.getContributors().get(1).getContributor().getLogin()).contains("mehdi");
-                        assertThat(response.getContributors().get(2).getContributor().getLogin()).contains("pierre");
-                    }, true
-            );
             test_contributors_stats(Map.of("totalRewardedUsdAmount.lte", "3"),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getTotalRewardedUsdAmount().getValue())
                             .isLessThanOrEqualTo(BigDecimal.valueOf(3.0))), true
             );
-            test_contributors_stats(Map.of("issueCount.eq", "1"),
+            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "ISSUE"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getIssueCount().getValue())
                             .isEqualTo(1)), true
             );
-            test_contributors_stats(Map.of("prCount.eq", "2"),
+            test_contributors_stats(Map.of("contributionCount.eq", "2", "contributionCount.types", "PULL_REQUEST"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getPrCount().getValue())
                             .isEqualTo(2)), true
             );
-            test_contributors_stats(Map.of("codeReviewCount.eq", "1"),
+            test_contributors_stats(Map.of("contributionCount.eq", "1", "contributionCount.types", "CODE_REVIEW"),
                     response -> response.getContributors().forEach(project -> assertThat(project.getCodeReviewCount().getValue())
                             .isEqualTo(1)), true
             );
@@ -626,10 +571,26 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getRewardCount().getValue())
                             .isEqualTo(2)), true
             );
-            test_contributors_stats(Map.of("contributionCount.eq", "4"),
+            test_contributors_stats(Map.of("contributionCount.eq", "4", "contributionCount.types", "ISSUE,PULL_REQUEST,CODE_REVIEW"),
                     response -> response.getContributors().forEach(contributor -> assertThat(contributor.getContributionCount().getValue())
                             .isEqualTo(4)), true
             );
+            test_contributors_stats(Map.of("contributorIds", mehdi.githubUserId().toString(),
+                            "languageIds", "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                            "showFilteredKpis", "true"),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(2), true);
+            test_contributors_stats(Map.of("contributorIds", mehdi.githubUserId().toString(),
+                            "languageIds", "75ce6b37-8610-4600-8d2d-753b50aeda1e",
+                            "showFilteredKpis", "false"),
+                    response -> assertThat(response.getContributors())
+                            .hasSize(1)
+                            .extracting(BiContributorsPageItemResponse::getContributionCount)
+                            .extracting(NumberKpi::getValue)
+                            .contains(4), true);
         }
 
         @Test
