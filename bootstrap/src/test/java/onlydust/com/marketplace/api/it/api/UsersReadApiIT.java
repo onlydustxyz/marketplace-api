@@ -232,6 +232,25 @@ public class UsersReadApiIT extends AbstractMarketplaceApiIT {
     }
 
     @Test
+    void should_include_preferred_languages_in_stats() {
+        // Given
+        final var user = userAuthHelper.create();
+        userHelper.setPreferredLanguages(user, "typescript", "rust");
+
+        // When
+        client.get()
+                .uri(getApiURI(USER_LANGUAGES.formatted(user.user().getGithubUserId())))
+                // Then
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBody()
+                .consumeWith(System.out::println)
+                .jsonPath("$.languages[0].language.slug").isEqualTo("rust")
+                .jsonPath("$.languages[1].language.slug").isEqualTo("typescript");
+    }
+
+    @Test
     void should_return_users_ecosystems_stats() {
         // When
         client.get()
