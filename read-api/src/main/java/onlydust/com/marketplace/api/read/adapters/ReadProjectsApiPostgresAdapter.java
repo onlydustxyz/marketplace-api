@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.postgres.adapter.repository.CustomContributo
 import onlydust.com.marketplace.api.postgres.adapter.repository.CustomProjectRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.ProjectLeadViewRepository;
 import onlydust.com.marketplace.api.read.entities.LanguageReadEntity;
+import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.*;
 import onlydust.com.marketplace.api.read.mapper.RewardsMapper;
@@ -28,6 +29,7 @@ import onlydust.com.marketplace.project.domain.model.ProjectRewardSettings;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.JpaSort;
@@ -51,10 +53,11 @@ import static onlydust.com.marketplace.api.read.entities.project.ProjectPageItem
 import static onlydust.com.marketplace.api.read.properties.Cache.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.ProjectMapper.mapRewardSettings;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.forbidden;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.notFound;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
+import static org.springframework.http.HttpStatus.PARTIAL_CONTENT;
 import static org.springframework.http.ResponseEntity.ok;
+import static org.springframework.http.ResponseEntity.status;
 
 @RestController
 @AllArgsConstructor
@@ -78,6 +81,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     private final BudgetStatsReadRepository budgetStatsReadRepository;
     private final ProjectContributorQueryRepository projectContributorQueryRepository;
     private final ProjectCustomStatsReadRepository projectCustomStatsReadRepository;
+    private final AllTransactionReadRepository allTransactionReadRepository;
 
     @Override
     public ResponseEntity<ProjectPageResponse> getProjects(final Integer pageIndex,
@@ -474,5 +478,47 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 ResponseEntity.ok()
                         .cacheControl(cache.whenAnonymous(authenticatedUser, S))
                         .body(response);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ResponseEntity<ProjectTransactionPageResponse> getProjectTransactions(UUID projectId,
+                                                                                 Integer pageIndex,
+                                                                                 Integer pageSize,
+                                                                                 String fromDate,
+                                                                                 String toDate,
+                                                                                 List<ProjectTransactionType> types,
+                                                                                 String search) {
+        final var index = sanitizePageIndex(pageIndex);
+        final var size = sanitizePageSize(pageSize);
+
+        final var page = findAccountBookTransactions(projectId, fromDate, toDate, types, search, index, size);
+
+        final var response = new ProjectTransactionPageResponse()
+                .transactions(page.getContent().stream().map(AllTransactionReadEntity::toProjectTransactionPageItemResponse).toList())
+                .hasMore(hasMore(index, page.getTotalPages()))
+                .totalPageNumber(page.getTotalPages())
+                .totalItemNumber((int) page.getTotalElements())
+                .nextPageIndex(nextPageIndex(index, page.getTotalPages()));
+
+        return response.getHasMore() ? status(PARTIAL_CONTENT).body(response) : ok(response);
+    }
+
+    private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID projectId, String fromDate, String toDate,
+                                                                       List<ProjectTransactionType> types, String search, int index, int size) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
+            throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), projectId));
+
+
+        return allTransactionReadRepository.findAllForProject(
+                projectId,
+                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
+                onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate),
+                search,
+                types == null ? null : types.stream().map(ProjectTransactionType::name).toList(),
+                PageRequest.of(index, size, Sort.by("timestamp").descending())
+        );
     }
 }

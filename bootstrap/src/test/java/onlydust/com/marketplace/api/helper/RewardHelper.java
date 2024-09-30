@@ -8,7 +8,9 @@ import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.RewardId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.project.domain.model.RequestRewardCommand;
+import onlydust.com.marketplace.project.domain.model.Reward;
 import onlydust.com.marketplace.project.domain.port.input.RewardFacadePort;
+import onlydust.com.marketplace.project.domain.port.output.RewardStoragePort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import java.util.stream.IntStream;
 public class RewardHelper {
     @Autowired
     private RewardFacadePort rewardFacadePort;
+    @Autowired
+    private RewardStoragePort rewardStoragePort;
     private final Faker faker = new Faker();
 
     public RewardId create(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, GithubUserId recipientId, long amount, Currency.Id currencyId) {
@@ -43,5 +47,10 @@ public class RewardHelper {
 
     public void cancel(ProjectId projectId, UserAuthHelper.AuthenticatedUser lead, RewardId rewardId) {
         rewardFacadePort.cancelReward(UserId.of(lead.user().getId()), projectId, rewardId);
+    }
+
+    public Reward get(RewardId rewardId) {
+        return rewardStoragePort.get(rewardId)
+                .orElseThrow(() -> new RuntimeException("Reward not found"));
     }
 }

@@ -212,6 +212,7 @@ public class AllUserReadEntity {
 
     public ContributorResponse toContributorResponse() {
         return new ContributorResponse()
+                .id(userId)
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl)
@@ -220,6 +221,7 @@ public class AllUserReadEntity {
 
     public RankedContributorResponse toRankedContributorResponse() {
         return new RankedContributorResponse()
+                .id(userId)
                 .githubUserId(githubUserId)
                 .login(login)
                 .avatarUrl(avatarUrl)

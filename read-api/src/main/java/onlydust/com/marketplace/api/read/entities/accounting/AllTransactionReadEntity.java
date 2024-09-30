@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
 import onlydust.com.marketplace.api.read.entities.project.ProjectLinkReadEntity;
 import onlydust.com.marketplace.api.read.entities.reward.RewardReadEntity;
 import onlydust.com.marketplace.api.read.entities.sponsor.SponsorReadEntity;
+import onlydust.com.marketplace.kernel.exception.OnlyDustException;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.annotations.Immutable;
@@ -68,6 +69,8 @@ public class AllTransactionReadEntity {
     @ManyToOne
     @JoinColumn(name = "rewardId")
     RewardReadEntity reward;
+    @Column(insertable = false, updatable = false)
+    UUID rewardId;
 
     @ManyToOne
     @JoinColumn(name = "paymentId")
@@ -100,7 +103,7 @@ public class AllTransactionReadEntity {
                 .id(id)
                 .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
                 .type(programTransactionType())
-                .thirdParty(thirdParty())
+                .thirdParty(programTransactionThirdParty())
                 .amount(toMoney(amount))
                 ;
     }
@@ -116,10 +119,10 @@ public class AllTransactionReadEntity {
                 .usdConversionRate(usdQuote);
     }
 
-    private ProgramTransactionPageItemResponseThirdParty thirdParty() {
+    private ProgramTransactionPageItemResponseThirdParty programTransactionThirdParty() {
         return project == null ?
                 new ProgramTransactionPageItemResponseThirdParty().sponsor(sponsor.toLinkResponse()) :
-                new ProgramTransactionPageItemResponseThirdParty().project(project().toLinkResponse());
+                new ProgramTransactionPageItemResponseThirdParty().project(project.toLinkResponse());
     }
 
     private ProgramTransactionType programTransactionType() {
@@ -145,8 +148,8 @@ public class AllTransactionReadEntity {
         csv.printRecord(id,
                 timestamp,
                 programTransactionType().name(),
-                thirdParty().getProject() == null ? null : thirdParty().getProject().getId(),
-                thirdParty().getSponsor() == null ? null : thirdParty().getSponsor().getId(),
+                programTransactionThirdParty().getProject() == null ? null : programTransactionThirdParty().getProject().getId(),
+                programTransactionThirdParty().getSponsor() == null ? null : programTransactionThirdParty().getSponsor().getId(),
                 amount.getAmount(),
                 amount.getCurrency().getCode(),
                 amount.getUsdEquivalent()
@@ -184,6 +187,33 @@ public class AllTransactionReadEntity {
                 amount.getCurrency().getCode(),
                 amount.getUsdEquivalent()
         );
+    }
+
+    public ProjectTransactionPageItemResponse toProjectTransactionPageItemResponse() {
+        return new ProjectTransactionPageItemResponse()
+                .id(id)
+                .date(timestamp.toInstant().atZone(ZoneOffset.UTC))
+                .type(projectTransactionType())
+                .thirdParty(projectTransactionThirdParty())
+                .amount(toMoney(amount))
+                ;
+    }
+
+    private ProjectTransactionPageItemResponseThirdParty projectTransactionThirdParty() {
+        if (program == null) {
+            throw OnlyDustException.internalServerError("Program not found for project transaction %s".formatted(id));
+        }
+        return reward == null ?
+                new ProjectTransactionPageItemResponseThirdParty().program(program.toLinkResponse()) :
+                new ProjectTransactionPageItemResponseThirdParty().contributor(reward.recipient().toContributorResponse());
+    }
+
+    private ProjectTransactionType projectTransactionType() {
+        return switch (type) {
+            case TRANSFER -> rewardId == null ? ProjectTransactionType.GRANTED : ProjectTransactionType.REWARDED;
+            case REFUND -> ProjectTransactionType.UNGRANTED;
+            default -> throw new IllegalStateException("%s transaction types are not allowed for project transactions".formatted(type));
+        };
     }
 
     public enum Type {

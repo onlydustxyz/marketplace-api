@@ -9727,7 +9727,6 @@ components:
       type: string
       enum:
         - REWARDED
-        - UNREWARDED
         - GRANTED
         - UNGRANTED
 
