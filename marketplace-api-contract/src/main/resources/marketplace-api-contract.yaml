@@ -79,6 +79,10 @@ paths:
           schema:
             $ref: '#/components/schemas/ProjectId'
         - in: query
+          name: projectSlug
+          schema:
+            $ref: '#/components/schemas/ProjectSlug'
+        - in: query
           name: types
           description: Transaction types filter
           schema:
