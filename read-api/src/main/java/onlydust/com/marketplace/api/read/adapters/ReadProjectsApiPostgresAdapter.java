@@ -495,7 +495,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                                                  Integer pageSize,
                                                                                  String fromDate,
                                                                                  String toDate,
-                                                                                 List<ProjectTransactionType> types,
+                                                                                 List<FinancialTransactionType> types,
                                                                                  String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -522,7 +522,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                                                             @RequestParam(required = false) Integer pageSize,
                                                             @RequestParam(required = false) String fromDate,
                                                             @RequestParam(required = false) String toDate,
-                                                            @RequestParam(required = false) List<ProjectTransactionType> types,
+                                                            @RequestParam(required = false) List<FinancialTransactionType> types,
                                                             @RequestParam(required = false) String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -546,7 +546,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
     }
 
     private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID projectId, String fromDate, String toDate,
-                                                                       List<ProjectTransactionType> types, String search, int index, int size) {
+                                                                       List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProjectLead(ProjectId.of(projectId), authenticatedUser.id()))
@@ -558,7 +558,7 @@ public class ReadProjectsApiPostgresAdapter implements ReadProjectsApi {
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(fromDate),
                 onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseNullable(toDate),
                 search,
-                types == null ? null : types.stream().map(ProjectTransactionType::name).toList(),
+                types == null ? null : types.stream().map(FinancialTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp").descending())
         );
     }

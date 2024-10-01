@@ -1,9 +1,9 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
+import onlydust.com.marketplace.api.contract.model.BiFinancialsStatsListResponse;
+import onlydust.com.marketplace.api.contract.model.FinancialTransactionType;
 import onlydust.com.marketplace.api.contract.model.GrantRequest;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionStatListResponse;
-import onlydust.com.marketplace.api.contract.model.ProgramTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -605,7 +605,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-01-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-01-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 1515.00,
                                         "totalPerCurrency": [
                                           {
@@ -668,7 +669,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-02-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-02-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 21383.81,
                                         "totalPerCurrency": [
                                           {
@@ -708,20 +710,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -730,6 +718,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -741,20 +743,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -763,6 +751,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -773,23 +775,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-03-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-03-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -802,6 +791,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -813,20 +816,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -835,6 +824,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -846,20 +849,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -868,6 +857,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -878,23 +881,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-04-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-04-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -907,6 +897,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -951,20 +955,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -973,6 +963,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -983,23 +987,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-05-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-05-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1012,6 +1003,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1056,20 +1061,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -1078,6 +1069,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1088,23 +1093,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-06-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-06-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1117,6 +1109,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1161,20 +1167,6 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
                                               "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
                                               "code": "ETH",
                                               "name": "Ether",
@@ -1183,6 +1175,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1193,23 +1199,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-07-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-07-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1222,6 +1215,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1233,6 +1240,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
                                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                               "code": "USDC",
                                               "name": "USD Coin",
@@ -1242,7 +1263,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1.010001,
                                             "ratio": null
-                                          },
+                                          }
+                                        ]
+                                      },
+                                      "totalRewarded": {
+                                        "totalUsdEquivalent": 0.00,
+                                        "totalPerCurrency": [
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1256,29 +1282,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
                                             "ratio": null
-                                          }
-                                        ]
-                                      },
-                                      "totalRewarded": {
-                                        "totalUsdEquivalent": 2084.98,
-                                        "totalPerCurrency": [
-                                          {
-                                            "amount": 1,
-                                            "prettyAmount": 1,
-                                            "currency": {
-                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                              "code": "ETH",
-                                              "name": "Ether",
-                                              "logoUrl": null,
-                                              "decimals": 18
-                                            },
-                                            "usdEquivalent": 1781.98,
-                                            "usdConversionRate": 1781.983987,
-                                            "ratio": 85
                                           },
                                           {
-                                            "amount": 300,
-                                            "prettyAmount": 300,
+                                            "amount": 0,
+                                            "prettyAmount": 0,
                                             "currency": {
                                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                               "code": "USDC",
@@ -1286,9 +1293,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                               "decimals": 6
                                             },
-                                            "usdEquivalent": 303.00,
+                                            "usdEquivalent": 0.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 15
+                                            "ratio": null
                                           }
                                         ]
                                       },
@@ -1298,23 +1305,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         .jsonPath("$.stats[?(@.date == '2024-08-01')]").value(jsonObjectEquals("""
                                 {
                                       "date": "2024-08-01",
-                                      "totalReceived": {
+                                      "totalDeposited": null,
+                                      "totalAllocated": {
                                         "totalUsdEquivalent": 0.00,
                                         "totalPerCurrency": [
-                                          {
-                                            "amount": 0,
-                                            "prettyAmount": 0,
-                                            "currency": {
-                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
-                                              "code": "USDC",
-                                              "name": "USD Coin",
-                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-                                              "decimals": 6
-                                            },
-                                            "usdEquivalent": 0.00,
-                                            "usdConversionRate": 1.010001,
-                                            "ratio": null
-                                          },
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1327,6 +1321,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             },
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
+                                              "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
+                                              "code": "USDC",
+                                              "name": "USD Coin",
+                                              "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
+                                              "decimals": 6
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1.010001,
                                             "ratio": null
                                           }
                                         ]
@@ -1338,6 +1346,20 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "amount": 0,
                                             "prettyAmount": 0,
                                             "currency": {
+                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
+                                              "code": "ETH",
+                                              "name": "Ether",
+                                              "logoUrl": null,
+                                              "decimals": 18
+                                            },
+                                            "usdEquivalent": 0.00,
+                                            "usdConversionRate": 1781.983987,
+                                            "ratio": null
+                                          },
+                                          {
+                                            "amount": 0,
+                                            "prettyAmount": 0,
+                                            "currency": {
                                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                               "code": "USDC",
                                               "name": "USD Coin",
@@ -1347,7 +1369,12 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1.010001,
                                             "ratio": null
-                                          },
+                                          }
+                                        ]
+                                      },
+                                      "totalRewarded": {
+                                        "totalUsdEquivalent": 0.00,
+                                        "totalPerCurrency": [
                                           {
                                             "amount": 0,
                                             "prettyAmount": 0,
@@ -1361,29 +1388,10 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                             "usdEquivalent": 0.00,
                                             "usdConversionRate": 1781.983987,
                                             "ratio": null
-                                          }
-                                        ]
-                                      },
-                                      "totalRewarded": {
-                                        "totalUsdEquivalent": 3664.97,
-                                        "totalPerCurrency": [
-                                          {
-                                            "amount": 2,
-                                            "prettyAmount": 2,
-                                            "currency": {
-                                              "id": "71bdfcf4-74ee-486b-8cfe-5d841dd93d5c",
-                                              "code": "ETH",
-                                              "name": "Ether",
-                                              "logoUrl": null,
-                                              "decimals": 18
-                                            },
-                                            "usdEquivalent": 3563.97,
-                                            "usdConversionRate": 1781.983987,
-                                            "ratio": 97
                                           },
                                           {
-                                            "amount": 100,
-                                            "prettyAmount": 100,
+                                            "amount": 0,
+                                            "prettyAmount": 0,
                                             "currency": {
                                               "id": "562bbf65-8a71-4d30-ad63-520c0d68ba27",
                                               "code": "USDC",
@@ -1391,9 +1399,9 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                                               "logoUrl": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
                                               "decimals": 6
                                             },
-                                            "usdEquivalent": 101.00,
+                                            "usdEquivalent": 0.00,
                                             "usdConversionRate": 1.010001,
-                                            "ratio": 3
+                                            "ratio": null
                                           }
                                         ]
                                       },
@@ -1483,8 +1491,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @ParameterizedTest
-            @EnumSource(ProgramTransactionType.class)
-            void should_get_program_monthly_transactions_stats_filtered_by_types(ProgramTransactionType type) {
+            @EnumSource(value = FinancialTransactionType.class, names = {"GRANTED", "UNGRANTED", "ALLOCATED", "UNALLOCATED"})
+            void should_get_program_monthly_transactions_stats_filtered_by_types(FinancialTransactionType type) {
                 // When
                 final var stats = client.get()
                         .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(program.id()), Map.of(
@@ -1495,29 +1503,29 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                         // Then
                         .expectStatus()
                         .isOk()
-                        .expectBody(ProgramTransactionStatListResponse.class)
+                        .expectBody(BiFinancialsStatsListResponse.class)
                         .returnResult().getResponseBody().getStats();
 
                 switch (type) {
                     case GRANTED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.APRIL).findFirst().orElseThrow().getTransactionCount()).isEqualTo(3);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MAY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JUNE).findFirst()).isEmpty();
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JUNE).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                     }
                     case UNGRANTED -> {
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.APRIL).findFirst()).isEmpty();
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MAY).findFirst()).isEmpty();
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.APRIL).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MAY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JUNE).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                     }
                     case ALLOCATED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst()).isEmpty();
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                     }
                     case UNALLOCATED -> {
                         assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.JANUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(1);
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst()).isEmpty();
-                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst()).isEmpty();
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.FEBRUARY).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
+                        assertThat(stats.stream().filter(s -> s.getDate().getMonth() == Month.MARCH).findFirst().orElseThrow().getTransactionCount()).isEqualTo(0);
                     }
                 }
             }
@@ -1701,8 +1709,8 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @ParameterizedTest
-            @EnumSource(ProgramTransactionType.class)
-            void should_get_program_transactions_filtered_by_types(ProgramTransactionType type) {
+            @EnumSource(value = FinancialTransactionType.class, names = {"GRANTED", "UNGRANTED", "ALLOCATED", "UNALLOCATED"})
+            void should_get_program_transactions_filtered_by_types(FinancialTransactionType type) {
                 // When
                 client.get()
                         .uri(getApiURI(PROGRAM_TRANSACTIONS.formatted(program.id()), Map.of(
@@ -1719,6 +1727,7 @@ public class ProgramsApiIT extends AbstractMarketplaceApiIT {
                             case UNGRANTED -> 1;
                             case ALLOCATED -> 2;
                             case UNALLOCATED -> 1;
+                            default -> throw new IllegalStateException();
                         })
                         .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
             }

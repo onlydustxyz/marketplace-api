@@ -4,11 +4,11 @@ import lombok.AllArgsConstructor;
 import onlydust.com.marketplace.api.contract.ReadProgramsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.ProgramTransactionMonthlyStatReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.AllTransactionReadRepository;
+import onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProgramReadRepository;
-import onlydust.com.marketplace.api.read.repositories.ProgramTransactionMonthlyStatsReadRepository;
 import onlydust.com.marketplace.api.read.repositories.ProjectReadRepository;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
@@ -31,11 +31,13 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.groupingBy;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
 import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.*;
 import static org.springframework.http.HttpStatus.OK;
@@ -51,7 +53,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ProgramReadRepository programReadRepository;
     private final PermissionService permissionService;
-    private final ProgramTransactionMonthlyStatsReadRepository programTransactionMonthlyStatsReadRepository;
+    private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
     private final AllTransactionReadRepository allTransactionReadRepository;
     private final ProjectReadRepository projectReadRepository;
 
@@ -109,7 +111,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                                                  Integer pageSize,
                                                                                  String fromDate,
                                                                                  String toDate,
-                                                                                 List<ProgramTransactionType> types,
+                                                                                 List<FinancialTransactionType> types,
                                                                                  String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -135,7 +137,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                                                             @RequestParam(required = false) Integer pageSize,
                                                             @RequestParam(required = false) String fromDate,
                                                             @RequestParam(required = false) String toDate,
-                                                            @RequestParam(required = false) List<ProgramTransactionType> types,
+                                                            @RequestParam(required = false) List<FinancialTransactionType> types,
                                                             @RequestParam(required = false) String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -159,7 +161,7 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
     }
 
     private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID programId, String fromDate, String toDate,
-                                                                       List<ProgramTransactionType> types, String search, int index, int size) {
+                                                                       List<FinancialTransactionType> types, String search, int index, int size) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
@@ -171,44 +173,46 @@ public class ReadProgramsApiPostgresAdapter implements ReadProgramsApi {
                 DateMapper.parseNullable(fromDate),
                 DateMapper.parseNullable(toDate),
                 search,
-                types == null ? null : types.stream().map(ProgramTransactionType::name).toList(),
+                types == null ? null : types.stream().map(FinancialTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by("timestamp").descending())
         );
     }
 
     @Override
-    public ResponseEntity<ProgramTransactionStatListResponse> getProgramTransactionsStats(UUID programId,
-                                                                                          String fromDate,
-                                                                                          String toDate,
-                                                                                          List<ProgramTransactionType> types,
-                                                                                          String search,
-                                                                                          Boolean showEmpty,
-                                                                                          ProgramTransactionStatsSort sort,
-                                                                                          SortDirection sortDirection) {
+    public ResponseEntity<BiFinancialsStatsListResponse> getProgramTransactionsStats(UUID programId,
+                                                                                     String fromDate,
+                                                                                     String toDate,
+                                                                                     List<FinancialTransactionType> types,
+                                                                                     String search,
+                                                                                     Boolean showEmpty,
+                                                                                     FinancialTransactionStatsSort sort,
+                                                                                     SortDirection sortDirection) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserProgramLead(authenticatedUser.id(), ProgramId.of(programId)))
             throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), programId));
 
         final var comparison = switch (sort) {
-            default -> comparing(ProgramTransactionStatResponse::getDate);
+            default -> comparing(BiFinancialsStatsResponse::getDate);
         };
 
-        final var stats = programTransactionMonthlyStatsReadRepository.findAll(
-                        programId,
-                        DateMapper.parseNullable(fromDate),
-                        DateMapper.parseNullable(toDate),
-                        search,
-                        types == null ? null : types.stream().map(ProgramTransactionType::name).toList())
-                .stream().collect(groupingBy(ProgramTransactionMonthlyStatReadEntity::date));
+        final var allTypes = List.of(ALLOCATED, UNALLOCATED, GRANTED, UNGRANTED);
 
-        final var response = new ProgramTransactionStatListResponse()
-                .stats(stats.entrySet().stream().map(e -> new ProgramTransactionStatResponse()
+        final var stats = biFinancialMonthlyStatsReadRepository.findAll(programId,
+                        BiFinancialMonthlyStatsReadRepository.IdGrouping.PROGRAM_ID,
+                        DateMapper.parseZonedNullable(fromDate),
+                        DateMapper.parseZonedNullable(toDate),
+                        search,
+                        Optional.ofNullable(types).orElse(allTypes).stream().map(Enum::name).toList())
+                .stream().collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
+
+        final var response = new BiFinancialsStatsListResponse()
+                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
                                         .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                        .totalReceived(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalReceived))
-                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalGranted))
-                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), ProgramTransactionMonthlyStatReadEntity::totalRewarded))
-                                        .transactionCount(e.getValue().stream().mapToInt(ProgramTransactionMonthlyStatReadEntity::transactionCount).sum())
+                                        .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
+                                        .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
+                                        .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
+                                        .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum())
                                 )
                                 .filter(s -> !FALSE.equals(showEmpty) || s.getTransactionCount() > 0)
                                 .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())

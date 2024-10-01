@@ -2100,7 +2100,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProjectTransactionType'
+              $ref: '#/components/schemas/FinancialTransactionType'
         - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
@@ -4422,7 +4422,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProgramTransactionType'
+              $ref: '#/components/schemas/FinancialTransactionType'
         - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
@@ -4432,7 +4432,7 @@ paths:
         - in: query
           name: sort
           schema:
-            $ref: '#/components/schemas/ProgramTransactionStatsSort'
+            $ref: '#/components/schemas/FinancialTransactionStatsSort'
         - in: query
           name: sortDirection
           schema:
@@ -4443,7 +4443,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProgramTransactionStatListResponse'
+                $ref: '#/components/schemas/BiFinancialsStatsListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4491,7 +4491,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/ProgramTransactionType'
+              $ref: '#/components/schemas/FinancialTransactionType'
         - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
@@ -4566,7 +4566,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/SponsorTransactionType'
+              $ref: '#/components/schemas/FinancialTransactionType'
         - $ref: '#/components/parameters/searchParam'
         - in: query
           name: showEmpty
@@ -4576,7 +4576,7 @@ paths:
         - in: query
           name: sort
           schema:
-            $ref: '#/components/schemas/SponsorTransactionStatsSort'
+            $ref: '#/components/schemas/FinancialTransactionStatsSort'
         - in: query
           name: sortDirection
           schema:
@@ -4587,7 +4587,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SponsorTransactionStatListResponse'
+                $ref: '#/components/schemas/BiFinancialsStatsListResponse'
         "401":
           $ref: '#/components/responses/UnauthorizedError'
         "500":
@@ -4635,7 +4635,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/SponsorTransactionType'
+              $ref: '#/components/schemas/FinancialTransactionType'
         - $ref: '#/components/parameters/searchParam'
       responses:
         "200":
@@ -6617,7 +6617,7 @@ components:
             rewardCount:
               type: integer
 
-    ProgramTransactionStatListResponse:
+    BiFinancialsStatsListResponse:
       type: object
       required:
         - stats
@@ -6625,43 +6625,9 @@ components:
         stats:
           type: array
           items:
-            $ref: '#/components/schemas/ProgramTransactionStatResponse'
+            $ref: '#/components/schemas/BiFinancialsStatsResponse'
 
-    ProgramTransactionStatResponse:
-      type: object
-      required:
-        - date
-        - totalReceived
-        - totalGranted
-        - totalRewarded
-        - transactionCount
-      properties:
-        date:
-          type: string
-          format: date
-          description: Date of the transactions
-        totalReceived:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        totalGranted:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        totalRewarded:
-          $ref: '#/components/schemas/DetailedTotalMoney'
-        transactionCount:
-          type: integer
-          description: Number of transactions for this month
-          example: 42
-
-    SponsorTransactionStatListResponse:
-      type: object
-      required:
-        - stats
-      properties:
-        stats:
-          type: array
-          items:
-            $ref: '#/components/schemas/SponsorTransactionStatResponse'
-
-    SponsorTransactionStatResponse:
+    BiFinancialsStatsResponse:
       type: object
       required:
         - date
@@ -9608,7 +9574,7 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/SponsorTransactionType'
+          $ref: '#/components/schemas/FinancialTransactionType'
         program:
           $ref: '#/components/schemas/ProgramLinkResponse'
         amount:
@@ -9643,7 +9609,7 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/ProgramTransactionType'
+          $ref: '#/components/schemas/FinancialTransactionType'
         thirdParty:
           type: object
           properties:
@@ -9681,7 +9647,7 @@ components:
           type: string
           format: date-time
         type:
-          $ref: '#/components/schemas/ProjectTransactionType'
+          $ref: '#/components/schemas/FinancialTransactionType'
         thirdParty:
           type: object
           properties:
@@ -9870,27 +9836,15 @@ components:
         - TRANSFER
         - REFUND
 
-    ProgramTransactionType:
-      type: string
-      enum:
-        - GRANTED
-        - UNGRANTED
-        - ALLOCATED
-        - UNALLOCATED
-
-    ProjectTransactionType:
-      type: string
-      enum:
-        - REWARDED
-        - GRANTED
-        - UNGRANTED
-
-    SponsorTransactionType:
+    FinancialTransactionType:
       type: string
       enum:
         - DEPOSITED
         - ALLOCATED
         - UNALLOCATED
+        - GRANTED
+        - UNGRANTED
+        - REWARDED
 
     SponsorDepositTransactionStatus:
       type: string
@@ -10356,13 +10310,7 @@ components:
         - AMOUNT
         - STATUS
 
-    SponsorTransactionStatsSort:
-      type: string
-      default: DATE
-      enum:
-        - DATE
-
-    ProgramTransactionStatsSort:
+    FinancialTransactionStatsSort:
       type: string
       default: DATE
       enum:

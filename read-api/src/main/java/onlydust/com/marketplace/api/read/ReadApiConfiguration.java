@@ -55,6 +55,13 @@ public class ReadApiConfiguration {
     }
 
     @Bean
+    public BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository(
+            final EntityManager entityManager
+    ) {
+        return new BiFinancialMonthlyStatsReadRepository(entityManager);
+    }
+
+    @Bean
     @ConfigurationProperties(value = "application.cache", ignoreUnknownFields = false)
     public Cache cache() {
         return new Cache();

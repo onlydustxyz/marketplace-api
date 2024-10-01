@@ -1,7 +1,7 @@
 package onlydust.com.marketplace.api.it.api;
 
 import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
-import onlydust.com.marketplace.api.contract.model.ProjectTransactionType;
+import onlydust.com.marketplace.api.contract.model.FinancialTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
 import onlydust.com.marketplace.api.suites.tags.TagAccounting;
 import onlydust.com.marketplace.kernel.model.ProjectId;
@@ -366,8 +366,8 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
             }
 
             @ParameterizedTest
-            @EnumSource(ProjectTransactionType.class)
-            void should_get_program_transactions_filtered_by_types(ProjectTransactionType type) {
+            @EnumSource(value = FinancialTransactionType.class, names = {"REWARDED", "GRANTED", "UNGRANTED"})
+            void should_get_program_transactions_filtered_by_types(FinancialTransactionType type) {
                 // When
                 client.get()
                         .uri(getApiURI(PROJECT_TRANSACTIONS.formatted(projectId), Map.of(
@@ -384,6 +384,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
                             case REWARDED -> 2;
                             case GRANTED -> 2;
                             case UNGRANTED -> 1;
+                            default -> throw new IllegalArgumentException();
                         })
                         .jsonPath("$.transactions[?(@.type != '%s')]".formatted(type.name())).doesNotExist();
             }
