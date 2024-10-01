@@ -429,4 +429,9 @@ public class ProjectConfiguration {
                                                                              final NotificationPort notificationPort) {
         return new GoodFirstIssueCreatedNotifierJob(githubStoragePort, projectStoragePort, userStoragePort, notificationPort);
     }
+
+    @Bean
+    public ProjectContributorLabelFacadePort projectContributorLabelFacadePort(final ProjectContributorLabelStoragePort projectContributorLabelStoragePort) {
+        return new ProjectContributorLabelService(projectContributorLabelStoragePort);
+    }
 }

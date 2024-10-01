@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectContributorLabelsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectContributorLabelRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectContributorLabelResponse;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,11 +22,15 @@ import java.util.UUID;
 @Profile("api")
 public class ProjectContributorLabelsRestApi implements ProjectContributorLabelsApi {
 
+    private final ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
+
     @Override
     public ResponseEntity<ProjectContributorLabelResponse> createProjectContributorLabel(UUID projectId,
                                                                                          ProjectContributorLabelRequest projectContributorLabelRequest) {
-        // TODO: Implement this method
-        return ProjectContributorLabelsApi.super.createProjectContributorLabel(projectId, projectContributorLabelRequest);
+        final var label = projectContributorLabelFacadePort.createContributorLabel(ProjectId.of(projectId), projectContributorLabelRequest.getName());
+        return ResponseEntity.ok(new ProjectContributorLabelResponse()
+                .id(label.id().value())
+                .name(label.name()));
     }
 
     @Override

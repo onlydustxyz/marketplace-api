@@ -434,4 +434,9 @@ public class PostgresConfiguration {
         return (properties) -> properties.put(AvailableSettings.JSON_FORMAT_MAPPER,
                 new JacksonJsonFormatMapper(objectMapper));
     }
+
+    @Bean
+    public PostgresProjectContributorLabelAdapter postgresProjectContributorLabelAdapter(final ProjectContributorLabelRepository projectContributorLabelRepository) {
+        return new PostgresProjectContributorLabelAdapter(projectContributorLabelRepository);
+    }
 }

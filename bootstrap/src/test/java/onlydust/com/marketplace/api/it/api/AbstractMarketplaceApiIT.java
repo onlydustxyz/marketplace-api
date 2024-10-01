@@ -207,6 +207,7 @@ public class AbstractMarketplaceApiIT {
     protected static final String BI_STATS_CONTRIBUTORS = "/api/v1/bi/stats/contributors";
     protected static final String BI_PROJECTS = "/api/v1/bi/projects";
     protected static final String BI_CONTRIBUTORS = "/api/v1/bi/contributors";
+    protected static final String PROJECT_CONTRIBUTOR_LABELS = "/api/v1/projects/%s/contributor-labels";
 
     private static PostgreSQLContainer postgresSQLContainer = new PostgreSQLContainer<>("postgres:15.6-alpine")
             .withDatabaseName("marketplace_db")
