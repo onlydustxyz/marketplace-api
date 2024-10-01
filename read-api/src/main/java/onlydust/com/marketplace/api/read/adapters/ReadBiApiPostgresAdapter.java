@@ -5,11 +5,15 @@ import onlydust.com.marketplace.accounting.domain.model.Country;
 import onlydust.com.marketplace.api.contract.ReadBiApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.bi.*;
+import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
+import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper;
 import onlydust.com.marketplace.kernel.model.EcosystemId;
 import onlydust.com.marketplace.kernel.model.ProgramId;
+import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.kernel.model.SponsorId;
 import onlydust.com.marketplace.project.domain.service.PermissionService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -24,9 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,8 +38,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.FALSE;
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
+import static onlydust.com.marketplace.api.contract.model.FinancialTransactionType.*;
+import static onlydust.com.marketplace.api.read.repositories.BiFinancialMonthlyStatsReadRepository.IdGrouping.*;
 import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.parseZonedNullable;
-import static onlydust.com.marketplace.kernel.exception.OnlyDustException.internalServerError;
+import static onlydust.com.marketplace.api.rest.api.adapter.mapper.DateMapper.toZoneDateTime;
+import static onlydust.com.marketplace.kernel.exception.OnlyDustException.*;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.hasMore;
 import static onlydust.com.marketplace.kernel.pagination.PaginationHelper.nextPageIndex;
 import static org.springframework.http.HttpStatus.OK;
@@ -49,6 +59,7 @@ import static org.springframework.http.ResponseEntity.status;
 @Profile("api")
 public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private static final ZonedDateTime DEFAULT_FROM_DATE = ZonedDateTime.parse("2007-10-20T05:24:19Z");
+    private final PermissionService permissionService;
     private final AggregatedProjectKpisReadRepository aggregatedProjectKpisReadRepository;
     private final AggregatedContributorKpisReadRepository aggregatedContributorKpisReadRepository;
     private final WorldMapKpiReadRepository worldMapKpiReadRepository;
@@ -56,6 +67,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
     private final ContributorKpisReadRepository contributorKpisReadRepository;
     private final PermissionService permissionsService;
     private final AuthenticatedAppUserService authenticatedAppUserService;
+    private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
 
     @Override
     public ResponseEntity<BiContributorsPageResponse> getBIContributors(BiContributorsQueryParams q) {
@@ -122,7 +134,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                     var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
                     return stats.toDto(statsOfPreviousPeriod);
                 })
-                .sorted(Comparator.comparing(BiContributorsStatsListItemResponse::getTimestamp))
+                .sorted(comparing(BiContributorsStatsListItemResponse::getTimestamp))
                 .skip(1) // Skip the first element as it is the previous period used to compute churned contributor count
                 .toList();
 
@@ -204,7 +216,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                     var statsOfPreviousPeriod = statsPerTimestamp.get(stats.timestampOfPreviousPeriod());
                     return stats.toDto(statsOfPreviousPeriod);
                 })
-                .sorted(Comparator.comparing(BiProjectsStatsListItemResponse::getTimestamp))
+                .sorted(comparing(BiProjectsStatsListItemResponse::getTimestamp))
                 .skip(1) // Skip the first element as it is the previous period used to compute churned project count
                 .toList();
 
@@ -334,5 +346,79 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
                 PageRequest.of(q.getPageIndex(), q.getPageSize(), Sort.by(q.getSortDirection() == SortDirection.DESC ? Sort.Direction.DESC : Sort.Direction.ASC,
                         ProjectKpisReadRepository.getSortProperty(q.getSort())))
         );
+    }
+
+    @Override
+    public ResponseEntity<BiFinancialsStatsListResponse> getBIFinancialsStats(String fromDate,
+                                                                              String toDate,
+                                                                              String search,
+                                                                              UUID sponsorId,
+                                                                              UUID programId,
+                                                                              UUID projectId,
+                                                                              List<FinancialTransactionType> types,
+                                                                              Boolean showEmpty,
+                                                                              FinancialTransactionStatsSort sort,
+                                                                              SortDirection sortDirection) {
+        final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
+
+        if (sponsorId == null && programId == null && projectId == null)
+            throw badRequest("At least one of sponsorId, programId or projectId must be provided");
+
+        final var idGrouping = sponsorId != null ? SPONSOR_ID : programId != null ? PROGRAM_ID : PROJECT_ID;
+
+        final var id = switch (idGrouping) {
+            case SPONSOR_ID -> sponsorId;
+            case PROGRAM_ID -> programId;
+            case PROJECT_ID -> projectId;
+        };
+
+        switch (idGrouping) {
+            case SPONSOR_ID -> {
+                if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(id)))
+                    throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), id));
+            }
+            case PROGRAM_ID -> {
+                if (!permissionService.hasUserAccessToProgram(authenticatedUser.id(), ProgramId.of(id)))
+                    throw unauthorized("User %s is not authorized to access program %s".formatted(authenticatedUser.id(), id));
+
+            }
+            case PROJECT_ID -> {
+                if (!permissionService.hasUserAccessToProject(ProjectId.of(id), Optional.ofNullable(authenticatedUser.id())))
+                    throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
+            }
+        }
+
+        final var allTypes = switch (idGrouping) {
+            case SPONSOR_ID -> List.of(DEPOSITED, ALLOCATED, UNALLOCATED);
+            case PROGRAM_ID -> List.of(ALLOCATED, UNALLOCATED, GRANTED, UNGRANTED);
+            case PROJECT_ID -> List.of(GRANTED, UNGRANTED, REWARDED);
+        };
+
+        final var stats = biFinancialMonthlyStatsReadRepository.findAll(id,
+                        idGrouping,
+                        toZoneDateTime(DateMapper.parseNullable(fromDate)),
+                        toZoneDateTime(DateMapper.parseNullable(toDate)),
+                        search,
+                        Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList())
+                .stream()
+                .collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
+
+        final var comparison = switch (sort) {
+            default -> comparing(BiFinancialsStatsResponse::getDate);
+        };
+
+        final var response = new BiFinancialsStatsListResponse()
+                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
+                                .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
+                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalDeposited))
+                                .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
+                                .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
+                                .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
+                                .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum()))
+                        .filter(r -> !FALSE.equals(showEmpty) || r.getTransactionCount() > 0)
+                        .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
+                        .toList());
+
+        return ok(response);
     }
 }

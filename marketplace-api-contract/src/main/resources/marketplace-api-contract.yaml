@@ -56,6 +56,59 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/bi/stats/financials:
+    get:
+      tags:
+        - ReadBi
+      summary: Get financials stats for diagram
+      operationId: getBIFinancialsStats
+      parameters:
+        - $ref: '#/components/parameters/fromDateParam'
+        - $ref: '#/components/parameters/toDateParam'
+        - $ref: '#/components/parameters/searchParam'
+        - in: query
+          name: sponsorId
+          schema:
+            $ref: '#/components/schemas/SponsorId'
+        - in: query
+          name: programId
+          schema:
+            $ref: '#/components/schemas/ProgramId'
+        - in: query
+          name: projectId
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: query
+          name: types
+          description: Transaction types filter
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/FinancialTransactionType'
+        - in: query
+          name: showEmpty
+          schema:
+            default: true
+            type: boolean
+        - in: query
+          name: sort
+          schema:
+            $ref: '#/components/schemas/FinancialTransactionStatsSort'
+        - in: query
+          name: sortDirection
+          schema:
+            $ref: '#/components/schemas/SortDirection'
+
+      responses:
+        "200":
+          description: 'Financials stats'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiFinancialsStatsListResponse'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/bi/projects:
     get:
       tags:
@@ -4387,8 +4440,6 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-
-
   /api/v1/programs/{programId}/stats/transactions:
     get:
       security:
@@ -4400,6 +4451,7 @@ paths:
       description: |
         Get program transactions stats grouped by month. 
         Only program leaders can access this information.
+      deprecated: true
       parameters:
         - in: path
           name: programId
@@ -4541,6 +4593,7 @@ paths:
         - ReadSponsors
       summary: Get sponsor transactions stats
       operationId: getSponsorTransactionsStats
+      deprecated: true
       description: |
         Get sponsor transactions stats grouped by month. 
         Only sponsor leaders can access this information.
@@ -5203,7 +5256,6 @@ components:
         items:
           type: string
           format: uuid
-
 
   responses:
     InternalServerError:
