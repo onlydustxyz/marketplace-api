@@ -559,3 +559,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/00000350_improve_perf.sql
   - include:
       file: db/changelog/changelogs/00000351_update_bi_views.sql
+  - include:
+      file: db/changelog/changelogs/00000352_create_project_contributor_labels_table.sql
