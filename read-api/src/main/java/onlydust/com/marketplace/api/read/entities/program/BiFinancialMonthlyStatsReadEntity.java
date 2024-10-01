@@ -8,7 +8,7 @@ import onlydust.com.marketplace.api.read.entities.currency.CurrencyReadEntity;
 import org.hibernate.annotations.Immutable;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
@@ -17,23 +17,18 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Immutable
 @Accessors(fluent = true)
-@IdClass(ProgramTransactionMonthlyStatReadEntity.PrimaryKey.class)
-public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransactionStat {
+@IdClass(BiFinancialMonthlyStatsReadEntity.PrimaryKey.class)
+public class BiFinancialMonthlyStatsReadEntity implements ProgramTransactionStat {
     @Id
     @NonNull
-    UUID programId;
+    UUID id;
 
     @Id
     @NonNull
     UUID currencyId;
 
     @Id
-    @Getter(AccessLevel.NONE)
-    Date date;
-
-    public Date date() {
-        return date;
-    }
+    ZonedDateTime date;
 
     @NonNull
     @ManyToOne
@@ -41,7 +36,10 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
     CurrencyReadEntity currency;
 
     @NonNull
-    BigDecimal totalReceived;
+    BigDecimal totalDeposited;
+
+    @NonNull
+    BigDecimal totalAllocated;
 
     @NonNull
     BigDecimal totalGranted;
@@ -54,8 +52,8 @@ public class ProgramTransactionMonthlyStatReadEntity implements ProgramTransacti
 
     @EqualsAndHashCode
     public static class PrimaryKey {
-        UUID programId;
+        UUID id;
         UUID currencyId;
-        Date date;
+        ZonedDateTime date;
     }
 }

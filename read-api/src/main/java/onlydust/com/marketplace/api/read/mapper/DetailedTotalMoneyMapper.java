@@ -26,8 +26,10 @@ public interface DetailedTotalMoneyMapper {
 
         return new DetailedTotalMoney()
                 .totalPerCurrency(stats.stream()
+                        .sorted(comparing(c -> c.currency().name()))
                         .map(s -> s.toMoney(amountSupplier.apply(s), usdTotal))
-                        .sorted(comparing(DetailedTotalMoneyTotalPerCurrencyInner::getUsdEquivalent, nullsLast(naturalOrder())).reversed()).toList())
+                        .sorted(comparing(DetailedTotalMoneyTotalPerCurrencyInner::getUsdEquivalent, nullsLast(naturalOrder())).reversed())
+                        .toList())
                 .totalUsdEquivalent(prettyUsd(usdTotal));
     }
 }

@@ -5,8 +5,8 @@ import onlydust.com.marketplace.api.contract.ReadSponsorsApi;
 import onlydust.com.marketplace.api.contract.model.*;
 import onlydust.com.marketplace.api.read.entities.accounting.AllTransactionReadEntity;
 import onlydust.com.marketplace.api.read.entities.accounting.DepositReadEntity;
+import onlydust.com.marketplace.api.read.entities.program.BiFinancialMonthlyStatsReadEntity;
 import onlydust.com.marketplace.api.read.entities.program.ProgramReadEntity;
-import onlydust.com.marketplace.api.read.entities.program.SponsorTransactionMonthlyStatReadEntity;
 import onlydust.com.marketplace.api.read.mapper.DetailedTotalMoneyMapper;
 import onlydust.com.marketplace.api.read.repositories.*;
 import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static java.lang.Boolean.FALSE;
@@ -54,7 +55,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private final AllTransactionReadRepository allTransactionReadRepository;
     private final SponsorReadRepository sponsorReadRepository;
     private final ProgramReadRepository programReadRepository;
-    private final SponsorTransactionMonthlyStatsReadRepository sponsorTransactionMonthlyStatsReadRepository;
+    private final BiFinancialMonthlyStatsReadRepository biFinancialMonthlyStatsReadRepository;
     private final DepositReadRepository depositReadRepository;
 
     @Override
@@ -94,7 +95,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                                                  Integer pageSize,
                                                                                  String fromDate,
                                                                                  String toDate,
-                                                                                 List<SponsorTransactionType> types,
+                                                                                 List<FinancialTransactionType> types,
                                                                                  String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -118,7 +119,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
                                                             @RequestParam(required = false) Integer pageSize,
                                                             @RequestParam(required = false) String fromDate,
                                                             @RequestParam(required = false) String toDate,
-                                                            @RequestParam(required = false) List<SponsorTransactionType> types,
+                                                            @RequestParam(required = false) List<FinancialTransactionType> types,
                                                             @RequestParam(required = false) String search) {
         final var index = sanitizePageIndex(pageIndex);
         final var size = sanitizePageSize(pageSize);
@@ -143,7 +144,7 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
     private Page<AllTransactionReadEntity> findAccountBookTransactions(UUID sponsorId,
                                                                        String fromDate,
                                                                        String toDate,
-                                                                       List<SponsorTransactionType> types,
+                                                                       List<FinancialTransactionType> types,
                                                                        String search,
                                                                        int index,
                                                                        int size) {
@@ -154,41 +155,43 @@ public class ReadSponsorsApiPostgresAdapter implements ReadSponsorsApi {
 
 
         return allTransactionReadRepository.findAllForSponsor(sponsorId, DateMapper.parseNullable(fromDate),
-                DateMapper.parseNullable(toDate), search, types == null ? null : types.stream().map(SponsorTransactionType::name).toList(),
+                DateMapper.parseNullable(toDate), search, types == null ? null : types.stream().map(FinancialTransactionType::name).toList(),
                 PageRequest.of(index, size, Sort.by(Sort.Order.by("timestamp").with(DESC), Sort.Order.by("depositStatus").nullsLast())));
     }
 
     @Override
-    public ResponseEntity<SponsorTransactionStatListResponse> getSponsorTransactionsStats(UUID sponsorId, String fromDate, String toDate,
-                                                                                          List<SponsorTransactionType> types, String search,
-                                                                                          Boolean showEmpty, SponsorTransactionStatsSort sort,
-                                                                                          SortDirection sortDirection
+    public ResponseEntity<BiFinancialsStatsListResponse> getSponsorTransactionsStats(UUID sponsorId, String fromDate, String toDate,
+                                                                                     List<FinancialTransactionType> types, String search,
+                                                                                     Boolean showEmpty, FinancialTransactionStatsSort sort,
+                                                                                     SortDirection sortDirection
     ) {
         final var authenticatedUser = authenticatedAppUserService.getAuthenticatedUser();
 
         if (!permissionService.isUserSponsorLead(authenticatedUser.id(), SponsorId.of(sponsorId)))
             throw unauthorized("User %s is not authorized to access sponsor %s".formatted(authenticatedUser.id(), sponsorId));
 
-        final var stats = sponsorTransactionMonthlyStatsReadRepository.findAll(sponsorId,
+        final var allTypes = List.of(FinancialTransactionType.DEPOSITED, FinancialTransactionType.ALLOCATED, FinancialTransactionType.UNALLOCATED);
+        final var stats = biFinancialMonthlyStatsReadRepository.findAll(sponsorId,
+                        BiFinancialMonthlyStatsReadRepository.IdGrouping.SPONSOR_ID,
                         toZoneDateTime(DateMapper.parseNullable(fromDate)),
                         toZoneDateTime(DateMapper.parseNullable(toDate)),
                         search,
-                        types == null ? null : types.stream().map(SponsorTransactionType::name).toList())
+                        Optional.ofNullable(types).orElse(allTypes).stream().map(FinancialTransactionType::name).toList())
                 .stream()
-                .collect(groupingBy(SponsorTransactionMonthlyStatReadEntity::date));
+                .collect(groupingBy(BiFinancialMonthlyStatsReadEntity::date));
 
         final var comparison = switch (sort) {
-            default -> comparing(SponsorTransactionStatResponse::getDate);
+            default -> comparing(BiFinancialsStatsResponse::getDate);
         };
 
-        final var response = new SponsorTransactionStatListResponse()
-                .stats(stats.entrySet().stream().map(e -> new SponsorTransactionStatResponse()
+        final var response = new BiFinancialsStatsListResponse()
+                .stats(stats.entrySet().stream().map(e -> new BiFinancialsStatsResponse()
                                 .date(e.getKey().toInstant().atZone(ZoneOffset.UTC).toLocalDate())
-                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalDeposited))
-                                .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalAllocated))
-                                .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalGranted))
-                                .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), SponsorTransactionMonthlyStatReadEntity::totalRewarded))
-                                .transactionCount(e.getValue().stream().mapToInt(SponsorTransactionMonthlyStatReadEntity::transactionCount).sum()))
+                                .totalDeposited(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalDeposited))
+                                .totalAllocated(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalAllocated))
+                                .totalGranted(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalGranted))
+                                .totalRewarded(DetailedTotalMoneyMapper.map(e.getValue(), BiFinancialMonthlyStatsReadEntity::totalRewarded))
+                                .transactionCount(e.getValue().stream().mapToInt(BiFinancialMonthlyStatsReadEntity::transactionCount).sum()))
                         .filter(r -> !FALSE.equals(showEmpty) || r.getTransactionCount() > 0)
                         .sorted(sortDirection == SortDirection.ASC ? comparison : comparison.reversed())
                         .toList());

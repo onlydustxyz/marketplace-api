@@ -125,19 +125,19 @@ public class AllTransactionReadEntity {
                 new ProgramTransactionPageItemResponseThirdParty().project(project.toLinkResponse());
     }
 
-    private ProgramTransactionType programTransactionType() {
+    private FinancialTransactionType programTransactionType() {
         return switch (type) {
-            case TRANSFER -> project == null ? ProgramTransactionType.ALLOCATED : ProgramTransactionType.GRANTED;
-            case REFUND -> project == null ? ProgramTransactionType.UNALLOCATED : ProgramTransactionType.UNGRANTED;
+            case TRANSFER -> project == null ? FinancialTransactionType.ALLOCATED : FinancialTransactionType.GRANTED;
+            case REFUND -> project == null ? FinancialTransactionType.UNALLOCATED : FinancialTransactionType.UNGRANTED;
             default -> throw new IllegalStateException("%s transaction types are not allowed for program transactions".formatted(type));
         };
     }
 
-    private SponsorTransactionType sponsorTransactionType() {
+    private FinancialTransactionType sponsorTransactionType() {
         return switch (type) {
-            case MINT, DEPOSIT -> SponsorTransactionType.DEPOSITED;
-            case TRANSFER -> SponsorTransactionType.ALLOCATED;
-            case REFUND -> SponsorTransactionType.UNALLOCATED;
+            case MINT, DEPOSIT -> FinancialTransactionType.DEPOSITED;
+            case TRANSFER -> FinancialTransactionType.ALLOCATED;
+            case REFUND -> FinancialTransactionType.UNALLOCATED;
             case BURN, WITHDRAW -> throw new NotImplementedException("%s transaction type is not implemented".formatted(type));
             default -> throw new IllegalStateException("%s transaction types are not allowed for sponsor transactions".formatted(type));
         };
@@ -208,10 +208,10 @@ public class AllTransactionReadEntity {
                 new ProjectTransactionPageItemResponseThirdParty().contributor(reward.recipient().toContributorResponse());
     }
 
-    private ProjectTransactionType projectTransactionType() {
+    private FinancialTransactionType projectTransactionType() {
         return switch (type) {
-            case TRANSFER -> rewardId == null ? ProjectTransactionType.GRANTED : ProjectTransactionType.REWARDED;
-            case REFUND -> ProjectTransactionType.UNGRANTED;
+            case TRANSFER -> rewardId == null ? FinancialTransactionType.GRANTED : FinancialTransactionType.REWARDED;
+            case REFUND -> FinancialTransactionType.UNGRANTED;
             default -> throw new IllegalStateException("%s transaction types are not allowed for project transactions".formatted(type));
         };
     }
