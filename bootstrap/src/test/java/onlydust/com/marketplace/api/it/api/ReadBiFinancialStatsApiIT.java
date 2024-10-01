@@ -6,12 +6,13 @@ import onlydust.com.marketplace.accounting.domain.model.user.GithubUserId;
 import onlydust.com.marketplace.api.contract.model.BiFinancialsStatsListResponse;
 import onlydust.com.marketplace.api.contract.model.FinancialTransactionType;
 import onlydust.com.marketplace.api.helper.UserAuthHelper;
-import onlydust.com.marketplace.api.suites.tags.TagAccounting;
+import onlydust.com.marketplace.api.suites.tags.TagBI;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.Program;
 import onlydust.com.marketplace.project.domain.model.Project;
 import onlydust.com.marketplace.project.domain.model.Sponsor;
 import onlydust.com.marketplace.project.domain.port.input.ProjectFacadePort;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,7 @@ import static onlydust.com.marketplace.api.helper.DateHelper.at;
 import static onlydust.com.marketplace.api.helper.JSONPathAssertion.jsonObjectEquals;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TagAccounting
+@TagBI
 public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
     @Autowired
     ProjectFacadePort projectFacadePort;
@@ -1898,7 +1899,6 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
-                    .consumeWith(System.out::println)
                     .jsonPath("$.stats[?(@.date == '2024-01-01')]").value(jsonObjectEquals("""
                             {
                                   "date": "2024-01-01",
@@ -3075,6 +3075,9 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
 
         @Test
         void should_get_project_bi_financial_stats() {
+            // Given
+            final var responseBody = new MutableObject<String>();
+
             // When
             client.get()
                     .uri(getApiURI(BI_STATS_FINANCIALS, Map.of(
@@ -3086,6 +3089,7 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                     .expectStatus()
                     .isOk()
                     .expectBody()
+                    .consumeWith(b -> responseBody.setValue(new String(b.getResponseBody(), StandardCharsets.UTF_8)))
                     .jsonPath("$.stats[?(@.date == '2024-04-01')]").value(jsonObjectEquals("""
                             {
                                   "date": "2024-04-01",
@@ -4001,6 +4005,18 @@ public class ReadBiFinancialStatsApiIT extends AbstractMarketplaceApiIT {
                                 }
                             """))
             ;
+
+            client.get()
+                    .uri(getApiURI(BI_STATS_FINANCIALS, Map.of(
+                            "projectSlug", myProject.getSlug()
+                    )))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json(responseBody.getValue());
 
             client.get()
                     .uri(getApiURI(PROGRAM_STATS_TRANSACTIONS.formatted(myProgram.id()), Map.of("showEmpty", "false")))
