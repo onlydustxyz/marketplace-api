@@ -408,4 +408,10 @@ public class ProjectsRestApi implements ProjectsApi {
         contributionsFacadePort.unassign(ProjectId.of(projectId), authenticatedUser.id(), contributionId);
         return noContent().build();
     }
+
+    @Override
+    public ResponseEntity<Void> updateContributorsLabels(UUID projectId, ContributorsLabelsRequest contributorsLabelsRequest) {
+        // TODO: Implement this method
+        return ProjectsApi.super.updateContributorsLabels(projectId, contributorsLabelsRequest);
+    }
 }
