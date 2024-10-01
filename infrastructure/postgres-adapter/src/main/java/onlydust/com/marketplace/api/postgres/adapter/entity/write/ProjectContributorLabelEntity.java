@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
 
 import java.util.UUID;
@@ -29,5 +30,13 @@ public class ProjectContributorLabelEntity {
                 .projectId(label.projectId().value())
                 .name(label.name())
                 .build();
+    }
+
+    public ProjectContributorLabel toDomain() {
+        return new ProjectContributorLabel(
+                ProjectContributorLabel.Id.of(id),
+                ProjectId.of(projectId),
+                name
+        );
     }
 }

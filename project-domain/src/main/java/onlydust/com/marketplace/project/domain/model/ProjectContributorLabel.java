@@ -24,11 +24,7 @@ public class ProjectContributorLabel {
     public ProjectContributorLabel(@NonNull Id id, @NonNull ProjectId projectId, @NonNull String name) {
         this.id = id;
         this.projectId = projectId;
-        this.name = name;
-        
-        if (this.slug().isEmpty()) {
-            throw badRequest("Title must contain at least one alphanumeric character");
-        }
+        this.name(name);
     }
 
     public static ProjectContributorLabel of(@NonNull ProjectId projectId, @NonNull String name) {
@@ -37,6 +33,13 @@ public class ProjectContributorLabel {
 
     public @NonNull String slug() {
         return name.replaceAll("[^a-zA-Z0-9_\\- ]+", "").trim().replaceAll("\\s+", "-").toLowerCase();
+    }
+
+    public void name(@NonNull String name) {
+        this.name = name;
+        if (this.slug().isEmpty()) {
+            throw badRequest("Label must contain at least one alphanumeric character");
+        }
     }
 
     @NoArgsConstructor(staticName = "random")

@@ -2060,7 +2060,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/projects/{projectId}/contributor-labels/{labelId}:
+  /api/v1/contributor-labels/{labelId}:
     put:
       tags:
         - ProjectContributorLabels
@@ -2069,11 +2069,6 @@ paths:
       description: |
         Update contributor label for project. The caller must be a leader of the project.
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
         - in: path
           name: labelId
           required: true
@@ -2103,11 +2098,6 @@ paths:
       description: |
         Delete contributor label for project. The caller must be a leader of the project.
       parameters:
-        - in: path
-          name: projectId
-          required: true
-          schema:
-            $ref: '#/components/schemas/ProjectId'
         - in: path
           name: labelId
           required: true
@@ -5414,6 +5404,10 @@ components:
       type: string
       format: uuid
       description: Project contributor-label ID
+
+    ProjectContributorLabelSlug:
+      type: string
+      description: Project contributor-label slug
 
     ProjectApplicationId:
       type: string
@@ -11452,6 +11446,8 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/ProjectContributorLabelId'
+        slug:
+          $ref: '#/components/schemas/ProjectContributorLabelSlug'
         name:
           type: string
           example: 'Core Contributor'
