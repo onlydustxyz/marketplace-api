@@ -386,7 +386,7 @@ public class ReadBiApiPostgresAdapter implements ReadBiApi {
 
             }
             case PROJECT_ID -> {
-                if (!permissionService.hasUserAccessToProject(ProjectId.of(id), Optional.ofNullable(authenticatedUser.id())))
+                if (!permissionService.isUserProjectLead(ProjectId.of(id), authenticatedUser.id()))
                     throw unauthorized("User %s is not authorized to access project %s".formatted(authenticatedUser.id(), id));
             }
         }
