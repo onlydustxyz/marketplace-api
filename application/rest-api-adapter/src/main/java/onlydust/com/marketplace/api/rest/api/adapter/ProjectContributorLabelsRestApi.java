@@ -7,7 +7,9 @@ import lombok.extern.slf4j.Slf4j;
 import onlydust.com.marketplace.api.contract.ProjectContributorLabelsApi;
 import onlydust.com.marketplace.api.contract.model.ProjectContributorLabelRequest;
 import onlydust.com.marketplace.api.contract.model.ProjectContributorLabelResponse;
+import onlydust.com.marketplace.api.rest.api.adapter.authentication.AuthenticatedAppUserService;
 import onlydust.com.marketplace.kernel.model.ProjectId;
+import onlydust.com.marketplace.project.domain.model.ProjectContributorLabel;
 import onlydust.com.marketplace.project.domain.port.input.ProjectContributorLabelFacadePort;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
@@ -22,26 +24,30 @@ import java.util.UUID;
 @Profile("api")
 public class ProjectContributorLabelsRestApi implements ProjectContributorLabelsApi {
 
+    private final AuthenticatedAppUserService authenticatedAppUserService;
     private final ProjectContributorLabelFacadePort projectContributorLabelFacadePort;
 
     @Override
     public ResponseEntity<ProjectContributorLabelResponse> createProjectContributorLabel(UUID projectId,
                                                                                          ProjectContributorLabelRequest projectContributorLabelRequest) {
-        final var label = projectContributorLabelFacadePort.createContributorLabel(ProjectId.of(projectId), projectContributorLabelRequest.getName());
+        final var caller = authenticatedAppUserService.getAuthenticatedUser();
+        final var label = projectContributorLabelFacadePort.createLabel(caller.id(), ProjectId.of(projectId), projectContributorLabelRequest.getName());
         return ResponseEntity.ok(new ProjectContributorLabelResponse()
                 .id(label.id().value())
                 .name(label.name()));
     }
 
     @Override
-    public ResponseEntity<Void> deleteProjectContributorLabel(UUID projectId, UUID labelId) {
-        // TODO: Implement this method
-        return ProjectContributorLabelsApi.super.deleteProjectContributorLabel(projectId, labelId);
+    public ResponseEntity<Void> deleteProjectContributorLabel(UUID labelId) {
+        final var caller = authenticatedAppUserService.getAuthenticatedUser();
+        projectContributorLabelFacadePort.deleteLabel(caller.id(), ProjectContributorLabel.Id.of(labelId));
+        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<Void> updateProjectContributorLabel(UUID projectId, UUID labelId, ProjectContributorLabelRequest projectContributorLabelRequest) {
-        // TODO: Implement this method
-        return ProjectContributorLabelsApi.super.updateProjectContributorLabel(projectId, labelId, projectContributorLabelRequest);
+    public ResponseEntity<Void> updateProjectContributorLabel(UUID labelId, ProjectContributorLabelRequest projectContributorLabelRequest) {
+        final var caller = authenticatedAppUserService.getAuthenticatedUser();
+        projectContributorLabelFacadePort.updateLabel(caller.id(), ProjectContributorLabel.Id.of(labelId), projectContributorLabelRequest.getName());
+        return ResponseEntity.noContent().build();
     }
 }
