@@ -1944,6 +1944,134 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
+  /api/v1/projects/{projectId}/contributor-labels:
+    get:
+      tags:
+        - ReadProjectContributorLabels
+      summary: Get project contributor labels
+      operationId: getProjectContributorLabels
+      description: |
+        Get project contributor labels. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      responses:
+        "200":
+          description: 'Project contributor labels'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectContributorLabelListResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      tags:
+        - ProjectContributorLabels
+      summary: Create contributor label for project
+      operationId: createProjectContributorLabel
+      description: |
+        Create contributor label for project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectContributorLabelRequest'
+      responses:
+        "200":
+          description: 'New project contributor label'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectContributorLabelResponse'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
+  /api/v1/projects/{projectId}/contributor-labels/{labelId}:
+    put:
+      tags:
+        - ProjectContributorLabels
+      summary: Update contributor label for project
+      operationId: updateProjectContributorLabel
+      description: |
+        Update contributor label for project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: path
+          name: labelId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectContributorLabelId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectContributorLabelRequest'
+      responses:
+        "204":
+          description: 'Project contributor label was updated successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags:
+        - ProjectContributorLabels
+      summary: Delete contributor label from project
+      operationId: deleteProjectContributorLabel
+      description: |
+        Delete contributor label for project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+        - in: path
+          name: labelId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectContributorLabelId'
+      responses:
+        "204":
+          description: 'Project contributor label was deleted successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+
   /api/v1/projects/{projectId}/transactions:
     get:
       security:
@@ -2155,6 +2283,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContributorsPageResponse'
+        "403":
+          $ref: '#/components/responses/ProjectForbiddenError'
+        "404":
+          $ref: '#/components/responses/NotFoundError'
+        "500":
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags:
+        - Projects
+      summary: Update contributors labels
+      operationId: updateContributorsLabels
+      description: |
+        Update contributors labels within project. The caller must be a leader of the project.
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContributorsLabelsRequest'
+      responses:
+        "204":
+          description: 'Contributors labels were updated successfully.'
+        "401":
+          $ref: '#/components/responses/UnauthorizedError'
         "403":
           $ref: '#/components/responses/ProjectForbiddenError'
         "404":
@@ -5200,6 +5357,11 @@ components:
       type: string
       format: uuid
       description: OnlyDust project ID
+
+    ProjectContributorLabelId:
+      type: string
+      format: uuid
+      description: Project contributor-label ID
 
     ProjectApplicationId:
       type: string
@@ -11272,3 +11434,57 @@ components:
         value:
           type: number
           format: int64
+
+    ProjectContributorLabelRequest:
+      type: object
+      required:
+        - label
+      properties:
+        label:
+          type: string
+          example: 'Core Contributor'
+
+    ProjectContributorLabelResponse:
+      type: object
+      required:
+        - id
+        - label
+      properties:
+        id:
+          $ref: '#/components/schemas/ProjectContributorLabelId'
+        label:
+          type: string
+          example: 'Core Contributor'
+
+    ProjectContributorLabelListResponse:
+      type: object
+      required:
+        - labels
+      properties:
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelResponse'
+
+    ContributorsLabelsRequest:
+      type: object
+      required:
+        - contributorsLabels
+      properties:
+        contributorsLabels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContributorLabelsRequest'
+
+    ContributorLabelsRequest:
+      type: object
+      required:
+        - githubUserId
+        - labels
+      properties:
+        githubUserId:
+          $ref: '#/components/schemas/GithubUserId'
+        labels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectContributorLabelResponse'
