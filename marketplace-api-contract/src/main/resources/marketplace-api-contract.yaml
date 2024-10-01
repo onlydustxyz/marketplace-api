@@ -11438,9 +11438,9 @@ components:
     ProjectContributorLabelRequest:
       type: object
       required:
-        - label
+        - name
       properties:
-        label:
+        name:
           type: string
           example: 'Core Contributor'
 
@@ -11448,11 +11448,11 @@ components:
       type: object
       required:
         - id
-        - label
+        - name
       properties:
         id:
           $ref: '#/components/schemas/ProjectContributorLabelId'
-        label:
+        name:
           type: string
           example: 'Core Contributor'
 
