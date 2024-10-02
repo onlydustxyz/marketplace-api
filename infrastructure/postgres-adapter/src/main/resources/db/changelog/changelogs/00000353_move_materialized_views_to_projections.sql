@@ -124,6 +124,7 @@ DROP FUNCTION bi.select_contributors(fromDate timestamptz,
                                      contributionStatuses indexer_exp.contribution_status[],
                                      searchQuery text,
                                      filteredKpis boolean);
+
 DROP MATERIALIZED VIEW IF EXISTS bi.m_project_global_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_contributor_global_data;
 DROP MATERIALIZED VIEW IF EXISTS bi.m_contribution_data;
@@ -149,7 +150,6 @@ WITH allocations AS (SELECT abt.currency_id,
 SELECT program_id, project_id, bool_or(remaining_amount > 0) as has_remaining_grants
 FROM allocations
 GROUP BY program_id, project_id;
-
 
 CREATE MATERIALIZED VIEW m_active_programs_projects AS
 SELECT program_id, project_id
@@ -319,11 +319,12 @@ create index bi_p_reward_data_contributor_id_month_timestamp_idx_inv on bi.p_rew
 create index bi_p_reward_data_contributor_id_quarter_timestamp_idx_inv on bi.p_reward_data (quarter_timestamp, contributor_id, currency_id);
 create index bi_p_reward_data_contributor_id_year_timestamp_idx_inv on bi.p_reward_data (year_timestamp, contributor_id, currency_id);
 
-CREATE MATERIALIZED VIEW bi.m_project_grants_data AS
-SELECT abt.project_id,
-       abt.program_id,
-       abt.currency_id,
-       abt.timestamp,
+call create_pseudo_projection('bi', 'project_grants_data', $$
+SELECT abt.id                                                                           as transaction_id,
+       abt.project_id                                                                   as project_id,
+       abt.program_id                                                                   as program_id,
+       abt.currency_id                                                                  as currency_id,
+       abt.timestamp                                                                    as timestamp,
        date_trunc('day', abt.timestamp)                                                 as day_timestamp,
        date_trunc('week', abt.timestamp)                                                as week_timestamp,
        date_trunc('month', abt.timestamp)                                               as month_timestamp,
@@ -346,7 +347,8 @@ WHERE abt.project_id IS NOT NULL
   AND (abt.type = 'TRANSFER' OR abt.type = 'REFUND')
   AND abt.reward_id IS NULL
   AND abt.payment_id IS NULL
-GROUP BY abt.project_id,
+GROUP BY abt.id,
+         abt.project_id,
          abt.program_id,
          abt.currency_id,
          abt.timestamp,
@@ -354,22 +356,21 @@ GROUP BY abt.project_id,
          abt.amount,
          hq.usd_conversion_rate,
          prog.name
-;
+$$, 'transaction_id');
 
-create unique index bi_project_grants_data_pk on bi.m_project_grants_data (project_id, timestamp, program_id, currency_id);
-
-create index bi_project_grants_data_timestamp_idx on bi.m_project_grants_data (timestamp, project_id);
-create index bi_project_grants_data_day_timestamp_idx on bi.m_project_grants_data (day_timestamp, project_id);
-create index bi_project_grants_data_week_timestamp_idx on bi.m_project_grants_data (week_timestamp, project_id);
-create index bi_project_grants_data_month_timestamp_idx on bi.m_project_grants_data (month_timestamp, project_id);
-create index bi_project_grants_data_quarter_timestamp_idx on bi.m_project_grants_data (quarter_timestamp, project_id);
-create index bi_project_grants_data_year_timestamp_idx on bi.m_project_grants_data (year_timestamp, project_id);
-create index bi_project_grants_data_timestamp_idx_inv on bi.m_project_grants_data (project_id, timestamp);
-create index bi_project_grants_data_day_timestamp_idx_inv on bi.m_project_grants_data (project_id, day_timestamp);
-create index bi_project_grants_data_week_timestamp_idx_inv on bi.m_project_grants_data (project_id, week_timestamp);
-create index bi_project_grants_data_month_timestamp_idx_inv on bi.m_project_grants_data (project_id, month_timestamp);
-create index bi_project_grants_data_quarter_timestamp_idx_inv on bi.m_project_grants_data (project_id, quarter_timestamp);
-create index bi_project_grants_data_year_timestamp_idx_inv on bi.m_project_grants_data (project_id, year_timestamp);
+create unique index bi_project_grants_data_project_timestamp_program_currency_idx on bi.p_project_grants_data (project_id, timestamp, program_id, currency_id);
+create index bi_project_grants_data_timestamp_idx on bi.p_project_grants_data (timestamp, project_id);
+create index bi_project_grants_data_day_timestamp_idx on bi.p_project_grants_data (day_timestamp, project_id);
+create index bi_project_grants_data_week_timestamp_idx on bi.p_project_grants_data (week_timestamp, project_id);
+create index bi_project_grants_data_month_timestamp_idx on bi.p_project_grants_data (month_timestamp, project_id);
+create index bi_project_grants_data_quarter_timestamp_idx on bi.p_project_grants_data (quarter_timestamp, project_id);
+create index bi_project_grants_data_year_timestamp_idx on bi.p_project_grants_data (year_timestamp, project_id);
+create index bi_project_grants_data_timestamp_idx_inv on bi.p_project_grants_data (project_id, timestamp);
+create index bi_project_grants_data_day_timestamp_idx_inv on bi.p_project_grants_data (project_id, day_timestamp);
+create index bi_project_grants_data_week_timestamp_idx_inv on bi.p_project_grants_data (project_id, week_timestamp);
+create index bi_project_grants_data_month_timestamp_idx_inv on bi.p_project_grants_data (project_id, month_timestamp);
+create index bi_project_grants_data_quarter_timestamp_idx_inv on bi.p_project_grants_data (project_id, quarter_timestamp);
+create index bi_project_grants_data_year_timestamp_idx_inv on bi.p_project_grants_data (project_id, year_timestamp);
 
 
 
@@ -448,7 +449,7 @@ FROM projects p
          LEFT JOIN iam.users u ON u.id = pleads.user_id
          LEFT JOIN LATERAL (select distinct c.name, c.code
                             from bi.p_reward_data rd
-                                     full outer join bi.m_project_grants_data gd on gd.project_id = rd.project_id
+                                     full outer join bi.p_project_grants_data gd on gd.project_id = rd.project_id
                                      join currencies c on c.id = coalesce(rd.currency_id, gd.currency_id)
                             where rd.project_id = p.id
                                or gd.project_id = p.id) currencies on true
@@ -489,7 +490,7 @@ FROM projects p
                                                             'logoUrl', c.logo_url)                 as currency,
                                          sum(gd.amount)                                            as amount,
                                          accounting.usd_equivalent_at(sum(gd.amount), c.id, now()) as current_usd_amount
-                                  from bi.m_project_grants_data gd
+                                  from bi.p_project_grants_data gd
                                            join currencies c on c.id = gd.currency_id
                                   group by gd.project_id, c.id) gd
 
@@ -694,7 +695,7 @@ FROM bi.m_project_global_data p
 
          LEFT JOIN (select gd.project_id,
                            coalesce(sum(gd.usd_amount), 0) as total_granted_usd_amount
-                    from bi.m_project_grants_data gd
+                    from bi.p_project_grants_data gd
                     where gd.timestamp >= fromDate
                       and gd.timestamp < toDate
                     group by gd.project_id) gd on gd.project_id = p.project_id
