@@ -12,6 +12,7 @@ import onlydust.com.marketplace.api.infrastructure.project.ProjectServiceAdapter
 import onlydust.com.marketplace.api.infura.adapters.EthWeb3EnsValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.StarknetAccountValidatorAdapter;
 import onlydust.com.marketplace.api.infura.adapters.Web3EvmAccountAddressValidatorAdapter;
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.api.slack.SlackApiAdapter;
 import onlydust.com.marketplace.api.stellar.adapters.StellarAccountIdValidator;
 import onlydust.com.marketplace.api.sumsub.webhook.adapter.mapper.SumsubMapper;
@@ -136,8 +137,9 @@ public class AccountingConfiguration {
     @Bean
     public AccountingObserverPort accountingObserver(final RewardStatusUpdater rewardStatusUpdater,
                                                      final AccountingNotifier accountingNotifier,
-                                                     final AccountingTrackingNotifier accountingTrackingNotifier) {
-        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier);
+                                                     final AccountingTrackingNotifier accountingTrackingNotifier,
+                                                     final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new AccountingObserverComposite(accountingNotifier, rewardStatusUpdater, accountingTrackingNotifier, postgresBiProjectorAdapter);
     }
 
     @Bean

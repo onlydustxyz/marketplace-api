@@ -156,6 +156,9 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-21T00:00:08Z", () -> githubHelper.createPullRequest(bridge_frontend, james));
             at("2021-02-28T00:00:08Z", () -> githubHelper.createPullRequest(bridge_api, james));
 
+            projectFacadePort.refreshStats();
+            // BI regarding the following commands should be refreshed in real-time
+
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 1, STRK));
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, antho.githubUserId(), 2, STRK));
             at("2021-01-01T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, james.githubUserId(), 3, STRK));
@@ -164,7 +167,6 @@ public class ContributorDeepKpisApiIT extends AbstractMarketplaceApiIT {
             at("2021-02-10T00:00:00Z", () -> rewardHelper.create(onlyDust, pierre, abdel.githubUserId(), 5, STRK));
 
             allProgramOrEcosystemIds = String.join(",", Stream.of(universe).map(UUID::toString).toList());
-            projectFacadePort.refreshStats();
         }
 
         @Test

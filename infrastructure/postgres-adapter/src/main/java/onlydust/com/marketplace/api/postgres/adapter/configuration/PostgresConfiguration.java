@@ -451,4 +451,9 @@ public class PostgresConfiguration {
     public BiRewardDataRepository biRewardDataRepository(final EntityManager entityManager) {
         return new BiRewardDataRepository(entityManager);
     }
+
+    @Bean
+    PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository) {
+        return new PostgresBiProjectorAdapter(biRewardDataRepository);
+    }
 }
