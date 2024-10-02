@@ -25,15 +25,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @ToString
 @Immutable
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(force = true)
 @Accessors(fluent = true)
 public class UserProfileLanguagePageItemEntity {
     @Id
+    @EqualsAndHashCode.Include
     @NonNull
     UUID language_id;
-
-    @NonNull
-    String language_name;
 
     @NonNull
     Integer rank;
