@@ -46,6 +46,7 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
         private static Sponsor sponsor;
         private static Program program;
         private static ProjectId projectId;
+        private static String projectSlug;
         UserAuthHelper.AuthenticatedUser programLead;
         private static final AtomicBoolean setupDone = new AtomicBoolean();
 
@@ -57,7 +58,9 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
 
             sponsor = sponsorHelper.create(programLead);
             program = programHelper.create(sponsor.id(), programLead);
-            projectId = projectHelper.create(caller).getKey();
+            final var project = projectHelper.create(caller);
+            projectId = project.getLeft();
+            projectSlug = project.getRight();
         }
 
         @Test
@@ -65,6 +68,28 @@ public class ProjectTransactionsApiIT extends AbstractMarketplaceApiIT {
             // When
             client.get()
                     .uri(getApiURI(PROJECT_TRANSACTIONS.formatted(projectId.toString())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
+                    .exchange()
+                    // Then
+                    .expectStatus()
+                    .isOk()
+                    .expectBody()
+                    .json("""
+                            {
+                              "totalPageNumber": 0,
+                              "totalItemNumber": 0,
+                              "hasMore": false,
+                              "nextPageIndex": 0,
+                              "transactions": []
+                            }
+                            """);
+        }
+
+        @Test
+        void should_get_project_transactions_by_slug() {
+            // When
+            client.get()
+                    .uri(getApiURI(PROJECT_TRANSACTIONS.formatted(projectSlug)))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + caller.jwt())
                     .exchange()
                     // Then

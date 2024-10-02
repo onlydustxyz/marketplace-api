@@ -15,6 +15,7 @@ import onlydust.com.marketplace.api.postgres.adapter.mapper.RewardableItemMapper
 import onlydust.com.marketplace.api.postgres.adapter.repository.*;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectLeaderInvitationRepository;
 import onlydust.com.marketplace.api.postgres.adapter.repository.old.ProjectRepoRepository;
+import onlydust.com.marketplace.kernel.model.OrSlug;
 import onlydust.com.marketplace.kernel.model.ProjectId;
 import onlydust.com.marketplace.kernel.model.UserId;
 import onlydust.com.marketplace.kernel.pagination.Page;
@@ -261,7 +262,15 @@ public class PostgresProjectAdapter implements ProjectStoragePort {
     @Override
     @Transactional(readOnly = true)
     public List<UserId> getProjectLeadIds(ProjectId projectId) {
-        return projectLeadViewRepository.findProjectLeaders(projectId.value())
+        return getProjectLeadIds(OrSlug.of(projectId));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserId> getProjectLeadIds(OrSlug<ProjectId> projectIdOrSlug) {
+        return projectLeadViewRepository.findProjectLeaders(
+                        projectIdOrSlug.uuid().orElse(null),
+                        projectIdOrSlug.slug().orElse(null))
                 .stream()
                 .map(ProjectLeadQueryEntity::getId)
                 .map(UserId::of)

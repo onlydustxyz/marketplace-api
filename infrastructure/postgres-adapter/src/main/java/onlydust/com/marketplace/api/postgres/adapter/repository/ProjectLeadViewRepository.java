@@ -21,10 +21,13 @@ public interface ProjectLeadViewRepository extends JpaRepository<ProjectLeadQuer
                 ga.html_url,
                 true as has_accepted_invitation
             from iam.users u
-            join project_leads pl on pl.user_id = u.id and pl.project_id = :projectId
-            left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
+                join project_leads pl on pl.user_id = u.id
+                join projects p on p.id = pl.project_id
+                left join indexer_exp.github_accounts ga on ga.id = u.github_user_id
+            where (:projectId is not null and p.id = :projectId)
+               or (:projectSlug is not null and p.slug = :projectSlug)
             """, nativeQuery = true)
-    List<ProjectLeadQueryEntity> findProjectLeaders(UUID projectId);
+    List<ProjectLeadQueryEntity> findProjectLeaders(UUID projectId, String projectSlug);
 
     @Query(value = """
             (

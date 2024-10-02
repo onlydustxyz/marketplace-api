@@ -17,8 +17,13 @@ public class PermissionService implements PermissionPort {
     private final EcosystemStoragePort ecosystemStoragePort;
 
     @Override
+    public boolean isUserProjectLead(OrSlug<ProjectId> projectIdOrSlug, UserId projectLeadId) {
+        return projectStoragePort.getProjectLeadIds(projectIdOrSlug).contains(projectLeadId);
+    }
+
+    @Override
     public boolean isUserProjectLead(ProjectId projectId, UserId projectLeadId) {
-        return projectStoragePort.getProjectLeadIds(projectId).contains(projectLeadId);
+        return isUserProjectLead(OrSlug.of(projectId), projectLeadId);
     }
 
     @Override

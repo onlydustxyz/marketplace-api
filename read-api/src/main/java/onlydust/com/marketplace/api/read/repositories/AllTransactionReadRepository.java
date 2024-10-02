@@ -20,7 +20,7 @@ public interface AllTransactionReadRepository extends Repository<AllTransactionR
             LEFT JOIN FETCH t.reward r
             LEFT JOIN r.recipient rr
             WHERE
-                t.project.id = :projectId AND
+                (:projectId IS NOT NULL AND t.project.id = :projectId OR :projectSlug IS NOT NULL AND t.project.slug = :projectSlug) AND
                 t.payment IS NULL AND
                 (t.rewardId IS NULL OR t.rewardId IS NOT NULL AND r.id IS NOT NULL) AND
                 (:search IS NULL OR rr.login ilike '%' || CAST(:search AS String) || '%' OR t.project.name ilike '%' || CAST(:search AS String) || '%') AND
@@ -33,6 +33,7 @@ public interface AllTransactionReadRepository extends Repository<AllTransactionR
                 ))
             """)
     Page<AllTransactionReadEntity> findAllForProject(UUID projectId,
+                                                     String projectSlug,
                                                      Date fromDate,
                                                      Date toDate,
                                                      String search,

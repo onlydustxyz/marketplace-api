@@ -2119,7 +2119,7 @@ paths:
         "500":
           $ref: '#/components/responses/InternalServerError'
 
-  /api/v1/projects/{projectId}/transactions:
+  /api/v1/projects/{projectIdOrSlug}/transactions:
     get:
       security:
         - bearerAuth: [ ]
@@ -2133,10 +2133,10 @@ paths:
         Only project leaders can access this information.
       parameters:
         - in: path
-          name: projectId
+          name: projectIdOrSlug
           required: true
           schema:
-            $ref: '#/components/schemas/ProjectId'
+            type: string
         - $ref: '#/components/parameters/pageIndexParam'
         - $ref: '#/components/parameters/pageSizeParam'
         - $ref: '#/components/parameters/fromDateParam'
