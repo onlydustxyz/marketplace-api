@@ -492,10 +492,12 @@ public class PostgresConfiguration {
     PostgresBiProjectorAdapter postgresBiProjectorAdapter(final BiRewardDataRepository biRewardDataRepository,
                                                           final BiContributionDataRepository biContributionDataRepository,
                                                           final BiProjectGrantsDataRepository biProjectGrantsDataRepository,
-                                                          final BiProjectGlobalDataRepository biProjectGlobalDataRepository) {
+                                                          final BiProjectGlobalDataRepository biProjectGlobalDataRepository,
+                                                          final BiContributorGlobalDataRepository biContributorGlobalDataRepository) {
         return new PostgresBiProjectorAdapter(biRewardDataRepository,
                 biContributionDataRepository,
                 biProjectGrantsDataRepository,
-                biProjectGlobalDataRepository);
+                biProjectGlobalDataRepository,
+                biContributorGlobalDataRepository);
     }
 }

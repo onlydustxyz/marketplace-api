@@ -1,5 +1,6 @@
 package onlydust.com.marketplace.api.configuration;
 
+import onlydust.com.marketplace.api.postgres.adapter.PostgresBiProjectorAdapter;
 import onlydust.com.marketplace.kernel.port.output.IndexerPort;
 import onlydust.com.marketplace.kernel.port.output.NotificationPort;
 import onlydust.com.marketplace.kernel.port.output.OutboxConsumer;
@@ -37,7 +38,7 @@ public class UserDomainConfiguration {
     public NotificationSettingsService notificationSettingsService(final NotificationSettingsStoragePort notificationSettingsStoragePort,
                                                                    final MarketingNotificationSettingsStoragePort marketingNotificationSettingsStoragePort,
                                                                    final AppUserStoragePort appUserStoragePort) {
-        return new NotificationSettingsService(notificationSettingsStoragePort,marketingNotificationSettingsStoragePort, appUserStoragePort);
+        return new NotificationSettingsService(notificationSettingsStoragePort, marketingNotificationSettingsStoragePort, appUserStoragePort);
     }
 
     @Bean
@@ -70,8 +71,9 @@ public class UserDomainConfiguration {
 
     @Bean
     public UserObserverPort userObservers(final OutboxUserService outboxUserService,
-                                          final UserObserverPort notificationSettingsService) {
-        return new UserObserverComposite(outboxUserService, notificationSettingsService);
+                                          final UserObserverPort notificationSettingsService,
+                                          final PostgresBiProjectorAdapter postgresBiProjectorAdapter) {
+        return new UserObserverComposite(outboxUserService, notificationSettingsService, postgresBiProjectorAdapter);
     }
 
     @Bean

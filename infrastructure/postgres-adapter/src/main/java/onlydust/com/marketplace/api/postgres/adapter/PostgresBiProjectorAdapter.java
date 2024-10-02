@@ -8,22 +8,21 @@ import onlydust.com.marketplace.accounting.domain.model.SponsorAccountStatement;
 import onlydust.com.marketplace.accounting.domain.model.billingprofile.BillingProfile;
 import onlydust.com.marketplace.accounting.domain.port.out.AccountingObserverPort;
 import onlydust.com.marketplace.accounting.domain.service.AccountBookFacade;
-import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiContributionDataRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGlobalDataRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiProjectGrantsDataRepository;
-import onlydust.com.marketplace.api.postgres.adapter.repository.bi.BiRewardDataRepository;
+import onlydust.com.marketplace.api.postgres.adapter.repository.bi.*;
 import onlydust.com.marketplace.kernel.model.*;
 import onlydust.com.marketplace.project.domain.port.input.ContributionObserverPort;
 import onlydust.com.marketplace.project.domain.port.input.ProjectObserverPort;
+import onlydust.com.marketplace.user.domain.port.input.UserObserverPort;
 
 import java.util.Set;
 
 @AllArgsConstructor
-public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort {
+public class PostgresBiProjectorAdapter implements AccountingObserverPort, ContributionObserverPort, ProjectObserverPort, UserObserverPort {
     private final BiRewardDataRepository biRewardDataRepository;
     private final BiContributionDataRepository biContributionDataRepository;
     private final BiProjectGrantsDataRepository biProjectGrantsDataRepository;
     private final BiProjectGlobalDataRepository biProjectGlobalDataRepository;
+    private final BiContributorGlobalDataRepository biContributorGlobalDataRepository;
 
     @Override
     public void onSponsorAccountBalanceChanged(SponsorAccountStatement sponsorAccount) {
@@ -117,5 +116,11 @@ public class PostgresBiProjectorAdapter implements AccountingObserverPort, Contr
     @Override
     public void onProjectCategorySuggested(String categoryName, UserId userId) {
 
+    }
+
+    @Override
+    @Transactional
+    public void onUserSignedUp(AuthenticatedUser user) {
+        biContributorGlobalDataRepository.refresh(user.githubUserId());
     }
 }
