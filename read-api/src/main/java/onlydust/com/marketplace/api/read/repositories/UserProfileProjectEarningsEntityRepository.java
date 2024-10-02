@@ -12,7 +12,7 @@ public interface UserProfileProjectEarningsEntityRepository extends Repository<U
     @Query(value = """
             select r.project_id       as project_id,
                    sum(r.usd_amount)  as total_earned_usd
-            from bi.m_reward_data r
+            from bi.p_reward_data r
                 join bi.p_project_global_data p on r.project_id = p.project_id
             where r.contributor_id = :githubUserId and
                   (:ecosystemId is null or :ecosystemId = any (p.ecosystem_ids)) and

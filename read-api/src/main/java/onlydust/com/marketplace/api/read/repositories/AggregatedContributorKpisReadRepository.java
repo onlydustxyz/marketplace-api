@@ -48,7 +48,7 @@ public class AggregatedContributorKpisReadRepository {
                  aggregated_project_rewards_stats AS
                      (SELECT d.#timeGrouping#_timestamp     as timestamp,
                              coalesce(sum(d.usd_amount), 0) as total_rewarded_usd_amount
-                      from bi.m_reward_data d
+                      from bi.p_reward_data d
                       where d.#timeGrouping#_timestamp >= date_trunc(:timeGrouping, cast(:fromDate as timestamptz))
                         and d.#timeGrouping#_timestamp < date_trunc(:timeGrouping, cast(:toDate as timestamptz)) + cast(:timeGroupingInterval as interval)
                         and (coalesce(:programOrEcosystemIds) is null
